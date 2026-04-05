@@ -585,7 +585,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   .tx-step:last-child{border-bottom:none}
   .tx-step-ico{font-size:24px;margin-bottom:0;flex-shrink:0;width:40px;text-align:center}
   .tx-step-name{font-size:13px;font-weight:600}
-  .tx-step-desc{font-size:12px;margin-top:2px}
+
   .tx-step.active{
     background:var(--bg-highlight);
     border-radius:8px;
@@ -1552,7 +1552,6 @@ function mod7Content(){
   const tier3 = [
     {t:'Stanford HAI (Human-Centered AI)',p:'Stanford University',url:'https://hai.stanford.edu/',why:'Stanford\u2019s interdisciplinary AI institute. Their research, policy papers, and public lectures offer the most thoughtful analysis of AI\u2019s societal impact. The annual AI Index Report is the definitive source for understanding where AI stands globally.'},
     {t:'Stanford AI Index Report',p:'Stanford HAI',url:'https://hai.stanford.edu/ai-index',why:'The most authoritative annual report on AI progress, investment, adoption, and policy worldwide. Essential reading for understanding the big picture.'},
-    {t:'Anthropic Alignment Science Blog',p:'Anthropic',url:'https://alignment.anthropic.com/',why:'Understand how AI models are made safe and aligned with human values. Written accessibly despite covering deep technical topics. Gives you insight into the \u201cwhy\u201d behind AI tool behavior.'},
     {t:'MCP GitHub Organization',p:'Model Context Protocol',url:'https://github.com/modelcontextprotocol',why:'The source code and documentation for MCP \u2014 the open protocol that lets AI tools connect to external systems. Understanding MCP conceptually helps you understand where AI integration is heading.'},
     {t:'MCP on Wikipedia',p:'Wikipedia',url:'https://en.wikipedia.org/wiki/Model_Context_Protocol',why:'A well-maintained, accessible overview of MCP\u2019s architecture, adoption by major AI providers, and significance as an open standard.'}
   ];
@@ -2408,7 +2407,7 @@ const GLOSSARY = [
   {term:'Gradient Descent',cat:'ML Fundamentals',def:'An optimization algorithm that iteratively adjusts model weights in the direction that reduces error. Like walking downhill in a landscape of possible weight values to find the lowest point (minimum error).',why:'This is literally how models "learn" \u2014 they follow gradients toward better predictions. Every trained model you use was optimized by gradient descent.',rel:['Backpropagation','Learning Rate','Loss Function']},
   {term:'Learning Rate',cat:'ML Fundamentals',def:'A hyperparameter controlling how much to adjust weights at each training step. Too high = training is unstable and overshoots. Too low = training is extremely slow or gets stuck.',why:'One of the most critical settings in model training \u2014 it determines whether training converges successfully at all.',rel:['Gradient Descent','Training','Weights']},
   {term:'Loss Function',cat:'ML Fundamentals',def:'A mathematical formula measuring how wrong the model\u2019s predictions are compared to the actual correct answers. Training aims to minimize this value through gradient descent.',why:'The loss function is the model\u2019s report card \u2014 lower loss means better predictions. When people say a model is "training well," they mean the loss is decreasing.',rel:['Backpropagation','Gradient Descent','Training']},
-  {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task (like general language understanding) and adapting it for a different but related task (like classifying support tickets), leveraging previously learned patterns.',why:'This is why fine-tuning works \u2014 the model transfers its general knowledge to your specific domain rather than learning everything from scratch.',rel:['Fine-Tuning','Training','Pre-training']},
+  {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task (like general language understanding) and adapting it for a different but related task (like classifying support tickets), leveraging previously learned patterns.',why:'This is why fine-tuning works \u2014 the model transfers its general knowledge to your specific domain rather than learning everything from scratch.',rel:['Fine-Tuning','Training']},
   {term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that can create new content \u2014 text, images, audio, video, code \u2014 rather than just classifying or analyzing.',why:'The category of AI you interact with most directly. Every AI writing tool is GenAI.',rel:['LLM','Diffusion Model']},
   {term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative AI model trained on massive text datasets to understand and generate human language. Examples: Claude, GPT, Gemini.',why:'The specific technology powering the AI writing and editing tools you use daily.',rel:['Generative AI','Transformer','Token']},
   {term:'Transformer',cat:'GenAI',def:'The neural network architecture introduced in 2017 that powers virtually all modern LLMs. Key innovation: the attention mechanism.',why:'Understanding transformers helps you understand LLM strengths and limitations.',rel:['Attention Mechanism','LLM']},
@@ -2463,7 +2462,7 @@ const GLOSSARY = [
   {term:'Reflection (Agents)',cat:'Agents',def:'An agent\u2019s ability to evaluate its own intermediate outputs, identify problems or gaps, and decide whether to revise, retry with a different approach, or proceed to the next step.',why:'Self-reflection improves agent reliability, similar to how a good writer reviews their own draft before submitting it.',rel:['Agent Loop','Constitutional AI']},
   {term:'Tool Orchestration',cat:'Agents',def:'An agent\u2019s ability to select, sequence, and coordinate multiple tools to accomplish a complex task \u2014 search first, then analyze, then draft, then verify.',why:'Orchestration is what makes agents powerful. Combining search, code execution, document retrieval, and generation into a coherent workflow multiplies each tool\u2019s value.',rel:['Agent','Function Calling / Tool Use','MCP']},
   {term:'Working Memory (Agents)',cat:'Agents',def:'The accumulated context an agent maintains across subtasks within a single run, storing intermediate results, decisions, and findings for reference by later steps.',why:'Working memory is why agents can build on earlier steps \u2014 and why they struggle with very long, complex tasks that exceed their memory capacity.',rel:['Agent Loop','Context Window']},
-  {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI output reflecting imbalances in training data, design, or evaluation.',why:'AI content may inadvertently favor certain perspectives or use non-inclusive language.',rel:['Training Data','Fairness']},
+  {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI output reflecting imbalances in training data, design, or evaluation.',why:'AI content may inadvertently favor certain perspectives or use non-inclusive language.',rel:['Training Data']},
   {term:'Alignment',cat:'Ethics',def:'The goal of ensuring AI systems behave in accordance with human values and intentions.',why:'Alignment research is why modern AI tools are generally helpful and safe.',rel:['RLHF','Guardrails']},
   {term:'Guardrails',cat:'Ethics',def:'Built-in restrictions preventing AI from generating harmful, illegal, or inappropriate content.',why:'Guardrails protect you and your organization from publishing problematic content.',rel:['Alignment','Safety']},
   {term:'Red-Teaming',cat:'Ethics',def:'Deliberately trying to make AI fail or bypass safety measures to identify vulnerabilities.',why:'Understanding red-teaming explains why AI tools sometimes seem overly cautious.',rel:['Guardrails']},
@@ -2566,33 +2565,47 @@ function showFinalAssessment(){
 }
 
 function scoreFinal(){
-  let correct = 0;
   const total = 15;
-  for(let i=0;i<total;i++){
+  let firstUnanswered = null;
+  for(let i = 0; i < total; i++){
     const qid = `final-q${i}`;
     if(!quizStates[qid]){
-      const card = document.getElementById('qc-'+qid);
-      if(card){
-        const btn = document.getElementById('btn-'+qid);
-        if(btn && !btn.disabled) btn.click();
-        else {
-          const opts = card.querySelectorAll('.quiz-opt');
-          if(opts.length) { opts[0].click(); setTimeout(()=>btn.click(),10); }
-        }
+      const card = document.getElementById('qc-' + qid);
+      const selected = card ? card.querySelector('.quiz-opt.selected') : null;
+      if(!selected){
+        if(!firstUnanswered) firstUnanswered = card;
       }
     }
   }
-  setTimeout(()=>{
-    for(let i=0;i<total;i++){
-      const card = document.getElementById('qc-final-q'+i);
+  if(firstUnanswered){
+    firstUnanswered.scrollIntoView({behavior:'smooth', block:'center'});
+    firstUnanswered.style.boxShadow = '0 0 0 3px var(--warning)';
+    setTimeout(() => firstUnanswered.style.boxShadow = '', 2000);
+    const answered = total - document.querySelectorAll('#main-content .quiz-card:not(.correct):not(.incorrect)').length;
+    const unansweredWithSelection = document.querySelectorAll('#main-content .quiz-card:not(.correct):not(.incorrect) .quiz-opt.selected').length;
+    const remaining = total - Object.keys(quizStates).filter(k => k.startsWith('final-')).length - unansweredWithSelection;
+    alert('Please answer all 15 questions before calculating your score. Scroll through to find any you missed.');
+    return;
+  }
+  for(let i = 0; i < total; i++){
+    const qid = `final-q${i}`;
+    if(!quizStates[qid]){
+      const btn = document.getElementById('btn-' + qid);
+      if(btn && !btn.disabled) btn.click();
+    }
+  }
+  setTimeout(() => {
+    let correct = 0;
+    for(let i = 0; i < total; i++){
+      const card = document.getElementById('qc-final-q' + i);
       if(card && card.classList.contains('correct')) correct++;
     }
     const el = document.getElementById('final-score');
     let cls, msg;
-    if(correct >= 12){ cls='excellent'; msg='Excellent! You\'ve built a strong AI foundation.'; }
-    else if(correct >= 8){ cls='good'; msg='Good progress! Review the modules where you missed questions.'; }
-    else { cls='keep'; msg='Keep learning! Revisit the modules and try again.'; }
-    el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div></div>`;
+    if(correct >= 12){ cls = 'excellent'; msg = "Excellent! You've built a strong AI foundation."; }
+    else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
+    else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
+    el.innerHTML = '<div class="score-banner ' + cls + '"><div class="score-num">' + correct + ' / ' + total + '</div><div class="score-msg">' + msg + '</div></div>';
     el.scrollIntoView({behavior:'smooth'});
   }, 200);
 }
