@@ -140,7 +140,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 
 .deeper{margin:16px 0;border-left:3px solid var(--accent-light);padding-left:16px}
 .deeper summary{font-size:14px;font-weight:600;color:var(--accent);cursor:pointer;padding:8px 0;list-style:none;display:flex;align-items:center;gap:6px}
-.deeper summary::before{content:'\u25B6';font-size:10px;transition:transform .2s}
+.deeper summary::before{content:'▶';font-size:10px;transition:transform .2s}
 .deeper[open] summary::before{transform:rotate(90deg)}
 .deeper summary::-webkit-details-marker{display:none}
 .deeper-body{font-size:14px;color:var(--tx-secondary);line-height:1.7;padding:8px 0}
@@ -844,7 +844,11 @@ var MOD7_QUIZ_POOL = [
 
 /* ══ MODULE 1: UNDER THE HOOD ══ */
 function mod1Content(){
-  return '<div class="sec-title">Neural Network Layers \u2014 Visual Walkthrough</div>'+
+  return '<div class="card"><div class="card-text" style="line-height:1.8">'+
+  '<p>AI-101 showed you what AI does. This module shows you how it works \u2014 at a level that helps you predict when AI will succeed and when it will fail. You won\u2019t need to understand the math, but you will understand why models hallucinate, why bigger models cost more, why some models handle images while others don\u2019t, and why the same prompt produces different results across models.</p>'+
+  '<p style="margin-top:10px">The four sections below build on each other: neural network layers show how data flows through a model, the attention mechanism explains why Transformers revolutionized AI, the training pipeline traces how a model goes from random noise to useful assistant, and multi-modal processing explains how models handle text, images, and audio through the same architecture. Understanding these mechanics gives you the mental model to make better decisions about which tools to use and how to use them.</p>'+
+  '</div></div>'+
+  '<div class="sec-title">Neural Network Layers \u2014 Visual Walkthrough</div>'+
   '<div class="sim-area sim-focusable" tabindex="0" data-sim="tx">'+
     '<p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Step through each layer of a neural network to see how data flows from input to output. Use the controls or arrow keys.</p>'+
     '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">'+
@@ -885,6 +889,8 @@ function mod1Content(){
     '<div class="callout" style="margin-top:16px">Before Transformers (2017), neural networks processed text sequentially \u2014 word by word, left to right. By word 500, it had largely forgotten word 1. The attention mechanism changed everything by allowing every word to directly \u201clook at\u201d every other word simultaneously, regardless of distance. This is why modern LLMs can understand that a pronoun on page 10 refers to a noun introduced on page 1.</div>'+
   '</div>'+
 
+  '<div class="callout"><strong>Why this matters for your work:</strong> Understanding the training pipeline explains three things you encounter daily: (1) why models have knowledge cutoff dates \u2014 training data has a collection deadline, (2) why models sometimes produce biased output \u2014 bias in training data propagates to outputs, and (3) why fine-tuned models behave differently from base models \u2014 they\u2019ve been through additional training with specific objectives.</div>'+
+
   '<div class="sec-title">The Training Pipeline</div>'+
   '<div class="flow-box sim-focusable" tabindex="0" data-sim="flow-training" id="training-flow-box">'+
     '<div class="flow-ctrl">'+
@@ -919,10 +925,20 @@ function mod1Content(){
   '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
     '<div class="case-title">Why the Same Prompt Produces Different Results Across Models</div>'+
     '<dl class="case-body">'+
-      '<dt>Situation</dt><dd>A tech writer sends the identical prompt to Claude, ChatGPT, and Gemini: \u201cSummarize this API changelog for product managers.\u201d Each produces a noticeably different output \u2014 different length, tone, structure, and even factual emphasis.</dd>'+
-      '<dt>Why This Happens</dt><dd>Each model was trained on different data mixtures, fine-tuned with different instruction sets, and optimized with different RLHF preferences. Claude\u2019s training emphasizes nuance and caution; GPT tends toward expansive, confident responses; Gemini leverages Google\u2019s search integration for recency. Additionally, each platform adds its own system prompt that shapes behavior before your prompt even arrives.</dd>'+
-      '<dt>What to Do</dt><dd>Don\u2019t assume one model is \u201cbetter.\u201d Instead, match the model to the task: use the model that produces the best output for your specific content type. Develop a brief \u201cmodel comparison\u201d habit: try important prompts across 2-3 models and compare results. Over time, you\u2019ll develop intuition for which model excels at which task.</dd>'+
-      '<dt>Takeaway</dt><dd>Choosing the right model for the task matters as much as writing a good prompt. Results should be evaluated per-model, not assumed to be universal.</dd>'+
+      '<dt>Situation</dt>'+
+      '<dd>A tech writer at a B2B software company sends the identical prompt to Claude, ChatGPT, and Gemini: \u201cSummarize this API changelog for product managers. Focus on user-facing impact.\u201d Each model produces a noticeably different output \u2014 different length, tone, structure, and factual emphasis. The writer assumed all models would produce similar results from the same input.</dd>'+
+      '<dt>Context</dt>'+
+      '<dd>The team had been using ChatGPT exclusively. When management approved a Claude Team subscription, the writer tested both models with existing prompts. Prompts optimized for ChatGPT\u2019s style (expansive, confident) produced verbose output from Claude, while Claude\u2019s preference for nuanced, qualified language felt \u201cwishy-washy\u201d compared to what the team was used to.</dd>'+
+      '<dt>What They Discovered</dt>'+
+      '<dd>Each model was trained on different data, fine-tuned with different instruction sets, and optimized with different RLHF preferences. Specifically:'+
+      '<p style="margin-top:8px"><strong>Claude</strong> emphasized accuracy and qualification \u2014 it flagged uncertain claims with hedging language and structured output in clear sections, but was more conservative about stating benefits without evidence from the changelog.</p>'+
+      '<p style="margin-top:8px"><strong>ChatGPT</strong> was more expansive \u2014 it added context beyond the changelog, used more marketing-friendly language, and produced longer output. However, it occasionally added implications not directly stated in the source material.</p>'+
+      '<p style="margin-top:8px"><strong>Gemini</strong> was the most concise and leveraged Google\u2019s ecosystem by cross-referencing public documentation, but had lower style compliance with the team\u2019s specific formatting standards.</p>'+
+      '<p style="margin-top:8px">Additionally, each platform\u2019s system prompt shaped behavior before the writer\u2019s prompt even arrived \u2014 Claude\u2019s system prompt emphasizes helpfulness and accuracy, while ChatGPT\u2019s emphasizes engagement and thoroughness.</p></dd>'+
+      '<dt>What They Changed</dt>'+
+      '<dd>(1) They stopped assuming prompts are model-portable \u2014 a prompt optimized for one model needs adjustment for another. (2) They created model-specific prompt variants for their top 10 templates. (3) They matched models to task types: Claude for technical accuracy (API docs, specs), ChatGPT for creative flexibility (blog drafts, marketing), and Gemini for long-document processing.</dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) \u201cBest model\u201d depends entirely on what you\u2019re optimizing for \u2014 accuracy, creativity, speed, or cost produce different winners. (2) Prompts are not model-portable without adjustment; a prompt that works brilliantly in Claude may underperform in ChatGPT and vice versa. (3) The model that \u201cfeels best\u201d in casual use is not necessarily the model that scores best on your specific tasks \u2014 systematic evaluation reveals this. (4) Using 2-3 models for different task types is pragmatic, not wasteful. (5) Re-evaluate model assignments quarterly \u2014 capabilities shift rapidly with each provider\u2019s updates.</dd>'+
     '</dl></div>'+
 
   renderQuiz('mod1', pickRandom(MOD1_QUIZ_POOL, 5));
@@ -930,7 +946,13 @@ function mod1Content(){
 
 /* ══ MODULE 2: THE AI ECOSYSTEM ══ */
 function mod2Content(){
-  return '<div class="sec-title">The AI Technology Stack</div>'+
+  return '<div class="card"><div class="card-text" style="line-height:1.8">'+
+  '<p>The AI landscape in 2025\u20132026 looks simple on the surface \u2014 ChatGPT, Claude, Gemini, Copilot \u2014 but beneath each product is a stack of technologies, business models, and tradeoffs that directly affect your work. Choosing the wrong model for a task doesn\u2019t just produce poor output \u2014 it wastes time, money, and trust. Understanding the ecosystem means making informed decisions instead of defaulting to whatever tool was mentioned last.</p>'+
+  '<p style="margin-top:10px">The stack has four layers, and most confusion comes from conflating them. The <strong>model layer</strong> is the trained neural network (GPT-4, Claude Opus, Gemini Pro). The <strong>API layer</strong> provides programmatic access to the model with specific parameters, pricing, and rate limits. The <strong>application layer</strong> is what end users interact with \u2014 ChatGPT is an application built on GPT models, Claude.ai is an application built on Claude models. The <strong>integration layer</strong> connects AI to your specific tools and data \u2014 MCP servers, RAG pipelines, custom workflows. Each layer has different vendors, pricing, and tradeoffs.</p>'+
+  '<p style="margin-top:10px">The most important distinction for content professionals: <strong>open-source vs. proprietary</strong>. Proprietary models (Claude, GPT, Gemini) offer the highest capability, managed infrastructure, and continuous updates \u2014 but your data goes to external servers and you depend on the vendor\u2019s pricing and policies. Open-source models (Llama, Mistral, Qwen) offer full control, data privacy, and no per-token costs \u2014 but require technical expertise to deploy and generally lag behind proprietary models on the hardest tasks. Most content teams use proprietary APIs for daily work and consider open-source for specific use cases requiring data sensitivity.</p>'+
+  '</div></div>'+
+
+  '<div class="sec-title">The AI Technology Stack</div>'+
   '<div class="sim-area">'+
     '<p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Understanding the four layers helps you see why the same model behaves differently in different applications.</p>'+
     '<svg viewBox="0 0 700 320" style="width:100%;max-width:700px;display:block;margin:0 auto">'+
@@ -957,7 +979,7 @@ function mod2Content(){
       '<tr><td><strong>Accessibility</strong></td><td>Web UI + API; easy to start</td><td>Requires setup; self-hosting or third-party</td></tr>'+
       '<tr><td><strong>Cost</strong></td><td>Per-token pricing; scales with usage</td><td>Free model weights; you pay for compute</td></tr>'+
       '<tr><td><strong>Control</strong></td><td>Limited \u2014 provider sets guardrails</td><td>Full control over behavior and limits</td></tr>'+
-      '<tr><td><strong>Customization</strong></td><td>System prompts only; no model changes</td><td>Full fine-tuning, RLHF, architecture changes</td></tr>'+
+      '<tr><td><strong>Customization</strong></td><td>System prompts + API fine-tuning available (OpenAI, Google, Anthropic all offer fine-tuning); no architecture changes</td><td>Full fine-tuning, RLHF, architecture changes, weight modification</td></tr>'+
       '<tr><td><strong>Privacy</strong></td><td>Data sent to provider\u2019s servers</td><td>Runs on your infrastructure; data stays local</td></tr>'+
       '<tr><td><strong>Performance</strong></td><td>Generally best-in-class for top tiers</td><td>Competitive; smaller models for specific tasks</td></tr>'+
       '<tr><td><strong>Support</strong></td><td>Enterprise SLAs, documentation, SDKs</td><td>Community-driven; no guaranteed support</td></tr>'+
@@ -977,6 +999,23 @@ function mod2Content(){
       '<tr><td><strong>Best For</strong></td><td>Complex analysis, content review</td><td>General tasks, creative writing</td><td>Research, multi-modal, long docs</td><td>Office workflows, coding</td></tr>'+
     '</tbody></table></div>'+
 
+  '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
+    '<div class="case-title">Choosing the Right Model: How a Content Team Evaluated 4 Platforms</div>'+
+    '<dl class="case-body">'+
+      '<dt>Situation</dt>'+
+      '<dd>A 10-person content team was using ChatGPT Plus individual accounts. Management asked them to standardize on one enterprise platform. The team needed to evaluate Claude, ChatGPT Enterprise, Gemini, and Copilot for their specific workflow: API documentation, knowledge base articles, and release notes.</dd>'+
+      '<dt>Evaluation Method</dt>'+
+      '<dd>They created a benchmark of 30 representative tasks across their three content types. Each task had a \u201cgold standard\u201d output (human-written, editor-approved). They ran all 30 tasks through each platform and scored outputs on 4 dimensions: factual accuracy (does it match the source spec?), style compliance (does it follow their style guide?), completeness (does it cover all required sections?), and edit distance (how much human editing is needed?).'+
+      '<p style="margin-top:8px">They tracked time-to-first-draft, editing time, and total cost per task for each platform over a 2-week evaluation period.</p></dd>'+
+      '<dt>Results</dt>'+
+      '<dd>Claude scored highest on accuracy (92%) and style compliance (89%) for their technical documentation tasks. GPT-4 scored highest on creative flexibility for marketing-adjacent content. Gemini had the fastest response times but lower style compliance. Copilot was best for in-editor suggestions but weakest for standalone content generation.'+
+      '<p style="margin-top:8px">The surprise finding: the platform that \u201cfelt best\u201d in casual use (ChatGPT) wasn\u2019t the platform that scored best on their specific tasks (Claude). Without systematic evaluation, they would have chosen based on familiarity rather than fit.</p></dd>'+
+      '<dt>Decision</dt>'+
+      '<dd>They standardized on Claude Team for documentation and knowledge base work (primary workload, 80% of tasks) and kept ChatGPT access for brainstorming and marketing content (20% of tasks). Total cost was lower than 10 individual ChatGPT Plus subscriptions.</dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) Evaluate on YOUR tasks, not on generic benchmarks \u2014 model rankings vary by use case. (2) \u201cBest model\u201d depends on what you\u2019re measuring \u2014 accuracy, speed, cost, and style compliance produce different winners. (3) Most teams don\u2019t need to pick just one \u2014 using 2 platforms for different task types is pragmatic. (4) Enterprise plans are usually cheaper than multiple individual subscriptions and provide better security, admin controls, and usage analytics. (5) Re-evaluate quarterly \u2014 model capabilities change rapidly and last quarter\u2019s winner may not be this quarter\u2019s.</dd>'+
+    '</dl></div>'+
+
   '<details class="deeper"><summary>Deeper Dive: When to Use Which Model</summary><div class="deeper-body">'+
     '<p>Not every task needs the most powerful (and expensive) model. Here\u2019s a practical decision framework:</p>'+
     '<p style="margin-top:10px"><strong>Small, fast tasks</strong> (grammar check, quick summary, format conversion): Use smaller/faster models like Claude Haiku, GPT-4o mini, or Gemini Flash. They\u2019re cheaper, faster, and more than capable for routine work. Running every spell-check through a frontier model is like driving a Ferrari to the mailbox.</p>'+
@@ -991,7 +1030,12 @@ function mod2Content(){
 
 /* ══ MODULE 3: ADVANCED PROMPT ENGINEERING ══ */
 function mod3Content(){
-  return '<div class="sec-title">Few-Shot Prompting</div>'+
+  return '<div class="card"><div class="card-text" style="line-height:1.8">'+
+  '<p>AI-101 covered the six components of a good prompt. This module gives you the advanced techniques that separate adequate prompts from expert-level prompts. The difference matters: a basic prompt might produce a serviceable first draft, but an advanced prompt using few-shot examples, chain-of-thought reasoning, and prompt chaining produces output that requires minimal editing and catches issues a basic prompt misses entirely.</p>'+
+  '<p style="margin-top:10px">The techniques below are ordered by impact. Few-shot prompting (showing examples) is the single most effective technique for consistency. Chain-of-thought prompting (forcing step-by-step reasoning) is the most effective for accuracy. System prompt design gives you persistent control over AI behavior. Prompt chaining breaks complex tasks into manageable steps. And structured output ensures results feed cleanly into your downstream workflows.</p>'+
+  '<p style="margin-top:10px">You don\u2019t need all of these for every prompt. But knowing when to reach for each one \u2014 and combining them when needed \u2014 is what turns AI from a drafting assistant into a reliable production tool.</p>'+
+  '</div></div>'+
+  '<div class="sec-title">Few-Shot Prompting</div>'+
   '<div class="card"><div class="card-text" style="line-height:1.8">'+
     '<p>Few-shot prompting provides the AI with examples of the desired input-output pattern before your actual request. Instead of describing what you want, you <em>show</em> it. This is one of the most powerful techniques for getting consistent, high-quality output.</p>'+
     '<p style="margin-top:12px"><strong>Example \u2014 Without few-shot:</strong> \u201cConvert this changelog to a release note.\u201d \u2192 Generic, inconsistent formatting.</p>'+
@@ -1031,6 +1075,7 @@ function mod3Content(){
   '</div>'+
 
   '<div class="sec-title">Prompt Chaining</div>'+
+  '<div class="callout success"><strong>The #1 advanced technique:</strong> If you learn only one thing from this module, make it prompt chaining. Breaking a complex task into sequential focused steps \u2014 where each step\u2019s output feeds the next \u2014 will improve your output quality more than any other technique. A 5-step chain with simple prompts outperforms a single complex prompt almost every time.</div>'+
   '<p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Breaking complex tasks into sequential, focused prompts produces dramatically better results than a single monolithic prompt.</p>'+
   '<div class="flow-box sim-focusable" tabindex="0" data-sim="flow-chain" id="chain-flow-box">'+
     '<div class="flow-ctrl">'+
@@ -1064,18 +1109,35 @@ function mod3Content(){
   '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
     '<div class="case-title">From One Prompt to Four: How Chaining Transformed a Review Workflow</div>'+
     '<dl class="case-body">'+
-      '<dt>Situation</dt><dd>A content team asked AI to \u201creview this 20-page spec for accuracy and style.\u201d The AI produced vague feedback: \u201cThe document is well-structured with minor style inconsistencies.\u201d</dd>'+
-      '<dt>Improvement</dt><dd>They broke the review into a 4-step chain: extract claims, verify against source, check style guide compliance, and synthesize findings.</dd>'+
-      '<dt>Result</dt><dd>The chain identified 12 factual discrepancies, 8 style violations, and 5 missing sections \u2014 compared to \u201cminor inconsistencies\u201d from the single prompt.</dd>'+
-      '<dt>Takeaway</dt><dd>Prompt chaining produces qualitatively better results because each step has a focused objective. The AI doesn\u2019t have to juggle multiple evaluation criteria simultaneously.</dd>'+
+      '<dt>Situation</dt>'+
+      '<dd>A content team asked AI to \u201creview this 20-page product specification for accuracy and style.\u201d The AI returned vague, unhelpful feedback: \u201cThe document is generally well-structured with minor style inconsistencies in sections 3 and 7. Consider reviewing technical terminology for consistency.\u201d The team had no actionable items \u2014 just hand-waving.</dd>'+
+      '<dt>Context</dt>'+
+      '<dd>The spec covered a major API update with 40+ endpoint changes, new error codes, and revised rate limits. A single-prompt review was asking the model to simultaneously track factual accuracy across 40 endpoints, check style guide compliance, verify completeness against the engineering changelog, and produce a coherent summary \u2014 too many objectives competing for attention within one pass.</dd>'+
+      '<dt>Approach</dt>'+
+      '<dd>They broke the review into a 4-step prompt chain, with each step focused on a single objective:'+
+      '<p style="margin-top:8px"><strong>Step 1 \u2014 Extract Claims:</strong> \u201cRead this draft and list every factual claim, technical specification, and numerical value as a numbered list. Do not evaluate \u2014 just extract.\u201d This produced a list of 67 verifiable claims.</p>'+
+      '<p style="margin-top:8px"><strong>Step 2 \u2014 Cross-Reference:</strong> \u201cFor each claim in the list above, search the attached engineering changelog. Mark each as CONFIRMED, CONTRADICTED, or NOT FOUND. Include the changelog section for confirmed/contradicted items.\u201d This identified 12 contradicted claims and 8 claims with no source.</p>'+
+      '<p style="margin-top:8px"><strong>Step 3 \u2014 Style Review:</strong> \u201cNow review the original draft for style guide compliance: active voice, present tense, no jargon, headers for each section, bullet points for lists. Flag each violation with the specific rule broken.\u201d This found 8 style violations.</p>'+
+      '<p style="margin-top:8px"><strong>Step 4 \u2014 Synthesize:</strong> \u201cCreate a review summary with three sections: Critical Issues (contradicted facts), Style Fixes (violations), and Missing Coverage (sections in the changelog with no corresponding documentation). Prioritize by severity.\u201d</p></dd>'+
+      '<dt>Results</dt>'+
+      '<dd>(1) The 4-step chain identified 12 factual discrepancies, 8 style violations, and 5 missing sections \u2014 compared to \u201cminor inconsistencies\u201d from the single prompt. (2) Total processing time: ~8 minutes across all 4 steps, compared to ~2 minutes for the single useless prompt. (3) The review caught a critical error: the spec listed rate limits from the previous API version, not the new one \u2014 an error that would have caused customer-facing documentation to be wrong. (4) The team adopted this chain as their standard review workflow.</dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) A single prompt asking for multiple types of analysis produces shallow results on all dimensions. Each step in a chain gets the model\u2019s full attention. (2) Separating extraction from evaluation prevents the model from skipping claims it \u201cthinks\u201d are obviously correct. (3) The chain\u2019s total cost (4 API calls) was trivial compared to the cost of publishing a spec with wrong rate limits. (4) Not every task needs chaining \u2014 simple tasks with one objective work fine in a single prompt. Chain when the task has distinct subtasks that benefit from focused attention.</dd>'+
     '</dl></div>'+
+
+  '<div class="callout warning"><strong>When NOT to chain:</strong> Don\u2019t chain simple tasks. If a single prompt reliably produces good output, adding steps adds latency and cost without improving quality. Chain when: (1) the task has clearly distinct subtasks, (2) a single prompt produces inconsistent results, or (3) you need different \u201cexpertise\u201d at different stages (e.g., factual extraction vs. style review).</div>'+
 
   renderQuiz('mod3', pickRandom(MOD3_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 4: RAG, MCP & TOOL USE ══ */
 function mod4Content(){
-  return '<div class="sec-title">RAG Pipeline \u2014 How AI Searches Your Documents</div>'+
+  return '<div class="card"><div class="card-text" style="line-height:1.8">'+
+  '<p>RAG and MCP solve the same fundamental problem from different angles: <strong>how do you give AI access to information it wasn\u2019t trained on?</strong> RAG does it by retrieving documents and injecting them into the prompt as context. MCP does it by giving AI the ability to call tools that access external systems in real time. In practice, most production AI systems use both \u2014 RAG for document-based knowledge and MCP/function calling for live data and actions.</p>'+
+  '<p style="margin-top:10px">Understanding these technologies matters even if you never build them yourself. When your organization deploys an AI-powered knowledge base, RAG is what determines whether it gives accurate answers or hallucinates. When Claude connects to your Jira, Confluence, or Google Drive, MCP is the protocol making that possible. Knowing how they work helps you diagnose problems (\u201cWhy does the chatbot keep giving outdated answers?\u201d \u2014 probably a retrieval or chunking issue) and set realistic expectations (\u201cCan AI answer questions about last week\u2019s meeting?\u201d \u2014 only if the meeting notes are in the retrieval corpus).</p>'+
+  '</div></div>'+
+
+  '<div class="sec-title">RAG Pipeline \u2014 How AI Searches Your Documents</div>'+
   '<div class="card" style="margin-bottom:16px"><div class="card-text">RAG (Retrieval-Augmented Generation) grounds AI responses in your actual documents rather than relying solely on training data. This dramatically reduces hallucination and enables AI to answer questions about your organization\u2019s specific content.</div></div>'+
   '<div class="flow-box sim-focusable" tabindex="0" data-sim="flow-rag" id="rag-flow-box">'+
     '<div class="flow-ctrl">'+
@@ -1090,6 +1152,8 @@ function mod4Content(){
     '<div class="flow-detail" id="flow-detail-rag"></div>'+
     '<div class="kb-hint">Click here, then use <kbd>\u25C0</kbd> <kbd>\u25B6</kbd> arrow keys to navigate</div>'+
   '</div>'+
+
+  '<div class="callout warning"><strong>The #1 RAG failure:</strong> When a RAG system gives wrong answers, the problem is almost always retrieval, not generation. The LLM faithfully answers based on whatever documents were retrieved. If the wrong documents were retrieved \u2014 because of poor chunking, weak embeddings, or a query that doesn\u2019t match the document vocabulary \u2014 the LLM confidently generates a wrong answer grounded in irrelevant context. Always diagnose retrieval quality first.</div>'+
 
   '<div class="sec-title">MCP \u2014 How AI Connects to Your Tools</div>'+
   '<div class="card" style="margin-bottom:16px"><div class="card-text">MCP (Model Context Protocol) is an open standard by Anthropic that standardizes how AI applications connect to external tools and data sources. Think of it as USB-C for AI \u2014 one universal connector instead of a different cable for every device.</div></div>'+
@@ -1106,6 +1170,8 @@ function mod4Content(){
     '<div class="flow-detail" id="flow-detail-mcp"></div>'+
     '<div class="kb-hint">Click here, then use <kbd>\u25C0</kbd> <kbd>\u25B6</kbd> arrow keys to navigate</div>'+
   '</div>'+
+
+  '<div class="callout"><strong>MCP vs. function calling:</strong> Function calling is model-specific (Claude\u2019s tool use, GPT\u2019s function calling). MCP is protocol-level \u2014 build one MCP server for Jira, and it works with any MCP-compatible AI client. Think of function calling as teaching one specific AI to use a tool, and MCP as building a universal adapter that any AI can plug into.</div>'+
 
   '<div class="sec-title">Function Calling vs. MCP</div>'+
   '<div class="comparator">'+
@@ -1125,10 +1191,19 @@ function mod4Content(){
   '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
     '<div class="case-title">How RAG Eliminated 90% of Hallucinations in a Knowledge Base Bot</div>'+
     '<dl class="case-body">'+
-      '<dt>Situation</dt><dd>A support team deployed a chatbot using a vanilla LLM to answer customer questions. Within a week, customers reported receiving confident but incorrect answers about product features, pricing, and policies.</dd>'+
-      '<dt>Root Cause</dt><dd>The LLM was answering from its general training data, not from the company\u2019s actual documentation. It hallucinated product features that didn\u2019t exist and quoted pricing from competitors.</dd>'+
-      '<dt>Solution</dt><dd>Implemented RAG: all support articles, product docs, and policy documents were chunked, embedded, and stored in a vector database. The chatbot now retrieves relevant documents before generating each response.</dd>'+
-      '<dt>Result</dt><dd>Hallucination rate dropped from ~30% to ~3%. When the bot doesn\u2019t find relevant documentation, it now says \u201cI couldn\u2019t find this information in our docs \u2014 please contact support\u201d instead of guessing.</dd>'+
+      '<dt>Situation</dt>'+
+      '<dd>A support team at a SaaS company deployed a customer-facing chatbot using a vanilla LLM (no retrieval, no grounding). Within the first week, the support team received 23 customer complaints about incorrect answers \u2014 the bot confidently stated product features that didn\u2019t exist, quoted pricing from competitors as if it were the company\u2019s own, and fabricated integration capabilities.</dd>'+
+      '<dt>Context</dt>'+
+      '<dd>The chatbot was answering from the LLM\u2019s general training data, which included information about many SaaS products. It had no access to the company\u2019s actual documentation, pricing pages, or feature lists. When a customer asked \u201cDoes your platform support SSO?\u201d, the bot answered based on what SaaS platforms generally support \u2014 not what this specific product actually offered. The team initially blamed \u201cAI hallucination\u201d but the real problem was architecture: the bot had no source of truth.</dd>'+
+      '<dt>Approach</dt>'+
+      '<dd>They implemented a RAG pipeline in three phases:'+
+      '<p style="margin-top:8px"><strong>Phase 1 \u2014 Document ingestion:</strong> All support articles (340 documents), product documentation (120 pages), pricing pages, and policy documents were chunked into ~500-token segments, embedded using a text embedding model, and stored in a vector database.</p>'+
+      '<p style="margin-top:8px"><strong>Phase 2 \u2014 Retrieval integration:</strong> Every customer query now triggers a similarity search against the vector database. The top 5 most relevant document chunks are retrieved and injected into the prompt as context, along with the instruction: \u201cAnswer the customer\u2019s question using ONLY the provided documentation. If the answer is not in the documentation, say: I couldn\u2019t find this in our docs \u2014 please contact support at [email].\u201d</p>'+
+      '<p style="margin-top:8px"><strong>Phase 3 \u2014 Iterative tuning:</strong> They monitored retrieval quality for 2 weeks, adjusting chunk sizes (settled on 400\u2013600 tokens with 50-token overlap), adding metadata filters (product version, content type), and implementing a reranking step to improve retrieval relevance.</p></dd>'+
+      '<dt>Results</dt>'+
+      '<dd>(1) Hallucination rate dropped from ~30% to ~3% within the first month. (2) The remaining 3% were mostly cases where the documentation itself was outdated or ambiguous \u2014 a documentation problem, not an AI problem. (3) Customer satisfaction with chatbot responses improved from 2.1/5 to 4.2/5. (4) Support ticket volume decreased 18% as the chatbot successfully resolved more queries. (5) When the bot doesn\u2019t find relevant documentation, it now gracefully redirects to human support instead of guessing.</dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) A vanilla LLM without retrieval is almost never appropriate for customer-facing applications \u2014 the hallucination risk is too high. (2) RAG quality depends entirely on retrieval quality \u2014 the LLM faithfully answers based on whatever documents it receives, so if the wrong documents are retrieved, the answer is wrong. (3) Chunk size matters more than most teams expect \u2014 too small and you lose context, too large and you dilute relevance. (4) The \u201cI don\u2019t know\u201d fallback is the most important design decision \u2014 a bot that admits ignorance is vastly better than one that fabricates answers. (5) RAG doesn\u2019t eliminate the need for good documentation \u2014 it exposes documentation gaps by showing exactly which queries have no source material to draw from.</dd>'+
     '</dl></div>'+
 
   renderQuiz('mod4', pickRandom(MOD4_QUIZ_POOL, 5));
@@ -1136,7 +1211,13 @@ function mod4Content(){
 
 /* ══ MODULE 5: AGENTIC AI ══ */
 function mod5Content(){
-  return '<div class="sec-title">What Is an Agent?</div>'+
+  return '<div class="card"><div class="card-text" style="line-height:1.8">'+
+  '<p>Agentic AI represents the biggest shift in how we interact with AI since ChatGPT launched. The conversation model \u2014 type a prompt, get a response, refine, repeat \u2014 is being replaced by the delegation model: assign a goal, let the AI plan the steps, use tools, evaluate its own progress, and deliver a result. The human\u2019s role changes from \u201cprompter\u201d to \u201cmanager.\u201d</p>'+
+  '<p style="margin-top:10px">This shift requires a fundamentally different skill set. With a chatbot, prompt quality determines output quality. With an agent, <em>goal definition</em> determines output quality. A clear, well-bounded goal with explicit success criteria (\u201cReview these 50 articles for style guide compliance, flag violations with the specific rule broken, and generate a summary of the 10 most common violation types\u201d) produces excellent results. A vague goal (\u201cFix the docs\u201d) produces exactly the kind of unfocused, partially-correct work you\u2019d get from a human employee given the same vague instruction.</p>'+
+  '<p style="margin-top:10px">The critical judgment call with agents is <strong>supervision level</strong>. Current agents (2025\u20132026) are capable enough to be useful but unreliable enough to require oversight. The right supervision level depends on two factors: <em>reversibility</em> (can you undo a bad action?) and <em>consequence</em> (what\u2019s the worst case?). Editing a draft is reversible and low-consequence \u2014 let the agent work autonomously with periodic review. Publishing to production is irreversible and high-consequence \u2014 require human approval before every action. Most content workflows fall somewhere in between.</p>'+
+  '</div></div>'+
+
+  '<div class="sec-title">What Is an Agent?</div>'+
   '<div class="card" style="margin-bottom:16px"><div class="card-text" style="line-height:1.8">'+
     '<p>AI agents represent a spectrum of autonomy, from simple one-shot prompts to fully autonomous multi-step systems:</p>'+
   '</div></div>'+
@@ -1146,6 +1227,8 @@ function mod5Content(){
     '<div class="concept-card" style="border-left:4px solid var(--accent)"><div class="concept-title">Copilot</div><div class="concept-desc">AI integrated into your workflow tool, providing suggestions as you work. GitHub Copilot, Cursor, etc. You\u2019re in control; the AI assists.</div></div>'+
     '<div class="concept-card" style="border-left:4px solid var(--success)"><div class="concept-title">Agent</div><div class="concept-desc">Autonomous planning + tool use + multi-step execution. The AI decides what to do, which tools to use, and when to ask for help. You assign the goal; the agent figures out the steps.</div></div>'+
   '</div>'+
+
+  '<div class="callout"><strong>Where most content teams are today:</strong> The majority of content professionals are in the <em>Copilot</em> stage \u2014 using AI integrated into their tools (Claude in the browser, Copilot in the editor) for suggestions and drafts. The move to <em>Agent</em> is happening now but requires trust-building: start with low-risk autonomous tasks (research, first-draft generation), verify agent reliability on YOUR specific content, then gradually expand autonomy as confidence grows. Don\u2019t jump straight to full delegation.</div>'+
 
   '<div class="sec-title">The Agent Loop</div>'+
   '<div class="flow-box sim-focusable" tabindex="0" data-sim="flow-agent" id="agent-flow-box">'+
@@ -1163,8 +1246,8 @@ function mod5Content(){
   '</div>'+
 
   '<details class="deeper"><summary>Deeper Dive: Agents Today vs. Tomorrow</summary><div class="deeper-body">'+
-    '<p><strong>Where agents are now (2024-2025):</strong> Current AI agents are capable but require careful oversight. They excel at structured, well-defined tasks with clear success criteria \u2014 running code, searching documents, transforming content. They struggle with ambiguous goals, tasks requiring deep domain expertise, and situations requiring judgment calls that depend on organizational context. Agent failures tend to cascade: one wrong decision early in a multi-step task compounds through subsequent steps.</p>'+
-    '<p style="margin-top:10px"><strong>Practical limitations today:</strong> Agents can\u2019t reliably handle tasks that require more than 10-15 steps. Their \u201cworking memory\u201d is essentially the context window, which means they can lose track of earlier decisions in long workflows. They don\u2019t learn from mistakes within a session (though the human can redirect them). And they can\u2019t yet assess their own confidence accurately \u2014 they may confidently proceed with a flawed approach rather than asking for help.</p>'+
+    '<p><strong>Where agents are now (2025\u20132026):</strong> Current AI agents are capable but require careful oversight. They excel at structured, well-defined tasks with clear success criteria \u2014 running code, searching documents, transforming content. They struggle with ambiguous goals, tasks requiring deep domain expertise, and situations requiring judgment calls that depend on organizational context. Agent failures tend to cascade: one wrong decision early in a multi-step task compounds through subsequent steps.</p>'+
+    '<p style="margin-top:10px"><strong>Practical limitations (as of 2025\u20132026):</strong> Agents can\u2019t reliably handle tasks that require more than 10-15 steps. Their \u201cworking memory\u201d is essentially the context window, which means they can lose track of earlier decisions in long workflows. They don\u2019t learn from mistakes within a session (though the human can redirect them). And they can\u2019t yet assess their own confidence accurately \u2014 they may confidently proceed with a flawed approach rather than asking for help.</p>'+
     '<p style="margin-top:10px"><strong>Where agents are heading:</strong> Autonomous documentation maintenance (monitoring repos for changes and drafting updates), continuous content quality monitoring (flagging outdated articles, broken links, terminology inconsistencies), and proactive update suggestions (\u201cThis article references v3.1 features, but v3.2 is released \u2014 here\u2019s a suggested update\u201d). Multi-agent systems where specialized agents collaborate \u2014 one researches, one drafts, one reviews \u2014 are an active area of development.</p>'+
     '<p style="margin-top:10px"><strong>The human-in-the-loop remains essential:</strong> Even as agents become more capable, content workflows demand human approval before publication. The best near-term model is: agents handle research, drafting, and initial review; humans make judgment calls, approve publication, and handle edge cases.</p>'+
   '</div></details>'+
@@ -1172,18 +1255,35 @@ function mod5Content(){
   '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
     '<div class="case-title">An Agent-Assisted Release Note Workflow</div>'+
     '<dl class="case-body">'+
-      '<dt>Situation</dt><dd>A documentation team spends 2 days each sprint converting engineering changelogs into customer-facing release notes across 5 product areas.</dd>'+
-      '<dt>Agent Workflow</dt><dd>The team deploys an agent that: (1) monitors the Git repository for changelog updates, (2) retrieves relevant product context from the knowledge base, (3) drafts release notes using the team\u2019s established template and style guide, (4) cross-references against the existing documentation for consistency, and (5) submits drafts for human review with a confidence score for each item.</dd>'+
-      '<dt>Result</dt><dd>The 2-day task became a 3-hour review session. The agent drafted 80% of items correctly on the first pass. The remaining 20% needed human editing, primarily for nuanced customer impact assessment that required product knowledge the agent didn\u2019t have.</dd>'+
-      '<dt>Takeaway</dt><dd>Agents excel at structured, repeatable tasks with clear patterns. The human\u2019s role shifts from drafting to reviewing and adding judgment \u2014 a more valuable use of expertise.</dd>'+
+      '<dt>Situation</dt>'+
+      '<dd>A documentation team of 4 writers spends 2 days each sprint converting engineering changelogs into customer-facing release notes across 5 product areas. The process is repetitive and well-structured \u2014 perfect for agent assistance \u2014 but requires product knowledge to assess customer impact, which the writers have and AI does not.</dd>'+
+      '<dt>Context</dt>'+
+      '<dd>Each sprint produces 30\u201350 changelog entries across 5 repositories. Each entry needs to be evaluated for customer impact, translated into plain language, categorized (feature, fix, improvement, deprecation), and formatted according to the team\u2019s release note template. The writers spend roughly 60% of their time on mechanical translation and 40% on judgment calls about customer impact.</dd>'+
+      '<dt>Agent Workflow</dt>'+
+      '<dd>The team deployed an agent that executes a 5-step workflow:'+
+      '<p style="margin-top:8px"><strong>(1) Monitor:</strong> The agent watches the Git repository for changelog updates tagged with the current sprint.</p>'+
+      '<p style="margin-top:8px"><strong>(2) Retrieve context:</strong> For each changelog entry, the agent retrieves relevant product context from the knowledge base \u2014 feature descriptions, previous release notes, and customer-facing terminology.</p>'+
+      '<p style="margin-top:8px"><strong>(3) Draft:</strong> Using the retrieved context and the team\u2019s established template, the agent drafts a customer-facing release note for each entry. It categorizes each item and assigns a confidence score.</p>'+
+      '<p style="margin-top:8px"><strong>(4) Cross-reference:</strong> The agent checks each draft against existing documentation for terminology consistency and flags any conflicts.</p>'+
+      '<p style="margin-top:8px"><strong>(5) Submit for review:</strong> Drafts are submitted to the team\u2019s review queue, sorted by confidence score (lowest confidence first, so humans review the most uncertain items first).</p></dd>'+
+      '<dt>Results</dt>'+
+      '<dd>(1) The 2-day task became a 3-hour review session. (2) The agent drafted 80% of items correctly on the first pass. (3) The remaining 20% needing human editing were primarily nuanced customer impact assessments \u2014 exactly the kind of judgment that requires product expertise. (4) Writers reported higher job satisfaction \u2014 they spent their time on interesting judgment calls instead of mechanical reformatting.</dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) Agents excel at structured, repeatable tasks with clear patterns and well-defined templates. (2) The confidence score was critical \u2014 it let the team focus human attention where it mattered most instead of reviewing every item equally. (3) The agent\u2019s cross-referencing step caught terminology inconsistencies the team previously missed. (4) The human\u2019s role shifted from drafting to reviewing and adding judgment \u2014 a more valuable use of expertise. (5) Start agent deployment with your most structured, lowest-risk workflow. Release notes were ideal because every output gets human review before publication.</dd>'+
     '</dl></div>'+
+
+  '<div class="callout warning"><strong>Agent errors compound.</strong> In a chatbot, a wrong answer is one wrong answer. In an agent running a 10-step workflow, a wrong decision at step 3 corrupts steps 4 through 10. This is why the best agent workflows include quality checkpoints between stages \u2014 the agent assesses its own intermediate output and flags low-confidence results for human review before proceeding. Build these checkpoints into your agent design from day one.</div>'+
 
   renderQuiz('mod5', pickRandom(MOD5_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 6: ADVANCED AI WORKFLOW ══ */
 function mod6Content(){
-  return '<div class="sec-title">Building Your Prompt Library</div>'+
+  return '<div class="card"><div class="card-text" style="line-height:1.8">'+
+  '<p>Individual AI productivity gains are valuable, but they don\u2019t scale. When one writer has great prompts and another struggles, the team\u2019s overall output quality is inconsistent and unpredictable. This module covers the infrastructure that turns individual skill into team capability: shared prompt libraries, evaluation rubrics, multi-document consistency workflows, and content governance frameworks.</p>'+
+  '<p style="margin-top:10px">The goal is to make your team\u2019s worst AI output as good as your best writer\u2019s average AI output. That requires standardization \u2014 not of creativity, but of baseline quality. The prompt library ensures everyone starts from a proven template. The evaluation rubric ensures everyone applies the same review standards. The governance framework ensures everyone follows the same rules about data handling and disclosure. Together, these create a foundation that lets individual writers focus on judgment and creativity rather than reinventing basic prompts from scratch.</p>'+
+  '</div></div>'+
+  '<div class="sec-title">Building Your Prompt Library</div>'+
   '<div class="card"><div class="card-text" style="line-height:1.8">'+
     '<p>A prompt library is a curated collection of tested, reusable prompt templates organized by task type. It\u2019s your team\u2019s most valuable AI productivity asset. Every time someone discovers a prompt that works brilliantly, it should be saved, documented, and shared.</p>'+
     '<p style="margin-top:12px"><strong>Structure each entry with:</strong> (1) Task category, (2) The prompt template with placeholder variables, (3) An example of good output, (4) Notes on when it works best and when it doesn\u2019t, (5) Which model produces the best results.</p>'+
@@ -1201,6 +1301,8 @@ function mod6Content(){
     '</div>'+
     '<div class="callout" style="margin-top:16px">Adjust the weights to match your content type. Technical documentation might weight accuracy at 40%+ while marketing copy might weight tone higher. The key is having a <em>consistent</em> rubric so every reviewer applies the same standards.</div>'+
   '</div>'+
+
+  '<div class="callout success"><strong>The fastest way to build a team AI playbook:</strong> Don\u2019t start from scratch. Have each team member submit their 3 best-performing prompts. Test all submissions against the same 10 representative tasks. The top performers become your starter templates. Document each template with: the prompt text, an example of good output, when to use it, and when NOT to use it. You\u2019ll have a working playbook in a week.</div>'+
 
   '<div class="sec-title">Multi-Document Consistency Analysis</div>'+
   '<div class="card"><div class="card-text" style="line-height:1.8">'+
@@ -1225,10 +1327,18 @@ function mod6Content(){
   '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
     '<div class="case-title">How a 12-Person Content Team Built Their AI Playbook</div>'+
     '<dl class="case-body">'+
-      '<dt>Situation</dt><dd>A documentation team of 12 writers used AI individually \u2014 each with their own prompts, different tools, and no shared standards. Quality varied wildly and some writers weren\u2019t using AI at all.</dd>'+
-      '<dt>Approach</dt><dd>They dedicated one sprint to: (1) auditing current AI usage across the team, (2) collecting the best prompts from each writer, (3) standardizing a shared prompt library with 30 templates, (4) establishing a review rubric, and (5) choosing default models for each task type.</dd>'+
-      '<dt>Result</dt><dd>Within 3 months: content output increased 40%, average time-to-publish decreased from 5 days to 3 days, and consistency scores (measured by cross-document terminology checks) improved by 60%.</dd>'+
-      '<dt>Takeaway</dt><dd>The investment in standardization paid for itself within the first month. Individual AI use is good; systematic team AI use is transformational.</dd>'+
+      '<dt>Situation</dt>'+
+      '<dd>A documentation team of 12 writers across 3 product lines used AI individually \u2014 each with their own prompts saved in different places, different tool preferences, and no shared quality standards. Output quality varied wildly between writers, and 3 of the 12 weren\u2019t using AI at all because they \u201ccouldn\u2019t get good results.\u201d</dd>'+
+      '<dt>Context</dt>'+
+      '<dd>Management had approved a Claude Team subscription but saw uneven adoption. The team lead conducted an informal audit and discovered that the 4 writers getting excellent AI results all used structured prompts with role, context, and examples \u2014 while the 5 getting poor results used one-line prompts like \u201crewrite this\u201d or \u201cmake this better.\u201d The quality gap wasn\u2019t about the tool; it was about prompting skill, and there was no mechanism to share what worked.</dd>'+
+      '<dt>Approach</dt>'+
+      '<dd>They dedicated one 2-week sprint entirely to standardization:'+
+      '<p style="margin-top:8px"><strong>Week 1 \u2014 Audit and collect:</strong> Each writer submitted their 5 most-used prompts. The team tested all 60 prompts against the same set of 15 representative tasks (5 per product line) and scored output quality on a 1\u20135 rubric covering accuracy, style, completeness, and edit distance. They discovered that the top 12 prompts (all from the 4 skilled users) consistently scored 4+ while the bottom 30 scored under 3.</p>'+
+      '<p style="margin-top:8px"><strong>Week 2 \u2014 Standardize and document:</strong> They distilled the best prompts into 30 templates organized by task type and product line. Each template included: the prompt text with [PLACEHOLDER] variables, an example of good output, notes on when to use and when NOT to use it, and which model produced the best results for that task. They also established a 5-point evaluation rubric with specific criteria for each score level.</p></dd>'+
+      '<dt>Results</dt>'+
+      '<dd>(1) Within 3 months, content output increased 40% across the team. (2) Average time-to-publish decreased from 5 days to 3 days. (3) Consistency scores (measured by quarterly cross-document terminology checks) improved by 60%. (4) The 3 writers who previously weren\u2019t using AI became productive users within 2 weeks \u2014 the problem had been prompting skill, not tool capability. (5) New team members onboarded onto AI workflows in 2 days instead of 2 weeks.</dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) Prompt quality variation across a team is the single biggest barrier to AI adoption \u2014 standardize early. (2) Testing prompts against the same inputs with a rubric reveals quality differences invisible in casual use. (3) The writers who \u201ccouldn\u2019t get good results\u201d became productive users once given proven templates \u2014 the tool was never the problem. (4) The playbook is a living document \u2014 they assigned a rotating \u201cAI lead\u201d each month to add new templates, retire underperformers, and adjust for model updates. (5) The ROI case wrote itself: 40% more output with no additional headcount, documented with before/after metrics.</dd>'+
     '</dl></div>'+
 
   renderQuiz('mod6', pickRandom(MOD6_QUIZ_POOL, 5));
@@ -1243,6 +1353,8 @@ function mod7Content(){
     '<div class="card"><div class="card-title">Selection Bias</div><div class="card-text">The internet text used for training is not a random sample of human knowledge. It over-represents opinions from people who write online, topics that generate engagement, and sources in English. Niche expertise, oral traditions, and non-digital knowledge are underrepresented.</div></div>'+
     '<div class="card"><div class="card-title">Confirmation Bias (in Prompts)</div><div class="card-text">LLMs are trained through RLHF to be agreeable and helpful. If your prompt implies a certain answer (\u201cIsn\u2019t it true that X is best?\u201d), the AI will often agree. Frame questions neutrally: \u201cWhat are the arguments for and against X?\u201d to get balanced output.</div></div>'+
   '</div>'+
+
+  '<div class="callout warning"><strong>The copyright gray zone:</strong> The legal landscape for AI-generated content is unsettled and evolving rapidly. What\u2019s clear: purely AI-generated content (no substantial human creative contribution) is generally not copyrightable. What\u2019s unclear: where the line falls between \u201cAI-assisted\u201d (copyrightable, human directed the creative process) and \u201cAI-generated\u201d (not copyrightable, human just pressed a button). Until the law settles, the safest position for content teams is: use AI for drafts and research, but ensure substantial human editing, judgment, and creative direction in every published piece.</div>'+
 
   '<div class="sec-title">Alignment & Constitutional AI</div>'+
   '<div class="card"><div class="card-text" style="line-height:1.8">'+
@@ -1265,6 +1377,25 @@ function mod7Content(){
     '<p style="margin-top:12px"><strong>Practical guidelines:</strong> (1) Always add substantial human creative input to AI drafts. (2) Don\u2019t claim AI output as purely original work. (3) Follow your organization\u2019s disclosure policies. (4) Don\u2019t paste third-party copyrighted content into AI without authorization. (5) Keep records of your editorial process.</p>'+
   '</div></div>'+
 
+  '<div class="case-study"><div class="case-badge">CASE STUDY</div>'+
+    '<div class="case-title">When an AI Usage Policy Saved a Company from a PR Crisis</div>'+
+    '<dl class="case-body">'+
+      '<dt>Situation</dt>'+
+      '<dd>A marketing team at a mid-size SaaS company used AI to generate a series of customer success stories for their website. The stories were polished, specific, and compelling. They included customer names, company names, specific metrics (\u201c47% increase in productivity\u201d), and direct quotes. The content was published without the standard editorial review because \u201cAI wrote it, and it looked perfect.\u201d</dd>'+
+      '<dt>What Went Wrong</dt>'+
+      '<dd>Three of the five \u201ccustomer success stories\u201d were entirely fabricated. The customer names were real companies found in the AI\u2019s training data, but those companies had never been customers. The metrics were plausible but invented. The \u201cdirect quotes\u201d were hallucinated. One of the named companies discovered the fake case study through a Google Alert and contacted the SaaS company\u2019s legal department.</dd>'+
+      '<dt>Root Cause</dt>'+
+      '<dd>The company had no AI content policy. There was no requirement to verify AI-generated claims against real data. The marketing team assumed that because the AI output was detailed and well-written, it was also accurate. The polished presentation of the content \u2014 proper formatting, specific numbers, realistic quotes \u2014 actually made the fabrication harder to detect. This is automation bias: well-formatted AI output feels trustworthy even when it\u2019s entirely made up.</dd>'+
+      '<dt>The Fix</dt>'+
+      '<dd>The company implemented a 4-part AI content policy within a week:'+
+      '<p style="margin-top:8px"><strong>(1) Verification requirement:</strong> Every factual claim in AI-generated content must be verified against a primary source before publication. No exceptions for \u201cobvious\u201d facts \u2014 AI hallucinations are most dangerous when they\u2019re plausible.</p>'+
+      '<p style="margin-top:8px"><strong>(2) Prohibited content categories:</strong> AI may not generate customer quotes, testimonials, or case studies with specific named entities without explicit written approval from those entities. AI may not generate statistics or data claims unless sourced from a provided dataset.</p>'+
+      '<p style="margin-top:8px"><strong>(3) Review workflow:</strong> All AI-assisted content goes through the same editorial review as human-written content. The \u201cAI wrote it\u201d shortcut is eliminated. Every piece gets a fact-check, style review, and editorial sign-off.</p>'+
+      '<p style="margin-top:8px"><strong>(4) Disclosure framework:</strong> Internal metadata tags track which content was AI-assisted. Public-facing content includes disclosure where required by industry standards or client contracts.</p></dd>'+
+      '<dt>Lessons</dt>'+
+      '<dd>(1) AI content policies are not bureaucratic overhead \u2014 they prevent real business damage. (2) The most dangerous AI output is the output that looks perfect \u2014 it bypasses human skepticism. (3) Verification is not optional, even when the content \u201cseems right.\u201d (4) Specific, named entities (people, companies, quotes, statistics) are the highest-risk hallucination targets \u2014 always verify these first. (5) Publishing unreviewed AI content is publishing unverified content, regardless of how polished it appears.</dd>'+
+    '</dl></div>'+
+
   '<details class="deeper"><summary>Deeper Dive: Building Your Organization\u2019s AI Usage Guidelines</summary><div class="deeper-body">'+
     '<p>Every organization using AI for content creation needs clear, practical usage guidelines. Here\u2019s a framework for building yours:</p>'+
     '<p style="margin-top:10px"><strong>1. Define permitted use cases:</strong> Specify which tasks can use AI assistance (drafting, editing, summarization, translation) and which cannot (final approval, legal content, customer-facing commitments without review). Be specific \u2014 \u201cAI may be used for first drafts that will be reviewed by a human editor\u201d is better than \u201cAI may be used for writing.\u201d</p>'+
@@ -1273,6 +1404,8 @@ function mod7Content(){
     '<p style="margin-top:10px"><strong>4. Address disclosure:</strong> Determine when and how to disclose AI involvement. Some organizations disclose on all AI-assisted content; others disclose only when AI generated a substantial portion. Choose a policy and apply it consistently.</p>'+
     '<p style="margin-top:10px"><strong>5. Plan for evolution:</strong> AI capabilities change rapidly. Review and update your guidelines quarterly. Assign an \u201cAI lead\u201d who stays current on tool capabilities and policy implications.</p>'+
   '</div></details>'+
+
+  '<div class="callout"><strong>Building your team\u2019s AI policy:</strong> A practical AI usage policy needs four components: (1) <em>Permitted uses</em> \u2014 what tasks can use AI assistance. (2) <em>Review requirements</em> \u2014 what review steps are required before AI-assisted content is published. (3) <em>Data handling rules</em> \u2014 what information can and cannot be sent to AI tools. (4) <em>Disclosure guidelines</em> \u2014 when and how to disclose AI involvement. Start simple, iterate based on real incidents, and review quarterly.</div>'+
 
   renderQuiz('mod7', pickRandom(MOD7_QUIZ_POOL, 5));
 }
@@ -1686,7 +1819,7 @@ var ALL_RT_PASSAGES = [
   ]},
   {text:'The Model Context Protocol supports three core primitives: tools (executable functions), resources (read-only data), and prompts (reusable templates). According to the MCP Foundation\u2019s 2025 adoption survey, over 85% of enterprise AI deployments now use MCP for tool integration, making it the dominant standard ahead of both LangChain and OpenAPI.',sentences:[
     {s:'The Model Context Protocol supports three core primitives: tools (executable functions), resources (read-only data), and prompts (reusable templates).',h:false},
-    {s:'According to the MCP Foundation\u2019s 2025 adoption survey, over 85% of enterprise AI deployments now use MCP for tool integration, making it the dominant standard ahead of both LangChain and OpenAPI.',h:true,why:'There is no "MCP Foundation adoption survey" and the 85% figure is fabricated. MCP was introduced in late 2024 and donated to the Linux Foundation\u2019s Agentic AI Foundation. The "MCP Foundation" doesn\u2019t exist as a separate entity.'}
+    {s:'According to the MCP Foundation\u2019s 2025 adoption survey, over 85% of enterprise AI deployments now use MCP for tool integration, making it the dominant standard ahead of both LangChain and OpenAPI.',h:true,why:'There is no "MCP Foundation adoption survey" and the 85% figure is fabricated. MCP was introduced by Anthropic in late 2024 as an open-source protocol and has seen growing adoption, but there is no standalone \u201cMCP Foundation.\u201d'}
   ]}
 ];
 var rtRevealed = false;

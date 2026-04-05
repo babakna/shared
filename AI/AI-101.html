@@ -1220,6 +1220,8 @@ function mod1Content(){
     </div>
   </div>
 
+  <div class="callout"><strong>The practical test:</strong> When a colleague says "we're using AI," ask which layer. A rule-based spell checker, a trained content classifier, and a generative drafting tool all qualify as "AI" but have completely different accuracy profiles, review requirements, and failure modes. Knowing the layer tells you how much to trust the output.</div>
+
   <details class="deeper">
     <summary>Deeper Dive: The Practical Difference Between AI Layers</summary>
     <div class="deeper-body">
@@ -1231,6 +1233,23 @@ function mod1Content(){
       <p style="margin-top:10px">The right choice depends on your scale, accuracy needs, and budget. Many real-world systems combine layers \u2014 using ML classifiers for bulk processing and GenAI for complex edge cases that need reasoning.</p>
     </div>
   </details>
+
+  <div class="case-study">
+    <div class="case-badge">CASE STUDY</div>
+    <div class="case-title">How a Publishing Team Misunderstood "AI" and Wasted 3 Months</div>
+    <dl class="case-body">
+      <dt>Situation</dt>
+      <dd>A publishing team was told to "implement AI for content quality." They spent 3 months evaluating enterprise AI platforms costing $50K+/year, assuming they needed a custom-trained model.</dd>
+      <dt>What Went Wrong</dt>
+      <dd>They confused the AI layers. Their actual need — checking articles for style guide compliance, flagging passive voice, and suggesting headline improvements — was a prompting task, not a training task. They didn't need a custom ML model trained on their content. They needed well-crafted prompts for an existing LLM.</dd>
+      <dt>The Fix</dt>
+      <dd>A senior editor spent 2 days building a prompt library with 12 templates for their most common review tasks. Each template included the style guide rules as context, the specific review criteria, and the desired output format. They tested each template against 20 known articles to validate quality.</dd>
+      <dt>Result</dt>
+      <dd>The prompt library achieved 91% agreement with human reviewers on style compliance checks. Cost: $0 (using existing Claude team subscription). Time to implement: 2 days instead of 3 months. The enterprise AI platform was cancelled.</dd>
+      <dt>Lessons</dt>
+      <dd>(1) Identify which AI layer you actually need before evaluating solutions. (2) Most content teams need prompting skills, not ML engineering. (3) Start with the cheapest, simplest approach — a prompt library — before investing in custom models. (4) Test against known-good examples to validate quality before rolling out. (5) The most expensive tool is rarely the right first step.</dd>
+    </dl>
+  </div>
 
   <div class="sec-title">Myth vs. Reality</div>
   <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Click each card to flip it and reveal the reality behind common AI myths.</p>
@@ -1246,11 +1265,13 @@ function mod1Content(){
         {y:'2012',t:'Deep learning breakthrough (AlexNet)'},
         {y:'2017',t:'Transformer architecture ("Attention Is All You Need")'},
         {y:'2022',t:'ChatGPT launches \u2014 GenAI goes mainstream'},
-        {y:'2024',t:'Agentic AI, MCP protocol, multi-modal models'},
-        {y:'2025\u2013',t:'AI agents go mainstream, reasoning models, 1M+ token context'}
+        {y:'2024',t:'Agentic AI, MCP protocol, multi-modal models, 1M+ token context'},
+        {y:'2025\u2013',t:'AI agents go mainstream, reasoning models, open-weight frontier models'}
       ].map(e=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-year">${e.y}</div><div class="tl-text">${e.t}</div></div>`).join('')}
     </div>
   </div>
+
+  <div class="callout warning"><strong>Common misconception:</strong> The timeline might suggest AI progress is linear. It's not — it's exponential. More happened between 2022 and 2026 than between 1950 and 2022. The pace will continue accelerating, which is why building foundational understanding now matters so much.</div>
 
   ${renderQuiz('mod1', pickRandom(MOD1_QUIZ_POOL, 5))}`;
 }
@@ -1270,6 +1291,8 @@ function mod2Content(){
     <div class="concept-title">Reinforcement Learning</div><div class="concept-desc">The model learns through trial and error, receiving rewards for desired outcomes and penalties for undesired ones. Think of it like learning to write headlines for maximum engagement \u2014 you try different approaches, observe which ones get the most clicks, and adjust your strategy. Over thousands of iterations, you develop an intuition for what works. This is how RLHF (Reinforcement Learning from Human Feedback) works \u2014 the process used to make ChatGPT, Claude, and other LLMs helpful and conversational. Human evaluators rate thousands of AI responses, and the model adjusts its behavior to maximize positive ratings.</div>
     <div style="margin-top:8px;font-size:12px;color:var(--tx-muted)">Examples: Game-playing AI, robotics, RLHF for LLMs</div></div>
   </div>
+
+  <div class="callout"><strong>Key principle:</strong> The classifier simulation below demonstrates supervised learning in miniature. In production, the same principle applies at massive scale — Spotify's recommendation engine, Gmail's spam filter, and every auto-tagging system in your CMS all work this way. The quality of your labels directly determines the quality of the model.</div>
 
   <div class="sec-title">Interactive: Train a Text Classifier</div>
   <div class="sim-area" id="classifier-sim">
@@ -1293,14 +1316,14 @@ function mod2Content(){
   <div class="grid-2">
     <div class="card" style="border-left:4px solid var(--accent)">
       <div class="card-title">\u2699\uFE0F Training</div>
-      <div class="card-text">Data flows into the model, weights adjust. <strong>Learning from examples</strong> \u2014 happens once, takes a long time, requires lots of data and compute.</div>
+      <div class="card-text">Training is when the model learns from data. Millions of examples are fed through the neural network, and after each batch, the model\u2019s internal weights are adjusted slightly to reduce its prediction errors \u2014 a process called gradient descent. This happens billions of times across weeks or months on thousands of specialized GPUs. Training GPT-4 reportedly cost over $100 million in compute alone. The result is a trained model \u2014 a file containing billions of optimized numerical weights that encode the patterns discovered in the training data. Training happens once (or occasionally, when the model is updated), and the trained model is then deployed for use.</div>
     </div>
     <div class="card" style="border-left:4px solid var(--success)">
       <div class="card-title">\u26A1 Inference</div>
-      <div class="card-text">A new input goes into the trained model, output comes out. <strong>Using what it learned</strong> \u2014 happens every time you use AI, fast, no new learning.</div>
+      <div class="card-text">Inference is when the trained model processes new inputs and generates outputs \u2014 this is what happens every time you send a prompt and get a response. The model\u2019s weights are frozen; no learning occurs. Your input passes through the network, the weights transform it through hundreds of mathematical operations, and a prediction comes out the other side. Inference is fast (seconds) and cheap (fractions of a cent per prompt) compared to training. Every conversation you have with Claude, ChatGPT, or Gemini is inference \u2014 the model is applying what it already learned, not learning anything new from your conversation.</div>
     </div>
   </div>
-  <div class="callout">The trained model is saved and deployed. Every time you send a prompt and get a response, that\u2019s inference \u2014 the model isn\u2019t learning anything new from your conversation.</div>
+  <div class="callout">Think of it this way: training is like a chef spending years learning to cook \u2014 studying techniques, experimenting with thousands of recipes, developing intuition. Inference is that trained chef preparing your specific meal in minutes. The chef isn\u2019t learning anything new while cooking your order \u2014 they\u2019re applying skills already developed. The quality of the meal depends on the quality of their training, not on what happens during your individual order.</div>
 
   <details class="deeper">
     <summary>Deeper Dive: Why Training Data Quality Determines Everything</summary>
@@ -1317,11 +1340,22 @@ function mod2Content(){
     <div class="case-badge">CASE STUDY</div>
     <div class="case-title">How a Documentation Team Used Classification to Auto-Tag 10,000 Support Articles</div>
     <dl class="case-body">
-      <dt>Situation</dt><dd>A technical writing team had 10,000+ support articles across 15 product categories. Manual tagging took 3 months. Articles were inconsistently categorized.</dd>
-      <dt>Approach</dt><dd>They trained a text classifier (supervised learning) on 2,000 manually tagged articles. The model learned patterns in the text that correlated with each category.</dd>
-      <dt>Result</dt><dd>The classifier tagged the remaining 8,000 articles in under an hour with 89% accuracy. The team then manually reviewed the ~880 misclassified articles \u2014 still saving over 2 months of work.</dd>
-      <dt>Takeaway</dt><dd>ML doesn\u2019t have to be perfect to be useful. An 89% accurate classifier combined with human review is far more efficient than 100% manual work.</dd>
-      <dt>Lessons for Content Teams</dt><dd>(1) Start small \u2014 you don\u2019t need 10,000 labeled examples to begin. Even 500 well-labeled articles can produce a useful first model. (2) Measure before and after \u2014 track classification accuracy so you can quantify the time saved. (3) Plan for human review \u2014 even at 89% accuracy, that\u2019s 1,100 misclassified articles. Build a human review step into the workflow for the model\u2019s low-confidence predictions. (4) Iterate \u2014 retrain the model quarterly with corrections and new content to prevent accuracy drift.</dd>
+      <dt>Situation</dt>
+      <dd>A technical writing team at a SaaS company had accumulated 10,000+ support articles across 15 product categories over 6 years. Articles were inconsistently categorized \u2014 different writers used different tagging conventions, some articles had no tags at all, and at least 20% were in the wrong category based on a spot-check audit. Manual re-tagging was estimated at 3 months of full-time work for one person.</dd>
+      <dt>Context</dt>
+      <dd>The team needed accurate categorization for a new AI-powered search feature that relied on category metadata to filter results. Inaccurate tags meant customers would miss relevant articles or find irrelevant ones. The deadline was 8 weeks \u2014 not enough time for manual re-tagging.</dd>
+      <dt>Approach</dt>
+      <dd>They used supervised learning to build a text classifier:
+      <p style="margin-top:8px"><strong>Step 1 \u2014 Curate training data:</strong> Three senior writers manually reviewed and correctly tagged 2,000 articles (200 hours of work over 2 weeks). They prioritized diversity \u2014 ensuring each of the 15 categories had at least 80 well-tagged examples, with more examples for categories that were commonly confused (e.g., \u201cBilling\u201d vs. \u201cAccount Management\u201d).</p>
+      <p style="margin-top:8px"><strong>Step 2 \u2014 Train the classifier:</strong> Using an off-the-shelf text classification service, they fed in the 2,000 labeled articles. The model learned patterns in word usage, sentence structure, and topic clustering that correlated with each category.</p>
+      <p style="margin-top:8px"><strong>Step 3 \u2014 Validate before deploying:</strong> They held out 400 of the 2,000 articles as a validation set (not used during training). The model\u2019s predictions on this unseen set measured 89% accuracy \u2014 high enough to be useful, with known weak spots in the \u201cBilling\u201d vs. \u201cAccount Management\u201d distinction (78% accuracy on those two categories).</p>
+      <p style="margin-top:8px"><strong>Step 4 \u2014 Classify and review:</strong> The model tagged the remaining 8,000 articles in under an hour. The team then manually reviewed the ~880 articles where the model\u2019s confidence was below 80%, focusing review time on the predictions most likely to be wrong.</p></dd>
+      <dt>Results</dt>
+      <dd>(1) 8,000 articles classified in under 1 hour (vs. estimated 3 months manually). (2) 89% overall accuracy, rising to 94% after manual review of low-confidence predictions. (3) Total project time: 3.5 weeks (2 weeks labeling + 1 day training + 1 week reviewing low-confidence items) vs. estimated 12 weeks for full manual re-tagging. (4) The new AI search feature launched on time with accurate category metadata.</dd>
+      <dt>Lessons Learned</dt>
+      <dd>(1) Start small \u2014 you don\u2019t need 10,000 labeled examples to begin. Even 500 well-labeled articles can produce a useful first model, but 2,000 with category diversity gave much stronger results. (2) Label quality matters more than quantity \u2014 the team discovered during labeling that 3 of their 15 categories had overlapping definitions, so they merged them before training. Cleaning up the taxonomy first prevented the model from learning confused boundaries. (3) Measure before and after \u2014 tracking classification accuracy let them quantify time saved and build the case for expanding ML to other workflows. (4) Plan for human review \u2014 even at 89% accuracy, that\u2019s ~880 misclassified articles. Building a confidence-based review queue focused human attention where it mattered most. (5) Models drift \u2014 they scheduled quarterly retraining with corrections and new articles to prevent accuracy degradation as the product evolved.</dd>
+      <dt>What They\u2019d Do Differently</dt>
+      <dd>They would have involved the entire writing team in the labeling phase instead of just three senior writers. The labeling process surfaced inconsistencies in how the team defined categories \u2014 insights that were valuable beyond the ML project. They also would have started with a smaller pilot (1,000 articles, 5 categories) to validate the approach before committing to the full 15-category taxonomy.</dd>
     </dl>
   </div>
 
@@ -1331,6 +1365,13 @@ function mod2Content(){
 /* ══ MODULE 3: LLMs & HOW THEY WORK ══ */
 function mod3Content(){
   return `
+  <div class="card">
+    <div class="card-text" style="line-height:1.8">
+      <p>You don't need to understand Transformer internals to use AI effectively — just as you don't need to understand internal combustion to drive a car. But understanding the basics helps you predict when AI will succeed and when it will fail.</p>
+      <p style="margin-top:10px">The key insight: LLMs don't "understand" your text the way you do. They process it through mathematical transformations that capture statistical patterns. When those patterns align with reality, the output is accurate. When they don't — especially for rare facts, recent events, or precise reasoning — the model generates confident-sounding text that may be wrong. This is why verification matters, and why the six steps below help you understand where things can go right or wrong.</p>
+    </div>
+  </div>
+
   <div class="sec-title">How a Transformer Processes Text</div>
   <div class="sim-area sim-focusable" tabindex="0" data-sim="tx">
     <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Step through each stage of how an LLM processes your input. Use the controls or arrow keys below.</p>
@@ -1368,7 +1409,9 @@ function mod3Content(){
     <input type="range" class="temp-slider" id="temp-slider" min="0" max="100" value="0" oninput="updateTemp()">
     <div class="temp-val" id="temp-val">0.0</div>
     <div class="temp-output" id="temp-output"></div>
-    <div class="callout" style="margin-top:16px">Lower temperature = more predictable, consistent output. Higher = more creative but potentially less coherent. For technical writing, lower temperatures are usually better. For brainstorming, try higher values.</div>
+    <div class="callout" style="margin-top:16px"><strong>What temperature actually does:</strong> At each step, the model produces a probability distribution over its entire vocabulary \u2014 a ranked list of every possible next token with a probability attached. Temperature scales these probabilities. At temperature 0, the model always picks the single highest-probability token \u2014 the output is nearly deterministic and repeatable. At temperature 0.7, the probabilities are softened \u2014 lower-ranked tokens get a better chance of being selected, introducing variety. At temperature 1.0+, the distribution flattens further, and unlikely tokens can be chosen, producing creative but sometimes incoherent output.
+<br><br>
+<strong>Practical guidelines:</strong> For factual content, technical documentation, and anything where accuracy matters \u2014 use low temperature (0.0\u20130.3). For brainstorming, creative writing, and generating diverse options \u2014 try higher temperature (0.7\u20131.0). Important: temperature controls <em>randomness</em>, not <em>accuracy</em>. A model at temperature 0 will still hallucinate if the underlying prediction is wrong \u2014 it will just hallucinate the same way every time.</div>
   </div>
 
   <details class="deeper">
@@ -1400,10 +1443,21 @@ function mod3Content(){
     <div class="case-badge">CASE STUDY</div>
     <div class="case-title">Why the AI Truncated a 50-Page Document \u2014 Understanding Context Windows</div>
     <dl class="case-body">
-      <dt>Situation</dt><dd>A tech writer pasted a 50-page user guide into an AI tool and asked for a summary. The AI summarized only the first 15 pages.</dd>
-      <dt>What Happened</dt><dd>The document was ~35,000 tokens. The model\u2019s context window was only 16,000 tokens \u2014 it literally could not \u201csee\u201d the entire document.</dd>
-      <dt>Solution</dt><dd>Switched to a 128K context window model, and the full document was processed. Alternatively, break the document into chunks and summarize each separately.</dd>
-      <dt>Takeaway</dt><dd>Context windows are a real constraint. Rule of thumb: 1 page \u2248 500\u2013800 tokens.</dd>
+      <dt>Situation</dt>
+      <dd>A technical writer at a mid-size software company pasted a 50-page user guide (~35,000 tokens) into an AI tool and prompted: "Summarize this document and list all breaking changes." The AI returned a summary that covered only the first 15 pages. The writer assumed the AI had identified only 15 pages of relevant content \u2014 they didn\u2019t realize the rest was never processed.</dd>
+      <dt>Context</dt>
+      <dd>The team had recently adopted AI tools but hadn\u2019t received training on context windows or token limits. The AI tool they were using had a 16,000-token context window. The writer had no way of knowing the document exceeded the model\u2019s capacity because the tool didn\u2019t display a warning \u2014 it simply processed what fit and ignored the rest.</dd>
+      <dt>Approach</dt>
+      <dd>After discovering the truncation (a colleague noticed a breaking change on page 40 was missing from the summary), the team investigated and implemented three changes:
+      <p style="margin-top:8px"><strong>Step 1 \u2014 Understand the constraint:</strong> They calculated that their 50-page document was approximately 35,000 tokens. Their model\u2019s 16K context window meant the AI literally could not see more than ~20 pages at once, leaving no room for the response output.</p>
+      <p style="margin-top:8px"><strong>Step 2 \u2014 Switch models:</strong> For full-document processing, they moved to a model with a 128K context window. The entire 50-page document fit with room for a thorough response.</p>
+      <p style="margin-top:8px"><strong>Step 3 \u2014 Implement a chunking workflow for edge cases:</strong> For documents exceeding even the 128K window (rare but possible with specifications and regulatory filings), they adopted a two-pass approach: summarize each major section separately, then synthesize the section summaries into an overall brief. They also added a verification step \u2014 asking the model to list all section headings it could see before summarizing, which immediately reveals if content was truncated.</p></dd>
+      <dt>Results</dt>
+      <dd>(1) Zero truncation incidents after implementing the verification step. (2) The two-pass chunking workflow actually produced better summaries than single-pass processing, because the AI could focus on each section without attention degradation. (3) Time to summarize a 50-page document: ~15 minutes (including the verification step), down from ~2 hours of manual reading and note-taking.</dd>
+      <dt>Lessons Learned</dt>
+      <dd>(1) Context windows are a hard physical constraint \u2014 the model cannot \u201ctry harder\u201d to process more tokens. If your content doesn\u2019t fit, it\u2019s silently dropped. (2) No current AI tool warns you when input is truncated. The burden is on you to check. (3) The verification prompt (\u201clist the section headings you can see\u201d) is a 10-second safeguard that prevents hours of rework from missed content. (4) Bigger context windows help, but the \u201clost in the middle\u201d effect means very long documents may still get uneven attention \u2014 chunking often produces better results even when the full document fits. (5) Every content team should know their primary model\u2019s context window size the way they know their CMS\u2019s character limits.</dd>
+      <dt>What They\u2019d Do Differently</dt>
+      <dd>They would have started with a token estimation step before processing any long document. A simple rule of thumb (1 page \u2248 500\u2013800 tokens) would have immediately flagged the 50-page document as exceeding the 16K window. They also would have built the \u201clist the headings you see\u201d verification step into their prompt templates from day one instead of discovering the problem after a missed breaking change reached a customer.</dd>
     </dl>
   </div>
 
@@ -1413,6 +1467,14 @@ function mod3Content(){
 /* ══ MODULE 4: PROMPT ENGINEERING ══ */
 function mod4Content(){
   return `
+  <div class="card">
+    <div class="card-text" style="line-height:1.8">
+      <p>Prompt engineering is not a technical skill — it's a communication skill. Every time you write a prompt, you're giving instructions to a system that takes your words literally, has no context about your organization, and cannot ask follow-up questions. The clearer and more specific your instructions, the better the output. Vague prompts produce vague results, every time.</p>
+      <p style="margin-top:10px">The six components below are not a rigid formula — they're a checklist. Not every prompt needs all six. A simple "Summarize this paragraph" works fine for basic tasks. But when output quality matters — when you're producing content that will be published, reviewed, or relied upon — systematically including role, context, task, constraints, format, and examples transforms AI from a frustrating guessing game into a reliable tool.</p>
+      <p style="margin-top:10px">The most important shift is mental, not technical: stop asking AI to "do something" and start <em>briefing</em> it the way you'd brief a freelance writer. What's the assignment? Who's the audience? What does good output look like? What are the boundaries? The more thoroughly you brief, the less time you spend editing the result.</p>
+    </div>
+  </div>
+
   <div class="sec-title">Anatomy of a Good Prompt</div>
   <div id="prompt-anatomy"></div>
 
@@ -1420,6 +1482,8 @@ function mod4Content(){
   <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:12px">See how the same request produces dramatically different results depending on prompt quality.</p>
   <div class="comp-tabs" id="comp-tabs"></div>
   <div class="comparator" id="comparator"></div>
+
+  <div class="callout success"><strong>The 80/20 rule of prompting:</strong> Adding just <em>context</em> (who's the audience?) and <em>constraints</em> (how long? what tone? what to avoid?) to a basic prompt will improve output quality by roughly 80%. The other four components (role, task specificity, format, examples) provide the remaining 20%. If you're short on time, always add context and constraints.</div>
 
   <div class="sec-title">Common Anti-Patterns</div>
   <div id="anti-patterns"></div>
@@ -1448,6 +1512,25 @@ function mod4Content(){
     </div>
   </div>
 
+  <div class="case-study">
+    <div class="case-badge">CASE STUDY</div>
+    <div class="case-title">How a Documentation Team Built Their First Prompt Library in One Sprint</div>
+    <dl class="case-body">
+      <dt>Situation</dt>
+      <dd>A 6-person documentation team was using AI individually — each writer had their own prompts saved in random places (clipboard, sticky notes, text files). Prompt quality varied wildly. Some writers got excellent results; others called AI "useless" because their prompts were vague.</dd>
+      <dt>Context</dt>
+      <dd>The team produced API documentation, release notes, knowledge base articles, and internal guides. They used Claude via the team subscription. Each writer spent approximately 2 hours per day on tasks where AI could help — drafting, editing, content transformation, and metadata generation.</dd>
+      <dt>Approach</dt>
+      <dd>The team lead dedicated one sprint (2 weeks) to standardization:
+      <p style="margin-top:8px"><strong>Week 1 — Collect and evaluate:</strong> Each writer submitted their 5 best prompts. The team tested all 30 prompts against the same set of 10 representative tasks and scored output quality 1–5. They discovered that the top-performing prompts all shared the same pattern: they included role, audience context, specific constraints, and an example of desired output.</p>
+      <p style="margin-top:8px"><strong>Week 2 — Standardize and document:</strong> They distilled the best prompts into 15 templates organized by task type (API doc draft, release note transformation, style review, metadata generation, etc.). Each template included: the prompt text with [PLACEHOLDER] variables, an example of good output, a note on when to use it and when NOT to, and common mistakes to avoid.</p></dd>
+      <dt>Results</dt>
+      <dd>After 4 weeks of using the shared library: (1) Average first-draft quality improved from 3.1/5 to 4.2/5. (2) Time spent editing AI output dropped by approximately 40%. (3) The writer who previously called AI "useless" became one of the most productive users — the problem had been prompts, not the tool. (4) New team members onboarded 3x faster because they started with proven templates instead of figuring out prompting from scratch.</dd>
+      <dt>Lessons</dt>
+      <dd>(1) Prompt quality variation across a team is the single biggest barrier to AI adoption — standardize early. (2) Testing prompts against the same inputs reveals quality differences you can't see otherwise. (3) The library should be a living document — add new templates when someone discovers a better approach, retire templates that stop working after model updates. (4) Include "when NOT to use this" notes — knowing when a template doesn't apply prevents misuse. (5) The best prompt library is built from real team experience, not from a generic "prompting guide."</dd>
+    </dl>
+  </div>
+
   <details class="deeper">
     <summary>Deeper Dive: The Prompt Iteration Workflow</summary>
     <div class="deeper-body">
@@ -1459,18 +1542,30 @@ function mod4Content(){
     </div>
   </details>
 
+  <div class="callout warning"><strong>A prompt library is never finished.</strong> Models change, products evolve, and new use cases emerge. Review and update your templates quarterly. When a model update changes output quality on a template, that's a signal to re-test and adjust — not to abandon the approach.</div>
+
   ${renderQuiz('mod4', pickRandom(MOD4_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 5: AI IN YOUR WORKFLOW ══ */
 function mod5Content(){
   return `
+  <div class="card">
+    <div class="card-text" style="line-height:1.8">
+      <p>The biggest mistake content professionals make with AI is trying to use it for everything at once. The teams that succeed start with a single, well-defined workflow — usually the most repetitive and time-consuming one — and master it before expanding. The six task categories below represent the highest-ROI applications for content editors, ordered from most straightforward to most nuanced.</p>
+      <p style="margin-top:10px">Each task card contains a ready-to-use prompt template. But the template alone isn't enough — you need to understand <em>when</em> to use each workflow and <em>what to watch for</em> in the output. AI excels at the first 80% of most content tasks: generating a solid first draft, catching inconsistencies across long documents, transforming content between formats. The last 20% — editorial judgment, audience calibration, brand voice, factual verification — remains human work. The goal is to spend your time on that 20%, not on the 80% AI can handle.</p>
+      <p style="margin-top:10px">A critical mindset shift: AI output is always a <em>first draft</em>, never a final product. Even when the output looks polished, treat it as unverified until you've checked it. The polish is what makes AI output dangerous — grammatically perfect text with fabricated facts looks exactly like grammatically perfect text with real facts. Your verification step is not optional.</p>
+    </div>
+  </div>
+
   <div class="sec-title">AI-Powered Workflow Tasks</div>
   <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Click each card to reveal a prompt template, pro tips, and pitfalls to avoid.</p>
   <div class="task-grid" id="task-grid"></div>
 
+  <div class="callout"><strong>Start here:</strong> If you're new to using AI in your workflow, start with <em>Content Transformation</em> (converting existing content to a different format or audience). It's the lowest-risk, highest-reward starting point because you have a source document to compare against, making verification straightforward. Move to first-draft generation only after you're comfortable with the verification process.</div>
+
   <div class="case-study">
-    <div class="case-badge">CASE STUDY</div>
+    <div class="case-badge">WORKED EXAMPLE</div>
     <div class="case-title">Before & After: Engineering Changelogs \u2192 Customer-Facing Release Notes</div>
     <dl class="case-body">
       <dt>Situation</dt><dd>Engineering changelog: "Fixed race condition in CSV export handler causing OOM on datasets >500K rows. Perf improvement: dashboard API p95 latency 340ms\u2192205ms."</dd>
@@ -1479,6 +1574,28 @@ function mod5Content(){
       <dt>Before</dt><dd>"Perf improvement: dashboard API p95 latency 340ms\u2192205ms"</dd>
       <dt>After</dt><dd><strong>Faster Dashboard Loading</strong> \u2014 Dashboard pages now load up to 40% faster, improving responsiveness especially when viewing complex reports.</dd>
       <dt>Takeaway</dt><dd>AI translated engineering language into clear, benefit-oriented customer communication in seconds. The writer reviewed for accuracy and added context. Total time: 10 minutes instead of 45.</dd>
+    </dl>
+  </div>
+
+  <div class="case-study">
+    <div class="case-badge">CASE STUDY</div>
+    <div class="case-title">Measuring the Real Impact: 6 Months of AI-Assisted Documentation</div>
+    <dl class="case-body">
+      <dt>Situation</dt>
+      <dd>A technical writing team of 4 people was producing approximately 40 knowledge base articles per month. Each article took an average of 3.5 hours from research to publication. The backlog was growing — the product team shipped features faster than the writers could document them.</dd>
+      <dt>Context</dt>
+      <dd>The team decided to systematically integrate AI into their workflow rather than using it ad hoc. They tracked time, quality, and output volume for 3 months before AI adoption (baseline) and 3 months after.</dd>
+      <dt>Approach</dt>
+      <dd>They built AI into three specific workflow stages:
+      <p style="margin-top:8px"><strong>Research & summarization:</strong> Instead of reading 10-page engineering specs manually, they used AI to extract key changes, user-facing impacts, and technical details into a structured brief. Time savings: ~45 minutes per article.</p>
+      <p style="margin-top:8px"><strong>First-draft generation:</strong> Using the AI-generated brief plus a standard article template as the prompt, they generated first drafts that required editing rather than writing from scratch. Time savings: ~30 minutes per article.</p>
+      <p style="margin-top:8px"><strong>Consistency review:</strong> Before publication, AI reviewed each article against the style guide and checked terminology consistency with existing published articles. Time savings: ~20 minutes per article, plus caught issues human reviewers missed.</p></dd>
+      <dt>Results (6-month measurement)</dt>
+      <dd>(1) Articles per month increased from 40 to 67 (+68%). (2) Average time per article dropped from 3.5 hours to 1.9 hours (-46%). (3) Style guide compliance (measured by quarterly audit) improved from 82% to 94%. (4) The backlog was eliminated within 4 months. (5) Two writers reported higher job satisfaction — they spent more time on "interesting" work (complex articles, user research) and less on routine documentation.</dd>
+      <dt>What Surprised Them</dt>
+      <dd>The biggest quality improvement wasn't in drafting — it was in consistency review. AI caught terminology inconsistencies across the entire published library that no human reviewer would find because no one re-reads all 500+ articles. The "find all instances where we use 'log in' vs. 'login' vs. 'log-in'" task that would take a human days took AI minutes.</dd>
+      <dt>Lessons</dt>
+      <dd>(1) Measure before you change anything — without the 3-month baseline, they couldn't have proven the impact. (2) AI saved the most time on the most boring tasks, which is exactly where it should. (3) The consistency review use case was more valuable than drafting — they hadn't anticipated this. (4) Quality improved alongside speed, contradicting the assumption that faster = sloppier. (5) Not every article benefits equally — complex, novel topics still take nearly as long because the "research and judgment" phase can't be automated.</dd>
     </dl>
   </div>
 
@@ -1492,6 +1609,8 @@ function mod5Content(){
       <p style="margin-top:10px"><strong>Measure the impact:</strong> Track time-to-publish, error rates, and content volume before and after AI adoption. Concrete metrics make the case for continued investment and help identify where the workflow needs adjustment.</p>
     </div>
   </details>
+
+  <div class="callout success"><strong>The compound effect:</strong> AI workflow improvements compound over time. A prompt library gets better as you add templates. Consistency review catches more issues as your reference corpus grows. First drafts improve as you refine your templates based on editing patterns. Month 6 is significantly better than month 1.</div>
 
   ${renderQuiz('mod5', pickRandom(MOD5_QUIZ_POOL, 5))}`;
 }
@@ -1508,6 +1627,8 @@ function mod6Content(){
     <div class="spectrum-item warn"><div class="spectrum-icon">\u26A0\uFE0F</div><div style="font-weight:700;color:var(--warning);font-size:12px;margin-bottom:6px">PLAUSIBLE BUT WRONG</div><div class="spectrum-text">\u201cPython 3.12 introduced pattern matching.\u201d <em>(Actually introduced in 3.10)</em></div></div>
     <div class="spectrum-item bad"><div class="spectrum-icon">\u274C</div><div style="font-weight:700;color:var(--error);font-size:12px;margin-bottom:6px">COMPLETE FABRICATION</div><div class="spectrum-text">\u201cAccording to the 2024 IEEE study on documentation practices (Zhang et al.)...\u201d <em>(This study doesn\u2019t exist)</em></div></div>
   </div>
+
+  <div class="callout warning"><strong>The danger zone:</strong> The middle category — "plausible but wrong" — is the most dangerous for content editors. Obvious errors (gibberish, impossible claims) are easy to catch. Subtle errors (slightly wrong version numbers, plausible but fabricated statistics, real-sounding but nonexistent citations) slip through because they <em>look right</em>. Train yourself to be most suspicious of specific, authoritative-sounding claims — these are where hallucinations hide.</div>
 
   <div class="sec-title">Interactive: Spot the Hallucination</div>
   <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Click on sentences you think are hallucinated (fabricated or incorrect). Then check your answers.</p>
@@ -1535,6 +1656,23 @@ function mod6Content(){
     </div>
   </div>
 
+  <div class="case-study">
+    <div class="case-badge">CASE STUDY</div>
+    <div class="case-title">When AI Bias Shaped a Product Launch — And the Team That Caught It</div>
+    <dl class="case-body">
+      <dt>Situation</dt>
+      <dd>A content team used AI to generate marketing copy for a global product launch. The AI produced polished, professional copy in 12 hours that would have taken 2 weeks manually. Leadership was thrilled — until the localization team reviewed the output.</dd>
+      <dt>What They Found</dt>
+      <dd>The AI-generated copy made three types of culturally biased assumptions: (1) All examples used American contexts (baseball metaphors, Thanksgiving references, dollar-denominated pricing examples). (2) The "customer testimonials" section defaulted to Anglo-Saxon names even for regions where they'd be unusual. (3) Date formats used MM/DD/YYYY throughout, which is confusing or incorrect for most of the world. None of these were factual errors — they were cultural blind spots baked into the model's training data.</dd>
+      <dt>Root Cause</dt>
+      <dd>The AI's training data is predominantly American English internet text. When asked to write "professional marketing copy" without cultural specifications, it defaults to American norms. The prompts didn't specify target markets, cultural considerations, or localization requirements — the team assumed the AI would "know" the content was for a global audience.</dd>
+      <dt>The Fix</dt>
+      <dd>The team added three elements to their prompt templates for global content: (1) Explicit target market specification ("This content will be published in Germany, Japan, and Brazil"). (2) A cultural review checklist in the system prompt ("Avoid culture-specific metaphors, use internationally recognized examples, format dates as DD Month YYYY"). (3) A mandatory localization review step before publication, even for content initially generated in English.</dd>
+      <dt>Lessons</dt>
+      <dd>(1) AI defaults reflect American English internet culture — always specify cultural context for global content. (2) "Polished and professional" is not the same as "appropriate for the audience." (3) The faster AI generates content, the more critical the review step becomes — speed makes it tempting to skip review. (4) Build cultural specifications into your prompt templates, not into individual prompts — templates enforce consistency. (5) Localization review is not optional for AI-generated content, even when the output language is correct.</dd>
+    </dl>
+  </div>
+
   <details class="deeper">
     <summary>Deeper Dive: Your Editorial Eye Is More Valuable Than Ever</summary>
     <div class="deeper-body">
@@ -1548,6 +1686,8 @@ function mod6Content(){
 
   <div class="sec-title">Decision Scenarios: Would You Publish This?</div>
   <div id="scenarios-area"></div>
+
+  <div class="callout"><strong>The editorial judgment principle:</strong> AI can flag potential issues (inconsistencies, style violations, suspicious claims). AI cannot make the final call on whether content serves your audience. That judgment — balancing accuracy, tone, cultural sensitivity, brand voice, and audience needs — is uniquely human. Your role isn't being replaced by AI; it's being elevated to the judgment layer that AI cannot reach.</div>
 
   ${renderQuiz('mod6', pickRandom(MOD6_QUIZ_POOL, 5))}`;
 }
@@ -1585,6 +1725,12 @@ function mod7Content(){
   ];
   return `
   <div class="sec-title">Your Learning Path</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-text" style="line-height:1.8">
+      <p>This roadmap is organized in three tiers \u2014 start with Tier 1 and complete at least one resource before moving on. You don\u2019t need to finish everything here; pick the resources that match your learning style and available time. Video learners should start with 3Blue1Brown or Andrew Ng\u2019s courses. Readers should start with Anthropic\u2019s documentation. Hands-on learners should jump to Google AI Essentials or the DeepLearning.AI short courses.</p>
+      <p style="margin-top:10px">Each resource includes a \u201cwhy this one\u201d annotation so you can make an informed choice rather than working through everything sequentially. The Anthropic reference section at the bottom is not a learning path \u2014 it\u2019s a set of bookmarks to revisit whenever you need them.</p>
+    </div>
+  </div>
 
   <details class="roadmap-section">
     <summary style="background:var(--primary)">\uD83C\uDFAF AI-101 Core Resources \u2014 Start Here (2\u20134 weeks)</summary>
@@ -1843,7 +1989,7 @@ const TX_STEPS = [
   {ico:'\u2702\uFE0F',name:'Tokenizer',desc:'The raw text is split into tokens \u2014 sub-word units that the model can process. This isn\u2019t a simple word split. The word \u201ctokenization\u201d becomes two tokens (\u201ctoken\u201d + \u201cization\u201d). Punctuation, spaces, and special characters each become their own tokens. A typical English sentence of 10 words might produce 12\u201315 tokens.'},
   {ico:'\uD83D\uDCCD',name:'Embedding',desc:'Each token is converted into a vector \u2014 a list of hundreds or thousands of numbers that represents that token\u2019s meaning in mathematical space. Words with similar meanings (like \u201chappy\u201d and \u201cjoyful\u201d) end up with similar vectors. This is how the model captures semantic relationships without understanding language the way humans do.'},
   {ico:'\uD83D\uDD17',name:'Attention Layers',desc:'This is the breakthrough innovation of the Transformer architecture. Each token \u201cattends to\u201d every other token in the sequence simultaneously \u2014 weighing how relevant each other token is to its current position. This is why the model can understand that in \u201cThe bank by the river,\u201d the word \u201cbank\u201d means a riverbank, not a financial institution \u2014 because it attends to \u201criver\u201d and adjusts its interpretation.'},
-  {ico:'\uD83D\uDCCA',name:'Multiple Layers',desc:'The signal passes through dozens or hundreds of stacked Transformer layers (GPT-4 reportedly uses over 100 layers; Claude\u2019s exact count isn\u2019t public). Each layer refines the representation further \u2014 early layers capture basic syntax and word relationships, middle layers capture semantic meaning, and later layers capture high-level concepts and task-specific reasoning.'},
+  {ico:'\uD83D\uDCCA',name:'Multiple Layers',desc:'The signal passes through dozens or hundreds of stacked Transformer layers (frontier models like GPT-4 and Claude are believed to use dozens to over a hundred layers, though exact architectures are not public). Each layer refines the representation further \u2014 early layers capture basic syntax and word relationships, middle layers capture semantic meaning, and later layers capture high-level concepts and task-specific reasoning.'},
   {ico:'\uD83C\uDFAF',name:'Output Prediction',desc:'The model produces a probability distribution over its entire vocabulary (typically 50,000\u2013100,000+ tokens) predicting which token should come next. The token with the highest probability is selected (or sampled based on temperature settings), added to the sequence, and the process repeats for the next token. This is autoregressive generation \u2014 one token at a time, with each new token informed by everything that came before.'}
 ];
 
@@ -2352,8 +2498,8 @@ const ALL_SPOT_PASSAGES = [
     {s:'It was created by Guido van Rossum and first released in 1991.',h:false},
     {s:'Python\'s simple syntax makes it accessible to beginners while remaining powerful enough for complex applications.',h:false}
   ]},
-  {text:'The Chicago Manual of Style was first published in 1906 and is now in its 18th edition. It recommends using the serial comma in all cases. According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',sentences:[
-    {s:'The Chicago Manual of Style was first published in 1906 and is now in its 18th edition.',h:false},
+  {text:'The Chicago Manual of Style was first published in 1906 and is now in its 17th edition. It recommends using the serial comma in all cases. According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',sentences:[
+    {s:'The Chicago Manual of Style was first published in 1906 and is now in its 17th edition.',h:false},
     {s:'It recommends using the serial comma in all cases.',h:false},
     {s:'According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',h:true,why:'This survey and statistic are fabricated. AI frequently invents specific survey data with precise percentages to sound authoritative.'}
   ]},
