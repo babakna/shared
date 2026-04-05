@@ -234,8 +234,6 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .scenario-opt.selected{border-color:var(--primary);background:var(--bg-highlight);color:var(--primary)}
 .scenario-opt.best{border-color:var(--success);background:rgba(16,185,129,0.08);color:var(--success)}
 
-.roadmap-tier{margin-bottom:32px}
-.tier-header{padding:12px 20px;border-radius:10px;color:#fff;font-weight:700;font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .resource-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:10px;transition:all .2s}
 .resource-card:hover{box-shadow:var(--shadow-md)}
 .resource-title{font-size:15px;font-weight:600;color:var(--tx-primary)}
@@ -528,7 +526,6 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   .resource-card{padding:14px 16px}
   .resource-title{font-size:14px}
   .resource-why{font-size:12px}
-  .tier-header{font-size:14px;padding:10px 16px}
   .scenario-opts{flex-direction:column}
   .scenario-opt{width:100%;text-align:center;padding:10px;min-height:44px}
   .search-overlay{width:95%;top:60px;max-height:70vh}
@@ -663,12 +660,12 @@ var COURSES = [
   {id:'101', label:'AI Essentials', file:'AI-101.html'},
   {id:'102', label:'AI Deep Dive', file:'AI-102.html'},
   {id:'103', label:'Models Explorer', file:'AI-103.html'},
-  {id:'104', label:'AI in Practice', file:'AI-104.html'},
+  {id:'104', label:'Building with AI', file:'AI-104.html'},
   {id:'105', label:'The AI Frontier', file:'AI-105.html'}
 ];
 var THIS_COURSE = '102';
 
-const MODULES = [
+var MODULES = [
   {id:'under-hood',title:'Under the Hood',short:'Under Hood',icon:'cpu',color:'#2563EB'},
   {id:'ecosystem',title:'The AI Ecosystem',short:'Ecosystem',icon:'globe',color:'#7C3AED'},
   {id:'adv-prompt',title:'Advanced Prompt Engineering',short:'Adv. Prompt',icon:'layers',color:'#06B6D4'},
@@ -680,7 +677,7 @@ const MODULES = [
   {id:'glossary',title:'Glossary',short:'Glossary',icon:'book',color:'#6366F1'}
 ];
 
-const ICONS = {
+var ICONS = {
   cpu:'<svg viewBox="0 0 24 24"><path d="M9 2v2H7v2H5v2H3v4h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-4h-2V8h-2V6h-2V4h-2V2H9zm1 4h4v2h2v4h-2v2h-4v-2H8v-4h2V6z"/></svg>',
   globe:'<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
   layers:'<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
@@ -692,7 +689,7 @@ const ICONS = {
   book:'<svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 4h2v5l-1-1-1 1V4zm9 16H6V4h1v9l3-3 3 3V4h5v16z"/></svg>'
 };
 
-const LANDING_DESCS = [
+var LANDING_DESCS = [
   {desc:'Go deeper into how AI actually works. Explore neural network layers visually, understand the attention mechanism that makes Transformers revolutionary, trace the complete training pipeline from raw data to deployed model, and discover how multi-modal models process text, images, and audio simultaneously.',feat:'Neural network layer visual \u2022 Training pipeline flow simulation \u2022 Multi-modal comparison \u2022 5 quiz questions'},
   {desc:'Navigate the landscape of AI models, APIs, and applications. Understand the critical differences between open-source and proprietary models, compare major platforms (Claude, ChatGPT, Gemini, Copilot) across capabilities, and learn how the AI technology stack fits together from model to end-user application.',feat:'AI stack diagram \u2022 Interactive platform comparison matrix \u2022 Open vs. proprietary tradeoffs \u2022 5 quiz questions'},
   {desc:'Move beyond basics into techniques that produce expert-level results. Master few-shot prompting, chain-of-thought reasoning, system prompt design, structured output, and multi-step prompt chaining. Practice building complex prompt chains for real documentation workflows.',feat:'Prompt chain builder exercise \u2022 Few-shot workshop \u2022 System prompt designer \u2022 Case study \u2022 5 quiz questions'},
@@ -701,13 +698,13 @@ const LANDING_DESCS = [
   {desc:'Take your daily AI practice to the next level. Build systematic prompt libraries, implement multi-document consistency analysis, develop content governance frameworks, learn to evaluate AI output quality rigorously, and design workflows that scale across your team.',feat:'Prompt library builder exercise \u2022 Evaluation rubric tool \u2022 Multi-doc analysis templates \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Develop sophisticated judgment for AI governance. Examine bias sources in training data with real examples, understand alignment and guardrail mechanisms, learn red-teaming concepts, navigate copyright and IP considerations for content creators, and build organizational AI usage guidelines.',feat:'Bias source analysis exercise \u2022 Red-teaming scenarios \u2022 Copyright decision tree \u2022 AI governance template \u2022 5 quiz questions'},
   {desc:'Your curated path for continued growth. Foundation refreshers, intermediate skill-building, advanced resources, and seminal papers \u2014 DeepLearning.AI specialized courses, Stanford HAI research, Anthropic\u2019s MCP and alignment science, interactive tools, and the foundational research that shaped modern AI. Every resource annotated with \u2018why this one\u2019 and time estimates.',feat:'37 curated resources with live links \u2022 Tier 1 (Foundation), Tier 2 (Applied), Tier 3 (Advanced), and Tier 4 (Seminal Papers) paths'},
-  {desc:'106 AI terms defined for content professionals, covering both foundational and advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, and more. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 9 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
+  {desc:'105 AI terms defined for content professionals, covering both foundational and advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, and more. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 9 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
 ];
 
-let currentModule = -1;
-let completedModules = new Set();
-let quizStates = {};
-const mainEl = document.getElementById('main-content');
+var currentModule = -1;
+var completedModules = new Set();
+var quizStates = {};
+var mainEl = document.getElementById('main-content');
 
 function renderTrail(){
   var t = document.getElementById('trail');
@@ -727,7 +724,7 @@ function goModule(idx){
   document.getElementById('hdr').classList.add('compact');
   renderTrail();
   renderModule(idx);
-  const mobBar = document.getElementById('mob-module-bar');
+  var mobBar = document.getElementById('mob-module-bar');
   if(mobBar){
     if(idx >= 0 && idx < MODULES.length){
       mobBar.innerHTML = '<strong>'+MODULES[idx].title+'</strong> \u2014 Module '+(idx+1)+' of '+MODULES.length;
@@ -743,7 +740,7 @@ function showLanding(){
   document.getElementById('hdr').classList.remove('compact');
   renderTrail();
   renderLanding();
-  const mobBar = document.getElementById('mob-module-bar');
+  var mobBar = document.getElementById('mob-module-bar');
   if(mobBar) mobBar.innerHTML = '';
 }
 
@@ -754,7 +751,7 @@ function renderLanding(){
     '<p>Advanced concepts for the AI-literate professional. Build on your foundations with deeper technical understanding, practical advanced techniques, and strategic workflow integration.</p>'+
     '<div class="hero-grid">'+
       '<div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">Interactive Modules</div></div>'+
-      '<div class="hero-stat"><div class="hero-stat-n">106</div><div class="hero-stat-l">Glossary Terms</div></div>'+
+      '<div class="hero-stat"><div class="hero-stat-n">105</div><div class="hero-stat-l">Glossary Terms</div></div>'+
       '<div class="hero-stat"><div class="hero-stat-n">45+</div><div class="hero-stat-l">Quiz Questions</div></div>'+
     '</div>'+
     '<div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Learn \u2500\u2500</div>'+
@@ -776,13 +773,13 @@ function renderLanding(){
 }
 
 function renderModule(idx){
-  const m = MODULES[idx];
-  const nav = '<div class="nav-btns">'+
+  var m = MODULES[idx];
+  var nav = '<div class="nav-btns">'+
     (idx > 0 ? '<button class="nav-btn secondary" onclick="goModule('+(idx-1)+')">\u2190 '+MODULES[idx-1].title+'</button>' : '<div></div>')+
     (idx < MODULES.length - 1 ? '<button class="nav-btn primary" onclick="completeAndNext('+idx+')">Next: '+MODULES[idx+1].title+' \u2192</button>' : '<button class="nav-btn primary" onclick="showFinalAssessment()">Final Assessment \u2192</button>')+
   '</div>';
-  const hdr = '<div class="mod-hdr"><div class="mod-ico" style="background:'+m.color+'">'+ICONS[m.icon]+'</div><div><div class="mod-title">'+m.title+'</div><div class="mod-desc">'+LANDING_DESCS[idx].desc+'</div></div></div>';
-  const content = getModuleContent(idx);
+  var hdr = '<div class="mod-hdr"><div class="mod-ico" style="background:'+m.color+'">'+ICONS[m.icon]+'</div><div><div class="mod-title">'+m.title+'</div><div class="mod-desc">'+LANDING_DESCS[idx].desc+'</div></div></div>';
+  var content = getModuleContent(idx);
   mainEl.innerHTML = hdr + content + nav;
   initModuleInteractions(idx);
 }
@@ -857,7 +854,7 @@ var MOD5_QUIZ_POOL = [
   {type:'mc',q:'When should an agent stop and request human input?',opts:['Never \u2014 agents should be fully autonomous','Only when it encounters an error','Before making irreversible changes or when it encounters ambiguity','Only at the very end of the task'],a:2,exp:'Well-designed agents request human approval before irreversible actions and when they encounter ambiguity that requires judgment.'},
   {type:'mc',q:'What is "reflection" in the context of AI agents?',opts:['The agent mirrors user behavior','The agent evaluates its own output and decides if it needs to retry','The agent copies another agent\u2019s approach','The agent processes images'],a:1,exp:'Reflection is when an agent critiques its own intermediate results and decides whether to revise, retry, or proceed. It\u2019s a self-correction mechanism.'},
   {type:'tf',q:'Current AI agents are reliable enough to make irreversible decisions without human oversight.',a:false,exp:'Current agents are not reliable enough for unsupervised irreversible actions. Human-in-the-loop remains essential for production workflows.'},
-  {type:'mc',q:'In the agent loop, what role does "working memory" serve?',opts:['It stores training data','It accumulates results from each subtask so later steps can reference earlier findings','It saves conversations for future sessions','It caches model weights'],a:1,exp:'Working memory persists across subtasks within a single run, allowing later steps to reference earlier results.'}
+  {type:'mc',q:'What is "tool orchestration" in the context of AI agents?',opts:['Running multiple AI models simultaneously','Selecting, sequencing, and coordinating multiple tools to complete a complex task','Installing new software tools automatically','Training the agent to use new tools'],a:1,exp:'Tool orchestration is an agent\u2019s ability to choose the right tool at each step and chain them together \u2014 search, then analyze, then draft, then verify \u2014 into a coherent workflow.'}
 ];
 
 var MOD6_QUIZ_POOL = [
@@ -877,7 +874,7 @@ var MOD7_QUIZ_POOL = [
   {type:'mc',q:'What is red-teaming in the context of AI?',opts:['Using AI to generate red-colored content','Deliberately trying to find problems, failures, and safety issues in AI outputs','Training the model with negative examples','Testing AI response speed'],a:1,exp:'Red-teaming is the practice of deliberately probing AI outputs for problems \u2014 bias, inaccuracy, safety issues, and edge cases.'},
   {type:'tf',q:'If your prompt implies a certain answer, modern AI tools will always push back and give a balanced response.',a:false,exp:'LLMs are trained to be agreeable through RLHF. Leading prompts often get confirming responses. Frame questions neutrally for balanced output.'},
   {type:'mc',q:'An effective organizational AI usage policy should include:',opts:['A ban on all AI use until regulations are finalized','Only technical specifications for approved models','Permitted use cases, review requirements, data handling rules, and disclosure policies','A single rule: use your judgment'],a:2,exp:'Comprehensive guidelines cover what\u2019s permitted, how content is reviewed, what data can be sent to AI, and when to disclose AI involvement.'},
-  {type:'mc',q:'What is Constitutional AI (CAI)?',opts:['AI governed by a country\u2019s constitution','A training technique where the model critiques its own output against principles','AI that only discusses legal topics','A government certification for AI'],a:1,exp:'Constitutional AI is Anthropic\u2019s approach where the model evaluates its own responses against principles like helpfulness, harmlessness, and honesty.'},
+  {type:'mc',q:'When developing an AI usage policy for your team, which element is LEAST important?',opts:['Rules about what data can be sent to AI tools','Specifying which AI model brand everyone must use','Review and approval requirements for AI-generated content','Disclosure guidelines for when AI was used'],a:1,exp:'Specifying a single brand is too rigid and becomes outdated quickly. Effective policies focus on data handling, review processes, and transparency \u2014 principles that apply regardless of which tool is used.'},
   {type:'tf',q:'AI detection tools reliably distinguish between AI-generated and human-written content.',a:false,exp:'AI detection tools are unreliable \u2014 frequent false positives and false negatives. Edited or mixed content easily defeats them.'},
   {type:'mc',q:'A writer uses AI to paraphrase 10 paragraphs from a copyrighted article. Is this acceptable?',opts:['Yes \u2014 paraphrasing makes it original','No \u2014 paraphrasing copyrighted work can still constitute infringement','Only if the AI is credited','Only if the source is over 5 years old'],a:1,exp:'Paraphrasing copyrighted work can constitute infringement if the ideas, structure, and creative expression are substantially reproduced.'}
 ];
@@ -1776,16 +1773,16 @@ window.checkRedTeam = function(){
 
 /* ══ GLOSSARY ══ */
 var GLOSSARY = [
-  {term:'Artificial Intelligence (AI)',cat:'ML Fundamentals',def:'Computer systems that perform tasks typically requiring human intelligence, such as understanding language, recognizing patterns, and making decisions.',why:'The umbrella term for all the tools you use to augment your writing workflow.',rel:['Machine Learning','Deep Learning']},
+  {term:'Artificial Intelligence (AI)',cat:'ML Fundamentals',def:'Computer systems that perform tasks typically requiring human intelligence, such as understanding language, recognizing patterns, and making decisions.',why:'The umbrella term for all the tools you use to augment your writing workflow.',rel:['Machine Learning (ML)','Deep Learning']},
   {term:'Machine Learning (ML)',cat:'ML Fundamentals',def:'A subset of AI where systems learn patterns from data instead of being explicitly programmed with rules.',why:'Understanding ML helps you grasp why AI tools improve over time and why they sometimes make unexpected mistakes.',rel:['Supervised Learning','Unsupervised Learning','Training Data']},
-  {term:'Deep Learning',cat:'ML Fundamentals',def:'A type of machine learning that uses neural networks with many layers to learn complex patterns from large amounts of data.',why:'Deep learning powers the language models (like Claude and GPT) you use daily.',rel:['Neural Network','Machine Learning']},
+  {term:'Deep Learning',cat:'ML Fundamentals',def:'A type of machine learning that uses neural networks with many layers to learn complex patterns from large amounts of data.',why:'Deep learning powers the language models (like Claude and GPT) you use daily.',rel:['Neural Network','Machine Learning (ML)']},
   {term:'Supervised Learning',cat:'ML Fundamentals',def:'Training a model using labeled data \u2014 examples paired with correct answers.',why:'This is how text classifiers and auto-tagging systems are built.',rel:['Training Data','Classification']},
   {term:'Unsupervised Learning',cat:'ML Fundamentals',def:'Training a model to find patterns in data without labeled examples.',why:'Used for clustering documents by topic and discovering content gaps.',rel:['Clustering']},
   {term:'Reinforcement Learning',cat:'ML Fundamentals',def:'Training a model through trial and error, using rewards for good outcomes and penalties for bad ones.',why:'RLHF is how LLMs are fine-tuned to be helpful and safe.',rel:['RLHF']},
   {term:'Neural Network',cat:'ML Fundamentals',def:'A computing system inspired by the brain\'s structure, consisting of layers of interconnected nodes.',why:'The building block of deep learning and every LLM you interact with.',rel:['Deep Learning','Weights']},
   {term:'Training',cat:'ML Fundamentals',def:'The process of teaching a model by showing it many examples so it can learn patterns.',why:'Understanding training helps you understand knowledge cutoff dates and biases.',rel:['Training Data','Inference','Fine-Tuning']},
   {term:'Inference',cat:'ML Fundamentals',def:'Using a trained model to process new inputs and generate outputs.',why:'Every time you send a prompt and get a response, that\'s inference.',rel:['Training','Latency']},
-  {term:'Training Data',cat:'ML Fundamentals',def:'The dataset used to teach a model. Can include text, images, code, and other content.',why:'Data quality and breadth directly affect what the AI knows and what biases it has.',rel:['Training','Bias']},
+  {term:'Training Data',cat:'ML Fundamentals',def:'The dataset used to teach a model. Can include text, images, code, and other content.',why:'Data quality and breadth directly affect what the AI knows and what biases it has.',rel:['Training','Bias (in AI)']},
   {term:'Overfitting',cat:'ML Fundamentals',def:'When a model memorizes training data instead of learning general patterns.',why:'An overfitted model handles known examples but fails on your unique content.',rel:['Training']},
   {term:'Classification',cat:'ML Fundamentals',def:'Assigning a category or label to an input (e.g., "Is this spam?").',why:'Directly applicable to content tagging and document categorization.',rel:['Supervised Learning']},
   {term:'Clustering',cat:'ML Fundamentals',def:'Grouping similar items together without predefined categories.',why:'Useful for discovering topic groups in a large content library.',rel:['Unsupervised Learning']},
@@ -1800,31 +1797,31 @@ var GLOSSARY = [
   {term:'Learning Rate',cat:'ML Fundamentals',def:'A hyperparameter controlling how much to adjust weights at each training step. Too high = unstable; too low = slow learning.',why:'One of the most critical settings in model training \u2014 affects whether training converges at all.',rel:['Gradient Descent','Training']},
   {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task and adapting it for a different but related task, leveraging previously learned patterns.',why:'This is why fine-tuned models work \u2014 they transfer general language knowledge to specific tasks.',rel:['Fine-Tuning']},
   {term:'Data Augmentation',cat:'ML Fundamentals',def:'Creating modified copies of training data to increase dataset size and diversity (e.g., rotating images, paraphrasing text).',why:'Helps models generalize better, especially when training data is limited.',rel:['Training Data']},
-  {term:'Feature Engineering',cat:'ML Fundamentals',def:'The process of selecting, transforming, or creating input features to improve model performance.',why:'In traditional ML, this was the most important skill. Deep learning automates much of it.',rel:['Machine Learning']},
-  {term:'Diffusion Model',cat:'GenAI',def:'A GenAI model for image generation (e.g., DALL-E, Midjourney, Stable Diffusion). Works by learning to progressively remove noise from random data to create images.',why:'If you create visual content or need AI-generated images, these are the models behind the tools.',rel:['Generative AI','Multi-modal']},
+  {term:'Feature Engineering',cat:'ML Fundamentals',def:'The process of selecting, transforming, or creating input features to improve model performance.',why:'In traditional ML, this was the most important skill. Deep learning automates much of it.',rel:['Machine Learning (ML)']},
+  {term:'Diffusion Model',cat:'GenAI',def:'A GenAI model for image generation (e.g., DALL-E, Midjourney, Stable Diffusion). Works by learning to progressively remove noise from random data to create images.',why:'If you create visual content or need AI-generated images, these are the models behind the tools.',rel:['Generative AI (GenAI)','Multi-modal']},
   {term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that create new content \u2014 text, images, audio, video, code.',why:'The category of AI you interact with most directly.',rel:['Large Language Model (LLM)','Diffusion Model']},
-  {term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative AI model trained on massive text datasets to understand and generate human language.',why:'The technology powering the AI writing and editing tools you use daily.',rel:['Generative AI','Transformer','Token']},
+  {term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative AI model trained on massive text datasets to understand and generate human language.',why:'The technology powering the AI writing and editing tools you use daily.',rel:['Generative AI (GenAI)','Transformer','Token']},
   {term:'Transformer',cat:'GenAI',def:'The neural network architecture introduced in 2017 that powers virtually all modern LLMs.',why:'Understanding transformers helps you understand LLM strengths and limitations.',rel:['Attention Mechanism','Large Language Model (LLM)']},
   {term:'Attention Mechanism',cat:'GenAI',def:'The core technique in Transformers allowing every word to weigh the importance of every other word simultaneously.',why:'This is why LLMs can understand context across long texts.',rel:['Transformer','Context Window']},
   {term:'Token',cat:'GenAI',def:'A sub-word unit that LLMs use to process text.',why:'Tokens determine cost, context limits, and how much text AI can process.',rel:['Tokenizer','Context Window']},
   {term:'Tokenizer',cat:'GenAI',def:'The component converting text into tokens and back.',why:'Different models use different tokenizers, which is why token counts vary.',rel:['Token']},
   {term:'Context Window',cat:'GenAI',def:'The maximum number of tokens a model can process in a single interaction.',why:'Determines the longest document you can process in one prompt.',rel:['Token','Truncation']},
-  {term:'Temperature',cat:'GenAI',def:'A parameter controlling output randomness. Low = predictable. High = creative.',why:'For technical docs, use lower temperature. For brainstorming, try higher.',rel:['Top-p','Sampling']},
+  {term:'Temperature',cat:'GenAI',def:'A parameter controlling output randomness. Low = predictable. High = creative.',why:'For technical docs, use lower temperature. For brainstorming, try higher.',rel:['Top-p (Nucleus Sampling)','Sampling']},
   {term:'Top-p (Nucleus Sampling)',cat:'GenAI',def:'A parameter controlling diversity by limiting the pool of tokens considered.',why:'Like temperature, it affects output variability.',rel:['Temperature','Sampling']},
   {term:'System Prompt',cat:'GenAI',def:'Hidden instructions defining AI behavior before your conversation begins.',why:'Understanding system prompts helps you work with AI tools more effectively.',rel:['Prompt','Role Prompting']},
-  {term:'Multi-modal',cat:'GenAI',def:'AI models that process and generate multiple content types \u2014 text, images, audio.',why:'Multi-modal models can analyze images and process mixed-media content.',rel:['Large Language Model (LLM)','Generative AI']},
-  {term:'Embedding',cat:'GenAI',def:'A numerical representation of text as a vector in high-dimensional space. Similar meanings = similar vectors.',why:'Embeddings power semantic search, document matching, and RAG systems.',rel:['Vector','RAG','Semantic Search']},
+  {term:'Multi-modal',cat:'GenAI',def:'AI models that process and generate multiple content types \u2014 text, images, audio.',why:'Multi-modal models can analyze images and process mixed-media content.',rel:['Large Language Model (LLM)','Generative AI (GenAI)']},
+  {term:'Embedding',cat:'GenAI',def:'A numerical representation of text as a vector in high-dimensional space. Similar meanings = similar vectors.',why:'Embeddings power semantic search, document matching, and RAG systems.',rel:['Vector','RAG (Retrieval-Augmented Generation)','Semantic Search']},
   {term:'Vector',cat:'GenAI',def:'A list of numbers representing content in mathematical space, used for similarity comparisons.',why:'When AI finds "related articles," it\'s comparing vectors.',rel:['Embedding','Vector Database']},
   {term:'Hallucination',cat:'GenAI',def:'When AI generates confident, plausible content that is factually incorrect or fabricated.',why:'The #1 risk for content editors. Always verify claims and citations.',rel:['Grounding']},
-  {term:'Grounding',cat:'GenAI',def:'Techniques connecting AI output to verifiable source material, reducing hallucination.',why:'RAG is a grounding technique \u2014 it gives AI actual documents to reference.',rel:['RAG','Hallucination']},
+  {term:'Grounding',cat:'GenAI',def:'Techniques connecting AI output to verifiable source material, reducing hallucination.',why:'RAG is a grounding technique \u2014 it gives AI actual documents to reference.',rel:['RAG (Retrieval-Augmented Generation)','Hallucination']},
   {term:'Fine-Tuning',cat:'GenAI',def:'Further training a pre-trained model on a specific dataset to specialize its behavior.',why:'More expensive than prompt engineering but produces specialized behavior.',rel:['Training','RLHF']},
   {term:'RLHF',cat:'GenAI',def:'Reinforcement Learning from Human Feedback \u2014 human ratings improve model behavior.',why:'RLHF is why modern AI tools are helpful, conversational, and safe.',rel:['Reinforcement Learning','Fine-Tuning','Alignment']},
   {term:'Knowledge Cutoff',cat:'GenAI',def:'The date beyond which a model has no training data.',why:'Verify time-sensitive information \u2014 the AI\'s knowledge may be outdated.',rel:['Training Data','Grounding']},
-  {term:'Sampling',cat:'GenAI',def:'The process by which the model selects the next token from probabilities.',why:'Explains why the same prompt can produce different outputs each time.',rel:['Temperature','Top-p']},
+  {term:'Sampling',cat:'GenAI',def:'The process by which the model selects the next token from probabilities.',why:'Explains why the same prompt can produce different outputs each time.',rel:['Temperature','Top-p (Nucleus Sampling)']},
   {term:'Tokenization',cat:'GenAI',def:'The process of converting text into tokens.',why:'Understanding tokenization helps estimate costs and context window usage.',rel:['Token','Tokenizer']},
   {term:'Truncation',cat:'GenAI',def:'When input exceeding the context window is cut off silently.',why:'If AI output ignores part of a long document, truncation is likely the cause.',rel:['Context Window','Token']},
   {term:'Streaming',cat:'GenAI',def:'Delivering the AI response token by token as generated.',why:'This is why you see AI responses appear word by word.',rel:['Inference','Latency']},
-  {term:'Benchmark',cat:'GenAI',def:'A standardized test for evaluating and comparing AI model performance.',why:'Helps you interpret model comparison claims.',rel:['Evaluation','Model']},
+  {term:'Benchmark',cat:'GenAI',def:'A standardized test for evaluating and comparing AI model performance.',why:'Helps you interpret model comparison claims.',rel:['Evaluation (of AI output)','Model']},
   {term:'Constitutional AI',cat:'GenAI',def:'A technique where the model self-critiques its responses against a set of principles before outputting them, developed by Anthropic.',why:'Explains why Claude tends to be more cautious and nuanced than other models.',rel:['Alignment','RLHF','Guardrails']},
   {term:'Mixture of Experts (MoE)',cat:'GenAI',def:'An architecture where the model routes each input to specialized sub-networks ("experts"), activating only a fraction of total parameters per query.',why:'Enables very large models to run efficiently \u2014 only part of the model is active for each request.',rel:['Transformer','Parameters']},
   {term:'Speculative Decoding',cat:'GenAI',def:'A technique where a small, fast model drafts candidate tokens that a larger model then verifies, accelerating inference without quality loss.',why:'This is one reason why AI responses are getting faster without getting worse.',rel:['Inference','Latency']},
@@ -1836,7 +1833,7 @@ var GLOSSARY = [
   {term:'Safety Filter',cat:'GenAI',def:'A system that screens AI inputs and outputs for harmful, dangerous, or policy-violating content.',why:'Explains why AI sometimes refuses legitimate requests \u2014 safety filters can have false positives.',rel:['Guardrails','Red-Teaming']},
   {term:'Red-Teaming',cat:'GenAI',def:'Deliberately trying to make AI fail or bypass safety measures to identify vulnerabilities.',why:'Understanding red-teaming explains why AI tools sometimes seem overly cautious.',rel:['Guardrails','Safety Filter']},
   {term:'Prompt',cat:'Prompting',def:'The input you give to an AI model \u2014 your question, instruction, or request.',why:'Prompt quality directly determines output quality.',rel:['Prompt Engineering','System Prompt']},
-  {term:'Prompt Engineering',cat:'Prompting',def:'Designing and refining prompts to get optimal output from an AI model.',why:'Your core skill for working effectively with AI tools.',rel:['Prompt','Few-Shot','Chain-of-Thought']},
+  {term:'Prompt Engineering',cat:'Prompting',def:'Designing and refining prompts to get optimal output from an AI model.',why:'Your core skill for working effectively with AI tools.',rel:['Prompt','Few-Shot','Chain-of-Thought (CoT)']},
   {term:'Zero-Shot',cat:'Prompting',def:'Asking AI to perform a task without providing any examples.',why:'Quick for simple tasks, but less consistent without examples.',rel:['Few-Shot','Prompt']},
   {term:'Few-Shot',cat:'Prompting',def:'Providing the AI with examples of the desired input-output pattern before your request.',why:'One of the most effective techniques for improving consistency.',rel:['Zero-Shot','Prompt Engineering']},
   {term:'Chain-of-Thought (CoT)',cat:'Prompting',def:'Prompting the AI to think step by step or show reasoning before answering.',why:'Produces more accurate results for complex analytical tasks.',rel:['Prompt Engineering']},
@@ -1844,43 +1841,42 @@ var GLOSSARY = [
   {term:'Role Prompting',cat:'Prompting',def:'Instructing the AI to adopt a specific persona or expertise.',why:'Setting a role calibrates language, tone, and detail depth.',rel:['System Prompt','Prompt Engineering']},
   {term:'Output Format',cat:'Prompting',def:'Specifying the structure of the AI\'s response (bullets, table, JSON, markdown).',why:'Explicit format instructions prevent manual reformatting.',rel:['Prompt Engineering','Structured Output']},
   {term:'API (Application Programming Interface)',cat:'Infrastructure',def:'Rules and protocols allowing software to communicate. In AI: the interface for prompts and responses.',why:'Understanding APIs helps you know why the same model behaves differently in different tools.',rel:['Model','Inference']},
-  {term:'Model',cat:'Infrastructure',def:'The trained AI system that processes inputs and generates outputs.',why:'Different models have different capabilities, speeds, and costs.',rel:['Large Language Model (LLM)','Parameters','API']},
+  {term:'Model',cat:'Infrastructure',def:'The trained AI system that processes inputs and generates outputs.',why:'Different models have different capabilities, speeds, and costs.',rel:['Large Language Model (LLM)','Parameters','API (Application Programming Interface)']},
   {term:'Open-Source Model',cat:'Infrastructure',def:'An AI model whose weights and code are publicly available (e.g., Llama, Mistral).',why:'Open-source gives more control but requires expertise to deploy.',rel:['Model','Proprietary Model']},
-  {term:'Proprietary Model',cat:'Infrastructure',def:'An AI model owned by a company, accessible only through their API (e.g., Claude, GPT).',why:'These are what you use through Claude.ai and ChatGPT.',rel:['Model','API','Open-Source Model']},
+  {term:'Proprietary Model',cat:'Infrastructure',def:'An AI model owned by a company, accessible only through their API (e.g., Claude, GPT).',why:'These are what you use through Claude.ai and ChatGPT.',rel:['Model','API (Application Programming Interface)','Open-Source Model']},
   {term:'Latency',cat:'Infrastructure',def:'The time delay between sending a prompt and receiving a response.',why:'Larger models and longer prompts = higher latency.',rel:['Inference','Model']},
   {term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: the AI model runs locally on your computer or phone. Cloud: the model runs on remote servers and results are sent back over the internet.',why:'Cloud inference requires internet and sends data to external servers. On-device inference is private but limited by device hardware. This matters for sensitive content workflows.',rel:['Inference','Latency']},
   {term:'RAG (Retrieval-Augmented Generation)',cat:'RAG & Infrastructure',def:'A technique where AI retrieves relevant documents from a knowledge base before generating a response.',why:'RAG grounds AI in your actual documentation, reducing hallucination.',rel:['Embedding','Vector Database','Grounding']},
-  {term:'Vector Database',cat:'RAG & Infrastructure',def:'A database optimized for storing and searching vector embeddings.',why:'The backend powering RAG and semantic search in AI knowledge bases.',rel:['Vector','Embedding','RAG']},
-  {term:'Chunking Strategy',cat:'RAG & Infrastructure',def:'The method used to split documents into smaller pieces for embedding and storage in a RAG system.',why:'Chunk size affects retrieval quality \u2014 too small loses context, too large dilutes relevance.',rel:['RAG','Vector Database']},
-  {term:'Hybrid Search',cat:'RAG & Infrastructure',def:'Combining keyword search and semantic (vector) search to get the best of both approaches.',why:'Hybrid search catches both exact matches and semantic matches, improving retrieval quality.',rel:['Semantic Search','RAG']},
-  {term:'Reranking',cat:'RAG & Infrastructure',def:'Using a secondary model to re-score and reorder search results for better relevance.',why:'Reranking improves the quality of retrieved documents before they\u2019re sent to the LLM.',rel:['RAG','Hybrid Search']},
+  {term:'Vector Database',cat:'RAG & Infrastructure',def:'A database optimized for storing and searching vector embeddings.',why:'The backend powering RAG and semantic search in AI knowledge bases.',rel:['Vector','Embedding','RAG (Retrieval-Augmented Generation)']},
+  {term:'Chunking Strategy',cat:'RAG & Infrastructure',def:'The method used to split documents into smaller pieces for embedding and storage in a RAG system.',why:'Chunk size affects retrieval quality \u2014 too small loses context, too large dilutes relevance.',rel:['RAG (Retrieval-Augmented Generation)','Vector Database']},
+  {term:'Hybrid Search',cat:'RAG & Infrastructure',def:'Combining keyword search and semantic (vector) search to get the best of both approaches.',why:'Hybrid search catches both exact matches and semantic matches, improving retrieval quality.',rel:['Semantic Search','RAG (Retrieval-Augmented Generation)']},
+  {term:'Reranking',cat:'RAG & Infrastructure',def:'Using a secondary model to re-score and reorder search results for better relevance.',why:'Reranking improves the quality of retrieved documents before they\u2019re sent to the LLM.',rel:['RAG (Retrieval-Augmented Generation)','Hybrid Search']},
   {term:'Vector Similarity',cat:'RAG & Infrastructure',def:'A mathematical measure of how close two vectors are in embedding space, indicating semantic similarity.',why:'The core mechanism behind semantic search and RAG retrieval.',rel:['Cosine Similarity','Embedding']},
   {term:'Cosine Similarity',cat:'RAG & Infrastructure',def:'A specific method of measuring vector similarity based on the angle between two vectors, ranging from -1 to 1.',why:'The most common similarity metric used in vector databases and RAG systems.',rel:['Vector Similarity','Vector Database']},
-  {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools and data sources.',why:'MCP is how AI tools connect to your company\'s systems \u2014 the USB-C of AI.',rel:['Function Calling / Tool Use','Function Calling','API']},
-  {term:'Function Calling / Tool Use',cat:'Protocols',def:'The ability of an AI to invoke external tools as part of generating a response.',why:'Makes AI go beyond text generation \u2014 it can look things up and take actions.',rel:['MCP','Agent','API']},
-  {term:'Structured Output',cat:'Protocols',def:'AI output in a defined format like JSON, XML, or a specific template.',why:'Essential when output feeds into other systems (CMS, databases, pipelines).',rel:['Output Format','API']},
-  {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\u2019s ability to break complex tasks into subtasks, determine the right sequence, and decide which tools to use at each step.',why:'Understanding how agents plan helps you design better task descriptions and evaluate whether an agent\u2019s approach makes sense.',rel:['Agent Loop','Tool Orchestration','Prompt Chaining']},
-  {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Function Calling / Tool Use','MCP','Planning']},
-  {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool providing suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent','Function Calling / Tool Use']},
-  {term:'Planning (Agentic)',cat:'Agents',def:'An AI agent\'s ability to break tasks into subtasks, determine sequence, and select tools.',why:'Understanding agent planning helps you design better task descriptions.',rel:['Agent','Prompt Chaining']},
-  {term:'Agent Loop',cat:'Agents',def:'The iterative cycle agents follow: observe, plan, act, evaluate, repeat until the goal is met.',why:'Understanding the agent loop helps you predict agent behavior and design better tasks.',rel:['Agent','Planning (Agentic)']},
-  {term:'Tool Orchestration',cat:'Agents',def:'An agent\u2019s ability to select and sequence multiple tools to accomplish a complex task.',why:'Orchestration is what makes agents powerful \u2014 combining search, code execution, and data retrieval.',rel:['Agent','Function Calling / Tool Use']},
+  {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools and data sources.',why:'MCP is how AI tools connect to your company\'s systems \u2014 the USB-C of AI.',rel:['Function Calling / Tool Use','Function Calling / Tool Use','API (Application Programming Interface)']},
+  {term:'Function Calling / Tool Use',cat:'Protocols',def:'The ability of an AI to invoke external tools as part of generating a response.',why:'Makes AI go beyond text generation \u2014 it can look things up and take actions.',rel:['MCP (Model Context Protocol)','Agent (AI Agent)','API (Application Programming Interface)']},
+  {term:'Structured Output',cat:'Protocols',def:'AI output in a defined format like JSON, XML, or a specific template.',why:'Essential when output feeds into other systems (CMS, databases, pipelines).',rel:['Output Format','API (Application Programming Interface)']},
+  {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\u2019s ability to analyze a complex task, break it into ordered subtasks, determine the right sequence and dependencies, and decide which tools to use at each step.',why:'Planning is what distinguishes agents from chatbots. A chatbot responds to one message; an agent plans a multi-step strategy.',rel:['Agent (AI Agent)','Agent Loop','Tool Orchestration','Prompt Chaining']},
+  {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Function Calling / Tool Use','MCP (Model Context Protocol)','Planning (in Agents)']},
+  {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool providing suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent (AI Agent)','Function Calling / Tool Use']},
+  {term:'Agent Loop',cat:'Agents',def:'The iterative cycle agents follow: observe, plan, act, evaluate, repeat until the goal is met.',why:'Understanding the agent loop helps you predict agent behavior and design better tasks.',rel:['Agent (AI Agent)','Planning (in Agents)']},
+  {term:'Tool Orchestration',cat:'Agents',def:'An agent\u2019s ability to select and sequence multiple tools to accomplish a complex task.',why:'Orchestration is what makes agents powerful \u2014 combining search, code execution, and data retrieval.',rel:['Agent (AI Agent)','Function Calling / Tool Use']},
   {term:'Working Memory (Agents)',cat:'Agents',def:'The accumulated context an agent maintains across subtasks, storing results and decisions for reference.',why:'Working memory is why agents can build on earlier steps \u2014 and why they struggle with very long tasks.',rel:['Agent Loop','Context Window']},
-  {term:'Human-in-the-Loop (Agents)',cat:'Agents',def:'A design pattern where agents request human approval before irreversible actions.',why:'Essential for content workflows where accuracy matters more than speed.',rel:['Agent','Responsible AI']},
+  {term:'Human-in-the-Loop (Agents)',cat:'Agents',def:'A design pattern where agents request human approval before irreversible actions.',why:'Essential for content workflows where accuracy matters more than speed.',rel:['Agent (AI Agent)','Responsible AI']},
   {term:'Reflection (Agents)',cat:'Agents',def:'An agent\u2019s ability to evaluate its own outputs and correct mistakes before returning results.',why:'Self-reflection improves agent reliability, similar to a writer editing their own draft.',rel:['Agent Loop','Constitutional AI']},
-  {term:'Multi-Agent Systems',cat:'Agents',def:'Architectures where multiple specialized agents collaborate \u2014 one researches, one drafts, one reviews.',why:'The future of complex AI workflows: specialized agents working together like a team.',rel:['Agent','Tool Orchestration']},
-  {term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\u2019s context at request time.',why:'Every time you paste a document into AI chat, you\'re doing context injection.',rel:['RAG','Context Window','Prompt']},
+  {term:'Multi-Agent Systems',cat:'Agents',def:'Architectures where multiple specialized agents collaborate \u2014 one researches, one drafts, one reviews.',why:'The future of complex AI workflows: specialized agents working together like a team.',rel:['Agent (AI Agent)','Tool Orchestration']},
+  {term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\u2019s context at request time.',why:'Every time you paste a document into AI chat, you\'re doing context injection.',rel:['RAG (Retrieval-Augmented Generation)','Context Window','Prompt']},
   {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI output reflecting imbalances in training data, design, or evaluation.',why:'AI content may inadvertently favor certain perspectives or use non-inclusive language.',rel:['Training Data']},
   {term:'Alignment',cat:'Ethics',def:'Ensuring AI systems behave in accordance with human values and intentions.',why:'Alignment research is why modern AI tools are generally helpful and safe.',rel:['RLHF','Guardrails','Constitutional AI']},
   {term:'Guardrails',cat:'Ethics',def:'Built-in restrictions preventing AI from generating harmful content.',why:'Guardrails protect you and your organization from publishing problematic content.',rel:['Alignment','Safety Filter']},
-  {term:'Responsible AI',cat:'Ethics',def:'Practices ensuring AI is developed and used ethically, fairly, transparently, and safely.',why:'You play a role by verifying output, checking for bias, and maintaining editorial standards.',rel:['Bias','Alignment','Guardrails']},
+  {term:'Responsible AI',cat:'Ethics',def:'Practices ensuring AI is developed and used ethically, fairly, transparently, and safely.',why:'You play a role by verifying output, checking for bias, and maintaining editorial standards.',rel:['Bias (in AI)','Alignment','Guardrails']},
   {term:'Automation Bias',cat:'Ethics',def:'The human tendency to over-rely on automated systems and accept their output without critical evaluation.',why:'The biggest practical risk for content editors using AI \u2014 always verify.',rel:['Hallucination']},
   {term:'Prompt Library / Playbook',cat:'Workflow',def:'A curated collection of tested, reusable prompt templates organized by task type.',why:'Building a prompt library saves time and ensures team consistency.',rel:['Prompt Engineering','Prompt Template']},
-  {term:'Prompt Template',cat:'Workflow',def:'A reusable prompt structure with placeholder variables for specific tasks.',why:'Templates standardize AI usage and ensure consistently good output.',rel:['Prompt Library','Prompt Engineering']},
+  {term:'Prompt Template',cat:'Workflow',def:'A reusable prompt structure with placeholder variables for specific tasks.',why:'Templates standardize AI usage and ensure consistently good output.',rel:['Prompt Library / Playbook','Prompt Engineering']},
   {term:'Human-in-the-Loop',cat:'Workflow',def:'A workflow where AI handles part of the task and a human reviews and approves.',why:'This IS your workflow \u2014 AI drafts, you review, edit, and approve.',rel:['Responsible AI']},
   {term:'Content Transformation',cat:'Workflow',def:'Using AI to convert content from one format, audience, or style to another.',why:'One of the highest-ROI daily uses of AI for content editors.',rel:['Prompt Template']},
-  {term:'Semantic Search',cat:'Workflow',def:'Search matching by meaning rather than exact keywords.',why:'AI-powered semantic search finds content even when users don\'t use exact terminology.',rel:['Embedding','Vector','RAG']},
-  {term:'Chunking',cat:'Workflow',def:'Breaking a large document into smaller sections for AI processing.',why:'Explains why AI sometimes "misses" a section in a long document.',rel:['Context Window','RAG','Token']},
+  {term:'Semantic Search',cat:'Workflow',def:'Search matching by meaning rather than exact keywords.',why:'AI-powered semantic search finds content even when users don\'t use exact terminology.',rel:['Embedding','Vector','RAG (Retrieval-Augmented Generation)']},
+  {term:'Chunking',cat:'Workflow',def:'Breaking a large document into smaller sections for AI processing.',why:'Explains why AI sometimes "misses" a section in a long document.',rel:['Context Window','RAG (Retrieval-Augmented Generation)','Token']},
   {term:'Evaluation (of AI output)',cat:'Workflow',def:'Systematically assessing quality, accuracy, and usefulness of AI-generated content.',why:'A consistent evaluation rubric makes your review process faster and more reliable.',rel:['Human-in-the-Loop']}
 ];
 
