@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Models &amp; Algorithms Explorer</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563EB;--primary-light:#3B82F6;--primary-dark:#1D4ED8;
+  --accent:#7C3AED;--accent-light:#8B5CF6;
+  --secondary:#06B6D4;
+  --success:#10B981;--warning:#F59E0B;--error:#EF4444;
+  --bg-body:#F8FAFC;--bg-card:#FFFFFF;--bg-muted:#F1F5F9;--bg-highlight:#EFF6FF;
+  --tx-primary:#0F172A;--tx-secondary:#475569;--tx-muted:#94A3B8;
+  --border:#E2E8F0;--border-active:#2563EB;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+  --gradient-primary:linear-gradient(135deg,#2563EB,#7C3AED);
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif;
+  --font-mono:'SF Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg-body);color:var(--tx-secondary);line-height:1.6;font-size:16px}
+a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
+
+.hdr{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+.hdr-l{display:flex;align-items:center;gap:14px}
+.hdr-ico{width:38px;height:38px;background:var(--gradient-primary);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-ico svg{width:22px;height:22px;fill:#fff}
+.hdr-t{font-size:20px;font-weight:700;color:var(--tx-primary)}
+.hdr-s{font-size:12px;color:var(--tx-secondary);margin-top:1px}
+.hdr-s .by{color:var(--accent);font-weight:600}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.hdr-btn{background:var(--bg-muted);border:1px solid var(--border);border-radius:8px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--tx-secondary);flex-shrink:0}
+.hdr-btn:hover{border-color:var(--primary);color:var(--primary)}
+.hdr-btn svg{width:18px;height:18px}
+
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--bg-card);position:sticky;top:56px;z-index:50;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{padding:12px 20px;font-size:14px;font-weight:600;color:var(--tx-muted);cursor:pointer;border:none;background:none;white-space:nowrap;border-bottom:3px solid transparent;transition:all .2s;font-family:var(--font-body)}
+.tab-btn:hover{color:var(--tx-primary);background:var(--bg-highlight)}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-btn:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+.explorer-layout{display:flex;gap:0;min-height:calc(100vh - 120px)}
+.explorer-sidebar{width:300px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);max-height:calc(100vh - 120px);position:sticky;top:120px}
+.explorer-main{flex:1;padding:24px;overflow-y:auto}
+
+.filter-bar{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-muted)}
+.filter-bar input{width:100%;padding:8px 12px;font-size:14px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--tx-primary);font-family:var(--font-body)}
+.filter-bar input:focus{outline:none;border-color:var(--primary)}
+.filter-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.filter-chip{padding:4px 10px;border:1px solid var(--border);border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;background:var(--bg-card);color:var(--tx-secondary);font-family:var(--font-body);transition:all .15s}
+.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.filter-chip:hover:not(.active){border-color:var(--primary);color:var(--primary)}
+.filter-count{font-size:11px;color:var(--tx-muted);margin-top:6px}
+
+.cat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;font-weight:600;font-size:14px;color:var(--tx-primary);border-bottom:1px solid var(--border);transition:background .15s;user-select:none}
+.cat-header:hover{background:var(--bg-highlight)}
+.cat-count{margin-left:auto;font-size:12px;color:var(--tx-muted);background:var(--bg-muted);padding:2px 8px;border-radius:10px}
+.cat-arrow{transition:transform .2s;font-size:10px;color:var(--tx-muted)}
+.cat-header.expanded .cat-arrow{transform:rotate(90deg)}
+
+.cat-models{display:none;padding:0}
+.cat-header.expanded+.cat-models{display:block}
+
+.model-item{padding:8px 16px 8px 42px;cursor:pointer;font-size:13px;color:var(--tx-secondary);transition:all .15s;border-left:3px solid transparent}
+.model-item:hover{background:var(--bg-highlight);color:var(--tx-primary)}
+.model-item.active{background:var(--bg-highlight);color:var(--primary);border-left-color:var(--primary);font-weight:600}
+
+.model-detail{max-width:800px}
+.model-name{font-size:28px;font-weight:800;color:var(--tx-primary);margin-bottom:8px}
+.model-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.model-year{font-size:13px;color:var(--tx-muted)}
+.model-paper{font-size:13px;color:var(--tx-muted);font-style:italic}
+.model-category{font-size:13px;color:var(--tx-secondary);margin-bottom:20px}
+
+.model-section{margin-bottom:24px}
+.model-section-title{font-size:15px;font-weight:700;color:var(--tx-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.model-section-body{font-size:14px;color:var(--tx-secondary);line-height:1.7}
+
+.model-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.model-col ul{list-style:none;padding:0;margin:0}
+.model-col li{padding:6px 0;font-size:13px;color:var(--tx-secondary);border-bottom:1px solid var(--border)}
+.model-col li:last-child{border-bottom:none}
+
+.comparison-card{background:var(--bg-muted);border-radius:8px;padding:12px 16px;margin-bottom:8px}
+.comparison-card strong{color:var(--primary);font-size:13px}
+.comparison-card p{font-size:13px;color:var(--tx-secondary);margin-top:4px}
+
+.variant-chips{display:flex;flex-wrap:wrap;gap:6px}
+.variant-chip{background:var(--bg-muted);border:1px solid var(--border);border-radius:16px;padding:4px 12px;font-size:12px;color:var(--tx-secondary)}
+
+.related-link{display:inline-block;color:var(--primary);cursor:pointer;font-size:13px;margin-right:12px;text-decoration:underline}
+.related-link:hover{color:var(--primary-dark)}
+
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+.badge-daily{background:#10B981;color:#fff}
+.badge-useful{background:#3B82F6;color:#fff}
+.badge-reference{background:#8B5CF6;color:#fff}
+.badge-deployed{background:#10B981;color:#fff}
+.badge-emerging{background:#F59E0B;color:#000}
+.badge-research{background:#EF4444;color:#fff}
+
+.welcome-card{text-align:center;padding:60px 20px;color:var(--tx-muted)}
+.welcome-card h2{font-size:22px;font-weight:700;color:var(--tx-primary);margin-bottom:8px}
+.welcome-card p{font-size:14px;max-width:400px;margin:0 auto}
+
+.compare-selectors{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:24px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:24px}
+.compare-selectors select{flex:1;min-width:200px;padding:10px 14px;font-size:14px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--tx-primary);font-family:var(--font-body)}
+.compare-selectors select:focus{outline:none;border-color:var(--primary)}
+.compare-vs{font-size:16px;font-weight:700;color:var(--tx-muted)}
+
+.compare-table{width:100%;border-collapse:collapse;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.compare-table th{text-align:left;padding:12px 16px;background:var(--bg-muted);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--tx-primary)}
+.compare-table td{padding:12px 16px;border:1px solid var(--border);font-size:13px;color:var(--tx-secondary);vertical-align:top;line-height:1.6}
+.compare-table tr:hover td{background:var(--bg-highlight)}
+
+.decision-container{max-width:700px;margin:0 auto;padding:24px 0}
+.decision-step{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow-sm);animation:fadeSlide .3s ease}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.decision-q{font-size:18px;font-weight:700;color:var(--tx-primary);margin-bottom:16px}
+.decision-opt{display:block;width:100%;padding:12px 16px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--tx-secondary);font-size:14px;cursor:pointer;text-align:left;font-family:var(--font-body);transition:all .15s}
+.decision-opt:hover{border-color:var(--primary);background:var(--bg-highlight);color:var(--primary)}
+.decision-result{background:var(--bg-highlight);border:2px solid var(--primary);border-radius:12px;padding:24px;margin-top:16px}
+.decision-result h3{font-size:16px;font-weight:700;color:var(--primary);margin-bottom:12px}
+.result-model{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+.result-model-name{font-size:14px;font-weight:600;color:var(--tx-primary)}
+.result-model-link{font-size:12px;font-weight:600;color:var(--primary);cursor:pointer}
+.decision-restart{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 16px;background:var(--bg-muted);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--tx-secondary);cursor:pointer;font-family:var(--font-body)}
+.decision-restart:hover{border-color:var(--primary);color:var(--primary)}
+
+.timeline-container{padding:24px 0}
+.timeline-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:24px 0;position:relative}
+.timeline{display:flex;gap:0;padding:0 24px;position:relative;min-width:max-content}
+.timeline::before{content:'';position:absolute;top:50%;left:24px;right:24px;height:3px;background:var(--gradient-primary);z-index:0}
+.tl-era{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;position:relative;padding:0 16px}
+.tl-year{font-size:24px;font-weight:800;color:var(--primary)}
+.tl-label{font-size:12px;font-weight:700;color:var(--tx-secondary);margin:4px 0;text-align:center}
+.tl-dot{width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--bg-card);box-shadow:0 0 0 2px var(--primary);z-index:2;margin:8px 0}
+.tl-desc{font-size:12px;color:var(--tx-muted);text-align:center;max-width:180px;line-height:1.5;margin-top:8px}
+.tl-models{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.tl-model-chip{background:var(--bg-highlight);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--primary);cursor:pointer;font-weight:600;transition:all .15s}
+.tl-model-chip:hover{background:var(--primary);color:#fff}
+
+.resources-container{max-width:800px;margin:0 auto;padding:24px 0}
+.resource-tier{margin-bottom:32px}
+.tier-header{padding:12px 20px;border-radius:10px;color:#fff;font-weight:700;font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.resource-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:10px;transition:all .2s}
+.resource-card:hover{box-shadow:var(--shadow-md)}
+.resource-title{font-size:15px;font-weight:600;color:var(--tx-primary)}
+.resource-provider{font-size:12px;color:var(--tx-muted);margin-top:2px}
+.resource-meta{display:flex;gap:12px;margin-top:8px;font-size:12px;color:var(--tx-muted);flex-wrap:wrap}
+.resource-why{font-size:13px;color:var(--tx-secondary);line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.resource-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--primary);margin-top:8px}
+
+.glossary-container{max-width:960px;margin:0 auto;padding:24px 0}
+.gloss-search{width:100%;padding:12px 18px;font-size:15px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--tx-primary);font-family:var(--font-body);transition:border-color .2s;margin-bottom:16px}
+.gloss-search:focus{outline:none;border-color:var(--primary)}
+.gloss-filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.gloss-filter{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:var(--bg-card);color:var(--tx-secondary);font-family:var(--font-body);transition:all .2s}
+.gloss-filter.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.gloss-filter:hover:not(.active){border-color:var(--primary)}
+.alpha-bar{display:flex;gap:2px;margin-bottom:16px;flex-wrap:wrap}
+.alpha-btn{width:28px;height:28px;border-radius:4px;border:none;background:transparent;cursor:pointer;font-size:12px;font-weight:600;color:var(--tx-muted);font-family:var(--font-body);transition:all .2s;display:flex;align-items:center;justify-content:center}
+.alpha-btn:hover{background:var(--bg-highlight);color:var(--primary)}
+.alpha-btn.active{background:var(--primary);color:#fff}
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:12px}
+.gloss-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;transition:all .2s}
+.gloss-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm)}
+.gloss-term{font-size:16px;font-weight:700;color:var(--tx-primary);margin-bottom:4px}
+.gloss-def{font-size:13px;color:var(--tx-secondary);line-height:1.6;margin:8px 0}
+.gloss-why{font-size:12px;color:var(--accent);font-style:italic;line-height:1.5}
+.gloss-related{margin-top:8px;font-size:12px;color:var(--tx-muted)}
+.gloss-related a{color:var(--primary);font-weight:600;cursor:pointer}
+
+.search-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(0,0,0,.3);backdrop-filter:blur(2px)}
+.search-backdrop.open{display:block}
+.search-overlay{display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);width:92%;max-width:620px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);z-index:201;max-height:500px;overflow:hidden}
+.search-overlay.open{display:block}
+.search-overlay input{width:100%;padding:16px 20px;font-size:16px;border:none;border-bottom:1px solid var(--border);background:transparent;color:var(--tx-primary);font-family:var(--font-body);outline:none}
+.search-results{max-height:420px;overflow-y:auto;padding:8px 0}
+.search-item{padding:10px 20px;cursor:pointer;transition:background .15s}
+.search-item:hover{background:var(--bg-highlight)}
+.search-cat{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.search-txt{font-size:14px;color:var(--tx-primary);margin-top:2px}
+.search-txt mark{background:rgba(37,99,235,0.15);color:var(--primary);border-radius:2px;padding:0 2px}
+.search-empty{padding:24px;text-align:center;color:var(--tx-muted);font-size:14px}
+
+.scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow-md);z-index:90;transition:opacity .3s,transform .3s,background .2s}
+.scroll-top:hover{background:var(--primary-dark);transform:translateY(-2px)}
+.scroll-top.vis{display:flex}
+
+.mob-only{display:none}
+.mob-drawer-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:300;backdrop-filter:blur(2px)}
+.mob-drawer-backdrop.open{display:block}
+.mob-drawer{position:fixed;top:0;right:-300px;width:280px;max-width:80vw;height:100%;background:var(--bg-card);z-index:301;transition:right 0.3s ease;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden}
+.mob-drawer.open{right:0}
+.mob-drawer-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.mob-drawer-close{background:none;border:none;font-size:28px;color:var(--tx-secondary);cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.mob-drawer-close:hover{background:var(--bg-muted)}
+.mob-drawer-list{flex:1;overflow-y:auto;padding:12px 0}
+.mob-drawer-item{display:flex;align-items:center;gap:12px;padding:14px 20px;cursor:pointer;transition:background 0.15s;border-left:3px solid transparent}
+.mob-drawer-item:hover,.mob-drawer-item:active{background:var(--bg-highlight)}
+.mob-drawer-item.active{background:var(--bg-highlight);border-left-color:var(--primary)}
+.mob-drawer-name{font-size:14px;font-weight:600;color:var(--tx-primary)}
+.mob-drawer-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--tx-muted);text-align:center}
+
+.sim-focusable{outline:none;border-radius:12px;transition:box-shadow .2s}
+.sim-focusable:focus-visible{box-shadow:0 0 0 3px rgba(37,99,235,0.3)}
+
+.section-intro{max-width:800px;margin:0 auto 24px;text-align:center;padding:40px 20px}
+.section-intro h2{font-size:28px;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.section-intro p{font-size:15px;color:var(--tx-secondary);line-height:1.7}
+
+.badge-cat{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(37,99,235,0.1);color:var(--primary)}
+
+@media print{
+  .hdr,.tab-bar,.search-overlay,.search-backdrop,.hdr-btn,.scroll-top,.mob-drawer,.mob-drawer-backdrop,.explorer-sidebar,.filter-bar{display:none!important}
+  .tab-pane{display:block!important}
+  .tab-pane:not(.active){display:none!important}
+  body{background:#fff;color:#000;font-size:12px}
+  .model-detail,.compare-table,.resource-card,.gloss-card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}
+  .explorer-layout{display:block}
+  .explorer-main{padding:0}
+}
+
+@media(max-width:768px){
+  .mob-only{display:flex}
+  html,body{overflow-x:hidden;max-width:100vw}
+
+  .hdr{padding:10px 16px}
+  .hdr-t{font-size:16px}
+  .hdr-s{font-size:11px}
+  .hdr-ico{width:32px;height:32px;border-radius:6px}
+  .hdr-ico svg{width:18px;height:18px}
+  .mob-only.hdr-btn{width:44px;height:44px;background:var(--primary);color:#fff;border-color:var(--primary);border-radius:10px}
+  .mob-only.hdr-btn svg{stroke:#fff;width:20px;height:20px}
+
+  .tab-bar{top:52px}
+  .tab-btn{padding:10px 14px;font-size:12px}
+
+  .explorer-layout{flex-direction:column}
+  .explorer-sidebar{width:100%;max-height:300px;border-right:none;border-bottom:1px solid var(--border);position:static}
+  .explorer-main{padding:16px}
+  .model-columns{grid-template-columns:1fr}
+  .model-name{font-size:22px}
+
+  .compare-selectors{flex-direction:column;gap:8px}
+  .compare-selectors select{min-width:100%}
+  .compare-vs{display:none}
+
+  .decision-q{font-size:16px}
+  .decision-opt{font-size:13px}
+
+  .tl-era{flex:0 0 160px}
+  .tl-year{font-size:18px}
+  .tl-desc{font-size:11px}
+
+  .gloss-grid{grid-template-columns:1fr}
+
+  .section-intro{padding:24px 16px}
+  .section-intro h2{font-size:22px}
+
+  .scroll-top{width:40px;height:40px;bottom:16px;right:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <div class="hdr-l">
+    <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M12 2C9 2 6.5 4 6 7c-.7.2-1.3.5-1.8 1C3 9 2 10.5 2 12.2c0 2 1.5 3.6 3.3 3.8H8v-1.5H5.5c-1.3-.2-2-1.2-2-2.3 0-1 .6-2 1.5-2.3l.7-.3.1-.7c.3-2.3 2.3-4 4.7-4 2.2 0 4 1.5 4.5 3.5l.2.8.8.1c1.5.2 2.5 1.4 2.5 2.9 0 1.3-.9 2.4-2.2 2.6H14v1.5h2.7c2.1-.2 3.8-2 3.8-4.1 0-2-1.4-3.7-3.3-4.1C16.5 4.3 14.5 2 12 2zm-1 10v4H8.5L12 20l3.5-4H13v-4h-2z"/></svg></div>
+    <div><div class="hdr-t">AI Models &amp; Algorithms Explorer</div><div class="hdr-s">Your Interactive Reference to AI/ML Models, Architectures &amp; Patterns · <span class="by">Brought to you by Babak</span></div></div>
+  </div>
+  <div class="hdr-r">
+    <button class="hdr-btn mob-only" id="mob-menu-btn" title="Menu" aria-label="Open navigation menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
+  </div>
+</header>
+
+<nav class="tab-bar" id="tab-bar">
+  <button class="tab-btn active" data-tab="explorer">Model Explorer</button>
+  <button class="tab-btn" data-tab="compare">Compare</button>
+  <button class="tab-btn" data-tab="which">Which Model?</button>
+  <button class="tab-btn" data-tab="timeline">Timeline</button>
+  <button class="tab-btn" data-tab="resources">Resources</button>
+  <button class="tab-btn" data-tab="glossary">Glossary</button>
+</nav>
+
+<div class="tab-pane active" id="pane-explorer">
+  <div class="explorer-layout">
+    <aside class="explorer-sidebar">
+      <div class="filter-bar">
+        <input type="text" id="explorer-search" placeholder="Search models…" oninput="onExplorerSearch()" autocomplete="off" />
+        <div class="filter-chips" id="filter-chips"></div>
+        <div class="filter-count" id="filter-count"></div>
+      </div>
+      <div id="explorer-sidebar-list"></div>
+    </aside>
+    <div class="explorer-main" id="explorer-main">
+      <div class="welcome-card" id="welcome-card">
+        <h2>Select a Model</h2>
+        <p>Choose a model from the sidebar to explore its architecture, use cases, strengths, and limitations.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-pane" id="pane-compare">
+  <div style="max-width:960px;margin:0 auto;padding:24px">
+    <div class="section-intro"><h2>Compare Models</h2><p>Select two or three models to see a side-by-side comparison of their capabilities, strengths, and ideal use cases.</p></div>
+    <div class="compare-selectors">
+      <select id="compare-a" onchange="renderComparison()"><option value="">Select Model A…</option></select>
+      <span class="compare-vs">vs.</span>
+      <select id="compare-b" onchange="renderComparison()"><option value="">Select Model B…</option></select>
+      <span class="compare-vs">vs.</span>
+      <select id="compare-c" onchange="renderComparison()"><option value="">(Optional) Model C…</option></select>
+    </div>
+    <div id="compare-table"></div>
+  </div>
+</div>
+
+<div class="tab-pane" id="pane-which">
+  <div style="max-width:960px;margin:0 auto;padding:24px">
+    <div class="section-intro"><h2>Which Model Do I Need?</h2><p>Answer a few questions about your task and we'll recommend the best models for your use case.</p></div>
+    <div class="decision-container" id="decision-container"></div>
+  </div>
+</div>
+
+<div class="tab-pane" id="pane-timeline">
+  <div style="max-width:100%;margin:0 auto;padding:24px">
+    <div class="section-intro"><h2>Evolution of AI Models</h2><p>From the Perceptron to Agentic AI — a visual journey through the key milestones in artificial intelligence.</p></div>
+    <div class="timeline-wrap" id="timeline-wrap"><div class="timeline" id="timeline"></div></div>
+  </div>
+</div>
+
+<div class="tab-pane" id="pane-resources">
+  <div class="resources-container" id="resources-container"></div>
+</div>
+
+<div class="tab-pane" id="pane-glossary">
+  <div class="glossary-container">
+    <div class="section-intro"><h2>AI Glossary</h2><p>125+ terms explained in plain language with context on why each matters for your work.</p></div>
+    <input type="text" class="gloss-search" id="gloss-search" placeholder="Search glossary terms…" oninput="filterGlossary()" autocomplete="off" />
+    <div class="gloss-filters" id="gloss-filters"></div>
+    <div class="alpha-bar" id="alpha-bar"></div>
+    <div class="gloss-grid" id="gloss-grid"></div>
+  </div>
+</div>
+
+<div class="mob-drawer-backdrop" id="mob-drawer-backdrop"></div>
+<div class="mob-drawer" id="mob-drawer">
+  <div class="mob-drawer-header">
+    <div style="font-size:16px;font-weight:700;color:var(--tx-primary)">Navigation</div>
+    <button class="mob-drawer-close" id="mob-drawer-close" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="mob-drawer-list" id="mob-drawer-list"></div>
+</div>
+
+<button class="scroll-top" id="scroll-top-btn" title="Back to top" aria-label="Scroll to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<div class="search-backdrop" id="search-backdrop"></div>
+<div class="search-overlay" id="search-overlay">
+  <input type="text" id="search-input" placeholder="Search models, glossary, resources…" autocomplete="off" />
+  <div class="search-results" id="search-results"></div>
+</div>
+
+<script>
+const CATEGORIES = [
+  {id:'foundation',name:'Foundation Architectures',icon:'\u{1F3D7}\uFE0F',desc:'The building blocks that power modern AI'},
+  {id:'llm',name:'Large Language Models',icon:'\u{1F4AC}',desc:'The models behind ChatGPT, Claude, and Gemini'},
+  {id:'patterns',name:'AI Patterns & Systems',icon:'\u{1F504}',desc:'RAG, agents, tool use, and modern AI workflows'},
+  {id:'vision',name:'Vision Models',icon:'\u{1F441}\uFE0F',desc:'Image recognition, object detection, and visual AI'},
+  {id:'generative',name:'Generative Models',icon:'\u{1F3A8}',desc:'Creating images, audio, and synthetic data'},
+  {id:'multimodal',name:'Multimodal Models',icon:'\u{1F517}',desc:'Models that process text, images, and audio together'},
+  {id:'classical-sup',name:'Classical ML \u2014 Supervised',icon:'\u{1F4CA}',desc:'Proven algorithms for prediction and classification'},
+  {id:'classical-uns',name:'Classical ML \u2014 Unsupervised',icon:'\u{1F50D}',desc:'Finding hidden patterns without labeled data'},
+  {id:'ensemble',name:'Ensemble Methods',icon:'\u{1F332}',desc:'Combining multiple models for better accuracy'},
+  {id:'sequence',name:'Sequence & Time Series',icon:'\u{1F4C8}',desc:'Analyzing data that has a time dimension'},
+  {id:'rl',name:'Reinforcement Learning',icon:'\u{1F3AE}',desc:'Learning through trial, error, and rewards'},
+  {id:'graph',name:'Graph Models',icon:'\u{1F578}\uFE0F',desc:'Understanding relationships and network structures'},
+  {id:'audio',name:'Audio & Speech',icon:'\u{1F399}\uFE0F',desc:'Processing spoken language and sound'},
+  {id:'specialized',name:'Specialized & Research',icon:'\u{1F52C}',desc:'Cutting-edge and domain-specific architectures'}
+];
+
+const MODELS = [
+{id:'transformer',name:'Transformer',category:'Foundation Architectures',year:2017,paper:'Attention Is All You Need (Vaswani et al.)',relevance:'daily',status:'deployed',
+summary:'The architecture behind virtually every modern AI tool you use. Introduced the self-attention mechanism that allows every element in a sequence to directly attend to every other element simultaneously, regardless of distance. This replaced the sequential processing of RNNs, enabling massive parallelization during training and dramatically improving performance on language tasks.',
+whyItMatters:'Every time you use Claude, ChatGPT, Gemini, or any modern AI writing tool, you\u2019re using a Transformer. Understanding this architecture helps you understand why AI is good at some things (connecting ideas across long documents) and struggles with others (precise counting, arithmetic).',
+howItWorks:'Imagine reading a sentence where every word can look at every other word simultaneously and decide how much attention to pay to each. The word \u201Cit\u201D in \u201CThe cat sat on the mat because it was tired\u201D needs to figure out that \u201Cit\u201D means \u201Ccat.\u201D The attention mechanism computes a relevance score between every pair of words, creating a map of which words are most related. This happens across multiple \u201Cattention heads\u201D in parallel \u2014 each head learns different relationship types. Multiple layers of this attention, plus feed-forward networks, transform input text into rich representations that capture meaning.',
+strengths:['Processes all tokens simultaneously (massively parallel)','Captures long-range dependencies that RNNs miss','Scales predictably with more data and compute','The foundation of all state-of-the-art language models'],
+limitations:['Quadratic memory cost with sequence length','No inherent understanding of order without positional encoding','Computationally expensive for very long sequences compared to newer architectures like Mamba'],
+realWorldUse:['Powering ChatGPT, Claude, and Gemini for text generation','Machine translation (Google Translate)','Code completion (GitHub Copilot)','Document summarization','Content moderation at scale'],
+comparisons:[{model:'RNN/LSTM',diff:'Processes all tokens in parallel vs. sequentially, enabling much faster training on modern GPUs.'},{model:'Mamba',diff:'Mamba uses state space models for linear-time processing vs. Transformer\u2019s quadratic attention, better for very long sequences.'},{model:'CNN',diff:'Global attention across entire sequence vs. local receptive fields that only see nearby elements.'}],
+variants:['GPT (decoder-only)','BERT (encoder-only)','T5 (encoder-decoder)','PaLM','LLaMA','Mistral'],
+related:['attention-mechanism','bert','gpt-family'],tags:['nlp','generation','foundation','architecture']},
+
+{id:'attention-mechanism',name:'Attention Mechanism',category:'Foundation Architectures',year:2014,paper:'Neural Machine Translation by Jointly Learning to Align and Translate (Bahdanau et al.)',relevance:'daily',status:'deployed',
+summary:'The core innovation inside Transformers. Attention computes weighted relevance scores between all pairs of elements in a sequence, allowing the model to focus on the most relevant context for each position. Self-attention (within one sequence) and cross-attention (between two sequences) are the two main forms. Multi-head attention runs several attention functions in parallel, each learning different relationship patterns.',
+whyItMatters:'When an AI tool correctly understands that a pronoun on page 10 refers to a person named on page 1, that\u2019s the attention mechanism at work. When it loses track of context in a very long document, that\u2019s the attention mechanism running into its quadratic cost limits.',
+howItWorks:'For each word, the mechanism creates three vectors: Query (what am I looking for?), Key (what do I represent?), and Value (what information do I carry?). Each Query is compared against all Keys to produce attention scores. These scores become weights applied to Values, creating a context-aware representation. It\u2019s like each word asking \u201Cwhich other words should I pay attention to?\u201D and getting a weighted answer from every word in the document.',
+strengths:['Captures relationships regardless of distance','Parallelizable across all positions','Interpretable (attention weights show what the model focuses on)','Adapts dynamically to each input'],
+limitations:['Quadratic memory O(n\u00B2) with sequence length','Can over-attend to common patterns','Attention weights don\u2019t always correspond to human intuitions about relevance'],
+realWorldUse:['Every LLM interaction you have','Machine translation systems','Document understanding and search ranking','Image captioning and visual QA','Code analysis and completion'],
+comparisons:[{model:'Recurrence (RNN)',diff:'Parallel attention over all positions vs. sequential context passing, dramatically faster training.'},{model:'Convolution (CNN)',diff:'Global receptive field from layer one vs. local patterns that grow with depth.'},{model:'State Space (Mamba)',diff:'Quadratic full attention vs. linear-time selective state compression.'}],
+variants:['Self-Attention','Cross-Attention','Multi-Head Attention','Sparse Attention','Flash Attention','Grouped Query Attention'],
+related:['transformer','bert','gpt-family','mamba'],tags:['foundation','architecture','mechanism']},
+
+{id:'moe',name:'Mixture of Experts (MoE)',category:'Foundation Architectures',year:2022,paper:'Switch Transformers (Fedus et al.)',relevance:'useful',status:'deployed',
+summary:'An architecture where the model contains multiple specialized sub-networks (\u201Cexperts\u201D) and a learned router that directs each input to only the most relevant experts. A model can have trillions of parameters but only activate a fraction for any given input, dramatically reducing computational cost while maintaining quality. Mixtral, GPT-4 (rumored), and Gemini all use MoE variants.',
+whyItMatters:'MoE explains why some very large models can run surprisingly fast. When someone says \u201Cthis model has 1.8 trillion parameters but runs on consumer hardware,\u201D MoE is usually the answer \u2014 only a fraction of parameters are active per query.',
+howItWorks:'Think of a hospital with specialists. When you arrive, a triage nurse (router) directs you to the right specialist (expert) based on your symptoms. Similarly, MoE routes each token through a router network that picks the top 2 experts (out of, say, 8) to process it. The experts\u2019 outputs are weighted and combined. Each expert may specialize in different domains or languages.',
+strengths:['Massive model capacity with reasonable inference cost','Experts can specialize in different domains or languages','Scales to very large parameter counts efficiently','Proven at production scale in models like Mixtral'],
+limitations:['Training instability (load balancing across experts is hard)','Experts can collapse (all inputs routed to same few)','Higher memory footprint even if compute is lower','Communication overhead in distributed training'],
+realWorldUse:['Powering Mixtral 8x7B and 8x22B','Likely architecture inside GPT-4','Google\u2019s Switch Transformer','Enabling large models that would otherwise be too expensive to deploy'],
+comparisons:[{model:'Dense Transformer',diff:'Lower per-query compute but higher total memory vs. uniform activation of all parameters.'},{model:'Smaller Dense Model',diff:'More total capacity at similar inference cost vs. limited capacity at guaranteed cost.'},{model:'Distillation',diff:'Complementary approach \u2014 MoE for efficient large models, distillation for efficient small models.'}],
+variants:['Switch Transformer','Mixtral','GShard','Expert Choice Routing'],
+related:['transformer','gpt-family','quantization'],tags:['foundation','architecture','efficiency']},
+
+{id:'mamba',name:'State Space Models (Mamba)',category:'Foundation Architectures',year:2023,paper:'Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao)',relevance:'useful',status:'emerging',
+summary:'A new architecture challenging Transformers by replacing attention with selective state space layers that process sequences in linear time O(n) instead of quadratic O(n\u00B2). Mamba achieves comparable quality to Transformers on many tasks while processing very long sequences much more efficiently. It\u2019s the first serious architectural alternative to Transformers since 2017.',
+whyItMatters:'If Mamba or similar architectures succeed, AI tools could process entire books, codebases, or content libraries in a single pass without the context window limitations that plague current Transformer-based tools.',
+howItWorks:'Instead of every token looking at every other token (attention), Mamba maintains a compressed running state that selectively remembers important information and forgets irrelevant details \u2014 similar to how you summarize a chapter mentally rather than re-reading every page. A gating mechanism decides what to keep and what to discard at each step, making memory usage constant regardless of sequence length.',
+strengths:['Linear time and memory with sequence length','Excellent for very long sequences (100K+ tokens)','Faster inference than equivalent Transformers','No quadratic bottleneck'],
+limitations:['Still newer and less proven than Transformers','Smaller ecosystem of tools and research','Some tasks where global attention genuinely matters may still favor Transformers','Hybrid approaches (Transformer + Mamba) may ultimately win'],
+realWorldUse:['Experimental language models','DNA sequence analysis and genomics','Long-document processing research','Potential future replacement or complement to Transformers in production AI'],
+comparisons:[{model:'Transformer',diff:'Linear vs. quadratic complexity \u2014 major advantage for very long sequences.'},{model:'LSTM',diff:'Modern selective state compression vs. older gated recurrence.'},{model:'RetNet',diff:'Different approaches to efficient long-range modeling, both targeting Transformer limitations.'}],
+variants:['Mamba','Mamba-2','Jamba (hybrid Mamba-Transformer)','S4','S5'],
+related:['transformer','attention-mechanism'],tags:['foundation','architecture','efficiency','emerging']},
+
+{id:'gpt-family',name:'GPT Family',category:'Large Language Models',year:2018,paper:'Improving Language Understanding by Generative Pre-Training (Radford et al.)',relevance:'daily',status:'deployed',
+summary:'OpenAI\u2019s series of decoder-only Transformer models. GPT-3 (175B parameters) demonstrated that massive scale produces emergent capabilities. GPT-3.5 powers the original ChatGPT. GPT-4 added multimodal understanding and significantly improved reasoning. The GPT family established that auto-regressive language modeling at scale produces general-purpose intelligence.',
+whyItMatters:'GPT models power ChatGPT, which brought AI into mainstream awareness. Understanding GPT\u2019s strengths and weaknesses helps you evaluate when ChatGPT is the right tool and when Claude, Gemini, or other models might serve you better.',
+howItWorks:'GPT is a decoder-only Transformer trained to predict the next token. During training, it reads trillions of tokens and learns statistical patterns about language, facts, and reasoning. At inference time, it generates text one token at a time, each new token informed by everything that came before. RLHF fine-tunes it to be helpful and follow instructions rather than just predict text.',
+strengths:['Exceptional at open-ended generation','Vast general knowledge','Strong reasoning in GPT-4','Massive ecosystem of applications and integrations','Multimodal capability in GPT-4'],
+limitations:['Hallucination (confident fabrication)','Knowledge cutoff date','Expensive to run at scale','Proprietary (no access to weights)','Can be verbose'],
+realWorldUse:['ChatGPT for content drafting and editing','API integration for automated content pipelines','Code generation via GitHub Copilot','Customer service chatbots','Summarization and analysis'],
+comparisons:[{model:'Claude',diff:'GPT tends to be more expansive, Claude more cautious and nuanced in safety-sensitive areas.'},{model:'Llama',diff:'Proprietary with large ecosystem vs. open-source with full customization.'},{model:'Gemini',diff:'GPT has larger third-party ecosystem, Gemini has stronger native multimodal and Google integration.'}],
+variants:['GPT-2','GPT-3','GPT-3.5','GPT-4','GPT-4o','GPT-4o mini'],
+related:['transformer','claude','bert','rlhf'],tags:['llm','generation','daily','foundation']},
+
+{id:'claude',name:'Claude / Constitutional AI',category:'Large Language Models',year:2023,paper:'Constitutional AI: Harmlessness from AI Feedback (Bai et al.)',relevance:'daily',status:'deployed',
+summary:'Anthropic\u2019s family of language models, distinguished by Constitutional AI \u2014 a training technique where the model critiques its own outputs against a set of principles before responding. Claude models (Haiku, Sonnet, Opus) span a range of capability and cost. Claude is known for nuanced, thoughtful responses, strong instruction following, and a cautious approach to potentially harmful content.',
+whyItMatters:'Understanding how Claude is built differently from GPT (Constitutional AI vs RLHF) helps you understand its behavior: why it asks clarifying questions, why it sometimes declines requests, and why its tone differs from ChatGPT.',
+howItWorks:'Like GPT, Claude is a Transformer-based LLM. The key difference is Constitutional AI (CAI): during training, Claude\u2019s responses are evaluated against a set of principles covering helpfulness, harmlessness, and honesty. The model essentially reviews its own outputs and revises them. This self-critique mechanism is why Claude tends to be more cautious and balanced.',
+strengths:['Strong instruction following and nuanced tone','Thoughtful safety approach (Constitutional AI)','Excellent at complex analysis and long-form content','Large context window (up to 200K tokens)','Generally fewer hallucinations on factual claims'],
+limitations:['Can be overly cautious on edge cases','Sometimes provides excessive caveats','Smaller third-party ecosystem than GPT','May decline tasks other models would attempt'],
+realWorldUse:['Content drafting and editorial review','Technical documentation and analysis','Complex research synthesis','Code review and development','Enterprise AI applications'],
+comparisons:[{model:'GPT Family',diff:'More cautious and nuanced vs. more expansive and ecosystem-rich.'},{model:'Gemini',diff:'Stronger text analysis and long-context vs. stronger multimodal and Google integration.'},{model:'Llama',diff:'Proprietary API-based vs. open-source customizable.'}],
+variants:['Claude Haiku (fast/cheap)','Claude Sonnet (balanced)','Claude Opus (most capable)'],
+related:['transformer','gpt-family','rlhf'],tags:['llm','generation','daily','safety']},
+
+{id:'bert',name:'BERT',category:'Large Language Models',year:2018,paper:'BERT: Pre-training of Deep Bidirectional Transformers (Devlin et al.)',relevance:'daily',status:'deployed',
+summary:'An encoder-only Transformer that revolutionized NLP by introducing bidirectional pre-training. Unlike GPT which reads left-to-right, BERT reads in both directions simultaneously, making it exceptionally good at understanding context. BERT established the pre-train-then-fine-tune paradigm that became standard practice across the industry.',
+whyItMatters:'When you use Google Search, smart email categorization, or any AI tool that needs to understand the meaning of text rather than generate new text, BERT-family models are likely at work. It\u2019s the backbone of text classification, sentiment analysis, and search ranking.',
+howItWorks:'BERT is trained using Masked Language Modeling \u2014 randomly hiding 15% of words and predicting them from surrounding context. Because it sees words both before and after the masked position, BERT develops deep bidirectional understanding. You then fine-tune this pre-trained model on your specific task with a small amount of labeled data, leveraging the language understanding it already learned.',
+strengths:['Exceptional at text understanding and classification','Bidirectional context captures meaning better than left-to-right models','Relatively small and fast for deployment','Massive ecosystem of fine-tuned variants','Works great with small labeled datasets after pre-training'],
+limitations:['Cannot generate text (encoder-only architecture)','Maximum 512 tokens (much smaller than modern LLMs)','Requires task-specific fine-tuning (less flexible than GPT)','Being superseded by larger models for many tasks'],
+realWorldUse:['Google Search ranking algorithm','Email spam detection and classification','Sentiment analysis for brand monitoring','Document classification and tagging','Named entity recognition','Question answering systems'],
+comparisons:[{model:'GPT Family',diff:'Understands text deeply vs. generates text fluently \u2014 complementary strengths.'},{model:'Modern LLMs',diff:'Smaller and task-specific vs. large and general-purpose; BERT excels when you need fast, focused classification.'},{model:'Transformer (full)',diff:'Encoder-only vs. encoder-decoder; BERT sacrifices generation for superior understanding.'}],
+variants:['BERT-base','BERT-large','RoBERTa','ALBERT','DistilBERT','DeBERTa'],
+related:['transformer','gpt-family','attention-mechanism'],tags:['nlp','classification','foundation','understanding']},
+
+{id:'llama',name:'Llama (Meta)',category:'Large Language Models',year:2023,paper:'LLaMA: Open and Efficient Foundation Language Models (Touvron et al.)',relevance:'useful',status:'deployed',
+summary:'Meta\u2019s family of open-source large language models that democratized access to powerful AI. Llama proved that smaller, well-trained models could match or exceed larger proprietary ones. The open weights allow anyone to run, fine-tune, and build on these models, spawning an entire ecosystem of community adaptations.',
+whyItMatters:'Llama broke the monopoly of proprietary AI models. If your organization wants to run AI on-premise for data privacy, customize a model for your domain, or avoid per-query API costs, Llama-family models are the go-to starting point.',
+howItWorks:'Like GPT, Llama is a decoder-only Transformer trained to predict the next token. What sets it apart is training efficiency \u2014 Meta used more data and better training recipes to achieve strong performance at smaller parameter counts. Open weights mean anyone can download, run locally, fine-tune on domain data, or deploy in custom applications.',
+strengths:['Fully open-source (weights available)','Runs on consumer hardware (smaller variants)','Customizable through fine-tuning','No API costs or rate limits','Data stays private on your infrastructure','Strong community of adapters and tools'],
+limitations:['Requires technical expertise to deploy','Smaller models less capable than GPT-4 or Claude','No built-in safety rails like commercial APIs','Community fine-tunes vary wildly in quality'],
+realWorldUse:['On-premise AI for data-sensitive industries','Custom chatbots fine-tuned for specific domains','Research and experimentation','Local AI assistants on developer machines','Basis for variants like Vicuna, Alpaca, CodeLlama'],
+comparisons:[{model:'GPT Family',diff:'Open-source and customizable vs. proprietary with large ecosystem.'},{model:'Claude',diff:'Full control and customization vs. ready-to-use with safety guardrails.'},{model:'Mistral',diff:'Similar open-source philosophy, different training approaches and model sizes.'}],
+variants:['Llama','Llama 2','Llama 3','Llama 3.1','Llama 3.2','CodeLlama'],
+related:['transformer','gpt-family','quantization','distillation'],tags:['llm','open-source','generation','foundation']},
+
+{id:'gemini',name:'Gemini',category:'Large Language Models',year:2023,paper:'Gemini: A Family of Highly Capable Multimodal Models (Google DeepMind)',relevance:'daily',status:'deployed',
+summary:'Google DeepMind\u2019s natively multimodal model family, designed from the ground up to understand text, images, audio, video, and code simultaneously. Unlike models that bolted vision onto a text model, Gemini was trained on all modalities from the start. Available as Nano (on-device), Flash (fast), Pro (balanced), and Ultra (most capable).',
+whyItMatters:'Gemini is deeply integrated into Google\u2019s ecosystem \u2014 Search, Docs, Gmail, YouTube, and Android. If you work with Google Workspace tools, Gemini is the AI you\u2019ll interact with most. Its native multimodal capability means it can analyze images, documents, and videos without separate tools.',
+howItWorks:'Gemini uses a Transformer-based architecture trained simultaneously on text, images, audio, and video. Instead of adding vision to a text model as a secondary capability, Gemini processes all modalities through a unified model. This means it can naturally reason across modalities \u2014 describing an image, answering questions about a video, or generating code from a diagram.',
+strengths:['True native multimodal understanding','Massive context window (up to 1M+ tokens)','Deeply integrated with Google ecosystem','Strong at code and mathematics','Multiple size tiers for different needs'],
+limitations:['Tight integration with Google means less flexibility outside that ecosystem','Some features limited to specific regions','Privacy concerns with Google data integration','Hallucination rates comparable to other frontier models'],
+realWorldUse:['Google Workspace AI features (Docs, Sheets, Gmail)','Visual document understanding','YouTube video summarization','Google Search AI Overviews','Android on-device AI features'],
+comparisons:[{model:'GPT-4',diff:'Natively multimodal from training vs. vision added to a text model; Gemini has larger context windows.'},{model:'Claude',diff:'Broader modality support and Google integration vs. deeper text analysis and safety focus.'},{model:'Llama',diff:'Proprietary full-stack ecosystem vs. open-source text-focused.'}],
+variants:['Gemini Nano','Gemini Flash','Gemini Pro','Gemini Ultra'],
+related:['transformer','gpt-family','claude','clip'],tags:['llm','multimodal','generation','daily']},
+
+{id:'rag',name:'RAG \u2014 Retrieval-Augmented Generation',category:'AI Patterns & Systems',year:2020,paper:'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis et al.)',relevance:'daily',status:'deployed',
+summary:'A pattern that combines a retrieval system (search) with a generative model (LLM) to produce answers grounded in specific source documents. Instead of relying solely on training data, RAG first retrieves relevant documents from your knowledge base, then feeds them to the LLM as context. This dramatically reduces hallucinations and keeps answers current.',
+whyItMatters:'RAG is how organizations connect AI to their own content. Every time you want AI to answer questions about your documents, product specs, or internal knowledge base without fine-tuning the model, RAG is the standard approach.',
+howItWorks:'When you ask a question, RAG converts it into a vector embedding and searches a document database for the most relevant passages. These passages are inserted into the LLM\u2019s prompt as context. The LLM generates an answer based on the retrieved information rather than training data alone. Think of it as giving the AI a cheat sheet of relevant documents before asking it to answer.',
+strengths:['Dramatically reduces hallucinations by grounding in sources','No need to retrain the model for new information','Sources can be cited for verification','Content stays current without retraining','Works with any LLM'],
+limitations:['Quality depends heavily on retrieval quality','Chunking strategy matters significantly','Can miss relevant context if retrieval fails','Adds latency to responses','Struggles when answers require reasoning across many disconnected documents'],
+realWorldUse:['Enterprise knowledge base chatbots','Documentation search and Q&A','Customer support with product-specific answers','Legal document analysis','Medical information retrieval'],
+comparisons:[{model:'Fine-tuning',diff:'No retraining needed and easily updated vs. knowledge embedded in model weights.'},{model:'Pure LLM',diff:'Grounded in verifiable sources vs. relying solely on training data.'},{model:'Agentic RAG',diff:'Single retrieval pass vs. iterative multi-step retrieval with reasoning.'}],
+variants:['Naive RAG','Advanced RAG','Agentic RAG','Graph RAG','Hybrid RAG'],
+related:['agentic-ai','bert','gpt-family','prompt-chaining'],tags:['patterns','retrieval','daily','enterprise']},
+
+{id:'agentic-ai',name:'Agentic AI Patterns',category:'AI Patterns & Systems',year:2023,paper:'ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al.)',relevance:'daily',status:'emerging',
+summary:'A design pattern where LLMs act as autonomous agents that plan multi-step tasks, use tools, make decisions, and iterate on their own output. Unlike chatbots that respond to one message at a time, agentic systems break down complex goals into sub-tasks, call external APIs, execute code, and verify their own work.',
+whyItMatters:'Agentic AI is the current frontier of practical AI application. When your AI tool autonomously researches a topic, drafts content, checks facts, and formats the output from a single instruction, that\u2019s agentic behavior. Understanding this helps you design better workflows.',
+howItWorks:'An agent follows an observe-plan-act-evaluate loop. Given a complex task, the LLM plans what steps are needed, executes step one (maybe searching for information), observes the result, decides if it\u2019s sufficient, then moves to the next step. Tools like web search, code execution, and file access extend capabilities beyond text generation. Key patterns include ReAct (reasoning + acting) and Reflexion (self-evaluation).',
+strengths:['Handles complex multi-step tasks autonomously','Adapts approach based on intermediate results','Can use tools to extend capabilities','Mimics human problem-solving workflows','Enables automation of entire pipelines'],
+limitations:['Can go off track on long reasoning chains','Tool use errors compound through steps','Expensive (multiple LLM calls per task)','Hard to debug when things go wrong','Unreliable for high-stakes decisions without human oversight'],
+realWorldUse:['Automated research and report generation','Code review and refactoring (Cursor, Copilot Workspace)','Content creation pipelines','Customer service escalation handling','Data analysis workflows'],
+comparisons:[{model:'Simple Chatbot',diff:'Multi-step autonomous planning vs. single-turn question-answer.'},{model:'RAG',diff:'Active tool use and reasoning vs. passive document retrieval.'},{model:'Prompt Chaining',diff:'Dynamic planning that adapts vs. fixed predetermined sequences.'}],
+variants:['ReAct','Plan-and-Execute','Reflexion','AutoGPT','BabyAGI','CrewAI'],
+related:['mcp','rag','prompt-chaining','chain-of-thought'],tags:['patterns','agents','daily','emerging']},
+
+{id:'mcp',name:'MCP \u2014 Model Context Protocol',category:'AI Patterns & Systems',year:2024,paper:'Model Context Protocol Specification (Anthropic, 2024)',relevance:'useful',status:'emerging',
+summary:'A standardized protocol created by Anthropic that defines how AI models connect to external tools, data sources, and services. Think of MCP as USB-C for AI \u2014 a universal interface that lets any AI model talk to any tool without custom integration for each combination.',
+whyItMatters:'MCP solves the integration explosion. Without it, connecting 10 AI models to 10 tools requires 100 custom integrations. With MCP, each implements the protocol once and everything connects. This is why Cursor, Claude Desktop, and other tools can suddenly access databases, APIs, and file systems.',
+howItWorks:'MCP defines a client-server architecture. The AI application (client) connects to MCP servers, each providing tools, resources, or prompts. When the AI needs to use a tool, it sends a standardized request to the MCP server, which executes the action and returns the result. Tool providers build one MCP server and it works with any MCP-compatible AI client.',
+strengths:['Universal standard eliminates custom integrations','Growing ecosystem of pre-built servers','Enables tool use across different AI models','Clean separation between AI logic and tool logic','Open specification anyone can implement'],
+limitations:['Still very new and evolving','Not all AI platforms support it yet','Security model still maturing','Overhead for simple integrations','Requires technical setup'],
+realWorldUse:['Cursor IDE connecting AI to development tools','Claude Desktop accessing local files and databases','Enterprise systems connecting AI to internal APIs','Automated workflows spanning multiple services'],
+comparisons:[{model:'Custom API Integration',diff:'One standard protocol vs. bespoke integration for each tool-model pair.'},{model:'Function Calling',diff:'Protocol-level interoperability vs. model-specific tool invocation.'},{model:'LangChain',diff:'Open specification/standard vs. framework/library approach.'}],
+variants:['MCP Servers','MCP Clients','MCP Resources','MCP Prompts','MCP Tools'],
+related:['agentic-ai','rag','prompt-chaining'],tags:['patterns','protocol','integration','emerging']},
+
+{id:'rlhf',name:'RLHF \u2014 Reinforcement Learning from Human Feedback',category:'AI Patterns & Systems',year:2022,paper:'Training language models to follow instructions with human feedback (Ouyang et al.)',relevance:'useful',status:'deployed',
+summary:'The training technique that turns a raw text-predicting language model into a helpful assistant. Human evaluators rank model outputs by quality, these rankings train a reward model, and the LLM is fine-tuned using reinforcement learning to maximize the reward model\u2019s scores, aligning behavior with human preferences.',
+whyItMatters:'RLHF is the reason ChatGPT feels helpful rather than generating random text continuations. Every commercial LLM you use has gone through some form of human preference alignment.',
+howItWorks:'Three stages: First, human labelers write ideal responses to prompts. Second, labelers rank multiple model outputs from best to worst, training a reward model that predicts quality scores. Third, the LLM is optimized using reinforcement learning (PPO algorithm) to generate responses that score high on the reward model. The result prioritizes helpful, accurate, safe responses.',
+strengths:['Transforms raw language models into useful assistants','Captures nuanced human preferences hard to specify in rules','Responsible for the breakthrough in AI usability','Can be applied to any base model'],
+limitations:['Expensive (requires many human labelers)','Can introduce biases of the labelers','Reward hacking (model games the reward model)','Labeler disagreements reduce signal quality'],
+realWorldUse:['Training ChatGPT and all major commercial chatbots','Aligning AI to be helpful and safe','Reducing toxic or harmful outputs','Improving instruction-following capability'],
+comparisons:[{model:'Constitutional AI',diff:'Human feedback rankings vs. self-critique against written principles.'},{model:'DPO',diff:'Separate reward model with RL vs. direct preference optimization without reward model.'},{model:'Supervised Fine-tuning alone',diff:'Preference-aligned behavior vs. just pattern matching on examples.'}],
+variants:['RLHF','RLAIF (AI feedback)','DPO','PPO','GRPO'],
+related:['claude','gpt-family','distillation'],tags:['patterns','training','alignment','safety']},
+
+{id:'prompt-chaining',name:'Prompt Chaining',category:'AI Patterns & Systems',year:2022,paper:'',relevance:'daily',status:'deployed',
+summary:'A technique where the output of one LLM call becomes the input for the next, creating a pipeline of specialized prompts. Instead of one massive prompt trying to do everything, each link in the chain handles one focused subtask, passing results forward for higher quality.',
+whyItMatters:'Prompt chaining is how you get consistently high-quality results on complex tasks. Instead of asking AI to \u201Cresearch, draft, and edit an article\u201D in one prompt, chain three prompts: one researches, one drafts from the research, one edits the draft.',
+howItWorks:'You design a sequence of prompts, each with a specific role. Prompt 1 might analyze a document and extract key themes. Its output feeds into Prompt 2, which expands themes into an outline. Prompt 3 drafts full sections. Prompt 4 reviews for tone and accuracy. Each prompt is simple and focused, making the overall chain more reliable.',
+strengths:['More reliable than single complex prompts','Each step can be tested and refined independently','Easier to debug when something goes wrong','Output quality improves with specialization','Enables complex multi-step workflows'],
+limitations:['Higher latency (multiple API calls)','Higher cost (more tokens processed)','Chain is only as strong as its weakest link','Errors can compound through the chain','Requires careful design of handoff points'],
+realWorldUse:['Content creation pipelines (research \u2192 draft \u2192 edit \u2192 format)','Document processing (extract \u2192 classify \u2192 summarize)','Translation workflows (translate \u2192 localize \u2192 review)','Data analysis (query \u2192 analyze \u2192 visualize \u2192 narrate)'],
+comparisons:[{model:'Single Prompt',diff:'Multiple focused steps vs. one complex instruction; chaining is more reliable for complex tasks.'},{model:'Agentic AI',diff:'Fixed predetermined sequence vs. dynamic planning that adapts based on results.'},{model:'RAG',diff:'Processing pipeline approach vs. retrieval + generation pattern.'}],
+variants:['Sequential Chains','Branching Chains','Parallel Chains','Conditional Chains'],
+related:['agentic-ai','chain-of-thought','rag'],tags:['patterns','workflow','daily','technique']},
+
+{id:'chain-of-thought',name:'Chain-of-Thought Prompting',category:'AI Patterns & Systems',year:2022,paper:'Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al.)',relevance:'daily',status:'deployed',
+summary:'A prompting technique that dramatically improves AI reasoning by asking the model to show its work step by step before giving a final answer. Adding phrases like \u201CLet\u2019s think step by step\u201D unlocks capabilities the model cannot access through direct questioning alone.',
+whyItMatters:'Chain-of-thought is one of the simplest yet most powerful techniques you can use right now. When the AI gives a wrong answer, simply asking it to \u201Cthink step by step\u201D can fix the error. It\u2019s the difference between \u201CWhat\u2019s the answer?\u201D versus \u201CWalk me through your reasoning.\u201D',
+howItWorks:'Instead of generating an answer directly, the model produces intermediate reasoning steps. For analysis, it lists observations before drawing conclusions. This works because the model uses its own generated reasoning as additional context \u2014 giving itself a scratchpad for thinking. Zero-shot CoT (just add \u201Cthink step by step\u201D) and few-shot CoT (provide example reasoning chains) are the two main approaches.',
+strengths:['Dramatically improves reasoning accuracy','Zero cost to implement (just change your prompt)','Works across all modern LLMs','Makes model reasoning transparent and auditable','Enables solving problems the model fails at with direct prompting'],
+limitations:['Increases output length and cost','Reasoning steps can be plausible but wrong','Less useful for simple tasks','Can overcomplicate straightforward questions','Model may still make logical errors in the chain'],
+realWorldUse:['Improving accuracy on analytical tasks','Debugging AI errors by requesting explicit reasoning','Fact-checking and verification workflows','Complex content analysis','Decision support where transparency matters'],
+comparisons:[{model:'Direct Prompting',diff:'Step-by-step visible reasoning vs. immediate answer with hidden reasoning.'},{model:'Prompt Chaining',diff:'Single prompt with internal reasoning vs. multiple prompts in sequence.'},{model:'Tree of Thought',diff:'Linear reasoning chain vs. branching exploration of multiple paths.'}],
+variants:['Zero-shot CoT','Few-shot CoT','Tree of Thought','Self-Consistency','Step-by-Step Verification'],
+related:['prompt-chaining','agentic-ai','gpt-family'],tags:['patterns','prompting','daily','technique']},
+
+{id:'distillation',name:'Knowledge Distillation',category:'AI Patterns & Systems',year:2015,paper:'Distilling the Knowledge in a Neural Network (Hinton et al.)',relevance:'useful',status:'deployed',
+summary:'A technique for creating smaller, faster \u201Cstudent\u201D models by training them to mimic larger \u201Cteacher\u201D models. Instead of training from scratch, the student learns from the teacher\u2019s rich probability distributions, transferring knowledge that would otherwise require massive datasets and compute. This is how \u201Cmini\u201D versions of frontier models are created.',
+whyItMatters:'Distillation is why you can run capable AI on a laptop or phone. When a vendor releases a \u201Cmini\u201D version that\u2019s 10x smaller but retains 90% of quality, distillation is usually the technique behind it.',
+howItWorks:'The teacher model produces soft probability distributions (not just the top answer, but probabilities across all possible outputs). The student trains to match these distributions, which contain far more information than simple labels. The teacher\u2019s \u201Cdark knowledge\u201D \u2014 knowing a cat image is slightly dog-like but not at all car-like \u2014 transfers nuanced understanding.',
+strengths:['Produces much smaller and faster models with modest quality loss','Cheaper to deploy at scale','Enables on-device AI','Student models outperform same-size models trained from scratch','Well-proven technique with extensive research'],
+limitations:['Student never fully matches teacher quality','Distillation process itself requires significant compute','Some capabilities don\u2019t transfer well (rare or complex reasoning)','Teacher quality is the ceiling'],
+realWorldUse:['Creating GPT-4o mini and Claude Haiku from larger models','Deploying AI on mobile devices','Reducing API costs for production systems','Enabling real-time AI that needs low latency','DistilBERT for efficient text classification'],
+comparisons:[{model:'Quantization',diff:'Reducing model knowledge (smaller architecture) vs. reducing number precision (same architecture, lower bits).'},{model:'Fine-tuning',diff:'Transferring from a larger teacher vs. adapting a model to a specific task.'},{model:'Training from scratch',diff:'Guided by teacher\u2019s knowledge vs. independent learning from raw data.'}],
+variants:['Knowledge Distillation','DistilBERT','TinyBERT','Student-Teacher Training'],
+related:['quantization','bert','gpt-family'],tags:['patterns','efficiency','training','optimization']},
+
+{id:'quantization',name:'Quantization',category:'AI Patterns & Systems',year:2023,paper:'',relevance:'useful',status:'deployed',
+summary:'A technique that reduces model size by lowering the numerical precision of weights \u2014 converting 32-bit floating-point numbers to 4-bit integers. This makes models 4-8x smaller and significantly faster with surprisingly small quality loss, enabling large models to run on consumer hardware.',
+whyItMatters:'Quantization is why you can run a 70-billion-parameter model on a gaming laptop. Without it, that model would need a $10,000 server. It\u2019s the key technology behind the \u201Clocal AI\u201D movement.',
+howItWorks:'Neural network weights are normally 32-bit floating-point numbers. Quantization converts these to lower precision \u2014 16-bit, 8-bit, or even 4-bit integers. Since most weights cluster in predictable ranges, this compression loses very little information. Think of reducing a RAW photo to high-quality JPEG: much smaller, and most people can\u2019t see the difference. Methods like GPTQ and GGUF optimize which weights to quantize more aggressively.',
+strengths:['4-8x reduction in model size and memory','Significantly faster inference','Enables running large models on consumer hardware','Minimal quality loss at 8-bit and 4-bit','No retraining required for post-training quantization'],
+limitations:['Some quality degradation at very low bit counts','Not all operations quantize equally well','Quantized models harder to fine-tune further','Edge cases and rare knowledge affected first'],
+realWorldUse:['Running Llama and Mistral on laptops via llama.cpp','Mobile AI features on smartphones','Edge device deployment','Reducing cloud inference costs','Making open-source models accessible to individuals'],
+comparisons:[{model:'Distillation',diff:'Same architecture at lower precision vs. smaller architecture trained from teacher.'},{model:'Pruning',diff:'Reducing numerical precision vs. removing network connections entirely.'},{model:'Full Precision',diff:'Smaller and faster with minor quality loss vs. maximum quality at higher cost.'}],
+variants:['GPTQ','GGUF','AWQ','INT8','INT4','FP16','BF16'],
+related:['distillation','llama','moe'],tags:['patterns','efficiency','deployment','optimization']},
+
+{id:'cnn',name:'CNN \u2014 Convolutional Neural Networks',category:'Vision Models',year:1998,paper:'Gradient-Based Learning Applied to Document Recognition (LeCun et al.)',relevance:'useful',status:'deployed',
+summary:'The architecture that taught computers to see. CNNs process images by sliding small filters across the input, detecting features like edges, textures, and shapes at progressively higher levels of abstraction. Early layers detect simple patterns; deeper layers combine them into complex features. CNNs dominated computer vision from 2012 to 2020.',
+whyItMatters:'CNNs power most image-related AI you encounter: photo organization, image search, facial recognition, medical imaging, and quality control in manufacturing.',
+howItWorks:'A CNN processes an image through layers of learnable filters. A 3x3 filter slides across the image, computing a dot product at each position to create a feature map. Early filters detect edges and colors; deeper filters combine these into textures, parts, then objects. Pooling layers reduce spatial dimensions. Finally, fully connected layers classify the extracted features.',
+strengths:['Excellent at spatial pattern recognition','Translation invariant (detects objects regardless of position)','Efficient parameter sharing through filters','Well-understood and mature technology','Huge ecosystem of pre-trained models'],
+limitations:['Requires large amounts of labeled image data','Limited receptive field (can miss global context)','Being surpassed by Vision Transformers on many benchmarks','Not inherently good at distant spatial relationships'],
+realWorldUse:['Photo classification (Google Photos, Apple Photos)','Medical image analysis (X-ray, MRI interpretation)','Autonomous vehicle vision systems','Manufacturing quality control','Content moderation (detecting inappropriate images)'],
+comparisons:[{model:'Vision Transformer',diff:'Local receptive fields that grow with depth vs. global attention from the first layer.'},{model:'Traditional Computer Vision',diff:'Learned features vs. hand-crafted features like edge detectors.'},{model:'Fully Connected Networks',diff:'Spatial awareness through convolution vs. treating each pixel independently.'}],
+variants:['LeNet','AlexNet','VGG','ResNet','Inception','EfficientNet','MobileNet'],
+related:['vision-transformer','yolo','diffusion-models'],tags:['vision','classification','architecture','foundation']},
+
+{id:'vision-transformer',name:'Vision Transformer (ViT)',category:'Vision Models',year:2020,paper:'An Image is Worth 16x16 Words (Dosovitskiy et al.)',relevance:'useful',status:'deployed',
+summary:'Applying the Transformer architecture directly to images by splitting them into patches and treating each patch as a \u201Ctoken.\u201D ViT achieved state-of-the-art image classification, proving attention-based architectures could outperform CNNs for vision. This sparked the convergence of vision and language architectures that enables today\u2019s multimodal models.',
+whyItMatters:'ViT is why modern multimodal models (GPT-4, Gemini, Claude) can understand images \u2014 they use Transformer-based vision encoders. The unification of text and image processing under one architecture enabled the multimodal AI revolution.',
+howItWorks:'An image is divided into fixed-size patches (e.g., 16x16 pixels). Each patch is flattened and projected into an embedding vector, just like word tokens in text. Position embeddings are added so the model knows spatial locations. These patch tokens are processed by a standard Transformer encoder with self-attention, giving every patch global context from the first layer.',
+strengths:['Global context from the first layer','Scales better than CNNs with more data and compute','Unified architecture with language models','Strong transfer learning across vision tasks','Captures long-range spatial dependencies'],
+limitations:['Needs very large datasets to train well','Quadratic attention cost with image resolution','Slower than efficient CNNs for simple tasks','Patch-based approach can miss fine details at boundaries'],
+realWorldUse:['Image classification in Google, Meta, and Microsoft products','Medical imaging analysis','Satellite imagery interpretation','Visual search engines','Backbone for multimodal models like CLIP'],
+comparisons:[{model:'CNN',diff:'Global attention from layer one vs. local convolutions that expand with depth.'},{model:'CLIP',diff:'Pure vision model vs. vision-language joint model.'},{model:'Transformer (text)',diff:'Same architecture applied to image patches instead of text tokens.'}],
+variants:['ViT','DeiT','Swin Transformer','BEiT','MAE','DINO'],
+related:['transformer','attention-mechanism','clip','cnn'],tags:['vision','classification','architecture','transformer']},
+
+{id:'diffusion-models',name:'Diffusion Models',category:'Generative Models',year:2020,paper:'Denoising Diffusion Probabilistic Models (Ho et al.)',relevance:'useful',status:'deployed',
+summary:'The technology behind DALL-E, Midjourney, and Stable Diffusion. Diffusion models generate images by learning to gradually remove noise from a completely random image until a clear picture emerges. During training, the model learns to reverse a noise-addition process. At generation time, it starts with pure noise and iteratively refines it guided by a text prompt.',
+whyItMatters:'Diffusion models are why AI image generation exploded in 2022-2023. Every time you use Midjourney, DALL-E, or Stable Diffusion to generate an image from text, you\u2019re using a diffusion model.',
+howItWorks:'Training involves two processes. The forward process gradually adds noise to real images until they become pure static. The model then learns the reverse: taking a noisy image and predicting the slightly-less-noisy version. At generation time, starting from random noise, the model applies learned denoising step by step (20-50 steps), sculpting noise into a coherent image. A text encoder (often CLIP) provides guidance.',
+strengths:['Produces the highest-quality AI-generated images','Highly controllable through text prompts','Can be fine-tuned for specific styles','Stable training (unlike GANs)','Supports image editing, inpainting, and style transfer'],
+limitations:['Slow generation (many denoising steps required)','Computationally expensive','Can reproduce copyrighted styles from training data','Struggles with text in images and counting','Large model sizes'],
+realWorldUse:['AI image generation (Midjourney, DALL-E, Stable Diffusion)','Graphic design and concept art','Advertising creative generation','Product photography','Image editing and restoration'],
+comparisons:[{model:'GAN',diff:'Iterative denoising process vs. adversarial generator-discriminator competition.'},{model:'CLIP',diff:'Generates images from text vs. understands relationships between images and text.'},{model:'ViT',diff:'Creates new images vs. classifies existing images.'}],
+variants:['DDPM','Stable Diffusion','DALL-E 2/3','Midjourney','Imagen','Latent Diffusion'],
+related:['gan','clip','vision-transformer'],tags:['generative','images','architecture','creative']},
+
+{id:'yolo',name:'YOLO \u2014 You Only Look Once',category:'Vision Models',year:2015,paper:'You Only Look Once: Unified, Real-Time Object Detection (Redmon et al.)',relevance:'useful',status:'deployed',
+summary:'A real-time object detection system that identifies and locates multiple objects in an image in a single pass. Unlike earlier approaches that scanned images multiple times, YOLO divides the image into a grid and predicts bounding boxes and class probabilities simultaneously, making it fast enough for real-time video.',
+whyItMatters:'YOLO is why your phone can recognize objects in real time, why security cameras detect people and vehicles, and why retail stores track shelf inventory. Whenever you see AI detecting and labeling objects in live video, YOLO or its descendants are likely involved.',
+howItWorks:'YOLO divides an image into a grid. Each cell predicts bounding boxes, confidence scores, and class probabilities. The network processes the entire image once (\u201CYou Only Look Once\u201D) and outputs all detections simultaneously. Non-maximum suppression removes duplicates, producing labeled bounding boxes of what objects are where.',
+strengths:['Real-time speed (30-100+ FPS)','Detects multiple objects simultaneously','End-to-end trainable','Many versions with continual improvements','Runs on edge devices'],
+limitations:['Struggles with very small objects','Less accurate than slower two-stage detectors for some tasks','Difficulty with heavily occluded objects','Grid approach can miss objects at boundaries'],
+realWorldUse:['Security and surveillance systems','Autonomous driving perception','Retail inventory tracking','Medical image analysis (lesion detection)','Sports analytics (player tracking)','Wildlife monitoring'],
+comparisons:[{model:'R-CNN (two-stage)',diff:'Single forward pass vs. region proposal + classification; YOLO is much faster.'},{model:'CNN',diff:'Object detection (what + where) vs. image classification (what only).'},{model:'Vision Transformer',diff:'Speed-optimized detection vs. accuracy-optimized understanding.'}],
+variants:['YOLOv1','YOLOv5','YOLOv7','YOLOv8','YOLO-NAS','YOLOX'],
+related:['cnn','vision-transformer'],tags:['vision','detection','real-time','architecture']},
+
+{id:'clip',name:'CLIP \u2014 Contrastive Language-Image Pretraining',category:'Multimodal Models',year:2021,paper:'Learning Transferable Visual Models From Natural Language Supervision (Radford et al.)',relevance:'useful',status:'deployed',
+summary:'A model that connects images and text in a shared understanding space. CLIP trains an image encoder and text encoder so that matching image-text pairs have similar vector representations. This enables zero-shot image classification, text-based image search, and serves as the bridge between language and vision in systems like Stable Diffusion.',
+whyItMatters:'CLIP is the unsung hero of the multimodal AI revolution. It\u2019s inside Stable Diffusion understanding your text prompts and guiding image generation. It\u2019s why you can search photos by typing descriptions.',
+howItWorks:'CLIP trains on 400 million image-text pairs. An image encoder processes images while a text encoder processes captions. Training pulls matching pairs together in embedding space and pushes non-matching pairs apart (contrastive learning). After training, CLIP computes similarity between any image and any text. To classify an image, compare its embedding against candidate text descriptions and pick the closest match.',
+strengths:['Zero-shot classification (no task-specific training needed)','Bridges vision and language modalities','Enables text-based image search','Robust across diverse visual domains','Foundation for image generation systems'],
+limitations:['Inherits biases from internet training data','Struggles with fine-grained distinctions','Simpler text understanding than dedicated language models','Not designed for generation'],
+realWorldUse:['Text-based image search in photo libraries','Guiding text-to-image generation in Stable Diffusion/DALL-E','Content moderation (matching images to policy descriptions)','Visual question answering','Zero-shot product categorization'],
+comparisons:[{model:'CNN',diff:'Multimodal vision-language understanding vs. vision-only classification.'},{model:'BERT',diff:'Image+text joint embedding vs. text-only understanding.'},{model:'Diffusion Models',diff:'Understanding and matching images/text vs. generating new images.'}],
+variants:['CLIP','OpenCLIP','SigLIP','BLIP','BLIP-2'],
+related:['vision-transformer','diffusion-models','gemini'],tags:['multimodal','vision','language','foundation']},
+
+{id:'linear-regression',name:'Linear Regression',category:'Classical ML \u2014 Supervised',year:1805,paper:'M\u00E9thode des moindres carr\u00E9s (Legendre, 1805)',relevance:'reference',status:'deployed',
+summary:'The simplest and most interpretable ML algorithm. Linear regression finds the best straight line through data points to predict a continuous numerical outcome. Despite its simplicity, it remains one of the most widely used algorithms for forecasting, trend analysis, and understanding variable relationships.',
+whyItMatters:'Linear regression is the foundation of predictive analytics. Every time you see a trend line on a chart, a sales forecast, or a predicted value in a spreadsheet, linear regression is likely involved.',
+howItWorks:'Given data points, linear regression finds the line (y = mx + b) that minimizes the total squared distance between the line and all points. For multiple features, it extends to a hyperplane. The model multiplies each feature by a learned weight, sums them, and adds a bias term. Weights tell you how much each feature contributes to the prediction.',
+strengths:['Extremely interpretable (weights show feature importance)','Fast to train and predict','Works well when relationships are approximately linear','Provides statistical confidence intervals','Baseline for comparing complex models'],
+limitations:['Assumes linear relationships (misses curves and interactions)','Sensitive to outliers','Poor with many correlated features','Cannot model complex nonlinear patterns'],
+realWorldUse:['Sales and revenue forecasting','Real estate price estimation','Marketing campaign ROI analysis','Scientific relationship modeling','Baseline comparison for more complex models'],
+comparisons:[{model:'Logistic Regression',diff:'Predicts continuous numbers vs. classifies into categories.'},{model:'Decision Tree',diff:'One equation through all data vs. rule-based splits for different regions.'},{model:'Neural Network',diff:'Single linear layer vs. many nonlinear layers.'}],
+variants:['Simple Linear Regression','Multiple Regression','Ridge (L2)','Lasso (L1)','Elastic Net'],
+related:['logistic-regression','decision-tree','xgboost'],tags:['classical','supervised','regression','interpretable']},
+
+{id:'logistic-regression',name:'Logistic Regression',category:'Classical ML \u2014 Supervised',year:1958,paper:'',relevance:'useful',status:'deployed',
+summary:'Despite its name, logistic regression is a classification algorithm. It predicts the probability that an input belongs to a category by applying a sigmoid function to a linear combination of features. It\u2019s the go-to baseline for binary classification and remains widely used due to its interpretability, speed, and reliability.',
+whyItMatters:'Logistic regression is behind many everyday AI decisions: spam detection, ad click prediction, loan approval scoring, and medical diagnosis support. When you need to predict a yes/no outcome and explain why, logistic regression is often the best starting point.',
+howItWorks:'Like linear regression, it computes a weighted sum of features. But instead of outputting that sum directly, it passes it through the sigmoid function, squashing any number into a probability between 0 and 1. If the probability exceeds a threshold (usually 0.5), the model predicts class 1; otherwise class 0. Weights are optimized to minimize cross-entropy loss.',
+strengths:['Highly interpretable (feature weights show impact)','Fast to train and predict','Outputs calibrated probabilities','Works well with many features','Excellent baseline for classification tasks'],
+limitations:['Assumes linear decision boundaries','Underperforms on highly nonlinear data','Requires feature engineering for complex relationships','Sensitive to class imbalance without adjustment'],
+realWorldUse:['Email spam classification','Credit scoring and loan approval','Medical diagnosis probability','Customer churn prediction','Ad click-through rate prediction'],
+comparisons:[{model:'Linear Regression',diff:'Classifies into categories vs. predicts continuous numbers.'},{model:'Decision Tree',diff:'Linear decision boundary vs. rule-based splits.'},{model:'SVM',diff:'Probabilistic output vs. maximum-margin boundary.'}],
+variants:['Binary Logistic Regression','Multinomial','Ordinal','Regularized (L1/L2)'],
+related:['linear-regression','svm','decision-tree'],tags:['classical','supervised','classification','interpretable']},
+
+{id:'decision-tree',name:'Decision Trees',category:'Classical ML \u2014 Supervised',year:1986,paper:'Classification and Regression Trees (Breiman et al.)',relevance:'useful',status:'deployed',
+summary:'An algorithm that makes predictions by learning if-then rules from data, creating a tree-like flowchart of decisions. Each node tests a feature, branches represent outcomes, and leaves provide predictions. Decision trees are the most human-readable ML algorithm and the building block of Random Forests and XGBoost.',
+whyItMatters:'Decision trees are the most explainable AI model. When someone asks \u201Cwhy did the model predict this?\u201D a decision tree provides a clear, traceable path of decisions. They\u2019re also the building block of the most powerful structured data algorithms.',
+howItWorks:'The algorithm starts with all data at the root and finds the feature and threshold that best splits data into purer groups (using Gini impurity or information gain). It recursively splits each group, creating branches until reaching a stopping condition. To predict, follow the decision path from root to a leaf containing the prediction.',
+strengths:['Extremely interpretable (visual decision path)','Handles both numerical and categorical data','No feature scaling required','Captures nonlinear relationships','Fast to train and predict'],
+limitations:['Prone to overfitting (memorizing training data)','Unstable (small data changes produce very different trees)','Greedy algorithm (doesn\u2019t guarantee optimal tree)','Generally less accurate than ensemble methods'],
+realWorldUse:['Credit approval (explainability required by regulation)','Medical triage and diagnosis support','Customer segmentation','Fraud detection with clear audit trails','Building block for Random Forest and XGBoost'],
+comparisons:[{model:'Random Forest',diff:'Single tree vs. forest of diverse trees; Random Forest is more accurate but less interpretable.'},{model:'Logistic Regression',diff:'Rule-based splits vs. single linear boundary.'},{model:'Neural Network',diff:'Fully interpretable vs. black box.'}],
+variants:['CART','ID3','C4.5','C5.0','Regression Trees','Classification Trees'],
+related:['random-forest','xgboost','logistic-regression'],tags:['classical','supervised','classification','interpretable']},
+
+{id:'svm',name:'SVM \u2014 Support Vector Machines',category:'Classical ML \u2014 Supervised',year:1995,paper:'Support-Vector Networks (Cortes & Vapnik)',relevance:'reference',status:'deployed',
+summary:'An algorithm that finds the optimal boundary separating different classes with the maximum margin \u2014 the widest possible gap between the boundary and nearest data points. SVMs handle non-linearly separable data using the kernel trick, which projects data into higher dimensions where a linear boundary works. They dominated ML before deep learning.',
+whyItMatters:'SVMs introduced the principle of maximum margin, which appears throughout ML. The kernel trick remains a powerful mathematical concept. SVMs represent an important chapter in ML history and still work well for specific tasks.',
+howItWorks:'SVM finds the hyperplane that separates two classes with the largest margin. Support vectors are data points closest to the boundary that define its position. For non-linearly separable data, the kernel trick maps data into higher dimensions. For example, concentric circles in 2D become separable by a plane in 3D. Common kernels include linear, polynomial, and RBF.',
+strengths:['Effective in high-dimensional spaces','Strong theoretical foundation','Memory efficient (only stores support vectors)','Versatile through kernel selection','Resistant to overfitting with proper regularization'],
+limitations:['Doesn\u2019t scale well to very large datasets','Sensitive to feature scaling','Doesn\u2019t provide probability estimates natively','Kernel choice and tuning can be tricky'],
+realWorldUse:['Text classification and sentiment analysis','Bioinformatics (gene classification)','Handwriting recognition','Spam detection','Face detection (pre-deep-learning)'],
+comparisons:[{model:'Logistic Regression',diff:'Maximum margin boundary vs. probabilistic classification.'},{model:'Random Forest',diff:'Single optimized boundary vs. ensemble of many trees.'},{model:'Neural Network',diff:'Kernel-based feature mapping vs. learned hierarchical representations.'}],
+variants:['Linear SVM','Kernel SVM (RBF, Polynomial)','SVC','SVR (regression)','Nu-SVM'],
+related:['logistic-regression','knn','random-forest'],tags:['classical','supervised','classification','reference']},
+
+{id:'knn',name:'KNN \u2014 K-Nearest Neighbors',category:'Classical ML \u2014 Supervised',year:1967,paper:'Nearest Neighbor Pattern Classification (Cover & Hart)',relevance:'reference',status:'deployed',
+summary:'One of the simplest ML algorithms: to classify a new point, find the K most similar training examples and take a vote. KNN memorizes all training data and compares new inputs against it at prediction time. Conceptually simple but the \u201Cfind similar items\u201D logic powers recommendation systems, image search, and RAG.',
+whyItMatters:'KNN introduces the fundamental concept of similarity-based reasoning that underpins embeddings, vector databases, and semantic search. Understanding KNN gives you intuition for how modern AI retrieval systems work.',
+howItWorks:'All training data is stored in memory. When a new point arrives, the algorithm computes distance (usually Euclidean) to every training point, finds the K closest, and assigns the most common class among those neighbors. K is a hyperparameter \u2014 small K is sensitive to noise, large K smooths decisions.',
+strengths:['Extremely simple to understand','No training phase (lazy learning)','Naturally handles multi-class problems','Decision boundary adapts to data shape','Non-parametric (no assumptions)'],
+limitations:['Slow at prediction time (scans all data)','High memory usage (stores entire dataset)','Performance degrades in high dimensions','Sensitive to irrelevant features and scaling'],
+realWorldUse:['Recommendation systems (find similar users/items)','Anomaly detection (points far from neighbors)','Image classification for small datasets','Missing value imputation','Prototype-based reasoning'],
+comparisons:[{model:'Decision Tree',diff:'Distance-based voting vs. rule-based splitting.'},{model:'SVM',diff:'Instance-based comparison vs. optimized boundary.'},{model:'Neural Network',diff:'Memorization of examples vs. learned abstract representations.'}],
+variants:['K-Nearest Neighbors','Weighted KNN','Ball Tree KNN','KD-Tree KNN'],
+related:['k-means','svm','pca'],tags:['classical','supervised','classification','reference']},
+
+{id:'k-means',name:'K-Means Clustering',category:'Classical ML \u2014 Unsupervised',year:1957,paper:'Some methods for classification and analysis of multivariate observations (MacQueen)',relevance:'useful',status:'deployed',
+summary:'The most widely used clustering algorithm. K-Means groups data into K clusters by iteratively assigning each point to the nearest centroid and updating centroids to be the mean of their assigned points. It discovers natural groupings in data without labels.',
+whyItMatters:'K-Means is behind customer segmentation, document clustering, image compression, and color palette extraction. It\u2019s one of the most practical unsupervised algorithms for finding patterns in unlabeled data.',
+howItWorks:'You specify K (number of clusters). The algorithm randomly places K centroids, then repeats: (1) assign each point to the nearest centroid, (2) move each centroid to the mean of its assigned points. After a few iterations, centroids stabilize and clusters are defined.',
+strengths:['Simple, fast, and scalable','Works well with large datasets','Easy to interpret results','Guaranteed to converge','Available in every ML library'],
+limitations:['Must specify K in advance','Assumes spherical clusters of similar size','Sensitive to initial centroid placement','Can\u2019t discover arbitrary-shaped clusters','Sensitive to outliers'],
+realWorldUse:['Customer segmentation for marketing','Document and topic clustering','Image color palette extraction','Geographic data grouping','Anomaly detection (distant points)','Data preprocessing for other algorithms'],
+comparisons:[{model:'DBSCAN',diff:'Fixed K you specify vs. automatic cluster discovery with arbitrary shapes.'},{model:'PCA',diff:'Groups similar points vs. reduces dimensions for visualization.'},{model:'Hierarchical Clustering',diff:'Flat partition vs. tree-structured cluster hierarchy.'}],
+variants:['K-Means','K-Means++','Mini-Batch K-Means','K-Medoids'],
+related:['pca','knn'],tags:['classical','unsupervised','clustering','segmentation']},
+
+{id:'pca',name:'PCA \u2014 Principal Component Analysis',category:'Classical ML \u2014 Unsupervised',year:1901,paper:'On Lines and Planes of Closest Fit (Pearson)',relevance:'useful',status:'deployed',
+summary:'A dimensionality reduction technique that transforms high-dimensional data into fewer dimensions while preserving as much variance (information) as possible. PCA finds the principal components \u2014 directions where data varies most \u2014 and projects data onto those axes.',
+whyItMatters:'When you have data with hundreds of features, PCA helps you understand which dimensions matter most and reduce complexity. It\u2019s widely used for visualization (projecting complex data into 2D plots) and speeding up other algorithms.',
+howItWorks:'PCA computes the covariance matrix to find which dimensions co-vary most, then finds eigenvectors (principal components) ordered by how much variance they explain. The first component captures the most variance, the second captures the next most (orthogonal to the first), and so on. Project onto the top few components to reduce dimensions.',
+strengths:['Reduces dimensionality while preserving maximum information','Removes correlated features','Effective for data visualization','Speeds up downstream algorithms','Well-understood mathematically'],
+limitations:['Only captures linear relationships','Components are hard to interpret (mixtures of originals)','Sensitive to feature scaling','Assumes variance equals importance'],
+realWorldUse:['Data visualization (projecting to 2D/3D)','Face recognition preprocessing (eigenfaces)','Noise reduction in signal processing','Feature reduction before classification','Genomics and financial data analysis'],
+comparisons:[{model:'K-Means',diff:'Dimensionality reduction vs. clustering; complementary techniques.'},{model:'UMAP/t-SNE',diff:'Linear reduction vs. nonlinear reduction; PCA is faster, UMAP preserves local structure better.'},{model:'Feature Selection',diff:'Transforming all features into new axes vs. choosing a subset of original features.'}],
+variants:['PCA','Kernel PCA','Sparse PCA','Incremental PCA','Randomized PCA'],
+related:['k-means','knn','linear-regression'],tags:['classical','unsupervised','reduction','visualization']},
+
+{id:'random-forest',name:'Random Forest',category:'Ensemble Methods',year:2001,paper:'Random Forests (Breiman)',relevance:'useful',status:'deployed',
+summary:'An ensemble method that builds many decision trees on random subsets of data and features, then combines predictions through voting or averaging. By introducing randomness and combining many weak learners, Random Forest overcomes individual tree instability and overfitting.',
+whyItMatters:'Random Forest is often the first algorithm data scientists reach for with structured (tabular) data. It frequently outperforms complex methods with minimal tuning. If you have spreadsheet data and want accurate predictions, Random Forest is a strong default.',
+howItWorks:'Train many decision trees (100-500), each on a random bootstrap sample of data using a random subset of features at each split. This randomness ensures diverse trees that make different errors. For prediction, every tree votes and the majority wins (classification) or the average is taken (regression). Individual errors cancel out.',
+strengths:['Excellent accuracy with minimal tuning','Resistant to overfitting','Handles both numerical and categorical data','Provides feature importance rankings','Parallelizable training'],
+limitations:['Less interpretable than single decision tree','Slower prediction than simpler models','Can be memory-intensive with many trees','Doesn\u2019t extrapolate beyond training data range'],
+realWorldUse:['Customer churn prediction','Fraud detection in financial transactions','Medical diagnosis from patient features','Credit scoring','Equipment failure prediction','Feature importance analysis'],
+comparisons:[{model:'Decision Tree',diff:'Forest of diverse trees vs. single tree; much more accurate but less interpretable.'},{model:'XGBoost',diff:'Random parallel trees vs. sequential boosted trees; XGBoost usually more accurate with tuning.'},{model:'Neural Network',diff:'Best for structured/tabular data vs. best for unstructured data (images, text).'}],
+variants:['Random Forest','Extra Trees','Rotation Forest'],
+related:['decision-tree','xgboost','logistic-regression'],tags:['ensemble','classification','regression','structured-data']},
+
+{id:'xgboost',name:'XGBoost',category:'Ensemble Methods',year:2016,paper:'XGBoost: A Scalable Tree Boosting System (Chen & Guestrin)',relevance:'useful',status:'deployed',
+summary:'The reigning champion of structured data. XGBoost builds decision trees sequentially, where each new tree specifically corrects errors made by all previous trees. This gradient boosting approach, combined with aggressive engineering optimizations, produces the most accurate predictions for tabular data in most benchmarks.',
+whyItMatters:'If you have structured data (spreadsheets, databases, CSV files), XGBoost is likely the most accurate algorithm available. It dominates data science competitions and real-world production ML systems.',
+howItWorks:'Trees are trained sequentially. The first tree makes predictions. The second tree learns to predict the first tree\u2019s errors. The third corrects remaining errors, and so on. Each tree is small, but the ensemble becomes very strong. Gradient descent optimizes the loss function at each step. Built-in regularization prevents overfitting.',
+strengths:['Typically the most accurate model for tabular data','Built-in regularization prevents overfitting','Handles missing values natively','Feature importance analysis','Highly optimized and fast'],
+limitations:['Requires more careful hyperparameter tuning than Random Forest','Less interpretable than simpler models','Not suitable for unstructured data (images, text)','Can overfit with too many boosting rounds'],
+realWorldUse:['Winning Kaggle data science competitions','Real-time fraud detection at banks','Product recommendation systems','Insurance claim prediction','Customer lifetime value estimation','Ad click prediction at scale'],
+comparisons:[{model:'Random Forest',diff:'Sequential boosting (each tree corrects predecessors) vs. parallel random trees (diverse independent trees).'},{model:'Neural Network',diff:'Dominates on structured data vs. dominates on unstructured data.'},{model:'Logistic Regression',diff:'Complex nonlinear patterns vs. simple linear relationships.'}],
+variants:['XGBoost','LightGBM','CatBoost','Gradient Boosting Machines'],
+related:['random-forest','decision-tree','linear-regression'],tags:['ensemble','boosting','structured-data','competition']},
+
+{id:'rnn',name:'RNN \u2014 Recurrent Neural Networks',category:'Sequence & Time Series',year:1986,paper:'Learning representations by back-propagating errors (Rumelhart, Hinton & Williams)',relevance:'reference',status:'deployed',
+summary:'The original architecture for processing sequential data. RNNs process inputs one step at a time while maintaining a hidden state that acts as memory. Naturally suited for text, speech, and time series, but vanilla RNNs suffer from the vanishing gradient problem, limiting their ability to learn long-range dependencies.',
+whyItMatters:'RNNs introduced the crucial idea that AI models can have memory \u2014 processing sequences while maintaining context. This concept is the ancestor of LSTM and Transformers. Understanding RNNs helps you appreciate why Transformers were revolutionary.',
+howItWorks:'At each step, the RNN takes current input and previous hidden state, processes them through a neural network, and produces output and a new hidden state. The hidden state carries information from all previous steps. The same weights are shared across all steps, so the network handles sequences of any length. Training uses backpropagation through time.',
+strengths:['Natural fit for sequential data','Handles variable-length sequences','Weight sharing across time steps','Conceptually intuitive (input + memory = output)','Foundation for more advanced sequence models'],
+limitations:['Vanishing gradient (can\u2019t learn long-range dependencies)','Sequential processing (can\u2019t parallelize)','Slow to train on long sequences','Largely superseded by LSTM and Transformers'],
+realWorldUse:['Simple time series prediction','Historical text generation systems','Early speech recognition','Music generation experiments','Educational demonstrations of sequence modeling'],
+comparisons:[{model:'LSTM',diff:'Vanilla memory vs. gated memory with forget/input/output controls.'},{model:'Transformer',diff:'Sequential one-at-a-time processing vs. parallel attention over all positions.'},{model:'CNN',diff:'Sequence processing with memory vs. spatial pattern detection.'}],
+variants:['Vanilla RNN','Bidirectional RNN','Deep RNN','Elman Network','Jordan Network'],
+related:['lstm','transformer','attention-mechanism'],tags:['sequence','architecture','foundation','reference']},
+
+{id:'lstm',name:'LSTM \u2014 Long Short-Term Memory',category:'Sequence & Time Series',year:1997,paper:'Long Short-Term Memory (Hochreiter & Schmidhuber)',relevance:'useful',status:'deployed',
+summary:'An advanced RNN that solved the vanishing gradient problem with a gating mechanism controlling what to remember, forget, and output at each step. LSTMs can learn dependencies spanning hundreds of time steps. Dominant from 1997 until Transformers took over for language, LSTMs remain widely used for time series tasks.',
+whyItMatters:'LSTMs are still the go-to model for many time series tasks: stock price prediction, weather forecasting, energy demand, and anomaly detection. They\u2019re simpler to deploy than Transformers for these tasks and often perform comparably on shorter sequences.',
+howItWorks:'LSTM adds a cell state (long-term memory highway) and three gates. The forget gate decides what to discard from the cell state. The input gate decides what new information to store. The output gate decides what to reveal to the next layer. Gates use sigmoid activations that learn to selectively remember and forget. The cell state carries information unchanged across many steps.',
+strengths:['Effectively captures long-range dependencies','Solves the vanishing gradient problem','Bidirectional variants for full context','Well-understood and mature','Good for time series forecasting'],
+limitations:['Sequential processing limits parallelization','Slower to train than Transformers','Struggles with very long sequences (thousands of steps)','Being replaced by Transformers for most NLP tasks'],
+realWorldUse:['Time series forecasting (stock prices, energy demand, sales)','Anomaly detection in sensor data','Speech recognition systems','Machine translation (pre-Transformer era)','Music composition','Handwriting recognition'],
+comparisons:[{model:'RNN',diff:'Gated memory that selectively remembers vs. vanilla hidden state that fades.'},{model:'Transformer',diff:'Sequential with long memory vs. parallel with quadratic attention; LSTM better for time series, Transformer better for language.'},{model:'GRU',diff:'Three gates (forget, input, output) vs. two gates (reset, update); GRU is simpler.'}],
+variants:['LSTM','Bidirectional LSTM','Stacked LSTM','GRU (Gated Recurrent Unit)','Peephole LSTM'],
+related:['rnn','transformer','attention-mechanism'],tags:['sequence','time-series','architecture','memory']},
+
+{id:'whisper',name:'Whisper',category:'Audio & Speech',year:2022,paper:'Robust Speech Recognition via Large-Scale Weak Supervision (Radford et al.)',relevance:'useful',status:'deployed',
+summary:'OpenAI\u2019s speech recognition model that transcribes speech to text with remarkable accuracy across 97+ languages. Trained on 680,000 hours of multilingual audio, Whisper approaches human-level accuracy and handles accents, background noise, and technical jargon better than previous systems. It\u2019s open-source.',
+whyItMatters:'Whisper democratized high-quality speech-to-text. Before Whisper, accurate transcription required expensive commercial APIs. Now anyone can run state-of-the-art transcription locally, powering meeting notes, subtitles, and accessibility features.',
+howItWorks:'Whisper uses an encoder-decoder Transformer. Audio is converted into a mel spectrogram (visual representation of sound frequencies over time), which the encoder processes. The decoder generates transcript text token by token, similar to language model text generation. Massive diverse training data gives robustness across languages and conditions. It can also translate while transcribing.',
+strengths:['State-of-the-art accuracy across 97+ languages','Handles accents, noise, and domain jargon','Open-source (free to use and deploy locally)','Can translate while transcribing','Multiple model sizes for different compute budgets'],
+limitations:['Not real-time for larger models','Can hallucinate text during silent segments','Struggles with heavily overlapping speakers','Large models need significant compute'],
+realWorldUse:['Meeting transcription and note-taking','Podcast and video subtitle generation','Accessibility tools for hearing-impaired users','Medical and legal dictation','Voice-commanded interfaces','Multilingual content creation'],
+comparisons:[{model:'Google Speech-to-Text',diff:'Open-source and free vs. commercial API with per-minute pricing.'},{model:'Traditional ASR',diff:'End-to-end neural approach vs. multi-stage pipeline (acoustic model + language model).'},{model:'Wav2Vec',diff:'Supervised training on labeled audio vs. self-supervised learning from unlabeled audio.'}],
+variants:['Whisper tiny','Whisper base','Whisper small','Whisper medium','Whisper large','Whisper large-v3'],
+related:['transformer','attention-mechanism'],tags:['audio','speech','transcription','open-source']},
+
+{id:'gan',name:'GAN \u2014 Generative Adversarial Networks',category:'Generative Models',year:2014,paper:'Generative Adversarial Nets (Goodfellow et al.)',relevance:'useful',status:'deployed',
+summary:'An architecture where two neural networks compete: a generator creates fake data and a discriminator tries to distinguish real from fake. Through this adversarial training, the generator learns to create increasingly realistic content. GANs revolutionized image generation before diffusion models and remain useful for specific tasks.',
+whyItMatters:'GANs introduced adversarial training and produced the first photorealistic AI-generated images. While largely replaced by diffusion models for general image generation, they remain important for image editing, super-resolution, and data augmentation.',
+howItWorks:'Two networks train in a minimax game. The generator takes random noise and produces data (like images). The discriminator receives both real and generated data and classifies each as real or fake. As the discriminator improves, the generator must improve to fool it. This competition drives both networks toward high quality until the generator produces highly realistic output.',
+strengths:['Produces sharp, high-quality images','Fast generation (single forward pass once trained)','Excellent for image-to-image translation','Strong for data augmentation','Unique creative applications'],
+limitations:['Notoriously difficult to train (mode collapse, instability)','Generator may only learn a subset of outputs','No easy quality metric during training','Largely superseded by diffusion models','Ethical concerns with deepfakes'],
+realWorldUse:['Image super-resolution (enhancing low-res photos)','Face generation and editing (FaceApp, aging filters)','Style transfer (photo to painting)','Data augmentation for training other models','Video game texture generation','Medical image synthesis'],
+comparisons:[{model:'Diffusion Models',diff:'Adversarial competition vs. iterative denoising; diffusion models produce more diverse, higher-quality results.'},{model:'VAE',diff:'Adversarial training vs. reconstruction-based training; GANs produce sharper images.'},{model:'CLIP',diff:'Generating content vs. understanding content.'}],
+variants:['DCGAN','StyleGAN','CycleGAN','Pix2Pix','ProGAN','BigGAN','StarGAN'],
+related:['diffusion-models','cnn','vision-transformer'],tags:['generative','images','architecture','adversarial']}
+];
+
+const DECISION_TREE = [
+  {question:'What type of task are you trying to accomplish?',options:[
+    {label:'Generate text, summaries, or content',next:1},{label:'Classify or categorize items',next:2},
+    {label:'Predict a number or trend',next:3},{label:'Find patterns or groups in data',next:4},
+    {label:'Detect anomalies or outliers',next:5},{label:'Process images or video',next:6},
+    {label:'Process audio or speech',next:7},{label:'Automate a multi-step workflow',next:8}]},
+  {question:'What kind of text generation?',options:[
+    {label:'Conversational AI / chatbots',result:['gpt-family','claude','gemini']},
+    {label:'Search + generate from my documents',result:['rag','agentic-ai']},
+    {label:'Summarization or rewriting',result:['gpt-family','claude','bert']},
+    {label:'Structured output (JSON, tables)',result:['gpt-family','claude']}]},
+  {question:'How much labeled training data do you have?',options:[
+    {label:'Thousands of labeled examples',result:['random-forest','xgboost','logistic-regression']},
+    {label:'A few dozen examples',result:['bert','gpt-family']},
+    {label:'No labeled data',result:['k-means','pca']},
+    {label:'I want to classify text specifically',result:['bert','logistic-regression']}]},
+  {question:'What are you predicting?',options:[
+    {label:'A continuous number (price, count, score)',result:['linear-regression','xgboost']},
+    {label:'A time series (future values from past)',result:['lstm','transformer']},
+    {label:'A yes/no outcome',result:['logistic-regression','random-forest','xgboost']},
+    {label:'Multiple categories',result:['random-forest','xgboost','decision-tree']}]},
+  {question:'Do you know how many groups exist?',options:[
+    {label:'Yes, I know the number of clusters',result:['k-means']},
+    {label:'No, let the algorithm find them',result:['k-means','pca']},
+    {label:'I want to reduce dimensions for visualization',result:['pca']}]},
+  {question:'What kind of anomaly detection?',options:[
+    {label:'Unusual data points in tabular data',result:['random-forest','xgboost']},
+    {label:'Unusual patterns in a time series',result:['lstm']},
+    {label:'Unusual behavior in a network/graph',result:['random-forest']}]},
+  {question:'What do you need to do with images?',options:[
+    {label:'Classify images into categories',result:['cnn','vision-transformer']},
+    {label:'Detect or locate objects',result:['yolo','cnn']},
+    {label:'Generate new images from text',result:['diffusion-models','gan']},
+    {label:'Understand images + text together',result:['clip','gemini']}]},
+  {question:'What audio task?',options:[
+    {label:'Transcribe speech to text',result:['whisper']},
+    {label:'Understand spoken commands',result:['whisper','transformer']},
+    {label:'Generate speech from text',result:['transformer']}]},
+  {question:'What kind of automation?',options:[
+    {label:'Multi-step tasks with tool use',result:['agentic-ai','mcp']},
+    {label:'Connecting AI to external data/services',result:['rag','mcp']},
+    {label:'Chaining multiple AI steps together',result:['prompt-chaining','agentic-ai']}]}
+];
+
+const TIMELINE_DATA = [
+  {year:1957,era:'Origins',models:['Perceptron'],desc:'Frank Rosenblatt creates the first neural network, capable of learning simple pattern classification.'},
+  {year:1986,era:'Backpropagation',models:['Neural Networks'],desc:'Rumelhart, Hinton & Williams popularize backpropagation, enabling multi-layer networks to train.'},
+  {year:1997,era:'Sequence Models',models:['LSTM','RNN'],desc:'Hochreiter & Schmidhuber introduce LSTM, solving the vanishing gradient problem for sequences.'},
+  {year:1998,era:'Vision Breakthrough',models:['CNN'],desc:'Yann LeCun\u2019s LeNet demonstrates CNNs for digit recognition.'},
+  {year:2001,era:'Kernel Methods',models:['SVM','Random Forest'],desc:'SVMs and Random Forests dominate ML competitions for structured data.'},
+  {year:2012,era:'Deep Learning Explosion',models:['Neural Networks','CNN'],desc:'AlexNet wins ImageNet by a massive margin, proving deep learning for vision.'},
+  {year:2014,era:'Generative AI Begins',models:['GAN'],desc:'Goodfellow introduces GANs \u2014 two networks competing to generate realistic content.'},
+  {year:2017,era:'The Transformer Revolution',models:['Transformer'],desc:'\u201CAttention Is All You Need\u201D is published. This single paper changes everything that follows.'},
+  {year:2018,era:'Language Understanding',models:['BERT'],desc:'Google\u2019s BERT shows that pre-training then fine-tuning crushes specialized models.'},
+  {year:2020,era:'Scale Changes Everything',models:['GPT-3'],desc:'GPT-3 (175B parameters) demonstrates that scale alone unlocks emergent capabilities.'},
+  {year:2021,era:'Multimodal + Diffusion',models:['CLIP','Diffusion Models'],desc:'CLIP connects vision and language. Diffusion models begin generating photorealistic images.'},
+  {year:2022,era:'ChatGPT Moment',models:['GPT-3.5','Claude'],desc:'ChatGPT launches (Nov 2022), bringing AI to mainstream awareness. Anthropic launches Claude.'},
+  {year:2023,era:'Multimodal + Open Source',models:['GPT-4','Llama','Gemini'],desc:'GPT-4 adds vision. Meta releases Llama. Google launches Gemini multimodal.'},
+  {year:2024,era:'Agents & Efficiency',models:['Mamba','MoE','Agentic AI','MCP'],desc:'State space models challenge Transformers. AI agents and MCP enable tool use. RAG becomes standard.'},
+  {year:2025,era:'The Present',models:['Claude 4','Agentic RAG'],desc:'Agentic systems mature. RAG variants multiply. AI becomes infrastructure, not novelty.'}
+];
+
+const RESOURCES = [
+  {tier:'Foundational Courses',color:'var(--primary)',items:[
+    {title:'AI for Everyone',provider:'DeepLearning.AI / Coursera',time:'6 hours',url:'https://www.coursera.org/learn/ai-for-everyone',why:'Andrew Ng\u2019s beginner-friendly overview of AI concepts, business strategy, and societal impact.'},
+    {title:'Generative AI for Everyone',provider:'DeepLearning.AI / Coursera',time:'5 hours',url:'https://www.coursera.org/learn/generative-ai-for-everyone',why:'Focused specifically on GenAI concepts, capabilities, and practical applications.'},
+    {title:'Google AI Essentials',provider:'Google / Coursera',time:'10 hours',url:'https://www.coursera.org/learn/google-ai-essentials',why:'Hands-on course covering AI tools in the Google ecosystem with practical exercises.'},
+    {title:'Introduction to Generative AI',provider:'Google Cloud Skills Boost',time:'45 min',url:'https://www.cloudskillsboost.google/course_templates/536',why:'Quick, focused introduction to generative AI concepts from Google\u2019s cloud team.'},
+    {title:'Prompt Engineering for ChatGPT',provider:'Vanderbilt / Coursera',time:'18 hours',url:'https://www.coursera.org/learn/prompt-engineering',why:'Deep dive into prompt engineering techniques with hands-on practice.'}
+  ]},
+  {tier:'Architecture Deep Dives',color:'var(--accent)',items:[
+    {title:'The Illustrated Transformer',provider:'Jay Alammar',time:'30 min read',url:'https://jalammar.github.io/illustrated-transformer/',why:'The best visual explanation of how Transformers work. Essential reading for understanding modern AI.'},
+    {title:'3Blue1Brown Neural Networks',provider:'3Blue1Brown / YouTube',time:'4 hours',url:'https://www.3blue1brown.com/topics/neural-networks',why:'Beautiful visual explanations of neural networks, backpropagation, and deep learning fundamentals.'},
+    {title:'Stanford CS231n (CNNs)',provider:'Stanford University',time:'Self-paced',url:'https://cs231n.stanford.edu/',why:'The definitive course on convolutional neural networks and computer vision.'},
+    {title:'Andrej Karpathy\u2019s Zero to Hero',provider:'Andrej Karpathy / YouTube',time:'12+ hours',url:'https://karpathy.ai/zero-to-hero.html',why:'Build a GPT from scratch. The best way to truly understand how language models work.'},
+    {title:'Anthropic Prompt Engineering Guide',provider:'Anthropic',time:'2 hours',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',why:'Official guide to prompting Claude effectively, from the team that built it.'}
+  ]},
+  {tier:'Tools & Platforms',color:'var(--success)',items:[
+    {title:'Hugging Face',provider:'Hugging Face',time:'Ongoing',url:'https://huggingface.co/',why:'The GitHub of AI models. Browse, test, and deploy thousands of open-source models.'},
+    {title:'Google Colab',provider:'Google',time:'Ongoing',url:'https://colab.research.google.com/',why:'Free cloud notebooks with GPU access for experimenting with AI models.'},
+    {title:'Papers With Code',provider:'Community',time:'Ongoing',url:'https://paperswithcode.com/',why:'Every AI research paper linked to its implementation. Great for understanding state-of-the-art.'},
+    {title:'What is MCP?',provider:'Anthropic',time:'30 min',url:'https://modelcontextprotocol.io/',why:'Understanding the Model Context Protocol that\u2019s becoming the standard for AI tool integration.'}
+  ]}
+];
+
+const GLOSSARY = [
+{term:'Artificial Intelligence (AI)',cat:'ML Fundamentals',def:'Computer systems performing tasks typically requiring human intelligence.',why:'The umbrella term for all the tools you use to augment your workflow.',rel:['Machine Learning','Deep Learning']},
+{term:'Machine Learning (ML)',cat:'ML Fundamentals',def:'A subset of AI where systems learn patterns from data instead of being explicitly programmed.',why:'Understanding ML helps you grasp why AI tools improve over time and make unexpected mistakes.',rel:['Supervised Learning','Unsupervised Learning','Training Data']},
+{term:'Deep Learning',cat:'ML Fundamentals',def:'ML using neural networks with many layers to learn complex patterns from large data.',why:'Powers the language models like Claude and GPT you use daily.',rel:['Neural Network','Machine Learning']},
+{term:'Supervised Learning',cat:'ML Fundamentals',def:'Training a model using labeled data \u2014 examples paired with correct answers.',why:'How text classifiers and auto-tagging systems are built.',rel:['Training Data','Classification']},
+{term:'Unsupervised Learning',cat:'ML Fundamentals',def:'Training a model to find patterns without labeled examples.',why:'Used for clustering documents by topic and customer segmentation.',rel:['Clustering']},
+{term:'Reinforcement Learning',cat:'ML Fundamentals',def:'Training through trial and error using rewards for good outcomes.',why:'RLHF is how LLMs are fine-tuned to be helpful and safe.',rel:['RLHF']},
+{term:'Neural Network',cat:'ML Fundamentals',def:'Layers of interconnected nodes that process information, inspired by the brain.',why:'The building block of deep learning and every LLM.',rel:['Deep Learning','Weights']},
+{term:'Training',cat:'ML Fundamentals',def:'Teaching a model by showing it many examples so it learns patterns.',why:'Explains knowledge cutoff dates and training data biases.',rel:['Training Data','Inference','Fine-Tuning']},
+{term:'Inference',cat:'ML Fundamentals',def:'Using a trained model to process new inputs and generate outputs.',why:'Every prompt-response cycle is inference.',rel:['Training','Latency']},
+{term:'Training Data',cat:'ML Fundamentals',def:'The dataset used to teach a model patterns.',why:'Quality and breadth directly affect AI knowledge and biases.',rel:['Training','Bias']},
+{term:'Overfitting',cat:'ML Fundamentals',def:'When a model memorizes training data instead of learning general patterns.',why:'An overfitted model fails on novel content.',rel:['Training']},
+{term:'Classification',cat:'ML Fundamentals',def:'Assigning a category to an input (e.g., spam vs. not spam).',why:'Directly applicable to content tagging and routing.',rel:['Supervised Learning']},
+{term:'Clustering',cat:'ML Fundamentals',def:'Grouping similar items together without predefined categories.',why:'Useful for discovering topic groups in content libraries.',rel:['Unsupervised Learning']},
+{term:'Weights',cat:'ML Fundamentals',def:'Numerical values in a neural network adjusted during training.',why:'When people say \u201C70 billion parameters,\u201D they mean weights.',rel:['Neural Network','Parameters']},
+{term:'Parameters',cat:'ML Fundamentals',def:'Total adjustable weights in a model; indicates size and capability.',why:'Larger counts generally mean more capable but costly models.',rel:['Weights','Model']},
+{term:'Activation Function',cat:'ML Fundamentals',def:'Mathematical function introducing non-linearity to neural networks. Common: ReLU, sigmoid, tanh.',why:'Without activation functions, networks could only learn linear relationships.',rel:['Neural Network']},
+{term:'Backpropagation',cat:'ML Fundamentals',def:'Algorithm calculating how each weight contributed to errors, enabling learning.',why:'The mathematical engine of neural network training.',rel:['Gradient Descent','Loss Function']},
+{term:'Gradient Descent',cat:'ML Fundamentals',def:'Optimization algorithm iteratively adjusting weights to reduce error.',why:'Literally how models learn \u2014 following gradients toward better predictions.',rel:['Backpropagation','Learning Rate']},
+{term:'Learning Rate',cat:'ML Fundamentals',def:'Controls how much to adjust weights at each step. Too high = unstable, too low = slow.',why:'One of the most critical training settings.',rel:['Gradient Descent','Training']},
+{term:'Loss Function',cat:'ML Fundamentals',def:'Formula measuring how wrong predictions are. Training minimizes this.',why:'The model\u2019s report card \u2014 lower loss = better predictions.',rel:['Backpropagation','Gradient Descent']},
+{term:'Transfer Learning',cat:'ML Fundamentals',def:'Adapting a model trained on one task for a different but related task.',why:'Why fine-tuning works \u2014 transfer general knowledge to your domain.',rel:['Fine-Tuning','Training']},
+{term:'Epoch',cat:'ML Fundamentals',def:'One complete pass through the entire training dataset.',why:'Too few = underfitting, too many = overfitting.',rel:['Training','Batch Size']},
+{term:'Batch Size',cat:'ML Fundamentals',def:'Number of training examples processed together before updating weights.',why:'Affects training speed and quality.',rel:['Training','Epoch']},
+{term:'Feature Engineering',cat:'ML Fundamentals',def:'Selecting or creating input features to improve model performance.',why:'Deep learning automates much of this, but data quality still matters enormously.',rel:['Machine Learning','Training Data']},
+{term:'Data Augmentation',cat:'ML Fundamentals',def:'Creating modified copies of training data to increase size and diversity.',why:'Helps models generalize, especially with limited domain data.',rel:['Training Data','Overfitting']},
+{term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that create new content \u2014 text, images, audio, video, code.',why:'The category of AI you interact with most directly.',rel:['LLM','Diffusion Model']},
+{term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative model trained on massive text to understand and generate language.',why:'The technology powering Claude, GPT, and Gemini.',rel:['Generative AI','Transformer','Token']},
+{term:'Transformer',cat:'GenAI',def:'The 2017 architecture powering virtually all modern LLMs via attention mechanisms.',why:'Understanding Transformers explains LLM strengths and limitations.',rel:['Attention Mechanism','LLM']},
+{term:'Attention Mechanism',cat:'GenAI',def:'Technique allowing models to weigh importance of every element relative to every other.',why:'Why LLMs can understand context across long texts.',rel:['Transformer','Context Window']},
+{term:'Token',cat:'GenAI',def:'Sub-word unit that LLMs process. Common words \u2248 1 token; longer words split into multiple.',why:'Tokens determine cost and context limits. 1 page \u2248 500\u2013800 tokens.',rel:['Tokenizer','Context Window']},
+{term:'Context Window',cat:'GenAI',def:'Maximum tokens a model can process in one interaction (input + output).',why:'Determines the longest document you can process in one prompt.',rel:['Token','Truncation']},
+{term:'Temperature',cat:'GenAI',def:'Controls output randomness. Low (0.0) = deterministic. High (1.0) = creative.',why:'Use lower for technical docs, higher for brainstorming.',rel:['Top-p','Sampling']},
+{term:'Top-p (Nucleus Sampling)',cat:'GenAI',def:'Limits the token pool considered at each step, controlling diversity.',why:'Another dial for controlling output variability.',rel:['Temperature','Sampling']},
+{term:'Embedding',cat:'GenAI',def:'Numerical vector representation of text where similar meanings have similar vectors.',why:'Powers semantic search, document matching, and RAG.',rel:['Vector','RAG','Semantic Search']},
+{term:'Vector',cat:'GenAI',def:'A list of numbers representing content in mathematical space.',why:'AI finds related articles by comparing vectors.',rel:['Embedding','Vector Database']},
+{term:'Hallucination',cat:'GenAI',def:'When AI generates confident, plausible content that is factually incorrect.',why:'The #1 risk for content editors. Always verify facts.',rel:['Grounding']},
+{term:'Grounding',cat:'GenAI',def:'Connecting AI output to verifiable source material.',why:'RAG is a grounding technique.',rel:['RAG','Hallucination']},
+{term:'Fine-Tuning',cat:'GenAI',def:'Further training a pre-trained model on specific data to specialize behavior.',why:'More expensive than prompt engineering but deeply customizes the model.',rel:['Training','RLHF']},
+{term:'RLHF',cat:'GenAI',def:'Reinforcement Learning from Human Feedback \u2014 aligning models with human preferences.',why:'Why modern AI assistants are helpful and conversational.',rel:['Reinforcement Learning','Alignment']},
+{term:'Knowledge Cutoff',cat:'GenAI',def:'The date beyond which a model has no training data.',why:'Verify time-sensitive information \u2014 AI knowledge may be outdated.',rel:['Training Data']},
+{term:'Sampling',cat:'GenAI',def:'Process by which the model selects the next token from the probability distribution.',why:'Explains why the same prompt can produce different outputs.',rel:['Temperature','Top-p']},
+{term:'Tokenization',cat:'GenAI',def:'Converting text into tokens for model processing.',why:'Helps estimate costs and context window usage.',rel:['Token','Tokenizer']},
+{term:'Truncation',cat:'GenAI',def:'When input exceeding the context window is cut off.',why:'If AI ignores part of a long document, truncation is likely the cause.',rel:['Context Window','Token']},
+{term:'Streaming',cat:'GenAI',def:'Delivering AI response token by token as generated.',why:'Why you see AI responses appear word by word.',rel:['Inference','Latency']},
+{term:'Benchmark',cat:'GenAI',def:'Standardized test to evaluate and compare model performance.',why:'Helps interpret model comparison claims.',rel:['Evaluation']},
+{term:'Constitutional AI',cat:'GenAI',def:'Anthropic\u2019s technique where the model self-critiques against principles before responding.',why:'Explains why Claude is more cautious and nuanced.',rel:['Alignment','RLHF']},
+{term:'Distillation',cat:'GenAI',def:'Training a smaller model to mimic a larger one, creating compact models retaining most capability.',why:'How \u201Cmini\u201D model versions are created.',rel:['Transfer Learning','Parameters']},
+{term:'Instruction Tuning',cat:'GenAI',def:'Fine-tuning on instruction-response pairs to improve direction-following.',why:'The difference between a base model and an assistant.',rel:['Fine-Tuning','RLHF']},
+{term:'Mixture of Experts (MoE)',cat:'GenAI',def:'Architecture with specialized sub-networks and a router activating only relevant experts per query.',why:'Enables huge models to run efficiently.',rel:['Transformer','Parameters']},
+{term:'Quantization',cat:'GenAI',def:'Reducing weight precision (e.g., 32-bit to 4-bit) to make models smaller and faster.',why:'Enables running large models on laptops and phones.',rel:['Weights','Inference']},
+{term:'Reward Model',cat:'GenAI',def:'A model trained on human preferences to score AI output quality.',why:'Bridge between human judgment and model optimization at scale.',rel:['RLHF','Alignment']},
+{term:'Speculative Decoding',cat:'GenAI',def:'Small fast model drafts tokens, large model verifies in parallel for speed.',why:'One reason AI responses get faster without getting worse.',rel:['Inference','Latency']},
+{term:'Prompt',cat:'Prompting',def:'The input you give to an AI model.',why:'Prompt quality directly determines output quality.',rel:['Prompt Engineering']},
+{term:'Prompt Engineering',cat:'Prompting',def:'Designing and refining prompts for best output.',why:'Your core skill for working with AI tools.',rel:['Prompt','Few-Shot','Chain-of-Thought']},
+{term:'Zero-Shot',cat:'Prompting',def:'Asking the AI to perform a task without examples.',why:'Quick for simple tasks but less consistent.',rel:['Few-Shot','Prompt']},
+{term:'Few-Shot',cat:'Prompting',def:'Providing a few examples of desired input-output pattern.',why:'One of the most effective techniques for consistency.',rel:['Zero-Shot','Prompt Engineering']},
+{term:'Chain-of-Thought (CoT)',cat:'Prompting',def:'Prompting the AI to think step by step before answering.',why:'Produces more accurate results for complex tasks.',rel:['Prompt Engineering']},
+{term:'Prompt Chaining',cat:'Prompting',def:'Sequential prompts where each output feeds the next.',why:'The most effective strategy for complex tasks.',rel:['Prompt Engineering']},
+{term:'Role Prompting',cat:'Prompting',def:'Instructing AI to adopt a specific persona or expertise.',why:'Calibrates language, tone, and detail depth.',rel:['System Prompt','Prompt Engineering']},
+{term:'System Prompt',cat:'Prompting',def:'Hidden instructions defining AI behavior before your conversation.',why:'Understanding system prompts helps you work more effectively with AI.',rel:['Prompt','Role Prompting']},
+{term:'API',cat:'Infrastructure',def:'Interface for sending prompts to AI models and receiving responses.',why:'Understanding APIs helps you know why different tools behave differently.',rel:['Model','Inference']},
+{term:'Model',cat:'Infrastructure',def:'The trained AI system (e.g., Claude Opus 4, GPT-4o).',why:'Different models have different capabilities, speeds, and costs.',rel:['LLM','Parameters']},
+{term:'Open-Source Model',cat:'Infrastructure',def:'AI model with publicly available weights and code (e.g., Llama, Mistral).',why:'More control but requires expertise to deploy.',rel:['Model']},
+{term:'Proprietary Model',cat:'Infrastructure',def:'AI model accessible only through a company\u2019s API (e.g., Claude, GPT).',why:'These are what you use through Claude.ai and ChatGPT.',rel:['Model','API']},
+{term:'Latency',cat:'Infrastructure',def:'Time delay between sending a prompt and receiving a response.',why:'Larger models and longer prompts = higher latency.',rel:['Inference']},
+{term:'RAG',cat:'Protocols',def:'Retrieval-Augmented Generation \u2014 retrieving documents before generating responses.',why:'Grounds AI in your documentation, reducing hallucination.',rel:['Embedding','Vector Database']},
+{term:'Vector Database',cat:'Protocols',def:'Database optimized for storing and searching vector embeddings.',why:'The backend powering RAG and semantic search.',rel:['Vector','Embedding','RAG']},
+{term:'MCP',cat:'Protocols',def:'Model Context Protocol \u2014 open standard for connecting AI to tools and services.',why:'How AI tools connect to your company\u2019s systems.',rel:['Tool Use','API']},
+{term:'Function Calling / Tool Use',cat:'Protocols',def:'AI invoking external tools as part of generating a response.',why:'Makes AI go beyond text generation to take actions.',rel:['MCP','Agent']},
+{term:'Structured Output',cat:'Protocols',def:'AI output in defined format like JSON or specific templates.',why:'Essential when output feeds into other systems.',rel:['API']},
+{term:'Cosine Similarity',cat:'Protocols',def:'Measuring how similar two vectors are by the angle between them.',why:'Most common metric in vector databases for finding relevant documents.',rel:['Vector','Embedding']},
+{term:'Hybrid Search',cat:'Protocols',def:'Combining keyword and semantic vector search.',why:'Significantly improves RAG retrieval quality.',rel:['Semantic Search','RAG']},
+{term:'Chunking Strategy',cat:'Protocols',def:'How documents are split into pieces for embedding and RAG.',why:'Chunk size directly affects retrieval quality.',rel:['RAG','Vector Database']},
+{term:'Agent (AI Agent)',cat:'Agents',def:'AI system that autonomously plans, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows autonomously.',rel:['Tool Use','MCP']},
+{term:'Copilot',cat:'Agents',def:'AI assistant integrated into a software tool providing suggestions.',why:'Brings AI into tools you already use.',rel:['Agent','Tool Use']},
+{term:'Agent Loop',cat:'Agents',def:'Iterative cycle: observe, plan, act, evaluate, repeat.',why:'Helps predict agent behavior and design better tasks.',rel:['Agent']},
+{term:'Planning (Agentic)',cat:'Agents',def:'Agent\u2019s ability to break tasks into ordered subtasks and select tools.',why:'What distinguishes agents from chatbots.',rel:['Agent','Agent Loop']},
+{term:'Reflection (Agents)',cat:'Agents',def:'Agent evaluating its own outputs and deciding whether to revise.',why:'Self-reflection improves agent reliability.',rel:['Agent Loop']},
+{term:'Tool Orchestration',cat:'Agents',def:'Agent selecting, sequencing, and coordinating multiple tools.',why:'Combining tools into coherent workflows multiplies each tool\u2019s value.',rel:['Agent','MCP']},
+{term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors reflecting imbalances in training data or design.',why:'AI content may inadvertently favor certain perspectives.',rel:['Training Data']},
+{term:'Alignment',cat:'Ethics',def:'Ensuring AI behaves in accordance with human values.',why:'Alignment research is why modern AI tools are generally helpful and safe.',rel:['RLHF','Guardrails']},
+{term:'Guardrails',cat:'Ethics',def:'Built-in restrictions preventing harmful AI output.',why:'Protect you and your organization from problematic content.',rel:['Alignment']},
+{term:'Responsible AI',cat:'Ethics',def:'Practices ensuring ethical, fair, transparent AI use.',why:'You play a role by verifying output and checking for bias.',rel:['Bias','Alignment']},
+{term:'Red-Teaming',cat:'Ethics',def:'Deliberately trying to make AI fail to identify vulnerabilities.',why:'Explains why AI tools sometimes seem overly cautious.',rel:['Guardrails']},
+{term:'Semantic Search',cat:'Workflow',def:'Search matching by meaning rather than exact keywords.',why:'Finds content even when users don\u2019t use exact terminology.',rel:['Embedding','Vector','RAG']},
+{term:'Human-in-the-Loop',cat:'Workflow',def:'Workflow where AI handles part of the task and a human reviews.',why:'This IS the recommended AI workflow \u2014 AI drafts, you review.',rel:['Responsible AI']},
+{term:'Evaluation (of AI output)',cat:'Workflow',def:'Systematically assessing quality and accuracy of AI-generated content.',why:'Consistent evaluation makes review faster and more reliable.',rel:['Human-in-the-Loop']},
+{term:'Softmax',cat:'Algorithms',def:'Function converting a vector of numbers into a probability distribution that sums to 1. Used as the final layer in classification and in attention score normalization.',why:'The mathematical function that turns raw model scores into the probabilities you see in AI predictions.',rel:['Attention Mechanism','Classification']},
+{term:'Kernel Trick',cat:'Algorithms',def:'Mathematical technique projecting data into higher dimensions where it becomes linearly separable, without explicitly computing the transformation.',why:'The key insight behind SVMs that enables them to handle complex non-linear data.',rel:['SVM']},
+{term:'Gini Impurity',cat:'Algorithms',def:'Measure of how often a randomly chosen element would be misclassified. Used by decision trees to choose the best split.',why:'Understanding Gini impurity helps you understand how decision trees and Random Forests make splitting decisions.',rel:['Decision Trees','Random Forest']},
+{term:'Cross-Entropy Loss',cat:'Algorithms',def:'Loss function measuring difference between predicted probability distribution and actual labels. The standard loss for classification tasks.',why:'The most common way models learn to classify \u2014 it punishes confident wrong predictions heavily.',rel:['Loss Function','Classification']},
+{term:'Sigmoid Function',cat:'Algorithms',def:'S-shaped function that maps any number to a value between 0 and 1. Used in logistic regression and neural network gates.',why:'The mathematical bridge between raw numbers and probabilities in classification.',rel:['Logistic Regression','LSTM','Activation Function']},
+{term:'Pooling (CNN)',cat:'Algorithms',def:'Operation reducing spatial dimensions of feature maps, typically by taking the maximum or average value in each region.',why:'Makes CNNs invariant to small position shifts and reduces computational cost.',rel:['CNN']},
+{term:'Dropout',cat:'Algorithms',def:'Regularization technique that randomly deactivates neurons during training, forcing the network to be robust.',why:'A simple trick that dramatically reduces overfitting in neural networks.',rel:['Overfitting','Neural Network']},
+{term:'Normalization (Batch/Layer)',cat:'Algorithms',def:'Techniques standardizing layer inputs during training to stabilize and accelerate learning.',why:'Enables training of very deep networks that would otherwise be unstable.',rel:['Neural Network','Training']},
+{term:'Residual Connection',cat:'Algorithms',def:'Shortcut connection that adds layer input directly to its output, enabling training of very deep networks.',why:'The key innovation in ResNet that made 100+ layer networks trainable and is now standard in Transformers.',rel:['Transformer','Neural Network']},
+{term:'Self-Attention',cat:'Algorithms',def:'Attention computed within a single sequence, where each element attends to all others.',why:'The core operation inside every Transformer layer.',rel:['Attention Mechanism','Transformer']},
+{term:'Cross-Attention',cat:'Algorithms',def:'Attention between two different sequences (e.g., a prompt and its response, or text and an image).',why:'How encoder-decoder models and multimodal models connect different inputs.',rel:['Attention Mechanism','Transformer']},
+{term:'Positional Encoding',cat:'Algorithms',def:'Information added to token embeddings so the model knows the order/position of elements in a sequence.',why:'Transformers have no inherent notion of order \u2014 positional encoding provides it.',rel:['Transformer','Embedding']},
+{term:'Greedy Decoding',cat:'Algorithms',def:'Generating text by always choosing the single most probable next token.',why:'Fastest decoding but can miss better overall sequences.',rel:['Sampling','Beam Search']},
+{term:'Beam Search',cat:'Algorithms',def:'Decoding strategy that maintains multiple candidate sequences and selects the best overall path.',why:'Produces higher-quality output than greedy decoding by exploring alternatives.',rel:['Greedy Decoding','Sampling']},
+{term:'Top-K / Top-P Sampling',cat:'Algorithms',def:'Sampling strategies limiting token selection to the K most likely or those within cumulative probability P.',why:'Controls the balance between creativity and coherence in AI text generation.',rel:['Temperature','Sampling']},
+{term:'Knowledge Graph',cat:'Algorithms',def:'Structured representation of entities and their relationships, used to provide factual context to AI systems.',why:'Powers Graph RAG and helps AI reason about relationships between concepts.',rel:['RAG','Embedding']},
+{term:'Embedding Space',cat:'Algorithms',def:'The high-dimensional mathematical space where embeddings live. Similar items cluster together.',why:'Understanding embedding space helps you understand semantic search and similarity.',rel:['Embedding','Vector']},
+{term:'Latent Space',cat:'Algorithms',def:'Compressed internal representation learned by a model, capturing essential features of the data.',why:'Where the \u201Cunderstanding\u201D lives inside generative models like diffusion models and GANs.',rel:['Embedding','GAN','Diffusion Models']},
+{term:'Zero-Shot / Few-Shot / Many-Shot',cat:'Algorithms',def:'Classification of how many examples are provided: zero (none), few (2-10), many (dozens+).',why:'Determines which model approach to use \u2014 LLMs excel at zero/few-shot, classical ML needs many-shot.',rel:['Zero-Shot','Few-Shot','Transfer Learning']},
+{term:'Tokenizer',cat:'GenAI',def:'The component that converts text into tokens (for input) and tokens back into text (for output).',why:'Different models use different tokenizers, which is why token counts vary across models.',rel:['Token']},
+{term:'Multi-modal',cat:'GenAI',def:'AI models that can process and generate multiple content types \u2014 text, images, audio, video.',why:'Multi-modal models can analyze images, generate diagrams, and process mixed-media content.',rel:['LLM','Generative AI']},
+{term:'Diffusion Model',cat:'GenAI',def:'A GenAI model for image generation (e.g., DALL-E, Midjourney). Works by learning to remove noise from random data.',why:'If you need AI-generated images, these are the models behind the tools.',rel:['Generative AI']},
+{term:'Output Format',cat:'Prompting',def:'Specifying the structure of the AI\u2019s response (bullets, table, JSON, markdown, numbered steps).',why:'Explicit format instructions prevent manual reformatting.',rel:['Prompt Engineering','Structured Output']},
+{term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: AI runs locally on your hardware. Cloud: AI runs on remote servers.',why:'Cloud requires internet and sends data externally. On-device is private but limited in capability.',rel:['Inference','Latency']},
+{term:'Reranking',cat:'Protocols',def:'Using a secondary model to re-score and reorder search results after initial retrieval.',why:'Key technique for improving RAG quality \u2014 initial retrieval casts a wide net, reranking narrows to the most relevant.',rel:['RAG','Hybrid Search']},
+{term:'Vector Similarity',cat:'Protocols',def:'Mathematical measure of how close two vectors are in embedding space.',why:'Core mechanism behind semantic search \u2014 \u201Cfind similar meaning\u201D = \u201Cfind close vectors.\u201D',rel:['Cosine Similarity','Embedding']},
+{term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\u2019s context at request time.',why:'Every time you paste a document into AI chat, you\u2019re doing context injection.',rel:['RAG','Context Window']},
+{term:'Multi-Agent Systems',cat:'Agents',def:'Architectures where multiple specialized agents collaborate \u2014 one researches, one drafts, one reviews.',why:'The future of complex AI workflows: specialized agents working together like a team.',rel:['Agent','Tool Orchestration']},
+{term:'Working Memory (Agents)',cat:'Agents',def:'Accumulated context an agent maintains across subtasks within a single run.',why:'Why agents can build on earlier steps \u2014 and why they struggle with very long tasks.',rel:['Agent Loop','Context Window']},
+{term:'Human-in-the-Loop (Agents)',cat:'Agents',def:'Design pattern where agents request human approval before irreversible actions.',why:'Essential for workflows where accuracy matters more than speed.',rel:['Agent','Responsible AI']},
+{term:'Automation Bias',cat:'Ethics',def:'Human tendency to over-rely on automated systems without critical evaluation.',why:'The biggest practical risk for anyone using AI \u2014 always verify.',rel:['Hallucination']},
+{term:'Prompt Library / Playbook',cat:'Workflow',def:'A curated collection of tested, reusable prompt templates organized by task type.',why:'Building a prompt library saves time and ensures team consistency.',rel:['Prompt Engineering','Prompt Template']},
+{term:'Prompt Template',cat:'Workflow',def:'A reusable prompt structure with placeholder variables for specific tasks.',why:'Templates standardize AI usage and ensure consistently good output.',rel:['Prompt Library','Prompt Engineering']},
+{term:'Content Transformation',cat:'Workflow',def:'Using AI to convert content from one format, audience, or style to another.',why:'One of the highest-ROI daily uses of AI for content editors.',rel:['Prompt Template']},
+{term:'Chunking',cat:'Workflow',def:'Breaking a large document into smaller sections for AI processing.',why:'Explains why AI sometimes misses sections in long documents.',rel:['Context Window','RAG','Token']},
+{term:'Preference Optimization (DPO)',cat:'GenAI',def:'Direct Preference Optimization \u2014 simpler alternative to RLHF that optimizes directly on preference pairs.',why:'Emerging technique that may replace RLHF due to simplicity and stability.',rel:['RLHF','Fine-Tuning']},
+{term:'Safety Filter',cat:'GenAI',def:'System screening AI inputs/outputs for harmful or policy-violating content.',why:'Explains why AI tools sometimes refuse seemingly legitimate requests.',rel:['Guardrails','Red-Teaming']},
+{term:'Softmax Temperature',cat:'Algorithms',def:'Applying temperature scaling to logits before softmax, controlling how peaked or flat the probability distribution is.',why:'The mechanism behind the Temperature slider \u2014 higher temperature = flatter distribution = more creative output.',rel:['Temperature','Softmax','Sampling']}
+];
+
+/* ══ STATE ══ */
+let activeModel = null;
+let activeCategory = null;
+let filterRelevance = 'all';
+let filterStatus = 'all';
+let searchQuery = '';
+let glossFilter = 'All';
+let glossAlpha = '';
+let glossSearchQ = '';
+let currentTab = 'explorer';
+
+const REL_LABEL = {daily:'Core Knowledge',useful:'Good to Know',reference:'Deep Reference'};
+const STAT_LABEL = {deployed:'Widely Deployed',emerging:'Emerging',research:'Research Stage'};
+
+/* ══ TAB SWITCHING ══ */
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + tab));
+  history.replaceState(null, '', '#' + tab);
+  if (tab === 'compare') initCompare();
+  if (tab === 'which') initDecision();
+  if (tab === 'timeline') renderTimeline();
+  if (tab === 'resources') renderResources();
+  if (tab === 'glossary') initGlossary();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+/* ══ EXPLORER ══ */
+function getFilteredModels() {
+  return MODELS.filter(m => {
+    if (filterRelevance !== 'all' && m.relevance !== filterRelevance) return false;
+    if (filterStatus !== 'all' && m.status !== filterStatus) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return m.name.toLowerCase().includes(q) || m.summary.toLowerCase().includes(q) ||
+             m.tags.some(t => t.includes(q)) || m.category.toLowerCase().includes(q);
+    }
+    return true;
+  });
+}
+
+function renderFilterChips() {
+  const chips = [
+    {label:'All',val:'all',type:'rel'},{label:'Core Knowledge',val:'daily',type:'rel'},
+    {label:'Good to Know',val:'useful',type:'rel'},{label:'Deep Reference',val:'reference',type:'rel'},
+    {label:'Deployed',val:'deployed',type:'stat'},{label:'Emerging',val:'emerging',type:'stat'}
+  ];
+  document.getElementById('filter-chips').innerHTML = chips.map(c => {
+    const active = (c.type === 'rel' && filterRelevance === c.val) || (c.type === 'stat' && filterStatus === c.val);
+    return '<button class="filter-chip ' + (active ? 'active' : '') + '" onclick="setFilter(\'' + c.type + '\',\'' + c.val + '\')">' + c.label + '</button>';
+  }).join('');
+}
+
+window.setFilter = function(type, val) {
+  if (type === 'rel') { filterRelevance = val; filterStatus = 'all'; }
+  else { filterStatus = val; filterRelevance = 'all'; }
+  renderFilterChips();
+  renderSidebar();
+};
+
+function renderSidebar() {
+  const filtered = getFilteredModels();
+  const el = document.getElementById('explorer-sidebar-list');
+  el.innerHTML = CATEGORIES.map(cat => {
+    const models = filtered.filter(m => m.category === cat.name);
+    if (!models.length) return '';
+    const expanded = activeCategory === cat.id || models.some(m => m.id === activeModel);
+    return '<div class="cat-header ' + (expanded ? 'expanded' : '') + '" onclick="toggleCategory(\'' + cat.id + '\')">' +
+      '<span>' + cat.icon + '</span><span>' + cat.name + '</span><span class="cat-count">' + models.length + '</span><span class="cat-arrow">\u25B6</span></div>' +
+      '<div class="cat-models">' + models.map(m =>
+        '<div class="model-item ' + (m.id === activeModel ? 'active' : '') + '" onclick="selectModel(\'' + m.id + '\')" tabindex="0" onkeydown="if(event.key===\'Enter\')selectModel(\'' + m.id + '\')">' + m.name + '</div>'
+      ).join('') + '</div>';
+  }).join('');
+  document.getElementById('filter-count').textContent = 'Showing ' + filtered.length + ' of ' + MODELS.length + ' models';
+}
+
+window.toggleCategory = function(catId) {
+  activeCategory = activeCategory === catId ? null : catId;
+  renderSidebar();
+};
+
+window.selectModel = function(id) {
+  activeModel = id;
+  const m = MODELS.find(x => x.id === id);
+  if (!m) return;
+  activeCategory = CATEGORIES.find(c => c.name === m.category)?.id;
+  renderSidebar();
+  renderModelDetail(m);
+  if (currentTab !== 'explorer') switchTab('explorer');
+  if (window.innerWidth <= 768) document.getElementById('explorer-main').scrollIntoView({behavior:'smooth'});
+};
+
+function renderModelDetail(m) {
+  const main = document.getElementById('explorer-main');
+  main.innerHTML =
+    '<div class="model-detail">' +
+      '<div class="model-name">' + m.name + '</div>' +
+      '<div class="model-meta">' +
+        '<span class="badge badge-' + m.relevance + '">' + REL_LABEL[m.relevance] + '</span>' +
+        '<span class="badge badge-' + m.status + '">' + STAT_LABEL[m.status] + '</span>' +
+        '<span class="model-year">Introduced: ' + m.year + '</span>' +
+        (m.paper ? '<span class="model-paper">\uD83D\uDCC4 ' + m.paper + '</span>' : '') +
+      '</div>' +
+      '<div class="model-category">' + m.category + '</div>' +
+      sec('Summary', m.summary) +
+      sec('Why It Matters to You', m.whyItMatters) +
+      sec('How It Works (Plain English)', m.howItWorks) +
+      '<div class="model-columns">' +
+        '<div class="model-col"><div class="model-section-title">\u2705 Strengths</div><ul>' + m.strengths.map(s => '<li>' + s + '</li>').join('') + '</ul></div>' +
+        '<div class="model-col"><div class="model-section-title">\u26A0\uFE0F Limitations</div><ul>' + m.limitations.map(l => '<li>' + l + '</li>').join('') + '</ul></div>' +
+      '</div>' +
+      '<div class="model-section"><div class="model-section-title">Real-World Use Cases</div><div class="model-section-body">' +
+        m.realWorldUse.map((u,i) => '<div style="padding:6px 0;border-bottom:1px solid var(--border)">' + (i+1) + '. ' + u + '</div>').join('') + '</div></div>' +
+      (m.comparisons.length ? '<div class="model-section"><div class="model-section-title">How It Compares</div>' +
+        m.comparisons.map(c => '<div class="comparison-card"><strong>vs. ' + c.model + '</strong><p>' + c.diff + '</p></div>').join('') + '</div>' : '') +
+      (m.variants.length ? '<div class="model-section"><div class="model-section-title">Variants &amp; Family</div><div class="variant-chips">' +
+        m.variants.map(v => '<span class="variant-chip">' + v + '</span>').join('') + '</div></div>' : '') +
+      (m.related.length ? '<div class="model-section"><div class="model-section-title">Related Models</div><div>' +
+        m.related.map(r => { const rel = MODELS.find(x => x.id === r); return rel ? '<span class="related-link" onclick="selectModel(\'' + r + '\')">' + rel.name + '</span>' : ''; }).join('') + '</div></div>' : '') +
+    '</div>';
+}
+
+function sec(title, body) {
+  return '<div class="model-section"><div class="model-section-title">' + title + '</div><div class="model-section-body">' + body + '</div></div>';
+}
+
+window.onExplorerSearch = function() {
+  searchQuery = document.getElementById('explorer-search').value;
+  renderSidebar();
+};
+
+/* ══ COMPARE ══ */
+function initCompare() {
+  ['compare-a','compare-b','compare-c'].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">' + (id === 'compare-c' ? '(Optional) Model C\u2026' : 'Select Model ' + id.slice(-1).toUpperCase() + '\u2026') + '</option>' +
+      MODELS.map(m => '<option value="' + m.id + '"' + (m.id === cur ? ' selected' : '') + '>' + m.name + '</option>').join('');
+  });
+}
+
+window.renderComparison = function() {
+  const ids = ['compare-a','compare-b','compare-c'].map(id => document.getElementById(id).value).filter(Boolean);
+  const models = ids.map(id => MODELS.find(m => m.id === id)).filter(Boolean);
+  if (models.length < 2) { document.getElementById('compare-table').innerHTML = '<p style="text-align:center;color:var(--tx-muted);padding:40px">Select at least two models to compare.</p>'; return; }
+  const rows = [
+    ['Name', m => '<strong>' + m.name + '</strong>'],
+    ['Category', m => m.category],
+    ['Year', m => m.year],
+    ['Relevance', m => '<span class="badge badge-' + m.relevance + '">' + REL_LABEL[m.relevance] + '</span>'],
+    ['Status', m => '<span class="badge badge-' + m.status + '">' + STAT_LABEL[m.status] + '</span>'],
+    ['Summary', m => m.summary],
+    ['Strengths', m => '<ul style="margin:0;padding-left:16px">' + m.strengths.map(s => '<li>' + s + '</li>').join('') + '</ul>'],
+    ['Limitations', m => '<ul style="margin:0;padding-left:16px">' + m.limitations.map(l => '<li>' + l + '</li>').join('') + '</ul>'],
+    ['Best For', m => m.realWorldUse[0] || '']
+  ];
+  document.getElementById('compare-table').innerHTML = '<table class="compare-table"><thead><tr><th></th>' +
+    models.map(m => '<th>' + m.name + '</th>').join('') + '</tr></thead><tbody>' +
+    rows.map(([label, fn]) => '<tr><td><strong>' + label + '</strong></td>' + models.map(m => '<td>' + fn(m) + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table>';
+};
+
+/* ══ DECISION TREE ══ */
+let decisionPath = [];
+function initDecision() { decisionPath = []; renderDecisionStep(0); }
+
+function renderDecisionStep(idx) {
+  const container = document.getElementById('decision-container');
+  const step = DECISION_TREE[idx];
+  if (!step) return;
+  const stepEl = document.createElement('div');
+  stepEl.className = 'decision-step';
+  stepEl.innerHTML = '<div class="decision-q">' + step.question + '</div>' +
+    step.options.map((o, i) => '<button class="decision-opt" onclick="decisionChoice(' + idx + ',' + i + ')">' + o.label + '</button>').join('');
+  if (idx === 0) container.innerHTML = '';
+  container.appendChild(stepEl);
+  stepEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+window.decisionChoice = function(stepIdx, optIdx) {
+  const opt = DECISION_TREE[stepIdx].options[optIdx];
+  const step = document.querySelectorAll('.decision-step')[decisionPath.length];
+  if (step) {
+    step.querySelectorAll('.decision-opt').forEach((b, i) => {
+      b.disabled = true;
+      if (i === optIdx) b.style.borderColor = 'var(--primary)';
+      else b.style.opacity = '0.4';
+    });
+  }
+  decisionPath.push({step: stepIdx, opt: optIdx});
+  if (opt.result) {
+    showDecisionResult(opt.result);
+  } else if (opt.next !== undefined) {
+    renderDecisionStep(opt.next);
+  }
+};
+
+function showDecisionResult(modelIds) {
+  const container = document.getElementById('decision-container');
+  const div = document.createElement('div');
+  div.className = 'decision-result';
+  div.innerHTML = '<h3>Recommended Models</h3>' +
+    modelIds.map(id => {
+      const m = MODELS.find(x => x.id === id);
+      return m ? '<div class="result-model"><span class="result-model-name">' + m.name +
+        ' <span class="badge badge-' + m.relevance + '" style="font-size:10px">' + REL_LABEL[m.relevance] + '</span></span>' +
+        '<span class="result-model-link" onclick="selectModel(\'' + id + '\')">View Details \u2192</span></div>' : '';
+    }).join('') +
+    '<button class="decision-restart" onclick="initDecision()">\u21BA Start Over</button>';
+  container.appendChild(div);
+  div.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ══ TIMELINE ══ */
+function renderTimeline() {
+  document.getElementById('timeline').innerHTML = TIMELINE_DATA.map(t =>
+    '<div class="tl-era">' +
+      '<div class="tl-year">' + t.year + '</div>' +
+      '<div class="tl-label">' + t.era + '</div>' +
+      '<div class="tl-dot"></div>' +
+      '<div class="tl-desc">' + t.desc + '</div>' +
+      '<div class="tl-models">' + t.models.map(name => {
+        const m = MODELS.find(x => x.name === name || x.name.includes(name));
+        return '<span class="tl-model-chip"' + (m ? ' onclick="selectModel(\'' + m.id + '\')"' : '') + '>' + name + '</span>';
+      }).join('') + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+/* ══ RESOURCES ══ */
+function renderResources() {
+  document.getElementById('resources-container').innerHTML =
+    '<div class="section-intro"><h2>Learning Resources</h2><p>Curated courses, references, and tools for deepening your understanding of AI models and algorithms.</p></div>' +
+    RESOURCES.map(tier =>
+      '<div class="resource-tier"><div class="tier-header" style="background:' + tier.color + '">' + tier.tier + '</div>' +
+      tier.items.map(r =>
+        '<div class="resource-card"><div class="resource-title">' + r.title + '</div>' +
+        '<div class="resource-provider">' + r.provider + '</div>' +
+        '<div class="resource-meta"><span>\u23F1 ' + r.time + '</span></div>' +
+        '<div class="resource-why">' + r.why + '</div>' +
+        '<a class="resource-link" href="' + r.url + '" target="_blank" rel="noopener">Visit Resource \u2192</a></div>'
+      ).join('') + '</div>'
+    ).join('');
+}
+
+/* ══ GLOSSARY ══ */
+const GLOSS_CATS = ['All','ML Fundamentals','GenAI','Prompting','Infrastructure','Protocols','Agents','Ethics','Workflow','Algorithms'];
+const GLOSS_CAT_MAP = {'ML Fundamentals':'badge-ml','GenAI':'badge-genai','Prompting':'badge-prompt','Infrastructure':'badge-infra','Ethics':'badge-ethics','Workflow':'badge-workflow','Protocols':'badge-proto','Agents':'badge-proto','Algorithms':'badge-ml'};
+const BADGE_CSS = {'badge-ml':'background:rgba(37,99,235,0.1);color:var(--primary)','badge-genai':'background:rgba(124,58,237,0.1);color:var(--accent)','badge-prompt':'background:rgba(6,182,212,0.1);color:var(--secondary)','badge-infra':'background:rgba(245,158,11,0.1);color:var(--warning)','badge-ethics':'background:rgba(239,68,68,0.1);color:var(--error)','badge-workflow':'background:rgba(16,185,129,0.1);color:var(--success)','badge-proto':'background:rgba(79,70,229,0.1);color:#4F46E5'};
+
+function initGlossary() {
+  document.getElementById('gloss-filters').innerHTML = GLOSS_CATS.map(c =>
+    '<button class="gloss-filter ' + (c === glossFilter ? 'active' : '') + '" onclick="setGlossFilter(\'' + c + '\',this)">' + c + '</button>'
+  ).join('');
+  document.getElementById('alpha-bar').innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l =>
+    '<button class="alpha-btn" onclick="setGlossAlpha(\'' + l + '\',this)">' + l + '</button>'
+  ).join('');
+  renderGloss();
+}
+
+window.setGlossFilter = function(c, btn) {
+  glossFilter = c; glossAlpha = '';
+  document.querySelectorAll('.gloss-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('active'));
+  renderGloss();
+};
+window.setGlossAlpha = function(l, btn) {
+  glossAlpha = glossAlpha === l ? '' : l;
+  document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('active'));
+  if (glossAlpha) btn.classList.add('active');
+  renderGloss();
+};
+window.filterGlossary = function() {
+  glossSearchQ = document.getElementById('gloss-search').value.toLowerCase();
+  renderGloss();
+};
+
+function renderGloss() {
+  let items = GLOSSARY;
+  if (glossFilter !== 'All') items = items.filter(g => g.cat === glossFilter);
+  if (glossAlpha) items = items.filter(g => g.term[0].toUpperCase() === glossAlpha);
+  if (glossSearchQ) items = items.filter(g => g.term.toLowerCase().includes(glossSearchQ) || g.def.toLowerCase().includes(glossSearchQ));
+  document.getElementById('gloss-grid').innerHTML = items.length ? items.map(g =>
+    '<div class="gloss-card" id="g-' + g.term.replace(/[^a-zA-Z0-9]/g, '') + '">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="gloss-term">' + g.term + '</div><span class="badge" style="' + (BADGE_CSS[GLOSS_CAT_MAP[g.cat] || 'badge-ml'] || '') + '">' + g.cat + '</span></div>' +
+      '<div class="gloss-def">' + g.def + '</div>' +
+      '<div class="gloss-why">Why it matters: ' + g.why + '</div>' +
+      (g.rel.length ? '<div class="gloss-related">Related: ' + g.rel.map(r => '<a onclick="jumpGloss(\'' + r.replace(/'/g, "\\'") + '\')">' + r + '</a>').join(', ') + '</div>' : '') +
+    '</div>'
+  ).join('') : '<div class="search-empty">No matching terms found.</div>';
+}
+
+window.jumpGloss = function(term) {
+  glossSearchQ = ''; glossFilter = 'All'; glossAlpha = '';
+  document.getElementById('gloss-search').value = '';
+  initGlossary();
+  const id = 'g-' + term.replace(/[^a-zA-Z0-9]/g, '');
+  const el = document.getElementById(id);
+  if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.boxShadow = '0 0 0 3px var(--primary)'; setTimeout(() => el.style.boxShadow = '', 2000); }
+};
+
+/* ══ GLOBAL SEARCH ══ */
+let searchIndex = [];
+function buildSearchIndex() {
+  searchIndex = [];
+  MODELS.forEach(m => searchIndex.push({type:'Model',text:m.name,desc:m.summary.substring(0,100)+'\u2026',action:() => selectModel(m.id)}));
+  GLOSSARY.forEach(g => searchIndex.push({type:'Glossary',text:g.term,desc:g.def.substring(0,100)+'\u2026',action:() => { switchTab('glossary'); setTimeout(() => { document.getElementById('gloss-search').value = g.term; filterGlossary(); }, 100); }}));
+  RESOURCES.forEach(tier => tier.items.forEach(r => searchIndex.push({type:'Resource',text:r.title,desc:r.provider,action:() => switchTab('resources')})));
+}
+
+function performSearch(query) {
+  if (!query.trim()) return [];
+  const q = query.toLowerCase();
+  return searchIndex.filter(i => i.text.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)).slice(0, 12);
+}
+
+function openSearch() {
+  document.getElementById('search-backdrop').classList.add('open');
+  document.getElementById('search-overlay').classList.add('open');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-input').focus();
+  document.getElementById('search-results').innerHTML = '<div class="search-empty">Start typing to search\u2026</div>';
+}
+function closeSearch() {
+  document.getElementById('search-backdrop').classList.remove('open');
+  document.getElementById('search-overlay').classList.remove('open');
+}
+
+document.getElementById('search-btn').onclick = openSearch;
+document.getElementById('search-backdrop').onclick = closeSearch;
+document.getElementById('search-input').oninput = function() {
+  const results = performSearch(this.value);
+  const container = document.getElementById('search-results');
+  if (!this.value.trim()) { container.innerHTML = '<div class="search-empty">Start typing to search\u2026</div>'; return; }
+  if (!results.length) { container.innerHTML = '<div class="search-empty">No results found.</div>'; return; }
+  container.innerHTML = results.map((r, i) => {
+    const hl = r.text.replace(new RegExp('(' + this.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>');
+    return '<div class="search-item" data-idx="' + i + '"><div class="search-cat">' + r.type + '</div><div class="search-txt">' + hl + '</div></div>';
+  }).join('');
+  container.querySelectorAll('.search-item').forEach(el => {
+    el.onclick = () => { results[parseInt(el.dataset.idx)].action(); closeSearch(); };
+  });
+};
+
+/* ══ KEYBOARD ══ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.key === 'Escape') closeSearch();
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+
+/* ══ MOBILE DRAWER ══ */
+const TABS_META = [
+  {id:'explorer',label:'Model Explorer',icon:'\uD83D\uDCDA'},
+  {id:'compare',label:'Compare',icon:'\u2696\uFE0F'},
+  {id:'which',label:'Which Model?',icon:'\uD83E\uDD14'},
+  {id:'timeline',label:'Timeline',icon:'\uD83D\uDCC5'},
+  {id:'resources',label:'Resources',icon:'\uD83D\uDCDA'},
+  {id:'glossary',label:'Glossary',icon:'\uD83D\uDCD6'}
+];
+
+function openMobDrawer() {
+  const list = document.getElementById('mob-drawer-list');
+  list.innerHTML = TABS_META.map(t =>
+    '<div class="mob-drawer-item ' + (currentTab === t.id ? 'active' : '') + '" onclick="switchTab(\'' + t.id + '\');closeMobDrawer()">' +
+      '<span style="font-size:20px">' + t.icon + '</span><div class="mob-drawer-name">' + t.label + '</div></div>'
+  ).join('') + '<div class="mob-drawer-footer">Brought to you by Babak</div>';
+  document.getElementById('mob-drawer-backdrop').classList.add('open');
+  document.getElementById('mob-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobDrawer() {
+  document.getElementById('mob-drawer-backdrop').classList.remove('open');
+  document.getElementById('mob-drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('mob-menu-btn').addEventListener('click', openMobDrawer);
+document.getElementById('mob-drawer-backdrop').addEventListener('click', closeMobDrawer);
+document.getElementById('mob-drawer-close').addEventListener('click', closeMobDrawer);
+
+/* ══ SCROLL TO TOP ══ */
+const scrollBtn = document.getElementById('scroll-top-btn');
+window.addEventListener('scroll', () => scrollBtn.classList.toggle('vis', window.scrollY > 300));
+scrollBtn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+
+/* ══ HASH NAVIGATION ══ */
+function handleHash() {
+  const hash = location.hash.replace('#', '') || 'explorer';
+  const validTabs = ['explorer','compare','which','timeline','resources','glossary'];
+  if (validTabs.includes(hash)) switchTab(hash);
+}
+
+/* ══ INIT ══ */
+buildSearchIndex();
+renderFilterChips();
+renderSidebar();
+handleHash();
+window.addEventListener('hashchange', handleHash);
+</script>
+</body>
+</html>

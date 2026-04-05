@@ -6,6 +6,7 @@ Interactive AI learning tools designed for content editors and technical writers
 
 - **AI-101.html** — AI Essentials: Foundations, prompt engineering, workflow integration, ethics
 - **AI-102.html** — AI Deep Dive: Advanced concepts, RAG, MCP, agentic AI, advanced workflows
+- **AI-103.html** — AI Models & Algorithms Explorer: Interactive reference to 90+ AI/ML models, architectures, and patterns
 
 ## How to Use
 
@@ -14,6 +15,7 @@ Open any HTML file directly in your browser — no installation, no dependencies
 **Live versions:**
 - [AI-101: AI Essentials](https://babakna.github.io/shared/AI/AI-101.html)
 - [AI-102: AI Deep Dive](https://babakna.github.io/shared/AI/AI-102.html)
+- [AI-103: Models & Algorithms Explorer](https://babakna.github.io/shared/AI/AI-103.html)
 
 ## Author
 
