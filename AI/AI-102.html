@@ -276,7 +276,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .tx-step.active{opacity:1;background:var(--bg-highlight);border-radius:8px}
 .tx-step-ico{font-size:28px;margin-bottom:6px}
 .tx-step-name{font-size:12px;font-weight:700;color:var(--tx-primary)}
-.tx-step-desc{font-size:11px;color:var(--tx-secondary);margin-top:4px;line-height:1.4}
+
 
 .scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow-md);z-index:90;transition:opacity .3s,transform .3s,background .2s}
 .scroll-top:hover{background:var(--primary-dark);transform:translateY(-2px)}
@@ -356,8 +356,23 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .rubric-item label{flex:1;font-size:14px;color:var(--tx-primary);font-weight:500}
 .rubric-weight{width:60px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;text-align:center;font-size:14px;font-family:var(--font-body);color:var(--tx-primary)}
 
+.course-nav{display:flex;align-items:center;gap:2px;padding:6px 24px;background:var(--bg-card);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.course-nav::-webkit-scrollbar{display:none}
+.course-link{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;color:var(--tx-muted);text-decoration:none;white-space:nowrap;transition:all .2s;font-family:var(--font-body)}
+.course-link:hover{color:var(--primary);background:var(--bg-highlight);text-decoration:none}
+.course-link.current{background:var(--gradient-primary);color:#fff;cursor:default;pointer-events:none}
+
+.roadmap-section{margin-bottom:16px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.roadmap-section summary{padding:14px 20px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#fff;transition:background 0.2s}
+.roadmap-section summary::-webkit-details-marker{display:none}
+.roadmap-section summary::marker{display:none}
+.roadmap-section summary::after{content:'\25B8';margin-left:auto;font-size:14px;transition:transform 0.2s}
+.roadmap-section[open] summary::after{transform:rotate(90deg)}
+.roadmap-section .roadmap-body{padding:16px 20px}
+
 @media print{
   .hdr,.trail-wrap,.search-overlay,.search-backdrop,.nav-btns,.flow-ctrl,.quiz-check,.train-btn,.hdr-btn,.scroll-top{display:none!important}
+  .course-nav{display:none!important}
   .pane{display:block!important;page-break-after:always}
   .pane:not(.on){display:none!important}
   body{background:#fff;color:#000;font-size:12px}
@@ -399,6 +414,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 }
 
 @media(max-width:768px){
+  .course-nav{padding:6px 12px}
+  .course-link{padding:5px 10px;font-size:11px}
   .mob-only{display:flex}
   .trail-wrap{display:none!important}
   .mob-module-bar{display:block}
@@ -447,7 +464,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   .tx-step:last-child{border-bottom:none}
   .tx-step-ico{font-size:24px;margin-bottom:0;flex-shrink:0;width:40px;text-align:center}
   .tx-step-name{font-size:13px;font-weight:600}
-  .tx-step-desc{font-size:12px;margin-top:2px}
+
   .tx-step.active{background:var(--bg-highlight);border-radius:8px;border-bottom:2px solid var(--primary)}
   .flow-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
   .flow-inner{min-width:unset!important}
@@ -530,6 +547,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 }
 
 @media(max-width:480px){
+  .course-nav{padding:4px 8px;gap:1px}
+  .course-link{padding:4px 8px;font-size:10px}
   .hero{padding:24px 12px 24px}
   .hero h1{font-size:24px}
   .hero p{font-size:14px;margin-bottom:20px}
@@ -595,6 +614,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   </div>
 </header>
 
+<nav class="course-nav" id="course-nav"></nav>
+
 <div class="mob-drawer-backdrop" id="mob-drawer-backdrop"></div>
 <div class="mob-drawer" id="mob-drawer">
   <div class="mob-drawer-header">
@@ -638,6 +659,15 @@ function pickRandom(arr, count){
   return shuffleArray(arr).slice(0, count);
 }
 
+var COURSES = [
+  {id:'101', label:'AI Essentials', file:'AI-101.html'},
+  {id:'102', label:'AI Deep Dive', file:'AI-102.html'},
+  {id:'103', label:'Models Explorer', file:'AI-103.html'},
+  {id:'104', label:'AI in Practice', file:'AI-104.html'},
+  {id:'105', label:'The AI Frontier', file:'AI-105.html'}
+];
+var THIS_COURSE = '102';
+
 const MODULES = [
   {id:'under-hood',title:'Under the Hood',short:'Under Hood',icon:'cpu',color:'#2563EB'},
   {id:'ecosystem',title:'The AI Ecosystem',short:'Ecosystem',icon:'globe',color:'#7C3AED'},
@@ -671,7 +701,7 @@ const LANDING_DESCS = [
   {desc:'Take your daily AI practice to the next level. Build systematic prompt libraries, implement multi-document consistency analysis, develop content governance frameworks, learn to evaluate AI output quality rigorously, and design workflows that scale across your team.',feat:'Prompt library builder exercise \u2022 Evaluation rubric tool \u2022 Multi-doc analysis templates \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Develop sophisticated judgment for AI governance. Examine bias sources in training data with real examples, understand alignment and guardrail mechanisms, learn red-teaming concepts, navigate copyright and IP considerations for content creators, and build organizational AI usage guidelines.',feat:'Bias source analysis exercise \u2022 Red-teaming scenarios \u2022 Copyright decision tree \u2022 AI governance template \u2022 5 quiz questions'},
   {desc:'Your curated path for continued growth. Foundation refreshers, intermediate skill-building, advanced resources, and seminal papers \u2014 DeepLearning.AI specialized courses, Stanford HAI research, Anthropic\u2019s MCP and alignment science, interactive tools, and the foundational research that shaped modern AI. Every resource annotated with \u2018why this one\u2019 and time estimates.',feat:'37 curated resources with live links \u2022 Tier 1 (Foundation), Tier 2 (Applied), Tier 3 (Advanced), and Tier 4 (Seminal Papers) paths'},
-  {desc:'100+ AI terms defined for content professionals. Everything from AI-101\u2019s 75 terms plus advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, and more. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 8 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
+  {desc:'106 AI terms defined for content professionals, covering both foundational and advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, and more. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 9 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
 ];
 
 let currentModule = -1;
@@ -724,7 +754,7 @@ function renderLanding(){
     '<p>Advanced concepts for the AI-literate professional. Build on your foundations with deeper technical understanding, practical advanced techniques, and strategic workflow integration.</p>'+
     '<div class="hero-grid">'+
       '<div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">Interactive Modules</div></div>'+
-      '<div class="hero-stat"><div class="hero-stat-n">100+</div><div class="hero-stat-l">Glossary Terms</div></div>'+
+      '<div class="hero-stat"><div class="hero-stat-n">106</div><div class="hero-stat-l">Glossary Terms</div></div>'+
       '<div class="hero-stat"><div class="hero-stat-n">45+</div><div class="hero-stat-l">Quiz Questions</div></div>'+
     '</div>'+
     '<div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Learn \u2500\u2500</div>'+
@@ -1334,26 +1364,52 @@ function mod8Content(){
     {t:'Language Models are Few-Shot Learners',p:'Brown et al. (OpenAI), 2020',time:'~2 hours (technical)',cost:'Free',url:'https://arxiv.org/abs/2005.14165',why:'The GPT-3 paper. Demonstrated that scale alone produces emergent capabilities \u2014 the model could perform tasks it was never explicitly trained for.'},
     {t:'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks',p:'Lewis et al. (Facebook AI), 2020',time:'~1 hour (technical)',cost:'Free',url:'https://arxiv.org/abs/2005.11401',why:'The paper that defined RAG \u2014 the architecture covered in Module 4. Showed that combining retrieval with generation dramatically reduces hallucination.'}
   ];
+  var rcTpl = function(r){return '<div class="resource-card"><div class="resource-title">'+r.t+'</div><div class="resource-provider">'+r.p+'</div><div class="resource-meta">'+(r.time?'<span>\u23F1 '+r.time+'</span>':'')+(r.cost?'<span>\uD83D\uDCB0 '+r.cost+'</span>':'')+'</div><div class="resource-why">'+r.why+'</div><a class="resource-link" href="'+r.url+'" target="_blank" rel="noopener">Open Resource \u2192</a></div>';};
+  var isRef = function(r){return r.p.indexOf('Anthropic')!==-1||r.t.indexOf('MCP')!==-1;};
+  var tier2Core = tier2.filter(function(r){return !isRef(r);});
+  var tier3Core = tier3.filter(function(r){return !isRef(r);});
+  var refLib = tier2.filter(isRef).concat(tier3.filter(isRef));
   return '<div class="sec-title">Your Learning Path</div>'+
-  '<div class="callout" style="margin-bottom:24px">This roadmap covers all four tiers. Already comfortable with AI basics? Skip ahead to Tier 2. New to AI? Start with the Tier 1 foundations.</div>'+
-  '<div class="roadmap-tier">'+
-    '<div class="tier-header" style="background:var(--primary)">\uD83C\uDFE0 Tier 1 \u2014 Foundation (Refresher)</div>'+
-    '<div class="callout" style="margin-bottom:12px">Already comfortable with AI basics? Skip ahead to Tier 2. New to AI? Start here.</div>'+
-    tier1.map(function(r){return '<div class="resource-card"><div class="resource-title">'+r.t+'</div><div class="resource-provider">'+r.p+'</div><div class="resource-meta"><span>\u23F1 '+r.time+'</span>'+(r.cost?'<span>\uD83D\uDCB0 '+r.cost+'</span>':'')+'</div><div class="resource-why">'+r.why+'</div><a class="resource-link" href="'+r.url+'" target="_blank" rel="noopener">Open Resource \u2192</a></div>';}).join('')+
+  '<details class="roadmap-section">'+
+    '<summary style="background:var(--bg-muted);color:var(--tx-primary);border-left:4px solid var(--primary)">\uD83C\uDFE0 AI-101 Refresher \u2014 Foundation Resources <span style="font-size:11px;font-weight:600;color:var(--tx-muted);background:var(--bg-highlight);padding:3px 10px;border-radius:20px;margin-left:8px">from AI-101</span></summary>'+
+    '<div class="roadmap-body">'+
+      '<div class="callout" style="margin-bottom:16px">Need to revisit the basics? These are the foundation resources from AI-101. Already comfortable? Skip ahead to the AI-102 path below.</div>'+
+      tier1.map(rcTpl).join('')+
+    '</div>'+
+  '</details>'+
+  '<details class="roadmap-section" open>'+
+    '<summary style="background:var(--accent)">\uD83D\uDE80 AI-102 Core Resources \u2014 Your Learning Path</summary>'+
+    '<div class="roadmap-body">'+
+      '<div class="callout" style="margin-bottom:16px">These resources align with what you\u2019re learning in AI Deep Dive. This is your core learning path.</div>'+
+      tier2Core.map(rcTpl).join('')+
+    '</div>'+
+  '</details>'+
+  '<details class="roadmap-section">'+
+    '<summary style="background:var(--secondary)">\uD83D\uDD2C Beyond AI-102 \u2014 Advanced & Research</summary>'+
+    '<div class="roadmap-body">'+
+      '<div class="callout" style="margin-bottom:16px">Frontier topics for when you\u2019re ready to go deeper. Return to these after completing the core path.</div>'+
+      tier3Core.map(rcTpl).join('')+
+    '</div>'+
+  '</details>'+
+  '<details class="roadmap-section">'+
+    '<summary style="background:var(--warning)">\uD83D\uDCC4 Seminal Papers \u2014 The Research Behind It All</summary>'+
+    '<div class="roadmap-body">'+
+      '<div class="callout" style="margin-bottom:16px">These are the foundational research papers behind the concepts in this course. Technical reads, but the abstracts and diagrams alone provide valuable context.</div>'+
+      tier4.map(rcTpl).join('')+
+    '</div>'+
+  '</details>'+
+  '<div style="background:rgba(16,185,129,0.08);border:2px solid var(--success);border-radius:12px;padding:24px;text-align:center;margin:24px 0">'+
+    '<div style="font-size:24px;margin-bottom:8px">\uD83C\uDF93</div>'+
+    '<div style="font-size:18px;font-weight:700;color:var(--success);margin-bottom:8px">AI-102 Learning Path Complete</div>'+
+    '<div style="font-size:14px;color:var(--tx-secondary);line-height:1.6">You\u2019ve reached the end of the AI Deep Dive learning path.<br>The resources below are references to bookmark \u2014 not additional homework.</div>'+
   '</div>'+
-  '<div class="roadmap-tier">'+
-    '<div class="tier-header" style="background:var(--accent)">\uD83D\uDE80 Tier 2 \u2014 Applied (Build Your Skills)</div>'+
-    tier2.map(function(r){return '<div class="resource-card"><div class="resource-title">'+r.t+'</div><div class="resource-provider">'+r.p+'</div><div class="resource-meta"><span>\u23F1 '+r.time+'</span>'+(r.cost?'<span>\uD83D\uDCB0 '+r.cost+'</span>':'')+'</div><div class="resource-why">'+r.why+'</div><a class="resource-link" href="'+r.url+'" target="_blank" rel="noopener">Open Resource \u2192</a></div>';}).join('')+
-  '</div>'+
-  '<div class="roadmap-tier">'+
-    '<div class="tier-header" style="background:var(--secondary)">\uD83D\uDD2C Tier 3 \u2014 Advanced (Go Deeper)</div>'+
-    tier3.map(function(r){return '<div class="resource-card"><div class="resource-title">'+r.t+'</div><div class="resource-provider">'+r.p+'</div><div class="resource-meta">'+(r.time?'<span>\u23F1 '+r.time+'</span>':'')+(r.cost?'<span>\uD83D\uDCB0 '+r.cost+'</span>':'')+'</div><div class="resource-why">'+r.why+'</div><a class="resource-link" href="'+r.url+'" target="_blank" rel="noopener">Open Resource \u2192</a></div>';}).join('')+
-  '</div>'+
-  '<div class="roadmap-tier">'+
-    '<div class="tier-header" style="background:var(--warning)">\uD83D\uDCC4 Tier 4 \u2014 Seminal Papers (The Research That Shaped Modern AI)</div>'+
-    '<div class="callout" style="margin-bottom:12px">These are the foundational research papers behind the concepts covered in this course. They are technical reads, but the abstracts and diagrams alone provide valuable context. Links go to the free arXiv preprint versions.</div>'+
-    tier4.map(function(r){return '<div class="resource-card"><div class="resource-title">'+r.t+'</div><div class="resource-provider">'+r.p+'</div><div class="resource-meta">'+(r.time?'<span>\u23F1 '+r.time+'</span>':'')+(r.cost?'<span>\uD83D\uDCB0 '+r.cost+'</span>':'')+'</div><div class="resource-why">'+r.why+'</div><a class="resource-link" href="'+r.url+'" target="_blank" rel="noopener">Open Resource \u2192</a></div>';}).join('')+
-  '</div>';
+  '<details class="roadmap-section">'+
+    '<summary style="background:var(--bg-muted);color:var(--tx-primary);border-left:4px solid var(--accent)">\uD83D\uDCD6 Reference Library \u2014 Anthropic, MCP & Official Docs</summary>'+
+    '<div class="roadmap-body">'+
+      '<div class="callout" style="margin-bottom:16px">These aren\u2019t sequential steps \u2014 they\u2019re references to bookmark and revisit when you need them.</div>'+
+      refLib.map(rcTpl).join('')+
+    '</div>'+
+  '</details>';
 }
 
 /* ══ MODULE 9: GLOSSARY ══ */
@@ -1742,13 +1798,13 @@ var GLOSSARY = [
   {term:'Batch Size',cat:'ML Fundamentals',def:'The number of training examples processed together before updating model weights.',why:'Batch size affects training speed and model quality \u2014 larger batches are faster but may miss subtle patterns.',rel:['Training','Epoch']},
   {term:'Epoch',cat:'ML Fundamentals',def:'One complete pass through the entire training dataset.',why:'Models typically train for many epochs. Too few = underfitting; too many = overfitting.',rel:['Training','Batch Size']},
   {term:'Learning Rate',cat:'ML Fundamentals',def:'A hyperparameter controlling how much to adjust weights at each training step. Too high = unstable; too low = slow learning.',why:'One of the most critical settings in model training \u2014 affects whether training converges at all.',rel:['Gradient Descent','Training']},
-  {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task and adapting it for a different but related task, leveraging previously learned patterns.',why:'This is why fine-tuned models work \u2014 they transfer general language knowledge to specific tasks.',rel:['Fine-Tuning','Pre-training']},
+  {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task and adapting it for a different but related task, leveraging previously learned patterns.',why:'This is why fine-tuned models work \u2014 they transfer general language knowledge to specific tasks.',rel:['Fine-Tuning']},
   {term:'Data Augmentation',cat:'ML Fundamentals',def:'Creating modified copies of training data to increase dataset size and diversity (e.g., rotating images, paraphrasing text).',why:'Helps models generalize better, especially when training data is limited.',rel:['Training Data']},
   {term:'Feature Engineering',cat:'ML Fundamentals',def:'The process of selecting, transforming, or creating input features to improve model performance.',why:'In traditional ML, this was the most important skill. Deep learning automates much of it.',rel:['Machine Learning']},
   {term:'Diffusion Model',cat:'GenAI',def:'A GenAI model for image generation (e.g., DALL-E, Midjourney, Stable Diffusion). Works by learning to progressively remove noise from random data to create images.',why:'If you create visual content or need AI-generated images, these are the models behind the tools.',rel:['Generative AI','Multi-modal']},
-  {term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that create new content \u2014 text, images, audio, video, code.',why:'The category of AI you interact with most directly.',rel:['LLM','Diffusion Model']},
+  {term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that create new content \u2014 text, images, audio, video, code.',why:'The category of AI you interact with most directly.',rel:['Large Language Model (LLM)','Diffusion Model']},
   {term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative AI model trained on massive text datasets to understand and generate human language.',why:'The technology powering the AI writing and editing tools you use daily.',rel:['Generative AI','Transformer','Token']},
-  {term:'Transformer',cat:'GenAI',def:'The neural network architecture introduced in 2017 that powers virtually all modern LLMs.',why:'Understanding transformers helps you understand LLM strengths and limitations.',rel:['Attention Mechanism','LLM']},
+  {term:'Transformer',cat:'GenAI',def:'The neural network architecture introduced in 2017 that powers virtually all modern LLMs.',why:'Understanding transformers helps you understand LLM strengths and limitations.',rel:['Attention Mechanism','Large Language Model (LLM)']},
   {term:'Attention Mechanism',cat:'GenAI',def:'The core technique in Transformers allowing every word to weigh the importance of every other word simultaneously.',why:'This is why LLMs can understand context across long texts.',rel:['Transformer','Context Window']},
   {term:'Token',cat:'GenAI',def:'A sub-word unit that LLMs use to process text.',why:'Tokens determine cost, context limits, and how much text AI can process.',rel:['Tokenizer','Context Window']},
   {term:'Tokenizer',cat:'GenAI',def:'The component converting text into tokens and back.',why:'Different models use different tokenizers, which is why token counts vary.',rel:['Token']},
@@ -1756,7 +1812,7 @@ var GLOSSARY = [
   {term:'Temperature',cat:'GenAI',def:'A parameter controlling output randomness. Low = predictable. High = creative.',why:'For technical docs, use lower temperature. For brainstorming, try higher.',rel:['Top-p','Sampling']},
   {term:'Top-p (Nucleus Sampling)',cat:'GenAI',def:'A parameter controlling diversity by limiting the pool of tokens considered.',why:'Like temperature, it affects output variability.',rel:['Temperature','Sampling']},
   {term:'System Prompt',cat:'GenAI',def:'Hidden instructions defining AI behavior before your conversation begins.',why:'Understanding system prompts helps you work with AI tools more effectively.',rel:['Prompt','Role Prompting']},
-  {term:'Multi-modal',cat:'GenAI',def:'AI models that process and generate multiple content types \u2014 text, images, audio.',why:'Multi-modal models can analyze images and process mixed-media content.',rel:['LLM','Generative AI']},
+  {term:'Multi-modal',cat:'GenAI',def:'AI models that process and generate multiple content types \u2014 text, images, audio.',why:'Multi-modal models can analyze images and process mixed-media content.',rel:['Large Language Model (LLM)','Generative AI']},
   {term:'Embedding',cat:'GenAI',def:'A numerical representation of text as a vector in high-dimensional space. Similar meanings = similar vectors.',why:'Embeddings power semantic search, document matching, and RAG systems.',rel:['Vector','RAG','Semantic Search']},
   {term:'Vector',cat:'GenAI',def:'A list of numbers representing content in mathematical space, used for similarity comparisons.',why:'When AI finds "related articles," it\'s comparing vectors.',rel:['Embedding','Vector Database']},
   {term:'Hallucination',cat:'GenAI',def:'When AI generates confident, plausible content that is factually incorrect or fabricated.',why:'The #1 risk for content editors. Always verify claims and citations.',rel:['Grounding']},
@@ -1788,11 +1844,11 @@ var GLOSSARY = [
   {term:'Role Prompting',cat:'Prompting',def:'Instructing the AI to adopt a specific persona or expertise.',why:'Setting a role calibrates language, tone, and detail depth.',rel:['System Prompt','Prompt Engineering']},
   {term:'Output Format',cat:'Prompting',def:'Specifying the structure of the AI\'s response (bullets, table, JSON, markdown).',why:'Explicit format instructions prevent manual reformatting.',rel:['Prompt Engineering','Structured Output']},
   {term:'API (Application Programming Interface)',cat:'Infrastructure',def:'Rules and protocols allowing software to communicate. In AI: the interface for prompts and responses.',why:'Understanding APIs helps you know why the same model behaves differently in different tools.',rel:['Model','Inference']},
-  {term:'Model',cat:'Infrastructure',def:'The trained AI system that processes inputs and generates outputs.',why:'Different models have different capabilities, speeds, and costs.',rel:['LLM','Parameters','API']},
+  {term:'Model',cat:'Infrastructure',def:'The trained AI system that processes inputs and generates outputs.',why:'Different models have different capabilities, speeds, and costs.',rel:['Large Language Model (LLM)','Parameters','API']},
   {term:'Open-Source Model',cat:'Infrastructure',def:'An AI model whose weights and code are publicly available (e.g., Llama, Mistral).',why:'Open-source gives more control but requires expertise to deploy.',rel:['Model','Proprietary Model']},
   {term:'Proprietary Model',cat:'Infrastructure',def:'An AI model owned by a company, accessible only through their API (e.g., Claude, GPT).',why:'These are what you use through Claude.ai and ChatGPT.',rel:['Model','API','Open-Source Model']},
   {term:'Latency',cat:'Infrastructure',def:'The time delay between sending a prompt and receiving a response.',why:'Larger models and longer prompts = higher latency.',rel:['Inference','Model']},
-  {term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: the AI model runs locally on your computer or phone. Cloud: the model runs on remote servers and results are sent back over the internet.',why:'Cloud inference requires internet and sends data to external servers. On-device inference is private but limited by device hardware. This matters for sensitive content workflows.',rel:['Inference','Latency','Privacy']},
+  {term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: the AI model runs locally on your computer or phone. Cloud: the model runs on remote servers and results are sent back over the internet.',why:'Cloud inference requires internet and sends data to external servers. On-device inference is private but limited by device hardware. This matters for sensitive content workflows.',rel:['Inference','Latency']},
   {term:'RAG (Retrieval-Augmented Generation)',cat:'RAG & Infrastructure',def:'A technique where AI retrieves relevant documents from a knowledge base before generating a response.',why:'RAG grounds AI in your actual documentation, reducing hallucination.',rel:['Embedding','Vector Database','Grounding']},
   {term:'Vector Database',cat:'RAG & Infrastructure',def:'A database optimized for storing and searching vector embeddings.',why:'The backend powering RAG and semantic search in AI knowledge bases.',rel:['Vector','Embedding','RAG']},
   {term:'Chunking Strategy',cat:'RAG & Infrastructure',def:'The method used to split documents into smaller pieces for embedding and storage in a RAG system.',why:'Chunk size affects retrieval quality \u2014 too small loses context, too large dilutes relevance.',rel:['RAG','Vector Database']},
@@ -1800,12 +1856,12 @@ var GLOSSARY = [
   {term:'Reranking',cat:'RAG & Infrastructure',def:'Using a secondary model to re-score and reorder search results for better relevance.',why:'Reranking improves the quality of retrieved documents before they\u2019re sent to the LLM.',rel:['RAG','Hybrid Search']},
   {term:'Vector Similarity',cat:'RAG & Infrastructure',def:'A mathematical measure of how close two vectors are in embedding space, indicating semantic similarity.',why:'The core mechanism behind semantic search and RAG retrieval.',rel:['Cosine Similarity','Embedding']},
   {term:'Cosine Similarity',cat:'RAG & Infrastructure',def:'A specific method of measuring vector similarity based on the angle between two vectors, ranging from -1 to 1.',why:'The most common similarity metric used in vector databases and RAG systems.',rel:['Vector Similarity','Vector Database']},
-  {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools and data sources.',why:'MCP is how AI tools connect to your company\'s systems \u2014 the USB-C of AI.',rel:['Tool Use','Function Calling','API']},
+  {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools and data sources.',why:'MCP is how AI tools connect to your company\'s systems \u2014 the USB-C of AI.',rel:['Function Calling / Tool Use','Function Calling','API']},
   {term:'Function Calling / Tool Use',cat:'Protocols',def:'The ability of an AI to invoke external tools as part of generating a response.',why:'Makes AI go beyond text generation \u2014 it can look things up and take actions.',rel:['MCP','Agent','API']},
   {term:'Structured Output',cat:'Protocols',def:'AI output in a defined format like JSON, XML, or a specific template.',why:'Essential when output feeds into other systems (CMS, databases, pipelines).',rel:['Output Format','API']},
   {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\u2019s ability to break complex tasks into subtasks, determine the right sequence, and decide which tools to use at each step.',why:'Understanding how agents plan helps you design better task descriptions and evaluate whether an agent\u2019s approach makes sense.',rel:['Agent Loop','Tool Orchestration','Prompt Chaining']},
-  {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Tool Use','MCP','Planning']},
-  {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool providing suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent','Tool Use']},
+  {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Function Calling / Tool Use','MCP','Planning']},
+  {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool providing suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent','Function Calling / Tool Use']},
   {term:'Planning (Agentic)',cat:'Agents',def:'An AI agent\'s ability to break tasks into subtasks, determine sequence, and select tools.',why:'Understanding agent planning helps you design better task descriptions.',rel:['Agent','Prompt Chaining']},
   {term:'Agent Loop',cat:'Agents',def:'The iterative cycle agents follow: observe, plan, act, evaluate, repeat until the goal is met.',why:'Understanding the agent loop helps you predict agent behavior and design better tasks.',rel:['Agent','Planning (Agentic)']},
   {term:'Tool Orchestration',cat:'Agents',def:'An agent\u2019s ability to select and sequence multiple tools to accomplish a complex task.',why:'Orchestration is what makes agents powerful \u2014 combining search, code execution, and data retrieval.',rel:['Agent','Function Calling / Tool Use']},
@@ -1814,7 +1870,7 @@ var GLOSSARY = [
   {term:'Reflection (Agents)',cat:'Agents',def:'An agent\u2019s ability to evaluate its own outputs and correct mistakes before returning results.',why:'Self-reflection improves agent reliability, similar to a writer editing their own draft.',rel:['Agent Loop','Constitutional AI']},
   {term:'Multi-Agent Systems',cat:'Agents',def:'Architectures where multiple specialized agents collaborate \u2014 one researches, one drafts, one reviews.',why:'The future of complex AI workflows: specialized agents working together like a team.',rel:['Agent','Tool Orchestration']},
   {term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\u2019s context at request time.',why:'Every time you paste a document into AI chat, you\'re doing context injection.',rel:['RAG','Context Window','Prompt']},
-  {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI output reflecting imbalances in training data, design, or evaluation.',why:'AI content may inadvertently favor certain perspectives or use non-inclusive language.',rel:['Training Data','Fairness']},
+  {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI output reflecting imbalances in training data, design, or evaluation.',why:'AI content may inadvertently favor certain perspectives or use non-inclusive language.',rel:['Training Data']},
   {term:'Alignment',cat:'Ethics',def:'Ensuring AI systems behave in accordance with human values and intentions.',why:'Alignment research is why modern AI tools are generally helpful and safe.',rel:['RLHF','Guardrails','Constitutional AI']},
   {term:'Guardrails',cat:'Ethics',def:'Built-in restrictions preventing AI from generating harmful content.',why:'Guardrails protect you and your organization from publishing problematic content.',rel:['Alignment','Safety Filter']},
   {term:'Responsible AI',cat:'Ethics',def:'Practices ensuring AI is developed and used ethically, fairly, transparently, and safely.',why:'You play a role by verifying output, checking for bias, and maintaining editorial standards.',rel:['Bias','Alignment','Guardrails']},
@@ -1927,32 +1983,44 @@ function showFinalAssessment(){
 }
 
 function scoreFinal(){
-  var correct = 0, total = 15;
-  for(var i=0;i<total;i++){
-    var qid = 'final-q'+i;
+  var total = 15;
+  var firstUnanswered = null;
+  for(var i = 0; i < total; i++){
+    var qid = 'final-q' + i;
     if(!quizStates[qid]){
-      var card = document.getElementById('qc-'+qid);
-      if(card){
-        var btn = document.getElementById('btn-'+qid);
-        if(btn && !btn.disabled) btn.click();
-        else {
-          var opts = card.querySelectorAll('.quiz-opt');
-          if(opts.length) { opts[0].click(); setTimeout(function(){btn.click();},10); }
-        }
+      var card = document.getElementById('qc-' + qid);
+      var selected = card ? card.querySelector('.quiz-opt.selected') : null;
+      if(!selected){
+        if(!firstUnanswered) firstUnanswered = card;
       }
     }
   }
+  if(firstUnanswered){
+    firstUnanswered.scrollIntoView({behavior:'smooth', block:'center'});
+    firstUnanswered.style.boxShadow = '0 0 0 3px var(--warning)';
+    setTimeout(function(){ firstUnanswered.style.boxShadow = ''; }, 2000);
+    alert('Please answer all 15 questions before calculating your score. Scroll through to find any you missed.');
+    return;
+  }
+  for(var i = 0; i < total; i++){
+    var qid = 'final-q' + i;
+    if(!quizStates[qid]){
+      var btn = document.getElementById('btn-' + qid);
+      if(btn && !btn.disabled) btn.click();
+    }
+  }
   setTimeout(function(){
-    for(var i=0;i<total;i++){
-      var card = document.getElementById('qc-final-q'+i);
+    var correct = 0;
+    for(var i = 0; i < total; i++){
+      var card = document.getElementById('qc-final-q' + i);
       if(card && card.classList.contains('correct')) correct++;
     }
     var el = document.getElementById('final-score');
     var cls, msg;
-    if(correct >= 12){ cls='excellent'; msg='Excellent! You\u2019ve mastered advanced AI concepts.'; }
-    else if(correct >= 8){ cls='good'; msg='Good progress! Review the modules where you missed questions.'; }
-    else { cls='keep'; msg='Keep learning! Revisit the modules and try again.'; }
-    el.innerHTML = '<div class="score-banner '+cls+'"><div class="score-num">'+correct+' / '+total+'</div><div class="score-msg">'+msg+'</div></div>';
+    if(correct >= 12){ cls = 'excellent'; msg = 'Excellent! You\u2019ve mastered advanced AI concepts.'; }
+    else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
+    else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
+    el.innerHTML = '<div class="score-banner ' + cls + '"><div class="score-num">' + correct + ' / ' + total + '</div><div class="score-msg">' + msg + '</div></div>';
     el.scrollIntoView({behavior:'smooth'});
   }, 200);
 }
@@ -2035,8 +2103,20 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+function renderCourseNav(){
+  var nav = document.getElementById('course-nav');
+  if(!nav) return;
+  nav.innerHTML = COURSES.map(function(c){
+    if(c.id === THIS_COURSE){
+      return '<span class="course-link current">' + c.label + '</span>';
+    }
+    return '<a class="course-link" href="' + c.file + '">' + c.label + '</a>';
+  }).join('');
+}
+
 /* ══ INITIALIZATION ══ */
 buildSearchIndex();
+renderCourseNav();
 showLanding();
 
 var scrollBtn = document.getElementById('scroll-top-btn');

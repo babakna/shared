@@ -314,6 +314,20 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .resource-why{font-size:13px;color:var(--tx-secondary);line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 .resource-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--primary);margin-top:8px}
 
+.roadmap-section{margin-bottom:16px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.roadmap-section summary{padding:14px 20px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#fff;transition:background 0.2s}
+.roadmap-section summary::-webkit-details-marker{display:none}
+.roadmap-section summary::marker{display:none}
+.roadmap-section summary::after{content:'▸';margin-left:auto;font-size:14px;transition:transform 0.2s}
+.roadmap-section[open] summary::after{transform:rotate(90deg)}
+.roadmap-section .roadmap-body{padding:16px 20px}
+
+.course-nav{display:flex;align-items:center;gap:2px;padding:6px 24px;background:var(--bg-card);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.course-nav::-webkit-scrollbar{display:none}
+.course-link{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;color:var(--tx-muted);text-decoration:none;white-space:nowrap;transition:all .2s;font-family:var(--font-body)}
+.course-link:hover{color:var(--primary);background:var(--bg-highlight);text-decoration:none}
+.course-link.current{background:var(--gradient-primary);color:#fff;cursor:default;pointer-events:none}
+
 .gloss-search{width:100%;padding:12px 18px;font-size:15px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--tx-primary);font-family:var(--font-body);transition:border-color .2s;margin-bottom:16px}
 .gloss-search:focus{outline:none;border-color:var(--primary)}
 .gloss-filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
@@ -415,7 +429,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .kb-hint kbd{background:var(--bg-muted);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:var(--font-mono);font-size:11px}
 
 @media print{
-  .hdr,.trail-wrap,.search-overlay,.search-backdrop,.nav-btns,.flow-ctrl,.quiz-check,.train-btn,.hdr-btn,.scroll-top{display:none!important}
+  .hdr,.trail-wrap,.search-overlay,.search-backdrop,.nav-btns,.flow-ctrl,.quiz-check,.train-btn,.hdr-btn,.scroll-top,.course-nav{display:none!important}
   .pane{display:block!important;page-break-after:always}
   .pane:not(.on){display:none!important}
   body{background:#fff;color:#000;font-size:12px}
@@ -757,6 +771,10 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   /* Workshop / inputs — prevent iOS zoom */
   #workshop-input{min-height:100px;font-size:16px}
   input,textarea,select{font-size:16px!important}
+
+  /* Course nav */
+  .course-nav{padding:6px 12px}
+  .course-link{padding:5px 10px;font-size:11px}
 }
 
 /* ── Phone (480px and below) ── */
@@ -836,6 +854,10 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 
   /* Keyboard hints — smaller */
   .kb-hint{font-size:10px}
+
+  /* Course nav */
+  .course-nav{padding:4px 8px;gap:1px}
+  .course-link{padding:4px 8px;font-size:10px}
 }
 
 </style>
@@ -859,6 +881,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
     <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
   </div>
 </header>
+
+<nav class="course-nav" id="course-nav"></nav>
 
 <!-- Mobile Navigation Drawer -->
 <div class="mob-drawer-backdrop" id="mob-drawer-backdrop"></div>
@@ -889,6 +913,15 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 <main class="main" id="main-content"></main>
 
 <script>
+const COURSES = [
+  {id:'101', label:'AI Essentials', file:'AI-101.html'},
+  {id:'102', label:'AI Deep Dive', file:'AI-102.html'},
+  {id:'103', label:'Models Explorer', file:'AI-103.html'},
+  {id:'104', label:'AI in Practice', file:'AI-104.html'},
+  {id:'105', label:'The AI Frontier', file:'AI-105.html'}
+];
+const THIS_COURSE = '101';
+
 const MODULES = [
   {id:'what-is-ai',title:'What Is AI?',short:'What Is AI',icon:'brain',color:'#2563EB'},
   {id:'how-learn',title:'How Machines Learn',short:'How Learn',icon:'chart',color:'#7C3AED'},
@@ -1557,47 +1590,63 @@ function mod7Content(){
   ];
   return `
   <div class="sec-title">Your Learning Path</div>
-  <div class="roadmap-tier">
-    <div class="tier-header" style="background:var(--primary)">\uD83C\uDFAF Tier 1 \u2014 Foundation (2\u20134 weeks, Beginner)</div>
-    ${tier1.map(r=>`<div class="resource-card">
-      <div class="resource-title">${r.t}</div>
-      <div class="resource-provider">${r.p}</div>
-      <div class="resource-meta"><span>\u23F1 ${r.time}</span>${r.cost?`<span>\uD83D\uDCB0 ${r.cost}</span>`:''}</div>
-      <div class="resource-why">${r.why}</div>
-      <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
-    </div>`).join('')}
+
+  <details class="roadmap-section" open>
+    <summary style="background:var(--primary)">\uD83C\uDFAF AI-101 Core Resources \u2014 Start Here (2\u20134 weeks)</summary>
+    <div class="roadmap-body">
+      ${tier1.map(r=>`<div class="resource-card">
+        <div class="resource-title">${r.t}</div>
+        <div class="resource-provider">${r.p}</div>
+        <div class="resource-meta"><span>\u23F1 ${r.time}</span>${r.cost?`<span>\uD83D\uDCB0 ${r.cost}</span>`:''}</div>
+        <div class="resource-why">${r.why}</div>
+        <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
+      </div>`).join('')}
+    </div>
+  </details>
+
+  <details class="roadmap-section">
+    <summary style="background:var(--accent)">\uD83D\uDE80 Beyond AI-101 \u2014 Build Your Skills <a href="AI-102.html" style="background:rgba(255,255,255,0.25);color:#fff;margin-left:8px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">Continues in AI-102 \u2192</a></summary>
+    <div class="roadmap-body">
+      ${tier2.map(r=>`<div class="resource-card">
+        <div class="resource-title">${r.t}</div>
+        <div class="resource-provider">${r.p}</div>
+        <div class="resource-meta"><span>\u23F1 ${r.time}</span>${r.cost?`<span>\uD83D\uDCB0 ${r.cost}</span>`:''}</div>
+        <div class="resource-why">${r.why}</div>
+        <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
+      </div>`).join('')}
+    </div>
+  </details>
+
+  <details class="roadmap-section">
+    <summary style="background:var(--secondary)">\uD83D\uDD2C Advanced Topics \u2014 Deep Dives <a href="AI-102.html" style="background:rgba(255,255,255,0.25);color:#fff;margin-left:8px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">Continues in AI-102 \u2192</a></summary>
+    <div class="roadmap-body">
+      ${tier3.map(r=>`<div class="resource-card">
+        <div class="resource-title">${r.t}</div>
+        <div class="resource-provider">${r.p}</div>
+        <div class="resource-why">${r.why}</div>
+        <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
+      </div>`).join('')}
+    </div>
+  </details>
+
+  <div style="background:rgba(16,185,129,0.08);border:2px solid var(--success);border-radius:12px;padding:24px;text-align:center;margin:24px 0">
+    <div style="font-size:24px;margin-bottom:8px">\uD83C\uDF93</div>
+    <div style="font-size:18px;font-weight:700;color:var(--success);margin-bottom:8px">AI-101 Learning Path Complete</div>
+    <div style="font-size:14px;color:var(--tx-secondary);line-height:1.6">You\u2019ve reached the end of the AI Essentials learning path.<br>The resources below are references to bookmark \u2014 not additional homework.</div>
   </div>
 
-  <div class="roadmap-tier">
-    <div class="tier-header" style="background:var(--accent)">\uD83D\uDCDA From the Source \u2014 Anthropic & MCP</div>
-    ${anthropic.map(r=>`<div class="resource-card">
-      <div class="resource-title">${r.t}</div>
-      <div class="resource-provider">${r.p}</div>
-      <div class="resource-why">${r.why}</div>
-      <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
-    </div>`).join('')}
-  </div>
-
-  <div class="roadmap-tier">
-    <div class="tier-header" style="background:var(--accent)">\uD83D\uDE80 Tier 2 \u2014 Applied <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;margin-left:8px">Continues in AI 102</span></div>
-    ${tier2.map(r=>`<div class="resource-card">
-      <div class="resource-title">${r.t}</div>
-      <div class="resource-provider">${r.p}</div>
-      <div class="resource-meta"><span>\u23F1 ${r.time}</span>${r.cost?`<span>\uD83D\uDCB0 ${r.cost}</span>`:''}</div>
-      <div class="resource-why">${r.why}</div>
-      <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
-    </div>`).join('')}
-  </div>
-
-  <div class="roadmap-tier">
-    <div class="tier-header" style="background:var(--secondary)">\uD83D\uDD2C Tier 3 \u2014 Advanced <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;margin-left:8px">Continues in AI 102</span></div>
-    ${tier3.map(r=>`<div class="resource-card">
-      <div class="resource-title">${r.t}</div>
-      <div class="resource-provider">${r.p}</div>
-      <div class="resource-why">${r.why}</div>
-      <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
-    </div>`).join('')}
-  </div>`;
+  <details class="roadmap-section">
+    <summary style="background:var(--bg-muted);color:var(--tx-primary);border-left:4px solid var(--accent)">\uD83D\uDCD6 Reference Library \u2014 Anthropic, MCP & Official Docs</summary>
+    <div class="roadmap-body">
+      <div class="callout" style="margin-bottom:16px">These aren\u2019t sequential steps \u2014 they\u2019re references to bookmark and revisit when you need them.</div>
+      ${anthropic.map(r=>`<div class="resource-card">
+        <div class="resource-title">${r.t}</div>
+        <div class="resource-provider">${r.p}</div>
+        <div class="resource-why">${r.why}</div>
+        <a class="resource-link" href="${r.url}" target="_blank" rel="noopener">Open Resource \u2192</a>
+      </div>`).join('')}
+    </div>
+  </details>`;
 }
 
 /* ══ MODULE 8: GLOSSARY ══ */
@@ -2565,7 +2614,7 @@ function showFinalAssessment(){
 }
 
 function scoreFinal(){
-  const total = 15;
+  let total = 15;
   let firstUnanswered = null;
   for(let i = 0; i < total; i++){
     const qid = `final-q${i}`;
@@ -2581,9 +2630,6 @@ function scoreFinal(){
     firstUnanswered.scrollIntoView({behavior:'smooth', block:'center'});
     firstUnanswered.style.boxShadow = '0 0 0 3px var(--warning)';
     setTimeout(() => firstUnanswered.style.boxShadow = '', 2000);
-    const answered = total - document.querySelectorAll('#main-content .quiz-card:not(.correct):not(.incorrect)').length;
-    const unansweredWithSelection = document.querySelectorAll('#main-content .quiz-card:not(.correct):not(.incorrect) .quiz-opt.selected').length;
-    const remaining = total - Object.keys(quizStates).filter(k => k.startsWith('final-')).length - unansweredWithSelection;
     alert('Please answer all 15 questions before calculating your score. Scroll through to find any you missed.');
     return;
   }
@@ -2605,7 +2651,7 @@ function scoreFinal(){
     if(correct >= 12){ cls = 'excellent'; msg = "Excellent! You've built a strong AI foundation."; }
     else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
     else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
-    el.innerHTML = '<div class="score-banner ' + cls + '"><div class="score-num">' + correct + ' / ' + total + '</div><div class="score-msg">' + msg + '</div></div>';
+    el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div></div>`;
     el.scrollIntoView({behavior:'smooth'});
   }, 200);
 }
@@ -2712,8 +2758,20 @@ document.addEventListener('keydown', e => {
   }
 });
 
+function renderCourseNav(){
+  const nav = document.getElementById('course-nav');
+  if(!nav) return;
+  nav.innerHTML = COURSES.map(c => {
+    if(c.id === THIS_COURSE){
+      return `<span class="course-link current">${c.label}</span>`;
+    }
+    return `<a class="course-link" href="${c.file}">${c.label}</a>`;
+  }).join('');
+}
+
 /* ══ INITIALIZATION ══ */
 buildSearchIndex();
+renderCourseNav();
 showLanding();
 
 const scrollBtn = document.getElementById('scroll-top-btn');
