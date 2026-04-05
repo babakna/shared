@@ -147,16 +147,9 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .tl-model-chip{background:var(--bg-highlight);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--primary);cursor:pointer;font-weight:600;transition:all .15s}
 .tl-model-chip:hover{background:var(--primary);color:#fff}
 
-.resources-container{max-width:800px;margin:0 auto;padding:24px 0}
-.resource-tier{margin-bottom:32px}
-.tier-header{padding:12px 20px;border-radius:10px;color:#fff;font-weight:700;font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.resource-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:10px;transition:all .2s}
-.resource-card:hover{box-shadow:var(--shadow-md)}
-.resource-title{font-size:15px;font-weight:600;color:var(--tx-primary)}
-.resource-provider{font-size:12px;color:var(--tx-muted);margin-top:2px}
-.resource-meta{display:flex;gap:12px;margin-top:8px;font-size:12px;color:var(--tx-muted);flex-wrap:wrap}
-.resource-why{font-size:13px;color:var(--tx-secondary);line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
-.resource-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--primary);margin-top:8px}
+.resource-card{display:block;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;transition:all .2s;cursor:pointer}
+.resource-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--primary-light)}
+.resource-card:active{transform:translateY(0)}
 
 .glossary-container{max-width:960px;margin:0 auto;padding:24px 0}
 .gloss-search{width:100%;padding:12px 18px;font-size:15px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--tx-primary);font-family:var(--font-body);transition:border-color .2s;margin-bottom:16px}
@@ -267,6 +260,10 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   .section-intro h2{font-size:22px}
 
   .scroll-top{width:40px;height:40px;bottom:16px;right:16px}
+
+  .resource-card{padding:14px 16px}
+  #resource-filters{padding:0 16px 12px}
+  #resource-list > div{padding:0 16px!important}
 }
 </style>
 </head>
@@ -274,7 +271,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 
 <header class="hdr" id="hdr">
   <div class="hdr-l">
-    <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M12 2C9 2 6.5 4 6 7c-.7.2-1.3.5-1.8 1C3 9 2 10.5 2 12.2c0 2 1.5 3.6 3.3 3.8H8v-1.5H5.5c-1.3-.2-2-1.2-2-2.3 0-1 .6-2 1.5-2.3l.7-.3.1-.7c.3-2.3 2.3-4 4.7-4 2.2 0 4 1.5 4.5 3.5l.2.8.8.1c1.5.2 2.5 1.4 2.5 2.9 0 1.3-.9 2.4-2.2 2.6H14v1.5h2.7c2.1-.2 3.8-2 3.8-4.1 0-2-1.4-3.7-3.3-4.1C16.5 4.3 14.5 2 12 2zm-1 10v4H8.5L12 20l3.5-4H13v-4h-2z"/></svg></div>
+    <div class="hdr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 00-5.2 2.3A6 6 0 003 9.5c0 2 1 3.7 2.5 4.8-.3.7-.5 1.4-.5 2.2a4.5 4.5 0 004.5 4.5H12m0-19a7 7 0 015.2 2.3A6 6 0 0121 9.5c0 2-1 3.7-2.5 4.8.3.7.5 1.4.5 2.2a4.5 4.5 0 01-4.5 4.5H12m0 0V2"/><circle cx="8.5" cy="9" r="1" fill="#fff" stroke="none"/><circle cx="15.5" cy="9" r="1" fill="#fff" stroke="none"/><circle cx="7" cy="14" r="1" fill="#fff" stroke="none"/><circle cx="17" cy="14" r="1" fill="#fff" stroke="none"/><path d="M8.5 9h2.5M15.5 9H13M7 14h2M17 14h-2" stroke-width="1"/></svg></div>
     <div><div class="hdr-t">AI Models &amp; Algorithms Explorer</div><div class="hdr-s">Your Interactive Reference to AI/ML Models, Architectures &amp; Patterns · <span class="by">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-r">
@@ -342,7 +339,17 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 </div>
 
 <div class="tab-pane" id="pane-resources">
-  <div class="resources-container" id="resources-container"></div>
+  <div class="hero" style="padding:32px 24px 24px">
+    <h2 style="font-size:24px;font-weight:800;color:var(--tx-primary);margin-bottom:8px">Curated Resources</h2>
+    <p style="font-size:15px;color:var(--tx-secondary)">37 hand-picked educational resources — documentation, courses, visual explainers, tools, and seminal papers. Every link is annotated with <em>why this one</em> and estimated time commitment.</p>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 24px 16px" id="resource-filters">
+    <button class="filter-chip active" onclick="filterResources('all',this)">All (37)</button>
+    <button class="filter-chip" onclick="filterResources('beginner',this)">Beginner</button>
+    <button class="filter-chip" onclick="filterResources('intermediate',this)">Intermediate</button>
+    <button class="filter-chip" onclick="filterResources('advanced',this)">Advanced</button>
+  </div>
+  <div id="resource-list"></div>
 </div>
 
 <div class="tab-pane" id="pane-glossary">
@@ -841,27 +848,60 @@ const TIMELINE_DATA = [
   {year:2025,era:'The Present',models:['Claude 4','Agentic RAG'],desc:'Agentic systems mature. RAG variants multiply. AI becomes infrastructure, not novelty.'}
 ];
 
+const RESOURCE_CATEGORIES = [
+  {id:'official',     name:'Official AI Documentation',          icon:'\uD83D\uDCD8'},
+  {id:'research',     name:'Research & Thought Leadership',      icon:'\uD83D\uDD2C'},
+  {id:'courses',      name:'Free Courses & Structured Learning', icon:'\uD83C\uDF93'},
+  {id:'visual',       name:'Visual & Interactive Explainers',    icon:'\uD83C\uDFA8'},
+  {id:'professional', name:'Professional Development',           icon:'\uD83D\uDCBC'},
+  {id:'tools',        name:'Tools & Platforms',                  icon:'\uD83D\uDEE0\uFE0F'},
+  {id:'papers',       name:'Seminal Papers',                     icon:'\uD83D\uDCC4'}
+];
+
 const RESOURCES = [
-  {tier:'Foundational Courses',color:'var(--primary)',items:[
-    {title:'AI for Everyone',provider:'DeepLearning.AI / Coursera',time:'6 hours',url:'https://www.coursera.org/learn/ai-for-everyone',why:'Andrew Ng\u2019s beginner-friendly overview of AI concepts, business strategy, and societal impact.'},
-    {title:'Generative AI for Everyone',provider:'DeepLearning.AI / Coursera',time:'5 hours',url:'https://www.coursera.org/learn/generative-ai-for-everyone',why:'Focused specifically on GenAI concepts, capabilities, and practical applications.'},
-    {title:'Google AI Essentials',provider:'Google / Coursera',time:'10 hours',url:'https://www.coursera.org/learn/google-ai-essentials',why:'Hands-on course covering AI tools in the Google ecosystem with practical exercises.'},
-    {title:'Introduction to Generative AI',provider:'Google Cloud Skills Boost',time:'45 min',url:'https://www.cloudskillsboost.google/course_templates/536',why:'Quick, focused introduction to generative AI concepts from Google\u2019s cloud team.'},
-    {title:'Prompt Engineering for ChatGPT',provider:'Vanderbilt / Coursera',time:'18 hours',url:'https://www.coursera.org/learn/prompt-engineering',why:'Deep dive into prompt engineering techniques with hands-on practice.'}
-  ]},
-  {tier:'Architecture Deep Dives',color:'var(--accent)',items:[
-    {title:'The Illustrated Transformer',provider:'Jay Alammar',time:'30 min read',url:'https://jalammar.github.io/illustrated-transformer/',why:'The best visual explanation of how Transformers work. Essential reading for understanding modern AI.'},
-    {title:'3Blue1Brown Neural Networks',provider:'3Blue1Brown / YouTube',time:'4 hours',url:'https://www.3blue1brown.com/topics/neural-networks',why:'Beautiful visual explanations of neural networks, backpropagation, and deep learning fundamentals.'},
-    {title:'Stanford CS231n (CNNs)',provider:'Stanford University',time:'Self-paced',url:'https://cs231n.stanford.edu/',why:'The definitive course on convolutional neural networks and computer vision.'},
-    {title:'Andrej Karpathy\u2019s Zero to Hero',provider:'Andrej Karpathy / YouTube',time:'12+ hours',url:'https://karpathy.ai/zero-to-hero.html',why:'Build a GPT from scratch. The best way to truly understand how language models work.'},
-    {title:'Anthropic Prompt Engineering Guide',provider:'Anthropic',time:'2 hours',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',why:'Official guide to prompting Claude effectively, from the team that built it.'}
-  ]},
-  {tier:'Tools & Platforms',color:'var(--success)',items:[
-    {title:'Hugging Face',provider:'Hugging Face',time:'Ongoing',url:'https://huggingface.co/',why:'The GitHub of AI models. Browse, test, and deploy thousands of open-source models.'},
-    {title:'Google Colab',provider:'Google',time:'Ongoing',url:'https://colab.research.google.com/',why:'Free cloud notebooks with GPU access for experimenting with AI models.'},
-    {title:'Papers With Code',provider:'Community',time:'Ongoing',url:'https://paperswithcode.com/',why:'Every AI research paper linked to its implementation. Great for understanding state-of-the-art.'},
-    {title:'What is MCP?',provider:'Anthropic',time:'30 min',url:'https://modelcontextprotocol.io/',why:'Understanding the Model Context Protocol that\u2019s becoming the standard for AI tool integration.'}
-  ]}
+  {id:'anthropic-prompt-overview',title:'Prompt Engineering Overview',provider:'Anthropic',category:'Official AI Documentation',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',time:'30 min read',level:'beginner',why:'The starting point for prompt engineering with Claude. Covers fundamentals \u2014 clarity, examples, XML structuring, role prompting \u2014 that apply to any AI tool.',tags:['prompting','claude','documentation']},
+  {id:'anthropic-best-practices',title:'Prompting Best Practices (Claude 4.x)',provider:'Anthropic',category:'Official AI Documentation',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices',time:'45 min read',level:'intermediate',why:'The definitive reference for Claude\'s latest models. Covers tool use, thinking, agentic systems, and frontend design prompting. Updated for Claude 4.6.',tags:['prompting','claude','advanced','documentation']},
+  {id:'anthropic-context-engineering',title:'Effective Context Engineering for AI Agents',provider:'Anthropic Engineering',category:'Official AI Documentation',url:'https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents',time:'20 min read',level:'advanced',why:'Goes beyond prompt engineering into context engineering \u2014 how to manage the finite context window for optimal agent performance. Essential for agentic workflows.',tags:['agents','context','advanced','architecture']},
+  {id:'anthropic-interactive-tutorial',title:'Interactive Prompt Engineering Tutorial',provider:'Anthropic (GitHub)',category:'Official AI Documentation',url:'https://github.com/anthropics/prompt-eng-interactive-tutorial',time:'4\u20136 hours (self-paced)',level:'beginner',why:'Hands-on Jupyter notebook tutorial with 9 chapters. Practice writing and troubleshooting prompts with immediate feedback. The best way to learn by doing.',tags:['prompting','tutorial','interactive','hands-on']},
+  {id:'mcp-docs',title:'Model Context Protocol \u2014 Getting Started',provider:'MCP Project',category:'Official AI Documentation',url:'https://modelcontextprotocol.io/docs/getting-started/intro',time:'30 min read',level:'intermediate',why:'Official MCP documentation. Understand how AI tools connect to external data and services through this open standard. Increasingly critical as AI moves beyond simple chat.',tags:['mcp','protocol','tools','integration']},
+
+  {id:'anthropic-research',title:'Anthropic Research Blog',provider:'Anthropic',category:'Research & Thought Leadership',url:'https://www.anthropic.com/research',time:'Ongoing',level:'advanced',why:'Peer into how frontier AI models are built, evaluated, and made safer. Not for casual reading \u2014 for when you want to understand the cutting edge.',tags:['research','safety','frontier']},
+  {id:'anthropic-alignment',title:'Alignment Science Blog',provider:'Anthropic',category:'Research & Thought Leadership',url:'https://alignment.anthropic.com/',time:'Ongoing',level:'advanced',why:'How AI models are made safe and aligned with human values. Explains Constitutional AI, interpretability research, and the science behind responsible AI development.',tags:['alignment','safety','research','constitutional-ai']},
+  {id:'stanford-hai',title:'Stanford Institute for Human-Centered AI (HAI)',provider:'Stanford University',category:'Research & Thought Leadership',url:'https://hai.stanford.edu/',time:'Ongoing',level:'intermediate',why:'Interdisciplinary AI research bridging technology, policy, and society. High-quality reports on AI\'s impact on work, education, and governance.',tags:['research','policy','society','university']},
+  {id:'stanford-ai-index',title:'AI Index Report',provider:'Stanford HAI',category:'Research & Thought Leadership',url:'https://hai.stanford.edu/ai-index',time:'Executive summary: 30 min; Full report: 3\u20134 hours',level:'intermediate',why:'The definitive annual landscape report on AI. Tracks investment, research output, adoption, policy, and public perception. Essential for understanding where the field is heading.',tags:['research','trends','annual','data']},
+  {id:'mcp-wikipedia',title:'Model Context Protocol \u2014 Overview',provider:'Wikipedia',category:'Research & Thought Leadership',url:'https://en.wikipedia.org/wiki/Model_Context_Protocol',time:'10 min read',level:'beginner',why:'Clear, neutral overview of MCP \u2014 its history, architecture, and adoption. Good starting point before diving into the official docs.',tags:['mcp','overview','reference']},
+
+  {id:'ai-for-everyone',title:'AI for Everyone',provider:'DeepLearning.AI / Coursera',category:'Free Courses & Structured Learning',url:'https://www.coursera.org/learn/ai-for-everyone',time:'~6 hours',level:'beginner',why:'Andrew Ng\'s non-technical AI introduction. Covers what AI can and can\'t do, how to work with AI teams, and the societal impact. No math, no code.',tags:['course','beginner','non-technical']},
+  {id:'genai-for-everyone',title:'Generative AI for Everyone',provider:'DeepLearning.AI / Coursera',category:'Free Courses & Structured Learning',url:'https://www.coursera.org/learn/generative-ai-for-everyone',time:'~8 hours',level:'beginner',why:'Andrew Ng\'s GenAI-focused course. How LLMs work, practical prompt techniques, and how GenAI changes work. Updated for the ChatGPT era.',tags:['course','genai','beginner']},
+  {id:'google-ai-essentials',title:'Google AI Essentials',provider:'Google / Coursera',category:'Free Courses & Structured Learning',url:'https://www.coursera.org/specializations/ai-essentials-google',time:'~14 hours',level:'beginner',why:'Google\'s hands-on introduction covering AI fundamentals, responsible AI, and practical applications. Earns a professional certificate.',tags:['course','google','beginner','certificate']},
+  {id:'google-prompting',title:'Google Prompting Essentials',provider:'Google / Coursera',category:'Free Courses & Structured Learning',url:'https://www.coursera.org/specializations/prompting-essentials-google',time:'~10 hours',level:'beginner',why:'Dedicated prompt engineering course with a 5-step prompting framework. Hands-on exercises you can apply immediately to any AI tool.',tags:['course','prompting','google','hands-on']},
+  {id:'google-ai-pro',title:'Google AI Professional Certificate',provider:'Google / Coursera',category:'Free Courses & Structured Learning',url:'https://www.coursera.org/professional-certificates/google-ai',time:'~7 hours (7 courses)',level:'intermediate',why:'Comprehensive AI professional credential. Covers ML fundamentals, TensorFlow basics, and responsible AI. Good for career development.',tags:['course','google','certificate','professional']},
+  {id:'deeplearning-short',title:'DeepLearning.AI Short Courses',provider:'DeepLearning.AI',category:'Free Courses & Structured Learning',url:'https://www.deeplearning.ai/courses/',time:'1\u20132 hours each',level:'intermediate',why:'30+ free short courses covering RAG, agents, LangChain, fine-tuning, and more. Bite-sized and practical \u2014 complete one during a lunch break.',tags:['course','short','rag','agents','practical']},
+  {id:'deeplearning-prompt-eng',title:'ChatGPT Prompt Engineering for Developers',provider:'DeepLearning.AI',category:'Free Courses & Structured Learning',url:'https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/',time:'~1.5 hours',level:'intermediate',why:'Isa Fulford (OpenAI) and Andrew Ng teach prompting techniques: summarizing, inferring, transforming, expanding. Techniques applicable to any AI tool, not just ChatGPT.',tags:['course','prompting','practical']},
+  {id:'fastai',title:'Practical Deep Learning for Coders',provider:'fast.ai',category:'Free Courses & Structured Learning',url:'https://course.fast.ai/',time:'~20 hours (7 weeks recommended)',level:'advanced',why:'Jeremy Howard\'s legendary course. Top-down approach \u2014 build working models from day one, then understand why they work. Studied by hundreds of thousands. Requires basic Python.',tags:['course','deep-learning','practical','python']},
+  {id:'google-ml-crash',title:'Machine Learning Crash Course',provider:'Google',category:'Free Courses & Structured Learning',url:'https://developers.google.com/machine-learning/crash-course',time:'~15 hours',level:'intermediate',why:'Google\'s internal ML training, made public. Covers linear regression through neural networks with interactive visualizations. The gold standard for structured ML fundamentals.',tags:['course','ml','google','fundamentals']},
+  {id:'karpathy-zero-to-hero',title:'Neural Networks: Zero to Hero',provider:'Andrej Karpathy (YouTube)',category:'Free Courses & Structured Learning',url:'https://karpathy.ai/zero-to-hero.html',time:'~13 hours (video series)',level:'advanced',why:'Former OpenAI/Tesla AI director builds neural networks from scratch in Python. Possibly the best explanation of how LLMs actually work, from the person who helped build GPT. Requires basic Python.',tags:['course','neural-networks','llm','from-scratch']},
+
+  {id:'3blue1brown',title:'Neural Networks (video series)',provider:'3Blue1Brown',category:'Visual & Interactive Explainers',url:'https://www.3blue1brown.com/topics/neural-networks',time:'~2 hours (4 videos)',level:'beginner',why:'Grant Sanderson\'s visually stunning animations make neural networks genuinely intuitive. The single best visual explanation of how neural networks learn. No prerequisites.',tags:['visual','neural-networks','video','beginner']},
+  {id:'illustrated-transformer',title:'The Illustrated Transformer',provider:'Jay Alammar',category:'Visual & Interactive Explainers',url:'https://jalammar.github.io/illustrated-transformer/',time:'30\u201345 min read',level:'intermediate',why:'The most-shared visual explanation of how Transformers work. Step-by-step diagrams showing attention, multi-head attention, positional encoding. Bookmark this \u2014 you\'ll revisit it.',tags:['visual','transformer','attention','diagrams']},
+  {id:'illustrated-gpt2',title:'The Illustrated GPT-2',provider:'Jay Alammar',category:'Visual & Interactive Explainers',url:'https://jalammar.github.io/illustrated-gpt2/',time:'30 min read',level:'intermediate',why:'Visual walkthrough of how GPT-2 generates text. Builds on the Illustrated Transformer to show how auto-regressive generation actually works, token by token.',tags:['visual','gpt','generation','diagrams']},
+  {id:'tf-playground',title:'TensorFlow Playground',provider:'Google',category:'Visual & Interactive Explainers',url:'https://playground.tensorflow.org/',time:'15\u201330 min (interactive)',level:'beginner',why:'Drag sliders to build a neural network in your browser and watch it learn in real time. The fastest way to develop intuition for how layers, neurons, and activation functions work.',tags:['interactive','neural-networks','hands-on','visual']},
+  {id:'cnn-explainer',title:'CNN Explainer',provider:'Georgia Tech / Polo Club',category:'Visual & Interactive Explainers',url:'https://poloclub.github.io/cnn-explainer/',time:'15\u201320 min (interactive)',level:'intermediate',why:'Interactive visualization of a convolutional neural network classifying images. See exactly what each layer detects \u2014 edges, textures, patterns, objects \u2014 in real time.',tags:['interactive','cnn','vision','visual']},
+
+  {id:'linkedin-intro-ai',title:'Introduction to Artificial Intelligence',provider:'Doug Rose / LinkedIn Learning',category:'Professional Development',url:'https://www.linkedin.com/learning/introduction-to-artificial-intelligence-24947908',time:'~2 hours',level:'beginner',why:'Business-focused AI overview for non-technical professionals. Covers AI types, neural networks, and practical workplace applications. Earns a LinkedIn badge.',tags:['professional','linkedin','beginner','business']},
+  {id:'linkedin-genai-essentials',title:'Career Essentials in Generative AI',provider:'Microsoft & LinkedIn',category:'Professional Development',url:'https://www.linkedin.com/learning/paths/career-essentials-in-generative-ai-by-microsoft-and-linkedin',time:'~5 hours (learning path)',level:'beginner',why:'GenAI fundamentals plus practical workplace applications with Microsoft tools. Earns a LinkedIn professional credential.',tags:['professional','linkedin','genai','microsoft','credential']},
+  {id:'linkedin-skill-paths',title:'AI Skill Pathways Library',provider:'LinkedIn Learning',category:'Professional Development',url:'https://learning.linkedin.com/resources/upskilling-and-reskilling/ai-skill-pathways-library',time:'Varies by path',level:'beginner',why:'Role-based AI learning paths. Find the path that matches your job title for curated, relevant content rather than generic AI training.',tags:['professional','linkedin','role-based','paths']},
+  {id:'anthropic-skilljar',title:'MCP Courses',provider:'Anthropic / Skilljar',category:'Professional Development',url:'https://anthropic.skilljar.com/',time:'Varies',level:'intermediate',why:'Official Anthropic training on Model Context Protocol. Hands-on courses for building MCP integrations.',tags:['mcp','professional','anthropic','certification']},
+
+  {id:'huggingface',title:'Hugging Face',provider:'Hugging Face',category:'Tools & Platforms',url:'https://huggingface.co/',time:'Ongoing resource',level:'intermediate',why:'The GitHub of AI. Browse 500K+ models, datasets, and interactive demos (Spaces). Even without coding, you can try models in your browser and understand what\'s available.',tags:['platform','models','datasets','demos']},
+  {id:'papers-with-code',title:'Papers With Code',provider:'Meta AI',category:'Tools & Platforms',url:'https://paperswithcode.com/',time:'Ongoing resource',level:'advanced',why:'Every major AI paper linked to its implementation code and benchmark results. When you hear about a new model, look it up here to see how it actually performs.',tags:['research','benchmarks','papers','code']},
+  {id:'mcp-github',title:'MCP GitHub Repository',provider:'Anthropic / Open Source',category:'Tools & Platforms',url:'https://github.com/modelcontextprotocol',time:'Ongoing resource',level:'advanced',why:'Source code, SDKs, and community-built MCP servers. The technical foundation for how AI tools connect to external systems.',tags:['mcp','github','open-source','technical']},
+  {id:'kaggle-learn',title:'Kaggle Learn',provider:'Kaggle / Google',category:'Tools & Platforms',url:'https://www.kaggle.com/learn',time:'~4 hours per micro-course',level:'intermediate',why:'Free micro-courses on Python, ML, deep learning, and data analysis \u2014 all runnable in the browser. No setup required. Great for hands-on learners.',tags:['platform','courses','hands-on','python']},
+
+  {id:'paper-attention',title:'Attention Is All You Need',provider:'Vaswani et al., 2017',category:'Seminal Papers',url:'https://arxiv.org/abs/1706.03762',time:'~1 hour (technical)',level:'advanced',why:'THE paper that started the modern AI era. Introduced the Transformer architecture that powers every LLM you use. Dense reading, but the diagrams alone are worth studying.',tags:['paper','transformer','foundational']},
+  {id:'paper-bert',title:'BERT: Pre-training of Deep Bidirectional Transformers',provider:'Devlin et al. (Google), 2018',category:'Seminal Papers',url:'https://arxiv.org/abs/1810.04805',time:'~1 hour (technical)',level:'advanced',why:'Proved that pre-training on massive text then fine-tuning for specific tasks crushes specialized models. The paper that made "pre-train then fine-tune" the standard paradigm.',tags:['paper','bert','pre-training','foundational']},
+  {id:'paper-gpt3',title:'Language Models are Few-Shot Learners',provider:'Brown et al. (OpenAI), 2020',category:'Seminal Papers',url:'https://arxiv.org/abs/2005.14165',time:'~2 hours (technical)',level:'advanced',why:'The GPT-3 paper. Demonstrated that scale alone produces emergent capabilities \u2014 the model could perform tasks it was never explicitly trained for. Changed the trajectory of AI research.',tags:['paper','gpt','scale','emergent']},
+  {id:'paper-rag',title:'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks',provider:'Lewis et al. (Facebook AI), 2020',category:'Seminal Papers',url:'https://arxiv.org/abs/2005.11401',time:'~1 hour (technical)',level:'advanced',why:'The paper that defined RAG. Showed that combining retrieval with generation dramatically reduces hallucination. Now the standard pattern for connecting AI to organizational data.',tags:['paper','rag','retrieval','foundational']}
 ];
 
 const GLOSSARY = [
@@ -1041,7 +1081,7 @@ function renderFilterChips() {
   const chips = [
     {label:'All',val:'all',type:'rel'},{label:'Core Knowledge',val:'daily',type:'rel'},
     {label:'Good to Know',val:'useful',type:'rel'},{label:'Deep Reference',val:'reference',type:'rel'},
-    {label:'Deployed',val:'deployed',type:'stat'},{label:'Emerging',val:'emerging',type:'stat'}
+    {label:'Deployed',val:'deployed',type:'stat'},{label:'Emerging',val:'emerging',type:'stat'},{label:'Research',val:'research',type:'stat'}
   ];
   document.getElementById('filter-chips').innerHTML = chips.map(c => {
     const active = (c.type === 'rel' && filterRelevance === c.val) || (c.type === 'stat' && filterStatus === c.val);
@@ -1226,19 +1266,45 @@ function renderTimeline() {
 }
 
 /* ══ RESOURCES ══ */
+let resourceFilter = 'all';
+
+function filterResources(level, btn) {
+  resourceFilter = level;
+  document.querySelectorAll('#resource-filters .filter-chip').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderResources();
+}
+
 function renderResources() {
-  document.getElementById('resources-container').innerHTML =
-    '<div class="section-intro"><h2>Learning Resources</h2><p>Curated courses, references, and tools for deepening your understanding of AI models and algorithms.</p></div>' +
-    RESOURCES.map(tier =>
-      '<div class="resource-tier"><div class="tier-header" style="background:' + tier.color + '">' + tier.tier + '</div>' +
-      tier.items.map(r =>
-        '<div class="resource-card"><div class="resource-title">' + r.title + '</div>' +
-        '<div class="resource-provider">' + r.provider + '</div>' +
-        '<div class="resource-meta"><span>\u23F1 ' + r.time + '</span></div>' +
-        '<div class="resource-why">' + r.why + '</div>' +
-        '<a class="resource-link" href="' + r.url + '" target="_blank" rel="noopener">Visit Resource \u2192</a></div>'
-      ).join('') + '</div>'
-    ).join('');
+  var filtered = resourceFilter === 'all' ? RESOURCES : RESOURCES.filter(function(r) { return r.level === resourceFilter; });
+  var container = document.getElementById('resource-list');
+
+  container.innerHTML = RESOURCE_CATEGORIES.map(function(cat) {
+    var items = filtered.filter(function(r) { return r.category === cat.name; });
+    if (items.length === 0) return '';
+    return '<div style="margin-bottom:32px;padding:0 24px">' +
+      '<div style="font-size:18px;font-weight:700;color:var(--tx-primary);margin-bottom:16px;display:flex;align-items:center;gap:8px">' +
+        '<span>' + cat.icon + '</span> ' + cat.name +
+        '<span style="font-size:12px;color:var(--tx-muted);background:var(--bg-muted);padding:2px 8px;border-radius:10px">' + items.length + '</span>' +
+      '</div>' +
+      '<div style="display:grid;gap:12px">' +
+        items.map(function(r) {
+          var levelBadge = r.level === 'beginner' ? 'badge-daily' : (r.level === 'intermediate' ? 'badge-useful' : 'badge-reference');
+          var levelLabel = r.level.charAt(0).toUpperCase() + r.level.slice(1);
+          return '<a href="' + r.url + '" target="_blank" rel="noopener" class="resource-card" style="text-decoration:none">' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">' +
+              '<div style="flex:1;min-width:200px">' +
+                '<div style="font-size:15px;font-weight:600;color:var(--primary)">' + r.title + ' \u2197</div>' +
+                '<div style="font-size:12px;color:var(--tx-muted);margin-top:2px">' + r.provider + ' \u00B7 ' + r.time + '</div>' +
+              '</div>' +
+              '<span class="badge ' + levelBadge + '" style="flex-shrink:0">' + levelLabel + '</span>' +
+            '</div>' +
+            '<div style="font-size:13px;color:var(--tx-secondary);margin-top:8px;line-height:1.6">' + r.why + '</div>' +
+          '</a>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 
 /* ══ GLOSSARY ══ */
@@ -1304,7 +1370,7 @@ function buildSearchIndex() {
   searchIndex = [];
   MODELS.forEach(m => searchIndex.push({type:'Model',text:m.name,desc:m.summary.substring(0,100)+'\u2026',action:() => selectModel(m.id)}));
   GLOSSARY.forEach(g => searchIndex.push({type:'Glossary',text:g.term,desc:g.def.substring(0,100)+'\u2026',action:() => { switchTab('glossary'); setTimeout(() => { document.getElementById('gloss-search').value = g.term; filterGlossary(); }, 100); }}));
-  RESOURCES.forEach(tier => tier.items.forEach(r => searchIndex.push({type:'Resource',text:r.title,desc:r.provider,action:() => switchTab('resources')})));
+  RESOURCES.forEach(function(r) { searchIndex.push({type:'Resource',text:r.title,desc:r.provider + ' \u00B7 ' + r.time,action:function(){ switchTab('resources'); }}); });
 }
 
 function performSearch(query) {
