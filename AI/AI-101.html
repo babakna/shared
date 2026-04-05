@@ -64,7 +64,6 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .search-empty{padding:24px;text-align:center;color:var(--tx-muted);font-size:14px}
 
 .main{max-width:960px;margin:0 auto;padding:24px}
-.pane{display:none}.pane.on{display:block}
 
 .hero{text-align:center;padding:80px 20px 60px}
 .hero-badge{display:inline-block;background:rgba(124,58,237,0.1);color:var(--accent);font-weight:700;font-size:12px;padding:6px 18px;border-radius:20px;margin-bottom:20px;letter-spacing:.5px}
@@ -304,8 +303,6 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .scenario-opt.selected{border-color:var(--primary);background:var(--bg-highlight);color:var(--primary)}
 .scenario-opt.best{border-color:var(--success);background:rgba(16,185,129,0.08);color:var(--success)}
 
-.roadmap-tier{margin-bottom:32px}
-.tier-header{padding:12px 20px;border-radius:10px;color:#fff;font-weight:700;font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .resource-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:10px;transition:all .2s}
 .resource-card:hover{box-shadow:var(--shadow-md)}
 .resource-title{font-size:15px;font-weight:600;color:var(--tx-primary)}
@@ -321,6 +318,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .roadmap-section summary::after{content:'▸';margin-left:auto;font-size:14px;transition:transform 0.2s}
 .roadmap-section[open] summary::after{transform:rotate(90deg)}
 .roadmap-section .roadmap-body{padding:16px 20px}
+.roadmap-badge{background:rgba(255,255,255,0.25);color:#fff;margin-left:8px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block;transition:background .2s}
+.roadmap-badge:hover{background:rgba(255,255,255,0.4);text-decoration:none}
 
 .course-nav{display:flex;align-items:center;gap:2px;padding:6px 24px;background:var(--bg-card);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .course-nav::-webkit-scrollbar{display:none}
@@ -407,6 +406,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .flow-mob-step.dim .flow-mob-num{background:var(--border)}
 .flow-mob-name{font-size:13px;font-weight:600;color:var(--primary)}
 .flow-mob-dir{font-size:11px;color:var(--tx-muted);margin-top:2px}
+.flow-mob-content{flex:1;min-width:0}
 
 /* ── Ensure horizontal-scroll containers have scroll indicators ── */
 .flow-scroll,.tx-step-visual,.timeline-wrap,.trail-wrap{
@@ -428,8 +428,6 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 
 @media print{
   .hdr,.trail-wrap,.search-overlay,.search-backdrop,.nav-btns,.flow-ctrl,.quiz-check,.train-btn,.hdr-btn,.scroll-top,.course-nav{display:none!important}
-  .pane{display:block!important;page-break-after:always}
-  .pane:not(.on){display:none!important}
   body{background:#fff;color:#000;font-size:12px}
   .card,.sim-area,.flow-box,.case-study,.quiz-card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}
   .flow-mrow{opacity:1!important}
@@ -737,8 +735,6 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   .resource-card{padding:14px 16px}
   .resource-title{font-size:14px}
   .resource-why{font-size:12px}
-  .tier-header{font-size:14px;padding:10px 16px}
-
   /* Scenario cards */
   .scenario-opts{flex-direction:column}
   .scenario-opt{width:100%;text-align:center;padding:10px;min-height:44px}
@@ -1578,7 +1574,7 @@ function mod7Content(){
   const tier2 = [
     {t:'DeepLearning.AI Short Courses',p:'DeepLearning.AI',time:'1\u20132 hours each',cost:'Free',url:'https://www.deeplearning.ai/courses/',why:'The best curated collection of focused AI courses. Each one teaches a specific skill in under 2 hours. Start with \u201cChatGPT Prompt Engineering for Developers\u201d even if you\u2019re not a developer \u2014 the prompting principles are universal.'},
     {t:'ChatGPT Prompt Engineering for Developers',p:'DeepLearning.AI & OpenAI',time:'~1.5 hours',cost:'Free',url:'https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/',why:'Taught by Andrew Ng and OpenAI\u2019s Isa Fulford. Despite the \u201cfor developers\u201d title, the prompting techniques are applicable to anyone. Covers summarizing, inferring, transforming, and expanding text \u2014 all core content editor tasks.'},
-    {t:'Google AI Professional Certificate',p:'Google / Coursera',time:'~7 hours total',cost:'Free to audit',url:'https://www.coursera.org/professional-certificates/google-ai',why:'Google\u2019s comprehensive program with 20+ hands-on activities. Goes deeper than AI Essentials with practical application scenarios.'},
+    {t:'Google AI Professional Certificate',p:'Google / Coursera',time:'~10 hours',cost:'Free to audit',url:'https://www.coursera.org/professional-certificates/google-ai',why:'Google\u2019s comprehensive program with 20+ hands-on activities. Goes deeper than AI Essentials with practical application scenarios.'},
     {t:'LinkedIn Learning AI Skill Pathways',p:'Microsoft & LinkedIn',time:'Varies',cost:'Subscription',url:'https://learning.linkedin.com/resources/upskilling-and-reskilling/ai-skill-pathways-library',why:'Structured learning paths organized by role and skill level. Choose the path that matches your job function for the most relevant curriculum.'}
   ];
   const tier3 = [
@@ -1590,7 +1586,7 @@ function mod7Content(){
   return `
   <div class="sec-title">Your Learning Path</div>
 
-  <details class="roadmap-section" open>
+  <details class="roadmap-section">
     <summary style="background:var(--primary)">\uD83C\uDFAF AI-101 Core Resources \u2014 Start Here (2\u20134 weeks)</summary>
     <div class="roadmap-body">
       ${tier1.map(r=>`<div class="resource-card">
@@ -1604,7 +1600,7 @@ function mod7Content(){
   </details>
 
   <details class="roadmap-section">
-    <summary style="background:var(--accent)">\uD83D\uDE80 Beyond AI-101 \u2014 Build Your Skills <a href="AI-102.html" style="background:rgba(255,255,255,0.25);color:#fff;margin-left:8px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">Continues in AI-102 \u2192</a></summary>
+    <summary style="background:var(--accent)">\uD83D\uDE80 Beyond AI-101 \u2014 Build Your Skills <a href="AI-102.html" class="roadmap-badge">Continues in AI-102 \u2192</a></summary>
     <div class="roadmap-body">
       ${tier2.map(r=>`<div class="resource-card">
         <div class="resource-title">${r.t}</div>
@@ -1617,7 +1613,7 @@ function mod7Content(){
   </details>
 
   <details class="roadmap-section">
-    <summary style="background:var(--secondary)">\uD83D\uDD2C Advanced Topics \u2014 Deep Dives <a href="AI-102.html" style="background:rgba(255,255,255,0.25);color:#fff;margin-left:8px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">Continues in AI-102 \u2192</a></summary>
+    <summary style="background:var(--secondary)">\uD83D\uDD2C Advanced Topics \u2014 Deep Dives <a href="AI-102.html" class="roadmap-badge">Continues in AI-102 \u2192</a></summary>
     <div class="roadmap-body">
       ${tier3.map(r=>`<div class="resource-card">
         <div class="resource-title">${r.t}</div>
@@ -1685,7 +1681,7 @@ function renderQuiz(id, questions){
   }).join('')}</div>`;
 }
 
-function esc(s){return s.replace(/'/g,"\\'").replace(/"/g,"&quot;")}
+function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,"&quot;").replace(/`/g,'\\`')}
 
 function selectQuizOpt(el){
   const qid = el.dataset.qid;
@@ -1737,7 +1733,7 @@ function initMod1(){
 
   const myths = pickRandom(ALL_MYTHS, 6);
   document.getElementById('myth-grid').innerHTML = myths.map(m=>`
-    <div class="flip-card" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card" tabindex="0" role="button" aria-label="Flip card to reveal reality" onclick="this.classList.toggle('flipped')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped')}">
       <div class="flip-inner">
         <div class="flip-front"><div class="flip-label">Myth</div><div class="flip-txt">\u201c${m.m}\u201d</div><div class="flip-hint">Click to reveal reality \u2192</div></div>
         <div class="flip-back"><div class="flip-label">Reality</div><div class="flip-txt">${m.r}</div></div>
@@ -1847,7 +1843,7 @@ const TX_STEPS = [
   {ico:'\u2702\uFE0F',name:'Tokenizer',desc:'The raw text is split into tokens \u2014 sub-word units that the model can process. This isn\u2019t a simple word split. The word \u201ctokenization\u201d becomes two tokens (\u201ctoken\u201d + \u201cization\u201d). Punctuation, spaces, and special characters each become their own tokens. A typical English sentence of 10 words might produce 12\u201315 tokens.'},
   {ico:'\uD83D\uDCCD',name:'Embedding',desc:'Each token is converted into a vector \u2014 a list of hundreds or thousands of numbers that represents that token\u2019s meaning in mathematical space. Words with similar meanings (like \u201chappy\u201d and \u201cjoyful\u201d) end up with similar vectors. This is how the model captures semantic relationships without understanding language the way humans do.'},
   {ico:'\uD83D\uDD17',name:'Attention Layers',desc:'This is the breakthrough innovation of the Transformer architecture. Each token \u201cattends to\u201d every other token in the sequence simultaneously \u2014 weighing how relevant each other token is to its current position. This is why the model can understand that in \u201cThe bank by the river,\u201d the word \u201cbank\u201d means a riverbank, not a financial institution \u2014 because it attends to \u201criver\u201d and adjusts its interpretation.'},
-  {ico:'\uD83D\uDCCA',name:'Multiple Layers',desc:'The signal passes through dozens or hundreds of stacked Transformer layers (GPT-4 has rumored 120 layers; Claude\u2019s exact count isn\u2019t public). Each layer refines the representation further \u2014 early layers capture basic syntax and word relationships, middle layers capture semantic meaning, and later layers capture high-level concepts and task-specific reasoning.'},
+  {ico:'\uD83D\uDCCA',name:'Multiple Layers',desc:'The signal passes through dozens or hundreds of stacked Transformer layers (GPT-4 reportedly uses over 100 layers; Claude\u2019s exact count isn\u2019t public). Each layer refines the representation further \u2014 early layers capture basic syntax and word relationships, middle layers capture semantic meaning, and later layers capture high-level concepts and task-specific reasoning.'},
   {ico:'\uD83C\uDFAF',name:'Output Prediction',desc:'The model produces a probability distribution over its entire vocabulary (typically 50,000\u2013100,000+ tokens) predicting which token should come next. The token with the highest probability is selected (or sampled based on temperature settings), added to the sequence, and the process repeats for the next token. This is autoregressive generation \u2014 one token at a time, with each new token informed by everything that came before.'}
 ];
 
@@ -1895,7 +1891,7 @@ function txStep(n){
 
 let ctxSize = 128000;
 function initTokenizer(){
-  const ctxSizes = [{l:'4K',v:4000},{l:'8K',v:8000},{l:'32K',v:32000},{l:'128K',v:128000},{l:'200K',v:200000}];
+  const ctxSizes = [{l:'4K',v:4000},{l:'8K',v:8000},{l:'32K',v:32000},{l:'128K',v:128000},{l:'200K',v:200000},{l:'1M',v:1000000}];
   document.getElementById('ctx-select').innerHTML = ctxSizes.map(c=>`<button class="ctx-btn ${c.v===ctxSize?'active':''}" onclick="setCtx(${c.v},this)">${c.l}</button>`).join('');
   tokenize();
 }
@@ -2256,7 +2252,10 @@ function renderWorkshop(i){
 function scoreWorkshop(){
   const input = document.getElementById('workshop-input').value.toLowerCase();
   if(input.trim().length < 10){
-    alert('Please write a prompt first!');
+    const resultsEl = document.getElementById('workshop-results');
+    resultsEl.style.display = 'block';
+    resultsEl.innerHTML = '<div class="callout warning" style="text-align:center"><strong>Please write a prompt first!</strong> Your prompt needs at least a few words before scoring.</div>';
+    resultsEl.scrollIntoView({behavior:'smooth', block:'nearest'});
     return;
   }
   const s = activeWorkshopScenarios[workshopIdx];
@@ -2328,7 +2327,7 @@ function initMod5(){
     {ico:'\uD83D\uDEE1\uFE0F',title:'Review & QA',desc:'Cross-check drafts against source documents',back:'<strong>When to use:</strong> When you need to verify that a draft accurately reflects its source material \u2014 especially useful for compliance documentation, legal reviews, or any content that must be verifiably accurate against a specification.<br><br><strong>Prompt template:</strong><br>\u201cCompare the following draft against the specification below. Identify: (1) claims in the draft that aren\u2019t supported by the spec, (2) information in the spec that\u2019s missing from the draft, (3) any contradictions between the two. Format as a numbered list with severity ratings (Critical / Important / Minor). Draft: [text] Specification: [text]\u201d<br><br><strong>Pro tip:</strong> AI excels at catching contradictions and omissions that a human reviewer might miss after reading the same documents repeatedly. Use it as a first-pass QA tool, then do your own focused review of the items it flags.<br><br><strong>Watch out for:</strong> The AI may flag stylistic differences as discrepancies. A draft that paraphrases the spec isn\u2019t necessarily inaccurate. Focus your review on the substantive flags \u2014 factual mismatches and missing information.'}
   ];
   document.getElementById('task-grid').innerHTML = tasks.map(t=>`
-    <div class="task-card" onclick="this.classList.toggle('flipped')">
+    <div class="task-card" tabindex="0" role="button" aria-label="Flip card to reveal prompt template" onclick="this.classList.toggle('flipped')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped')}">
       <div class="task-inner">
         <div class="task-front"><div class="concept-ico" style="background:var(--primary);font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px">${t.ico}</div><div class="concept-title">${t.title}</div><div class="concept-desc">${t.desc}</div><div style="font-size:11px;color:var(--tx-muted);margin-top:auto">Click to see prompt template \u2192</div></div>
         <div class="task-back">${t.back}</div>
@@ -2365,7 +2364,7 @@ const ALL_SPOT_PASSAGES = [
   ]},
   {text:'Technical writing as a profession emerged during World War II when the military needed clear documentation for complex equipment. The average technical writer in the US earns $87,850 per year according to the Bureau of Labor Statistics. The Society for Technical Communication, founded in 1953, currently has over 14,000 members across 52 chapters worldwide.',sentences:[
     {s:'Technical writing as a profession emerged during World War II when the military needed clear documentation for complex equipment.',h:false},
-    {s:'The average technical writer in the US earns $87,850 per year according to the Bureau of Labor Statistics.',h:true,why:'While the BLS does track technical writer salaries, the specific figure here may not be current. Always verify specific salary data against the actual BLS website rather than trusting AI-generated numbers.'},
+    {s:'The average technical writer in the US earns $87,850 per year according to the Bureau of Labor Statistics.',h:true,why:'The BLS does track technical writer salaries, but the specific dollar figure here was generated by AI and may be outdated or fabricated. AI frequently produces precise-sounding salary numbers that are plausible but unverifiable. Always check the actual BLS website for current data.'},
     {s:'The Society for Technical Communication, founded in 1953, currently has over 14,000 members across 52 chapters worldwide.',h:true,why:'The founding year and membership numbers are plausible but likely fabricated. AI generates specific organizational details that sound right but are often incorrect in the specifics.'}
   ]}
 ];
@@ -2378,7 +2377,7 @@ function initMod6(){
   document.getElementById('spot-area').innerHTML = selectedPassages.map((p,pi)=>`
     <div class="spot-passage" data-pidx="${pi}">
       <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Passage ${pi+1}</div>
-      ${p.sentences.map((s,si)=>`<span class="spot-sentence" data-pidx="${pi}" data-sidx="${si}" onclick="toggleSpotFlag(this)">${s.s} </span>`).join('')}
+      ${p.sentences.map((s,si)=>`<span class="spot-sentence" data-pidx="${pi}" data-sidx="${si}" tabindex="0" role="button" onclick="toggleSpotFlag(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSpotFlag(this)}">${s.s} </span>`).join('')}
     </div>`).join('');
   document.getElementById('spot-feedback').style.display = 'none';
   document.getElementById('spot-check-btn').style.display = '';
@@ -2595,7 +2594,6 @@ window.jumpToGloss = function(term){
 
 /* ══ FINAL ASSESSMENT ══ */
 function showFinalAssessment(){
-  completedModules.add(MODULES.length - 1);
   currentModule = -2;
   document.getElementById('trail-wrap').classList.add('vis');
   renderTrail();
@@ -2625,10 +2623,20 @@ function scoreFinal(){
     }
   }
   if(firstUnanswered){
+    let alertBanner = document.getElementById('final-unanswered-alert');
+    if(!alertBanner){
+        alertBanner = document.createElement('div');
+        alertBanner.id = 'final-unanswered-alert';
+        alertBanner.className = 'callout warning';
+        alertBanner.style.textAlign = 'center';
+        alertBanner.style.marginBottom = '16px';
+        const scoreBtn = document.querySelector('#final-score').previousElementSibling;
+        scoreBtn.parentNode.insertBefore(alertBanner, scoreBtn);
+    }
+    alertBanner.innerHTML = '<strong>Please answer all 15 questions before calculating your score.</strong> The highlighted question below still needs an answer.';
     firstUnanswered.scrollIntoView({behavior:'smooth', block:'center'});
     firstUnanswered.style.boxShadow = '0 0 0 3px var(--warning)';
     setTimeout(() => firstUnanswered.style.boxShadow = '', 2000);
-    alert('Please answer all 15 questions before calculating your score. Scroll through to find any you missed.');
     return;
   }
   for(let i = 0; i < total; i++){
@@ -2668,9 +2676,24 @@ function buildSearchIndex(){
     {t:'AI for Everyone',d:'DeepLearning.AI / Coursera \u2014 beginner course'},
     {t:'Generative AI for Everyone',d:'Andrew Ng\u2019s GenAI course'},
     {t:'Google AI Essentials',d:'Hands-on AI tools course'},
+    {t:'Introduction to Artificial Intelligence',d:'Doug Rose / LinkedIn Learning'},
+    {t:'Career Essentials in Generative AI',d:'Microsoft & LinkedIn \u2014 free'},
     {t:'3Blue1Brown Neural Networks',d:'Visual neural network explanations'},
+    {t:'Google Prompting Essentials',d:'Google / Coursera \u2014 prompt engineering'},
     {t:'Prompt Engineering Overview',d:'Anthropic official guide'},
-    {t:'What is MCP?',d:'Model Context Protocol introduction'}
+    {t:'Prompting Best Practices',d:'Anthropic Docs \u2014 Claude best practices'},
+    {t:'Interactive Prompt Engineering Tutorial',d:'Anthropic / GitHub \u2014 hands-on'},
+    {t:'What is MCP?',d:'Model Context Protocol introduction'},
+    {t:'Anthropic Research Blog',d:'Anthropic \u2014 AI research updates'},
+    {t:'Anthropic Alignment Science Blog',d:'Anthropic \u2014 AI safety research'},
+    {t:'DeepLearning.AI Short Courses',d:'Free focused AI courses \u2014 1\u20132 hours each'},
+    {t:'ChatGPT Prompt Engineering for Developers',d:'DeepLearning.AI & OpenAI'},
+    {t:'Google AI Professional Certificate',d:'Google / Coursera \u2014 comprehensive AI program'},
+    {t:'LinkedIn Learning AI Skill Pathways',d:'Microsoft & LinkedIn \u2014 structured paths'},
+    {t:'Stanford HAI',d:'Stanford Human-Centered AI \u2014 research & policy'},
+    {t:'Stanford AI Index Report',d:'Annual global AI progress report'},
+    {t:'MCP GitHub Organization',d:'Model Context Protocol source code'},
+    {t:'MCP on Wikipedia',d:'MCP architecture and adoption overview'}
   ];
   resources.forEach(r=>searchIndex.push({type:'Resource',text:r.t,desc:r.d,action:()=>goModule(6)}));
   searchIndex.push({type:'Assessment',text:'Final Assessment',desc:'15 comprehensive questions',action:()=>showFinalAssessment()});
