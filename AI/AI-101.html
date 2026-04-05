@@ -848,6 +848,9 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
     <div><div class="hdr-t">AI Essentials</div><div class="hdr-s">Your Interactive Guide to Understanding Artificial Intelligence · <span class="by">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-r">
+    <button class="hdr-btn" id="home-btn" title="Home" aria-label="Go to home page" onclick="showLanding()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg>
+    </button>
     <button class="hdr-btn mob-only" id="mob-menu-btn" title="Menu" aria-label="Open navigation menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -916,7 +919,133 @@ const LANDING_DESCS = [
   {desc:'Put your knowledge to work with practical, task-specific prompt templates for the six most common content editing tasks: research, drafting, editing, content transformation, metadata generation, and QA review. Each includes a ready-to-use prompt template and real-world tips.',feat:'6 interactive task cards with prompt templates \u2022 Before/after case study \u2022 5 quiz questions'},
   {desc:'Develop your critical eye for AI output. Understand why hallucinations happen mechanically, identify sources of bias, and practice spotting fabricated content in realistic exercises. Build the editorial judgment skills that make you the essential quality gatekeeper between AI and publication.',feat:'Spot the Hallucination exercise \u2022 3 decision scenarios \u2022 Bias awareness cards \u2022 5 quiz questions'},
   {desc:'Your curated guide to continuing the journey. Hand-picked resources organized in three tiers \u2014 from beginner courses (Andrew Ng, Google AI Essentials) through applied skills (DeepLearning.AI, prompt engineering) to advanced topics (Stanford HAI, MCP, alignment research). Every resource includes a \u2018why this one\u2019 annotation.',feat:'20+ curated resources with live links \u2022 Three-tier progressive path \u2022 Anthropic official resources section'},
-  {desc:'75 essential AI terms defined in plain English, each with a \u2018why it matters to you\u2019 annotation written specifically for content editors and technical writers. Searchable, filterable by category, with cross-linked related terms throughout.',feat:'Full-text search \u2022 7 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
+  {desc:'106 essential AI terms defined in plain English, each with a \u2018why it matters to you\u2019 annotation written specifically for content editors and technical writers. Searchable, filterable by category, with cross-linked related terms throughout.',feat:'Full-text search \u2022 8 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
+];
+
+function shuffleArray(arr) {
+  const shuffled = arr.slice();
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function pickRandom(arr, count) {
+  return shuffleArray(arr).slice(0, count);
+}
+
+const ALL_MYTHS = [
+  {m:'AI thinks like a human brain',r:'AI uses statistical pattern matching to predict likely outputs based on training data. It has no understanding, consciousness, intent, or common sense. When an LLM writes a grammatically perfect sentence, it\u2019s selecting statistically likely word sequences \u2014 not comprehending meaning. This is why it can write beautifully about a topic while getting basic facts completely wrong.'},
+  {m:'AI will replace writers and editors',r:'AI dramatically accelerates parts of the writing process \u2014 first drafts, summarization, content transformation, and consistency checking. But it cannot replace editorial judgment, brand voice intuition, audience awareness, or the ability to verify claims against reality. The writers who will struggle are those who refuse to learn AI tools. The writers who will thrive are those who use AI to handle routine work while focusing on judgment, creativity, and quality.'},
+  {m:'AI is always right',r:'AI \u201challucinates\u201d \u2014 it can generate confident, well-written text that is completely fabricated. It invents citations, makes up statistics, and states falsehoods with the same polished tone it uses for accurate information. There is no correlation between how confident AI sounds and how accurate it is. This is the single most important thing for content editors to understand.'},
+  {m:'You need to code to use AI',r:'Most AI tools are used through natural language prompts \u2014 your writing skills are literally your superpower. The better you are at clear, specific written communication, the better results you\u2019ll get from AI. Prompt engineering is a writing skill, not a programming skill. Strong writers often produce better prompts than strong coders.'},
+  {m:'All AI tools are the same',r:'Different models (Claude, GPT, Gemini, Llama) have different architectures, training data, capabilities, and behaviors. Claude tends to be more cautious and nuanced; GPT tends to be more expansive; Gemini has strong multi-modal capabilities. Even different versions of the same model have dramatically different quality levels. Choosing the right model matters.'},
+  {m:'AI learns from your conversations in real time',r:'Most AI tools don\u2019t update from individual chats \u2014 they use a fixed model trained on data up to a cutoff date. Your conversation is processed, a response is generated, and then the conversation is not used to retrain the model. The AI doesn\u2019t remember you between sessions unless the tool explicitly saves conversation history.'},
+  {m:'AI understands what it reads',r:'AI processes statistical patterns in text \u2014 it doesn\u2019t \u201cunderstand\u201d meaning the way you do. It can pass medical exams and write poetry, but it doesn\u2019t know what illness feels like or what a sunset looks like. When it produces something insightful, it\u2019s because the statistical patterns in its training data happened to encode that insight \u2014 not because it had a realization.'},
+  {m:'Bigger AI models are always better',r:'Larger models (more parameters) are generally more capable, but \u201cbigger\u201d doesn\u2019t always mean \u201cbetter for your task.\u201d A smaller, faster model may produce equally good release notes at a fraction of the cost and latency. For simple tasks like grammar checking or formatting, a 7B parameter model may outperform a 70B model simply because the task doesn\u2019t require deep reasoning.'},
+  {m:'AI-generated content is always detectable',r:'AI detection tools are unreliable \u2014 they produce frequent false positives (flagging human writing as AI) and false negatives (missing AI-generated text). Paraphrasing, editing, or mixing AI and human writing easily defeats detectors. The focus should be on content quality and accuracy, not on whether AI was involved in creating it.'},
+  {m:'AI training data is neutral and unbiased',r:'AI training data reflects the biases present in the internet, books, and other sources it was trained on. If certain perspectives, cultures, or demographics are underrepresented in training data, the model\u2019s outputs will reflect those gaps. This is why AI-generated content should always be reviewed for cultural sensitivity, inclusive language, and balanced perspectives.'}
+];
+
+const MOD1_QUIZ_POOL = [
+  {type:'tf',q:'Machine Learning is a subset of Artificial Intelligence.',a:true,exp:'ML is one approach within the broader field of AI.'},
+  {type:'tf',q:'Generative AI can create new content, but Deep Learning cannot.',a:false,exp:'Generative AI IS a type of deep learning. Both use neural networks, but GenAI specifically generates new content.'},
+  {type:'mc',q:'Which is the best analogy for how an LLM generates text?',opts:['Looking up answers in a database','Predicting the most likely next word based on patterns','Understanding the meaning of your question and reasoning about it','Copying text from its training data'],a:1,exp:'LLMs generate text by predicting the statistically most likely next token based on patterns learned during training.'},
+  {type:'mc',q:'A content editor uses an AI tool to draft release notes. The AI produces a paragraph that sounds authoritative but contains a product feature that doesn\'t exist. This is called:',opts:['A bug','Bias','A hallucination','Overfitting'],a:2,exp:'Hallucinations are when AI generates confident, plausible-sounding content that is factually incorrect or fabricated.'},
+  {type:'tf',q:'The Transformer architecture, introduced in 2017, is the foundation behind most modern LLMs like GPT and Claude.',a:true,exp:'The "Attention Is All You Need" paper introduced the Transformer, which is the basis for virtually all current large language models.'},
+  {type:'mc',q:'Which of these is NOT a type of Generative AI output?',opts:['Text generation','Image generation','Database queries','Audio generation'],a:2,exp:'Database queries are structured data operations, not generative content. GenAI creates new content like text, images, and audio.'},
+  {type:'tf',q:'Deep Learning is a subset of Machine Learning.',a:true,exp:'Deep Learning uses neural networks with many layers and is a specialized approach within the broader field of Machine Learning.'},
+  {type:'mc',q:'What year did ChatGPT launch, bringing Generative AI into mainstream awareness?',opts:['2019','2020','2022','2024'],a:2,exp:'ChatGPT launched in November 2022, marking the moment GenAI entered mainstream public awareness.'}
+];
+
+const MOD2_QUIZ_POOL = [
+  {type:'mc',q:'You have 5,000 unlabeled support tickets. Which ML type would discover natural groupings?',opts:['Supervised learning','Unsupervised learning','Reinforcement learning','Transfer learning'],a:1,exp:'Unsupervised learning finds patterns without labels \u2014 perfect for discovering natural groupings in unlabeled data.'},
+  {type:'tf',q:'A model trained on 100 labeled examples will generally perform better than one trained on 10,000 examples.',a:false,exp:'More high-quality training data almost always improves model performance.'},
+  {type:'mc',q:'In the classifier simulation, why did the model get some predictions wrong?',opts:['The model is broken','AI cannot classify text','The training data was limited, so the model hasn\'t seen every possible pattern','The model randomly guesses'],a:2,exp:'Limited training data means the model hasn\u2019t seen every possible pattern. More diverse data improves accuracy.'},
+  {type:'tf',q:'Training and inference are the same process.',a:false,exp:'Training is when the model learns (slow, compute-intensive). Inference is when it processes new inputs to generate outputs (fast).'},
+  {type:'mc',q:'Which real-world task is an example of supervised learning?',opts:['Grouping customers by purchasing behavior without predefined categories','An email system learning to filter spam by studying emails labeled \'spam\' or \'not spam\'','A robot learning to walk by trying movements and receiving a score','An AI generating a new image from a text description'],a:1,exp:'Spam filtering uses labeled examples (spam/not spam) to learn \u2014 the hallmark of supervised learning.'},
+  {type:'mc',q:'A model trained to classify support tickets keeps getting worse over time. The most likely cause is:',opts:['The model needs more parameters','Data drift \u2014 the product and customer language have evolved since training','The model was overfitted from the start','The classification algorithm is wrong'],a:1,exp:'Data drift occurs when real-world data evolves away from what the model was trained on. Products change, new terminology emerges, and customer language shifts.'},
+  {type:'tf',q:'Unsupervised learning is generally better than supervised learning for classification tasks.',a:false,exp:'Supervised learning is typically better for classification because it uses labeled examples. Unsupervised learning excels at finding hidden patterns without predefined categories.'},
+  {type:'mc',q:'What is the role of validation data in machine learning?',opts:['It trains the model','It tests the model on data it has never seen during training','It cleans the training data','It labels unlabeled data'],a:1,exp:'Validation data is a held-out set the model never sees during training. It measures how well the model generalizes to new, unseen examples.'}
+];
+
+const MOD3_QUIZ_POOL = [
+  {type:'tf',q:'An LLM reads and understands your prompt the same way a human reads text.',a:false,exp:'LLMs process all tokens simultaneously through mathematical attention mechanisms \u2014 they identify statistical patterns, not \u201cunderstand\u201d meaning.'},
+  {type:'mc',q:'Approximately how many tokens is a single page of text?',opts:['50\u2013100','500\u2013800','5,000\u20138,000','50,000'],a:1,exp:'One page of text is approximately 500\u2013800 tokens. A 50-page document could be 30,000+ tokens.'},
+  {type:'tf',q:'Setting temperature to 0 guarantees the AI will give the correct answer.',a:false,exp:'Temperature 0 makes output more deterministic, but the model can still be wrong. Temperature controls randomness, not accuracy.'},
+  {type:'mc',q:'What happens when your prompt exceeds the model\'s context window?',opts:['The model automatically summarizes the excess','The model ignores or truncates content that doesn\'t fit','The model processes it in multiple passes','The model asks you to shorten your input'],a:1,exp:'Content beyond the context window is simply not seen by the model \u2014 it\u2019s truncated.'},
+  {type:'mc',q:'What does the tokenizer do?',opts:['Checks your text for errors','Translates your text into another language','Breaks your text into sub-word units the model can process','Encrypts your text for security'],a:2,exp:'The tokenizer splits text into tokens \u2014 sub-word units that the model can process numerically.'},
+  {type:'mc',q:'What is "autoregressive generation" in LLMs?',opts:['The model generates the entire response at once','The model generates one token at a time, using each new token to inform the next','The model regenerates its response multiple times and picks the best one','The model retrieves pre-written responses from a database'],a:1,exp:'Autoregressive means the model produces output one token at a time, and each new token becomes part of the input for predicting the next token.'},
+  {type:'tf',q:'A model with a 128K context window can process a 128K-token document and still produce a full-length response.',a:false,exp:'The context window is shared between input AND output. A 128K input leaves almost no room for the response. You need headroom for the model\u2019s reply.'},
+  {type:'mc',q:'Why do you sometimes see AI responses appear word by word in chat interfaces?',opts:['The AI is thinking between each word','This is streaming \u2014 tokens are sent as they are generated','The internet connection is slow','The AI is checking each word for accuracy'],a:1,exp:'Streaming delivers tokens to the UI as they\u2019re generated rather than waiting for the complete response. It improves perceived speed.'}
+];
+
+const MOD4_QUIZ_POOL = [
+  {type:'mc',q:'Which prompt component MOST improves the relevance of AI output?',opts:['Making the prompt longer','Using all caps','Providing context about audience, product, and format','Asking the AI to "try harder"'],a:2,exp:'Context \u2014 audience, product details, desired format \u2014 gives the AI the information it needs to produce relevant output.'},
+  {type:'tf',q:'Providing an example of the desired output style (few-shot prompting) helps the AI match your expectations.',a:true,exp:'Showing the AI what good output looks like is one of the most effective prompting techniques.'},
+  {type:'mc',q:'A tech writer asks AI: "Summarize this 30-page spec." The output is too generic. Best fix?',opts:['Ask the AI to "do better"','Switch to a different AI model','Add constraints: specify audience, focus areas, length, and format','Copy the output and ask the AI to improve it'],a:2,exp:'Adding specific constraints gives the AI a clear lens for what matters in the summary.'},
+  {type:'tf',q:'You should always give the AI one complex prompt rather than breaking a task into steps.',a:false,exp:'Complex tasks produce better results when broken into sequential, focused prompts (prompt chaining).'},
+  {type:'mc',q:'Which of these is a prompt anti-pattern?',opts:['Specifying the output format','Providing examples of desired output','Pasting a large document with just "Fix this"','Telling the AI what role to adopt'],a:2,exp:'Vague instructions with no specifics force the AI to guess what you want \u2014 a classic anti-pattern.'},
+  {type:'mc',q:'What is "prompt chaining"?',opts:['Writing one very long prompt','Breaking a task into sequential prompts where each output feeds the next','Asking the same question multiple times','Using the same prompt across different AI tools'],a:1,exp:'Prompt chaining breaks complex tasks into focused steps. Each prompt has a single job, and its output becomes input for the next prompt.'},
+  {type:'tf',q:'Adding "please" and "thank you" to your prompts significantly improves AI output quality.',a:false,exp:'Politeness has minimal effect on output quality. What matters is clarity, specificity, context, constraints, and examples \u2014 the structural components of the prompt.'},
+  {type:'mc',q:'You ask AI to "make this better." This is an example of which anti-pattern?',opts:['The Information Dump','The Vague Handwave','The One-Shot Marathon','The Assumption of Perfection'],a:1,exp:'\u201cMake this better\u201d gives the AI no criteria for improvement. Better in what way? Tone? Accuracy? Length? Format? Specificity is key.'}
+];
+
+const MOD5_QUIZ_POOL = [
+  {type:'mc',q:'Which task benefits MOST from providing a source document alongside your prompt?',opts:['Brainstorming blog post ideas','Cross-checking a draft against a technical specification','Generating metadata tags','Writing a first draft from an outline'],a:1,exp:'Cross-checking requires a source of truth \u2014 the specification \u2014 to verify claims in the draft.'},
+  {type:'tf',q:'AI can replace the need for a human editor to review content before publishing.',a:false,exp:'AI is a powerful assistant, but human editorial judgment for accuracy, tone, and audience appropriateness remains essential.'},
+  {type:'mc',q:'Most effective way to use AI for a complex documentation project?',opts:['One long prompt covering everything','Break into sequential tasks: outline \u2192 draft \u2192 review \u2192 refine','Let the AI decide the approach','Use AI only for final proofreading'],a:1,exp:'Breaking complex work into sequential, focused prompts (prompt chaining) produces the best results.'},
+  {type:'tf',q:'When transforming content for a different audience, you should specify the target audience\'s technical level.',a:true,exp:'The same information needs completely different language and detail for engineers vs. end users.'},
+  {type:'mc',q:'The AI says a draft is accurate. What should you do?',opts:['Publish \u2014 the AI confirmed it','Spot-check by manually verifying 2\u20133 key claims','Ask the AI again to double-check','Review everything manually'],a:1,exp:'Always spot-check AI assessments. Verify key claims against source material \u2014 trust but verify.'},
+  {type:'mc',q:'Which workflow task benefits LEAST from AI assistance?',opts:['Drafting first versions of documentation','Making final editorial judgment calls on tone and brand voice','Checking terminology consistency across 50 pages','Generating metadata tags for articles'],a:1,exp:'Final editorial judgment \u2014 tone, brand voice, audience appropriateness \u2014 requires human sensibility that AI cannot replicate. All other tasks are strong AI use cases.'},
+  {type:'tf',q:'AI-generated content should go through the same review process as human-written content.',a:true,exp:'AI content needs the same (or more rigorous) review. The risk of hallucinated facts, inconsistent terminology, and tonal issues makes editorial review essential.'},
+  {type:'mc',q:'What is the most efficient way to use AI for a 50-page document review?',opts:['Paste all 50 pages in one prompt','Process it section by section with focused prompts for each','Ask the AI to read it and give general feedback','Use AI only for the executive summary'],a:1,exp:'Section-by-section processing gives the AI a focused task with each prompt, producing more thorough and accurate results than trying to handle everything at once.'}
+];
+
+const MOD6_QUIZ_POOL = [
+  {type:'tf',q:'If an AI generates a citation to a specific study with authors and a year, you can trust it is real.',a:false,exp:'AI frequently fabricates citations that look real. Always verify citations independently.'},
+  {type:'mc',q:'What is the MOST dangerous type of hallucination for a content editor?',opts:['Obviously wrong output (gibberish)','Plausible-sounding claims that are subtly incorrect','Repeated text','Overly formal tone'],a:1,exp:'Subtle errors that sound plausible are the hardest to catch and the most likely to be published.'},
+  {type:'tf',q:'Asking the AI "Are you sure?" reliably checks if its output is accurate.',a:false,exp:'The AI will often confidently reaffirm incorrect output. Verification requires external sources.'},
+  {type:'mc',q:'Which prompting approach gets the most balanced, accurate response?',opts:['"Prove that X is the best approach"','"What are the arguments for and against X? Include evidence."','"Isn\'t it true that X is better than Y?"','"I think X is true. Do you agree?"'],a:1,exp:'Asking for arguments on both sides prevents confirmation bias and produces more balanced output.'},
+  {type:'mc',q:'An AI generates a well-written, authoritative paragraph. Your first instinct should be to:',opts:['Trust it \u2014 AI is trained on reliable data','Evaluate factual claims against source documentation','Reject it \u2014 AI output is never reliable','Run it through another AI to verify'],a:1,exp:'Always evaluate claims against source material before using AI-generated content.'},
+  {type:'mc',q:'Which type of AI bias is MOST relevant to content editors?',opts:['Hardware bias','Automation bias \u2014 over-trusting polished AI output','Selection bias in model architecture','Quantization bias'],a:1,exp:'Automation bias is the tendency to trust AI output because it looks polished and confident. For content editors, this is the most dangerous bias because it leads to publishing unverified claims.'},
+  {type:'tf',q:'If an AI tool says "I\u2019m not sure about this," you can trust that it\u2019s being honest about its uncertainty.',a:false,exp:'AI expressions of uncertainty are not reliable indicators of actual confidence. The model may express uncertainty about things it\u2019s correct about, and sound completely confident about hallucinated content.'},
+  {type:'mc',q:'A colleague asks you to use AI to rewrite a competitor\u2019s published article "in your own words." What is the primary concern?',opts:['The AI might not produce good quality','This likely constitutes copyright infringement regardless of rewording','The AI will refuse the task','It would take too long'],a:1,exp:'Rewriting someone else\u2019s published work \u2014 even with different words \u2014 can constitute copyright infringement. The ideas, structure, and creative expression may be protected regardless of surface-level rewording.'}
+];
+
+const ALL_DECISION_SCENARIOS = [
+  {ctx:'AI-generated FAQ answer about a product. It looks polished but contains a specific technical claim about \u201c256-bit AES encryption for all data at rest and in transit.\u201d',best:1,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'The technical claim needs verification against your product documentation before publishing. The overall quality is fine \u2014 just verify the specific claim.'},
+  {ctx:'AI-generated social media post that uses a statistic: \u201cAccording to a recent industry study, 78% of enterprises have adopted AI tools for content creation.\u201d',best:2,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'Unverifiable statistics from \u201ca recent study\u201d without a named source are a red flag for fabrication. Reject and rewrite with a verifiable claim or remove the statistic.'},
+  {ctx:'AI-generated internal knowledge base article that accurately paraphrases the source specification you provided. The tone is professional and the structure is clear.',best:1,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'The content accurately reflects the source material. A quick review for tone and completeness, then it\u2019s good to go.'},
+  {ctx:'AI-generated product comparison table for your website. It compares your product against two competitors with specific feature checkmarks and performance numbers.',best:1,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'The feature comparisons and performance numbers must be verified against actual product specs. AI may fabricate or misattribute features. Verify every cell in the table, then publish.'},
+  {ctx:'AI-generated internal team wiki page summarizing your department\u2019s coding standards. The content closely matches the source document you provided but reorganizes it into a cleaner structure.',best:1,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'Since it\u2019s based on source material you provided and is for internal use, a quick review for accuracy and completeness is sufficient. The reorganization may actually improve the original.'},
+  {ctx:'AI-generated customer email response that promises a feature will be available "in the next quarterly release" based on a product roadmap you shared. The roadmap actually says the feature is "under consideration" with no committed date.',best:2,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'The AI escalated "under consideration" to a delivery commitment. This is dangerous \u2014 publishing this creates a customer expectation your team may not meet. Reject and rewrite with accurate language about the feature\u2019s actual status.'}
+];
+
+const FINAL_QUIZ_POOL = [
+  {type:'tf',q:'Generative AI is a subset of Deep Learning, which is a subset of Machine Learning, which is a subset of AI.',a:true,exp:'This is the correct nesting: AI \u2192 ML \u2192 Deep Learning \u2192 Generative AI.'},
+  {type:'mc',q:'A model with a 32K context window is asked to process a 50-page document (~35,000 tokens). What happens?',opts:['The model processes it automatically in chunks','The input is truncated \u2014 the model doesn\'t see the full document','The model asks for a smaller document','The output is limited to 32K tokens'],a:1,exp:'The context window covers input + output. Content beyond the limit is simply not seen.'},
+  {type:'tf',q:'Few-shot prompting means providing the AI with examples of the desired output format.',a:true,exp:'Few-shot prompting is one of the most effective techniques for improving output consistency.'},
+  {type:'mc',q:'Which technique reduces hallucination by grounding AI responses in actual documents?',opts:['Increasing temperature','RAG (Retrieval-Augmented Generation)','Using a larger model','Fine-tuning'],a:1,exp:'RAG retrieves actual documents and injects them as context, grounding the AI in real source material.'},
+  {type:'tf',q:'MCP (Model Context Protocol) is a proprietary Anthropic protocol that only works with Claude.',a:false,exp:'MCP is an open standard that works across multiple AI platforms.'},
+  {type:'mc',q:'Prompt: "You are a technical writer. Rewrite this changelog entry as a release note for IT admins. Keep it under 50 words." What components are present?',opts:['Role, task, constraints only','Role, context (audience), task, and constraints (length)','Only a task','Role and examples'],a:1,exp:'Role ("technical writer"), audience context ("IT admins"), task ("rewrite"), and constraint ("under 50 words") are all present.'},
+  {type:'tf',q:'Training happens once; inference happens every time you use the model.',a:true,exp:'Training is the learning phase. Inference is the using phase \u2014 it happens with every prompt.'},
+  {type:'mc',q:'An AI article includes: "According to a 2024 IEEE study by Chen & Park..." What should you do?',opts:['Trust it \u2014 IEEE is reputable','Search for the study to verify it exists','Remove the citation but keep the claim','Ask the same AI if it\'s real'],a:1,exp:'AI frequently fabricates citations. Always verify independently.'},
+  {type:'tf',q:'Setting temperature to 0 makes the AI output always correct.',a:false,exp:'Temperature controls randomness, not accuracy. The model can still be wrong at temperature 0.'},
+  {type:'mc',q:'Which prompting anti-pattern is MOST likely to produce poor results?',opts:['Providing too much context','Specifying the output format','Pasting a long document with only "Fix this"','Using role prompting'],a:2,exp:'Vague instructions force the AI to guess. Specificity is key.'},
+  {type:'tf',q:'Unsupervised learning requires labeled training data.',a:false,exp:'Unsupervised learning finds patterns WITHOUT labels. Supervised learning requires labels.'},
+  {type:'mc',q:'A team wants AI to search their internal knowledge base and generate grounded answers. Best approach?',opts:['Fine-tuning the model on their documents','RAG \u2014 retrieving and injecting relevant documents','Increasing temperature for creative search','Using prompt chaining'],a:1,exp:'RAG retrieves relevant documents and injects them as context \u2014 ideal for grounded, sourced answers.'},
+  {type:'tf',q:'Automation bias is the tendency for humans to over-trust AI output because it looks polished.',a:true,exp:'Polished AI output feels authoritative, making it tempting to skip verification.'},
+  {type:'mc',q:'AI output is almost correct but needs adjustments. Recommended approach?',opts:['Regenerate until perfect','Edit directly and verify key facts','Start over with a new prompt','Accept it \u2014 almost correct is fine'],a:1,exp:'Direct editing combined with fact verification is the most efficient approach.'},
+  {type:'tf',q:'Prompt chaining \u2014 breaking tasks into sequential prompts \u2014 generally produces better results than a single long prompt.',a:true,exp:'Sequential focused prompts allow the AI to excel at each step, producing higher quality overall.'},
+  {type:'mc',q:'What is the primary advantage of RAG over fine-tuning for accessing company-specific information?',opts:['RAG is always more accurate','RAG uses your actual documents as source material without retraining the model','RAG is free while fine-tuning costs money','RAG works offline'],a:1,exp:'RAG retrieves and injects your actual documents into the prompt, grounding the response in real content. Fine-tuning changes the model itself, which is expensive and risks losing general capability.'},
+  {type:'tf',q:'A model with higher temperature produces more accurate output.',a:false,exp:'Higher temperature increases randomness and creativity, not accuracy. For factual accuracy, lower temperature is generally better.'},
+  {type:'mc',q:'Which is the best description of what "tokens" are?',opts:['Complete words','Sub-word units that the model processes','Characters','Sentences'],a:1,exp:'Tokens are sub-word units. Common words are one token, longer words get split into multiple tokens. They are not words, characters, or sentences.'},
+  {type:'tf',q:'Open-source AI models are always less capable than proprietary models.',a:false,exp:'Some open-source models (like Llama 3) perform comparably to proprietary models on many tasks. The gap has narrowed significantly. The choice depends on your specific needs for control, privacy, and customization.'},
+  {type:'mc',q:'A content team wants to standardize their AI usage. What should they create first?',opts:['A fine-tuned model','A shared prompt template library','A custom AI application','An AI ethics board'],a:1,exp:'A shared prompt library is the fastest, cheapest, and most practical first step. It standardizes quality, saves time, and builds institutional knowledge about what prompts work best.'},
+  {type:'tf',q:'The same prompt will always produce the exact same output from the same model.',a:false,exp:'Due to temperature and sampling randomness, the same prompt can produce different outputs each time. Only at temperature 0 is the output nearly deterministic, and even then, slight variations can occur.'},
+  {type:'mc',q:'What does MCP stand for?',opts:['Machine Control Protocol','Model Context Protocol','Multi-Channel Processing','Managed Compute Platform'],a:1,exp:'MCP is the Model Context Protocol \u2014 an open standard for connecting AI applications to external tools, data sources, and services.'}
 ];
 
 let currentModule = -1;
@@ -926,10 +1055,13 @@ const mainEl = document.getElementById('main-content');
 
 function renderTrail(){
   const t = document.getElementById('trail');
-  t.innerHTML = '<div class="trail-line"></div>' + MODULES.map((m,i) => {
-    const cls = completedModules.has(i) ? 'done' : (i === currentModule ? 'active' : '');
-    return `<div class="trail-stop ${cls}" onclick="goModule(${i})" title="${m.title}"><div class="trail-dot"></div><div class="trail-lbl">${m.short}</div></div>`;
-  }).join('');
+  const homeCls = currentModule === -1 ? 'active' : '';
+  t.innerHTML = '<div class="trail-line"></div>' +
+    '<div class="trail-stop ' + homeCls + '" onclick="showLanding()" title="Home"><div class="trail-dot" style="' + (currentModule === -1 ? '' : 'background:var(--tx-muted);border-color:var(--tx-muted)') + '"></div><div class="trail-lbl">Home</div></div>' +
+    MODULES.map((m,i) => {
+      const cls = completedModules.has(i) ? 'done' : (i === currentModule ? 'active' : '');
+      return '<div class="trail-stop ' + cls + '" onclick="goModule(' + i + ')" title="' + m.title + '"><div class="trail-dot"></div><div class="trail-lbl">' + m.short + '</div></div>';
+    }).join('');
 }
 
 function goModule(idx){
@@ -969,7 +1101,7 @@ function renderLanding(){
     <p>A visual, hands-on guide to artificial intelligence for content editors and technical writers. No engineering background required \u2014 just curiosity.</p>
     <div class="hero-grid">
       <div class="hero-stat"><div class="hero-stat-n">8</div><div class="hero-stat-l">Interactive Modules</div></div>
-      <div class="hero-stat"><div class="hero-stat-n">75</div><div class="hero-stat-l">Glossary Terms</div></div>
+      <div class="hero-stat"><div class="hero-stat-n">106</div><div class="hero-stat-l">Glossary Terms</div></div>
       <div class="hero-stat"><div class="hero-stat-n">45+</div><div class="hero-stat-l">Quiz Questions</div></div>
     </div>
     <div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Learn \u2500\u2500</div>
@@ -1092,13 +1224,7 @@ function mod1Content(){
     </div>
   </div>
 
-  ${renderQuiz('mod1',[
-    {type:'tf',q:'Machine Learning is a subset of Artificial Intelligence.',a:true,exp:'ML is one approach within the broader field of AI.'},
-    {type:'tf',q:'Generative AI can create new content, but Deep Learning cannot.',a:false,exp:'Generative AI IS a type of deep learning. Both use neural networks, but GenAI specifically generates new content.'},
-    {type:'mc',q:'Which is the best analogy for how an LLM generates text?',opts:['Looking up answers in a database','Predicting the most likely next word based on patterns','Understanding the meaning of your question and reasoning about it','Copying text from its training data'],a:1,exp:'LLMs generate text by predicting the statistically most likely next token based on patterns learned during training.'},
-    {type:'mc',q:'A content editor uses an AI tool to draft release notes. The AI produces a paragraph that sounds authoritative but contains a product feature that doesn\'t exist. This is called:',opts:['A bug','Bias','A hallucination','Overfitting'],a:2,exp:'Hallucinations are when AI generates confident, plausible-sounding content that is factually incorrect or fabricated.'},
-    {type:'tf',q:'The Transformer architecture, introduced in 2017, is the foundation behind most modern LLMs like GPT and Claude.',a:true,exp:'The "Attention Is All You Need" paper introduced the Transformer, which is the basis for virtually all current large language models.'}
-  ])}`;
+  ${renderQuiz('mod1', pickRandom(MOD1_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 2: HOW MACHINES LEARN ══ */
@@ -1171,13 +1297,7 @@ function mod2Content(){
     </dl>
   </div>
 
-  ${renderQuiz('mod2',[
-    {type:'mc',q:'You have 5,000 unlabeled support tickets. Which ML type would discover natural groupings?',opts:['Supervised learning','Unsupervised learning','Reinforcement learning','Transfer learning'],a:1,exp:'Unsupervised learning finds patterns without labels \u2014 perfect for discovering natural groupings in unlabeled data.'},
-    {type:'tf',q:'A model trained on 100 labeled examples will generally perform better than one trained on 10,000 examples.',a:false,exp:'More high-quality training data almost always improves model performance.'},
-    {type:'mc',q:'In the classifier simulation, why did the model get some predictions wrong?',opts:['The model is broken','AI cannot classify text','The training data was limited, so the model hasn\'t seen every possible pattern','The model randomly guesses'],a:2,exp:'Limited training data means the model hasn\u2019t seen every possible pattern. More diverse data improves accuracy.'},
-    {type:'tf',q:'Training and inference are the same process.',a:false,exp:'Training is when the model learns (slow, compute-intensive). Inference is when it processes new inputs to generate outputs (fast).'},
-    {type:'mc',q:'Which real-world task is an example of supervised learning?',opts:['Grouping customers by purchasing behavior without predefined categories','An email system learning to filter spam by studying emails labeled \'spam\' or \'not spam\'','A robot learning to walk by trying movements and receiving a score','An AI generating a new image from a text description'],a:1,exp:'Spam filtering uses labeled examples (spam/not spam) to learn \u2014 the hallmark of supervised learning.'}
-  ])}`;
+  ${renderQuiz('mod2', pickRandom(MOD2_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 3: LLMs & HOW THEY WORK ══ */
@@ -1259,13 +1379,7 @@ function mod3Content(){
     </dl>
   </div>
 
-  ${renderQuiz('mod3',[
-    {type:'tf',q:'An LLM reads and understands your prompt the same way a human reads text.',a:false,exp:'LLMs process all tokens simultaneously through mathematical attention mechanisms \u2014 they identify statistical patterns, not \u201cunderstand\u201d meaning.'},
-    {type:'mc',q:'Approximately how many tokens is a single page of text?',opts:['50\u2013100','500\u2013800','5,000\u20138,000','50,000'],a:1,exp:'One page of text is approximately 500\u2013800 tokens. A 50-page document could be 30,000+ tokens.'},
-    {type:'tf',q:'Setting temperature to 0 guarantees the AI will give the correct answer.',a:false,exp:'Temperature 0 makes output more deterministic, but the model can still be wrong. Temperature controls randomness, not accuracy.'},
-    {type:'mc',q:'What happens when your prompt exceeds the model\'s context window?',opts:['The model automatically summarizes the excess','The model ignores or truncates content that doesn\'t fit','The model processes it in multiple passes','The model asks you to shorten your input'],a:1,exp:'Content beyond the context window is simply not seen by the model \u2014 it\u2019s truncated.'},
-    {type:'mc',q:'What does the tokenizer do?',opts:['Checks your text for errors','Translates your text into another language','Breaks your text into sub-word units the model can process','Encrypts your text for security'],a:2,exp:'The tokenizer splits text into tokens \u2014 sub-word units that the model can process numerically.'}
-  ])}`;
+  ${renderQuiz('mod3', pickRandom(MOD3_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 4: PROMPT ENGINEERING ══ */
@@ -1317,13 +1431,7 @@ function mod4Content(){
     </div>
   </details>
 
-  ${renderQuiz('mod4',[
-    {type:'mc',q:'Which prompt component MOST improves the relevance of AI output?',opts:['Making the prompt longer','Using all caps','Providing context about audience, product, and format','Asking the AI to "try harder"'],a:2,exp:'Context \u2014 audience, product details, desired format \u2014 gives the AI the information it needs to produce relevant output.'},
-    {type:'tf',q:'Providing an example of the desired output style (few-shot prompting) helps the AI match your expectations.',a:true,exp:'Showing the AI what good output looks like is one of the most effective prompting techniques.'},
-    {type:'mc',q:'A tech writer asks AI: "Summarize this 30-page spec." The output is too generic. Best fix?',opts:['Ask the AI to "do better"','Switch to a different AI model','Add constraints: specify audience, focus areas, length, and format','Copy the output and ask the AI to improve it'],a:2,exp:'Adding specific constraints gives the AI a clear lens for what matters in the summary.'},
-    {type:'tf',q:'You should always give the AI one complex prompt rather than breaking a task into steps.',a:false,exp:'Complex tasks produce better results when broken into sequential, focused prompts (prompt chaining).'},
-    {type:'mc',q:'Which of these is a prompt anti-pattern?',opts:['Specifying the output format','Providing examples of desired output','Pasting a large document with just "Fix this"','Telling the AI what role to adopt'],a:2,exp:'Vague instructions with no specifics force the AI to guess what you want \u2014 a classic anti-pattern.'}
-  ])}`;
+  ${renderQuiz('mod4', pickRandom(MOD4_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 5: AI IN YOUR WORKFLOW ══ */
@@ -1357,13 +1465,7 @@ function mod5Content(){
     </div>
   </details>
 
-  ${renderQuiz('mod5',[
-    {type:'mc',q:'Which task benefits MOST from providing a source document alongside your prompt?',opts:['Brainstorming blog post ideas','Cross-checking a draft against a technical specification','Generating metadata tags','Writing a first draft from an outline'],a:1,exp:'Cross-checking requires a source of truth \u2014 the specification \u2014 to verify claims in the draft.'},
-    {type:'tf',q:'AI can replace the need for a human editor to review content before publishing.',a:false,exp:'AI is a powerful assistant, but human editorial judgment for accuracy, tone, and audience appropriateness remains essential.'},
-    {type:'mc',q:'Most effective way to use AI for a complex documentation project?',opts:['One long prompt covering everything','Break into sequential tasks: outline \u2192 draft \u2192 review \u2192 refine','Let the AI decide the approach','Use AI only for final proofreading'],a:1,exp:'Breaking complex work into sequential, focused prompts (prompt chaining) produces the best results.'},
-    {type:'tf',q:'When transforming content for a different audience, you should specify the target audience\'s technical level.',a:true,exp:'The same information needs completely different language and detail for engineers vs. end users.'},
-    {type:'mc',q:'The AI says a draft is accurate. What should you do?',opts:['Publish \u2014 the AI confirmed it','Spot-check by manually verifying 2\u20133 key claims','Ask the AI again to double-check','Review everything manually'],a:1,exp:'Always spot-check AI assessments. Verify key claims against source material \u2014 trust but verify.'}
-  ])}`;
+  ${renderQuiz('mod5', pickRandom(MOD5_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 6: ETHICS & JUDGMENT ══ */
@@ -1419,13 +1521,7 @@ function mod6Content(){
   <div class="sec-title">Decision Scenarios: Would You Publish This?</div>
   <div id="scenarios-area"></div>
 
-  ${renderQuiz('mod6',[
-    {type:'tf',q:'If an AI generates a citation to a specific study with authors and a year, you can trust it is real.',a:false,exp:'AI frequently fabricates citations that look real. Always verify citations independently.'},
-    {type:'mc',q:'What is the MOST dangerous type of hallucination for a content editor?',opts:['Obviously wrong output (gibberish)','Plausible-sounding claims that are subtly incorrect','Repeated text','Overly formal tone'],a:1,exp:'Subtle errors that sound plausible are the hardest to catch and the most likely to be published.'},
-    {type:'tf',q:'Asking the AI "Are you sure?" reliably checks if its output is accurate.',a:false,exp:'The AI will often confidently reaffirm incorrect output. Verification requires external sources.'},
-    {type:'mc',q:'Which prompting approach gets the most balanced, accurate response?',opts:['"Prove that X is the best approach"','"What are the arguments for and against X? Include evidence."','"Isn\'t it true that X is better than Y?"','"I think X is true. Do you agree?"'],a:1,exp:'Asking for arguments on both sides prevents confirmation bias and produces more balanced output.'},
-    {type:'mc',q:'An AI generates a well-written, authoritative paragraph. Your first instinct should be to:',opts:['Trust it \u2014 AI is trained on reliable data','Evaluate factual claims against source documentation','Reject it \u2014 AI output is never reliable','Run it through another AI to verify'],a:1,exp:'Always evaluate claims against source material before using AI-generated content.'}
-  ])}`;
+  ${renderQuiz('mod6', pickRandom(MOD6_QUIZ_POOL, 5))}`;
 }
 
 /* ══ MODULE 7: LEARNING ROADMAP ══ */
@@ -1592,14 +1688,7 @@ function initMod1(){
   rings.forEach((r,i) => { setTimeout(() => { r.style.opacity = '1'; }, i * 700 + 300); });
   setTimeout(() => { taxCur = rings.length; }, rings.length * 700 + 400);
 
-  const myths = [
-    {m:'AI thinks like a human brain',r:'AI uses statistical pattern matching to predict likely outputs based on training data. It has no understanding, consciousness, intent, or common sense. When an LLM writes a grammatically perfect sentence, it\u2019s selecting statistically likely word sequences \u2014 not comprehending meaning. This is why it can write beautifully about a topic while getting basic facts completely wrong.'},
-    {m:'AI will replace writers and editors',r:'AI dramatically accelerates parts of the writing process \u2014 first drafts, summarization, content transformation, and consistency checking. But it cannot replace editorial judgment, brand voice intuition, audience awareness, or the ability to verify claims against reality. The writers who will struggle are those who refuse to learn AI tools. The writers who will thrive are those who use AI to handle the routine work while they focus on judgment, creativity, and quality \u2014 the things AI genuinely cannot do.'},
-    {m:'AI is always right',r:'AI \u201challucinates\u201d \u2014 it can generate confident, well-written text that is completely fabricated. It invents citations, makes up statistics, and states falsehoods with the same polished tone it uses for accurate information. There is no correlation between how confident AI sounds and how accurate it is. This is the single most important thing for content editors to understand about AI tools.'},
-    {m:'You need to code to use AI',r:'Most AI tools are used through natural language prompts \u2014 your writing skills are literally your superpower. The better you are at clear, specific written communication, the better results you\u2019ll get from AI. Prompt engineering is a writing skill, not a programming skill. Developers have no inherent advantage here; in fact, strong writers often produce better prompts than strong coders.'},
-    {m:'All AI tools are the same',r:'Different models (Claude, GPT, Gemini, Llama) have different architectures, training data, capabilities, and behaviors. Claude tends to be more cautious and nuanced; GPT tends to be more expansive; Gemini has strong multi-modal capabilities. Even different versions of the same model (GPT-3.5 vs. GPT-4) have dramatically different quality levels. Choosing the right model for the task matters.'},
-    {m:'AI learns from your conversations in real time',r:'Most AI tools don\u2019t update from individual chats \u2014 they use a fixed model trained on data up to a cutoff date. Your conversation is processed, a response is generated, and then (in most cases) the conversation is not used to retrain the model. This also means the AI doesn\u2019t remember you between sessions unless the tool explicitly saves conversation history. Each new conversation starts from scratch.'}
-  ];
+  const myths = pickRandom(ALL_MYTHS, 6);
   document.getElementById('myth-grid').innerHTML = myths.map(m=>`
     <div class="flip-card" onclick="this.classList.toggle('flipped')">
       <div class="flip-inner">
@@ -1998,7 +2087,7 @@ function initMod4(){
 }
 
 /* ── PROMPT WORKSHOP ── */
-const WORKSHOP_SCENARIOS = [
+const ALL_WORKSHOP_SCENARIOS = [
   {
     name: 'Release Notes',
     task: 'Convert the following engineering changelog entry into a customer-facing release note.',
@@ -2052,13 +2141,51 @@ const WORKSHOP_SCENARIOS = [
       mid: "<strong>Q3 Content Audit Summary</strong><br>\u2022 340 articles reviewed; 47 outdated, 23 have broken links, 12 reference discontinued products<br>\u2022 89 articles have zero organic traffic in 6 months<br>\u2022 Recommendation to archive, update top 50, fix links by end of Q3<br>\u2022 Budget request: 2 contract writers for 8 weeks<br>\u2022 Decision: working group to propose plan by Oct 15<br><br>Note: Covers the facts but doesn\u2019t highlight what the team lead needs to act on vs. what\u2019s just informational.",
       high: "<strong>Q3 Content Audit \u2014 Team Lead Brief</strong><br><br><strong>Key Finding:</strong> Of 340 articles reviewed, 82 need immediate attention \u2014 47 are outdated (>18 months), 23 have broken links, and 12 reference products we no longer sell. Additionally, 89 articles get zero organic traffic.<br><br><strong>Decision Made:</strong> A working group (Sarah, Mike, Dev) will propose a comprehensive plan by October 15th. Mike wants a redirect strategy before any articles are archived.<br><br><strong>Action Needed from You:</strong> Budget approval for 2 contract writers for 8 weeks to execute updates once the plan is approved.<br><br><strong>Timeline:</strong> Broken link fixes targeted for end of Q3; full update plan due Oct 15.<br><br>Note: This separates findings, decisions, action items, and timeline \u2014 exactly what a busy team lead needs. The prompt\u2019s constraints shaped this structure."
     }
+  },
+  {
+    name: 'Style Guide Check',
+    task: 'Write a prompt asking AI to review a paragraph against your team\u2019s style guide.',
+    source: 'Our style guide requires: active voice, present tense, no jargon without definition, sentences under 25 words, and Oxford comma. Here is the paragraph to review: "The data was processed by the system utilizing the new algorithm, which was developed by our engineering team and it has been deployed to production servers across multiple regions."',
+    checks: {
+      role: ['editor','reviewer','writer','proofreader','you are'],
+      context: ['style guide','standards','rules','guidelines','requirements','team','our'],
+      task: ['review','check','evaluate','assess','compare','analyze','audit'],
+      constraints: ['specific','each','list','flag','identify','highlight','rule by rule'],
+      format: ['table','list','bullet','format','structured','suggestion','revision','before','after'],
+      examples: ['example','like','for instance','sample','such as','show']
+    },
+    outputs: {
+      low: 'The paragraph has some issues with style. Consider revising for clarity.',
+      mid: '<strong>Issues found:</strong><br>\u2022 Passive voice: "was processed" and "was developed"<br>\u2022 Past tense: should be present tense<br>\u2022 Long sentence: the second sentence exceeds 25 words<br><br>Note: Better \u2014 it identifies specific issues. But doesn\u2019t provide corrected versions or cite which style guide rule each violation breaks.',
+      high: '<strong>Style Guide Compliance Review:</strong><br><br><strong>1. Active voice violation:</strong> "The data was processed by the system" \u2192 "The system processes the data"<br><strong>2. Tense violation:</strong> "was developed," "has been deployed" \u2192 "developed," "deploys to"<br><strong>3. Jargon:</strong> "utilizing" \u2192 "using" (simpler alternative)<br><strong>4. Sentence length:</strong> Second sentence is 31 words \u2192 Split into two sentences<br><strong>5. Oxford comma:</strong> No violation found<br><br><strong>Revised:</strong> "The system processes data using the new algorithm. The engineering team developed it and deploys it across multiple production regions."<br><br>Note: Each issue cites the specific rule, provides a correction, and the revised version applies all fixes.'
+    }
+  },
+  {
+    name: 'Competitor Analysis',
+    task: 'Write a prompt asking AI to analyze a competitor\u2019s product page and extract key messaging themes.',
+    source: '[Imagine you\u2019ve pasted a competitor\u2019s product landing page here \u2014 about 500 words describing their project management tool with features like real-time collaboration, AI-powered task prioritization, and integrations with 200+ tools.]',
+    checks: {
+      role: ['analyst','strategist','writer','marketer','researcher','you are'],
+      context: ['competitor','competitive','comparison','our product','market','positioning','messaging'],
+      task: ['analyze','extract','identify','compare','summarize','break down','list'],
+      constraints: ['theme','message','claim','value proposition','differentiator','specific','key'],
+      format: ['table','matrix','bullet','format','structured','category','column','heading'],
+      examples: ['example','like','for instance','sample','such as','show']
+    },
+    outputs: {
+      low: 'The competitor\u2019s product page highlights several features including collaboration tools and integrations. They seem to target team productivity.',
+      mid: '<strong>Key Messaging Themes:</strong><br>\u2022 Real-time collaboration as a differentiator<br>\u2022 AI-powered features (task prioritization)<br>\u2022 Breadth of integrations (200+ tools)<br>\u2022 Target audience: teams looking for productivity<br><br>Note: Identifies the themes but doesn\u2019t analyze the messaging strategy, emotional appeals, or gaps you could exploit.',
+      high: '<strong>Competitor Messaging Analysis:</strong><br><br><strong>Primary Value Proposition:</strong> "Work smarter with AI" \u2014 positions AI as the core differentiator, not just a feature<br><br><strong>Key Messaging Pillars:</strong><br>1. <strong>Intelligence:</strong> AI task prioritization framed as "your team\u2019s smartest member"<br>2. <strong>Connectivity:</strong> 200+ integrations framed as "works where you work"<br>3. <strong>Speed:</strong> Real-time collaboration framed as "no more waiting"<br><br><strong>Emotional Appeals:</strong> Reduces overwhelm, eliminates busywork, empowers teams<br><br><strong>Notable Gaps:</strong> No mention of security/compliance, no enterprise pricing transparency, no case studies from your industry<br><br>Note: Structured analysis with actionable insights. The "gaps" section is particularly valuable for positioning your own messaging.'
+    }
   }
 ];
 
 let workshopIdx = 0;
+let activeWorkshopScenarios = [];
 
 function initWorkshop(){
-  document.getElementById('workshop-tabs').innerHTML = WORKSHOP_SCENARIOS.map((s,i) =>
+  activeWorkshopScenarios = pickRandom(ALL_WORKSHOP_SCENARIOS, 3);
+  document.getElementById('workshop-tabs').innerHTML = activeWorkshopScenarios.map((s,i) =>
     `<button class="comp-tab ${i===0?'active':''}" onclick="switchWorkshop(${i},this)">${s.name}</button>`
   ).join('');
   renderWorkshop(0);
@@ -2072,7 +2199,7 @@ function switchWorkshop(i, btn){
 }
 
 function renderWorkshop(i){
-  const s = WORKSHOP_SCENARIOS[i];
+  const s = activeWorkshopScenarios[i];
   document.getElementById('workshop-task').innerHTML = `<strong>Your task:</strong> ${s.task}`;
   document.getElementById('workshop-source').innerHTML = `<strong>Source material:</strong><br>${s.source}`;
   document.getElementById('workshop-input').value = '';
@@ -2085,7 +2212,7 @@ function scoreWorkshop(){
     alert('Please write a prompt first!');
     return;
   }
-  const s = WORKSHOP_SCENARIOS[workshopIdx];
+  const s = activeWorkshopScenarios[workshopIdx];
   const components = ['role','context','task','constraints','format','examples'];
   const labels = ['Role / Persona','Context / Audience','Specific Task','Constraints','Output Format','Examples'];
   const tips = [
@@ -2163,7 +2290,7 @@ function initMod5(){
 }
 
 /* ── MOD 6 ── */
-const SPOT_PASSAGES = [
+const ALL_SPOT_PASSAGES = [
   {text:'Responsive web design was first introduced by Ethan Marcotte in a 2010 article for A List Apart. The approach uses flexible grids, fluid images, and CSS media queries to adapt layouts to different screen sizes. According to a 2024 WebTrends Global Survey (Harris & Patel), 94.7% of all new websites now use responsive design principles.',sentences:[
     {s:'Responsive web design was first introduced by Ethan Marcotte in a 2010 article for A List Apart.',h:false},
     {s:'The approach uses flexible grids, fluid images, and CSS media queries to adapt layouts to different screen sizes.',h:false},
@@ -2178,13 +2305,30 @@ const SPOT_PASSAGES = [
     {s:'Python is one of the most popular programming languages for data science and machine learning.',h:false},
     {s:'It was created by Guido van Rossum and first released in 1991.',h:false},
     {s:'Python\'s simple syntax makes it accessible to beginners while remaining powerful enough for complex applications.',h:false}
+  ]},
+  {text:'The Chicago Manual of Style was first published in 1906 and is now in its 18th edition. It recommends using the serial comma in all cases. According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',sentences:[
+    {s:'The Chicago Manual of Style was first published in 1906 and is now in its 18th edition.',h:false},
+    {s:'It recommends using the serial comma in all cases.',h:false},
+    {s:'According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',h:true,why:'This survey and statistic are fabricated. AI frequently invents specific survey data with precise percentages to sound authoritative.'}
+  ]},
+  {text:'Markdown was created by John Gruber in 2004 as a lightweight markup language. It allows writers to format text using simple syntax like asterisks for bold and hash marks for headings. Markdown files use the .md or .markdown extension and can be converted to HTML using any standard compiler.',sentences:[
+    {s:'Markdown was created by John Gruber in 2004 as a lightweight markup language.',h:false},
+    {s:'It allows writers to format text using simple syntax like asterisks for bold and hash marks for headings.',h:false},
+    {s:'Markdown files use the .md or .markdown extension and can be converted to HTML using any standard compiler.',h:false}
+  ]},
+  {text:'Technical writing as a profession emerged during World War II when the military needed clear documentation for complex equipment. The average technical writer in the US earns $87,850 per year according to the Bureau of Labor Statistics. The Society for Technical Communication, founded in 1953, currently has over 14,000 members across 52 chapters worldwide.',sentences:[
+    {s:'Technical writing as a profession emerged during World War II when the military needed clear documentation for complex equipment.',h:false},
+    {s:'The average technical writer in the US earns $87,850 per year according to the Bureau of Labor Statistics.',h:true,why:'While the BLS does track technical writer salaries, the specific figure here may not be current. Always verify specific salary data against the actual BLS website rather than trusting AI-generated numbers.'},
+    {s:'The Society for Technical Communication, founded in 1953, currently has over 14,000 members across 52 chapters worldwide.',h:true,why:'The founding year and membership numbers are plausible but likely fabricated. AI generates specific organizational details that sound right but are often incorrect in the specifics.'}
   ]}
 ];
 let spotRevealed = false;
+let selectedPassages = [];
 
 function initMod6(){
   spotRevealed = false;
-  document.getElementById('spot-area').innerHTML = SPOT_PASSAGES.map((p,pi)=>`
+  selectedPassages = pickRandom(ALL_SPOT_PASSAGES, 3);
+  document.getElementById('spot-area').innerHTML = selectedPassages.map((p,pi)=>`
     <div class="spot-passage" data-pidx="${pi}">
       <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Passage ${pi+1}</div>
       ${p.sentences.map((s,si)=>`<span class="spot-sentence" data-pidx="${pi}" data-sidx="${si}" onclick="toggleSpotFlag(this)">${s.s} </span>`).join('')}
@@ -2194,11 +2338,7 @@ function initMod6(){
   initScenarios();
 }
 function initScenarios(){
-  const scenarios = [
-    {ctx:'AI-generated FAQ answer about a product. It looks polished but contains a specific technical claim about \u201c256-bit AES encryption for all data at rest and in transit.\u201d',best:1,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'The technical claim needs verification against your product documentation before publishing. The overall quality is fine \u2014 just verify the specific claim.'},
-    {ctx:'AI-generated social media post that uses a statistic: \u201cAccording to a recent industry study, 78% of enterprises have adopted AI tools for content creation.\u201d',best:2,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'Unverifiable statistics from \u201ca recent study\u201d without a named source are a red flag for fabrication. Reject and rewrite with a verifiable claim or remove the statistic.'},
-    {ctx:'AI-generated internal knowledge base article that accurately paraphrases the source specification you provided. The tone is professional and the structure is clear.',best:1,opts:['Publish as-is','Edit then publish','Reject and rewrite'],exp:'The content accurately reflects the source material. A quick review for tone and completeness, then it\u2019s good to go.'}
-  ];
+  const scenarios = pickRandom(ALL_DECISION_SCENARIOS, 3);
   document.getElementById('scenarios-area').innerHTML = scenarios.map((s,i)=>`
     <div class="scenario-card" id="sc-${i}">
       <div style="font-size:14px;color:var(--tx-primary);line-height:1.6;margin-bottom:12px"><strong>Scenario ${i+1}:</strong> ${s.ctx}</div>
@@ -2214,7 +2354,7 @@ function checkSpot(){
   spotRevealed = true;
   document.getElementById('spot-check-btn').style.display = 'none';
   let correct = 0, total = 0;
-  SPOT_PASSAGES.forEach((p,pi)=>{
+  selectedPassages.forEach((p,pi)=>{
     p.sentences.forEach((s,si)=>{
       const el = document.querySelector(`.spot-sentence[data-pidx="${pi}"][data-sidx="${si}"]`);
       if(s.h) total++;
@@ -2259,6 +2399,16 @@ const GLOSSARY = [
   {term:'Clustering',cat:'ML Fundamentals',def:'Grouping similar items together without predefined categories.',why:'Useful for discovering topic groups in a large content library.',rel:['Unsupervised Learning']},
   {term:'Weights',cat:'ML Fundamentals',def:'The numerical values inside a neural network adjusted during training. They determine how the model processes input.',why:'When people say "70 billion parameters," they mean 70 billion weights \u2014 a measure of model capacity.',rel:['Neural Network','Parameters']},
   {term:'Parameters',cat:'ML Fundamentals',def:'The total number of adjustable weights in a model. Used as a rough indicator of model size and capability.',why:'Larger parameter counts generally mean more capable models but also more compute and cost.',rel:['Weights','Model']},
+  {term:'Activation Function',cat:'ML Fundamentals',def:'A mathematical function applied to each neuron\u2019s output that introduces non-linearity, enabling the network to learn complex patterns. Common examples include ReLU, sigmoid, and tanh.',why:'Without activation functions, a neural network could only learn simple linear relationships \u2014 no matter how many layers it has.',rel:['Neural Network','Weights']},
+  {term:'Backpropagation',cat:'ML Fundamentals',def:'The algorithm that calculates how much each weight contributed to prediction errors, enabling the model to learn by adjusting weights in the right direction. It works by propagating the error signal backward from the output layer through all hidden layers.',why:'The mathematical engine of neural network learning. Without backpropagation, neural networks couldn\u2019t train effectively.',rel:['Gradient Descent','Loss Function','Weights']},
+  {term:'Batch Size',cat:'ML Fundamentals',def:'The number of training examples processed together before updating model weights. Common sizes range from 32 to thousands depending on the model and available compute.',why:'Batch size affects training speed and quality \u2014 larger batches train faster but may miss subtle patterns that smaller batches catch.',rel:['Training','Epoch']},
+  {term:'Data Augmentation',cat:'ML Fundamentals',def:'Creating modified copies of training data to increase dataset size and diversity. For images: rotating, flipping, cropping. For text: paraphrasing, synonym substitution, back-translation.',why:'Helps models generalize better, especially when training data is limited \u2014 a common situation for specialized content domains.',rel:['Training Data','Overfitting']},
+  {term:'Epoch',cat:'ML Fundamentals',def:'One complete pass through the entire training dataset. Models typically train for many epochs, seeing each example multiple times.',why:'Too few epochs = the model hasn\u2019t learned enough (underfitting). Too many = the model memorizes training data (overfitting). Finding the right number is a key training decision.',rel:['Training','Batch Size','Overfitting']},
+  {term:'Feature Engineering',cat:'ML Fundamentals',def:'The process of selecting, transforming, or creating input features to improve model performance. In traditional ML, this was the most time-consuming and impactful part of the workflow.',why:'Deep learning automates much of feature engineering, but understanding the concept helps you appreciate why data quality matters so much.',rel:['Machine Learning','Training Data']},
+  {term:'Gradient Descent',cat:'ML Fundamentals',def:'An optimization algorithm that iteratively adjusts model weights in the direction that reduces error. Like walking downhill in a landscape of possible weight values to find the lowest point (minimum error).',why:'This is literally how models "learn" \u2014 they follow gradients toward better predictions. Every trained model you use was optimized by gradient descent.',rel:['Backpropagation','Learning Rate','Loss Function']},
+  {term:'Learning Rate',cat:'ML Fundamentals',def:'A hyperparameter controlling how much to adjust weights at each training step. Too high = training is unstable and overshoots. Too low = training is extremely slow or gets stuck.',why:'One of the most critical settings in model training \u2014 it determines whether training converges successfully at all.',rel:['Gradient Descent','Training','Weights']},
+  {term:'Loss Function',cat:'ML Fundamentals',def:'A mathematical formula measuring how wrong the model\u2019s predictions are compared to the actual correct answers. Training aims to minimize this value through gradient descent.',why:'The loss function is the model\u2019s report card \u2014 lower loss means better predictions. When people say a model is "training well," they mean the loss is decreasing.',rel:['Backpropagation','Gradient Descent','Training']},
+  {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task (like general language understanding) and adapting it for a different but related task (like classifying support tickets), leveraging previously learned patterns.',why:'This is why fine-tuning works \u2014 the model transfers its general knowledge to your specific domain rather than learning everything from scratch.',rel:['Fine-Tuning','Training','Pre-training']},
   {term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that can create new content \u2014 text, images, audio, video, code \u2014 rather than just classifying or analyzing.',why:'The category of AI you interact with most directly. Every AI writing tool is GenAI.',rel:['LLM','Diffusion Model']},
   {term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative AI model trained on massive text datasets to understand and generate human language. Examples: Claude, GPT, Gemini.',why:'The specific technology powering the AI writing and editing tools you use daily.',rel:['Generative AI','Transformer','Token']},
   {term:'Transformer',cat:'GenAI',def:'The neural network architecture introduced in 2017 that powers virtually all modern LLMs. Key innovation: the attention mechanism.',why:'Understanding transformers helps you understand LLM strengths and limitations.',rel:['Attention Mechanism','LLM']},
@@ -2297,10 +2447,22 @@ const GLOSSARY = [
   {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools, data sources, and services.',why:'MCP is how AI tools connect to your company\'s systems.',rel:['Tool Use','Function Calling','API']},
   {term:'Function Calling / Tool Use',cat:'Protocols',def:'The ability of an AI to invoke external tools (search, database queries, code execution) as part of generating a response.',why:'This makes AI tools go beyond text generation \u2014 they can look things up and take actions.',rel:['MCP','Agent','API']},
   {term:'Structured Output',cat:'Protocols',def:'AI output in a defined format like JSON, XML, or a specific template.',why:'Essential when output feeds into other systems (CMS, databases, publishing pipelines).',rel:['Output Format','API']},
+  {term:'Chunking Strategy',cat:'Protocols',def:'The method used to split documents into smaller pieces for embedding and storage in a RAG system. Strategies include fixed-size chunks, sentence-based splitting, and semantic chunking.',why:'Chunk size directly affects retrieval quality \u2014 too small loses context, too large dilutes relevance. Getting this right is critical for RAG performance.',rel:['RAG','Vector Database','Embedding']},
+  {term:'Cosine Similarity',cat:'Protocols',def:'A mathematical method of measuring how similar two vectors are based on the angle between them, ranging from -1 (opposite) to 1 (identical). Widely used in semantic search.',why:'The most common similarity metric used in vector databases and RAG systems to find relevant documents.',rel:['Vector','Embedding','Semantic Search']},
+  {term:'Hybrid Search',cat:'Protocols',def:'Combining traditional keyword search with semantic vector search to get the best of both approaches. Keywords catch exact matches (product names, error codes); semantic search catches meaning matches.',why:'Hybrid search significantly improves RAG retrieval quality by catching results that either method alone would miss.',rel:['Semantic Search','RAG','Vector Database']},
+  {term:'Reranking',cat:'Protocols',def:'Using a secondary, more precise model to re-score and reorder search results after initial retrieval, improving the relevance of the final set of documents sent to the LLM.',why:'Reranking is a key technique for improving RAG quality \u2014 the initial retrieval casts a wide net, and reranking narrows it to the most relevant results.',rel:['RAG','Hybrid Search','Vector Database']},
+  {term:'Vector Similarity',cat:'Protocols',def:'A mathematical measure of how close two vectors are in embedding space, indicating how semantically similar two pieces of text are.',why:'The core mechanism behind semantic search and RAG retrieval \u2014 "find documents with similar meaning" is implemented as "find vectors that are close together."',rel:['Cosine Similarity','Embedding','Vector']},
   {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Tool Use','MCP','Planning']},
   {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool that provides suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent','Tool Use']},
   {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\'s ability to break tasks into subtasks, determine sequence, and decide which tools to use.',why:'Understanding agent planning helps you design better task descriptions.',rel:['Agent','Prompt Chaining']},
   {term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\'s context at request time.',why:'Every time you paste a document into AI chat, you\'re doing context injection.',rel:['RAG','Context Window','Prompt']},
+  {term:'Agent Loop',cat:'Agents',def:'The iterative cycle agents follow: observe the current state, plan the next action, act by calling a tool or generating output, evaluate the result, and repeat until the goal is met.',why:'Understanding the agent loop helps you predict agent behavior and design better task descriptions.',rel:['Agent','Planning (in Agents)']},
+  {term:'Human-in-the-Loop (Agents)',cat:'Agents',def:'A design pattern where AI agents request human approval before taking irreversible actions. The agent proposes, the human approves or corrects, then the agent continues.',why:'Essential for content workflows where accuracy matters more than speed. A well-designed agent knows when to stop and ask rather than act autonomously.',rel:['Agent','Responsible AI']},
+  {term:'Multi-Agent Systems',cat:'Agents',def:'Architectures where multiple specialized agents collaborate on a task \u2014 one researches, one drafts, one reviews, one fact-checks. Each agent has a focused role and they coordinate through shared context.',why:'The future of complex AI workflows: specialized agents working together like a well-organized team, each contributing their strength.',rel:['Agent','Tool Orchestration']},
+  {term:'Planning (Agentic)',cat:'Agents',def:'An AI agent\u2019s ability to analyze a complex task, break it into ordered subtasks, determine dependencies between steps, and select which tools to use at each stage.',why:'Planning is what distinguishes agents from chatbots. A chatbot responds to one message; an agent plans a multi-step strategy.',rel:['Agent','Agent Loop','Prompt Chaining']},
+  {term:'Reflection (Agents)',cat:'Agents',def:'An agent\u2019s ability to evaluate its own intermediate outputs, identify problems or gaps, and decide whether to revise, retry with a different approach, or proceed to the next step.',why:'Self-reflection improves agent reliability, similar to how a good writer reviews their own draft before submitting it.',rel:['Agent Loop','Constitutional AI']},
+  {term:'Tool Orchestration',cat:'Agents',def:'An agent\u2019s ability to select, sequence, and coordinate multiple tools to accomplish a complex task \u2014 search first, then analyze, then draft, then verify.',why:'Orchestration is what makes agents powerful. Combining search, code execution, document retrieval, and generation into a coherent workflow multiplies each tool\u2019s value.',rel:['Agent','Function Calling / Tool Use','MCP']},
+  {term:'Working Memory (Agents)',cat:'Agents',def:'The accumulated context an agent maintains across subtasks within a single run, storing intermediate results, decisions, and findings for reference by later steps.',why:'Working memory is why agents can build on earlier steps \u2014 and why they struggle with very long, complex tasks that exceed their memory capacity.',rel:['Agent Loop','Context Window']},
   {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI output reflecting imbalances in training data, design, or evaluation.',why:'AI content may inadvertently favor certain perspectives or use non-inclusive language.',rel:['Training Data','Fairness']},
   {term:'Alignment',cat:'Ethics',def:'The goal of ensuring AI systems behave in accordance with human values and intentions.',why:'Alignment research is why modern AI tools are generally helpful and safe.',rel:['RLHF','Guardrails']},
   {term:'Guardrails',cat:'Ethics',def:'Built-in restrictions preventing AI from generating harmful, illegal, or inappropriate content.',why:'Guardrails protect you and your organization from publishing problematic content.',rel:['Alignment','Safety']},
@@ -2318,7 +2480,16 @@ const GLOSSARY = [
   {term:'Tokenization',cat:'GenAI',def:'The process of converting text into tokens.',why:'Understanding tokenization helps you estimate costs and context window usage.',rel:['Token','Tokenizer']},
   {term:'Truncation',cat:'GenAI',def:'When input exceeding the context window is cut off, and the model doesn\'t see the removed content.',why:'If AI output ignores part of a long document, truncation is likely the cause.',rel:['Context Window','Token']},
   {term:'Streaming',cat:'GenAI',def:'Delivering the AI response token by token as generated, rather than waiting for the complete response.',why:'This is why you see AI responses appear word by word.',rel:['Inference','Latency']},
-  {term:'Benchmark',cat:'GenAI',def:'A standardized test used to evaluate and compare AI model performance across specific tasks.',why:'Helps you interpret model comparison claims and know their limitations.',rel:['Evaluation','Model']}
+  {term:'Benchmark',cat:'GenAI',def:'A standardized test used to evaluate and compare AI model performance across specific tasks.',why:'Helps you interpret model comparison claims and know their limitations.',rel:['Evaluation','Model']},
+  {term:'Constitutional AI',cat:'GenAI',def:'A technique developed by Anthropic where the model self-critiques its responses against a set of principles (helpfulness, harmlessness, honesty) before outputting them. This adds a self-correction step to the generation process.',why:'Explains why Claude tends to be more cautious and nuanced than other models \u2014 it evaluates its own output against principles before you see it.',rel:['Alignment','RLHF','Guardrails']},
+  {term:'Distillation',cat:'GenAI',def:'Training a smaller "student" model to mimic a larger "teacher" model, creating a compact model that retains much of the larger model\u2019s capability at a fraction of the size and cost.',why:'This is how smaller, faster, cheaper models are created from frontier models. When a vendor offers a "mini" or "lite" version, distillation is often how it was made.',rel:['Transfer Learning','Training','Parameters']},
+  {term:'Instruction Tuning',cat:'GenAI',def:'Fine-tuning a model specifically on instruction-response pairs to improve its ability to follow directions. This is what turns a base model that predicts text into an assistant that follows your instructions.',why:'The difference between a model that can write text and one that actually follows your specific instructions. Every chat-based AI you use has been instruction-tuned.',rel:['Fine-Tuning','Supervised Learning','RLHF']},
+  {term:'Mixture of Experts (MoE)',cat:'GenAI',def:'An architecture where the model contains multiple specialized sub-networks ("experts") and a router that sends each input to only the most relevant experts. This means only a fraction of total parameters are active per query.',why:'Enables very large models to run efficiently \u2014 a model with 1 trillion parameters might only activate 100 billion for any given request.',rel:['Transformer','Parameters','Inference']},
+  {term:'Preference Optimization (DPO)',cat:'GenAI',def:'Direct Preference Optimization \u2014 a simpler alternative to RLHF that directly optimizes models on human preference pairs (preferred vs. rejected responses) without needing a separate reward model.',why:'An emerging training technique that may replace RLHF in some scenarios due to its simplicity and stability.',rel:['RLHF','Fine-Tuning','Alignment']},
+  {term:'Quantization',cat:'GenAI',def:'Reducing the precision of model weights (e.g., from 32-bit floating point to 4-bit integers) to make models smaller and faster with minimal quality loss.',why:'Enables running large models on smaller hardware, including laptops and phones. This is how "local" AI models work on consumer devices.',rel:['Weights','Inference','Parameters']},
+  {term:'Reward Model',cat:'GenAI',def:'A model trained on human preference judgments to automatically score AI outputs on quality, helpfulness, and safety. Used to guide RLHF training at scale.',why:'The reward model is the bridge between human judgment and model optimization \u2014 it lets the training process use millions of comparisons, not just the thousands that humans directly rated.',rel:['RLHF','Alignment','Fine-Tuning']},
+  {term:'Safety Filter',cat:'GenAI',def:'A system that screens AI inputs and outputs for harmful, dangerous, illegal, or policy-violating content. May operate as a separate classifier or be built into the model\u2019s behavior.',why:'Explains why AI tools sometimes refuse seemingly legitimate requests \u2014 safety filters can have false positives, blocking safe content that pattern-matches against harmful categories.',rel:['Guardrails','Red-Teaming','Alignment']},
+  {term:'Speculative Decoding',cat:'GenAI',def:'An inference acceleration technique where a small, fast model drafts candidate tokens that a larger model then verifies in parallel, speeding up generation without quality loss.',why:'One reason AI responses are getting faster without getting worse \u2014 the verification step ensures quality while the drafting step provides speed.',rel:['Inference','Latency','Token']}
 ];
 
 const CAT_MAP = {'ML Fundamentals':'badge-ml','GenAI':'badge-genai','Prompting':'badge-prompt','Infrastructure':'badge-infra','Ethics':'badge-ethics','Workflow':'badge-workflow','Protocols':'badge-proto','Agents':'badge-proto'};
@@ -2384,23 +2555,7 @@ function showFinalAssessment(){
   renderTrail();
   window.scrollTo({top:0,behavior:'smooth'});
 
-  const questions = [
-    {type:'tf',q:'Generative AI is a subset of Deep Learning, which is a subset of Machine Learning, which is a subset of AI.',a:true,exp:'This is the correct nesting: AI \u2192 ML \u2192 Deep Learning \u2192 Generative AI.'},
-    {type:'mc',q:'A model with a 32K context window is asked to process a 50-page document (~35,000 tokens). What happens?',opts:['The model processes it automatically in chunks','The input is truncated \u2014 the model doesn\'t see the full document','The model asks for a smaller document','The output is limited to 32K tokens'],a:1,exp:'The context window covers input + output. Content beyond the limit is simply not seen.'},
-    {type:'tf',q:'Few-shot prompting means providing the AI with examples of the desired output format.',a:true,exp:'Few-shot prompting is one of the most effective techniques for improving output consistency.'},
-    {type:'mc',q:'Which technique reduces hallucination by grounding AI responses in actual documents?',opts:['Increasing temperature','RAG (Retrieval-Augmented Generation)','Using a larger model','Fine-tuning'],a:1,exp:'RAG retrieves actual documents and injects them as context, grounding the AI in real source material.'},
-    {type:'tf',q:'MCP (Model Context Protocol) is a proprietary Anthropic protocol that only works with Claude.',a:false,exp:'MCP is an open standard that works across multiple AI platforms.'},
-    {type:'mc',q:'Prompt: "You are a technical writer. Rewrite this changelog entry as a release note for IT admins. Keep it under 50 words." What components are present?',opts:['Role, task, constraints only','Role, context (audience), task, and constraints (length)','Only a task','Role and examples'],a:1,exp:'Role ("technical writer"), audience context ("IT admins"), task ("rewrite"), and constraint ("under 50 words") are all present.'},
-    {type:'tf',q:'Training happens once; inference happens every time you use the model.',a:true,exp:'Training is the learning phase. Inference is the using phase \u2014 it happens with every prompt.'},
-    {type:'mc',q:'An AI article includes: "According to a 2024 IEEE study by Chen & Park..." What should you do?',opts:['Trust it \u2014 IEEE is reputable','Search for the study to verify it exists','Remove the citation but keep the claim','Ask the same AI if it\'s real'],a:1,exp:'AI frequently fabricates citations. Always verify independently.'},
-    {type:'tf',q:'Setting temperature to 0 makes the AI output always correct.',a:false,exp:'Temperature controls randomness, not accuracy. The model can still be wrong at temperature 0.'},
-    {type:'mc',q:'Which prompting anti-pattern is MOST likely to produce poor results?',opts:['Providing too much context','Specifying the output format','Pasting a long document with only "Fix this"','Using role prompting'],a:2,exp:'Vague instructions force the AI to guess. Specificity is key.'},
-    {type:'tf',q:'Unsupervised learning requires labeled training data.',a:false,exp:'Unsupervised learning finds patterns WITHOUT labels. Supervised learning requires labels.'},
-    {type:'mc',q:'A team wants AI to search their internal knowledge base and generate grounded answers. Best approach?',opts:['Fine-tuning the model on their documents','RAG \u2014 retrieving and injecting relevant documents','Increasing temperature for creative search','Using prompt chaining'],a:1,exp:'RAG retrieves relevant documents and injects them as context \u2014 ideal for grounded, sourced answers.'},
-    {type:'tf',q:'Automation bias is the tendency for humans to over-trust AI output because it looks polished.',a:true,exp:'Polished AI output feels authoritative, making it tempting to skip verification.'},
-    {type:'mc',q:'AI output is almost correct but needs adjustments. Recommended approach?',opts:['Regenerate until perfect','Edit directly and verify key facts','Start over with a new prompt','Accept it \u2014 almost correct is fine'],a:1,exp:'Direct editing combined with fact verification is the most efficient approach.'},
-    {type:'tf',q:'Prompt chaining \u2014 breaking tasks into sequential prompts \u2014 generally produces better results than a single long prompt.',a:true,exp:'Sequential focused prompts allow the AI to excel at each step, producing higher quality overall.'}
-  ];
+  const questions = pickRandom(FINAL_QUIZ_POOL, 15);
 
   mainEl.innerHTML = `
     <div class="mod-hdr"><div class="mod-ico" style="background:var(--gradient-primary)"><svg viewBox="0 0 24 24" fill="#fff" width="26" height="26"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><div><div class="mod-title">Final Assessment</div><div class="mod-desc">15 questions covering all modules. Test your AI knowledge!</div></div></div>
@@ -2560,7 +2715,10 @@ scrollBtn.addEventListener('click', () => {
 function renderMobDrawer(){
   const list = document.getElementById('mob-drawer-list');
   if(!list) return;
-  list.innerHTML = MODULES.map((m,i) => {
+  list.innerHTML = '<div class="mob-drawer-item" onclick="showLanding();closeMobDrawer()" style="border-bottom:2px solid var(--border);margin-bottom:4px">' +
+    '<div class="mob-drawer-ico" style="background:var(--tx-secondary)"><svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V10" fill="none" stroke="#fff" stroke-width="2"/></svg></div>' +
+    '<div><div class="mob-drawer-name">Home</div></div>' +
+  '</div>' + MODULES.map((m,i) => {
     const cls = (i === currentModule ? 'active' : '') + (completedModules.has(i) ? ' done' : '');
     return `<div class="mob-drawer-item ${cls}" onclick="goModule(${i});closeMobDrawer()">
       <div class="mob-drawer-ico" style="background:${m.color}">${ICONS[m.icon]}</div>

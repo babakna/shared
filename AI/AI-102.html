@@ -583,6 +583,9 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
     <div><div class="hdr-t">AI Deep Dive</div><div class="hdr-s">Advanced Concepts for the AI-Literate Professional &middot; <span class="by">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-r">
+    <button class="hdr-btn" id="home-btn" title="Home" aria-label="Go to home page" onclick="showLanding()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg>
+    </button>
     <button class="hdr-btn mob-only" id="mob-menu-btn" title="Menu" aria-label="Open navigation menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -620,6 +623,21 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 <main class="main" id="main-content"></main>
 
 <script>
+function shuffleArray(arr){
+  var shuffled = arr.slice();
+  for(var i = shuffled.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = shuffled[i];
+    shuffled[i] = shuffled[j];
+    shuffled[j] = temp;
+  }
+  return shuffled;
+}
+
+function pickRandom(arr, count){
+  return shuffleArray(arr).slice(0, count);
+}
+
 const MODULES = [
   {id:'under-hood',title:'Under the Hood',short:'Under Hood',icon:'cpu',color:'#2563EB'},
   {id:'ecosystem',title:'The AI Ecosystem',short:'Ecosystem',icon:'globe',color:'#7C3AED'},
@@ -652,7 +670,7 @@ const LANDING_DESCS = [
   {desc:'Explore the frontier of AI capability. Understand what AI agents are, how they plan and execute multi-step tasks, how they orchestrate tools, and what the agent loop looks like in practice. See a complete agentic workflow animated step by step.',feat:'Agent loop flow simulation \u2022 Planning visual \u2022 Tool orchestration diagram \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Take your daily AI practice to the next level. Build systematic prompt libraries, implement multi-document consistency analysis, develop content governance frameworks, learn to evaluate AI output quality rigorously, and design workflows that scale across your team.',feat:'Prompt library builder exercise \u2022 Evaluation rubric tool \u2022 Multi-doc analysis templates \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Develop sophisticated judgment for AI governance. Examine bias sources in training data with real examples, understand alignment and guardrail mechanisms, learn red-teaming concepts, navigate copyright and IP considerations for content creators, and build organizational AI usage guidelines.',feat:'Bias source analysis exercise \u2022 Red-teaming scenarios \u2022 Copyright decision tree \u2022 AI governance template \u2022 5 quiz questions'},
-  {desc:'Your curated path for continued growth. Intermediate and advanced resources \u2014 DeepLearning.AI specialized courses, Stanford HAI research, Anthropic\u2019s MCP and alignment science, and professional communities. Every resource annotated with \u2018why this one\u2019 and time estimates.',feat:'20+ curated resources with live links \u2022 Tier 2 (Applied) and Tier 3 (Advanced) paths \u2022 Professional communities'},
+  {desc:'Your curated path for continued growth. Foundation refreshers, intermediate skill-building, and advanced resources \u2014 DeepLearning.AI specialized courses, Stanford HAI research, Anthropic\u2019s MCP and alignment science, and professional communities. Every resource annotated with \u2018why this one\u2019 and time estimates.',feat:'20+ curated resources with live links \u2022 Tier 1 (Foundation), Tier 2 (Applied), and Tier 3 (Advanced) paths'},
   {desc:'100+ AI terms defined for content professionals. Everything from AI-101\u2019s 75 terms plus advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, and more. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 8 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
 ];
 
@@ -662,11 +680,14 @@ let quizStates = {};
 const mainEl = document.getElementById('main-content');
 
 function renderTrail(){
-  const t = document.getElementById('trail');
-  t.innerHTML = '<div class="trail-line"></div>' + MODULES.map((m,i) => {
-    const cls = completedModules.has(i) ? 'done' : (i === currentModule ? 'active' : '');
-    return '<div class="trail-stop '+cls+'" onclick="goModule('+i+')" title="'+m.title+'"><div class="trail-dot"></div><div class="trail-lbl">'+m.short+'</div></div>';
-  }).join('');
+  var t = document.getElementById('trail');
+  var homeCls = currentModule === -1 ? 'active' : '';
+  t.innerHTML = '<div class="trail-line"></div>' +
+    '<div class="trail-stop ' + homeCls + '" onclick="showLanding()" title="Home"><div class="trail-dot" style="' + (currentModule === -1 ? '' : 'background:var(--tx-muted);border-color:var(--tx-muted)') + '"></div><div class="trail-lbl">Home</div></div>' +
+    MODULES.map(function(m,i){
+      var cls = completedModules.has(i) ? 'done' : (i === currentModule ? 'active' : '');
+      return '<div class="trail-stop ' + cls + '" onclick="goModule(' + i + ')" title="' + m.title + '"><div class="trail-dot"></div><div class="trail-lbl">' + m.short + '</div></div>';
+    }).join('');
 }
 
 function goModule(idx){
@@ -753,6 +774,84 @@ function getModuleContent(idx){
   }
 }
 
+/* ══ QUIZ POOLS (8 questions each, 5 shown per module) ══ */
+var MOD1_QUIZ_POOL = [
+  {type:'mc',q:'What does the attention mechanism in Transformers allow the model to do?',opts:['Process text faster than previous architectures','Connect every word to every other word simultaneously, regardless of distance','Understand the true meaning of words like humans do','Store more training data'],a:1,exp:'The attention mechanism allows each token to directly attend to every other token simultaneously, enabling the model to capture long-range dependencies.'},
+  {type:'tf',q:'In a neural network, early layers detect basic features while deeper layers capture abstract patterns.',a:true,exp:'This hierarchical composition is fundamental \u2014 early layers find edges/word patterns, middle layers combine them, and deep layers capture high-level abstractions.'},
+  {type:'mc',q:'What is the purpose of RLHF in the training pipeline?',opts:['To make the model larger','To teach the model to predict the next word','To optimize the model for helpfulness using human preference rankings','To convert text into tokens'],a:2,exp:'RLHF uses human rankings of model outputs to train a reward model, then optimizes the LLM to produce outputs that score highly \u2014 making it helpful, harmless, and honest.'},
+  {type:'tf',q:'Multi-modal models have separate AI brains for text, images, and audio.',a:false,exp:'Multi-modal models convert all modalities into the same mathematical representation (embeddings) and process them through the same Transformer attention layers.'},
+  {type:'mc',q:'Why might the same prompt produce different results in Claude vs. ChatGPT?',opts:['One is broken','They use identical training but different UIs','Different training data, fine-tuning preferences, and system prompts','Random chance'],a:2,exp:'Different models have different training data, RLHF preferences, and system prompts, leading to meaningfully different outputs for the same input.'},
+  {type:'mc',q:'What happens in the "forward pass" during training?',opts:['The model saves its weights','The model processes input and makes a prediction','The model deletes incorrect data','The model communicates with other models'],a:1,exp:'In the forward pass, the model processes a batch of input data through its layers and produces predictions. These are then compared to actual answers to calculate loss.'},
+  {type:'tf',q:'Early layers in a neural network typically capture low-level features like edges, while deeper layers capture abstract concepts.',a:true,exp:'This hierarchical feature extraction is a key property of deep networks \u2014 each successive layer builds more complex representations from simpler ones.'},
+  {type:'mc',q:'What is the primary difference between how text and images enter a multi-modal Transformer?',opts:['They use completely different models','Text is tokenized while images are split into patches, but both become embeddings','Images bypass the Transformer entirely','Text requires more compute than images'],a:1,exp:'Both modalities are converted into embeddings before entering the Transformer. Text goes through a tokenizer; images go through a patch extractor and vision encoder.'}
+];
+
+var MOD2_QUIZ_POOL = [
+  {type:'mc',q:'Which layer of the AI technology stack do you directly control?',opts:['Foundation Models','APIs & Platforms','Applications','Your Workflow (prompts, templates, processes)'],a:3,exp:'Your workflow layer \u2014 your prompts, templates, and processes \u2014 is the layer you control and can optimize.'},
+  {type:'tf',q:'Open-source AI models are always less capable than proprietary models.',a:false,exp:'Open-source models like Llama and Mistral are increasingly competitive. The gap has narrowed significantly, and for specific tasks, open-source can match or exceed proprietary models.'},
+  {type:'mc',q:'Which model characteristic matters most for processing a 100-page document?',opts:['Parameter count','Training data quality','Context window size','Temperature setting'],a:2,exp:'Context window determines how much text the model can \u201csee\u201d at once. A 100-page document needs a large context window to avoid truncation.'},
+  {type:'tf',q:'The same foundation model always produces identical behavior regardless of which application uses it.',a:false,exp:'Applications add their own system prompts, parameters, and processing, which is why the same model behaves differently in Claude.ai vs. a custom app.'},
+  {type:'mc',q:'For privacy-sensitive content that cannot leave your organization, the best approach is:',opts:['Use Claude with a privacy disclaimer','Use an on-premise open-source model','Ask ChatGPT not to save the data','Encrypt the prompt before sending'],a:1,exp:'On-premise open-source models keep all data on your infrastructure \u2014 the only option that guarantees data never leaves your control.'},
+  {type:'mc',q:'Which layer of the AI technology stack do you directly interact with as a content editor?',opts:['Foundation Models','APIs & Platforms','Applications','Training Data'],a:2,exp:'Content editors interact with the Application layer (Claude.ai, ChatGPT, Copilot). The application communicates with the API and model layers behind the scenes.'},
+  {type:'tf',q:'Open-source models are always free to use in any context, including commercial applications.',a:false,exp:'Open-source models have varying licenses. Some (like Llama) restrict commercial use above certain user thresholds. Always check the specific license terms.'},
+  {type:'mc',q:'When the same model behaves differently in two applications, the most likely cause is:',opts:['The model version is different','Different system prompts and parameter settings','One application has faster internet','Random chance'],a:1,exp:'Applications add their own system prompts, temperature settings, and processing logic on top of the same model, causing different behavior.'}
+];
+
+var MOD3_QUIZ_POOL = [
+  {type:'mc',q:'What is the primary advantage of few-shot prompting over zero-shot?',opts:['It uses less tokens','It\u2019s faster','The model pattern-matches your examples for consistent format and style','It bypasses the model\u2019s guardrails'],a:2,exp:'Few-shot prompting shows the model what good output looks like, allowing it to pattern-match format, tone, length, and style from your examples.'},
+  {type:'tf',q:'Chain-of-thought prompting forces the model to show its reasoning, which tends to improve accuracy.',a:true,exp:'When the model must reason step by step, it catches errors it would miss when jumping directly to a conclusion.'},
+  {type:'mc',q:'What is the purpose of a system prompt?',opts:['To make the AI smarter','To define the AI\u2019s behavior, role, and constraints before user interaction','To increase the context window','To fine-tune the model\u2019s weights'],a:1,exp:'System prompts set the behavioral framework \u2014 role, style, constraints, and context \u2014 that shapes all subsequent interactions.'},
+  {type:'tf',q:'A single complex prompt always produces better results than breaking the task into a chain of focused prompts.',a:false,exp:'Prompt chaining typically produces dramatically better results for complex tasks because each step has a single, focused objective.'},
+  {type:'mc',q:'Which structured output format would be most useful for feeding AI results into a CMS database?',opts:['Free-form prose','Markdown with headers','JSON with defined fields','A bulleted list'],a:2,exp:'JSON provides structured, parseable data that databases and CMS systems can ingest directly without manual reformatting.'},
+  {type:'mc',q:'What is the primary benefit of structured output (JSON, XML) from AI?',opts:['It looks more professional','It can be directly consumed by other systems and automation pipelines','It is always more accurate','It uses fewer tokens'],a:1,exp:'Structured output is machine-parseable, meaning it can feed directly into CMS systems, databases, and automation workflows without manual reformatting.'},
+  {type:'tf',q:'A 3-step prompt chain always produces better results than a single well-crafted prompt.',a:false,exp:'Not always. For simple tasks, a single well-crafted prompt may produce equal results with less overhead. Chains benefit complex, multi-faceted tasks.'},
+  {type:'mc',q:'You want the AI to format every release note identically. The most effective technique is:',opts:['Increasing temperature','Providing 2-3 examples of correctly formatted release notes','Writing a longer task description','Using a different model'],a:1,exp:'Few-shot prompting (showing examples) is the most effective technique for consistent formatting. The model pattern-matches against examples.'}
+];
+
+var MOD4_QUIZ_POOL = [
+  {type:'mc',q:'What is the primary purpose of RAG?',opts:['To make AI responses faster','To ground AI responses in actual documents, reducing hallucination','To train the AI on your data','To replace the need for a knowledge base'],a:1,exp:'RAG retrieves relevant documents and includes them in the prompt context, grounding the AI\u2019s response in real source material.'},
+  {type:'tf',q:'In a RAG pipeline, the vector database uses keyword matching to find relevant documents.',a:false,exp:'Vector databases use semantic similarity (comparing embedding vectors), not keyword matching. This enables finding relevant documents even when exact keywords differ.'},
+  {type:'mc',q:'MCP is best described as:',opts:['A specific AI model','A standardized protocol for connecting AI to external tools','A type of prompt engineering','A database technology'],a:1,exp:'MCP (Model Context Protocol) is an open standard for connecting AI applications to external tools and data sources \u2014 like USB-C for AI.'},
+  {type:'tf',q:'Function calling and MCP serve the exact same purpose and are interchangeable.',a:false,exp:'Function calling is single-tool invocation (custom per API); MCP is a standardized protocol for discovering and using entire tool ecosystems. MCP is broader and more scalable.'},
+  {type:'mc',q:'When a RAG system cannot find relevant documents for a query, a well-designed system should:',opts:['Generate an answer from training data anyway','Report that it couldn\u2019t find relevant information','Make up plausible-sounding information','Search the internet instead'],a:1,exp:'A well-designed RAG system transparently reports when it can\u2019t find relevant documents rather than falling back to potentially hallucinated training data.'},
+  {type:'mc',q:'Why does RAG typically use "chunks" rather than whole documents?',opts:['Whole documents exceed context window limits','Chunks are easier to create','Chunks look better in search results','RAG requires exactly 512-token chunks'],a:0,exp:'Context windows have limits. Chunking breaks documents into pieces that fit while preserving enough surrounding text for coherent answers. Chunk size is tunable, not fixed.'},
+  {type:'tf',q:'MCP requires the AI model to know the internal API details of every service it connects to.',a:false,exp:'MCP abstracts away API details. The MCP server handles translation between the standardized protocol and each service\u2019s specific API.'},
+  {type:'mc',q:'A RAG system returns irrelevant documents. The most likely cause is:',opts:['The LLM is hallucinating','Poor embeddings or wrong chunking strategy','The vector database is full','The user asked a bad question'],a:1,exp:'Poor retrieval usually stems from suboptimal embeddings or chunking. If chunks are too small, context is lost. If the embedding model doesn\u2019t capture domain meaning, similarity search returns wrong results.'}
+];
+
+var MOD5_QUIZ_POOL = [
+  {type:'mc',q:'What distinguishes an AI agent from a chatbot?',opts:['Agents are smarter','Agents can plan, use tools, and execute multi-step tasks autonomously','Agents have larger context windows','Agents don\u2019t need prompts'],a:1,exp:'Agents autonomously plan, select tools, execute actions, and evaluate results across multiple steps \u2014 chatbots respond to individual messages.'},
+  {type:'tf',q:'Current AI agents can reliably handle any task without human oversight.',a:false,exp:'Current agents require careful oversight. They excel at structured tasks but struggle with ambiguity, and errors compound across steps.'},
+  {type:'mc',q:'In the agent loop, what is the purpose of "working memory"?',opts:['To permanently store all past conversations','To accumulate context from each subtask so later steps can reference earlier results','To replace the need for tool calls','To train the model on new data'],a:1,exp:'Working memory accumulates results from each subtask, allowing the agent to build on earlier findings as it progresses through the plan.'},
+  {type:'tf',q:'The "planning" step is what distinguishes an agent from a simple prompt-response pattern.',a:true,exp:'Planning \u2014 breaking a complex task into subtasks and determining sequence \u2014 is the defining capability that separates agents from chatbots.'},
+  {type:'mc',q:'When should an agent stop and request human input?',opts:['Never \u2014 agents should be fully autonomous','Only when it encounters an error','Before making irreversible changes or when it encounters ambiguity','Only at the very end of the task'],a:2,exp:'Well-designed agents request human approval before irreversible actions and when they encounter ambiguity that requires judgment.'},
+  {type:'mc',q:'What is "reflection" in the context of AI agents?',opts:['The agent mirrors user behavior','The agent evaluates its own output and decides if it needs to retry','The agent copies another agent\u2019s approach','The agent processes images'],a:1,exp:'Reflection is when an agent critiques its own intermediate results and decides whether to revise, retry, or proceed. It\u2019s a self-correction mechanism.'},
+  {type:'tf',q:'Current AI agents are reliable enough to make irreversible decisions without human oversight.',a:false,exp:'Current agents are not reliable enough for unsupervised irreversible actions. Human-in-the-loop remains essential for production workflows.'},
+  {type:'mc',q:'In the agent loop, what role does "working memory" serve?',opts:['It stores training data','It accumulates results from each subtask so later steps can reference earlier findings','It saves conversations for future sessions','It caches model weights'],a:1,exp:'Working memory persists across subtasks within a single run, allowing later steps to reference earlier results.'}
+];
+
+var MOD6_QUIZ_POOL = [
+  {type:'mc',q:'What is the most valuable component of a team\u2019s AI prompt library?',opts:['The number of prompts','Tested, documented templates with example outputs and usage notes','Prompts for every possible task','The most complex prompts possible'],a:1,exp:'Quality over quantity \u2014 well-documented templates with examples and usage notes ensure consistent, reliable results across the team.'},
+  {type:'tf',q:'AI can reliably replace human judgment for evaluating content tone and audience appropriateness.',a:false,exp:'While AI can flag potential issues, human judgment remains essential for evaluating tone, cultural sensitivity, and audience fit.'},
+  {type:'mc',q:'What\u2019s the most effective use of AI for multi-document consistency?',opts:['Asking AI to rewrite all documents','Using AI to identify inconsistencies across documents','Having AI auto-merge all documents','Letting AI pick the best version'],a:1,exp:'AI excels at finding inconsistencies (terminology, version numbers, procedural differences) across document sets that humans miss after repeated reading.'},
+  {type:'tf',q:'An AI content governance framework should include rules about what data can be sent to AI tools.',a:true,exp:'Data handling rules are essential \u2014 customer data, proprietary information, and compliance-sensitive content may require specific handling or on-premise models.'},
+  {type:'mc',q:'When scaling AI workflows across a team, the best first step is:',opts:['Buying the most expensive AI tool','Auditing current workflows to identify where AI saves the most time','Requiring everyone to use AI for everything','Training everyone on prompt engineering simultaneously'],a:1,exp:'Start with an audit to identify high-impact opportunities, then standardize solutions for those specific tasks before expanding.'},
+  {type:'mc',q:'What is the most important first step when building a team AI playbook?',opts:['Buy the most expensive AI tool','Audit the team\u2019s most time-consuming recurring tasks','Hire an AI engineer','Train everyone on Python'],a:1,exp:'Start by identifying where AI saves the most collective time. Audit recurring tasks, then map each to an AI workflow category.'},
+  {type:'tf',q:'A prompt library should be updated only when the AI model changes.',a:false,exp:'Update continuously \u2014 when products change, style guides evolve, new use cases emerge, or team members discover better approaches.'},
+  {type:'mc',q:'When evaluating AI output, which criterion should editors prioritize FIRST?',opts:['Formatting and visual appeal','Factual accuracy against source material','Word count','Creativity of language'],a:1,exp:'Factual accuracy is the non-negotiable first check. A beautifully formatted piece with errors is worse than plain-text accurate content.'}
+];
+
+var MOD7_QUIZ_POOL = [
+  {type:'mc',q:'What is Constitutional AI?',opts:['AI that follows the law','A technique where the model self-critiques its responses against a set of principles','AI that only works in democratic countries','A type of model architecture'],a:1,exp:'Constitutional AI has the model evaluate its own outputs against principles (helpful, harmless, honest) and revise before returning the response.'},
+  {type:'tf',q:'Purely AI-generated content with no human creative input is generally copyrightable.',a:false,exp:'In most jurisdictions, purely AI-generated content without substantial human creative contribution is not eligible for copyright protection.'},
+  {type:'mc',q:'What is red-teaming in the context of AI?',opts:['Using AI to generate red-colored content','Deliberately trying to find problems, failures, and safety issues in AI outputs','Training the model with negative examples','Testing AI response speed'],a:1,exp:'Red-teaming is the practice of deliberately probing AI outputs for problems \u2014 bias, inaccuracy, safety issues, and edge cases.'},
+  {type:'tf',q:'If your prompt implies a certain answer, modern AI tools will always push back and give a balanced response.',a:false,exp:'LLMs are trained to be agreeable through RLHF. Leading prompts often get confirming responses. Frame questions neutrally for balanced output.'},
+  {type:'mc',q:'An effective organizational AI usage policy should include:',opts:['A ban on all AI use until regulations are finalized','Only technical specifications for approved models','Permitted use cases, review requirements, data handling rules, and disclosure policies','A single rule: use your judgment'],a:2,exp:'Comprehensive guidelines cover what\u2019s permitted, how content is reviewed, what data can be sent to AI, and when to disclose AI involvement.'},
+  {type:'mc',q:'What is Constitutional AI (CAI)?',opts:['AI governed by a country\u2019s constitution','A training technique where the model critiques its own output against principles','AI that only discusses legal topics','A government certification for AI'],a:1,exp:'Constitutional AI is Anthropic\u2019s approach where the model evaluates its own responses against principles like helpfulness, harmlessness, and honesty.'},
+  {type:'tf',q:'AI detection tools reliably distinguish between AI-generated and human-written content.',a:false,exp:'AI detection tools are unreliable \u2014 frequent false positives and false negatives. Edited or mixed content easily defeats them.'},
+  {type:'mc',q:'A writer uses AI to paraphrase 10 paragraphs from a copyrighted article. Is this acceptable?',opts:['Yes \u2014 paraphrasing makes it original','No \u2014 paraphrasing copyrighted work can still constitute infringement','Only if the AI is credited','Only if the source is over 5 years old'],a:1,exp:'Paraphrasing copyrighted work can constitute infringement if the ideas, structure, and creative expression are substantially reproduced.'}
+];
+
 /* ══ MODULE 1: UNDER THE HOOD ══ */
 function mod1Content(){
   return '<div class="sec-title">Neural Network Layers \u2014 Visual Walkthrough</div>'+
@@ -836,13 +935,7 @@ function mod1Content(){
       '<dt>Takeaway</dt><dd>Choosing the right model for the task matters as much as writing a good prompt. Results should be evaluated per-model, not assumed to be universal.</dd>'+
     '</dl></div>'+
 
-  renderQuiz('mod1',[
-    {type:'mc',q:'What does the attention mechanism in Transformers allow the model to do?',opts:['Process text faster than previous architectures','Connect every word to every other word simultaneously, regardless of distance','Understand the true meaning of words like humans do','Store more training data'],a:1,exp:'The attention mechanism allows each token to directly attend to every other token simultaneously, enabling the model to capture long-range dependencies.'},
-    {type:'tf',q:'In a neural network, early layers detect basic features while deeper layers capture abstract patterns.',a:true,exp:'This hierarchical composition is fundamental \u2014 early layers find edges/word patterns, middle layers combine them, and deep layers capture high-level abstractions.'},
-    {type:'mc',q:'What is the purpose of RLHF in the training pipeline?',opts:['To make the model larger','To teach the model to predict the next word','To optimize the model for helpfulness using human preference rankings','To convert text into tokens'],a:2,exp:'RLHF uses human rankings of model outputs to train a reward model, then optimizes the LLM to produce outputs that score highly \u2014 making it helpful, harmless, and honest.'},
-    {type:'tf',q:'Multi-modal models have separate AI brains for text, images, and audio.',a:false,exp:'Multi-modal models convert all modalities into the same mathematical representation (embeddings) and process them through the same Transformer attention layers.'},
-    {type:'mc',q:'Why might the same prompt produce different results in Claude vs. ChatGPT?',opts:['One is broken','They use identical training but different UIs','Different training data, fine-tuning preferences, and system prompts','Random chance'],a:2,exp:'Different models have different training data, RLHF preferences, and system prompts, leading to meaningfully different outputs for the same input.'}
-  ]);
+  renderQuiz('mod1', pickRandom(MOD1_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 2: THE AI ECOSYSTEM ══ */
@@ -903,13 +996,7 @@ function mod2Content(){
     '<p style="margin-top:10px"><strong>Privacy-sensitive content</strong> (internal docs, customer data, legal content): Consider on-premise open-source models like Llama or Mistral. Data never leaves your infrastructure. The performance trade-off may be worth it for compliance-critical work.</p>'+
   '</div></details>'+
 
-  renderQuiz('mod2',[
-    {type:'mc',q:'Which layer of the AI technology stack do you directly control?',opts:['Foundation Models','APIs & Platforms','Applications','Your Workflow (prompts, templates, processes)'],a:3,exp:'Your workflow layer \u2014 your prompts, templates, and processes \u2014 is the layer you control and can optimize.'},
-    {type:'tf',q:'Open-source AI models are always less capable than proprietary models.',a:false,exp:'Open-source models like Llama and Mistral are increasingly competitive. The gap has narrowed significantly, and for specific tasks, open-source can match or exceed proprietary models.'},
-    {type:'mc',q:'Which model characteristic matters most for processing a 100-page document?',opts:['Parameter count','Training data quality','Context window size','Temperature setting'],a:2,exp:'Context window determines how much text the model can \u201csee\u201d at once. A 100-page document needs a large context window to avoid truncation.'},
-    {type:'tf',q:'The same foundation model always produces identical behavior regardless of which application uses it.',a:false,exp:'Applications add their own system prompts, parameters, and processing, which is why the same model behaves differently in Claude.ai vs. a custom app.'},
-    {type:'mc',q:'For privacy-sensitive content that cannot leave your organization, the best approach is:',opts:['Use Claude with a privacy disclaimer','Use an on-premise open-source model','Ask ChatGPT not to save the data','Encrypt the prompt before sending'],a:1,exp:'On-premise open-source models keep all data on your infrastructure \u2014 the only option that guarantees data never leaves your control.'}
-  ]);
+  renderQuiz('mod2', pickRandom(MOD2_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 3: ADVANCED PROMPT ENGINEERING ══ */
@@ -993,13 +1080,7 @@ function mod3Content(){
       '<dt>Takeaway</dt><dd>Prompt chaining produces qualitatively better results because each step has a focused objective. The AI doesn\u2019t have to juggle multiple evaluation criteria simultaneously.</dd>'+
     '</dl></div>'+
 
-  renderQuiz('mod3',[
-    {type:'mc',q:'What is the primary advantage of few-shot prompting over zero-shot?',opts:['It uses less tokens','It\u2019s faster','The model pattern-matches your examples for consistent format and style','It bypasses the model\u2019s guardrails'],a:2,exp:'Few-shot prompting shows the model what good output looks like, allowing it to pattern-match format, tone, length, and style from your examples.'},
-    {type:'tf',q:'Chain-of-thought prompting forces the model to show its reasoning, which tends to improve accuracy.',a:true,exp:'When the model must reason step by step, it catches errors it would miss when jumping directly to a conclusion.'},
-    {type:'mc',q:'What is the purpose of a system prompt?',opts:['To make the AI smarter','To define the AI\u2019s behavior, role, and constraints before user interaction','To increase the context window','To fine-tune the model\u2019s weights'],a:1,exp:'System prompts set the behavioral framework \u2014 role, style, constraints, and context \u2014 that shapes all subsequent interactions.'},
-    {type:'tf',q:'A single complex prompt always produces better results than breaking the task into a chain of focused prompts.',a:false,exp:'Prompt chaining typically produces dramatically better results for complex tasks because each step has a single, focused objective.'},
-    {type:'mc',q:'Which structured output format would be most useful for feeding AI results into a CMS database?',opts:['Free-form prose','Markdown with headers','JSON with defined fields','A bulleted list'],a:2,exp:'JSON provides structured, parseable data that databases and CMS systems can ingest directly without manual reformatting.'}
-  ]);
+  renderQuiz('mod3', pickRandom(MOD3_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 4: RAG, MCP & TOOL USE ══ */
@@ -1060,13 +1141,7 @@ function mod4Content(){
       '<dt>Result</dt><dd>Hallucination rate dropped from ~30% to ~3%. When the bot doesn\u2019t find relevant documentation, it now says \u201cI couldn\u2019t find this information in our docs \u2014 please contact support\u201d instead of guessing.</dd>'+
     '</dl></div>'+
 
-  renderQuiz('mod4',[
-    {type:'mc',q:'What is the primary purpose of RAG?',opts:['To make AI responses faster','To ground AI responses in actual documents, reducing hallucination','To train the AI on your data','To replace the need for a knowledge base'],a:1,exp:'RAG retrieves relevant documents and includes them in the prompt context, grounding the AI\u2019s response in real source material.'},
-    {type:'tf',q:'In a RAG pipeline, the vector database uses keyword matching to find relevant documents.',a:false,exp:'Vector databases use semantic similarity (comparing embedding vectors), not keyword matching. This enables finding relevant documents even when exact keywords differ.'},
-    {type:'mc',q:'MCP is best described as:',opts:['A specific AI model','A standardized protocol for connecting AI to external tools','A type of prompt engineering','A database technology'],a:1,exp:'MCP (Model Context Protocol) is an open standard for connecting AI applications to external tools and data sources \u2014 like USB-C for AI.'},
-    {type:'tf',q:'Function calling and MCP serve the exact same purpose and are interchangeable.',a:false,exp:'Function calling is single-tool invocation (custom per API); MCP is a standardized protocol for discovering and using entire tool ecosystems. MCP is broader and more scalable.'},
-    {type:'mc',q:'When a RAG system cannot find relevant documents for a query, a well-designed system should:',opts:['Generate an answer from training data anyway','Report that it couldn\u2019t find relevant information','Make up plausible-sounding information','Search the internet instead'],a:1,exp:'A well-designed RAG system transparently reports when it can\u2019t find relevant documents rather than falling back to potentially hallucinated training data.'}
-  ]);
+  renderQuiz('mod4', pickRandom(MOD4_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 5: AGENTIC AI ══ */
@@ -1113,13 +1188,7 @@ function mod5Content(){
       '<dt>Takeaway</dt><dd>Agents excel at structured, repeatable tasks with clear patterns. The human\u2019s role shifts from drafting to reviewing and adding judgment \u2014 a more valuable use of expertise.</dd>'+
     '</dl></div>'+
 
-  renderQuiz('mod5',[
-    {type:'mc',q:'What distinguishes an AI agent from a chatbot?',opts:['Agents are smarter','Agents can plan, use tools, and execute multi-step tasks autonomously','Agents have larger context windows','Agents don\u2019t need prompts'],a:1,exp:'Agents autonomously plan, select tools, execute actions, and evaluate results across multiple steps \u2014 chatbots respond to individual messages.'},
-    {type:'tf',q:'Current AI agents can reliably handle any task without human oversight.',a:false,exp:'Current agents require careful oversight. They excel at structured tasks but struggle with ambiguity, and errors compound across steps.'},
-    {type:'mc',q:'In the agent loop, what is the purpose of "working memory"?',opts:['To permanently store all past conversations','To accumulate context from each subtask so later steps can reference earlier results','To replace the need for tool calls','To train the model on new data'],a:1,exp:'Working memory accumulates results from each subtask, allowing the agent to build on earlier findings as it progresses through the plan.'},
-    {type:'tf',q:'The "planning" step is what distinguishes an agent from a simple prompt-response pattern.',a:true,exp:'Planning \u2014 breaking a complex task into subtasks and determining sequence \u2014 is the defining capability that separates agents from chatbots.'},
-    {type:'mc',q:'When should an agent stop and request human input?',opts:['Never \u2014 agents should be fully autonomous','Only when it encounters an error','Before making irreversible changes or when it encounters ambiguity','Only at the very end of the task'],a:2,exp:'Well-designed agents request human approval before irreversible actions and when they encounter ambiguity that requires judgment.'}
-  ]);
+  renderQuiz('mod5', pickRandom(MOD5_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 6: ADVANCED AI WORKFLOW ══ */
@@ -1172,13 +1241,7 @@ function mod6Content(){
       '<dt>Takeaway</dt><dd>The investment in standardization paid for itself within the first month. Individual AI use is good; systematic team AI use is transformational.</dd>'+
     '</dl></div>'+
 
-  renderQuiz('mod6',[
-    {type:'mc',q:'What is the most valuable component of a team\u2019s AI prompt library?',opts:['The number of prompts','Tested, documented templates with example outputs and usage notes','Prompts for every possible task','The most complex prompts possible'],a:1,exp:'Quality over quantity \u2014 well-documented templates with examples and usage notes ensure consistent, reliable results across the team.'},
-    {type:'tf',q:'AI can reliably replace human judgment for evaluating content tone and audience appropriateness.',a:false,exp:'While AI can flag potential issues, human judgment remains essential for evaluating tone, cultural sensitivity, and audience fit.'},
-    {type:'mc',q:'What\u2019s the most effective use of AI for multi-document consistency?',opts:['Asking AI to rewrite all documents','Using AI to identify inconsistencies across documents','Having AI auto-merge all documents','Letting AI pick the best version'],a:1,exp:'AI excels at finding inconsistencies (terminology, version numbers, procedural differences) across document sets that humans miss after repeated reading.'},
-    {type:'tf',q:'An AI content governance framework should include rules about what data can be sent to AI tools.',a:true,exp:'Data handling rules are essential \u2014 customer data, proprietary information, and compliance-sensitive content may require specific handling or on-premise models.'},
-    {type:'mc',q:'When scaling AI workflows across a team, the best first step is:',opts:['Buying the most expensive AI tool','Auditing current workflows to identify where AI saves the most time','Requiring everyone to use AI for everything','Training everyone on prompt engineering simultaneously'],a:1,exp:'Start with an audit to identify high-impact opportunities, then standardize solutions for those specific tasks before expanding.'}
-  ]);
+  renderQuiz('mod6', pickRandom(MOD6_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 7: ETHICS & RESPONSIBLE USE ══ */
@@ -1221,20 +1284,18 @@ function mod7Content(){
     '<p style="margin-top:10px"><strong>5. Plan for evolution:</strong> AI capabilities change rapidly. Review and update your guidelines quarterly. Assign an \u201cAI lead\u201d who stays current on tool capabilities and policy implications.</p>'+
   '</div></details>'+
 
-  renderQuiz('mod7',[
-    {type:'mc',q:'What is Constitutional AI?',opts:['AI that follows the law','A technique where the model self-critiques its responses against a set of principles','AI that only works in democratic countries','A type of model architecture'],a:1,exp:'Constitutional AI has the model evaluate its own outputs against principles (helpful, harmless, honest) and revise before returning the response.'},
-    {type:'tf',q:'Purely AI-generated content with no human creative input is generally copyrightable.',a:false,exp:'In most jurisdictions, purely AI-generated content without substantial human creative contribution is not eligible for copyright protection.'},
-    {type:'mc',q:'What is red-teaming in the context of AI?',opts:['Using AI to generate red-colored content','Deliberately trying to find problems, failures, and safety issues in AI outputs','Training the model with negative examples','Testing AI response speed'],a:1,exp:'Red-teaming is the practice of deliberately probing AI outputs for problems \u2014 bias, inaccuracy, safety issues, and edge cases.'},
-    {type:'tf',q:'If your prompt implies a certain answer, modern AI tools will always push back and give a balanced response.',a:false,exp:'LLMs are trained to be agreeable through RLHF. Leading prompts often get confirming responses. Frame questions neutrally for balanced output.'},
-    {type:'mc',q:'An effective organizational AI usage policy should include:',opts:['A ban on all AI use until regulations are finalized','Only technical specifications for approved models','Permitted use cases, review requirements, data handling rules, and disclosure policies','A single rule: use your judgment'],a:2,exp:'Comprehensive guidelines cover what\u2019s permitted, how content is reviewed, what data can be sent to AI, and when to disclose AI involvement.'}
-  ]);
+  renderQuiz('mod7', pickRandom(MOD7_QUIZ_POOL, 5));
 }
 
 /* ══ MODULE 8: LEARNING ROADMAP ══ */
 function mod8Content(){
   var tier1 = [
     {t:'AI for Everyone',p:'DeepLearning.AI / Coursera',time:'~6 hours',cost:'Free to audit',url:'https://www.coursera.org/learn/ai-for-everyone',why:'The gold standard beginner course by Andrew Ng. Non-technical, covers what AI can and can\u2019t do. Start here if you haven\u2019t already.'},
+    {t:'Generative AI for Everyone',p:'DeepLearning.AI / Coursera',time:'~8 hours',cost:'Free to audit',url:'https://www.coursera.org/learn/generative-ai-for-everyone',why:'Andrew Ng\u2019s GenAI-focused course. Covers how LLMs work, practical prompt techniques, and the impact of GenAI on work.'},
     {t:'Google AI Essentials',p:'Google / Coursera',time:'~10 hours',cost:'Free to audit',url:'https://www.coursera.org/specializations/ai-essentials-google',why:'Hands-on with real AI tools. The prompting module is particularly strong for content professionals.'},
+    {t:'Google Prompting Essentials',p:'Google / Coursera',time:'~10 hours',cost:'',url:'https://www.coursera.org/specializations/prompting-essentials-google',why:'Dedicated prompt engineering course with hands-on exercises. Teaches a 5-step prompting framework you can apply immediately.'},
+    {t:'Introduction to Artificial Intelligence',p:'Doug Rose / LinkedIn Learning',time:'~2 hours',cost:'Subscription',url:'https://www.linkedin.com/learning/introduction-to-artificial-intelligence-24947908',why:'Business-focused AI overview for non-technical professionals. Covers AI types, neural networks, and practical applications.'},
+    {t:'Career Essentials in Generative AI',p:'Microsoft & LinkedIn',time:'~5 hours',cost:'Free',url:'https://www.linkedin.com/learning/paths/career-essentials-in-generative-ai-by-microsoft-and-linkedin',why:'Covers GenAI fundamentals plus practical workplace applications with Microsoft tools. Earns a LinkedIn credential.'},
     {t:'3Blue1Brown \u2014 Neural Networks Series',p:'YouTube',time:'~4 hours',cost:'Free',url:'https://www.3blue1brown.com/topics/neural-networks',why:'The single best visual explanation of neural networks on the internet. Watch this to deeply understand Module 1.'}
   ];
   var tier2 = [
@@ -1256,9 +1317,10 @@ function mod8Content(){
     {t:'MCP on Wikipedia',p:'Wikipedia',time:'~15 min',cost:'Free',url:'https://en.wikipedia.org/wiki/Model_Context_Protocol',why:'Protocol overview and adoption. A well-maintained, accessible summary of MCP\u2019s significance.'}
   ];
   return '<div class="sec-title">Your Learning Path</div>'+
-  '<div class="callout" style="margin-bottom:24px">This roadmap focuses on Tier 2 (Applied) and Tier 3 (Advanced) resources. If you need foundations, start with Tier 1 or the companion guide, <strong>AI Essentials (AI-101)</strong>.</div>'+
+  '<div class="callout" style="margin-bottom:24px">This roadmap covers all three tiers. Already comfortable with AI basics? Skip ahead to Tier 2. New to AI? Start with the Tier 1 foundations.</div>'+
   '<div class="roadmap-tier">'+
-    '<div class="tier-header" style="background:var(--primary)">\uD83D\uDD04 Tier 1 \u2014 Refresher (Foundations from AI-101)</div>'+
+    '<div class="tier-header" style="background:var(--primary)">\uD83C\uDFE0 Tier 1 \u2014 Foundation (Refresher)</div>'+
+    '<div class="callout" style="margin-bottom:12px">Already comfortable with AI basics? Skip ahead to Tier 2. New to AI? Start here.</div>'+
     tier1.map(function(r){return '<div class="resource-card"><div class="resource-title">'+r.t+'</div><div class="resource-provider">'+r.p+'</div><div class="resource-meta"><span>\u23F1 '+r.time+'</span>'+(r.cost?'<span>\uD83D\uDCB0 '+r.cost+'</span>':'')+'</div><div class="resource-why">'+r.why+'</div><a class="resource-link" href="'+r.url+'" target="_blank" rel="noopener">Open Resource \u2192</a></div>';}).join('')+
   '</div>'+
   '<div class="roadmap-tier">'+
@@ -1564,7 +1626,7 @@ function txStep(n){
 }
 
 /* ── MOD 7: RED-TEAM EXERCISE ── */
-var RT_PASSAGES = [
+var ALL_RT_PASSAGES = [
   {text:'Our platform uses bank-grade AES-256 encryption for all data at rest and in transit. According to a 2024 Cybersecurity Benchmark Report by the National Institute of Standards (NIST), AES-256 remains unbreakable with current computing technology. Our security team conducts quarterly penetration testing.',sentences:[
     {s:'Our platform uses bank-grade AES-256 encryption for all data at rest and in transit.',h:false},
     {s:'According to a 2024 Cybersecurity Benchmark Report by the National Institute of Standards (NIST), AES-256 remains unbreakable with current computing technology.',h:true,why:'This specific report title is fabricated. While NIST does publish security standards, this specific "2024 Cybersecurity Benchmark Report" doesn\u2019t exist. AI commonly fabricates specific report names and dates.'},
@@ -1573,15 +1635,30 @@ var RT_PASSAGES = [
   {text:'The new AI-powered search feature processes queries in under 50 milliseconds, supports 23 languages, and was developed using a proprietary neural architecture called TransSearch-7, which combines BERT-style bidirectional encoding with a novel sparse attention mechanism.',sentences:[
     {s:'The new AI-powered search feature processes queries in under 50 milliseconds, supports 23 languages,',h:false},
     {s:'and was developed using a proprietary neural architecture called TransSearch-7, which combines BERT-style bidirectional encoding with a novel sparse attention mechanism.',h:true,why:'\u201cTransSearch-7\u201d is an AI-fabricated architecture name. The detailed technical description makes it sound plausible, but this is exactly how AI hallucinations work \u2014 confident, specific-sounding details that are completely invented.'}
+  ]},
+  {text:'Our platform uses end-to-end encryption with the ChaCha20-Poly1305 cipher suite for all data in transit. According to the 2025 Cloud Security Alliance report on encryption standards, ChaCha20 provides 37% better performance than AES-256 on mobile devices while maintaining equivalent security guarantees.',sentences:[
+    {s:'Our platform uses end-to-end encryption with the ChaCha20-Poly1305 cipher suite for all data in transit.',h:false},
+    {s:'According to the 2025 Cloud Security Alliance report on encryption standards, ChaCha20 provides 37% better performance than AES-256 on mobile devices while maintaining equivalent security guarantees.',h:true,why:'While ChaCha20 is real and performs well on mobile, the specific "2025 Cloud Security Alliance report" and the "37% better performance" figure are fabricated. AI invents specific reports and statistics to support true general claims.'}
+  ]},
+  {text:'Retrieval-Augmented Generation was first described in a 2020 paper by Lewis et al. at Facebook AI Research. The technique combines a retrieval system with a generator model to produce more factual responses. Modern RAG systems typically use vector databases like FAISS, Pinecone, or Weaviate to store document embeddings.',sentences:[
+    {s:'Retrieval-Augmented Generation was first described in a 2020 paper by Lewis et al. at Facebook AI Research.',h:false},
+    {s:'The technique combines a retrieval system with a generator model to produce more factual responses.',h:false},
+    {s:'Modern RAG systems typically use vector databases like FAISS, Pinecone, or Weaviate to store document embeddings.',h:false}
+  ]},
+  {text:'The Model Context Protocol supports three core primitives: tools (executable functions), resources (read-only data), and prompts (reusable templates). According to the MCP Foundation\u2019s 2025 adoption survey, over 85% of enterprise AI deployments now use MCP for tool integration, making it the dominant standard ahead of both LangChain and OpenAPI.',sentences:[
+    {s:'The Model Context Protocol supports three core primitives: tools (executable functions), resources (read-only data), and prompts (reusable templates).',h:false},
+    {s:'According to the MCP Foundation\u2019s 2025 adoption survey, over 85% of enterprise AI deployments now use MCP for tool integration, making it the dominant standard ahead of both LangChain and OpenAPI.',h:true,why:'There is no "MCP Foundation adoption survey" and the 85% figure is fabricated. MCP was introduced in late 2024 and donated to the Linux Foundation\u2019s Agentic AI Foundation. The "MCP Foundation" doesn\u2019t exist as a separate entity.'}
   ]}
 ];
 var rtRevealed = false;
+var selectedRTPassages = [];
 
 function initMod7(){
   rtRevealed = false;
+  selectedRTPassages = pickRandom(ALL_RT_PASSAGES, 3);
   var area = document.getElementById('redteam-area');
   if(!area) return;
-  area.innerHTML = RT_PASSAGES.map(function(p,pi){
+  area.innerHTML = selectedRTPassages.map(function(p,pi){
     return '<div class="spot-passage" data-pidx="'+pi+'"><div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Content Sample '+(pi+1)+'</div>'+
       p.sentences.map(function(s,si){return '<span class="spot-sentence" data-pidx="'+pi+'" data-sidx="'+si+'" onclick="toggleRTFlag(this)">'+s.s+' </span>';}).join('')+'</div>';
   }).join('');
@@ -1598,7 +1675,7 @@ window.checkRedTeam = function(){
   rtRevealed = true;
   document.getElementById('rt-check-btn').style.display = 'none';
   var correct = 0, total = 0;
-  RT_PASSAGES.forEach(function(p,pi){
+  selectedRTPassages.forEach(function(p,pi){
     p.sentences.forEach(function(s,si){
       var el = document.querySelector('.spot-sentence[data-pidx="'+pi+'"][data-sidx="'+si+'"]');
       if(s.h) total++;
@@ -1645,6 +1722,7 @@ var GLOSSARY = [
   {term:'Transfer Learning',cat:'ML Fundamentals',def:'Taking a model trained on one task and adapting it for a different but related task, leveraging previously learned patterns.',why:'This is why fine-tuned models work \u2014 they transfer general language knowledge to specific tasks.',rel:['Fine-Tuning','Pre-training']},
   {term:'Data Augmentation',cat:'ML Fundamentals',def:'Creating modified copies of training data to increase dataset size and diversity (e.g., rotating images, paraphrasing text).',why:'Helps models generalize better, especially when training data is limited.',rel:['Training Data']},
   {term:'Feature Engineering',cat:'ML Fundamentals',def:'The process of selecting, transforming, or creating input features to improve model performance.',why:'In traditional ML, this was the most important skill. Deep learning automates much of it.',rel:['Machine Learning']},
+  {term:'Diffusion Model',cat:'GenAI',def:'A GenAI model for image generation (e.g., DALL-E, Midjourney, Stable Diffusion). Works by learning to progressively remove noise from random data to create images.',why:'If you create visual content or need AI-generated images, these are the models behind the tools.',rel:['Generative AI','Multi-modal']},
   {term:'Generative AI (GenAI)',cat:'GenAI',def:'AI systems that create new content \u2014 text, images, audio, video, code.',why:'The category of AI you interact with most directly.',rel:['LLM','Diffusion Model']},
   {term:'Large Language Model (LLM)',cat:'GenAI',def:'A generative AI model trained on massive text datasets to understand and generate human language.',why:'The technology powering the AI writing and editing tools you use daily.',rel:['Generative AI','Transformer','Token']},
   {term:'Transformer',cat:'GenAI',def:'The neural network architecture introduced in 2017 that powers virtually all modern LLMs.',why:'Understanding transformers helps you understand LLM strengths and limitations.',rel:['Attention Mechanism','LLM']},
@@ -1691,6 +1769,7 @@ var GLOSSARY = [
   {term:'Open-Source Model',cat:'Infrastructure',def:'An AI model whose weights and code are publicly available (e.g., Llama, Mistral).',why:'Open-source gives more control but requires expertise to deploy.',rel:['Model','Proprietary Model']},
   {term:'Proprietary Model',cat:'Infrastructure',def:'An AI model owned by a company, accessible only through their API (e.g., Claude, GPT).',why:'These are what you use through Claude.ai and ChatGPT.',rel:['Model','API','Open-Source Model']},
   {term:'Latency',cat:'Infrastructure',def:'The time delay between sending a prompt and receiving a response.',why:'Larger models and longer prompts = higher latency.',rel:['Inference','Model']},
+  {term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: the AI model runs locally on your computer or phone. Cloud: the model runs on remote servers and results are sent back over the internet.',why:'Cloud inference requires internet and sends data to external servers. On-device inference is private but limited by device hardware. This matters for sensitive content workflows.',rel:['Inference','Latency','Privacy']},
   {term:'RAG (Retrieval-Augmented Generation)',cat:'RAG & Infrastructure',def:'A technique where AI retrieves relevant documents from a knowledge base before generating a response.',why:'RAG grounds AI in your actual documentation, reducing hallucination.',rel:['Embedding','Vector Database','Grounding']},
   {term:'Vector Database',cat:'RAG & Infrastructure',def:'A database optimized for storing and searching vector embeddings.',why:'The backend powering RAG and semantic search in AI knowledge bases.',rel:['Vector','Embedding','RAG']},
   {term:'Chunking Strategy',cat:'RAG & Infrastructure',def:'The method used to split documents into smaller pieces for embedding and storage in a RAG system.',why:'Chunk size affects retrieval quality \u2014 too small loses context, too large dilutes relevance.',rel:['RAG','Vector Database']},
@@ -1701,6 +1780,7 @@ var GLOSSARY = [
   {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools and data sources.',why:'MCP is how AI tools connect to your company\'s systems \u2014 the USB-C of AI.',rel:['Tool Use','Function Calling','API']},
   {term:'Function Calling / Tool Use',cat:'Protocols',def:'The ability of an AI to invoke external tools as part of generating a response.',why:'Makes AI go beyond text generation \u2014 it can look things up and take actions.',rel:['MCP','Agent','API']},
   {term:'Structured Output',cat:'Protocols',def:'AI output in a defined format like JSON, XML, or a specific template.',why:'Essential when output feeds into other systems (CMS, databases, pipelines).',rel:['Output Format','API']},
+  {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\u2019s ability to break complex tasks into subtasks, determine the right sequence, and decide which tools to use at each step.',why:'Understanding how agents plan helps you design better task descriptions and evaluate whether an agent\u2019s approach makes sense.',rel:['Agent Loop','Tool Orchestration','Prompt Chaining']},
   {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Tool Use','MCP','Planning']},
   {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool providing suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent','Tool Use']},
   {term:'Planning (Agentic)',cat:'Agents',def:'An AI agent\'s ability to break tasks into subtasks, determine sequence, and select tools.',why:'Understanding agent planning helps you design better task descriptions.',rel:['Agent','Prompt Chaining']},
@@ -1782,6 +1862,31 @@ window.jumpToGloss = function(term){
 };
 
 /* ══ FINAL ASSESSMENT ══ */
+var FINAL_QUIZ_POOL = [
+  {type:'mc',q:'What is the primary function of the attention mechanism in Transformers?',opts:['Speed up training','Allow each token to attend to every other token simultaneously','Reduce model size','Improve image processing'],a:1,exp:'The attention mechanism enables every token to directly attend to every other token, regardless of distance \u2014 the key innovation of Transformers.'},
+  {type:'tf',q:'RAG reduces hallucination by grounding AI responses in retrieved documents.',a:true,exp:'RAG retrieves relevant documents and includes them in context, giving the AI factual source material to reference.'},
+  {type:'mc',q:'What distinguishes an AI agent from a chatbot?',opts:['Agents are faster','Agents can autonomously plan, use tools, and execute multi-step tasks','Agents have better grammar','Agents don\u2019t need prompts'],a:1,exp:'Agents plan, select tools, execute actions, and evaluate results across multiple steps \u2014 chatbots respond to individual messages.'},
+  {type:'tf',q:'MCP is a proprietary protocol that only works with Claude.',a:false,exp:'MCP is an open standard designed to work across multiple AI platforms.'},
+  {type:'mc',q:'In the training pipeline, what does backpropagation calculate?',opts:['The best next token','How much each weight contributed to prediction errors','The optimal batch size','Training data quality'],a:1,exp:'Backpropagation traces errors backward through the network, calculating each weight\u2019s contribution to the loss.'},
+  {type:'tf',q:'Few-shot prompting is less effective than zero-shot for maintaining consistent output format.',a:false,exp:'Few-shot prompting (showing examples) is significantly more effective for consistent formatting and style than zero-shot.'},
+  {type:'mc',q:'A well-designed RAG system that cannot find relevant documents should:',opts:['Generate an answer from training data','Say it couldn\u2019t find relevant information','Search the internet','Ask a different model'],a:1,exp:'Transparently reporting missing information is better than falling back to potentially hallucinated training data.'},
+  {type:'tf',q:'Constitutional AI adds a self-critique step where the model evaluates its own output against principles.',a:true,exp:'Constitutional AI has the model critique its own responses against principles like helpfulness, harmlessness, and honesty.'},
+  {type:'mc',q:'What is the most effective approach for complex document review?',opts:['One long prompt covering everything','Breaking the task into a chain of focused prompts','Using the highest temperature setting','Asking the AI to "try harder"'],a:1,exp:'Prompt chaining produces dramatically better results for complex tasks because each step has a focused objective.'},
+  {type:'tf',q:'Purely AI-generated content without human creative input is generally copyrightable.',a:false,exp:'In most jurisdictions, purely AI-generated content without substantial human creative contribution is not copyrightable.'},
+  {type:'mc',q:'In the AI technology stack, which layer adds system prompts and parameters that shape model behavior?',opts:['Foundation Models','APIs & Platforms / Applications','Your Workflow','Training Data'],a:1,exp:'The application and API layers add system prompts, parameters, and processing that shape how the foundation model responds.'},
+  {type:'tf',q:'Vector databases use keyword matching to find relevant documents in RAG pipelines.',a:false,exp:'Vector databases use semantic similarity (comparing embedding vectors), enabling matching by meaning rather than exact keywords.'},
+  {type:'mc',q:'What is the primary benefit of building a team prompt library?',opts:['It makes AI unnecessary','It ensures consistent, high-quality output across the team','It replaces the need for style guides','It reduces the cost of AI tools'],a:1,exp:'A shared prompt library ensures everyone applies tested, proven prompts consistently rather than reinventing approaches individually.'},
+  {type:'tf',q:'The agent loop pattern is: observe \u2192 plan \u2192 act \u2192 evaluate \u2192 repeat.',a:true,exp:'This iterative cycle is the defining pattern of agentic AI \u2014 each iteration brings the agent closer to completing the assigned task.'},
+  {type:'mc',q:'Which technique is most effective for getting the AI to catch factual errors in a draft?',opts:['Asking "is this correct?"','Chain-of-thought: "List each claim, then evaluate each against the source"','Using a higher temperature','Making the prompt shorter'],a:1,exp:'Chain-of-thought forces systematic analysis rather than a surface-level assessment, catching significantly more errors.'},
+  {type:'mc',q:'What is "data drift" and why does it matter?',opts:['Data transferred between servers','Real-world data evolving away from training data, degrading performance','Storage costs increasing','Users providing incorrect input'],a:1,exp:'Data drift occurs when the real world changes but the model\u2019s training data doesn\u2019t. Products evolve, language shifts \u2014 a model trained on 2023 data may misclassify 2025 content.'},
+  {type:'tf',q:'In a RAG pipeline, the embedding model and the LLM are the same model.',a:false,exp:'They are typically different models. The embedding model converts text to vectors for search. The LLM generates responses. Different functions, different models.'},
+  {type:'mc',q:'What is the "lost in the middle" problem?',opts:['Models lose training data over time','Models pay less attention to content in the middle of long contexts','Middle neural network layers malfunction','Users forget their questions'],a:1,exp:'Research shows LLMs attend more strongly to content at the beginning and end of the context window, with reduced attention to middle sections.'},
+  {type:'tf',q:'A fine-tuned model always outperforms the base model on all tasks.',a:false,exp:'Fine-tuning improves the specific domain but can degrade other tasks \u2014 "catastrophic forgetting." The base model retains broader general capabilities.'},
+  {type:'mc',q:'Which capability most distinguishes an agent from a chatbot?',opts:['Faster responses','Autonomous planning, tool use, and multi-step execution','Better grammar','Larger context window'],a:1,exp:'Agents autonomously plan subtasks, select tools, and iterate. Chatbots respond to individual messages without multi-step planning.'},
+  {type:'tf',q:'Hybrid search in RAG combines keyword matching with semantic vector search.',a:true,exp:'Hybrid search uses both keyword matching (good for exact terms) and semantic search (good for meaning). Combined, they catch results either method alone would miss.'},
+  {type:'mc',q:'What is the most practical first step for a content team adopting AI?',opts:['Fine-tune a custom model','Deploy a RAG system','Build a shared prompt template library','Hire an AI engineer'],a:2,exp:'A shared prompt library is the fastest, cheapest, most impactful first step. It standardizes quality and builds institutional knowledge.'}
+];
+
 function showFinalAssessment(){
   completedModules.add(MODULES.length - 1);
   currentModule = -2;
@@ -1789,23 +1894,7 @@ function showFinalAssessment(){
   renderTrail();
   window.scrollTo({top:0,behavior:'smooth'});
 
-  var questions = [
-    {type:'mc',q:'What is the primary function of the attention mechanism in Transformers?',opts:['Speed up training','Allow each token to attend to every other token simultaneously','Reduce model size','Improve image processing'],a:1,exp:'The attention mechanism enables every token to directly attend to every other token, regardless of distance \u2014 the key innovation of Transformers.'},
-    {type:'tf',q:'RAG reduces hallucination by grounding AI responses in retrieved documents.',a:true,exp:'RAG retrieves relevant documents and includes them in context, giving the AI factual source material to reference.'},
-    {type:'mc',q:'What distinguishes an AI agent from a chatbot?',opts:['Agents are faster','Agents can autonomously plan, use tools, and execute multi-step tasks','Agents have better grammar','Agents don\u2019t need prompts'],a:1,exp:'Agents plan, select tools, execute actions, and evaluate results across multiple steps \u2014 chatbots respond to individual messages.'},
-    {type:'tf',q:'MCP is a proprietary protocol that only works with Claude.',a:false,exp:'MCP is an open standard designed to work across multiple AI platforms.'},
-    {type:'mc',q:'In the training pipeline, what does backpropagation calculate?',opts:['The best next token','How much each weight contributed to prediction errors','The optimal batch size','Training data quality'],a:1,exp:'Backpropagation traces errors backward through the network, calculating each weight\u2019s contribution to the loss.'},
-    {type:'tf',q:'Few-shot prompting is less effective than zero-shot for maintaining consistent output format.',a:false,exp:'Few-shot prompting (showing examples) is significantly more effective for consistent formatting and style than zero-shot.'},
-    {type:'mc',q:'A well-designed RAG system that cannot find relevant documents should:',opts:['Generate an answer from training data','Say it couldn\u2019t find relevant information','Search the internet','Ask a different model'],a:1,exp:'Transparently reporting missing information is better than falling back to potentially hallucinated training data.'},
-    {type:'tf',q:'Constitutional AI adds a self-critique step where the model evaluates its own output against principles.',a:true,exp:'Constitutional AI has the model critique its own responses against principles like helpfulness, harmlessness, and honesty.'},
-    {type:'mc',q:'What is the most effective approach for complex document review?',opts:['One long prompt covering everything','Breaking the task into a chain of focused prompts','Using the highest temperature setting','Asking the AI to "try harder"'],a:1,exp:'Prompt chaining produces dramatically better results for complex tasks because each step has a focused objective.'},
-    {type:'tf',q:'Purely AI-generated content without human creative input is generally copyrightable.',a:false,exp:'In most jurisdictions, purely AI-generated content without substantial human creative contribution is not copyrightable.'},
-    {type:'mc',q:'In the AI technology stack, which layer adds system prompts and parameters that shape model behavior?',opts:['Foundation Models','APIs & Platforms / Applications','Your Workflow','Training Data'],a:1,exp:'The application and API layers add system prompts, parameters, and processing that shape how the foundation model responds.'},
-    {type:'tf',q:'Vector databases use keyword matching to find relevant documents in RAG pipelines.',a:false,exp:'Vector databases use semantic similarity (comparing embedding vectors), enabling matching by meaning rather than exact keywords.'},
-    {type:'mc',q:'What is the primary benefit of building a team prompt library?',opts:['It makes AI unnecessary','It ensures consistent, high-quality output across the team','It replaces the need for style guides','It reduces the cost of AI tools'],a:1,exp:'A shared prompt library ensures everyone applies tested, proven prompts consistently rather than reinventing approaches individually.'},
-    {type:'tf',q:'The agent loop pattern is: observe \u2192 plan \u2192 act \u2192 evaluate \u2192 repeat.',a:true,exp:'This iterative cycle is the defining pattern of agentic AI \u2014 each iteration brings the agent closer to completing the assigned task.'},
-    {type:'mc',q:'Which technique is most effective for getting the AI to catch factual errors in a draft?',opts:['Asking "is this correct?"','Chain-of-thought: "List each claim, then evaluate each against the source"','Using a higher temperature','Making the prompt shorter'],a:1,exp:'Chain-of-thought forces systematic analysis rather than a surface-level assessment, catching significantly more errors.'}
-  ];
+  var questions = pickRandom(FINAL_QUIZ_POOL, 15);
 
   mainEl.innerHTML = '<div class="mod-hdr"><div class="mod-ico" style="background:var(--gradient-primary)"><svg viewBox="0 0 24 24" fill="#fff" width="26" height="26"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><div><div class="mod-title">Final Assessment</div><div class="mod-desc">15 questions covering all modules. Test your advanced AI knowledge!</div></div></div>'+
     renderQuiz('final', questions)+
@@ -1938,7 +2027,10 @@ scrollBtn.addEventListener('click', function(){
 function renderMobDrawer(){
   var list = document.getElementById('mob-drawer-list');
   if(!list) return;
-  list.innerHTML = MODULES.map(function(m,i){
+  list.innerHTML = '<div class="mob-drawer-item" onclick="showLanding();closeMobDrawer()" style="border-bottom:2px solid var(--border);margin-bottom:4px">' +
+    '<div class="mob-drawer-ico" style="background:var(--tx-secondary)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg></div>' +
+    '<div><div class="mob-drawer-name">Home</div></div>' +
+  '</div>' + MODULES.map(function(m,i){
     var cls = (i === currentModule ? 'active' : '') + (completedModules.has(i) ? ' done' : '');
     return '<div class="mob-drawer-item '+cls+'" onclick="goModule('+i+');closeMobDrawer()">'+
       '<div class="mob-drawer-ico" style="background:'+m.color+'">'+ICONS[m.icon]+'</div>'+

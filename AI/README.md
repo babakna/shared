@@ -12,8 +12,8 @@ Interactive AI learning tools designed for content editors and technical writers
 Open any HTML file directly in your browser — no installation, no dependencies, no server required.
 
 **Live versions:**
-- [AI-101: AI Essentials](https://babakna.github.io/AI-Resources/AI-101.html)
-- AI-102: Coming soon
+- [AI-101: AI Essentials](https://babakna.github.io/shared/AI/AI-101.html)
+- [AI-102: AI Deep Dive](https://babakna.github.io/shared/AI/AI-102.html)
 
 ## Author
 
