@@ -218,7 +218,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .temp-output{background:var(--bg-muted);border-radius:8px;padding:16px;font-size:14px;color:var(--tx-primary);line-height:1.7;font-style:italic;min-height:60px;border-left:3px solid var(--accent)}
 .temp-val{text-align:center;font-size:28px;font-weight:800;color:var(--primary);margin:8px 0}
 
-.flow-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:24px 0}
+.flow-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:24px 0;position:relative}
 .flow-ctrl{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg-muted);flex-wrap:wrap}
 .flow-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--tx-secondary);transition:all .15s;font-family:var(--font-body)}
 .flow-btn:hover{border-color:var(--primary);color:var(--primary)}
@@ -480,10 +480,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 }
 @keyframes swipeHintFade{
   0%,60%{opacity:1}
-  100%{opacity:0;display:none}
+  100%{opacity:0}
 }
-.flow-box{position:relative}
-
 /* ── FIX 4: Trail tablet visibility (769–1024px) ── */
 @media(max-width:1024px) and (min-width:769px){
   .trail-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 16px}
@@ -854,6 +852,10 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
   .course-link{padding:4px 8px;font-size:10px}
 }
 
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+  html{scroll-behavior:auto}
+}
 </style>
 </head>
 <body>
@@ -1151,6 +1153,8 @@ function renderLanding(){
 
 function renderModule(idx){
   const m = MODULES[idx];
+  const qp = ['mod1','mod2','mod3','mod4','mod5','mod6'][idx];
+  if(qp) Object.keys(quizStates).forEach(k => { if(k.startsWith(qp + '-')) delete quizStates[k]; });
   const nav = `<div class="nav-btns">
     ${idx > 0 ? `<button class="nav-btn secondary" onclick="goModule(${idx-1})">\u2190 ${MODULES[idx-1].title}</button>` : '<div></div>'}
     ${idx < MODULES.length - 1 ? `<button class="nav-btn primary" onclick="completeAndNext(${idx})">Next: ${MODULES[idx+1].title} \u2192</button>` : `<button class="nav-btn primary" onclick="showFinalAssessment()">Final Assessment \u2192</button>`}
@@ -1379,7 +1383,7 @@ function mod3Content(){
       <button class="flow-btn" tabindex="0" onclick="txStep(0)">\u23EE Reset</button>
       <button class="flow-btn" tabindex="0" onclick="txStep(Math.max(0,txCur-1))">\u25C0 Prev</button>
       <button class="flow-btn pri" tabindex="0" onclick="txStep(txCur+1)">Next \u25B6</button>
-      <button class="flow-btn" tabindex="0" onclick="txStep(6)">Show All \u23ED</button>
+      <button class="flow-btn" tabindex="0" onclick="txStep(TX_STEPS.length)">Show All \u23ED</button>
       <span class="flow-step-ind" id="tx-step-ind">Step 0 / 6</span>
     </div>
     <div class="tx-step-visual" id="tx-steps"></div>
@@ -1808,8 +1812,8 @@ function renderQuiz(id, questions){
       return `<div class="quiz-card" id="qc-${qid}">
         <div class="quiz-q"><span class="q-num">Q${i+1}.</span> ${q.q} <span class="q-type">True / False</span></div>
         <div class="quiz-opts">
-          <div class="quiz-opt" data-qid="${qid}" data-val="true" onclick="selectQuizOpt(this)" tabindex="0"><div class="opt-marker">T</div>True</div>
-          <div class="quiz-opt" data-qid="${qid}" data-val="false" onclick="selectQuizOpt(this)" tabindex="0"><div class="opt-marker">F</div>False</div>
+          <div class="quiz-opt" data-qid="${qid}" data-val="true" onclick="selectQuizOpt(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuizOpt(this)}" tabindex="0"><div class="opt-marker">T</div>True</div>
+          <div class="quiz-opt" data-qid="${qid}" data-val="false" onclick="selectQuizOpt(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuizOpt(this)}" tabindex="0"><div class="opt-marker">F</div>False</div>
         </div>
         <button class="quiz-check" id="btn-${qid}" onclick="checkQuiz('${qid}',${q.a},'${esc(q.exp)}')" disabled>Check Answer</button>
         <div class="quiz-fb" id="fb-${qid}"></div>
@@ -1818,7 +1822,7 @@ function renderQuiz(id, questions){
       return `<div class="quiz-card" id="qc-${qid}">
         <div class="quiz-q"><span class="q-num">Q${i+1}.</span> ${q.q} <span class="q-type">Multiple Choice</span></div>
         <div class="quiz-opts">
-          ${q.opts.map((o,j)=>`<div class="quiz-opt" data-qid="${qid}" data-val="${j}" onclick="selectQuizOpt(this)" tabindex="0"><div class="opt-marker">${String.fromCharCode(65+j)}</div>${o}</div>`).join('')}
+          ${q.opts.map((o,j)=>`<div class="quiz-opt" data-qid="${qid}" data-val="${j}" onclick="selectQuizOpt(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuizOpt(this)}" tabindex="0"><div class="opt-marker">${String.fromCharCode(65+j)}</div>${o}</div>`).join('')}
         </div>
         <button class="quiz-check" id="btn-${qid}" onclick="checkQuiz('${qid}',${q.a},'${esc(q.exp)}')" disabled>Check Answer</button>
         <div class="quiz-fb" id="fb-${qid}"></div>
@@ -2398,10 +2402,10 @@ function renderWorkshop(i){
 function scoreWorkshop(){
   const input = document.getElementById('workshop-input').value.toLowerCase();
   if(input.trim().length < 10){
-    const resultsEl = document.getElementById('workshop-results');
-    resultsEl.style.display = 'block';
-    resultsEl.innerHTML = '<div class="callout warning" style="text-align:center"><strong>Please write a prompt first!</strong> Your prompt needs at least a few words before scoring.</div>';
-    resultsEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+    document.getElementById('workshop-results').style.display = 'block';
+    document.getElementById('workshop-scorecard').innerHTML = '<div class="callout warning" style="text-align:center"><strong>Please write a prompt first!</strong> Your prompt needs at least a few words before scoring.</div>';
+    document.getElementById('workshop-output').innerHTML = '';
+    document.getElementById('workshop-results').scrollIntoView({behavior:'smooth', block:'nearest'});
     return;
   }
   const s = activeWorkshopScenarios[workshopIdx];
@@ -2567,6 +2571,8 @@ function checkSpot(){
 }
 window.checkScenario = function(si, sel, best, exp){
   const card = document.getElementById('sc-'+si);
+  if(card.dataset.answered) return;
+  card.dataset.answered = 'true';
   const opts = card.querySelectorAll('.scenario-opt');
   opts.forEach((o,j)=>{ o.style.cursor='default'; if(j===best) o.classList.add('best'); if(j===sel) o.classList.add('selected'); });
   const fb = document.getElementById('sc-fb-'+si);
@@ -2740,9 +2746,12 @@ window.jumpToGloss = function(term){
 
 /* ══ FINAL ASSESSMENT ══ */
 function showFinalAssessment(){
+  Object.keys(quizStates).forEach(k => { if(k.startsWith('final-')) delete quizStates[k]; });
   currentModule = -2;
   document.getElementById('trail-wrap').classList.add('vis');
   renderTrail();
+  const mobBar = document.getElementById('mob-module-bar');
+  if(mobBar) mobBar.innerHTML = '<strong>Final Assessment</strong>';
   window.scrollTo({top:0,behavior:'smooth'});
 
   const questions = pickRandom(FINAL_QUIZ_POOL, 15);
@@ -2785,6 +2794,8 @@ function scoreFinal(){
     setTimeout(() => firstUnanswered.style.boxShadow = '', 2000);
     return;
   }
+  const oldAlert = document.getElementById('final-unanswered-alert');
+  if(oldAlert) oldAlert.remove();
   for(let i = 0; i < total; i++){
     const qid = `final-q${i}`;
     if(!quizStates[qid]){
@@ -2792,20 +2803,18 @@ function scoreFinal(){
       if(btn && !btn.disabled) btn.click();
     }
   }
-  setTimeout(() => {
-    let correct = 0;
-    for(let i = 0; i < total; i++){
-      const card = document.getElementById('qc-final-q' + i);
-      if(card && card.classList.contains('correct')) correct++;
-    }
-    const el = document.getElementById('final-score');
-    let cls, msg;
-    if(correct >= 12){ cls = 'excellent'; msg = "Excellent! You've built a strong AI foundation."; }
-    else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
-    else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
-    el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div></div>`;
-    el.scrollIntoView({behavior:'smooth'});
-  }, 200);
+  let correct = 0;
+  for(let i = 0; i < total; i++){
+    const card = document.getElementById('qc-final-q' + i);
+    if(card && card.classList.contains('correct')) correct++;
+  }
+  const el = document.getElementById('final-score');
+  let cls, msg;
+  if(correct >= 12){ cls = 'excellent'; msg = "Excellent! You've built a strong AI foundation."; }
+  else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
+  else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
+  el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div></div>`;
+  el.scrollIntoView({behavior:'smooth'});
 }
 
 /* ══ GLOBAL SEARCH ══ */
@@ -2900,7 +2909,7 @@ function taxStep(dir){
 document.addEventListener('keydown', e => {
   if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if((e.ctrlKey||e.metaKey) && e.key === 'k'){ e.preventDefault(); openSearch(); return; }
-  if(e.key === 'Escape'){ closeSearch(); return; }
+  if(e.key === 'Escape'){ closeSearch(); closeMobDrawer(); return; }
 
   const focused = document.activeElement;
   if(!focused) return;

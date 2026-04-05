@@ -282,7 +282,7 @@ button,.flow-btn,.nav-btn{min-height:40px}
 .scroll-top{width:40px;height:40px;bottom:16px;right:16px}
 input,textarea,select{font-size:16px!important}
 .matrix-wrap{-webkit-overflow-scrolling:touch}.matrix-table{font-size:11px}
-.flow-step-list{display:block}.flow-nodes-wrap{display:none}
+.flow-step-list{display:block}.flow-nodes{display:none}
 }
 @media(max-width:480px){
 .course-nav{padding:4px 8px;gap:1px}.course-link{padding:4px 8px;font-size:10px}
@@ -294,7 +294,7 @@ input,textarea,select{font-size:16px!important}
 .main{padding:12px}.mod-title{font-size:18px}.sec-title{font-size:16px}
 .card{padding:14px}.concept-card{padding:14px}
 .btn-start{width:100%;justify-content:center}
-.flow-step-list{display:block}.flow-nodes-wrap{display:none}
+.flow-step-list{display:block}.flow-nodes{display:none}
 }
 </style>
 </head>
@@ -403,10 +403,11 @@ currentModule=-1;
 document.getElementById('trail-wrap').classList.add('vis');
 document.getElementById('hdr').classList.remove('compact');
 renderTrail();renderLanding();
-var mobBar=document.getElementById('mob-module-bar');if(mobBar)mobBar.innerHTML='';
+var mobBar=document.getElementById('mob-module-bar');if(mobBar){mobBar.innerHTML='';mobBar.style.display='none'}
 }
 function renderLanding(){
-mainEl.innerHTML='<div class="hero"><div class="hero-badge">Advanced Technical Course</div><h1>Building with AI</h1><p>From API calls to production agents \u2014 the engineering behind AI systems. Code samples, architecture diagrams, and implementation patterns for every concept.</p><div class="hero-grid"><div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">Interactive Modules</div></div><div class="hero-stat"><div class="hero-stat-n">145</div><div class="hero-stat-l">Glossary Terms</div></div><div class="hero-stat"><div class="hero-stat-n">50+</div><div class="hero-stat-l">Worked Examples</div></div></div>'+
+if(streamTimer){clearInterval(streamTimer);streamTimer=null}
+mainEl.innerHTML='<div class="hero"><div class="hero-badge">Advanced Technical Course</div><h1>Building with AI</h1><p>From API calls to production agents \u2014 the engineering behind AI systems. Code samples, architecture diagrams, and implementation patterns for every concept.</p><div class="hero-grid"><div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">Interactive Modules</div></div><div class="hero-stat"><div class="hero-stat-n">'+GLOSSARY.length+'</div><div class="hero-stat-l">Glossary Terms</div></div><div class="hero-stat"><div class="hero-stat-n">50+</div><div class="hero-stat-l">Worked Examples</div></div></div>'+
 '<div class="callout warning" style="text-align:left;max-width:700px;margin:0 auto 32px"><strong>Prerequisites:</strong> This course assumes familiarity with AI-101 and AI-102 concepts. If terms like RAG, MCP, embeddings, or RLHF are unfamiliar, start with <a href="AI-101.html">AI Essentials</a> and <a href="AI-102.html">AI Deep Dive</a> first.</div>'+
 '<div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Build \u2500\u2500</div>'+
 '<div class="grid-2" style="text-align:left">'+MODULES.map(function(m,i){return '<div class="toc-card" onclick="goModule('+i+')"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:'+m.color+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+ICONS[m.icon]+'</div><div><div style="font-size:11px;color:var(--tx-muted);font-weight:600">Module '+(i+1)+'</div><div style="font-size:16px;font-weight:700;color:var(--tx-primary)">'+m.title+'</div></div></div><div class="card-text">'+LANDING_DESCS[i].desc+'</div><div class="toc-features">'+LANDING_DESCS[i].feat+'</div><div style="font-size:13px;font-weight:600;color:var(--primary);margin-top:12px">Go to Module \u2192</div></div>'}).join('')+'</div>'+
@@ -414,6 +415,7 @@ mainEl.innerHTML='<div class="hero"><div class="hero-badge">Advanced Technical C
 '<div style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:40px">Content as of April 2026</div></div>';
 }
 function renderModule(idx){
+if(streamTimer){clearInterval(streamTimer);streamTimer=null}
 var m=MODULES[idx];
 var nav='<div class="nav-btns">'+(idx>0?'<button class="nav-btn secondary" onclick="goModule('+(idx-1)+')">\u2190 '+MODULES[idx-1].title+'</button>':'<div></div>')+(idx<MODULES.length-1?'<button class="nav-btn primary" onclick="completeAndNext('+idx+')">Next: '+MODULES[idx+1].title+' \u2192</button>':'<button class="nav-btn primary" onclick="showLanding()">\uD83C\uDFE0 Home</button>')+'</div>';
 var hdr='<div class="mod-hdr"><div class="mod-ico" style="background:'+m.color+'">'+ICONS[m.icon]+'</div><div><div class="mod-title">'+m.title+'</div><div class="mod-desc">'+LANDING_DESCS[idx].desc+'</div></div></div>';
@@ -445,7 +447,7 @@ if(ind)ind.textContent='Step '+cur+' / '+d.steps.length;
 var mobList=document.getElementById('flow-mob-'+id);
 if(mobList){
 mobList.innerHTML=d.steps.map(function(s,i){
-var cls=i<cur?'vis':(i===cur?'cur':'dim');
+var cls=cur===0?'dim':(i<cur-1?'vis':(i===cur-1?'cur':'dim'));
 return '<div class="flow-mob-step '+cls+'"><div class="flow-mob-num">'+(i+1)+'</div><div><div class="flow-mob-name">'+s.name+'</div><div class="flow-mob-dir">'+s.from+' \u2192 '+s.to+'</div></div></div>';
 }).join('');
 }
@@ -464,7 +466,7 @@ function mod1Content(){
 return '<div class="sec-title">What Is an AI API Call?</div>'+
 '<div class="card"><div class="card-text" style="line-height:1.8">'+
 '<p>Every AI tool you use \u2014 Claude.ai, ChatGPT, GitHub Copilot, Notion AI \u2014 is a thin interface calling an API behind the scenes. When you type a question into Claude.ai, the web app packages your text into an HTTP request, sends it to Anthropic\u2019s servers, and streams the response back to your browser. The chat window is just the frontend. The intelligence lives on the API server, and understanding that boundary is what separates casual users from practitioners who can build, optimize, and troubleshoot AI systems.</p>'+
-'<p style="margin-top:10px">The anatomy of an API request has several key components: the <strong>endpoint URL</strong> (e.g., <code>https://api.anthropic.com/v1/messages</code>) tells the server which model service you want; the <strong>authentication header</strong> (an API key or bearer token) proves you\u2019re authorized; the <strong>model parameter</strong> selects which model to use (e.g., <code>claude-sonnet-4-20250514</code>); the <strong>messages array</strong> contains the conversation history; and optional parameters like <strong>temperature</strong> (controls randomness from 0 to 1) and <strong>max_tokens</strong> (caps the response length) shape the output. Each parameter exists for a reason, and misconfiguring any one of them is a common source of unexpected behavior.</p>'+
+'<p style="margin-top:10px">The anatomy of an API request has several key components: the <strong>endpoint URL</strong> (e.g., <code>https://api.anthropic.com/v1/messages</code>) tells the server which model service you want; the <strong>authentication header</strong> (an API key or bearer token) proves you\u2019re authorized; the <strong>model parameter</strong> selects which model to use (e.g., <code>claude-sonnet-4-6-20250217</code>); the <strong>messages array</strong> contains the conversation history; and optional parameters like <strong>temperature</strong> (controls randomness from 0 to 1) and <strong>max_tokens</strong> (caps the response length) shape the output. Each parameter exists for a reason, and misconfiguring any one of them is a common source of unexpected behavior.</p>'+
 '<p style="margin-top:10px">Why does this matter even if you never write code? Because understanding the API layer explains <em>pricing</em> (you\u2019re charged per token processed, so longer inputs cost more), <em>latency</em> (why complex prompts take longer \u2014 more tokens = more inference compute), <em>context limits</em> (why pasting a 200-page PDF into a chat gets truncated \u2014 it exceeds the model\u2019s context window), and <em>error behavior</em> (why the tool sometimes says \u201Csomething went wrong\u201D \u2014 rate limits, server overload, or malformed requests). Every pricing page, every timeout, and every truncation warning traces back to the API mechanics described in this module.</p>'+
 '</div></div>'+
 '<div class="sec-title">API Request Lifecycle</div>'+
@@ -493,15 +495,19 @@ return '<div class="sec-title">What Is an AI API Call?</div>'+
 '<button class="flow-btn pri" id="stream-run-btn" onclick="runStreamDemo()">Run Demo</button></div>'+
 '<div class="callout"><strong>Key Insight:</strong> Streaming doesn\u2019t make the model think faster \u2014 it makes the user <em>feel</em> faster. The model generates tokens at the same speed either way. Streaming just shows them one at a time instead of waiting for all of them. The total time to complete the response is identical; the difference is that streaming delivers the first token in ~200ms while non-streaming makes you wait 2\u201310 seconds for the complete response. For user-facing applications, streaming is almost always the right choice. For batch pipelines where no human is waiting, non-streaming is simpler to implement.</div>'+
 '<div class="sec-title">Code Sample: Python API Call</div>'+
-'<div class="code-block"><span class="lang-label">Python</span><pre><code><span class="kw">import</span> anthropic\n\nclient = anthropic.Anthropic()\nmessage = client.messages.create(\n    model=<span class="str">"claude-sonnet-4-20250514"</span>,\n    max_tokens=<span class="num">1024</span>,\n    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Explain how APIs work"</span>}]\n)\n<span class="fn">print</span>(message.content[<span class="num">0</span>].text)</code></pre></div>'+
-'<div class="code-block"><span class="lang-label">Python \u2014 Streaming</span><pre><code><span class="kw">with</span> client.messages.stream(\n    model=<span class="str">"claude-sonnet-4-20250514"</span>,\n    max_tokens=<span class="num">1024</span>,\n    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Explain streaming"</span>}]\n) <span class="kw">as</span> stream:\n    <span class="kw">for</span> text <span class="kw">in</span> stream.text_stream:\n        <span class="fn">print</span>(text, end=<span class="str">""</span>, flush=<span class="kw">True</span>)</code></pre></div>'+
+'<div class="code-block"><span class="lang-label">Python</span><pre><code><span class="kw">import</span> anthropic\n\nclient = anthropic.Anthropic()\nmessage = client.messages.create(\n    model=<span class="str">"claude-sonnet-4-6-20250217"</span>,\n    max_tokens=<span class="num">1024</span>,\n    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Explain how APIs work"</span>}]\n)\n<span class="fn">print</span>(message.content[<span class="num">0</span>].text)</code></pre></div>'+
+'<div class="code-block"><span class="lang-label">Python \u2014 Streaming</span><pre><code><span class="kw">with</span> client.messages.stream(\n    model=<span class="str">"claude-sonnet-4-6-20250217"</span>,\n    max_tokens=<span class="num">1024</span>,\n    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Explain streaming"</span>}]\n) <span class="kw">as</span> stream:\n    <span class="kw">for</span> text <span class="kw">in</span> stream.text_stream:\n        <span class="fn">print</span>(text, end=<span class="str">""</span>, flush=<span class="kw">True</span>)</code></pre></div>'+
 '<div class="sec-title">API Provider Comparison</div>'+
 '<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th>Feature</th><th>Claude (Anthropic)</th><th>GPT (OpenAI)</th><th>Gemini (Google)</th></tr></thead><tbody>'+
 '<tr><td>Auth</td><td>x-api-key header</td><td>Bearer token</td><td>API key or OAuth</td></tr>'+
 '<tr><td>Streaming</td><td>SSE (server-sent events)</td><td>SSE</td><td>SSE</td></tr>'+
-'<tr><td>Max Output</td><td>8,192 tokens</td><td>16,384 tokens</td><td>8,192 tokens</td></tr>'+
+'<tr><td>Max Output</td><td>64K\u2013128K tokens (Sonnet\u2013Opus)</td><td>32K+ tokens (GPT-5)</td><td>8K\u201365K tokens (Flash\u2013Pro)</td></tr>'+
+'<tr><td>Context Window</td><td>1M tokens (Opus/Sonnet 4.6)</td><td>1M tokens (GPT-5)</td><td>1M+ tokens (Gemini 2.5+)</td></tr>'+
 '<tr><td>System Prompt</td><td>Top-level "system" param</td><td>"system" role message</td><td>systemInstruction field</td></tr>'+
 '<tr><td>Structured Output</td><td>Tool use / JSON mode</td><td>JSON mode / function calling</td><td>JSON mode</td></tr>'+
+'<tr><td>Vision Input</td><td>Images + PDFs (native)</td><td>Images (native)</td><td>Images, video, audio (native)</td></tr>'+
+'<tr><td>Tool Use</td><td>Native tool use + MCP</td><td>Function calling</td><td>Function calling</td></tr>'+
+'<tr><td>Batch API</td><td>Message Batches API (50% discount)</td><td>Batch API (50% discount)</td><td>Batch prediction</td></tr>'+
 '</tbody></table></div>'+
 '<details class="deeper"><summary>Deeper Dive: Rate Limiting, Retry Strategies, and Error Handling</summary><div class="deeper-body">'+
 '<p>Rate limiting is how API providers protect their infrastructure and ensure fair access for all customers. Every provider enforces limits on how many requests you can send within a time window, and understanding these limits is essential for building reliable systems. There are two distinct types of limits: <strong>requests per minute (RPM)</strong> and <strong>tokens per minute (TPM)</strong>. You can hit either one independently \u2014 sending 100 short requests might hit your RPM limit before you approach TPM, while a single massive prompt could consume your entire TPM allocation in one request. Most providers publish their limits in documentation, and many return the remaining quota in response headers.</p>'+
@@ -514,7 +520,7 @@ return '<div class="sec-title">What Is an AI API Call?</div>'+
 '<dt>Situation</dt><dd>A documentation team built a batch pipeline to process 500 support articles through Claude\u2019s API for auto-tagging and summarization. The pipeline needed to run nightly, processing each article with a structured prompt that extracted categories, sentiment, and a 2-sentence summary.</dd>'+
 '<dt>Context</dt><dd>The initial implementation was a simple for-loop: iterate through articles, send each to the API, collect results. No error handling, no token counting, no retry logic. It worked perfectly in testing with 10 short articles. When deployed against the full 500-article corpus, it fell apart within the first hour.</dd>'+
 '<dt>Approach</dt><dd>Three distinct failure modes emerged, each requiring a different fix. First, <strong>400 errors on long articles</strong>: 23 of the 500 articles were lengthy troubleshooting guides that, when combined with the system prompt and few-shot examples, exceeded the model\u2019s context window. The API rejected these with a 400 error and a context length message. Second, <strong>429 errors from rate limiting</strong>: the for-loop fired requests as fast as Python could send them, quickly exceeding the tokens-per-minute limit. After the first 429 response, the simple loop had no backoff logic, so it immediately retried and got another 429, creating a cascade. Third, <strong>inconsistent results with no retry logic</strong>: occasional 500 errors from transient server issues caused the pipeline to skip articles silently, producing incomplete results with no indication of what was missed.</dd>'+
-'<dd style="margin-top:8px">The team implemented a 3-layer fix: <strong>(1) Pre-flight token counting</strong> using the tiktoken library \u2014 before sending any request, count the tokens in the prompt + article. If the total exceeds 80% of the context window (leaving room for the response), chunk the article at paragraph boundaries and process each chunk separately, then merge the results. <strong>(2) Exponential backoff with jitter</strong> for 429 and 5xx errors \u2014 starting at 1 second, doubling up to 32 seconds, with \u00B125% random jitter. After 5 consecutive failures, a circuit breaker pauses all processing for 60 seconds. <strong>(3) Request logging and dead-letter queue</strong> \u2014 every request and response is logged with timestamp, token count, and status code. Failed articles after max retries go into a dead-letter queue for manual review rather than being silently dropped.</dd>'+
+'<dd style="margin-top:8px">The team implemented a 3-layer fix: <strong>(1) Pre-flight token counting</strong> using each provider\u2019s tokenizer (tiktoken for OpenAI, Anthropic\u2019s token counting API for Claude) \u2014 before sending any request, count the tokens in the prompt + article. If the total exceeds 80% of the context window (leaving room for the response), chunk the article at paragraph boundaries and process each chunk separately, then merge the results. <strong>(2) Exponential backoff with jitter</strong> for 429 and 5xx errors \u2014 starting at 1 second, doubling up to 32 seconds, with \u00B125% random jitter. After 5 consecutive failures, a circuit breaker pauses all processing for 60 seconds. <strong>(3) Request logging and dead-letter queue</strong> \u2014 every request and response is logged with timestamp, token count, and status code. Failed articles after max retries go into a dead-letter queue for manual review rather than being silently dropped.</dd>'+
 '<dt>Results</dt><dd>Pipeline reliability went from 74% completion rate to 99.6%. The 0.4% remaining failures were genuine edge cases (corrupted documents, articles in unsupported languages) that correctly went to the dead-letter queue. Processing time actually decreased from 4.2 hours to 3.1 hours because the backoff logic eliminated the retry storms that had been wasting API quota.</dd>'+
 '<dt>Lessons Learned</dt><dd><strong>1.</strong> Always count tokens before sending \u2014 the API will not truncate for you, it will reject the request. <strong>2.</strong> Build retry logic from day one, not after the first production failure. <strong>3.</strong> Log every API response including headers (rate limit headers tell you how close you are to the limit). <strong>4.</strong> Set a circuit breaker to stop the pipeline after N consecutive failures rather than burning through your API quota on a failing service. <strong>5.</strong> Test with production-scale data, not toy datasets \u2014 problems only emerge at volume.</dd>'+
 '<dt>What They\u2019d Do Differently</dt><dd>Use async/concurrent requests from the start (with rate-limit-aware throttling) instead of a sequential loop. The sequential approach was simpler to build but made the pipeline unnecessarily slow. They would also add a pre-processing step to estimate total pipeline cost before execution, preventing budget surprises.</dd>'+
@@ -629,14 +635,15 @@ return '<div class="sec-title">What Are Embeddings?</div>'+
 '<p style="margin-top:10px"><strong>Practical guidance:</strong> For FAQ content, use small chunks (256\u2013512 tokens) because answers are self-contained and compact. For long-form documentation, use larger chunks (512\u20131,024 tokens) with 10\u201315% overlap to preserve context. For code, chunk by function or class definition, not by character count \u2014 a function split across two chunks is useless for retrieval.</p>'+
 '</div></div>'+
 '<div class="sec-title">Vector Database Comparison</div>'+
-'<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th>Database</th><th>Type</th><th>Pricing</th><th>Best For</th></tr></thead><tbody>'+
-'<tr><td>Pinecone</td><td>Hosted</td><td>Free tier, then pay-per-use</td><td>Production SaaS, managed infra</td></tr>'+
-'<tr><td>Chroma</td><td>Self-hosted / embedded</td><td>Free (open source)</td><td>Prototyping, local development</td></tr>'+
-'<tr><td>pgvector</td><td>PostgreSQL extension</td><td>Free (with your Postgres)</td><td>Teams already using PostgreSQL</td></tr>'+
-'<tr><td>Weaviate</td><td>Both</td><td>Free tier + hosted</td><td>Multi-modal search</td></tr>'+
-'<tr><td>Qdrant</td><td>Both</td><td>Free tier + hosted</td><td>High-performance filtering</td></tr>'+
+'<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th>Database</th><th>Type</th><th>Hosting</th><th>Best For</th><th>Pricing Model</th></tr></thead><tbody>'+
+'<tr><td>Chroma</td><td>Open-source</td><td>Self-hosted / embedded</td><td>Prototyping, small-medium datasets</td><td>Free (self-hosted)</td></tr>'+
+'<tr><td>Pinecone</td><td>Managed</td><td>Cloud (serverless)</td><td>Production, zero-ops teams</td><td>Pay-per-query + storage</td></tr>'+
+'<tr><td>Weaviate</td><td>Open-source / Managed</td><td>Self-hosted or cloud</td><td>Hybrid search, multi-modal</td><td>Free (self-hosted) / usage-based</td></tr>'+
+'<tr><td>Qdrant</td><td>Open-source / Managed</td><td>Self-hosted or cloud</td><td>High performance, filtering</td><td>Free (self-hosted) / usage-based</td></tr>'+
+'<tr><td>pgvector</td><td>Extension</td><td>Any PostgreSQL host</td><td>Teams already using PostgreSQL</td><td>Free (extension)</td></tr>'+
+'<tr><td>FAISS</td><td>Library</td><td>In-process (no server)</td><td>Research, high-throughput batch</td><td>Free (library)</td></tr>'+
 '</tbody></table></div>'+
-'<div class="callout"><strong>Choosing a vector database:</strong> For most content teams starting with RAG, the database choice matters less than the chunking strategy and embedding model. Start with the simplest option (Chroma for prototyping, Pinecone or Weaviate for production) and optimize later. Switching vector databases is relatively straightforward; fixing bad chunking requires re-processing your entire document corpus.</div>'+
+'<div class="callout"><strong>Choosing a vector database:</strong> If you\u2019re prototyping, start with Chroma (embedded, zero setup). If you already use PostgreSQL, add pgvector. If you need managed production infrastructure with zero ops, use Pinecone. If you want open-source with advanced features (hybrid search, filtering, multi-tenancy), evaluate Weaviate or Qdrant. FAISS is best for research and offline batch processing where you need maximum throughput without a server.</div>'+
 '<div class="sec-title">Code: Embedding Pipeline</div>'+
 '<div class="code-block"><span class="lang-label">Python</span><pre><code><span class="kw">import</span> chromadb\n\nclient = chromadb.Client()\ncollection = client.create_collection(<span class="str">"docs"</span>)\n\n<span class="cm"># Add documents (Chroma auto-embeds)</span>\ncollection.add(\n    documents=[<span class="str">"AI uses neural networks"</span>, <span class="str">"Machine learning trains on data"</span>],\n    ids=[<span class="str">"doc1"</span>, <span class="str">"doc2"</span>]\n)\n\n<span class="cm"># Semantic search</span>\nresults = collection.query(\n    query_texts=[<span class="str">"How does AI learn?"</span>],\n    n_results=<span class="num">2</span>\n)</code></pre></div>'+
 '<details class="deeper"><summary>Deeper Dive: When Embeddings Fail and How to Diagnose It</summary><div class="deeper-body">'+
@@ -729,12 +736,13 @@ return '<div class="sec-title">What MCP Solves</div>'+
 '<rect x="520" y="130" width="160" height="40" rx="6" fill="rgba(239,68,68,0.08)" stroke="#EF4444"/><text x="600" y="155" text-anchor="middle" font-size="10" fill="#EF4444" font-weight="600">Database</text>'+
 '<line x1="422" y1="80" x2="518" y2="40" stroke="#10B981" stroke-width="1.5"/><line x1="422" y1="100" x2="518" y2="95" stroke="#F59E0B" stroke-width="1.5"/><line x1="422" y1="120" x2="518" y2="150" stroke="#EF4444" stroke-width="1.5"/>'+
 '</svg>'+
-'<div class="card"><div class="card-text" style="line-height:1.8"><p>The key insight behind MCP is the <strong>N+M advantage</strong>. Without MCP, connecting 5 AI providers to 10 services requires 50 custom integrations (5 \u00D7 10). Each integration is bespoke code that breaks when either side changes. With MCP, each AI provider implements one MCP client and each service implements one MCP server \u2014 total: 15 integrations (5 + 10). More importantly, a new service only needs one MCP server implementation to work with ALL AI providers simultaneously.</p><p style="margin-top:10px">This is why MCP adoption has been explosive \u2014 with 97+ million SDK installations as of early 2026. Building one MCP server for your internal documentation unlocks that documentation for Claude, ChatGPT, Cursor, and every other MCP-compatible tool, present and future. The investment is made once and compounds with every new AI tool that supports the protocol.</p></div></div>'+
+'<div class="card"><div class="card-text" style="line-height:1.8"><p>The key insight behind MCP is the <strong>N+M advantage</strong>. Without MCP, connecting 5 AI providers to 10 services requires 50 custom integrations (5 \u00D7 10). Each integration is bespoke code that breaks when either side changes. With MCP, each AI provider implements one MCP client and each service implements one MCP server \u2014 total: 15 integrations (5 + 10). More importantly, a new service only needs one MCP server implementation to work with ALL AI providers simultaneously.</p><p style="margin-top:10px">This is why MCP adoption has been explosive \u2014 with tens of millions of SDK installations by early 2026. Building one MCP server for your internal documentation unlocks that documentation for Claude, ChatGPT, Cursor, and every other MCP-compatible tool, present and future. The investment is made once and compounds with every new AI tool that supports the protocol.</p></div></div>'+
 '<div class="sec-title">MCP Tool Call Lifecycle</div>'+
 '<div class="flow-box sim-focusable" tabindex="0" data-sim="flow-mcp" id="flow-box-mcp">'+
 '<div class="flow-ctrl"><button class="flow-btn" onclick="flowStep(\'mcp\',0)">\u23EE Reset</button><button class="flow-btn" onclick="flowStep(\'mcp\',Math.max(0,flowCur.mcp-1))">\u25C0 Prev</button><button class="flow-btn pri" onclick="flowStep(\'mcp\',flowCur.mcp+1)">Next \u25B6</button><span class="flow-step-ind" id="flow-ind-mcp">Step 0 / 8</span></div>'+
 '<div class="flow-step-list" id="flow-mob-mcp"></div>'+
-'<div class="flow-detail" id="flow-detail-mcp"></div></div>'+
+'<div class="flow-detail" id="flow-detail-mcp"></div>'+
+'<div class="kb-hint">Use <kbd>\u25C0</kbd> <kbd>\u25B6</kbd> arrow keys</div></div>'+
 '<details class="deeper"><summary>Deeper Dive: Building an MCP Server \u2014 What Actually Happens</summary><div class="deeper-body">'+
 '<p>The <strong>server lifecycle</strong> follows a predictable pattern: initialization, tool registration, connection, and then a loop of tool discovery, execution, and response. When the MCP server starts, it registers its available tools with typed schemas \u2014 each tool has a name, a description (which the AI reads to decide when to use it), input parameters defined as JSON Schema, and a handler function that executes the actual logic. The server then establishes a connection with the AI client, either via stdio (standard input/output, common for local servers) or HTTP+SSE (for remote/cloud servers). Once connected, the client can query the server\u2019s capabilities at any time.</p>'+
 '<p style="margin-top:10px">A <strong>tool schema</strong> is what the AI reads to understand what a tool does and how to call it. For example, a \u201Csearch_docs\u201D tool might have the schema: name <code>search_docs</code>, description \u201CSearch the internal documentation knowledge base. Returns the top 5 most relevant results for the given query.\u201D, input parameters <code>{query: {type: "string", description: "The search query"}, limit: {type: "number", description: "Max results to return", default: 5}}</code>. The description is critical \u2014 it\u2019s how the AI decides whether to use this tool. A vague description like \u201Csearch stuff\u201D will cause the AI to misuse or ignore the tool. A specific description leads to precise tool selection.</p>'+
@@ -791,7 +799,7 @@ return '<div class="sec-title">Understanding Mixture of Experts</div>'+
 '<div class="card"><div class="card-text" style="line-height:1.8">'+
 '<p>Knowledge distillation follows the <strong>teacher-student paradigm</strong>: a large, capable \u201Cteacher\u201D model produces \u201Csoft labels\u201D \u2014 full probability distributions over all possible outputs for each training example. Instead of just saying \u201Cthis image is a cat\u201D (hard label: [1, 0, 0]), the teacher says \u201Cthis is 85% cat, 12% dog, 3% fox\u201D (soft label). A smaller \u201Cstudent\u201D model then trains to match these distributions, learning nuanced knowledge about inter-class relationships. The student learns that cats and dogs are similar (12% probability) but cats and cars are not (0.01% probability) \u2014 information that hard labels completely discard.</p>'+
 '<p style="margin-top:10px">Why does distillation work better than training the small model from scratch? Because the teacher\u2019s probability distributions contain <strong>far more information per training example</strong> than hard labels. A single training example teaches the student about ALL possible outputs simultaneously, not just the correct one. The soft probabilities encode the teacher\u2019s uncertainty, its understanding of similarity between categories, and subtle patterns it has learned. This is called \u201Cdark knowledge\u201D \u2014 information present in the soft labels that is invisible in the hard labels. Temperature scaling during distillation (typically T=2\u20134) further softens the distributions, amplifying this dark knowledge.</p>'+
-'<p style="margin-top:10px">The practical implications are enormous: distillation is how <strong>GPT-4o mini, Claude Haiku, and Gemini Flash</strong> are created. These small, fast, cheap models retain 85\u201395% of the teacher\u2019s quality at 5\u201315% of the cost. This quality/cost tradeoff is what makes AI affordable at scale. Without distillation, every API call would need to run the full frontier model, and most commercial AI applications would be economically unviable.</p>'+
+'<p style="margin-top:10px">The practical implications are enormous: distillation is the technique behind models like <strong>GPT-4o mini and Gemini Flash</strong>, and likely other compact model variants from major providers. These small, fast, cheap models retain 85\u201395% of the teacher\u2019s quality at 5\u201315% of the cost. This quality/cost tradeoff is what makes AI affordable at scale. Without distillation, every API call would need to run the full frontier model, and most commercial AI applications would be economically unviable.</p>'+
 '</div></div>'+
 '<div class="sec-title">Quantization Precision Ladder</div>'+
 '<div class="sim-area"><div style="display:flex;flex-direction:column;gap:12px">'+
@@ -808,7 +816,7 @@ return '<div class="sec-title">Understanding Mixture of Experts</div>'+
 '<p style="margin-top:10px">When <strong>NOT</strong> to quantize: <strong>medical, legal, or compliance content</strong> where accuracy on edge cases is critical and a subtle error could have real consequences. <strong>Tasks requiring rare terminology</strong> \u2014 if your domain uses specialized vocabulary that the model encounters infrequently, quantization may degrade exactly the knowledge you need most. <strong>Multilingual tasks</strong> \u2014 lower-resource languages are often the first casualty of quantization because they have fewer training examples and their representations are more fragile. For these use cases, use the API (full-precision model) even if it costs more.</p>'+
 '</div></details>'+
 '<div class="sec-title">Code: Run Quantized Model Locally</div>'+
-'<div class="code-block"><span class="lang-label">bash</span><pre><code><span class="cm"># Install Ollama and run a quantized model</span>\ncurl -fsSL https://ollama.com/install.sh | sh\n\n<span class="cm"># Pull a 4-bit quantized 70B model (~35GB)</span>\nollama pull llama3:70b-q4_0\n\n<span class="cm"># Run it locally</span>\nollama run llama3:70b-q4_0 <span class="str">"Explain MoE architecture"</span></code></pre></div>'+
+'<div class="code-block"><span class="lang-label">bash</span><pre><code><span class="cm"># Install Ollama and run a quantized model</span>\ncurl -fsSL https://ollama.com/install.sh | sh\n\n<span class="cm"># Pull a quantized model (check ollama.com for current models)</span>\nollama pull llama4:70b-q4_0\n\n<span class="cm"># Run it locally</span>\nollama run llama4:70b-q4_0 <span class="str">"Explain MoE architecture"</span></code></pre></div>'+
 '<div class="case-study"><div class="case-badge">CASE STUDY</div><div class="case-title">Running Llama 3 70B on a MacBook Pro for Data-Sensitive Tasks</div><dl class="case-body">'+
 '<dt>Situation</dt><dd>A security consulting firm needed to analyze client contracts and security audit reports using AI. Sending these documents to external APIs (OpenAI, Anthropic) violated their client agreements, which required all data to remain on-premises. They needed a capable model running locally.</dd>'+
 '<dt>Context</dt><dd>The team evaluated three options: (1) a private cloud deployment of an API-based model (expensive, complex), (2) a fine-tuned small model (insufficient quality for complex analysis), (3) running a quantized large model on local hardware. They had MacBook Pro M3 Max laptops with 64GB unified memory and wanted to avoid infrastructure management.</dd>'+
@@ -818,6 +826,7 @@ return '<div class="sec-title">Understanding Mixture of Experts</div>'+
 '<dt>Lessons Learned</dt><dd><strong>1.</strong> Test quantization on YOUR tasks, not general benchmarks \u2014 domain-specific degradation patterns differ from average benchmark scores. <strong>2.</strong> INT4 is sufficient for the majority of tasks; keep a higher-precision fallback for edge cases. <strong>3.</strong> Local inference speed (8 tok/s) is 10\u201320x slower than API (100+ tok/s); factor this into workflow design. <strong>4.</strong> Unified memory architecture (Apple Silicon) makes local inference more practical than discrete-GPU laptops for models in the 30\u201370GB range. <strong>5.</strong> The quality difference between INT4 and INT8 matters most for rare knowledge; common tasks are largely unaffected.</dd>'+
 '<dt>What They\u2019d Do Differently</dt><dd>Build an automated routing classifier that scores task complexity and routes to INT4 or INT8 automatically, rather than relying on the analyst\u2019s judgment about which tasks need higher precision.</dd>'+
 '</dl></div>'+
+'<div class="callout"><strong>Note on model versions:</strong> This case study used Llama 3 70B, which was the leading open-source model at the time of implementation. The current equivalent is Llama 4, which offers improved quality at similar quantization levels. The principles \u2014 choosing quantization level based on your specific task accuracy requirements, testing on YOUR tasks rather than generic benchmarks, and using hybrid INT4/INT8 routing \u2014 remain identical regardless of model version.</div>'+
 '';}
 
 
@@ -866,7 +875,8 @@ return '<div class="sec-title">Why Reasoning Strategies Exist</div>'+
 '<div class="flow-box sim-focusable" tabindex="0" data-sim="flow-react" id="flow-box-react">'+
 '<div class="flow-ctrl"><button class="flow-btn" onclick="flowStep(\'react\',0)">\u23EE Reset</button><button class="flow-btn" onclick="flowStep(\'react\',Math.max(0,flowCur.react-1))">\u25C0 Prev</button><button class="flow-btn pri" onclick="flowStep(\'react\',flowCur.react+1)">Next \u25B6</button><span class="flow-step-ind" id="flow-ind-react">Step 0 / 8</span></div>'+
 '<div class="flow-step-list" id="flow-mob-react"></div>'+
-'<div class="flow-detail" id="flow-detail-react"></div></div>'+
+'<div class="flow-detail" id="flow-detail-react"></div>'+
+'<div class="kb-hint">Use <kbd>\u25C0</kbd> <kbd>\u25B6</kbd> arrow keys</div></div>'+
 '<div class="sec-title">Technique Comparison</div>'+
 '<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th>Technique</th><th>API Calls</th><th>Accuracy Boost</th><th>Best For</th></tr></thead><tbody>'+
 '<tr><td>Chain-of-Thought</td><td>1</td><td>+10-25%</td><td>Math, logic, analysis</td></tr>'+
@@ -1145,14 +1155,15 @@ el.innerHTML='<div style="font-size:32px;font-weight:800;color:var(--primary)">'
 '<div style="font-size:14px;color:var(--tx-muted);margin-top:4px">API cost: $'+monthlyCost+'/month</div></div>';
 }
 
-window.toggleFlag=function(el){el.classList.toggle('flagged')};
+window.toggleFlag=function(el){var s=el.querySelector('.spot-sentence');if(s)s.classList.toggle('flagged')};
 window.revealInjections=function(){
 document.querySelectorAll('#inject-items .spot-passage').forEach(function(p){
 var isInject=p.dataset.inject==='true';
-p.classList.remove('flagged');
-p.querySelector('.spot-sentence').className='spot-sentence '+(isInject?'revealed-h':'revealed-ok');
+var s=p.querySelector('.spot-sentence');
+s.classList.remove('flagged');
+s.className='spot-sentence '+(isInject?'revealed-h':'revealed-ok');
 });
-document.getElementById('inject-result').innerHTML='<div class="callout '+(true?'success':'')+'">Items 2 and 3 contain injection attempts. Item 2 tries to extract the system prompt. Item 3 hides an injection inside a "product review."</div>';
+document.getElementById('inject-result').innerHTML='<div class="callout success">Items 2 and 3 contain injection attempts. Item 2 tries to extract the system prompt. Item 3 hides an injection inside a "product review."</div>';
 };
 
 /* ══ GLOSSARY ══ */
@@ -1240,8 +1251,8 @@ var GLOSSARY=[
 {term:'Weights',cat:'ML Fundamentals',def:'The learned numerical parameters in a neural network that determine how inputs are transformed to outputs.',why:'Weights are what models "learn" during training. Model size is measured by weight count (parameters).',rel:['Parameters']},
 {term:'Pre-Training',cat:'ML Fundamentals',def:'The initial training phase where the model learns language patterns from trillions of tokens of text.',why:'Pre-training creates the foundation capabilities. It is the most expensive phase, costing tens of millions of dollars.',rel:['Fine-Tuning']},
 {term:'Transfer Learning',cat:'ML Fundamentals',def:'Applying knowledge learned from one task to a different but related task.',why:'Transfer learning is why fine-tuning works — the pre-trained model already understands language.',rel:['Pre-Training','Fine-Tuning']},
-{term:'GPU',cat:'Infrastructure',def:'Graphics Processing Unit — specialized hardware that accelerates the parallel computations required for AI inference and training.',why:'GPU availability and cost directly impact what models you can run and at what speed.',rel:['Inference','VRAM']},
-{term:'VRAM',cat:'Infrastructure',def:'Video RAM on a GPU, used to hold model weights during inference. Model size in memory determines GPU requirements.',why:'A model needs approximately 2 bytes per parameter at FP16 in VRAM to run.',rel:['GPU','Quantization','Parameters']},
+{term:'GPU',cat:'Implementation',def:'Graphics Processing Unit — specialized hardware that accelerates the parallel computations required for AI inference and training.',why:'GPU availability and cost directly impact what models you can run and at what speed.',rel:['Inference','VRAM']},
+{term:'VRAM',cat:'Implementation',def:'Video RAM on a GPU, used to hold model weights during inference. Model size in memory determines GPU requirements.',why:'A model needs approximately 2 bytes per parameter at FP16 in VRAM to run.',rel:['GPU','Quantization','Parameters']},
 {term:'Supervised Learning',cat:'ML Fundamentals',def:'Training a model on labeled examples (input-output pairs) to learn the mapping between them.',why:'SFT (Supervised Fine-Tuning) is a key step in creating AI assistants from base models.',rel:['Fine-Tuning']},
 {term:'Unsupervised Learning',cat:'ML Fundamentals',def:'Training on data without explicit labels, finding patterns and structure autonomously.',why:'Pre-training is unsupervised — the model learns language structure from raw text without labels.',rel:['Pre-Training']},
 {term:'Bias (in AI)',cat:'Ethics',def:'Systematic errors in AI outputs that reflect prejudices in training data or design choices.',why:'AI bias can harm people and organizations. Awareness and testing for bias is an engineering responsibility.',rel:['Red-Teaming']},
@@ -1266,7 +1277,7 @@ var GLOSSARY=[
 {term:'Observability',cat:'Implementation',def:'The ability to understand system behavior through logs, metrics, and traces.',why:'You can\'t improve what you can\'t measure. Observability reveals cost, quality, and latency patterns.',rel:['Monitoring']},
 {term:'Monitoring',cat:'Implementation',def:'Continuous tracking of AI system health: response quality, latency, cost, and error rates.',why:'Monitoring catches quality degradation, cost spikes, and new attack patterns in real time.',rel:['Observability']},
 {term:'Fallback Strategy',cat:'Implementation',def:'An alternative action when the primary AI model or service is unavailable.',why:'Fallbacks (cached responses, simpler models, human routing) prevent total system failure.',rel:[]},
-{term:'Edge Inference',cat:'Infrastructure',def:'Running AI models on edge devices (phones, laptops, IoT) rather than cloud servers.',why:'Edge inference enables offline operation, lower latency, and data privacy.',rel:['Quantization','Ollama']},
+{term:'Edge Inference',cat:'Implementation',def:'Running AI models on edge devices (phones, laptops, IoT) rather than cloud servers.',why:'Edge inference enables offline operation, lower latency, and data privacy.',rel:['Quantization','Ollama']},
 {term:'Model Card',cat:'Ethics',def:'A standardized document describing a model\'s capabilities, limitations, training data, and intended use.',why:'Model cards help you evaluate whether a model is appropriate for your use case.',rel:[]},
 {term:'Data Privacy',cat:'Ethics',def:'Protecting personal and sensitive data from unauthorized access or unintended exposure.',why:'Sending sensitive data to AI APIs creates privacy risks. Know your data classification requirements.',rel:['PII (Personally Identifiable Information)','GDPR','Compliance']},
 {term:'GDPR',cat:'Ethics',def:'General Data Protection Regulation — EU regulation governing personal data processing.',why:'GDPR affects how you can use AI with data of EU residents, including AI-generated content about individuals.',rel:['Data Privacy','Compliance','PII (Personally Identifiable Information)']},
@@ -1304,7 +1315,7 @@ var GLOSSARY=[
 {term:'CI/CD for AI',cat:'Workflow',def:'Continuous Integration/Deployment pipelines adapted for AI systems: prompt testing, model evaluation, deployment.',why:'CI/CD catches quality regressions before they reach production.',rel:['Regression Testing','Pipeline']}
 ];
 
-var CAT_MAP={'ML Fundamentals':'badge-ml','GenAI':'badge-genai','Prompting':'badge-prompt','Infrastructure':'badge-infra','Ethics':'badge-ethics','Workflow':'badge-workflow','Protocols':'badge-proto','Agents':'badge-proto','Implementation':'badge-impl','Security':'badge-security','Evaluation':'badge-eval','RAG & Infrastructure':'badge-rag'};
+var CAT_MAP={'ML Fundamentals':'badge-ml','GenAI':'badge-genai','Prompting':'badge-prompt','Ethics':'badge-ethics','Workflow':'badge-workflow','Protocols':'badge-proto','Agents':'badge-proto','Implementation':'badge-impl','Security':'badge-security','Evaluation':'badge-eval','RAG & Infrastructure':'badge-rag'};
 var ALL_CATS=['All','ML Fundamentals','GenAI','Prompting','Implementation','RAG & Infrastructure','Protocols','Agents','Evaluation','Security','Ethics','Workflow'];
 var glossFilter='All',glossAlpha='',glossSearch='';
 
@@ -1361,7 +1372,7 @@ var RESOURCES=[
 {title:'Hugging Face Hub',provider:'Hugging Face',url:'https://huggingface.co',cat:'advanced',desc:'Model repository, datasets, and spaces for ML experimentation.'},
 {title:'vLLM',provider:'vLLM Project',url:'https://docs.vllm.ai',cat:'advanced',desc:'High-throughput LLM inference engine. Industry standard for serving.'},
 {title:'Attention Is All You Need',provider:'Vaswani et al., 2017',url:'https://arxiv.org/abs/1706.03762',cat:'papers',desc:'The foundational Transformer paper that started the modern AI revolution.'},
-{title:'BERT: Pre-training of Deep Bidirectional Transformers',provider:'Devlin et al., 2019',url:'https://arxiv.org/abs/1810.04805',cat:'papers',desc:'Introduced bidirectional pre-training, revolutionizing NLP.'},
+{title:'BERT: Pre-training of Deep Bidirectional Transformers',provider:'Devlin et al., 2018',url:'https://arxiv.org/abs/1810.04805',cat:'papers',desc:'Introduced bidirectional pre-training, revolutionizing NLP.'},
 {title:'Retrieval-Augmented Generation for Knowledge-Intensive NLP',provider:'Lewis et al., 2020',url:'https://arxiv.org/abs/2005.11401',cat:'papers',desc:'The original RAG paper establishing the retrieve-then-generate paradigm.'},
 {title:'Constitutional AI: Harmlessness from AI Feedback',provider:'Bai et al., 2022',url:'https://arxiv.org/abs/2212.08073',cat:'papers',desc:'Anthropic\'s approach to AI alignment through self-critique.'},
 {title:'ReAct: Synergizing Reasoning and Acting',provider:'Yao et al., 2023',url:'https://arxiv.org/abs/2210.03629',cat:'papers',desc:'The ReAct framework for interleaving reasoning with tool use.'},
@@ -1429,7 +1440,7 @@ renderResources()+
 function mod11Glossary(){
 return '<div class="sec-title">AI Engineering Glossary</div>'+
 '<div class="card"><div class="card-text">'+GLOSSARY.length+' terms covering AI fundamentals, implementation patterns, RAG, protocols, security, and evaluation. Search, filter by category, or browse alphabetically.</div></div>'+
-'<div id="gloss-filters"></div><div id="alpha-bar"></div>'+
+'<div class="gloss-filters" id="gloss-filters"></div><div class="alpha-bar" id="alpha-bar"></div>'+
 '<input class="gloss-search" id="gloss-search" type="text" placeholder="Search glossary terms\u2026" oninput="filterGlossary()">'+
 '<div class="gloss-grid" id="gloss-grid"></div>';
 }
@@ -1439,7 +1450,7 @@ var searchIndex=[];
 function buildSearchIndex(){
 searchIndex=[];
 MODULES.forEach(function(m,i){searchIndex.push({type:'Module',text:m.title,desc:LANDING_DESCS[i].desc.substring(0,100)+'\u2026',action:function(){goModule(i)}})});
-GLOSSARY.forEach(function(g){searchIndex.push({type:'Glossary',text:g.term,desc:g.def.substring(0,80)+'\u2026',action:function(){goModule(8);setTimeout(function(){var si=document.getElementById('gloss-search');if(si){si.value=g.term;filterGlossary()}},100)}})});
+GLOSSARY.forEach(function(g){searchIndex.push({type:'Glossary',text:g.term,desc:g.def.substring(0,80)+'\u2026',action:function(){goModule(10);setTimeout(function(){var si=document.getElementById('gloss-search');if(si){si.value=g.term;filterGlossary()}},100)}})});
 searchIndex.push({type:'Resources',text:'Learning Resources',desc:'63 curated resources for continued learning',action:function(){goModule(9)}});
 }
 function performSearch(q){if(!q.trim())return[];var ql=q.toLowerCase();return searchIndex.filter(function(item){return item.text.toLowerCase().includes(ql)||item.desc.toLowerCase().includes(ql)}).slice(0,12)}
@@ -1464,9 +1475,9 @@ document.getElementById('search-input').oninput=function(){renderSearchResults(t
 
 /* ══ KEYBOARD SHORTCUTS ══ */
 document.addEventListener('keydown',function(e){
-if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
 if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openSearch();return}
-if(e.key==='Escape'){closeSearch();return}
+if(e.key==='Escape'){closeSearch();closeMobDrawer();return}
+if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
 var focused=document.activeElement;
 if(!focused)return;
 var sim=focused.closest('.sim-focusable')||(focused.classList.contains('sim-focusable')?focused:null);
