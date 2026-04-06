@@ -21,6 +21,27 @@
   --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif;
   --font-mono:'SF Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;
 }
+[data-theme="dark"]{
+  --bg-body:#0F172A;--bg-card:#1E293B;--bg-muted:#334155;--bg-highlight:#1E3A5F;
+  --tx-primary:#F1F5F9;--tx-secondary:#CBD5E1;--tx-muted:#64748B;
+  --border:#334155;--border-active:#3B82F6;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+}
+[data-theme="dark"] .quiz-fb.correct{background:rgba(16,185,129,0.15);color:#6EE7B7;border-color:rgba(16,185,129,0.3)}
+[data-theme="dark"] .quiz-fb.incorrect{background:rgba(239,68,68,0.15);color:#FCA5A5;border-color:rgba(239,68,68,0.3)}
+[data-theme="dark"] .score-banner.excellent{background:rgba(16,185,129,0.15);color:#6EE7B7;border-color:var(--success)}
+[data-theme="dark"] .score-banner.good{background:rgba(37,99,235,0.15);color:#93C5FD;border-color:var(--primary)}
+[data-theme="dark"] .score-banner.keep{background:rgba(245,158,11,0.15);color:#FCD34D;border-color:var(--warning)}
+[data-theme="dark"] .callout{background:rgba(37,99,235,0.1);border-color:rgba(37,99,235,0.25)}
+[data-theme="dark"] .callout.warning{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25)}
+[data-theme="dark"] .callout.success{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25)}
+[data-theme="dark"] .token-chip:nth-child(odd){background:rgba(37,99,235,0.2)}
+[data-theme="dark"] .token-chip:nth-child(even){background:rgba(124,58,237,0.2)}
+[data-theme="dark"] .spot-sentence.flagged{background:rgba(239,68,68,0.2)}
+[data-theme="dark"] .spot-sentence.revealed-h{background:rgba(239,68,68,0.2)}
+[data-theme="dark"] .spot-sentence.revealed-ok{background:rgba(16,185,129,0.15)}
 html{scroll-behavior:smooth}
 body{font-family:var(--font-body);background:var(--bg-body);color:var(--tx-secondary);line-height:1.6;font-size:16px}
 a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
@@ -37,6 +58,9 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .hdr-btn:hover{border-color:var(--primary);color:var(--primary)}
 .hdr-btn svg{width:18px;height:18px}
 .hdr.compact .hdr-s{display:none}
+.hdr-v{font-size:11px;font-weight:600;color:var(--tx-muted);vertical-align:middle;margin-left:6px}
+.skip-link{position:absolute;top:-100%;left:16px;background:var(--primary);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-size:14px;font-weight:600;z-index:999;transition:top .2s}
+.skip-link:focus{top:0;outline:none;text-decoration:none}
 
 .trail-wrap{background:var(--bg-card);border-bottom:1px solid var(--border);padding:14px 24px;position:sticky;top:61px;z-index:99;display:none}
 .trail-wrap.vis{display:block}
@@ -859,11 +883,12 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <header class="hdr" id="hdr">
   <div class="hdr-l">
     <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v1h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v2a5 5 0 01-10 0v-2H6a3 3 0 01-3-3v-1a3 3 0 013-3h1V7a5 5 0 015-5zm0 2a3 3 0 00-3 3v6a3 3 0 006 0V7a3 3 0 00-3-3zm-2 14v1a2 2 0 004 0v-1h-4z"/></svg></div>
-    <div><div class="hdr-t">AI Essentials</div><div class="hdr-s">Your Interactive Guide to Understanding Artificial Intelligence · <span class="by">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">AI Essentials <span class="hdr-v">v1.0</span></div><div class="hdr-s">Your Interactive Guide to Understanding Artificial Intelligence · <span class="by">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-r">
     <button class="hdr-btn" id="home-btn" title="Home" aria-label="Go to home page" onclick="showLanding()">
@@ -873,6 +898,9 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
+    </button>
+    <button class="hdr-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleTheme()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="theme-icon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
     <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
   </div>
@@ -919,14 +947,14 @@ const COURSES = [
 const THIS_COURSE = '101';
 
 const MODULES = [
-  {id:'what-is-ai',title:'What Is AI?',short:'What Is AI',icon:'brain',color:'#2563EB'},
-  {id:'how-learn',title:'How Machines Learn',short:'How Learn',icon:'chart',color:'#7C3AED'},
-  {id:'llms',title:'LLMs & How They Work',short:'LLMs',icon:'layers',color:'#06B6D4'},
-  {id:'prompt-eng',title:'Prompt Engineering Basics',short:'Prompt Eng.',icon:'edit',color:'#F59E0B'},
-  {id:'workflow',title:'AI in Your Workflow',short:'Your Work',icon:'workflow',color:'#10B981'},
-  {id:'ethics',title:'Ethics & Judgment',short:'Ethics',icon:'shield',color:'#EF4444'},
-  {id:'roadmap',title:'Learning Roadmap',short:'Roadmap',icon:'map',color:'#4F46E5'},
-  {id:'glossary',title:'Glossary',short:'Glossary',icon:'book',color:'#0891B2'}
+  {id:'what-is-ai',title:'What Is AI?',short:'What Is AI',icon:'brain',color:'#2563EB',time:'~15 min'},
+  {id:'how-learn',title:'How Machines Learn',short:'How Learn',icon:'chart',color:'#7C3AED',time:'~20 min'},
+  {id:'llms',title:'LLMs & How They Work',short:'LLMs',icon:'layers',color:'#06B6D4',time:'~25 min'},
+  {id:'prompt-eng',title:'Prompt Engineering Basics',short:'Prompt Eng.',icon:'edit',color:'#F59E0B',time:'~15 min'},
+  {id:'workflow',title:'AI in Your Workflow',short:'Your Work',icon:'workflow',color:'#10B981',time:'~20 min'},
+  {id:'ethics',title:'Ethics & Judgment',short:'Ethics',icon:'shield',color:'#EF4444',time:'~20 min'},
+  {id:'roadmap',title:'Learning Roadmap',short:'Roadmap',icon:'map',color:'#4F46E5',time:'~10 min'},
+  {id:'glossary',title:'Glossary',short:'Glossary',icon:'book',color:'#0891B2',time:'Reference'}
 ];
 
 const ICONS = {
@@ -948,7 +976,7 @@ const LANDING_DESCS = [
   {desc:'Put your knowledge to work with practical, task-specific prompt templates for the six most common content editing tasks: research, drafting, editing, content transformation, metadata generation, and QA review. Each includes a ready-to-use prompt template and real-world tips.',feat:'6 interactive task cards with prompt templates \u2022 Before/after case study \u2022 5 quiz questions'},
   {desc:'Develop your critical eye for AI output. Understand why hallucinations happen mechanically, identify sources of bias, and practice spotting fabricated content in realistic exercises. Build the editorial judgment skills that make you the essential quality gatekeeper between AI and publication.',feat:'Spot the Hallucination exercise \u2022 3 decision scenarios \u2022 Bias awareness cards \u2022 5 quiz questions'},
   {desc:'Your curated guide to continuing the journey. Hand-picked resources organized in three tiers \u2014 from beginner courses (Andrew Ng, Google AI Essentials) through applied skills (DeepLearning.AI, prompt engineering) to advanced topics (Stanford HAI, MCP, alignment research). Every resource includes a \u2018why this one\u2019 annotation.',feat:'20+ curated resources with live links \u2022 Three-tier progressive path \u2022 Anthropic official resources section'},
-  {desc:'105 essential AI terms defined in plain English, each with a \u2018why it matters to you\u2019 annotation written specifically for content editors and technical writers. Searchable, filterable by category, with cross-linked related terms throughout.',feat:'Full-text search \u2022 8 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
+  {desc:'107 essential AI terms defined in plain English, each with a \u2018why it matters to you\u2019 annotation written specifically for content editors and technical writers. Searchable, filterable by category, with cross-linked related terms throughout.',feat:'Full-text search \u2022 8 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
 ];
 
 function shuffleArray(arr) {
@@ -1079,6 +1107,8 @@ const FINAL_QUIZ_POOL = [
 
 let currentModule = -1;
 let completedModules = new Set();
+try{const saved=JSON.parse(localStorage.getItem('ai101-completed')||'[]');saved.forEach(i=>completedModules.add(i));}catch(e){}
+function saveProgress(){try{localStorage.setItem('ai101-completed',JSON.stringify([...completedModules]));}catch(e){}}
 let quizStates = {};
 const mainEl = document.getElementById('main-content');
 
@@ -1130,15 +1160,15 @@ function renderLanding(){
     <p>A visual, hands-on guide to artificial intelligence for content editors and technical writers. No engineering background required \u2014 just curiosity.</p>
     <div class="hero-grid">
       <div class="hero-stat"><div class="hero-stat-n">8</div><div class="hero-stat-l">Interactive Modules</div></div>
-      <div class="hero-stat"><div class="hero-stat-n">105</div><div class="hero-stat-l">Glossary Terms</div></div>
-      <div class="hero-stat"><div class="hero-stat-n">45+</div><div class="hero-stat-l">Quiz Questions</div></div>
+      <div class="hero-stat"><div class="hero-stat-n">107</div><div class="hero-stat-l">Glossary Terms</div></div>
+      <div class="hero-stat"><div class="hero-stat-n">70</div><div class="hero-stat-l">Quiz Questions</div></div>
     </div>
     <div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Learn \u2500\u2500</div>
     <div class="grid-2" style="text-align:left">
       ${MODULES.map((m,i)=>`<div class="toc-card" onclick="goModule(${i})">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <div style="width:40px;height:40px;border-radius:10px;background:${m.color};display:flex;align-items:center;justify-content:center;flex-shrink:0">${ICONS[m.icon]}</div>
-          <div><div style="font-size:11px;color:var(--tx-muted);font-weight:600">Module ${i+1}</div><div style="font-size:16px;font-weight:700;color:var(--tx-primary)">${m.title}</div></div>
+          <div><div style="font-size:11px;color:var(--tx-muted);font-weight:600">Module ${i+1} · ${m.time}</div><div style="font-size:16px;font-weight:700;color:var(--tx-primary)">${m.title}</div></div>
         </div>
         <div class="card-text">${LANDING_DESCS[i].desc}</div>
         <div class="toc-features">${LANDING_DESCS[i].feat}</div>
@@ -1167,6 +1197,7 @@ function renderModule(idx){
 
 function completeAndNext(idx){
   completedModules.add(idx);
+  saveProgress();
   goModule(idx + 1);
 }
 
@@ -1270,7 +1301,8 @@ function mod1Content(){
         {y:'2017',t:'Transformer architecture ("Attention Is All You Need")'},
         {y:'2022',t:'ChatGPT launches \u2014 GenAI goes mainstream'},
         {y:'2024',t:'Agentic AI, MCP protocol, multi-modal models, 1M+ token context'},
-        {y:'2025\u2013',t:'AI agents go mainstream, reasoning models, open-weight frontier models'}
+        {y:'2025',t:'Reasoning models, open-weight frontier models, AI agents go mainstream'},
+        {y:'2026',t:'Agentic workflows reshape enterprise, AI-native development tools'}
       ].map(e=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-year">${e.y}</div><div class="tl-text">${e.t}</div></div>`).join('')}
     </div>
   </div>
@@ -1394,6 +1426,7 @@ function mod3Content(){
   <div class="sec-title">Token Visualizer</div>
   <div class="sim-area">
     <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:12px">Type or paste text to see how it splits into tokens. Tokens \u2260 words \u2014 longer words get split into sub-parts.</p>
+    <div class="callout warning" style="margin-bottom:12px"><strong>Simplified simulation:</strong> This tokenizer uses a small dictionary of ~18 common words to demonstrate the concept of sub-word splitting. Real tokenizers (like BPE used by GPT/Claude) split <em>all</em> words based on learned vocabulary of 50,000\u2013100,000 sub-word units. Actual token counts will differ from what you see here.</div>
     <input type="text" class="token-input" id="token-input" value="The quick brown fox jumps over the lazy dog" oninput="tokenize()">
     <div class="token-display" id="token-display"></div>
     <div class="ctx-bar"><div class="ctx-fill" id="ctx-fill" style="width:0%"></div></div>
@@ -1709,7 +1742,7 @@ function mod7Content(){
   ];
   const anthropic = [
     {t:'Prompt Engineering Overview',p:'Anthropic Docs',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',why:'Official guide from Claude\u2019s creators on prompt engineering fundamentals.'},
-    {t:'Prompting Best Practices',p:'Anthropic Docs',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices',why:'Detailed best practices for Claude\u2019s latest models \u2014 clarity, examples, XML structuring.'},
+    {t:'Prompting Best Practices',p:'Anthropic Docs',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',why:'Official best practices for Claude\u2019s latest models \u2014 clarity, examples, XML structuring. Updated as new models are released.'},
     {t:'Interactive Prompt Engineering Tutorial',p:'Anthropic / GitHub',url:'https://github.com/anthropics/prompt-eng-interactive-tutorial',why:'Hands-on tutorial with 9 chapters of prompt engineering concepts and exercises.'},
     {t:'What is MCP? (Introduction)',p:'Model Context Protocol Docs',url:'https://modelcontextprotocol.io/docs/getting-started/intro',why:'The official MCP introduction \u2014 the open protocol connecting AI tools to external systems.'},
     {t:'Anthropic Research Blog',p:'Anthropic',url:'https://www.anthropic.com/research',why:'Stay current on AI models, safety research, and new capabilities. Written for a broad audience.'},
@@ -1907,10 +1940,10 @@ const TICKETS = [
   {text:'I want to change my username',cat:'account'}
 ];
 const PREDICTIONS = [
-  {text:'My payment didn\'t go through',cat:'Billing',conf:92},
-  {text:'The search feature returns no results',cat:'Technical',conf:78},
-  {text:'I\'d like to merge two accounts',cat:'Account',conf:85},
-  {text:'The dashboard shows data from the wrong date range',cat:'Technical',conf:71}
+  {text:'My payment didn\'t go through',cat:'billing',conf:92},
+  {text:'The search feature returns no results',cat:'technical',conf:78},
+  {text:'I\'d like to merge two accounts',cat:'account',conf:85},
+  {text:'The dashboard shows data from the wrong date range',cat:'technical',conf:71}
 ];
 let labeledCount = 0;
 let selectedTicket = null;
@@ -1975,7 +2008,7 @@ function initMod2(){
       document.getElementById('train-btn').textContent = '\u2713 Model Trained!';
       document.getElementById('predictions').style.display = 'block';
       const pr = document.getElementById('pred-results');
-      pr.innerHTML = PREDICTIONS.map(p=>`<div class="prediction-card"><div class="pred-text">"${p.text}"</div><div class="pred-result" style="background:rgba(37,99,235,0.1);color:var(--primary)">\u2192 ${p.cat} (${p.conf}%)</div></div>`).join('');
+      pr.innerHTML = PREDICTIONS.map(p=>`<div class="prediction-card"><div class="pred-text">"${p.text}"</div><div class="pred-result" style="background:rgba(37,99,235,0.1);color:var(--primary)">\u2192 ${p.cat.charAt(0).toUpperCase()+p.cat.slice(1)} (${p.conf}%)</div></div>`).join('');
     }, 1500);
   };
 }
@@ -2039,7 +2072,7 @@ function txStep(n){
   if(activeStep) activeStep.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-let ctxSize = 128000;
+let ctxSize = 200000;
 function initTokenizer(){
   const ctxSizes = [{l:'4K',v:4000},{l:'8K',v:8000},{l:'32K',v:32000},{l:'128K',v:128000},{l:'200K',v:200000},{l:'1M',v:1000000}];
   document.getElementById('ctx-select').innerHTML = ctxSizes.map(c=>`<button class="ctx-btn ${c.v===ctxSize?'active':''}" onclick="setCtx(${c.v},this)">${c.l}</button>`).join('');
@@ -2603,6 +2636,7 @@ const GLOSSARY = [
   {term:'Data Augmentation',cat:'ML Fundamentals',def:'Creating modified copies of training data to increase dataset size and diversity. For images: rotating, flipping, cropping. For text: paraphrasing, synonym substitution, back-translation.',why:'Helps models generalize better, especially when training data is limited \u2014 a common situation for specialized content domains.',rel:['Training Data','Overfitting']},
   {term:'Epoch',cat:'ML Fundamentals',def:'One complete pass through the entire training dataset. Models typically train for many epochs, seeing each example multiple times.',why:'Too few epochs = the model hasn\u2019t learned enough (underfitting). Too many = the model memorizes training data (overfitting). Finding the right number is a key training decision.',rel:['Training','Batch Size','Overfitting']},
   {term:'Feature Engineering',cat:'ML Fundamentals',def:'The process of selecting, transforming, or creating input features to improve model performance. In traditional ML, this was the most time-consuming and impactful part of the workflow.',why:'Deep learning automates much of feature engineering, but understanding the concept helps you appreciate why data quality matters so much.',rel:['Machine Learning (ML)','Training Data']},
+  {term:'Federated Learning',cat:'ML Fundamentals',def:'A training approach where the model is sent to the data rather than data being sent to a central server. Each device or institution trains a local copy of the model on its own data, and only the model updates (not the raw data) are shared and aggregated. This enables training on sensitive data without exposing it.',why:'Increasingly important for privacy-preserving AI in healthcare, finance, and telecom \u2014 organizations can collaboratively improve models without sharing proprietary or regulated data.',rel:['Training','Privacy','Machine Learning (ML)']},
   {term:'Gradient Descent',cat:'ML Fundamentals',def:'An optimization algorithm that iteratively adjusts model weights in the direction that reduces error. Like walking downhill in a landscape of possible weight values to find the lowest point (minimum error).',why:'This is literally how models "learn" \u2014 they follow gradients toward better predictions. Every trained model you use was optimized by gradient descent.',rel:['Backpropagation','Learning Rate','Loss Function']},
   {term:'Learning Rate',cat:'ML Fundamentals',def:'A hyperparameter controlling how much to adjust weights at each training step. Too high = training is unstable and overshoots. Too low = training is extremely slow or gets stuck.',why:'One of the most critical settings in model training \u2014 it determines whether training converges successfully at all.',rel:['Gradient Descent','Training','Weights']},
   {term:'Loss Function',cat:'ML Fundamentals',def:'A mathematical formula measuring how wrong the model\u2019s predictions are compared to the actual correct answers. Training aims to minimize this value through gradient descent.',why:'The loss function is the model\u2019s report card \u2014 lower loss means better predictions. When people say a model is "training well," they mean the loss is decreasing.',rel:['Backpropagation','Gradient Descent','Training']},
@@ -2651,6 +2685,7 @@ const GLOSSARY = [
   {term:'Reranking',cat:'Protocols',def:'Using a secondary, more precise model to re-score and reorder search results after initial retrieval, improving the relevance of the final set of documents sent to the LLM.',why:'Reranking is a key technique for improving RAG quality \u2014 the initial retrieval casts a wide net, and reranking narrows it to the most relevant results.',rel:['RAG (Retrieval-Augmented Generation)','Hybrid Search','Vector Database']},
   {term:'Vector Similarity',cat:'Protocols',def:'A mathematical measure of how close two vectors are in embedding space, indicating how semantically similar two pieces of text are.',why:'The core mechanism behind semantic search and RAG retrieval \u2014 "find documents with similar meaning" is implemented as "find vectors that are close together."',rel:['Cosine Similarity','Embedding','Vector']},
   {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Function Calling / Tool Use','MCP (Model Context Protocol)','Planning (in Agents)']},
+  {term:'Agentic AI',cat:'Agents',def:'The paradigm of AI systems that act autonomously toward goals \u2014 planning multi-step strategies, using tools, making decisions, and self-correcting without human intervention at each step. Distinct from individual agents, agentic AI describes the broader shift from reactive chatbots to proactive, goal-directed AI systems.',why:'The defining trend of 2024\u20132026. Understanding agentic AI as a paradigm (not just a product feature) helps you anticipate how AI tools will evolve from assistants you prompt into collaborators that take initiative.',rel:['Agent (AI Agent)','Agent Loop','Multi-Agent Systems','Planning (in Agents)']},
   {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool that provides suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent (AI Agent)','Function Calling / Tool Use']},
   {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\u2019s ability to analyze a complex task, break it into ordered subtasks, determine dependencies between steps, and select which tools to use at each stage.',why:'Planning is what distinguishes agents from chatbots. A chatbot responds to one message; an agent plans a multi-step strategy.',rel:['Agent (AI Agent)','Agent Loop','Prompt Chaining']},
   {term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\'s context at request time.',why:'Every time you paste a document into AI chat, you\'re doing context injection.',rel:['RAG (Retrieval-Augmented Generation)','Context Window','Prompt']},
@@ -2813,8 +2848,34 @@ function scoreFinal(){
   if(correct >= 12){ cls = 'excellent'; msg = "Excellent! You've built a strong AI foundation."; }
   else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
   else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
-  el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div></div>`;
+  el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div><button class="btn-start" style="margin-top:16px;font-size:14px;padding:10px 24px" onclick="printCertificate(${correct},${total})">🎓 Print Completion Summary</button></div>`;
   el.scrollIntoView({behavior:'smooth'});
+}
+
+function printCertificate(correct,total){
+  const pct = Math.round((correct/total)*100);
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const w = window.open('','_blank','width=700,height=500');
+  w.document.write(`<!DOCTYPE html><html><head><title>AI Essentials - Completion Summary</title><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;max-width:600px;margin:40px auto;padding:40px;color:#0F172A;text-align:center}
+    .border{border:3px solid #2563EB;border-radius:16px;padding:40px}
+    h1{font-size:28px;background:linear-gradient(135deg,#2563EB,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .score{font-size:48px;font-weight:800;color:#2563EB;margin:16px 0}
+    .date{color:#64748B;font-size:14px;margin-top:24px}
+    .label{font-size:16px;color:#475569;margin-top:8px}
+    @media print{button{display:none}}
+    button{margin-top:24px;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+  </style></head><body><div class="border">
+    <div style="font-size:12px;letter-spacing:2px;color:#7C3AED;font-weight:700;text-transform:uppercase">Completion Summary</div>
+    <h1>AI Essentials</h1>
+    <div class="label">Interactive Guide to Understanding AI</div>
+    <div class="score">${correct} / ${total}</div>
+    <div class="label">${pct}% — Final Assessment Score</div>
+    <div class="date">${date}</div>
+    <div style="margin-top:24px;font-size:13px;color:#64748B">Brought to you by Babak</div>
+    <button onclick="window.print()">Print</button>
+  </div></body></html>`);
+  w.document.close();
 }
 
 /* ══ GLOBAL SEARCH ══ */
@@ -2994,6 +3055,29 @@ function closeMobDrawer(){
 document.getElementById('mob-menu-btn').addEventListener('click', openMobDrawer);
 document.getElementById('mob-drawer-backdrop').addEventListener('click', closeMobDrawer);
 document.getElementById('mob-drawer-close').addEventListener('click', closeMobDrawer);
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  try{localStorage.setItem('ai101-theme', isDark ? 'light' : 'dark');}catch(e){}
+  updateThemeIcon();
+}
+function updateThemeIcon(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('theme-icon').innerHTML = isDark
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+}
+(function(){
+  try{
+    const saved = localStorage.getItem('ai101-theme');
+    if(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme:dark)').matches)){
+      document.documentElement.setAttribute('data-theme','dark');
+    }
+  }catch(e){}
+  updateThemeIcon();
+})();
 </script>
 </body>
 </html>

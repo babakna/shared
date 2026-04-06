@@ -21,7 +21,21 @@
   --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif;
   --font-mono:'SF Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;
 }
+:root.dark{
+  --primary:#60A5FA;--primary-light:#93C5FD;--primary-dark:#3B82F6;
+  --accent:#A78BFA;--accent-light:#C4B5FD;
+  --secondary:#22D3EE;
+  --success:#34D399;--warning:#FBBF24;--error:#F87171;
+  --bg-body:#0F172A;--bg-card:#1E293B;--bg-muted:#334155;--bg-highlight:#1E3A5F;
+  --tx-primary:#F1F5F9;--tx-secondary:#CBD5E1;--tx-muted:#64748B;
+  --border:#334155;--border-active:#60A5FA;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+  --gradient-primary:linear-gradient(135deg,#3B82F6,#8B5CF6);
+}
 html{scroll-behavior:smooth}
+html.theme-transition,html.theme-transition *{transition:background-color .3s,border-color .3s,color .3s,box-shadow .3s!important}
 body{font-family:var(--font-body);background:var(--bg-body);color:var(--tx-secondary);line-height:1.6;font-size:16px}
 a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .hdr{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
@@ -296,9 +310,31 @@ input,textarea,select{font-size:16px!important}
 .btn-start{width:100%;justify-content:center}
 .flow-step-list{display:block}.flow-nodes{display:none}
 }
+.skip-nav{position:absolute;top:-100%;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:12px 24px;border-radius:0 0 8px 8px;font-weight:700;font-size:14px;z-index:9999;transition:top .2s}
+.skip-nav:focus{top:0;text-decoration:none;color:#fff}
+.theme-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ver-badge{font-size:10px;color:var(--tx-muted);font-weight:600;margin-left:8px;padding:2px 8px;border:1px solid var(--border);border-radius:10px;white-space:nowrap}
+.copy-btn{position:absolute;top:8px;right:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#94A3B8;cursor:pointer;font-family:var(--font-body);transition:all .2s;z-index:2}
+.copy-btn:hover{background:rgba(255,255,255,0.2);color:#E2E8F0}
+.copy-btn.copied{background:rgba(16,185,129,0.2);color:#34D399;border-color:rgba(16,185,129,0.3)}
+.quiz-area{background:var(--bg-card);border:2px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;box-shadow:var(--shadow-sm)}
+.quiz-title{font-size:17px;font-weight:700;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.quiz-q{font-size:14px;color:var(--tx-primary);margin-bottom:14px;line-height:1.7}
+.quiz-opts label{display:block;padding:10px 14px;margin-bottom:6px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;color:var(--tx-secondary);transition:all .15s;line-height:1.5}
+.quiz-opts label:hover{border-color:var(--primary);background:var(--bg-highlight)}
+.quiz-opts input{margin-right:10px;accent-color:var(--primary)}
+.quiz-opts label.correct{background:rgba(16,185,129,0.1);border-color:var(--success);color:var(--success)}
+.quiz-opts label.wrong{background:rgba(239,68,68,0.06);border-color:var(--error);color:var(--error)}
+.quiz-explain{display:none;margin-top:12px;padding:12px 16px;background:var(--bg-highlight);border-radius:8px;font-size:13px;color:var(--tx-secondary);line-height:1.7}
+.quiz-explain.vis{display:block}
+.quiz-check{margin-top:10px;background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all .2s}
+.quiz-check:hover{opacity:0.9}
+.quiz-check:disabled{opacity:0.5;cursor:not-allowed}
+.quiz-score{text-align:center;padding:16px;margin-top:16px;border-top:1px solid var(--border);font-size:15px;font-weight:600;color:var(--tx-primary)}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
 <header class="hdr" id="hdr">
 <div class="hdr-l">
 <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v1h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v2a5 5 0 01-10 0v-2H6a3 3 0 01-3-3v-1a3 3 0 013-3h1V7a5 5 0 015-5zm0 2a3 3 0 00-3 3v6a3 3 0 006 0V7a3 3 0 00-3-3zm-2 14v1a2 2 0 004 0v-1h-4z"/></svg></div>
@@ -307,6 +343,7 @@ input,textarea,select{font-size:16px!important}
 <div class="hdr-r">
 <button class="hdr-btn" id="home-btn" title="Home" aria-label="Go to home page" onclick="showLanding()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg></button>
 <button class="hdr-btn mob-only" id="mob-menu-btn" title="Menu" aria-label="Open navigation menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+<button class="hdr-btn theme-btn" id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg></button>
 <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
 </div>
 </header>
@@ -323,6 +360,39 @@ input,textarea,select{font-size:16px!important}
 <div class="mob-module-bar" id="mob-module-bar"></div>
 <main class="main" id="main-content"></main>
 <script>
+/* ══ VERSION ══ */
+var VERSION='1.0.0';
+var VERSION_DATE='April 2026';
+
+/* ══ DARK MODE ══ */
+(function(){
+var stored=localStorage.getItem('ai104-theme');
+if(stored==='dark'||(stored===null&&window.matchMedia('(prefers-color-scheme:dark)').matches)){
+document.documentElement.classList.add('dark');
+}
+})();
+function toggleTheme(){
+document.documentElement.classList.add('theme-transition');
+var isDark=document.documentElement.classList.toggle('dark');
+localStorage.setItem('ai104-theme',isDark?'dark':'light');
+var btn=document.getElementById('theme-btn');
+if(btn)btn.innerHTML=isDark?'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>':'<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>';
+setTimeout(function(){document.documentElement.classList.remove('theme-transition')},400);
+}
+
+/* ══ PROGRESS PERSISTENCE ══ */
+function saveProgress(){
+localStorage.setItem('ai104-progress',JSON.stringify({completed:Array.from(completedModules),current:currentModule}));
+}
+function loadProgress(){
+try{
+var d=JSON.parse(localStorage.getItem('ai104-progress'));
+if(d&&d.completed)d.completed.forEach(function(i){completedModules.add(i)});
+if(d&&typeof d.current==='number'&&d.current>=0)return d.current;
+}catch(e){}
+return -1;
+}
+
 /* ══ COURSE NAV ══ */
 var COURSES=[
 {id:'101',label:'AI Essentials',file:'AI-101.html'},
@@ -384,13 +454,14 @@ function renderTrail(){
 var t=document.getElementById('trail');
 var homeCls=currentModule===-1?'active':'';
 t.innerHTML='<div class="trail-line"></div><div class="trail-stop '+homeCls+'" onclick="showLanding()" title="Home"><div class="trail-dot" style="'+(currentModule===-1?'':'background:var(--tx-muted);border-color:var(--tx-muted)')+'"></div><div class="trail-lbl">Home</div></div>'+
-MODULES.map(function(m,i){var cls=completedModules.has(i)?'done':(i===currentModule?'active':'');return '<div class="trail-stop '+cls+'" onclick="goModule('+i+')" title="'+m.title+'"><div class="trail-dot"></div><div class="trail-lbl">'+m.short+'</div></div>'}).join('');
+MODULES.map(function(m,i){var cls=completedModules.has(i)?'done':(i===currentModule?'active':'');var refStyle=i>=9?' style="opacity:0.6"':'';return (i===9?'<div style="width:1px;height:20px;background:var(--border);margin:0 2px;flex-shrink:0"></div>':'')+'<div class="trail-stop '+cls+'"'+refStyle+' onclick="goModule('+i+')" title="'+m.title+(i>=9?' (Reference)':'')+'"><div class="trail-dot"></div><div class="trail-lbl">'+m.short+'</div></div>'}).join('');
 }
 
 /* ══ NAVIGATION ══ */
 function goModule(idx){
 if(idx<0){showLanding();return}
 currentModule=idx;
+saveProgress();
 document.getElementById('trail-wrap').classList.add('vis');
 document.getElementById('hdr').classList.add('compact');
 renderTrail();renderModule(idx);
@@ -407,24 +478,26 @@ var mobBar=document.getElementById('mob-module-bar');if(mobBar){mobBar.innerHTML
 }
 function renderLanding(){
 if(streamTimer){clearInterval(streamTimer);streamTimer=null}
-mainEl.innerHTML='<div class="hero"><div class="hero-badge">Advanced Technical Course</div><h1>Building with AI</h1><p>From API calls to production agents \u2014 the engineering behind AI systems. Code samples, architecture diagrams, and implementation patterns for every concept.</p><div class="hero-grid"><div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">Interactive Modules</div></div><div class="hero-stat"><div class="hero-stat-n">'+GLOSSARY.length+'</div><div class="hero-stat-l">Glossary Terms</div></div><div class="hero-stat"><div class="hero-stat-n">50+</div><div class="hero-stat-l">Worked Examples</div></div></div>'+
+var CONTENT_MODULES=MODULES.filter(function(_,i){return i<9}).length;
+mainEl.innerHTML='<div class="hero"><div class="hero-badge">Advanced Technical Course</div><h1>Building with AI</h1><p>From API calls to production agents \u2014 the engineering behind AI systems. Code samples, architecture diagrams, and implementation patterns for every concept.</p><div class="hero-grid"><div class="hero-stat"><div class="hero-stat-n">'+CONTENT_MODULES+'</div><div class="hero-stat-l">Interactive Modules</div></div><div class="hero-stat"><div class="hero-stat-n">'+GLOSSARY.length+'</div><div class="hero-stat-l">Glossary Terms</div></div><div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">In-Depth Case Studies</div></div></div>'+
 '<div class="callout warning" style="text-align:left;max-width:700px;margin:0 auto 32px"><strong>Prerequisites:</strong> This course assumes familiarity with AI-101 and AI-102 concepts. If terms like RAG, MCP, embeddings, or RLHF are unfamiliar, start with <a href="AI-101.html">AI Essentials</a> and <a href="AI-102.html">AI Deep Dive</a> first.</div>'+
 '<div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Build \u2500\u2500</div>'+
 '<div class="grid-2" style="text-align:left">'+MODULES.map(function(m,i){return '<div class="toc-card" onclick="goModule('+i+')"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:'+m.color+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+ICONS[m.icon]+'</div><div><div style="font-size:11px;color:var(--tx-muted);font-weight:600">Module '+(i+1)+'</div><div style="font-size:16px;font-weight:700;color:var(--tx-primary)">'+m.title+'</div></div></div><div class="card-text">'+LANDING_DESCS[i].desc+'</div><div class="toc-features">'+LANDING_DESCS[i].feat+'</div><div style="font-size:13px;font-weight:600;color:var(--primary);margin-top:12px">Go to Module \u2192</div></div>'}).join('')+'</div>'+
 '<div style="text-align:center;margin-top:32px"><button class="btn-start" onclick="goModule(0)">Start Building <span>\u2192</span></button></div>'+
-'<div style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:40px">Content as of April 2026</div></div>';
+'<div style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:40px">Content as of '+VERSION_DATE+' <span class="ver-badge">v'+VERSION+'</span></div></div>';
 }
 function renderModule(idx){
 if(streamTimer){clearInterval(streamTimer);streamTimer=null}
 var m=MODULES[idx];
 var nav='<div class="nav-btns">'+(idx>0?'<button class="nav-btn secondary" onclick="goModule('+(idx-1)+')">\u2190 '+MODULES[idx-1].title+'</button>':'<div></div>')+(idx<MODULES.length-1?'<button class="nav-btn primary" onclick="completeAndNext('+idx+')">Next: '+MODULES[idx+1].title+' \u2192</button>':'<button class="nav-btn primary" onclick="showLanding()">\uD83C\uDFE0 Home</button>')+'</div>';
 var hdr='<div class="mod-hdr"><div class="mod-ico" style="background:'+m.color+'">'+ICONS[m.icon]+'</div><div><div class="mod-title">'+m.title+'</div><div class="mod-desc">'+LANDING_DESCS[idx].desc+'</div></div></div>';
-mainEl.innerHTML=hdr+getModuleContent(idx)+nav;
+mainEl.innerHTML=hdr+getModuleContent(idx)+renderQuiz(idx)+nav;
 initModuleInteractions(idx);
+initCopyButtons();
 }
-function completeAndNext(idx){completedModules.add(idx);goModule(idx+1)}
+function completeAndNext(idx){completedModules.add(idx);saveProgress();goModule(idx+1)}
 function getModuleContent(idx){
-var fns=[mod1Content,mod2Content,mod3Content,mod4Content,mod5Content,mod6Content,mod7Content,mod8Content,mod9Content,mod10Resources,mod11Glossary];
+var fns=[mod1Content,mod2Content,mod3Content,mod4Content,mod5Content,mod6Content,mod7Content,mod8Content,mod9Content,mod10Content,mod11Content];
 return fns[idx]();
 }
 
@@ -826,7 +899,7 @@ return '<div class="sec-title">Understanding Mixture of Experts</div>'+
 '<dt>Lessons Learned</dt><dd><strong>1.</strong> Test quantization on YOUR tasks, not general benchmarks \u2014 domain-specific degradation patterns differ from average benchmark scores. <strong>2.</strong> INT4 is sufficient for the majority of tasks; keep a higher-precision fallback for edge cases. <strong>3.</strong> Local inference speed (8 tok/s) is 10\u201320x slower than API (100+ tok/s); factor this into workflow design. <strong>4.</strong> Unified memory architecture (Apple Silicon) makes local inference more practical than discrete-GPU laptops for models in the 30\u201370GB range. <strong>5.</strong> The quality difference between INT4 and INT8 matters most for rare knowledge; common tasks are largely unaffected.</dd>'+
 '<dt>What They\u2019d Do Differently</dt><dd>Build an automated routing classifier that scores task complexity and routes to INT4 or INT8 automatically, rather than relying on the analyst\u2019s judgment about which tasks need higher precision.</dd>'+
 '</dl></div>'+
-'<div class="callout"><strong>Note on model versions:</strong> This case study used Llama 3 70B, which was the leading open-source model at the time of implementation. The current equivalent is Llama 4, which offers improved quality at similar quantization levels. The principles \u2014 choosing quantization level based on your specific task accuracy requirements, testing on YOUR tasks rather than generic benchmarks, and using hybrid INT4/INT8 routing \u2014 remain identical regardless of model version.</div>'+
+'<div class="callout"><strong>Note on model versions:</strong> This case study used Llama 3 70B, which was the leading open-source model at the time of implementation. Open-source models evolve rapidly \u2014 check <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> for the latest available models. The principles \u2014 choosing quantization level based on your specific task accuracy requirements, testing on YOUR tasks rather than generic benchmarks, and using hybrid INT4/INT8 routing \u2014 remain identical regardless of model version.</div>'+
 '';}
 
 
@@ -1428,16 +1501,16 @@ items.map(function(r){return '<div class="resource-card"><a href="'+r.url+'" tar
 }
 
 /* ══ MODULE 10: Resources ══ */
-function mod10Resources(){
+function mod10Content(){
 return '<div class="sec-title">Your Learning Path</div>'+
 '<div class="card"><div class="card-text">Curated resources organized by category. The AI-104 Core Resources section contains the essential documentation and tools for everything covered in this course.</div></div>'+
 '<div style="background:var(--bg-highlight);border:2px solid var(--primary);border-radius:12px;padding:20px;margin:24px 0;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--primary);margin-bottom:8px">\uD83C\uDF93 Learning Path Complete!</div><div style="font-size:14px;color:var(--tx-secondary)">You\'ve explored 9 modules covering the full AI engineering stack. Use these resources to go deeper in the areas most relevant to your work.</div></div>'+
 renderResources()+
-'<div style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:32px">Content as of April 2026</div>';
+'<div style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:32px">Content as of '+VERSION_DATE+' <span class="ver-badge">v'+VERSION+'</span></div>';
 }
 
 /* ══ MODULE 11: Glossary ══ */
-function mod11Glossary(){
+function mod11Content(){
 return '<div class="sec-title">AI Engineering Glossary</div>'+
 '<div class="card"><div class="card-text">'+GLOSSARY.length+' terms covering AI fundamentals, implementation patterns, RAG, protocols, security, and evaluation. Search, filter by category, or browse alphabetically.</div></div>'+
 '<div class="gloss-filters" id="gloss-filters"></div><div class="alpha-bar" id="alpha-bar"></div>'+
@@ -1524,10 +1597,111 @@ var scrollBtn=document.getElementById('scroll-top-btn');
 window.addEventListener('scroll',function(){scrollBtn.classList.toggle('vis',window.scrollY>300)});
 scrollBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
 
+/* ══ COPY CODE BUTTONS ══ */
+function initCopyButtons(){
+document.querySelectorAll('.code-block').forEach(function(block){
+if(block.querySelector('.copy-btn'))return;
+var btn=document.createElement('button');
+btn.className='copy-btn';
+btn.textContent='Copy';
+btn.onclick=function(){
+var code=block.querySelector('code');
+if(!code)return;
+var text=code.textContent;
+navigator.clipboard.writeText(text).then(function(){
+btn.textContent='Copied!';
+btn.classList.add('copied');
+setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied')},2000);
+});
+};
+block.appendChild(btn);
+});
+}
+
+/* ══ QUIZ SYSTEM ══ */
+var QUIZZES={
+0:[{q:'An API returns HTTP 429. What is the correct response?',opts:['Retry immediately in a loop','Implement exponential backoff with jitter','Change your API key','Reduce the temperature parameter'],ans:1,explain:'HTTP 429 means "Too Many Requests" (rate limited). The correct strategy is exponential backoff with jitter — wait 1s, 2s, 4s, etc., with small random offsets to avoid synchronized retry storms.'},
+{q:'Which of these is a client-side error that retrying will NOT fix?',opts:['500 Internal Server Error','429 Too Many Requests','400 Bad Request','529 Overloaded'],ans:2,explain:'400 Bad Request means your request is structurally wrong — malformed JSON, missing fields, or exceeding the context window. This is YOUR bug; fix the request itself. Retries will fail identically.'}],
+1:[{q:'What is the primary advantage of a concise system prompt over a verbose one?',opts:['The model follows shorter prompts better','It saves tokens per request, reducing cost at scale','It prevents prompt injection','It increases response creativity'],ans:1,explain:'System prompts are prepended to every API call. A 500-token prompt vs. a 2,000-token one saves 1,500 tokens per request — at scale, this translates to significant cost savings and leaves more context window for conversation.'},
+{q:'Which system prompt component tells the model HOW to respond?',opts:['Role definition','Context block','Output format specification','Guardrails'],ans:2,explain:'The output format spec defines the structure (JSON, markdown, lists) and specific formatting rules. Role sets who the model is, context provides background data, and guardrails set boundaries.'}],
+2:[{q:'Two documents use completely different words but discuss the same topic. Which search method finds both?',opts:['Keyword search (BM25)','Semantic search via embeddings','Regex pattern matching','Full-text indexing'],ans:1,explain:'Embeddings capture semantic meaning, not exact words. "Car maintenance tips" and "Vehicle upkeep advice" would have similar embedding vectors despite sharing no keywords. BM25 would miss this.'},
+{q:'What is the primary risk of setting chunk size too small in a RAG pipeline?',opts:['Higher storage costs','Loss of semantic context within chunks','Slower retrieval speed','Increased embedding dimensionality'],ans:1,explain:'Chunks that are too small lose context — a sentence fragment may not carry enough meaning for accurate retrieval. The embedding captures the meaning of too little text, reducing relevance.'}],
+3:[{q:'In agentic RAG, what triggers a query reformulation?',opts:['The user clicks "retry"','A low confidence score from the self-assessment step','The vector database returns no results','A timeout on the initial retrieval'],ans:1,explain:'Agentic RAG includes a self-assessment step where the LLM evaluates whether retrieved chunks are sufficient. A low confidence score (e.g., 0.45) triggers automatic query reformulation and re-retrieval.'},
+{q:'What makes hybrid search (BM25 + vector) often better than pure vector search?',opts:['It is faster','It captures both exact term matches and semantic similarity','It uses less memory','It works without embeddings'],ans:1,explain:'Hybrid search combines keyword precision (BM25 finds exact terms like error codes or product names) with semantic understanding (vector search finds conceptually similar content). Together they cover more query types.'}],
+4:[{q:'What problem does MCP solve compared to direct API integrations?',opts:['It makes API calls faster','It reduces N×M integrations to N+M','It encrypts all tool calls','It replaces the need for authentication'],ans:1,explain:'Without MCP, N AI clients × M tools = N×M custom integrations. MCP standardizes the protocol so each client implements MCP once and each tool implements MCP once, giving N+M total integrations.'},
+{q:'In an MCP tool call, what format is used for client-server communication?',opts:['REST with JSON body','GraphQL queries','JSON-RPC','Protocol Buffers'],ans:2,explain:'MCP uses JSON-RPC as its transport protocol. The client sends structured JSON-RPC requests specifying the tool name and parameters, and the server responds with JSON-RPC results.'}],
+5:[{q:'In a Mixture of Experts model with 8 experts, how many experts typically process each token?',opts:['All 8','4 experts','2 experts','1 expert'],ans:2,explain:'MoE architectures typically activate only 2 experts per token via a learned router/gating network. This means a model with 1T total parameters might only use ~100B parameters per token, dramatically reducing compute.'},
+{q:'Which type of task degrades FIRST when a model is quantized from FP16 to INT4?',opts:['Common summarization tasks','Rare knowledge and specialized terminology','Simple translation','Basic Q&A'],ans:1,explain:'Quantization rounds outlier weights most aggressively. Rare knowledge (uncommon facts, niche terminology) is encoded in these outlier weights and degrades first. Common tasks survive quantization well.'}],
+6:[{q:'Why does Chain-of-Thought (CoT) prompting improve accuracy?',opts:['It makes the model use a larger context window','It forces intermediate reasoning steps that can reference each other','It reduces the temperature automatically','It accesses a different, more capable model'],ans:1,explain:'CoT forces the model to decompose problems step by step. Each intermediate step consumes tokens but can reference previous steps, preventing the errors that occur when the model jumps directly from question to answer.'},
+{q:'In the ReAct pattern, what are the three interleaved components?',opts:['Request, Evaluate, Act','Thought, Action, Observation','Read, Execute, Analyze','Reason, Attempt, Correct'],ans:1,explain:'ReAct interleaves Thought (the model reasons about what to do), Action (it calls an external tool), and Observation (it reads the tool result). This cycle repeats until the task is complete.'}],
+7:[{q:'What is an "LLM-as-Judge" evaluation?',opts:['Using an LLM to generate test cases','Using one LLM to score another LLM\'s output against criteria','A benchmark that only LLMs can take','A human evaluation assisted by LLM summaries'],ans:1,explain:'LLM-as-Judge uses a (typically more capable) LLM to evaluate output quality against defined rubrics. It correlates ~80-90% with human judgment and scales much better than manual review.'},
+{q:'Model routing reduces costs by:',opts:['Using only open-source models','Sending simple tasks to cheap models and complex tasks to expensive ones','Caching all responses','Reducing the temperature to 0'],ans:1,explain:'A classifier scores request complexity and routes accordingly: simple tasks (greetings, formatting) go to fast/cheap models, while complex tasks (analysis, reasoning) go to capable/expensive ones. This can reduce costs 50-70%.'}],
+8:[{q:'What is a canary token in AI security?',opts:['A special API key for testing','A unique string hidden in the system prompt that triggers alerts if leaked','A type of rate limiting token','A user authentication method'],ans:1,explain:'A canary token is a unique, hidden string placed in the system prompt. If it ever appears in the model\'s output, it means the system prompt has been leaked — triggering an immediate security alert.'},
+{q:'Which defense layer catches prompt injection attempts BEFORE they reach the model?',opts:['Output filtering','System prompt guardrails','Input sanitization and classification','Temperature limiting'],ans:2,explain:'Input sanitization and classification screens user input before it reaches the model, catching known injection patterns. This is the first line of defense. System prompt guardrails and output filters provide additional layers.'}]
+};
+
+function renderQuiz(modIdx){
+var qs=QUIZZES[modIdx];
+if(!qs||!qs.length)return '';
+var id='quiz-'+modIdx;
+return '<div class="quiz-area" id="'+id+'"><div class="quiz-title">\u2713 Knowledge Check</div>'+
+qs.map(function(q,qi){
+var qid=id+'-q'+qi;
+return '<div style="'+(qi>0?'margin-top:20px;padding-top:20px;border-top:1px solid var(--border)':'')+'"><div class="quiz-q"><strong>Q'+(qi+1)+':</strong> '+q.q+'</div>'+
+'<div class="quiz-opts" id="'+qid+'-opts">'+q.opts.map(function(o,oi){
+return '<label id="'+qid+'-o'+oi+'"><input type="radio" name="'+qid+'" value="'+oi+'" onchange="selectQuizOpt(\''+qid+'\','+oi+')">'+o+'</label>';
+}).join('')+'</div>'+
+'<div class="quiz-explain" id="'+qid+'-explain">'+q.explain+'</div></div>';
+}).join('')+
+'<button class="quiz-check" id="'+id+'-btn" onclick="checkQuiz('+modIdx+')" disabled>Check Answers</button>'+
+'<div class="quiz-score" id="'+id+'-score"></div></div>';
+}
+
+window.selectQuizOpt=function(qid,val){
+var modIdx=parseInt(qid.split('-')[1]);
+var id='quiz-'+modIdx;
+var btn=document.getElementById(id+'-btn');
+if(btn)btn.disabled=false;
+};
+
+window.checkQuiz=function(modIdx){
+var qs=QUIZZES[modIdx];if(!qs)return;
+var id='quiz-'+modIdx;
+var correct=0;
+qs.forEach(function(q,qi){
+var qid=id+'-q'+qi;
+var selected=document.querySelector('input[name="'+qid+'"]:checked');
+var selVal=selected?parseInt(selected.value):-1;
+q.opts.forEach(function(_,oi){
+var lbl=document.getElementById(qid+'-o'+oi);
+if(oi===q.ans)lbl.classList.add('correct');
+else if(oi===selVal)lbl.classList.add('wrong');
+});
+if(selVal===q.ans)correct++;
+document.getElementById(qid+'-explain').classList.add('vis');
+var radios=document.querySelectorAll('input[name="'+qid+'"]');
+radios.forEach(function(r){r.disabled=true});
+});
+var score=document.getElementById(id+'-score');
+score.innerHTML='Score: '+correct+' / '+qs.length+(correct===qs.length?' \u2014 Perfect! \ud83c\udf1f':'');
+var btn=document.getElementById(id+'-btn');
+if(btn)btn.disabled=true;
+};
+
+/* ══ DARK MODE BUTTON ══ */
+document.getElementById('theme-btn').addEventListener('click',toggleTheme);
+(function(){
+if(document.documentElement.classList.contains('dark')){
+var btn=document.getElementById('theme-btn');
+if(btn)btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+}
+})();
+
 /* ══ INIT ══ */
 buildSearchIndex();
 renderCourseNav();
-showLanding();
+var savedModule=loadProgress();
+if(savedModule>=0){goModule(savedModule)}else{showLanding()}
 </script>
 </body>
 </html>

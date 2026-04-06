@@ -21,6 +21,25 @@
   --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif;
   --font-mono:'SF Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;
 }
+[data-theme="dark"]{
+  --primary:#60A5FA;--primary-light:#93C5FD;--primary-dark:#3B82F6;
+  --accent:#A78BFA;--accent-light:#C4B5FD;
+  --secondary:#22D3EE;
+  --success:#34D399;--warning:#FBBF24;--error:#F87171;
+  --bg-body:#0F172A;--bg-card:#1E293B;--bg-muted:#334155;--bg-highlight:#1E3A5F;
+  --tx-primary:#F1F5F9;--tx-secondary:#CBD5E1;--tx-muted:#64748B;
+  --border:#334155;--border-active:#60A5FA;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+  --gradient-primary:linear-gradient(135deg,#3B82F6,#8B5CF6);
+}
+[data-theme="dark"] .quiz-fb.correct{background:rgba(52,211,153,0.12);color:#6EE7B7;border-color:rgba(52,211,153,0.25)}
+[data-theme="dark"] .quiz-fb.incorrect{background:rgba(248,113,113,0.12);color:#FCA5A5;border-color:rgba(248,113,113,0.25)}
+[data-theme="dark"] .score-banner.excellent{background:rgba(52,211,153,0.15);color:#6EE7B7}
+[data-theme="dark"] .score-banner.good{background:rgba(96,165,250,0.15);color:#93C5FD}
+[data-theme="dark"] .score-banner.keep{background:rgba(251,191,36,0.15);color:#FDE68A}
+[data-theme="dark"] .roadmap-section summary{color:#fff}
 html{scroll-behavior:smooth}
 body{font-family:var(--font-body);background:var(--bg-body);color:var(--tx-secondary);line-height:1.6;font-size:16px}
 a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
@@ -32,6 +51,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .hdr-t{font-size:20px;font-weight:700;color:var(--tx-primary)}
 .hdr-s{font-size:12px;color:var(--tx-secondary);margin-top:1px}
 .hdr-s .by{color:var(--accent);font-weight:600}
+.hdr-ver{font-size:11px;font-weight:600;color:var(--tx-muted);background:var(--bg-muted);padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px}
+.skip-link{position:absolute;top:-100%;left:16px;background:var(--primary);color:#fff;padding:10px 20px;border-radius:0 0 8px 8px;font-size:14px;font-weight:600;z-index:999;transition:top .2s}.skip-link:focus{top:0}
 .hdr-r{display:flex;align-items:center;gap:8px}
 .hdr-btn{background:var(--bg-muted);border:1px solid var(--border);border-radius:8px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--tx-secondary);flex-shrink:0}
 .hdr-btn:hover{border-color:var(--primary);color:var(--primary)}
@@ -150,6 +171,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .case-title{font-size:17px;font-weight:700;color:var(--tx-primary);margin-bottom:12px}
 .case-body dt{font-size:13px;font-weight:700;color:var(--primary);margin-top:12px}
 .case-body dd{font-size:14px;color:var(--tx-secondary);line-height:1.7;margin-left:0;margin-top:4px}
+.case-verified{font-size:11px;color:var(--tx-muted);text-align:right;margin-top:12px;font-style:italic}
 
 .sim-area{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;margin:24px 0;box-shadow:var(--shadow-sm)}
 .sim-title{font-size:16px;font-weight:600;color:var(--tx-primary);margin-bottom:16px;display:flex;align-items:center;gap:8px}
@@ -556,10 +578,11 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <header class="hdr" id="hdr">
   <div class="hdr-l">
     <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v1h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v2a5 5 0 01-10 0v-2H6a3 3 0 01-3-3v-1a3 3 0 013-3h1V7a5 5 0 015-5zm0 2a3 3 0 00-3 3v6a3 3 0 006 0V7a3 3 0 00-3-3zm-2 14v1a2 2 0 004 0v-1h-4z"/></svg></div>
-    <div><div class="hdr-t">AI Deep Dive</div><div class="hdr-s">Advanced Concepts for the AI-Literate Professional &middot; <span class="by">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">AI Deep Dive <span class="hdr-ver">v1.0</span></div><div class="hdr-s">Advanced Concepts for the AI-Literate Professional &middot; <span class="by">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-r">
     <button class="hdr-btn" id="home-btn" title="Home" aria-label="Go to home page" onclick="showLanding()">
@@ -569,6 +592,10 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
+    </button>
+    <button class="hdr-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
     <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
   </div>
@@ -715,7 +742,7 @@ function renderLanding(){
     '<div class="hero-grid">'+
       '<div class="hero-stat"><div class="hero-stat-n">9</div><div class="hero-stat-l">Interactive Modules</div></div>'+
       '<div class="hero-stat"><div class="hero-stat-n">105</div><div class="hero-stat-l">Glossary Terms</div></div>'+
-      '<div class="hero-stat"><div class="hero-stat-n">45+</div><div class="hero-stat-l">Quiz Questions</div></div>'+
+      '<div class="hero-stat"><div class="hero-stat-n">50+</div><div class="hero-stat-l">Quiz Questions</div></div>'+
     '</div>'+
     '<div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Learn \u2500\u2500</div>'+
     '<div class="grid-2" style="text-align:left">'+
@@ -752,7 +779,7 @@ function renderModule(idx){
   initModuleInteractions(idx);
 }
 
-function completeAndNext(idx){ completedModules.add(idx); goModule(idx + 1); }
+function completeAndNext(idx){ completedModules.add(idx); saveProgress(); goModule(idx + 1); }
 
 function getModuleContent(idx){
   switch(idx){
@@ -777,7 +804,7 @@ var MOD1_QUIZ_POOL = [
   {type:'tf',q:'Multi-modal models have separate AI brains for text, images, and audio.',a:false,exp:'Multi-modal models convert all modalities into the same mathematical representation (embeddings) and process them through the same Transformer attention layers.'},
   {type:'mc',q:'Why might the same prompt produce different results in Claude vs. ChatGPT?',opts:['One is broken','They use identical training but different UIs','Different training data, fine-tuning preferences, and system prompts','Random chance'],a:2,exp:'Different models have different training data, RLHF preferences, and system prompts, leading to meaningfully different outputs for the same input.'},
   {type:'mc',q:'What happens in the "forward pass" during training?',opts:['The model saves its weights','The model processes input and makes a prediction','The model deletes incorrect data','The model communicates with other models'],a:1,exp:'In the forward pass, the model processes a batch of input data through its layers and produces predictions. These are then compared to actual answers to calculate loss.'},
-  {type:'tf',q:'Early layers in a neural network typically capture low-level features like edges, while deeper layers capture abstract concepts.',a:true,exp:'This hierarchical feature extraction is a key property of deep networks \u2014 each successive layer builds more complex representations from simpler ones.'},
+  {type:'tf',q:'Transformers process text sequentially, one word at a time, just like earlier neural network architectures.',a:false,exp:'Unlike earlier architectures (RNNs, LSTMs) that processed text sequentially, Transformers process all tokens simultaneously through the attention mechanism, enabling massive parallelization and better long-range understanding.'},
   {type:'mc',q:'What is the primary difference between how text and images enter a multi-modal Transformer?',opts:['They use completely different models','Text is tokenized while images are split into patches, but both become embeddings','Images bypass the Transformer entirely','Text requires more compute than images'],a:1,exp:'Both modalities are converted into embeddings before entering the Transformer. Text goes through a tokenizer; images go through a patch extractor and vision encoder.'}
 ];
 
@@ -872,24 +899,24 @@ function mod1Content(){
   '<div class="sim-area">'+
     '<p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">The diagram below shows how the attention mechanism resolves ambiguity. The word \u201cit\u201d attends strongly to \u201ccat\u201d and weakly to \u201cmat,\u201d understanding <em>what</em> was tired.</p>'+
     '<svg viewBox="0 0 700 180" style="width:100%;max-width:700px;display:block;margin:0 auto">'+
-      '<style>.aword{font-size:15px;font-weight:600;fill:#0F172A;text-anchor:middle}.aline{stroke-linecap:round;fill:none}</style>'+
+      '<style>.aword{font-size:15px;font-weight:600;fill:var(--tx-primary);text-anchor:middle}.aline{stroke-linecap:round;fill:none}.albl{fill:var(--tx-secondary)}.amute{fill:var(--tx-muted)}</style>'+
       '<text class="aword" x="30" y="80">The</text>'+
-      '<text class="aword" x="100" y="80" fill="#2563EB">cat</text>'+
+      '<text class="aword" x="100" y="80" style="fill:var(--primary)">cat</text>'+
       '<text class="aword" x="170" y="80">sat</text>'+
       '<text class="aword" x="240" y="80">on</text>'+
       '<text class="aword" x="310" y="80">the</text>'+
       '<text class="aword" x="380" y="80">mat</text>'+
       '<text class="aword" x="460" y="80">because</text>'+
-      '<text class="aword" x="540" y="80" fill="#7C3AED">it</text>'+
+      '<text class="aword" x="540" y="80" style="fill:var(--accent)">it</text>'+
       '<text class="aword" x="620" y="80">was</text>'+
       '<text class="aword" x="680" y="80">tired</text>'+
-      '<path class="aline" d="M540,70 Q320,10 100,70" stroke="#2563EB" stroke-width="3" opacity="0.8"/>'+
-      '<path class="aline" d="M540,70 Q460,50 380,70" stroke="#F59E0B" stroke-width="1.5" opacity="0.4"/>'+
-      '<text x="320" y="25" font-size="11" fill="#2563EB" text-anchor="middle" font-weight="600">Strong attention (0.82)</text>'+
-      '<text x="460" y="55" font-size="11" fill="#F59E0B" text-anchor="middle">Weak attention (0.11)</text>'+
-      '<text x="350" y="130" font-size="12" fill="#475569" text-anchor="middle">The model learns that \u201cit\u201d refers to \u201ccat\u201d \u2014 not \u201cmat\u201d \u2014 through attention scores</text>'+
-      '<text x="350" y="150" font-size="12" fill="#475569" text-anchor="middle">computed between every pair of words simultaneously.</text>'+
-      '<text x="350" y="170" font-size="11" fill="#94A3B8" text-anchor="middle">This direct connection works regardless of distance \u2014 even across pages.</text>'+
+      '<path class="aline" d="M540,70 Q320,10 100,70" stroke="var(--primary)" stroke-width="3" opacity="0.8"/>'+
+      '<path class="aline" d="M540,70 Q460,50 380,70" stroke="var(--warning)" stroke-width="1.5" opacity="0.4"/>'+
+      '<text x="320" y="25" font-size="11" style="fill:var(--primary)" text-anchor="middle" font-weight="600">Strong attention (0.82)</text>'+
+      '<text x="460" y="55" font-size="11" style="fill:var(--warning)" text-anchor="middle">Weak attention (0.11)</text>'+
+      '<text x="350" y="130" font-size="12" class="albl" text-anchor="middle">The model learns that \u201cit\u201d refers to \u201ccat\u201d \u2014 not \u201cmat\u201d \u2014 through attention scores</text>'+
+      '<text x="350" y="150" font-size="12" class="albl" text-anchor="middle">computed between every pair of words simultaneously.</text>'+
+      '<text x="350" y="170" font-size="11" class="amute" text-anchor="middle">This direct connection works regardless of distance \u2014 even across pages.</text>'+
     '</svg>'+
     '<div class="callout" style="margin-top:16px">Before Transformers (2017), neural networks processed text sequentially \u2014 word by word, left to right. By word 500, it had largely forgotten word 1. The attention mechanism changed everything by allowing every word to directly \u201clook at\u201d every other word simultaneously, regardless of distance. This is why modern LLMs can understand that a pronoun on page 10 refers to a noun introduced on page 1.</div>'+
   '</div>'+
@@ -944,7 +971,7 @@ function mod1Content(){
       '<dd>(1) They stopped assuming prompts are model-portable \u2014 a prompt optimized for one model needs adjustment for another. (2) They created model-specific prompt variants for their top 10 templates. (3) They matched models to task types: Claude for technical accuracy (API docs, specs), ChatGPT for creative flexibility (blog drafts, marketing), and Gemini for long-document processing.</dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) \u201cBest model\u201d depends entirely on what you\u2019re optimizing for \u2014 accuracy, creativity, speed, or cost produce different winners. (2) Prompts are not model-portable without adjustment; a prompt that works brilliantly in Claude may underperform in ChatGPT and vice versa. (3) The model that \u201cfeels best\u201d in casual use is not necessarily the model that scores best on your specific tasks \u2014 systematic evaluation reveals this. (4) Using 2-3 models for different task types is pragmatic, not wasteful. (5) Re-evaluate model assignments quarterly \u2014 capabilities shift rapidly with each provider\u2019s updates.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   renderQuiz('mod1', pickRandom(MOD1_QUIZ_POOL, 5));
 }
@@ -952,7 +979,7 @@ function mod1Content(){
 /* ══ MODULE 2: THE AI ECOSYSTEM ══ */
 function mod2Content(){
   return '<div class="card"><div class="card-text" style="line-height:1.8">'+
-  '<p>The AI landscape in 2025\u20132026 looks simple on the surface \u2014 ChatGPT, Claude, Gemini, Copilot \u2014 but beneath each product is a stack of technologies, business models, and tradeoffs that directly affect your work. Choosing the wrong model for a task doesn\u2019t just produce poor output \u2014 it wastes time, money, and trust. Understanding the ecosystem means making informed decisions instead of defaulting to whatever tool was mentioned last.</p>'+
+  '<p>The current AI landscape looks simple on the surface \u2014 ChatGPT, Claude, Gemini, Copilot \u2014 but beneath each product is a stack of technologies, business models, and tradeoffs that directly affect your work. Choosing the wrong model for a task doesn\u2019t just produce poor output \u2014 it wastes time, money, and trust. Understanding the ecosystem means making informed decisions instead of defaulting to whatever tool was mentioned last.</p>'+
   '<p style="margin-top:10px">The stack has four layers, and most confusion comes from conflating them. The <strong>model layer</strong> is the trained neural network (GPT-4, Claude Opus, Gemini Pro). The <strong>API layer</strong> provides programmatic access to the model with specific parameters, pricing, and rate limits. The <strong>application layer</strong> is what end users interact with \u2014 ChatGPT is an application built on GPT models, Claude.ai is an application built on Claude models. The <strong>integration layer</strong> connects AI to your specific tools and data \u2014 MCP servers, RAG pipelines, custom workflows. Each layer has different vendors, pricing, and tradeoffs.</p>'+
   '<p style="margin-top:10px">The most important distinction for content professionals: <strong>open-source vs. proprietary</strong>. Proprietary models (Claude, GPT, Gemini) offer the highest capability, managed infrastructure, and continuous updates \u2014 but your data goes to external servers and you depend on the vendor\u2019s pricing and policies. Open-source models (Llama, Mistral, Qwen) offer full control, data privacy, and no per-token costs \u2014 but require technical expertise to deploy and generally lag behind proprietary models on the hardest tasks. Most content teams use proprietary APIs for daily work and consider open-source for specific use cases requiring data sensitivity.</p>'+
   '</div></div>'+
@@ -1019,7 +1046,7 @@ function mod2Content(){
       '<dd>They standardized on Claude Team for documentation and knowledge base work (primary workload, 80% of tasks) and kept ChatGPT access for brainstorming and marketing content (20% of tasks). Total cost was lower than 10 individual ChatGPT Plus subscriptions.</dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) Evaluate on YOUR tasks, not on generic benchmarks \u2014 model rankings vary by use case. (2) \u201cBest model\u201d depends on what you\u2019re measuring \u2014 accuracy, speed, cost, and style compliance produce different winners. (3) Most teams don\u2019t need to pick just one \u2014 using 2 platforms for different task types is pragmatic. (4) Enterprise plans are usually cheaper than multiple individual subscriptions and provide better security, admin controls, and usage analytics. (5) Re-evaluate quarterly \u2014 model capabilities change rapidly and last quarter\u2019s winner may not be this quarter\u2019s.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   '<details class="deeper"><summary>Deeper Dive: When to Use Which Model</summary><div class="deeper-body">'+
     '<p>Not every task needs the most powerful (and expensive) model. Here\u2019s a practical decision framework:</p>'+
@@ -1128,7 +1155,7 @@ function mod3Content(){
       '<dd>(1) The 4-step chain identified 12 factual discrepancies, 8 style violations, and 5 missing sections \u2014 compared to \u201cminor inconsistencies\u201d from the single prompt. (2) Total processing time: ~8 minutes across all 4 steps, compared to ~2 minutes for the single useless prompt. (3) The review caught a critical error: the spec listed rate limits from the previous API version, not the new one \u2014 an error that would have caused customer-facing documentation to be wrong. (4) The team adopted this chain as their standard review workflow.</dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) A single prompt asking for multiple types of analysis produces shallow results on all dimensions. Each step in a chain gets the model\u2019s full attention. (2) Separating extraction from evaluation prevents the model from skipping claims it \u201cthinks\u201d are obviously correct. (3) The chain\u2019s total cost (4 API calls) was trivial compared to the cost of publishing a spec with wrong rate limits. (4) Not every task needs chaining \u2014 simple tasks with one objective work fine in a single prompt. Chain when the task has distinct subtasks that benefit from focused attention.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   '<div class="callout warning"><strong>When NOT to chain:</strong> Don\u2019t chain simple tasks. If a single prompt reliably produces good output, adding steps adds latency and cost without improving quality. Chain when: (1) the task has clearly distinct subtasks, (2) a single prompt produces inconsistent results, or (3) you need different \u201cexpertise\u201d at different stages (e.g., factual extraction vs. style review).</div>'+
 
@@ -1209,7 +1236,7 @@ function mod4Content(){
       '<dd>(1) Hallucination rate dropped from ~30% to ~3% within the first month. (2) The remaining 3% were mostly cases where the documentation itself was outdated or ambiguous \u2014 a documentation problem, not an AI problem. (3) Customer satisfaction with chatbot responses improved from 2.1/5 to 4.2/5. (4) Support ticket volume decreased 18% as the chatbot successfully resolved more queries. (5) When the bot doesn\u2019t find relevant documentation, it now gracefully redirects to human support instead of guessing.</dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) A vanilla LLM without retrieval is almost never appropriate for customer-facing applications \u2014 the hallucination risk is too high. (2) RAG quality depends entirely on retrieval quality \u2014 the LLM faithfully answers based on whatever documents it receives, so if the wrong documents are retrieved, the answer is wrong. (3) Chunk size matters more than most teams expect \u2014 too small and you lose context, too large and you dilute relevance. (4) The \u201cI don\u2019t know\u201d fallback is the most important design decision \u2014 a bot that admits ignorance is vastly better than one that fabricates answers. (5) RAG doesn\u2019t eliminate the need for good documentation \u2014 it exposes documentation gaps by showing exactly which queries have no source material to draw from.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   renderQuiz('mod4', pickRandom(MOD4_QUIZ_POOL, 5));
 }
@@ -1275,7 +1302,7 @@ function mod5Content(){
       '<dd>(1) The 2-day task became a 3-hour review session. (2) The agent drafted 80% of items correctly on the first pass. (3) The remaining 20% needing human editing were primarily nuanced customer impact assessments \u2014 exactly the kind of judgment that requires product expertise. (4) Writers reported higher job satisfaction \u2014 they spent their time on interesting judgment calls instead of mechanical reformatting.</dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) Agents excel at structured, repeatable tasks with clear patterns and well-defined templates. (2) The confidence score was critical \u2014 it let the team focus human attention where it mattered most instead of reviewing every item equally. (3) The agent\u2019s cross-referencing step caught terminology inconsistencies the team previously missed. (4) The human\u2019s role shifted from drafting to reviewing and adding judgment \u2014 a more valuable use of expertise. (5) Start agent deployment with your most structured, lowest-risk workflow. Release notes were ideal because every output gets human review before publication.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   '<div class="callout warning"><strong>Agent errors compound.</strong> In a chatbot, a wrong answer is one wrong answer. In an agent running a 10-step workflow, a wrong decision at step 3 corrupts steps 4 through 10. This is why the best agent workflows include quality checkpoints between stages \u2014 the agent assesses its own intermediate output and flags low-confidence results for human review before proceeding. Build these checkpoints into your agent design from day one.</div>'+
 
@@ -1344,7 +1371,7 @@ function mod6Content(){
       '<dd>(1) Within 3 months, content output increased 40% across the team. (2) Average time-to-publish decreased from 5 days to 3 days. (3) Consistency scores (measured by quarterly cross-document terminology checks) improved by 60%. (4) The 3 writers who previously weren\u2019t using AI became productive users within 2 weeks \u2014 the problem had been prompting skill, not tool capability. (5) New team members onboarded onto AI workflows in 2 days instead of 2 weeks.</dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) Prompt quality variation across a team is the single biggest barrier to AI adoption \u2014 standardize early. (2) Testing prompts against the same inputs with a rubric reveals quality differences invisible in casual use. (3) The writers who \u201ccouldn\u2019t get good results\u201d became productive users once given proven templates \u2014 the tool was never the problem. (4) The playbook is a living document \u2014 they assigned a rotating \u201cAI lead\u201d each month to add new templates, retire underperformers, and adjust for model updates. (5) The ROI case wrote itself: 40% more output with no additional headcount, documented with before/after metrics.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   renderQuiz('mod6', pickRandom(MOD6_QUIZ_POOL, 5));
 }
@@ -1403,7 +1430,7 @@ function mod7Content(){
       '<p style="margin-top:8px"><strong>(4) Disclosure framework:</strong> Internal metadata tags track which content was AI-assisted. Public-facing content includes disclosure where required by industry standards or client contracts.</p></dd>'+
       '<dt>Lessons</dt>'+
       '<dd>(1) AI content policies are not bureaucratic overhead \u2014 they prevent real business damage. (2) The most dangerous AI output is the output that looks perfect \u2014 it bypasses human skepticism. (3) Verification is not optional, even when the content \u201cseems right.\u201d (4) Specific, named entities (people, companies, quotes, statistics) are the highest-risk hallucination targets \u2014 always verify these first. (5) Publishing unreviewed AI content is publishing unverified content, regardless of how polished it appears.</dd>'+
-    '</dl></div>'+
+    '</dl><div class="case-verified">Last verified: April 2026</div></div>'+
 
   '<details class="deeper"><summary>Deeper Dive: Building Your Organization\u2019s AI Usage Guidelines</summary><div class="deeper-body">'+
     '<p>Every organization using AI for content creation needs clear, practical usage guidelines. Here\u2019s a framework for building yours:</p>'+
@@ -2134,9 +2161,33 @@ function scoreFinal(){
     if(correct >= 12){ cls = 'excellent'; msg = 'Excellent! You\u2019ve mastered advanced AI concepts.'; }
     else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
     else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
-    el.innerHTML = '<div class="score-banner ' + cls + '"><div class="score-num">' + correct + ' / ' + total + '</div><div class="score-msg">' + msg + '</div></div>';
+    el.innerHTML = '<div class="score-banner ' + cls + '"><div class="score-num">' + correct + ' / ' + total + '</div><div class="score-msg">' + msg + '</div></div>' +
+      '<div style="text-align:center;margin-top:16px"><button class="btn-start" style="font-size:14px;padding:10px 24px" onclick="exportResults(' + correct + ',' + total + ')">Export Results</button></div>';
     el.scrollIntoView({behavior:'smooth'});
   }, 200);
+}
+
+function exportResults(correct, total){
+  var date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var pct = Math.round((correct/total)*100);
+  var lines = ['AI Deep Dive \u2014 Final Assessment Results','Date: '+date,'Score: '+correct+' / '+total+' ('+pct+'%)',''];
+  for(var i = 0; i < total; i++){
+    var card = document.getElementById('qc-final-q'+i);
+    if(!card) continue;
+    var qText = card.querySelector('.quiz-q');
+    var result = card.classList.contains('correct') ? '\u2713 Correct' : '\u2717 Incorrect';
+    lines.push('Q'+(i+1)+'. '+(qText ? qText.textContent.replace(/^Q\d+\s*/,'').replace(/\s*(MC|T\/F)\s*$/,'').trim() : 'Question '+(i+1)));
+    lines.push('   '+result);
+    var fb = card.querySelector('.quiz-fb');
+    if(fb && fb.textContent) lines.push('   '+fb.textContent.trim());
+    lines.push('');
+  }
+  var blob = new Blob([lines.join('\n')],{type:'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'AI-102-Assessment-Results.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 /* ══ GLOBAL SEARCH ══ */
@@ -2266,9 +2317,48 @@ function renderCourseNav(){
     if(c.id === THIS_COURSE){
       return '<span class="course-link current">' + c.label + '</span>';
     }
-    return '<a class="course-link" href="' + c.file + '">' + c.label + '</a>';
+    return '<a class="course-link" href="' + c.file + '" onclick="return checkCourseLink(event,\'' + c.file + '\',\'' + c.label + '\')">' + c.label + '</a>';
   }).join('');
 }
+function checkCourseLink(e,file,label){
+  var xhr = new XMLHttpRequest();
+  xhr.open('HEAD', file, false);
+  try{ xhr.send(); if(xhr.status >= 400) throw 0; }
+  catch(err){ e.preventDefault(); alert(label+' is not available yet. Check back soon!'); return false; }
+  return true;
+}
+
+/* ══ THEME TOGGLE ══ */
+(function(){
+  var saved = localStorage.getItem('ai102-theme');
+  if(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme:dark)').matches)){
+    document.documentElement.setAttribute('data-theme','dark');
+  }
+  updateThemeIcons();
+})();
+function updateThemeIcons(){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('theme-icon-sun').style.display = isDark ? 'block' : 'none';
+  document.getElementById('theme-icon-moon').style.display = isDark ? 'none' : 'block';
+}
+document.getElementById('theme-toggle').addEventListener('click', function(){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if(isDark){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('ai102-theme','light'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('ai102-theme','dark'); }
+  updateThemeIcons();
+});
+
+/* ══ PROGRESS PERSISTENCE ══ */
+function saveProgress(){
+  try{ localStorage.setItem('ai102-completed', JSON.stringify(Array.from(completedModules))); }catch(e){}
+}
+function loadProgress(){
+  try{
+    var data = localStorage.getItem('ai102-completed');
+    if(data){ JSON.parse(data).forEach(function(i){ completedModules.add(i); }); }
+  }catch(e){}
+}
+loadProgress();
 
 /* ══ INITIALIZATION ══ */
 buildSearchIndex();
