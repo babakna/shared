@@ -559,7 +559,7 @@ const FLOWS = {};
 FLOWS['airan_registration'] = {
   id:'airan_registration', title:'Registration via AI-RAN Node', section:'airan', badge:'VALIDATED',
   specRef:'TS 23.502 §4.2.2.2, O-RAN WG3, AI-RAN Alliance',
-  narrative:'The UE registers through an AI-RAN node (Nokia AirScale + NVIDIA Grace Hopper GPU) at the Innovation Center in Bellevue. The AI-RAN node performs standard gNB functions but adds GPU-accelerated RRC processing and AI-based beam management. Registration follows the same 5G AKA procedure but the gNB is replaced by the AI-RAN node with shared-memory GPU acceleration.',
+  narrative:'The UE registers through an AI-RAN node (Nokia AirScale + NVIDIA Grace Hopper GPU) at the Innovation Center. The AI-RAN node performs standard gNB functions but adds GPU-accelerated RRC processing and AI-based beam management. Registration follows the same 5G AKA procedure but the gNB is replaced by the AI-RAN node with shared-memory GPU acceleration.',
   nodes:['ue','ai_ran','gpu','amf','ausf','udm'],
   connections:[
     {from:'ue',to:'ai_ran',label:'Uu',type:'data'},
@@ -572,7 +572,7 @@ FLOWS['airan_registration'] = {
     {id:1, label:'Step 1: RRC Setup via AI-RAN', from:'ue', to:'ai_ran', interface:'Uu — NR Air Interface', protocol:'RRC (TS 38.331)', badge:'VALIDATED', lineType:'dp',
       description:'UE sends RRC Setup Request. The AI-RAN node receives on GPU-accelerated L1 PHY and uses AI-based beam management to optimize reception before processing the RRC message.',
       ingress:{title:'RRC Setup Request via AI-RAN',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // UE → AI-RAN Node (Nokia AirScale + NVIDIA Grace Hopper)
 // Standard RRC Setup Request — UE is unaware of AI-RAN
 {
@@ -584,15 +584,15 @@ FLOWS['airan_registration'] = {
     "spare": "0"
   },
   // NR cell seen by UE (standard broadcast):
-  "cellId": "310260-00A1-0042",
+  "cellId": "00101-00A1-0042",
   "physCellId": 342,
   "frequencyBand": "n41",
   "ssbIndex": 7,
   // AI-RAN GPU processes PHY in <100μs
-  "plmn": { "mcc": "310", "mnc": "260" }
+  "plmn": { "mcc": "001", "mnc": "01" }
 }`},
       egress:{title:'AI-RAN RRC Processing on GPU vDU',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN processes RRC on GPU-accelerated vDU
 // Nokia AirScale vDU running on NVIDIA Grace Hopper
 {
@@ -615,7 +615,7 @@ FLOWS['airan_registration'] = {
     {id:2, label:'Step 2: GPU Beam Inference', from:'ai_ran', to:'gpu', interface:'PCIe/NVLink — GPU Interconnect', protocol:'CUDA / Aerial SDK', badge:'VALIDATED', lineType:'dp',
       description:'AI-RAN offloads channel estimation and beam prediction to the GPU pool. The NVIDIA Grace Hopper shared-memory architecture enables zero-copy L1↔inference data transfer.',
       ingress:{title:'Channel Estimation Offload to GPU',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN vDU → GPU Pool via PCIe Gen5 / NVLink
 // Zero-copy shared memory — NVIDIA Aerial SDK
 {
@@ -635,7 +635,7 @@ FLOWS['airan_registration'] = {
   "sharedMemRegion": "0x7FA0_0000-0x7FA0_FFFF"
 }`},
       egress:{title:'GPU Beam Prediction Result',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // GPU returns beam prediction + enhanced CSI
 {
   "gpuInferenceResult": {
@@ -660,7 +660,7 @@ FLOWS['airan_registration'] = {
     {id:3, label:'Step 3: NAS Registration Request Forwarded', from:'ai_ran', to:'amf', interface:'N2 — NGAP (TS 38.413)', protocol:'NGAP', badge:'VALIDATED', lineType:'cp',
       description:'AI-RAN forwards the NAS Registration Request to the AMF via standard NGAP Initial UE Message. The AMF cannot distinguish an AI-RAN node from a traditional gNB.',
       ingress:{title:'NGAP Initial UE Message (Standard N2)',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN → AMF via standard N2 NGAP
 // AMF sees a standard gNB — no AI-RAN awareness needed
 {
@@ -670,10 +670,10 @@ FLOWS['airan_registration'] = {
       "id-NAS-PDU": "<NAS Registration Request>",
       "id-UserLocationInformation": {
         "nR-CGI": {
-          "pLMNIdentity": "310260",
+          "pLMNIdentity": "00101",
           "nRCellIdentity": "00A100042"
         },
-        "tAI": { "pLMNIdentity": "310260", "tAC": "000042" }
+        "tAI": { "pLMNIdentity": "00101", "tAC": "000042" }
       },
       "id-RRCEstablishmentCause": "mo-Signalling",
       "id-UEContextRequest": "requested"
@@ -683,14 +683,14 @@ FLOWS['airan_registration'] = {
   // with SUCI (concealed SUPI) per TS 33.501
 }`},
       egress:{title:'AMF Receives and Initiates Auth',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AMF processing — identical to standard gNB path
 {
   "amfProcessing": {
     "ran_ue_ngap_id": 1001,
     "amf_ue_ngap_id": 50042,
     "serving_network": {
-      "mcc": "310", "mnc": "260"
+      "mcc": "001", "mnc": "01"
     },
     "registration_type": "initial",
     "nas_pdu_decoded": {
@@ -709,7 +709,7 @@ FLOWS['airan_registration'] = {
     {id:4, label:'Step 4: Authentication Request to AUSF', from:'amf', to:'ausf', interface:'N12 — Nausf_UEAuthentication', protocol:'HTTP/2 (SBI)', badge:'VALIDATED', lineType:'cp',
       description:'AMF sends Nausf_UEAuthentication_Authenticate with the SUCI. Standard 5G AKA procedure — no AI-RAN-specific behavior on the core side.',
       ingress:{title:'Nausf_UEAuthentication_Authenticate Request',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AMF → AUSF: standard 5G AKA (TS 33.501 §6.1.3)
 // POST /nausf-auth/v1/ue-authentications
 {
@@ -727,7 +727,7 @@ FLOWS['airan_registration'] = {
 // AMF registered AI-RAN as standard gNB
 // via NG Setup (TS 38.413 §8.7.1)`},
       egress:{title:'AUSF Initiates SUCI Resolution',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AUSF processes authentication request
 {
   "ausfProcessing": {
@@ -748,7 +748,7 @@ FLOWS['airan_registration'] = {
     {id:5, label:'Step 5: UDM Authentication Vector', from:'ausf', to:'udm', interface:'N13 — Nudm_UEAuthentication', protocol:'HTTP/2 (SBI)', badge:'VALIDATED', lineType:'cp',
       description:'AUSF requests authentication vector from UDM. UDM resolves SUCI to SUPI and generates 5G HE AV (RAND, AUTN, XRES*, KAUSF).',
       ingress:{title:'Nudm_UEAuthentication_Get Request',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AUSF → UDM: Generate auth data
 // POST /nudm-ueau/v1/{supiOrSuci}/
 //      security-information/generate-auth-data
@@ -765,7 +765,7 @@ FLOWS['airan_registration'] = {
 // Standard TS 33.501 §6.1.3.2
 // PLMN: MCC=310, MNC=260`},
       egress:{title:'UDM Returns 5G HE AV',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // UDM → AUSF: 5G Home Environment Auth Vector
 {
   "authType": "5G_AKA",
@@ -775,7 +775,7 @@ FLOWS['airan_registration'] = {
     "xresStar": "0A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D",
     "kausf": "<derived_from_CK_IK_SN_name>"
   },
-  "supi": "imsi-310260000042781",
+  "supi": "imsi-00101000042781",
   "authSubscription": {
     "authenticationMethod": "5G_AKA",
     "sequenceNumber": { "sqn": "000000004A21" }
@@ -787,7 +787,7 @@ FLOWS['airan_registration'] = {
     {id:6, label:'Step 6: Auth Challenge to UE', from:'amf', to:'ue', interface:'Uu — NAS via NGAP + AI-RAN', protocol:'NAS 5GMM (TS 24.501)', badge:'VALIDATED', lineType:'cp', through:['ai_ran'],
       description:'AMF sends NAS Authentication Request carrying RAND and AUTN. Message passes transparently through the AI-RAN node — NAS encryption is end-to-end between UE and AMF.',
       ingress:{title:'NAS Authentication Request (via AI-RAN)',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AMF → UE (via AI-RAN transparent relay)
 // NAS Authentication Request (TS 24.501 §5.4.1.2)
 {
@@ -807,7 +807,7 @@ FLOWS['airan_registration'] = {
 // UE verifies AUTN → mutual authentication
 // Sends NAS Authentication Response with RES*`},
       egress:{title:'UE Computes RES* and Responds',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // UE USIM processes 5G AKA challenge:
 {
   "ue_auth_processing": {
@@ -832,7 +832,7 @@ FLOWS['airan_registration'] = {
     {id:7, label:'Step 7: NAS Security Mode', from:'amf', to:'ue', interface:'Uu — NAS via NGAP + AI-RAN', protocol:'NAS 5GMM (TS 24.501)', badge:'VALIDATED', lineType:'cp', through:['ai_ran'],
       description:'AMF activates NAS security — integrity (5G-IA2) and ciphering (5G-EA1). Messages are protected end-to-end UE↔AMF. AI-RAN node forwards NAS PDUs without inspection.',
       ingress:{title:'NAS Security Mode Command',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AMF → UE: NAS Security Mode Command
 // (TS 24.501 §5.4.2.2)
 {
@@ -854,7 +854,7 @@ FLOWS['airan_registration'] = {
 // AI-RAN relays NGAP DownlinkNASTransport
 // NAS Security Mode is UE ↔ AMF only`},
       egress:{title:'UE Completes NAS Security Activation',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // UE processes Security Mode Command:
 {
   "ue_security_activation": {
@@ -879,7 +879,7 @@ FLOWS['airan_registration'] = {
     {id:8, label:'Step 8: Registration Accept', from:'amf', to:'ue', interface:'Uu — NAS via NGAP + AI-RAN', protocol:'NAS 5GMM (TS 24.501)', badge:'VALIDATED', lineType:'cp', through:['ai_ran'],
       description:'AMF sends Registration Accept with 5G-GUTI, Allowed NSSAI, and registration area. UE is now registered on 5G SA via the AI-RAN node. Standard 3GPP registration — the innovation is WHERE it runs.',
       ingress:{title:'NAS Registration Accept',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AMF → UE: Registration Accept (TS 24.501 §5.5.1.2.4)
 {
   "NAS_RegistrationAccept": {
@@ -887,7 +887,7 @@ FLOWS['airan_registration'] = {
     "messageType": "0x42",
     "5GS_RegistrationResult": "3GPP access",
     "5G-GUTI": {
-      "mcc": "310", "mnc": "260",
+      "mcc": "001", "mnc": "01",
       "amfRegionId": "0x01",
       "amfSetId": "0x001",
       "amfPointer": "0x02",
@@ -898,20 +898,20 @@ FLOWS['airan_registration'] = {
       { "sst": 1, "sd": "ABCD02" }
     ],
     "registrationAreaList": {
-      "taiList": [{ "mcc":"310","mnc":"260","tac":"000042" }]
+      "taiList": [{ "mcc":"001","mnc":"01","tac":"000042" }]
     }
   }
 }`},
       egress:{title:'Registration Complete — AI-RAN Innovation',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // UE is fully registered on 5G SA
-// via AI-RAN node at Bellevue Innovation Center
+// via AI-RAN node at Innovation Center
 {
   "registrationSummary": {
     "status": "REGISTERED",
     "access": "3GPP_NR",
-    "plmn": { "mcc": "310", "mnc": "260" },
-    "5g_guti": "31026001001020042781",
+    "plmn": { "mcc": "001", "mnc": "01" },
+    "5g_guti": "0010101001020042781",
     "serving_cell": "AI-RAN-IC-Node-01"
   },
   // Standard 3GPP registration — 100% compliant
@@ -1006,10 +1006,10 @@ FLOWS['airan_pdu_shared'] = {
       "id-NAS-PDU": "<PDU Session Est. Request>",
       "id-UserLocationInformation": {
         "nR-CGI": {
-          "pLMNIdentity": "310260",
+          "pLMNIdentity": "00101",
           "nRCellIdentity": "00A100042"
         },
-        "tAI": { "pLMNIdentity": "310260", "tAC": "000042" }
+        "tAI": { "pLMNIdentity": "00101", "tAC": "000042" }
       }
     }
   }
@@ -1045,20 +1045,20 @@ FLOWS['airan_pdu_shared'] = {
 // AMF → SMF: Create SM Context (TS 29.502)
 // POST /nsmf-pdusession/v1/sm-contexts
 {
-  "supi": "imsi-310260000042781",
+  "supi": "imsi-00101000042781",
   "pduSessionId": 5,
   "dnn": "internet",
   "sNssai": { "sst": 1, "sd": "ABCD01" },
   "servingNfId": "amf-01-uuid",
-  "servingNetwork": { "mcc": "310", "mnc": "260" },
+  "servingNetwork": { "mcc": "001", "mnc": "01" },
   "requestType": "INITIAL_REQUEST",
   "n1SmMsg": "<NAS PDU Session Est. Request>",
   "anType": "3GPP_ACCESS",
   "ratType": "NR",
   "ueLocation": {
     "nrLocation": {
-      "ncgi": { "plmnId":"310260", "nrCellId":"00A100042" },
-      "tai": { "plmnId":"310260", "tac":"000042" }
+      "ncgi": { "plmnId":"00101", "nrCellId":"00A100042" },
+      "tai": { "plmnId":"00101", "tac":"000042" }
     }
   }
 }`},
@@ -1068,7 +1068,7 @@ FLOWS['airan_pdu_shared'] = {
 {
   "smfOrchestration": {
     "pdu_session_id": 5,
-    "supi": "imsi-310260000042781",
+    "supi": "imsi-00101000042781",
     "ip_pool_selected": "10.42.0.0/16",
     "ue_ip_assigned": "10.42.17.93",
     "session_type": "IPv4",
@@ -1090,14 +1090,14 @@ FLOWS['airan_pdu_shared'] = {
 // SMF → PCF: Policy association (TS 29.512)
 // POST /npcf-smpolicycontrol/v1/sm-policies
 {
-  "supi": "imsi-310260000042781",
+  "supi": "imsi-00101000042781",
   "pduSessionId": 5,
   "pduSessionType": "IPV4",
   "dnn": "internet",
   "sNssai": { "sst": 1, "sd": "ABCD01" },
   "ipv4Address": "10.42.17.93",
   "ratType": "NR",
-  "servingNetwork": { "mcc": "310", "mnc": "260" },
+  "servingNetwork": { "mcc": "001", "mnc": "01" },
   "accessType": "3GPP_ACCESS",
   "notificationUri": "https://smf-01.5gc.mnc01.mcc001.3gppnetwork.org/callback/policy-5"
 }
@@ -1782,7 +1782,7 @@ FLOWS['airan_telemetry'] = {
     "ricIndicationHeader": {
       "timestamp": "2026-04-01T15:30:00.100Z",
       "nodeId": "airan-ic-node-01",
-      "cellGlobalId": "310260-00A1-0042"
+      "cellGlobalId": "00101-00A1-0042"
     },
     "ricIndicationMessage": {
       "gpu_utilization_pct": 67,
@@ -1834,7 +1834,7 @@ FLOWS['airan_telemetry'] = {
     "timestamp": "2026-04-01T15:30:00.200Z",
     "aiRanAnalytics": {
       "nodeId": "airan-ic-node-01",
-      "plmn": { "mcc": "310", "mnc": "260" },
+      "plmn": { "mcc": "001", "mnc": "01" },
       "cellId": "00A100042",
       "gpu_utilization_pct": 67,
       "beam_prediction_accuracy": 0.968,
@@ -1883,7 +1883,7 @@ FLOWS['airan_telemetry'] = {
     "target": "smf-01.5gc.mnc01.mcc001.3gppnetwork.org",
     "aiRanInsights": {
       "nodeId": "airan-ic-node-01",
-      "cellId": "310260-00A1-0042",
+      "cellId": "00101-00A1-0042",
       "gpu_efficiency": 0.94,
       "latency_benefit_ms": 0.7,
       "sessions_benefiting": 342,
@@ -1936,7 +1936,7 @@ FLOWS['airan_telemetry'] = {
 // POST /nchf-convergedcharging/v3/chargingdata
 //      /{chargingDataRef}/update
 {
-  "subscriberIdentifier": "imsi-310260000042781",
+  "subscriberIdentifier": "imsi-00101000042781",
   "nfConsumerIdentification": {
     "nfIPv4Address": "10.0.1.10",
     "nfName": "smf-01"
@@ -1962,8 +1962,8 @@ FLOWS['airan_telemetry'] = {
 // CHF processes AI-RAN enriched charging data
 {
   "chfProcessing": {
-    "chargingDataRef": "CHG-310260-042781-005",
-    "subscriber": "imsi-310260000042781",
+    "chargingDataRef": "CHG-00101-042781-005",
+    "subscriber": "imsi-00101000042781",
     "ratingApplied": {
       "ratingGroup": 100,
       "standardUsage": {
@@ -2222,7 +2222,7 @@ FLOWS['sixg_registration'] = {
     "antiQuantumToken": "KMAC256:verified"
   },
   "subscriberData": {
-    "supi": "imsi-310260000000001",  // 6G test subscriber (distinct from AI-RAN SUPI imsi-310260000042781)
+    "supi": "imsi-00101000000001",  // 6G test subscriber (distinct from AI-RAN SUPI imsi-00101000042781)
     "subscriptionTier": "6G-Premium",
     "aiServicesEnabled": true,
     "twinProfileId": "TWIN-0742"
@@ -2299,7 +2299,7 @@ FLOWS['sixg_registration'] = {
     "schedulingType": "AI-predictive"
   },
   "registrationAccept": {
-    "6gGUTI": "6G-GUTI-310260-0742",
+    "6gGUTI": "6G-GUTI-00101-0742",
     "allowedSlice": { "SST": 1, "SD": "6G0001" }
   }
 }`},
@@ -2324,7 +2324,7 @@ FLOWS['sixg_registration'] = {
 // UE → AI Core (via AI-RAN): Registration Complete
 {
   "messageType": "6G-RegistrationComplete",
-  "6gGUTI": "6G-GUTI-310260-0742",
+  "6gGUTI": "6G-GUTI-00101-0742",
   "pqcConfirmation": {
     "kemDecapsOK": true,
     "signatureVerified": true,
@@ -2342,7 +2342,7 @@ FLOWS['sixg_registration'] = {
         code:`// AI Core final registration state:
 {
   "ueState": "6G-REGISTERED",
-  "supi": "imsi-310260000000001",
+  "supi": "imsi-00101000000001",
   "assignedCell": "sector-144",
   "pqcStatus": "quantum-safe-active",
   "twinBinding": "TWIN-0742",
@@ -2427,7 +2427,7 @@ FLOWS['sixg_session'] = {
     "throughputTarget_gbps": 20
   },
   "ueProfile": {
-    "supi": "imsi-310260000000001",
+    "supi": "imsi-00101000000001",
     "currentCell": "sector-144",
     "mobilityPrediction": "stationary-90min"
   },
@@ -4928,7 +4928,7 @@ FLOWS['airan_performance'] = {
     {id:1, label:'Step 1: L1 PHY Processing on GPU', from:'ai_ran', to:'ai_ran', interface:'Internal — GPU vDU', protocol:'NVIDIA Aerial cuPHY', badge:'VALIDATED', lineType:'dp',
       description:'cuPHY processes LDPC decode, channel estimation, and beam management on the Grace Hopper GPU. All L1 processing runs as CUDA kernels.',
       ingress:{title:'L1 PHY Processing Trigger',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN L1 PHY processing on NVIDIA Grace Hopper GPU
 // cuPHY handles all L1 operations as CUDA kernels
 {
@@ -4993,7 +4993,7 @@ FLOWS['airan_performance'] = {
     {id:2, label:'Step 2: GPU Telemetry Report', from:'ai_ran', to:'aictl', interface:'AI-RAN → AI-RAN Ctrl', protocol:'gRPC Telemetry', badge:'VALIDATED', lineType:'cp',
       description:'AI-RAN reports GPU performance metrics: L1 latency (87μs vs 200μs conventional), GPU utilization (42%), LDPC iterations (4 vs 8), beam prediction accuracy (94%).',
       ingress:{title:'GPU Performance Telemetry',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN → AI-RAN Controller telemetry report
 {
   "gpuTelemetry": {
@@ -5045,7 +5045,7 @@ FLOWS['airan_performance'] = {
     {id:3, label:'Step 3: GPU Scheduling Decision', from:'aictl', to:'aictl', interface:'Internal — AI-RAN Controller', protocol:'GPU Resource Scheduler', badge:'VALIDATED', lineType:'cp',
       description:'AI-RAN controller evaluates GPU capacity and determines it can accept AI inference workloads during low-RAN periods.',
       ingress:{title:'Scheduling Decision Input',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN Controller scheduling decision
 {
   "schedulingEval": {
@@ -5089,7 +5089,7 @@ FLOWS['airan_performance'] = {
     {id:4, label:'Step 4: AI Inference on Shared GPU', from:'ai_ran', to:'gpu', interface:'PCIe/NVLink — GPU Pool', protocol:'CUDA / TensorRT', badge:'VALIDATED', lineType:'dp',
       description:'During RAN idle cycles, the GPU runs edge AI inference (object detection, anomaly detection) on the shared hardware.',
       ingress:{title:'Edge AI Inference Request',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN → GPU Pool: edge inference during RAN idle
 {
   "inferenceRequest": {
@@ -5137,7 +5137,7 @@ FLOWS['airan_performance'] = {
     {id:5, label:'Step 5: Inference Result Returned', from:'gpu', to:'ai_ran', interface:'NVLink — Shared Memory', protocol:'CUDA Stream Callback', badge:'VALIDATED', lineType:'dp',
       description:'Inference complete in 12ms. GPU returns to RAN processing priority with zero-copy result delivery.',
       ingress:{title:'GPU Result via Shared Memory',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // GPU → AI-RAN: inference result via shared memory
 {
   "resultDelivery": {
@@ -5175,7 +5175,7 @@ FLOWS['airan_performance'] = {
     {id:6, label:'Step 6: Performance Analytics to NWDAF', from:'aictl', to:'nwdaf', interface:'AI-RAN Ctrl → NWDAF', protocol:'Nnwdaf (TS 29.520)', badge:'VALIDATED', lineType:'cp',
       description:'AI-RAN metrics forwarded to NWDAF: RAN processing time, inference throughput, GPU scheduling efficiency.',
       ingress:{title:'AI-RAN Analytics to NWDAF',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // AI-RAN Ctrl → NWDAF: performance analytics
 {
   "analyticsReport": {
@@ -5226,7 +5226,7 @@ FLOWS['airan_performance'] = {
     {id:7, label:'Step 7: Optimization Recommendation', from:'nwdaf', to:'pcf', interface:'NWDAF → PCF (Nnwdaf)', protocol:'Nnwdaf AnalyticsInfo (TS 29.520)', badge:'VALIDATED', lineType:'cp',
       description:'Analytics-driven recommendation: "AI-RAN sector 7 GPU underutilized 68% of time — safe to increase inference workload."',
       ingress:{title:'NWDAF Analytics Recommendation',
-        code:`// VALIDATED: AI-RAN Innovation Center Bellevue
+        code:`// VALIDATED: AI-RAN Innovation Center
 // NWDAF → PCF: optimization recommendation
 {
   "analyticsRecommendation": {
@@ -6052,7 +6052,7 @@ function renderArchDiagrams(el) {
     {id:'airan_vs', label:'AI-RAN vs Conventional RAN', badge:'VALIDATED'},
     {id:'6g', label:'6G AI-Native', badge:'VISION'},
     {id:'ims', label:'IMS / VoNR', badge:'FACT'},
-    {id:'devedge', label:'DevEdge / NEF API', badge:'FACT'},
+    {id:'devedge', label:'NEF API Exposure', badge:'FACT'},
   ];
   let html = '<h2>Architecture Diagrams</h2><div class="ref-tabs">';
   tabs.forEach((t,i) => {
@@ -6072,7 +6072,7 @@ function renderArchDiagrams(el) {
   drawArchComparison(document.getElementById('archsvg-airan_vs'));
   drawArch6G(document.getElementById('archsvg-6g'));
   drawArchIMS(document.getElementById('archsvg-ims'));
-  drawArchDevEdge(document.getElementById('archsvg-devedge'));
+  drawArchNEF(document.getElementById('archsvg-devedge'));
 }
 function switchArchTab(id, btn) {
   document.querySelectorAll('#ref-content .ref-tab').forEach(b => b.classList.remove('active'));
@@ -6253,20 +6253,20 @@ function drawArchSlicing(container) {
   const s2 = svgEl('rect', {x:160,y:s2y,width:700,height:75,rx:8,fill:'none',stroke:'#22c55e','stroke-width':2,'stroke-dasharray':'8 4'});
   svg.appendChild(s2);
   const s2t = svgEl('text', {x:175,y:s2y+16,fill:'#22c55e','font-size':'10','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
-  s2t.textContent = 'Slice 2: URLLC (SST=2) — T-Priority / First Responder'; svg.appendChild(s2t);
+  s2t.textContent = 'Slice 2: URLLC (SST=2) — Priority / First Responder'; svg.appendChild(s2t);
   svgBox(svg, 200,s2y+25,80,35,'SMF₂','URLLC'); svgBox(svg, 350,s2y+25,80,35,'UPF₂','URLLC'); svgBox(svg, 500,s2y+25,80,35,'PCF₂',''); svgBox(svg, 650,s2y+25,80,35,'DN₂','MEC/Edge');
   svgLine(svg, 280,s2y+42, 350,s2y+42, 'N4'); svgLine(svg, 430,s2y+42, 500,s2y+42); svgLine(svg, 580,s2y+42, 650,s2y+42, 'N6');
-  // Slice 3 — SuperMobile
+  // Slice 3 — Enterprise eMBB
   const s3y = 370;
   const s3 = svgEl('rect', {x:160,y:s3y,width:700,height:75,rx:8,fill:'none',stroke:'var(--accent)','stroke-width':2,'stroke-dasharray':'8 4'});
   svg.appendChild(s3);
   const s3t = svgEl('text', {x:175,y:s3y+16,fill:'var(--accent)','font-size':'10','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
-  s3t.textContent = 'Slice 3: eMBB (SST=1, operator SD) — SuperMobile / 5G On Demand'; svg.appendChild(s3t);
+  s3t.textContent = 'Slice 3: eMBB (SST=1, operator SD) — Enterprise / Private Network'; svg.appendChild(s3t);
   svgBox(svg, 200,s3y+25,80,35,'SMF₃','Custom'); svgBox(svg, 350,s3y+25,80,35,'UPF₃','Custom'); svgBox(svg, 500,s3y+25,80,35,'PCF₃',''); svgBox(svg, 650,s3y+25,80,35,'DN₃','Enterprise');
   svgLine(svg, 280,s3y+42, 350,s3y+42, 'N4'); svgLine(svg, 430,s3y+42, 500,s3y+42); svgLine(svg, 580,s3y+42, 650,s3y+42, 'N6');
   // Ref
   const ref = svgEl('text', {x:450,y:455,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: TS 23.501 §5.15 — Network Slicing. products mapped to slice types.'; svg.appendChild(ref);
+  ref.textContent = 'Ref: TS 23.501 §5.15 — Network Slicing. Illustrative products mapped to slice types.'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 function drawArchAIRAN(container) {
@@ -6430,12 +6430,12 @@ function drawArchIMS(container) {
   xlink.textContent = 'VoNR protocol flows are covered in the 5G Protocol Flow Simulator.'; svg.appendChild(xlink);
   container.appendChild(svg);
 }
-function drawArchDevEdge(container) {
+function drawArchNEF(container) {
   if(!container) return;
   const svg = svgEl('svg', {viewBox:'0 0 900 400', width:'100%', style:'max-height:400px'});
   // External side
   svgBox(svg, 30,90,100,50,'Developer / AF','External App',{stroke:'var(--badge-projected)',sw:1.5});
-  svgBox(svg, 210,90,140,50,'DevEdge API GW','DevEdge',{stroke:'var(--accent)',sw:2.5});
+  svgBox(svg, 210,90,140,50,'NEF API Gateway','Operator API',{stroke:'var(--accent)',sw:2.5});
   svgBox(svg, 430,90,90,50,'NEF','Network Exposure');
   svgLine(svg, 130,115, 210,115, 'HTTPS', {sw:2});
   svgLine(svg, 350,115, 430,115, 'N33', {sw:2,stroke:'var(--accent)'});
@@ -6443,7 +6443,7 @@ function drawArchDevEdge(container) {
   const cam = svgEl('text', {x:280,y:78,'text-anchor':'middle',fill:'var(--accent)','font-size':'9','font-weight':'700','font-family':"'Consolas',monospace"});
   cam.textContent = 'CAMARA / Open Gateway APIs'; svg.appendChild(cam);
   // API boxes
-  const apis = ['QoD','ANPA','Network Slicing','SIM Swap','Device Status','Network Auth'];
+  const apis = ['QoD','Slice API','Network Slicing','SIM Swap','Device Status','Network Auth'];
   apis.forEach((a,i) => {
     const col = i % 3, row = Math.floor(i/3);
     svgBox(svg, 210+col*110, 160+row*50, 100, 36, a, '', {stroke:'var(--accent)',sw:1});
@@ -6559,7 +6559,7 @@ function drawArchComparison(container) {
   });
 
   const ref = svgEl('text', {x:480,y:550,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: AI-RAN Alliance, O-RAN WG3, NVIDIA Aerial SDK — Innovation Center Bellevue'; svg.appendChild(ref);
+  ref.textContent = 'Ref: AI-RAN Alliance, O-RAN WG3, NVIDIA Aerial SDK — Innovation Center'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 
@@ -6568,8 +6568,8 @@ function renderLatency(el) {
   const rows = [
     ['5G SA Centralized','Deployed','3–12 ms','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
     ['Through-Path N9 (Edge)','Deployed','8–14 ms','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
-    ['Edge Control LBO','Deployed (Oct 2025)','2–7 ms','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
-    ['AI-RAN (Converged)','Validating (Bellevue)','1–4 ms (target)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load'],
+    ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
+    ['AI-RAN (Converged)','Validating (Lab)','1–4 ms (target)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load'],
     ['6G AI-Native','Vision (~2030)','<1 ms (target)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
   ];
   let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective.</p>';
@@ -6649,12 +6649,12 @@ function renderSpecLibrary(el) {
     ]},
   ];
   const deployedProducts = [
-    ['Edge Control','Edge Computing','5G Advanced edge computing with ULCL and local breakout'],
-    ['T-Platform','Enterprise Edge','Enterprise platform for edge application hosting'],
-    ['DevEdge APIs','Developer APIs','Developer APIs for network slicing, edge, QoD'],
+    ['ULCL Edge','Edge Computing','5G Advanced edge computing with ULCL and local breakout'],
+    ['Edge Platform','Enterprise Edge','Enterprise platform for edge application hosting'],
+    ['Operator APIs','Developer APIs','Developer APIs for network slicing, edge, QoD'],
     ['5G Advanced + L4S','Deployed','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
     ['AI-RAN Innovation Center','AI-RAN','Converged AI+RAN with NVIDIA and Nokia/Ericsson'],
-    ['SuperMobile / Network Slicing','Enterprise Slicing','Business network slicing plan with intelligent performance, security, and satellite'],
+    ['Enterprise eMBB / Network Slicing','Enterprise Slicing','Business network slicing plan with intelligent performance, security, and satellite'],
   ];
   const alliances = [
     ['O-RAN Alliance','<a href="https://www.o-ran.org" target="_blank">o-ran.org</a>','Open RAN architecture, RIC, open fronthaul specifications'],
@@ -6676,7 +6676,7 @@ function renderSpecLibrary(el) {
     });
     html += '</ul></div>';
   });
-  html += '<div class="spec-section"><h3>Deployed Products</h3><ul class="spec-list">';
+  html += '<div class="spec-section"><h3>Operator Products (Illustrative)</h3><ul class="spec-list">';
   deployedProducts.forEach(p => { html += `<li><span class="spec-num">${p[0]}</span><span class="spec-title">${p[1]}</span><span class="spec-desc">${p[2]}</span></li>`; });
   html += '</ul></div>';
   html += '<div class="spec-section"><h3>Industry Alliances &amp; Standards</h3><ul class="spec-list">';
@@ -6689,19 +6689,19 @@ function renderSpecLibrary(el) {
 const GLOSSARY_DATA = [
   ['AMF','Access and Mobility Management Function','Core NF handling UE registration, connection, reachability, and mobility management in the 5G Core.','TS 23.501 §6.2.1','Central to all 5G SA signaling; every UE registers through AMF.'],
   ['SMF','Session Management Function','Manages PDU sessions: establishment, modification, release. Selects UPFs, installs PFCP rules.','TS 23.501 §6.2.2','Drives data session setup and UPF rule programming.'],
-  ['UPF','User Plane Function','Packet processing, forwarding, QoS enforcement, usage reporting. The data plane anchor.','TS 23.501 §6.2.3','Deployed centrally and at edge in network for ULCL/Edge Control.'],
+  ['UPF','User Plane Function','Packet processing, forwarding, QoS enforcement, usage reporting. The data plane anchor.','TS 23.501 §6.2.3','Deployed centrally and at edge for ULCL-based local breakout.'],
   ['PCF','Policy Control Function','Makes policy decisions (QoS, charging, gating) and provides PCC rules to SMF/AMF.','TS 23.501 §6.2.5','Drives QoS differentiation, slicing policy, and edge steering rules.'],
   ['UDM','Unified Data Management','Stores subscriber data, generates authentication vectors, manages registration state.','TS 23.501 §6.2.4','Holds all subscriber profiles, SUPI→SUCI resolution, subscription data.'],
   ['AUSF','Authentication Server Function','Executes 5G AKA / EAP-AKA\' authentication, manages authentication vectors and key derivation.','TS 23.501 §6.2.6','Authenticates every 5G SA subscriber during registration.'],
   ['NRF','NF Repository Function','Service registry for all NF instances. Supports NF discovery and selection.','TS 23.501 §6.2.7','Enables dynamic NF discovery in the service-based 5GC.'],
-  ['NSSF','Network Slice Selection Function','Determines Allowed NSSAI, selects appropriate AMF set for requested network slices.','TS 23.501 §6.2.8','Used for T-Priority, SuperMobile, and enterprise slice selection.'],
-  ['NEF','Network Exposure Function','Exposes network capabilities to AFs via APIs. Translates external requests to internal policies.','TS 23.501 §6.2.9','Powers DevEdge APIs and AF traffic influence for Edge Control.'],
+  ['NSSF','Network Slice Selection Function','Determines Allowed NSSAI, selects appropriate AMF set for requested network slices.','TS 23.501 §6.2.8','Used for Priority URLLC, Enterprise eMBB, and enterprise slice selection.'],
+  ['NEF','Network Exposure Function','Exposes network capabilities to AFs via APIs. Translates external requests to internal policies.','TS 23.501 §6.2.9','Powers NEF API exposure and AF traffic influence for ULCL edge computing.'],
   ['CHF','Converged Charging Function','Provides converged online/offline charging. Manages quota, rating, and CDR generation.','TS 32.291','Handles all 5G charging; supports per-slice and per-service rating.'],
   ['NWDAF','Network Data Analytics Function','Collects network data, provides analytics and ML-based predictions to other NFs.','TS 23.288','Supports network optimization, anomaly detection, load prediction.'],
   ['SMSF','SMS Function','Handles SMS delivery over NAS (non-IMS path) for 5G-connected UEs.','TS 23.501 §6.2.11','Used for NAS-based SMS in 5G SA when IMS SMS not available.'],
-  ['EASDF','Edge Application Server Discovery Function','Assists in EAS discovery via DNS-based mechanisms for edge computing scenarios.','TS 23.548','Part of Edge Control architecture for edge app discovery.'],
-  ['EES','Edge Enabler Server','Provides edge service APIs, manages EAS lifecycle and edge connectivity.','TS 23.558','Component of T-Platform edge application hosting.'],
-  ['ECS','Edge Configuration Server','Provides EES discovery and edge configuration information to edge clients.','TS 23.558','Supports T-Platform edge service configuration.'],
+  ['EASDF','Edge Application Server Discovery Function','Assists in EAS discovery via DNS-based mechanisms for edge computing scenarios.','TS 23.548','Part of ULCL Edge architecture for edge app discovery.'],
+  ['EES','Edge Enabler Server','Provides edge service APIs, manages EAS lifecycle and edge connectivity.','TS 23.558','Component of Edge Platform edge application hosting.'],
+  ['ECS','Edge Configuration Server','Provides EES discovery and edge configuration information to edge clients.','TS 23.558','Supports Edge Platform edge service configuration.'],
   ['NSACF','Network Slice Admission Control Function','Controls the number of UEs or PDU sessions admitted per slice to prevent overload.','TS 23.501 §5.15.11','Enforces per-slice UE and PDU session admission limits (Rel-17+).'],
   ['SCP','Service Communication Proxy','Provides indirect communication, load balancing, and service mesh for SBI.','TS 23.501 §6.2.15','Deployed in 5GC for SBI traffic management.'],
   ['UDSF','Unstructured Data Storage Function','Stores unstructured data for stateless NF operation.','TS 23.501 §6.2.16','Enables stateless NF design in cloud-native 5GC.'],
@@ -6713,14 +6713,14 @@ const GLOSSARY_DATA = [
   ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts calling features: Wi-Fi Calling, Visual Voicemail, etc.'],
   ['MGCF','Media Gateway Control Function','Controls media gateways for PSTN/CS interworking.','TS 23.228','Used in IMS for PSTN breakout scenarios.'],
   ['BGCF','Breakout Gateway Control Function','Selects network for PSTN breakout in IMS-to-PSTN calls.','TS 23.228','Routes VoNR calls to PSTN when needed.'],
-  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','nationwide 5G SA gNB deployment on n25/n41/n71/n260.'],
+  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','Nationwide 5G SA gNB deployment across low/mid/mmWave bands.'],
   ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in O-RAN/vRAN disaggregated deployments.'],
   ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at cell sites in split-architecture configurations.'],
   ['O-RU','O-RAN Radio Unit','Open RAN radio unit handling PHY-low and RF. Connected to O-DU via open fronthaul.','O-RAN Alliance','Part of Open RAN architecture strategy.'],
   ['O-DU','O-RAN Distributed Unit','Open RAN DU with standardized interfaces per O-RAN specs.','O-RAN Alliance','Deployed in Open RAN sites.'],
   ['O-CU','O-RAN Central Unit','Open RAN CU with O-RAN compliant interfaces (E2, A1, O1).','O-RAN Alliance','Managed by RIC in Open RAN deployments.'],
-  ['RIC','RAN Intelligent Controller','Near-RT and Non-RT controller for RAN optimization via xApps/rApps.','O-RAN Alliance','uses RIC for AI/ML-driven RAN optimization.'],
-  ['AI-RAN Node','AI-RAN Converged Node','GPU-accelerated node combining RAN processing and AI inference on shared hardware.','AI-RAN Alliance','Under validation at Bellevue Innovation Center with NVIDIA.'],
+  ['RIC','RAN Intelligent Controller','Near-RT and Non-RT controller for RAN optimization via xApps/rApps.','O-RAN Alliance','Operator uses RIC for AI/ML-driven RAN optimization.'],
+  ['AI-RAN Node','AI-RAN Converged Node','GPU-accelerated node combining RAN processing and AI inference on shared hardware.','AI-RAN Alliance','Under validation at Innovation Center with NVIDIA.'],
   ['UE','User Equipment','Mobile device (phone, IoT device, CPE) connecting to the 5G network.','TS 23.501','All subscriber devices: phones, FWA, IoT, wearables.'],
   ['N1','N1 Reference Point','NAS signaling between UE and AMF (carried over N2 via gNB).','TS 23.501 §5.2','Carries registration, authentication, session management NAS messages.'],
   ['N2','N2 Reference Point','Control plane interface between gNB and AMF. Carries NGAP.','TS 23.501 §5.2','All gNB↔AMF signaling flows over N2.'],
@@ -6730,7 +6730,7 @@ const GLOSSARY_DATA = [
   ['N6','N6 Reference Point','User plane between UPF and Data Network (DN).','TS 23.501 §5.2','Connects UPF to internet/enterprise networks.'],
   ['N7','N7 Reference Point','SMF ↔ PCF for SM policy control (PCC rules, QoS decisions).','TS 23.501 §5.2','PCF provides QoS and charging policy to SMF via N7.'],
   ['N8','N8 Reference Point','AMF ↔ UDM for subscriber data access.','TS 23.501 §5.2','AMF retrieves subscriber data from UDM via N8.'],
-  ['N9','N9 Reference Point','User plane between two UPFs (e.g., ULCL → PSA). GTP-U tunnel.','TS 23.501 §5.2','Connects edge UPF to central UPF in Edge Control architecture.'],
+  ['N9','N9 Reference Point','User plane between two UPFs (e.g., ULCL → PSA). GTP-U tunnel.','TS 23.501 §5.2','Connects edge UPF to central UPF in ULCL Edge architecture.'],
   ['N10','N10 Reference Point','SMF ↔ UDM for session management subscription data.','TS 23.501 §5.2','SMF retrieves DNN/slice subscription from UDM via N10.'],
   ['N11','N11 Reference Point','AMF ↔ SMF for PDU session lifecycle management.','TS 23.501 §5.2','AMF forwards session requests to SMF via N11 in 5GC.'],
   ['N12','N12 Reference Point','AMF ↔ AUSF for UE authentication.','TS 23.501 §5.2','Authentication vectors exchanged via N12 during 5G AKA.'],
@@ -6739,9 +6739,9 @@ const GLOSSARY_DATA = [
   ['N15','N15 Reference Point','AMF ↔ PCF for AM policy control.','TS 23.501 §5.2','PCF provides RFSP and service area restrictions to AMF.'],
   ['N22','N22 Reference Point','AMF ↔ NSSF for network slice selection.','TS 23.501 §5.2','AMF queries NSSF for allowed slices during registration.'],
   ['N27','N27 Reference Point','NRF ↔ NSSF for NF set information.','TS 23.501 §5.2','NSSF queries NRF for AMF sets serving specific slices.'],
-  ['N33','N33 Reference Point','AF ↔ NEF for network capability exposure.','TS 23.501 §5.2','DevEdge APIs and AF traffic influence use N33.'],
+  ['N33','N33 Reference Point','AF ↔ NEF for network capability exposure.','TS 23.501 §5.2','NEF API exposure and AF traffic influence use N33.'],
   ['N40','N40 Reference Point','SMF ↔ CHF for converged charging.','TS 32.291','All 5G charging flows use N40 interface.'],
-  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','5G NR air interface on n25/n41/n71/n260 bands.'],
+  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','5G NR air interface across operator NR bands.'],
   ['F1','F1 Interface','Interface between gNB-CU and gNB-DU (F1-C control, F1-U user).','TS 38.470/473','Used in CU/DU split RAN deployments.'],
   ['E1','E1 Interface','Interface between gNB-CU-CP and gNB-CU-UP.','TS 38.460/463','Separates control and user plane processing in CU.'],
   ['Xn','Xn Interface','Inter-gNB interface for handover and dual connectivity.','TS 38.420/423','Supports inter-gNB handover and EN-DC/NR-DC.'],
@@ -6760,42 +6760,42 @@ const GLOSSARY_DATA = [
   ['SIP','Session Initiation Protocol','Signaling protocol for IMS voice/video session establishment.','TS 24.229, RFC 3261','Carries VoNR call setup through IMS CSCFs.'],
   ['Diameter','Diameter Protocol','AAA protocol used in 4G EPC (S6a, Gx, Gy). Replaced by SBI/HTTP/2 in 5GC.','RFC 6733','Legacy in LTE; 5GC uses SBI instead.'],
   ['eCPRI','enhanced Common Public Radio Interface','Fronthaul protocol between O-DU and O-RU carrying IQ samples.','eCPRI Spec v2.0','Used in Open RAN fronthaul deployments.'],
-  ['5QI','5G QoS Identifier','Scalar identifying QoS characteristics (priority, delay budget, error rate).','TS 23.501 §5.7.4','maps services to 5QI values for QoS differentiation.'],
-  ['S-NSSAI','Single Network Slice Selection Assistance Information','Identifies a network slice: SST (type) + optional SD (differentiator).','TS 23.501 §5.15.2','uses S-NSSAI to identify slices like T-Priority, SuperMobile.'],
+  ['5QI','5G QoS Identifier','Scalar identifying QoS characteristics (priority, delay budget, error rate).','TS 23.501 §5.7.4','Operator maps services to 5QI values for QoS differentiation.'],
+  ['S-NSSAI','Single Network Slice Selection Assistance Information','Identifies a network slice: SST (type) + optional SD (differentiator).','TS 23.501 §5.15.2','Operators use S-NSSAI to identify slices like Priority URLLC, Enterprise eMBB.'],
   ['SST','Slice/Service Type','8-bit value identifying the expected slice behavior (1=eMBB, 2=URLLC, 3=MIoT).','TS 23.501 §5.15.2.2','Standard slice types used across network.'],
-  ['SD','Slice Differentiator','24-bit value distinguishing slices with same SST (e.g., different enterprise slices).','TS 23.501 §5.15.2.2','uses SD to differentiate custom enterprise slices.'],
+  ['SD','Slice Differentiator','24-bit value distinguishing slices with same SST (e.g., different enterprise slices).','TS 23.501 §5.15.2.2','Operator uses SD to differentiate custom enterprise slices.'],
   ['NSSAI','Network Slice Selection Assistance Information','Set of S-NSSAIs — Requested, Allowed, Configured, or Subscribed.','TS 23.501 §5.15.2','UE provides Requested NSSAI; AMF returns Allowed NSSAI.'],
   ['DNN','Data Network Name','Identifies the data network the PDU session connects to (like APN in 4G).','TS 23.501 §5.6.1','DNNs include "internet", "ims", etc.'],
-  ['SUPI','Subscription Permanent Identifier','Globally unique permanent subscriber ID (usually IMSI format).','TS 23.501 §5.9.2','SUPI format: IMSI 310260xxxxxxxxx.'],
+  ['SUPI','Subscription Permanent Identifier','Globally unique permanent subscriber ID (usually IMSI format).','TS 23.501 §5.9.2','SUPI format: IMSI with test PLMN (001/01) + illustrative subscriber numbers.'],
   ['SUCI','Subscription Concealed Identifier','Privacy-preserving encrypted form of SUPI sent over the air.','TS 23.501 §5.9.2','UE encrypts MSIN using home network public key.'],
   ['5G-GUTI','5G Globally Unique Temporary Identifier','Temporary ID assigned by AMF to hide SUPI over the air.','TS 23.501 §5.9.4','AMF assigns new 5G-GUTI on every registration.'],
-  ['PDU Session','Protocol Data Unit Session','Logical connection between UE and data network through 5GC. Has QoS flows, IP address.','TS 23.501 §5.6','establishes PDU sessions per DNN/slice combination.'],
-  ['QoS Flow','Quality of Service Flow','Finest granularity of QoS within a PDU session, identified by QFI.','TS 23.501 §5.7','maps traffic to QoS flows with specific 5QI values.'],
+  ['PDU Session','Protocol Data Unit Session','Logical connection between UE and data network through 5GC. Has QoS flows, IP address.','TS 23.501 §5.6','Operator establishes PDU sessions per DNN/slice combination.'],
+  ['QoS Flow','Quality of Service Flow','Finest granularity of QoS within a PDU session, identified by QFI.','TS 23.501 §5.7','Operator maps traffic to QoS flows with specific 5QI values.'],
   ['PCC Rule','Policy and Charging Control Rule','Rule from PCF specifying QoS, charging, and gating for specific traffic.','TS 23.503','PCF provides PCC rules driving QoS and charging behavior.'],
   ['URR','Usage Reporting Rule','PFCP rule in UPF for monitoring and reporting traffic usage to SMF.','TS 29.244','Triggers charging reports based on volume/time thresholds.'],
   ['PDR','Packet Detection Rule','PFCP rule in UPF defining how to match incoming packets.','TS 29.244','UPF matches user traffic to PDRs for processing.'],
   ['FAR','Forwarding Action Rule','PFCP rule defining what to do with matched packets (forward, drop, buffer).','TS 29.244','Controls UPF forwarding decisions per matched PDR.'],
   ['QER','QoS Enforcement Rule','PFCP rule for rate limiting and QoS enforcement at UPF.','TS 29.244','Enforces session-AMBR and flow-level QoS at UPF.'],
   ['AMBR','Aggregate Maximum Bit Rate','Maximum data rate aggregate for a UE (UE-AMBR) or session (Session-AMBR).','TS 23.501 §5.7','sets AMBR per subscription tier and per slice.'],
-  ['ULCL','Uplink Classifier','UPF function that classifies UL traffic and steers it to local or central path.','TS 23.501 §5.6.4','Core of Edge Control: steers traffic to EAS or central DN.'],
+  ['ULCL','Uplink Classifier','UPF function that classifies UL traffic and steers it to local or central path.','TS 23.501 §5.6.4','Core of ULCL Edge: steers traffic to EAS or central DN.'],
   ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','central UPF acting as PSA for non-edge traffic.'],
-  ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','Edge Control uses ULCL-based LBO to reach edge applications.'],
+  ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','ULCL-based LBO steers traffic to local edge applications.'],
   ['TSN','Time-Sensitive Networking','IEEE 802.1 deterministic networking integrated with 5G for industrial automation.','TS 23.501 §5.27','enterprise offering for industrial IoT use cases.'],
-  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','Deployed nationwide on 5G Advanced (Jul 2025).'],
-  ['RedCap','Reduced Capability NR','NR devices with reduced bandwidth/antenna for IoT and wearables.','TR 38.875, Rel-17','supports RedCap for cost-optimized IoT devices.'],
-  ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for T-Priority and enterprise critical apps.'],
+  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G Advanced feature for ultra-low queuing delay (from Jul 2025).'],
+  ['RedCap','Reduced Capability NR','NR devices with reduced bandwidth/antenna for IoT and wearables.','TR 38.875, Rel-17','Operator supports RedCap for cost-optimized IoT devices.'],
+  ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
   ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','default 5G slice for consumer broadband services.'],
   ['mMTC','massive Machine Type Communication','5G service category for massive IoT (high device density, low data).','TS 23.501','IoT/NB-IoT service category.'],
   ['ISAC','Integrated Sensing and Communication','6G capability combining radar-like sensing with communication.','3GPP 6G studies','Envisioned for 6G physical AI and environmental sensing.'],
-  ['SSC Mode','Session and Service Continuity Mode','Defines how IP address continuity is handled during UPF changes (1/2/3).','TS 23.501 §5.6.9','uses SSC1 (default), SSC2/3 for edge mobility scenarios.'],
-  ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','deployed slicing: T-Priority, SuperMobile, 5G On Demand.'],
-  ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','SASE offering integrating SD-WAN with 5G and security.'],
-  ['Edge Control','Edge Control','5G Advanced edge computing solution using ULCL for local breakout.','product','Launched Oct 2025. Uses ULCL + EAS for sub-10ms application hosting.'],
-  ['T-Platform','T-Platform','enterprise platform for hosting edge applications on 5G infrastructure.','product','Launched Oct 2025 with Edge Control for enterprise edge workloads.'],
-  ['DevEdge','DevEdge','developer platform providing APIs for network capabilities.','product','APIs for QoD, slicing, edge discovery.'],
-  ['T-Priority','T-Priority','5G network slicing solution for first responders with priority access and preemption.','product','Announced Sep 2024; launched Feb 2025. Uses dedicated network slice with 5x resources for first responders.'],
-  ['SuperMobile','SuperMobile','business network slicing plan combining intelligent performance, built-in security, and satellite coverage.','product','Launched Aug 27, 2025. First business plan with nationwide network slice, Threat Protect, and T-Satellite.'],
-  ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware, eliminating dedicated AI accelerators.','AI-RAN Alliance','Under validation at Bellevue Innovation Center with NVIDIA and Nokia/Ericsson.'],
+  ['SSC Mode','Session and Service Continuity Mode','Defines how IP address continuity is handled during UPF changes (1/2/3).','TS 23.501 §5.6.9','Operator uses SSC1 (default), SSC2/3 for edge mobility scenarios.'],
+  ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','Example slicing products: Priority URLLC, Enterprise eMBB, Portable Private 5G.'],
+  ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','Example: SASE offering integrating SD-WAN with 5G and security.'],
+  ['ULCL Edge','ULCL Edge','5G Advanced edge computing solution using ULCL for local breakout.','product','Example: edge computing with ULCL + EAS for sub-10ms application hosting.'],
+  ['Edge Platform','Edge Platform','enterprise platform for hosting edge applications on 5G infrastructure.','product','Example: enterprise edge hosting platform for edge workloads.'],
+  ['Operator API','Operator API','developer platform providing APIs for network capabilities.','product','APIs for QoD, slicing, edge discovery.'],
+  ['Priority URLLC','Priority URLLC','5G network slicing solution for first responders with priority access and preemption.','product','Example: dedicated URLLC slice with priority resources for first responders.'],
+  ['Enterprise eMBB','Enterprise eMBB','business network slicing plan combining intelligent performance, built-in security, and satellite coverage.','product','Example: dedicated eMBB slice with enhanced QoS, security integration, and satellite coverage for business subscribers.'],
+  ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware, eliminating dedicated AI accelerators.','AI-RAN Alliance','Under validation at Innovation Center with NVIDIA and Nokia/Ericsson.'],
   ['Digital Twin','Network Digital Twin','Virtual replica of the physical network enabling simulation, prediction, and optimization of network behavior before applying changes to the live network.','ITU-R M.2160, 3GPP 6G studies','Envisioned for 6G network planning, fault prediction, and autonomous optimization.'],
   ['Intent Engine','Intent-Based Management Engine','6G management function that translates high-level operator intents (e.g., "guarantee 10 Gbps for AR zone") into concrete network configurations using AI/ML.','TM Forum, ETSI ZSM','Envisioned for 6G autonomous network management and slice orchestration.'],
   ['PQC','Post-Quantum Cryptography','Cryptographic algorithms designed to resist attacks from quantum computers. Includes lattice-based schemes like CRYSTALS-Kyber (KEM) and CRYSTALS-Dilithium (signatures).','NIST PQC Standards','Envisioned for 6G authentication to protect against harvest-now-decrypt-later quantum threats.'],
@@ -6809,7 +6809,7 @@ function renderGlossary(el) {
   html += '<div style="overflow:auto;max-height:calc(100vh - 250px)"><table class="ref-table" id="glossary-table"><thead><tr><th onclick="sortGlossaryBy(0)">Term</th><th onclick="sortGlossaryBy(1)">Full Name</th><th onclick="sortGlossaryBy(2)">Definition</th><th onclick="sortGlossaryBy(3)">Spec Ref</th><th onclick="sortGlossaryBy(4)">Context</th></tr></thead><tbody>';
   GLOSSARY_DATA.sort((a,b) => a[0].localeCompare(b[0]));
   GLOSSARY_DATA.forEach(g => {
-    html += `<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${g[3]}</td><td>${highlightText(g[4])}</td></tr>`;
+    html += `<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${g[3]}</td><td>${g[4]}</td></tr>`;
   });
   html += '</tbody></table></div>';
   el.innerHTML = html;
@@ -6834,17 +6834,17 @@ function sortGlossaryBy(col) {
 function renderTimeline(el) {
   const events = [
     {date:'Aug 2020', text:'First nationwide standalone 5G SA network in the U.S.', cls:''},
-    {date:'2021', text:'DevEdge platform launch — developer APIs for network capabilities', cls:''},
+    {date:'2021', text:'Operator API platform launch — developer APIs for network capabilities', cls:''},
     {date:'2022', text:'IoT Developer Kit — enabling IoT innovation on 5G', cls:''},
     {date:'Apr 2023', text:'Network slicing developer beta (nationwide)', cls:''},
-    {date:'Sep 2024', text:'T-Priority announced at Capital Markets Day (launched Feb 2025); SASE launched', cls:''},
+    {date:'Sep 2024', text:'Priority URLLC slice announced (launched Feb 2025); SASE launched', cls:''},
     {date:'Sep 2024', text:'AI-RAN Innovation Center announced (+ NVIDIA + Nokia + Ericsson)', cls:''},
     {date:'Apr 2025', text:'5G Advanced deployed nationwide', cls:''},
     {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
-    {date:'Aug 2025', text:'SuperMobile with network slice launched for business', cls:''},
-    {date:'Oct 2025', text:'Edge Control + T-Platform launched for enterprise edge computing', cls:''},
+    {date:'Aug 2025', text:'Enterprise eMBB slice launched for business subscribers', cls:''},
+    {date:'Oct 2025', text:'ULCL Edge + Edge Platform launched for enterprise edge computing', cls:''},
     {date:'Oct 2025', text:'NVIDIA $1B investment in Nokia for AI-RAN infrastructure', cls:''},
-    {date:'Oct 2024', text:'5G On Demand — portable 5G private network solution for enterprise', cls:''},
+    {date:'Oct 2024', text:'Portable Private 5G — on-demand private network solution for enterprise', cls:''},
     {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
     {date:'Mar 2026', text:'MWC: Nokia/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + 6G innovation hub established.', cls:''},
@@ -6858,7 +6858,7 @@ function renderTimeline(el) {
   let html = `<h2>Technology Timeline</h2><p>Key milestones in the 5G, 5G Advanced, AI-RAN, and 6G journey.</p>`;
   html += '<div class="timeline-container"><div class="timeline-line"></div>';
   events.forEach(e => {
-    html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${highlightText(e.text)}</div></div>`;
+    html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${e.text}</div></div>`;
   });
   html += '</div>';
   el.innerHTML = html;
@@ -6867,9 +6867,9 @@ function renderTimeline(el) {
 /* -- Band Map -- */
 function renderBandMap(el) {
   const bands = [
-    ['n71','600 MHz','FDD Low-band','5–10 MHz','Nationwide, excellent building penetration','Extended Range 5G'],
+    ['n71','600 MHz','FDD Low-band','5–10 MHz','Nationwide, excellent building penetration','Low-band coverage layer'],
     ['n25','1900 MHz','FDD Mid-band','5–20 MHz','Urban/suburban','PCS capacity layer'],
-    ['n41','2.5 GHz','TDD Mid-band','Up to 100 MHz','Metro/urban, high capacity','Ultra Capacity 5G — primary capacity'],
+    ['n41','2.5 GHz','TDD Mid-band','Up to 100 MHz','Metro/urban, high capacity','Mid-band primary capacity layer'],
     ['n260','39 GHz','TDD mmWave','Up to 800 MHz','Dense urban, venues','Ultra-high throughput hotspots'],
   ];
   let html = '<h2>5G Band Map <span class="badge badge-fact">FACT</span></h2>';
@@ -6878,24 +6878,20 @@ function renderBandMap(el) {
   bands.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
   html += '<div style="margin-top:18px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">';
-  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center OTA demonstrations use <strong>n77 (3.7 GHz C-Band)</strong> with Nokia AirScale Massive MIMO radios on NVIDIA Grace Hopper. the primary commercial mid-band is <strong>n41 (2.5 GHz)</strong>.</div>';
+  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center OTA demonstrations use <strong>n77 (3.7 GHz C-Band)</strong> with Nokia AirScale Massive MIMO radios on NVIDIA Grace Hopper. The primary commercial mid-band is <strong>n41 (2.5 GHz)</strong>.</div>';
   el.innerHTML = html;
 }
 
-/* ======== TEXT HIGHLIGHT ======== */
-function highlightText(html) {
-  return html;
-}
 
 /* ======== WELCOME PAGE ======== */
 function showWelcome() {
   showView('welcome');
   document.getElementById('welcome-view').innerHTML = '<div class="welcome-container">' +
     '<h2>3GPP Protocol Flow Simulator — AI-RAN & 6G</h2>' +
-    '<p>An interactive tool from the perspective for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus 6 reference pages including architecture diagrams and a band map.</p>' +
+    '<p>An interactive tool for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus 6 reference pages including architecture diagrams and a band map.</p>' +
     '<h3>Badge System</h3>' +
     '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">' +
-    '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production</span></div>' +
+    '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production network architecture</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-validated">VALIDATED</span><span>Demonstrated / validated in lab or Innovation Center</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-projected">PROJECTED</span><span>Engineering projection based on current trajectory</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-vision">VISION</span><span>forward-looking vision for 6G era</span></div>' +
