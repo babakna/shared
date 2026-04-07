@@ -9,7 +9,7 @@
 :root{
   --bg0:#FFFFFF;--bg1:#F8F8FA;--bg2:#F0F0F2;
   --tx0:#000000;--tx1:#333333;--tx2:#6A6A6A;--tx3:#999999;
-  --bdr:#E0E0E0;--mag:#E20074;--ber:#861B54;
+  --bdr:#E0E0E0;--mag:#1E3A5F;--ber:#4A7FB5;
   --sh1:rgba(0,0,0,.06);--sh2:rgba(0,0,0,.1);
   --thov:rgba(226,0,116,.05);--tact:rgba(226,0,116,.08);
   --cbg:#F0F0F2;--dbg:#FAFAFE;--lbg:#FFFFFF;
@@ -261,7 +261,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">T</div>
-    <div><div class="hdr-t">eSIM Specification Explorer</div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; <span style="color:#E20074">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer</div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; <span style="color:#1E3A5F">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -314,7 +314,7 @@ const SPEC_VERSIONS = {
 // Format: 'Entity Name': '#hexcolor'
 const EC={
   'Operator':'#2563EB','Operator (M2M-SP)':'#2563EB',
-  'SM-DP':'#E20074','SM-DP+':'#E20074','SM-DP+ (Profile Provider)':'#E20074',
+  'SM-DP':'#1E3A5F','SM-DP+':'#1E3A5F','SM-DP+ (Profile Provider)':'#1E3A5F',
   'SM-SR':'#7C3AED','SM-SR (3rd Party)':'#7C3AED',
   'SM-DS':'#D97706',
   'LPA':'#059669','LPA (Device)':'#059669',
@@ -650,7 +650,7 @@ const FL={
 
 'ifpp-late-binding':{nodes:['Operator|MNO / MVNO','SM-DP+ (Profile Provider)|Data Preparation+','Factory System|Manufacturing','eUICC|Embedded SIM'],steps:[
 {f:2,t:3,n:'Read EID',a:[['EID','Retrieved from eUICC']],d:'At device configuration time (which may be the end of the production line or a separate configuration station), the Factory System reads the EID. The target operator/profile may not have been known until this point \u2014 e.g., the shipping destination determines the operator.'},
-{f:2,t:2,n:'\u2666 Configuration Decision (Late Binding)',a:[['Shipping Destination','Determines target operator/network'],['Configuration Rules','Business logic mapping destination to profile type'],['Operator ID','Selected based on rules']],d:'<b>DECISION POINT:</b> The Factory System (or upstream configuration system) determines which operator and profile type to assign. Selection logic examples: (1) <b>Geography-based</b> \u2014 US-bound devices get T-Mobile bootstrap, EU-bound get Deutsche Telekom. (2) <b>Customer order-based</b> \u2014 enterprise customer\u2019s order specifies the operator. (3) <b>Inventory-based</b> \u2014 available profile pool determines assignment. (4) <b>Hybrid</b> \u2014 combination of the above with fallback rules. This is the key advantage of late binding \u2014 the profile choice is deferred to the last possible moment, enabling a single manufacturing flow for global products.'},
+{f:2,t:2,n:'\u2666 Configuration Decision (Late Binding)',a:[['Shipping Destination','Determines target operator/network'],['Configuration Rules','Business logic mapping destination to profile type'],['Operator ID','Selected based on rules']],d:'<b>DECISION POINT:</b> The Factory System (or upstream configuration system) determines which operator and profile type to assign. Selection logic examples: (1) <b>Geography-based</b> \u2014 US-bound devices get Operator A bootstrap, EU-bound get Operator B. (2) <b>Customer order-based</b> \u2014 enterprise customer\u2019s order specifies the operator. (3) <b>Inventory-based</b> \u2014 available profile pool determines assignment. (4) <b>Hybrid</b> \u2014 combination of the above with fallback rules. This is the key advantage of late binding \u2014 the profile choice is deferred to the last possible moment, enabling a single manufacturing flow for global products.'},
 {f:2,t:1,n:'Request BPP (Online)',a:[['EID','Target eUICC'],['profileType','Based on configuration rules'],['Operator ID','Determined by shipping destination']],d:'Factory System requests a BPP from the SM-DP+ at configuration time. This is a hybrid model \u2014 the BPP is generated on-demand but installed locally without the eUICC needing internet connectivity.'},
 {f:1,t:2,n:'BPP Delivery',a:[['boundProfilePackage','Freshly generated BPP'],['ICCID','Assigned profile']],d:'SM-DP+ generates and delivers the BPP in near-real-time.'},
 {f:2,t:3,n:'Load BPP (Local Interface)',a:[['boundProfilePackage','BPP'],['INSTALL','GlobalPlatform command']],d:'Factory System installs the BPP locally. Same fast local installation as the pre-generated path.'},
@@ -914,14 +914,14 @@ function svgCurve(x1,y1,cx1,cy1,cx2,cy2,x2,y2,color,label,dashed,tooltip){
 function archM2Mv3(){
   var s='<svg viewBox="0 0 1000 500" width="100%" style="max-width:1000px">';
   s+=svgEnt(50,60,'Operator','M2M-SP','#2563EB');
-  s+=svgEnt(50,280,'SM-DP','Data Preparation','#E20074');
+  s+=svgEnt(50,280,'SM-DP','Data Preparation','#1E3A5F');
   s+=svgEnt(420,60,'SM-SR','Secure Routing','#7C3AED');
   s+=svgEnt(780,170,'eUICC','Embedded SIM','#DC2626');
   s+=svgLine(200,93,420,93,'#2563EB','ES4',false,'ES4: Operator \u2192 SM-SR');
   s+=svgLine(125,125,125,280,'#2563EB','ES5',true,'ES5: Operator \u2194 SM-DP (not used in preloaded)');
-  s+=svgLine(200,313,420,93,'#E20074','ES2',false,'ES2: SM-DP \u2194 SM-SR');
+  s+=svgLine(200,313,420,93,'#1E3A5F','ES2',false,'ES2: SM-DP \u2194 SM-SR');
   s+=svgLine(570,93,780,203,'#7C3AED','ES1',false,'ES1: SM-SR \u2192 eUICC (remote)');
-  s+=svgCurve(200,330,400,440,650,440,780,235,'#E20074','ES3 (logical, via SM-SR)',true,'ES3: SM-DP \u2194 eUICC (logical, tunneled via ES2\u2192SM-SR\u2192ES1)');
+  s+=svgCurve(200,330,400,440,650,440,780,235,'#1E3A5F','ES3 (logical, via SM-SR)',true,'ES3: SM-DP \u2194 eUICC (logical, tunneled via ES2\u2192SM-SR\u2192ES1)');
   s+='</svg>';
   return s;
 }
@@ -929,18 +929,18 @@ function archM2Mv3(){
 function archM2Mv4(){
   var s='<svg viewBox="0 0 1000 550" width="100%" style="max-width:1000px">';
   s+=svgEnt(50,60,'Operator','M2M-SP','#2563EB');
-  s+=svgEnt(50,280,'SM-DP','Data Preparation','#E20074');
+  s+=svgEnt(50,280,'SM-DP','Data Preparation','#1E3A5F');
   s+=svgEnt(420,60,'SM-SR','Secure Routing','#7C3AED');
   s+=svgEnt(420,380,'SM-SR B','Swap Target','#7C3AED');
   s+=svgEnt(780,170,'eUICC','Embedded SIM','#DC2626');
-  s+=svgBadge(55,345,'Profile Interop','#E20074');
+  s+=svgBadge(55,345,'Profile Interop','#1E3A5F');
   s+='<text x="855" y="255" text-anchor="middle" fill="#DC2626" font-size="11" font-weight="600">MNO-SD</text>';
   s+=svgLine(200,93,420,93,'#2563EB','ES4',false,'ES4: Operator \u2192 SM-SR');
   s+=svgLine(125,125,125,280,'#2563EB','ES5',true,'ES5: Operator \u2194 SM-DP (not used in preloaded-profile deployments)');
-  s+=svgLine(200,313,420,93,'#E20074','ES2',false,'ES2: SM-DP \u2194 SM-SR');
+  s+=svgLine(200,313,420,93,'#1E3A5F','ES2',false,'ES2: SM-DP \u2194 SM-SR');
   s+=svgLine(570,93,780,203,'#7C3AED','ES1',false,'ES1: SM-SR \u2192 eUICC (remote)');
   s+=svgLine(495,125,495,380,'#7C3AED','ES6',true,'ES6: SM-SR \u2194 SM-SR B (platform handover)');
-  s+=svgCurve(200,330,400,480,650,480,780,235,'#E20074','ES3 (logical, via SM-SR)',true,'ES3: SM-DP \u2194 eUICC (logical)');
+  s+=svgCurve(200,330,400,480,650,480,780,235,'#1E3A5F','ES3 (logical, via SM-SR)',true,'ES3: SM-DP \u2194 eUICC (logical)');
   s+='</svg>';
   return s;
 }
@@ -950,27 +950,27 @@ function archConsumerV2(){
   s+='<rect x="600" y="100" width="360" height="280" rx="12" fill="none" stroke="var(--bdr)" stroke-width="2" stroke-dasharray="8,5"/>';
   s+='<text x="930" y="118" text-anchor="end" fill="var(--tx3)" font-size="12" font-weight="700">Device</text>';
   s+=svgEnt(40,140,'Operator','MNO / MVNO','#2563EB');
-  s+=svgEnt(310,60,'SM-DP+','Data Preparation+','#E20074');
+  s+=svgEnt(310,60,'SM-DP+','Data Preparation+','#1E3A5F');
   s+=svgEnt(310,330,'SM-DS','Discovery Server','#D97706');
   s+=svgEnt(640,120,'LPA','Local Profile Asst.','#059669');
   s+=svgEnt(640,280,'eUICC','Embedded SIM','#DC2626');
   s+=svgLine(190,173,310,93,'#2563EB','ES2+',false,'ES2+: Operator \u2194 SM-DP+');
   s+=svgLine(715,185,715,280,'#059669','ES10x',false,'ES10a/b/c: LPA \u2194 eUICC');
   s+=svgLine(640,170,460,363,'#059669','ES11',false,'ES11: LPA \u2194 SM-DS');
-  s+=svgLine(385,125,385,330,'#E20074','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
+  s+=svgLine(385,125,385,330,'#1E3A5F','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
   var pipeY=118;
   s+='<g><title>ES9+: SM-DP+ \u2194 LPA (transport tunnel for ES8+)</title>';
-  s+='<rect x="455" y="'+(pipeY-14)+'" width="190" height="28" rx="14" fill="none" stroke="#E20074" stroke-width="3" opacity="0.4"/>';
+  s+='<rect x="455" y="'+(pipeY-14)+'" width="190" height="28" rx="14" fill="none" stroke="#1E3A5F" stroke-width="3" opacity="0.4"/>';
   s+='<rect x="455" y="'+(pipeY-14)+'" width="190" height="28" rx="14" fill="rgba(226,0,116,0.05)"/>';
-  s+='<text x="550" y="'+(pipeY-20)+'" text-anchor="middle" fill="#E20074" font-size="12" font-weight="700">ES9+ (tunnel)</text>';
+  s+='<text x="550" y="'+(pipeY-20)+'" text-anchor="middle" fill="#1E3A5F" font-size="12" font-weight="700">ES9+ (tunnel)</text>';
   s+='</g>';
   s+='<g><title>ES8+: SM-DP+ \u2194 eUICC (logical end-to-end channel, tunneled via ES9+ and ES10b)</title>';
   var mid=_svgId('es8_');
-  s+='<defs><marker id="'+mid+'" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E20074"/></marker></defs>';
-  s+='<line x1="460" y1="'+pipeY+'" x2="640" y2="'+pipeY+'" stroke="#E20074" stroke-width="2" stroke-dasharray="6,4"/>';
-  s+='<path d="M640 '+pipeY+' L715 185 L715 280" fill="none" stroke="#E20074" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#'+mid+')"/>';
+  s+='<defs><marker id="'+mid+'" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1E3A5F"/></marker></defs>';
+  s+='<line x1="460" y1="'+pipeY+'" x2="640" y2="'+pipeY+'" stroke="#1E3A5F" stroke-width="2" stroke-dasharray="6,4"/>';
+  s+='<path d="M640 '+pipeY+' L715 185 L715 280" fill="none" stroke="#1E3A5F" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#'+mid+')"/>';
   s+='<rect x="725" y="220" width="110" height="18" rx="4" fill="var(--bg1)" stroke="var(--bdr)" stroke-width="1"/>';
-  s+='<text x="780" y="233" text-anchor="middle" fill="#E20074" font-size="11" font-weight="600" font-style="italic">ES8+ (logical)</text>';
+  s+='<text x="780" y="233" text-anchor="middle" fill="#1E3A5F" font-size="11" font-weight="600" font-style="italic">ES8+ (logical)</text>';
   s+='</g>';
   s+='</svg>';
   return s;
@@ -981,27 +981,27 @@ function archConsumerV3(){
   s+='<rect x="600" y="100" width="360" height="330" rx="12" fill="none" stroke="var(--bdr)" stroke-width="2" stroke-dasharray="8,5"/>';
   s+='<text x="930" y="118" text-anchor="end" fill="var(--tx3)" font-size="12" font-weight="700">Device</text>';
   s+=svgEnt(40,140,'Operator','MNO / MVNO','#2563EB');
-  s+=svgEnt(310,60,'SM-DP+','Data Preparation+','#E20074');
+  s+=svgEnt(310,60,'SM-DP+','Data Preparation+','#1E3A5F');
   s+=svgEnt(310,350,'SM-DS','Discovery Server','#D97706');
   s+=svgEnt(640,120,'LPA','Local Profile Asst.','#059669');
   s+=svgEnt(640,280,'eUICC (MEP)','Multi-Enabled Profiles','#DC2626');
   s+=svgLine(190,173,310,93,'#2563EB','ES2+',false,'ES2+: Operator \u2194 SM-DP+');
   s+=svgLine(715,185,715,280,'#059669','ES10a/b/c/d',false,'ES10a/b/c (existing) + ES10d (new in v3.x for MEP port management): LPA \u2194 eUICC');
   s+=svgLine(640,170,460,383,'#059669','ES11',false,'ES11: LPA \u2194 SM-DS');
-  s+=svgLine(385,125,385,350,'#E20074','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
+  s+=svgLine(385,125,385,350,'#1E3A5F','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
   var pipeY=118;
   s+='<g><title>ES9+: SM-DP+ \u2194 LPA (transport tunnel for ES8+)</title>';
-  s+='<rect x="455" y="'+(pipeY-14)+'" width="190" height="28" rx="14" fill="none" stroke="#E20074" stroke-width="3" opacity="0.4"/>';
+  s+='<rect x="455" y="'+(pipeY-14)+'" width="190" height="28" rx="14" fill="none" stroke="#1E3A5F" stroke-width="3" opacity="0.4"/>';
   s+='<rect x="455" y="'+(pipeY-14)+'" width="190" height="28" rx="14" fill="rgba(226,0,116,0.05)"/>';
-  s+='<text x="550" y="'+(pipeY-20)+'" text-anchor="middle" fill="#E20074" font-size="12" font-weight="700">ES9+ (tunnel)</text>';
+  s+='<text x="550" y="'+(pipeY-20)+'" text-anchor="middle" fill="#1E3A5F" font-size="12" font-weight="700">ES9+ (tunnel)</text>';
   s+='</g>';
   s+='<g><title>ES8+: SM-DP+ \u2194 eUICC (logical end-to-end channel, tunneled via ES9+ and ES10b)</title>';
   var mid=_svgId('es8_');
-  s+='<defs><marker id="'+mid+'" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E20074"/></marker></defs>';
-  s+='<line x1="460" y1="'+pipeY+'" x2="640" y2="'+pipeY+'" stroke="#E20074" stroke-width="2" stroke-dasharray="6,4"/>';
-  s+='<path d="M640 '+pipeY+' L715 185 L715 280" fill="none" stroke="#E20074" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#'+mid+')"/>';
+  s+='<defs><marker id="'+mid+'" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1E3A5F"/></marker></defs>';
+  s+='<line x1="460" y1="'+pipeY+'" x2="640" y2="'+pipeY+'" stroke="#1E3A5F" stroke-width="2" stroke-dasharray="6,4"/>';
+  s+='<path d="M640 '+pipeY+' L715 185 L715 280" fill="none" stroke="#1E3A5F" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#'+mid+')"/>';
   s+='<rect x="725" y="220" width="110" height="18" rx="4" fill="var(--bg1)" stroke="var(--bdr)" stroke-width="1"/>';
-  s+='<text x="780" y="233" text-anchor="middle" fill="#E20074" font-size="11" font-weight="600" font-style="italic">ES8+ (logical)</text>';
+  s+='<text x="780" y="233" text-anchor="middle" fill="#1E3A5F" font-size="11" font-weight="600" font-style="italic">ES8+ (logical)</text>';
   s+='</g>';
   s+=svgBadge(650,365,'MEP','#DC2626');
   s+='<rect x="670" y="390" width="60" height="20" rx="5" fill="var(--bg2)" stroke="#DC2626" stroke-width="1"/>';
@@ -1018,14 +1018,14 @@ function archIotIPAd(){
   s+='<rect x="480" y="300" width="420" height="180" rx="12" fill="none" stroke="var(--bdr)" stroke-width="2" stroke-dasharray="8,5"/>';
   s+='<text x="870" y="318" text-anchor="end" fill="var(--tx3)" font-size="12" font-weight="700">Device</text>';
   s+=svgEnt(40,50,'Operator','MNO / MVNO','#2563EB');
-  s+=svgEnt(310,50,'SM-DP+','Data Preparation+','#E20074');
+  s+=svgEnt(310,50,'SM-DP+','Data Preparation+','#1E3A5F');
   s+=svgEnt(590,50,'SM-DS','Discovery Server','#D97706');
   s+=svgEnt(310,180,'eIM','IoT Remote Manager','#0891B2');
   s+=svgEnt(520,330,'IPAd','IPA in Device','#4F46E5');
   s+=svgEnt(740,400,'eUICC (IoT)','Embedded SIM','#DC2626');
   s+=svgLine(190,83,310,83,'#2563EB','ES2+',false,'ES2+: Operator \u2192 SM-DP+');
   s+=svgLine(125,115,310,213,'#2563EB','ESop',false,'ESop: Operator \u2194 eIM');
-  s+=svgLine(460,83,590,83,'#E20074','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
+  s+=svgLine(460,83,590,83,'#1E3A5F','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
   s+=svgLine(385,245,540,350,'#0891B2','ESeim',false,'ESeim: eIM \u2192 IPAd (Direct mode)');
   s+=svgLine(595,330,385,115,'#4F46E5','ESipa',true,'ESipa: IPAd \u2192 SM-DP+ (Indirect mode)');
   s+=svgLine(670,363,740,433,'#4F46E5','Local',false,'IPAd \u2194 eUICC (internal device interface)');
@@ -1038,7 +1038,7 @@ function archIotIPAd(){
 function archIotIPAe(){
   var s='<svg viewBox="0 0 1000 480" width="100%" style="max-width:1000px">';
   s+=svgEnt(40,50,'Operator','MNO / MVNO','#2563EB');
-  s+=svgEnt(310,50,'SM-DP+','Data Preparation+','#E20074');
+  s+=svgEnt(310,50,'SM-DP+','Data Preparation+','#1E3A5F');
   s+=svgEnt(590,50,'SM-DS','Discovery Server','#D97706');
   s+=svgEnt(310,180,'eIM','IoT Remote Manager','#0891B2');
   s+='<g><rect x="520" y="300" width="180" height="120" rx="10" fill="var(--bg2)" stroke="var(--bdr)" stroke-width="1"/>';
@@ -1049,7 +1049,7 @@ function archIotIPAe(){
   s+='<text x="610" y="396" text-anchor="middle" fill="#4F46E5" font-size="12" font-weight="600">IPAe embedded</text></g>';
   s+=svgLine(190,83,310,83,'#2563EB','ES2+',false,'ES2+: Operator \u2192 SM-DP+');
   s+=svgLine(125,115,310,213,'#2563EB','ESop',false,'ESop: Operator \u2194 eIM');
-  s+=svgLine(460,83,590,83,'#E20074','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
+  s+=svgLine(460,83,590,83,'#1E3A5F','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
   s+=svgLine(385,245,540,340,'#0891B2','ESeim',false,'ESeim: eIM \u2192 eUICC (IPAe receives commands)');
   s+=svgLine(520,320,385,115,'#4F46E5','ESipa',true,'ESipa: eUICC (IPAe) \u2192 SM-DP+ (Indirect mode)');
   s+='<text x="500" y="455" text-anchor="middle" fill="var(--tx3)" font-size="11" font-style="italic">IPAe = IPA embedded in eUICC \u2014 the eUICC itself handles IPA functions internally for constrained devices</text>';
@@ -1060,11 +1060,11 @@ function archIotIPAe(){
 function archIfppV1(){
   var s='<svg viewBox="0 0 1000 350" width="100%" style="max-width:1000px">';
   s+=svgEnt(30,140,'Operator','MNO / MVNO','#2563EB');
-  s+=svgEnt(280,140,'SM-DP+','Profile Provider','#E20074');
+  s+=svgEnt(280,140,'SM-DP+','Profile Provider','#1E3A5F');
   s+=svgEnt(560,140,'Factory System','Manufacturing','#B45309');
   s+=svgEnt(810,140,'eUICC','Embedded SIM','#DC2626');
   s+=svgLine(180,173,280,173,'#2563EB','ES2+',false,'ES2+: Operator \u2194 SM-DP+');
-  s+=svgLine(430,173,560,173,'#E20074','Secure Transfer',false,'BPP delivery to factory');
+  s+=svgLine(430,173,560,173,'#1E3A5F','Secure Transfer',false,'BPP delivery to factory');
   s+='<g><title>Factory \u2192 eUICC (local wired interface)</title>';
   s+='<line x1="710" y1="173" x2="810" y2="173" stroke="#B45309" stroke-width="4"/>';
   s+='<polygon points="810,173 800,168 800,178" fill="#B45309"/>';
@@ -1276,7 +1276,7 @@ function esim101HTML(){
   /* SVG Comparison Diagram — Simplified */
   h+='<div class="arch-wrap" style="margin-bottom:24px">';
   h+='<svg viewBox="0 0 700 160" style="width:100%;max-width:700px;display:block;margin:0 auto">';
-  h+='<defs><linearGradient id="esimGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E20074;stop-opacity:0.08"/><stop offset="100%" style="stop-color:#E20074;stop-opacity:0.03"/></linearGradient></defs>';
+  h+='<defs><linearGradient id="esimGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1E3A5F;stop-opacity:0.08"/><stop offset="100%" style="stop-color:#1E3A5F;stop-opacity:0.03"/></linearGradient></defs>';
   h+='<defs><marker id="arrowhead101" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--mag)"/></marker></defs>';
   /* Physical SIM — minimal */
   h+='<g transform="translate(40,20)">';
@@ -1361,10 +1361,10 @@ function esim101HTML(){
   /* Milestones */
   var milestones=[
     {year:'2013',x:100,spec:'SGP.02 v3',label:'M2M RSP',desc:'(Push model)',color:'#2563EB',tab:'m2m'},
-    {year:'2016',x:270,spec:'SGP.22 v1',label:'Consumer',desc:'(Pull model)',color:'#E20074',tab:'consumer'},
-    {year:'2019',x:440,spec:'SGP.22 v2',label:'Consumer',desc:'(AC + DS)',color:'#E20074',tab:'consumer'},
+    {year:'2016',x:270,spec:'SGP.22 v1',label:'Consumer',desc:'(Pull model)',color:'#1E3A5F',tab:'consumer'},
+    {year:'2019',x:440,spec:'SGP.22 v2',label:'Consumer',desc:'(AC + DS)',color:'#1E3A5F',tab:'consumer'},
     {year:'2023',x:610,spec:'SGP.32 v1',label:'IoT RSP',desc:'(eIM, Direct/Indirect)',color:'#0891B2',tab:'iot'},
-    {year:'2023',x:780,spec:'SGP.22 v3',label:'Consumer',desc:'(MEP)',color:'#E20074',tab:'consumer'},
+    {year:'2023',x:780,spec:'SGP.22 v3',label:'Consumer',desc:'(MEP)',color:'#1E3A5F',tab:'consumer'},
     {year:'2025',x:920,spec:'SGP.41 v1',label:'IFPP',desc:'(Factory)',color:'#B45309',tab:'ifpp'}
   ];
   milestones.forEach(function(m){
@@ -1378,7 +1378,7 @@ function esim101HTML(){
   });
   /* Legend */
   h+='<g transform="translate(50,180)">';
-  var legendItems=[{color:'#2563EB',label:'M2M'},{color:'#E20074',label:'Consumer'},{color:'#0891B2',label:'IoT'},{color:'#B45309',label:'IFPP'}];
+  var legendItems=[{color:'#2563EB',label:'M2M'},{color:'#1E3A5F',label:'Consumer'},{color:'#0891B2',label:'IoT'},{color:'#B45309',label:'IFPP'}];
   legendItems.forEach(function(l,i){
     h+='<rect x="'+(i*100)+'" y="0" width="14" height="14" rx="3" fill="'+l.color+'"/>';
     h+='<text x="'+(i*100+20)+'" y="12" fill="var(--tx1)" font-size="12">'+l.label+'</text>';
@@ -2154,7 +2154,7 @@ function bindACParser(){
     var parts=val.split('$');
     if(parts[0]!=='1'){result.innerHTML='<div class="ac-error">Invalid format: must start with "1" (or "LPA:1").</div>';return}
     var labels=['Format','SM-DP+ Address','Matching ID','SM-DP+ OID','Confirmation Code'];
-    var colors=['#888','#E20074','#2563EB','#D97706','#059669'];
+    var colors=['#888','#1E3A5F','#2563EB','#D97706','#059669'];
     var descs=['Format version (always "1" for default RSP activation code format)','The FQDN of the SM-DP+ server that holds the profile','Token that identifies the specific profile order on the SM-DP+','Object Identifier for SM-DP+ certificate verification (optional)','User must enter this code during download for additional security (optional)'];
     var rh='<div class="ac-segments">';
     parts.forEach(function(p,i){
@@ -2522,7 +2522,7 @@ function bindEIDDecoder(){
     }
     var countryName=stdMII?(COUNTRY_CODES[cc]||'Unknown ('+cc+')'):'N/A (non-standard MII)';
     var seg=[
-      {label:'EUM Prefix',value:prefix8,color:'#E20074'},
+      {label:'EUM Prefix',value:prefix8,color:'#1E3A5F'},
       {label:'Platform/Product',value:platform,color:'#7C3AED'},
       {label:'Serial Number',value:serial,color:'#0891B2'},
       {label:'Check Digits',value:chk,color:checksumOk?'#059669':'#DC2626'}
@@ -2729,7 +2729,7 @@ function bindStateMachine(){
     var sid=g.dataset.sid,info=stateInfo[sid];if(!info)return;
     svgWrap.querySelectorAll('.sm-state rect').forEach(function(r){r.setAttribute('stroke-width','2')});
     g.querySelector('rect').setAttribute('stroke-width','4');
-    g.querySelector('rect').setAttribute('stroke','#E20074');
+    g.querySelector('rect').setAttribute('stroke','#1E3A5F');
     var dh='<b style="color:var(--mag)">'+info.title+'</b><br>';
     dh+='<b>Available operations:</b><ul style="margin:4px 0 8px 18px">';
     info.ops.forEach(function(o){dh+='<li>'+o+'</li>'});
@@ -2900,7 +2900,7 @@ function bindRemoteDecoder(){
     var cla=v.substr(0,2),ins=v.substr(2,2),p1=v.substr(4,2),p2=v.substr(6,2);
     var insName=REMOTE_INS[ins]||'Unknown';
     var claDesc='00'===cla?'ISO 7816':'80'===cla?'GlobalPlatform':'A0'===cla?'SIM Toolkit':'Other (0x'+cla+')';
-    var seg=[{l:'CLA',v:cla,d:claDesc,c:'#7C3AED'},{l:'INS',v:ins,d:insName,c:'#E20074'},{l:'P1',v:p1,d:'Parameter 1',c:'#2563EB'},{l:'P2',v:p2,d:'Parameter 2',c:'#0891B2'}];
+    var seg=[{l:'CLA',v:cla,d:claDesc,c:'#7C3AED'},{l:'INS',v:ins,d:insName,c:'#1E3A5F'},{l:'P1',v:p1,d:'Parameter 1',c:'#2563EB'},{l:'P2',v:p2,d:'Parameter 2',c:'#0891B2'}];
     var rh='<div class="ac-segments">';
     seg.forEach(function(s){rh+='<div class="ac-seg" style="border-color:'+s.c+';color:'+s.c+'"><div class="ac-seg-label">'+s.l+'</div><div class="ac-seg-value">'+s.v+'</div><div style="font-size:10px;opacity:.8">'+s.d+'</div></div>'});
     rh+='</div>';
@@ -3257,7 +3257,7 @@ function bindBatchQR(){
         var midEl=card.querySelectorAll('div');
         var midText=midEl.length>=3?midEl[2].textContent:'';
         var addrText=midEl.length>=4?midEl[3].textContent:'';
-        ctx.fillStyle='#E20074';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+        ctx.fillStyle='#1E3A5F';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
         ctx.fillText(midText.substring(0,28),x+80,y+178);
         ctx.fillStyle='#999999';ctx.font='9px sans-serif';
         ctx.fillText(addrText.substring(0,32),x+80,y+192);
