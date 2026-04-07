@@ -598,7 +598,7 @@ FLOWS['airan_registration'] = {
 // Nokia AirScale vDU running on NVIDIA Grace Hopper
 {
   "rrcProcessing": {
-    "node": "airan-bellevue-node-01",
+    "node": "airan-ic-node-01",
     "vdu_platform": "NVIDIA_Grace_Hopper_GH200",
     "l1_decode_engine": "NVIDIA_Aerial_cuPHY",
     "rrc_setup_complete": true,
@@ -703,7 +703,7 @@ FLOWS['airan_registration'] = {
         "protection_scheme": "ECIES_Profile_A"
       }
     },
-    "selected_ausf": "ausf-01.5gc.mnc260.mcc310.3gppnetwork.org"
+    "selected_ausf": "ausf-01.5gc.mnc01.mcc001.3gppnetwork.org"
   },
   // AMF initiates 5G AKA via N12
 }`}},
@@ -715,7 +715,7 @@ FLOWS['airan_registration'] = {
 // POST /nausf-auth/v1/ue-authentications
 {
   "supiOrSuci": "suci-0-310-260-0-0-0-0-0000042781",
-  "servingNetworkName": "5G:mnc260.mcc310.3gppnetwork.org",
+  "servingNetworkName": "5G:mnc01.mcc001.3gppnetwork.org",
   "resynchronizationInfo": null,
   "traceData": null
 }
@@ -733,9 +733,9 @@ FLOWS['airan_registration'] = {
 {
   "ausfProcessing": {
     "suci_received": "suci-0-310-260-0-0-0-0-0000042781",
-    "serving_network": "5G:mnc260.mcc310.3gppnetwork.org",
+    "serving_network": "5G:mnc01.mcc001.3gppnetwork.org",
     "auth_method_selected": "5G_AKA",
-    "udm_endpoint": "udm-01.5gc.mnc260.mcc310.3gppnetwork.org"
+    "udm_endpoint": "udm-01.5gc.mnc01.mcc001.3gppnetwork.org"
   },
   // AUSF → UDM (N13):
   // Nudm_UEAuthentication_Get to resolve SUCI
@@ -754,7 +754,7 @@ FLOWS['airan_registration'] = {
 // POST /nudm-ueau/v1/{supiOrSuci}/
 //      security-information/generate-auth-data
 {
-  "servingNetworkName": "5G:mnc260.mcc310.3gppnetwork.org",
+  "servingNetworkName": "5G:mnc01.mcc001.3gppnetwork.org",
   "ausfInstanceId": "ausf-01-uuid-a1b2c3d4",
   "authenticationMethod": "5G_AKA"
 }
@@ -895,8 +895,8 @@ FLOWS['airan_registration'] = {
       "5G-TMSI": "0x00042781"
     },
     "allowedNSSAI": [
-      { "sst": 1, "sd": "000001" },
-      { "sst": 1, "sd": "000002" }
+      { "sst": 1, "sd": "ABCD01" },
+      { "sst": 1, "sd": "ABCD02" }
     ],
     "registrationAreaList": {
       "taiList": [{ "mcc":"310","mnc":"260","tac":"000042" }]
@@ -913,7 +913,7 @@ FLOWS['airan_registration'] = {
     "access": "3GPP_NR",
     "plmn": { "mcc": "310", "mnc": "260" },
     "5g_guti": "31026001001020042781",
-    "serving_cell": "AI-RAN-Bellevue-Node-01"
+    "serving_cell": "AI-RAN-IC-Node-01"
   },
   // Standard 3GPP registration — 100% compliant
   // Innovation is in the INFRASTRUCTURE:
@@ -965,7 +965,7 @@ FLOWS['airan_pdu_shared'] = {
       "5qi": 9,
       "priorityLevel": 8
     },
-    "s-nssai": { "sst": 1, "sd": "000001" },
+    "s-nssai": { "sst": 1, "sd": "ABCD01" },
     "dnn": "fast.t-mobile.com"
   }
 }
@@ -976,7 +976,7 @@ FLOWS['airan_pdu_shared'] = {
 // AI-RAN GPU vDU decodes uplink and extracts NAS PDU
 {
   "airanProcessing": {
-    "node": "airan-bellevue-node-01",
+    "node": "airan-ic-node-01",
     "l1_decode": "NVIDIA_Aerial_cuPHY",
     "pdcp_sn": 42,
     "nas_pdu_extracted": true,
@@ -1016,7 +1016,7 @@ FLOWS['airan_pdu_shared'] = {
   }
 }
 // AMF performs SMF selection:
-// DNN: fast.t-mobile.com, S-NSSAI: SST=1/SD=000001
+// DNN: fast.t-mobile.com, S-NSSAI: SST=1/SD=ABCD01
 // Subscription data from UDM (retrieved at registration)`},
       egress:{title:'AMF Selects SMF and Forwards',
         code:`// PROJECTED: based on NVIDIA Aerial SDK
@@ -1024,9 +1024,9 @@ FLOWS['airan_pdu_shared'] = {
 {
   "amfSmfSelection": {
     "amf_ue_ngap_id": 50042,
-    "selected_smf": "smf-01.5gc.mnc260.mcc310.3gppnetwork.org",
+    "selected_smf": "smf-01.5gc.mnc01.mcc001.3gppnetwork.org",
     "selection_criteria": {
-      "s_nssai": { "sst": 1, "sd": "000001" },
+      "s_nssai": { "sst": 1, "sd": "ABCD01" },
       "dnn": "fast.t-mobile.com",
       "ue_location": "TAC=000042",
       "smf_load": "32%"
@@ -1049,7 +1049,7 @@ FLOWS['airan_pdu_shared'] = {
   "supi": "imsi-310260000042781",
   "pduSessionId": 5,
   "dnn": "fast.t-mobile.com",
-  "sNssai": { "sst": 1, "sd": "000001" },
+  "sNssai": { "sst": 1, "sd": "ABCD01" },
   "servingNfId": "amf-01-uuid",
   "servingNetwork": { "mcc": "310", "mnc": "260" },
   "requestType": "INITIAL_REQUEST",
@@ -1095,12 +1095,12 @@ FLOWS['airan_pdu_shared'] = {
   "pduSessionId": 5,
   "pduSessionType": "IPV4",
   "dnn": "fast.t-mobile.com",
-  "sNssai": { "sst": 1, "sd": "000001" },
+  "sNssai": { "sst": 1, "sd": "ABCD01" },
   "ipv4Address": "10.42.17.93",
   "ratType": "NR",
   "servingNetwork": { "mcc": "310", "mnc": "260" },
   "accessType": "3GPP_ACCESS",
-  "notificationUri": "https://smf-01.5gc/callback/policy-5"
+  "notificationUri": "https://smf-01.5gc.mnc01.mcc001.3gppnetwork.org/callback/policy-5"
 }
 // PCF evaluates subscriber profile,
 // slice policy, and operator rules
@@ -1127,11 +1127,11 @@ FLOWS['airan_pdu_shared'] = {
       "allow_all": {
         "flowInfos": [{ "flowDescription": "permit out ip from any to assigned" }],
         "refQosData": ["qos_default"],
-        "refChgData": ["chg_rg1001"]
+        "refChgData": ["chg_rg100"]
       }
     },
     "chgDecs": {
-      "chg_rg1001": { "ratingGroup": 1001, "online": true }
+      "chg_rg100": { "ratingGroup": 100, "online": true }
     }
   }
 }`}},
@@ -1142,7 +1142,7 @@ FLOWS['airan_pdu_shared'] = {
 // SMF → UPF: PFCP Session Establishment (TS 29.244)
 {
   "messageType": "PFCP_SESSION_ESTABLISHMENT_REQUEST",
-  "nodeId": "smf-01.5gc.mnc260.mcc310.3gppnetwork.org",
+  "nodeId": "smf-01.5gc.mnc01.mcc001.3gppnetwork.org",
   "cpFSEID": { "seid": 1005, "ipv4": "10.0.1.10" },
   "createPDR": [{
     "pdrId": 1,
@@ -1246,7 +1246,7 @@ FLOWS['airan_pdu_shared'] = {
       "id-RAN-UE-NGAP-ID": 1001,
       "id-PDUSessionResourceSetupListSUReq": [{
         "pDUSessionID": 5,
-        "s-NSSAI": { "sST": 1, "sD": "000001" },
+        "s-NSSAI": { "sST": 1, "sD": "ABCD01" },
         "pDUSessionResourceSetupRequestTransfer": {
           "ulNGU-UP-TNLInformation": {
             "gTPTunnel": {
@@ -1488,7 +1488,7 @@ FLOWS['airan_data_zerohop'] = {
   "n3GtpuUplink": {
     "tunnel": {
       "teid": "0x00050042",
-      "src": "airan-bellevue-node-01 (10.0.3.30)",
+      "src": "airan-ic-node-01 (10.0.3.30)",
       "dst": "upf-psa-01 (10.0.2.20)"
     },
     "gtpuExtHdr": {
@@ -1725,7 +1725,7 @@ FLOWS['airan_telemetry'] = {
 // Collects both infrastructure and RAN-specific metrics
 {
   "telemetryQuery": {
-    "node": "airan-bellevue-node-01",
+    "node": "airan-ic-node-01",
     "gpu_id": "GPU-0 (GH200-Grace-Hopper)",
     "collection_interval_ms": 100,
     "metric_groups": [
@@ -1782,7 +1782,7 @@ FLOWS['airan_telemetry'] = {
     "ricIndicationType": "REPORT",
     "ricIndicationHeader": {
       "timestamp": "2026-04-01T15:30:00.100Z",
-      "nodeId": "airan-bellevue-node-01",
+      "nodeId": "airan-ic-node-01",
       "cellGlobalId": "310260-00A1-0042"
     },
     "ricIndicationMessage": {
@@ -1800,7 +1800,7 @@ FLOWS['airan_telemetry'] = {
 // AI-RAN Controller correlates GPU + RAN metrics
 {
   "controllerProcessing": {
-    "node": "airan-bellevue-node-01",
+    "node": "airan-ic-node-01",
     "analysis": {
       "gpu_headroom_pct": 33,
       "l1_latency_trend": "STABLE",
@@ -1828,13 +1828,13 @@ FLOWS['airan_telemetry'] = {
 // POST /nnwdaf-eventssubscription/v1/subscriptions
 //      /{subscriptionId}/notify
 {
-  "notificationUri": "nnwdaf-01.5gc.mnc260.mcc310.3gppnetwork.org",
+  "notificationUri": "nnwdaf-01.5gc.mnc01.mcc001.3gppnetwork.org",
   "subscriptionId": "SUB-AIRAN-ANALYTICS-001",
   "eventNotifications": [{
     "event": "AI_RAN_PERFORMANCE",
     "timestamp": "2026-04-01T15:30:00.200Z",
     "aiRanAnalytics": {
-      "nodeId": "airan-bellevue-node-01",
+      "nodeId": "airan-ic-node-01",
       "plmn": { "mcc": "310", "mnc": "260" },
       "cellId": "00A100042",
       "gpu_utilization_pct": 67,
@@ -1851,7 +1851,7 @@ FLOWS['airan_telemetry'] = {
 // NWDAF processes AI-RAN telemetry in context
 {
   "nwdafCorrelation": {
-    "ai_ran_node": "airan-bellevue-node-01",
+    "ai_ran_node": "airan-ic-node-01",
     "network_context": {
       "sector_load_pct": 72,
       "backhaul_utilization_pct": 45,
@@ -1881,9 +1881,9 @@ FLOWS['airan_telemetry'] = {
 {
   "analyticsNotification": {
     "analyticsId": "AI_RAN_PERFORMANCE",
-    "target": "smf-01.5gc.mnc260.mcc310.3gppnetwork.org",
+    "target": "smf-01.5gc.mnc01.mcc001.3gppnetwork.org",
     "aiRanInsights": {
-      "nodeId": "airan-bellevue-node-01",
+      "nodeId": "airan-ic-node-01",
       "cellId": "310260-00A1-0042",
       "gpu_efficiency": 0.94,
       "latency_benefit_ms": 0.7,
@@ -1943,7 +1943,7 @@ FLOWS['airan_telemetry'] = {
     "nfName": "smf-01"
   },
   "multipleUnitUsage": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 100,
     "usedUnitContainer": [{
       "totalVolume": 2048000000,
       "uplinkVolume": 512000000,
@@ -1966,7 +1966,7 @@ FLOWS['airan_telemetry'] = {
     "chargingDataRef": "CHG-310260-042781-005",
     "subscriber": "imsi-310260000042781",
     "ratingApplied": {
-      "ratingGroup": 1001,
+      "ratingGroup": 100,
       "standardUsage": {
         "volume_gb": 2.048,
         "rate_per_gb": 0.05,
@@ -1999,7 +1999,7 @@ FLOWS['airan_telemetry'] = {
     "resultCode": "SUCCESS"
   },
   "multipleUnitInformation": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 100,
     "resultCode": "SUCCESS",
     "grantedUnit": {
       "totalVolume": 2048000000,
@@ -2203,7 +2203,7 @@ FLOWS['sixg_registration'] = {
     "encapsulatedKey": "b7e4f1a0...d93c",
     "nistSecurityLevel": 5
   },
-  "servingNetwork": "6G:mnc260.mcc310.3gppnetwork.org",
+  "servingNetwork": "6G:mnc01.mcc001.3gppnetwork.org",
   "signatureScheme": {
     "algorithm": "CRYSTALS-Dilithium-5",
     "publicKeyHash": "sha3-256:9f8e7d..."
@@ -2393,7 +2393,7 @@ FLOWS['sixg_session'] = {
     "codec": "volumetric-point-cloud",
     "participantCount": 2
   },
-  "dnn": "6g-immersive.t-mobile.com",
+  "dnn": "6g-immersive.operator.example",
   "slice": { "SST": 5, "SD": "HOLO01" }
 }
 // UE declares WHAT it needs, not HOW
@@ -2544,7 +2544,7 @@ FLOWS['sixg_session'] = {
   "far": [{
     "ruleId": 1,
     "action": "FORWARD",
-    "destination": "N6 → af-holo.t-mobile.com",
+    "destination": "N6 → af-holo.operator.example",
     "bufferStrategy": "predictive-prefetch"
   }],
   "qer": [{
@@ -3233,7 +3233,7 @@ FLOWS['sixg_intent_slice'] = {
     "requestedSD": "6GV2X1",
     "sliceProfile": {
       "maxUes": 500,
-      "areaOfService": "polygon-seattle-07",
+      "areaOfService": "polygon-metro-07",
       "isolationLevel": "hard",
       "resourceType": "dedicated"
     },
@@ -3345,7 +3345,7 @@ FLOWS['sixg_intent_slice'] = {
     },
     "edgePlacement": {
       "localBreakout": true,
-      "upfLocation": "edge-seattle-07",
+      "upfLocation": "edge-site-07",
       "dnProximity_km": 2
     }
   },
@@ -3368,7 +3368,7 @@ FLOWS['sixg_intent_slice'] = {
     "tunnelsCreated": 3
   },
   "edgeDeployment": {
-    "location": "edge-seattle-07",
+    "location": "edge-site-07",
     "distanceToDN_km": 1.8,
     "redundancy": "1+1-active-standby"
   },
@@ -4243,7 +4243,7 @@ FLOWS['sixg_charging'] = {
   },
   "scope": {
     "sliceInstanceId": "NSI-2030-0742-V2X",
-    "geographicArea": "seattle-metro",
+    "geographicArea": "metro-area",
     "timeWindow_min": 60
   },
   "pricingModel": "contextual-dynamic",
@@ -4934,7 +4934,7 @@ FLOWS['airan_performance'] = {
 // cuPHY handles all L1 operations as CUDA kernels
 {
   "l1Processing": {
-    "node": "airan-bellevue-node-01",
+    "node": "airan-ic-node-01",
     "subframe": 42,
     "slot": 7,
     "operations": [
@@ -4998,7 +4998,7 @@ FLOWS['airan_performance'] = {
 // AI-RAN → AI-RAN Controller telemetry report
 {
   "gpuTelemetry": {
-    "nodeId": "airan-bellevue-node-01",
+    "nodeId": "airan-ic-node-01",
     "reportPeriod_ms": 100,
     "timestamp": "2026-09-15T14:30:22.100Z",
     "l1Metrics": {
@@ -5028,7 +5028,7 @@ FLOWS['airan_performance'] = {
         code:`// AI-RAN Controller ingests performance data
 {
   "telemetryProcessed": {
-    "nodeId": "airan-bellevue-node-01",
+    "nodeId": "airan-ic-node-01",
     "gpuHealthStatus": "OPTIMAL",
     "performanceSummary": {
       "l1SpeedupVsConventional_x": 2.3,
@@ -5180,7 +5180,7 @@ FLOWS['airan_performance'] = {
 // AI-RAN Ctrl → NWDAF: performance analytics
 {
   "analyticsReport": {
-    "sourceNode": "airan-bellevue-node-01",
+    "sourceNode": "airan-ic-node-01",
     "reportType": "AIRAN_PERFORMANCE",
     "period": "2026-09-15T14:30:00Z/PT5M",
     "ranMetrics": {
@@ -5233,7 +5233,7 @@ FLOWS['airan_performance'] = {
   "analyticsRecommendation": {
     "analyticsId": "NWDAF-AIRAN-2026-0915-1430",
     "type": "RESOURCE_OPTIMIZATION",
-    "target": "airan-bellevue-node-01",
+    "target": "airan-ic-node-01",
     "finding": "AI-RAN sector 7 GPU underutilized 68% of time during off-peak hours (22:00-06:00). Safe to increase inference workload without RAN degradation.",
     "recommendation": {
       "action": "INCREASE_INFERENCE_ALLOCATION",
@@ -6262,7 +6262,7 @@ function drawArchSlicing(container) {
   const s3 = svgEl('rect', {x:160,y:s3y,width:700,height:75,rx:8,fill:'none',stroke:'var(--accent)','stroke-width':2,'stroke-dasharray':'8 4'});
   svg.appendChild(s3);
   const s3t = svgEl('text', {x:175,y:s3y+16,fill:'var(--accent)','font-size':'10','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
-  s3t.textContent = 'Slice 3: Operator-Defined (SST=3/4) — SuperMobile / 5G On Demand'; svg.appendChild(s3t);
+  s3t.textContent = 'Slice 3: eMBB (SST=1, operator SD) — SuperMobile / 5G On Demand'; svg.appendChild(s3t);
   svgBox(svg, 200,s3y+25,80,35,'SMF₃','Custom'); svgBox(svg, 350,s3y+25,80,35,'UPF₃','Custom'); svgBox(svg, 500,s3y+25,80,35,'PCF₃',''); svgBox(svg, 650,s3y+25,80,35,'DN₃','Enterprise');
   svgLine(svg, 280,s3y+42, 350,s3y+42, 'N4'); svgLine(svg, 430,s3y+42, 500,s3y+42); svgLine(svg, 580,s3y+42, 650,s3y+42, 'N6');
   // Ref
@@ -6591,7 +6591,7 @@ function renderSpecLibrary(el) {
       ['TS 24.501','NAS Protocol for 5GS — 5GMM and 5GSM','NAS message definitions, state machines, security procedures','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3370'],
       ['TS 29.500','5GC SBA Framework — HTTP/2','Service-based architecture conventions, discovery, HTTP/2 binding','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3347'],
       ['TS 29.502','Nsmf — SMF Services','Session management service operations (CreateSMContext, UpdateSMContext)','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3340'],
-      ['TS 29.503','Nudm — UDM Services','Subscriber data management, authentication data retrieval','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3340'],
+      ['TS 29.503','Nudm — UDM Services','Subscriber data management, authentication data retrieval','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3342'],
       ['TS 29.507','Npcf_AMPolicyControl','AM policy control for RFSP, service area restrictions','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3346'],
       ['TS 29.509','Nausf — AUSF Services','UE authentication procedures (5G AKA, EAP-AKA\')','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3348'],
       ['TS 29.510','Nnrf — NRF Services','NF registration, discovery, and management','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3345'],
@@ -6655,7 +6655,7 @@ function renderSpecLibrary(el) {
     ['DevEdge APIs','<a href="https://devedge.t-mobile.com" target="_blank">devedge.t-mobile.com</a>','Developer APIs for network slicing, edge, QoD'],
     ['5G Advanced + L4S','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
     ['AI-RAN Innovation Center','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Converged AI+RAN with NVIDIA and Nokia/Ericsson'],
-    ['SuperMobile / Network Slicing','<a href="https://www.t-mobile.com/business" target="_blank">t-mobile.com/business</a>','Consumer and enterprise network slicing products'],
+    ['SuperMobile / Network Slicing','<a href="https://www.t-mobile.com/business/plans/supermobile" target="_blank">t-mobile.com/business — SuperMobile</a>','Business network slicing plan with intelligent performance, security, and satellite'],
   ];
   const alliances = [
     ['O-RAN Alliance','<a href="https://www.o-ran.org" target="_blank">o-ran.org</a>','Open RAN architecture, RIC, open fronthaul specifications'],
@@ -6703,7 +6703,7 @@ const GLOSSARY_DATA = [
   ['EASDF','Edge Application Server Discovery Function','Assists in EAS discovery via DNS-based mechanisms for edge computing scenarios.','TS 23.548','Part of T-Mobile Edge Control architecture for edge app discovery.'],
   ['EES','Edge Enabler Server','Provides edge service APIs, manages EAS lifecycle and edge connectivity.','TS 23.558','Component of T-Mobile T-Platform edge application hosting.'],
   ['ECS','Edge Configuration Server','Provides EES discovery and edge configuration information to edge clients.','TS 23.558','Supports T-Platform edge service configuration.'],
-  ['NSACF','Network Slice Admission Control Function','Controls the number of UEs or PDU sessions admitted per slice to prevent overload.','TS 23.501 §5.15.11','Enforces T-Mobile slice admission limits (Rel-17+).'],
+  ['NSACF','Network Slice Admission Control Function','Controls the number of UEs or PDU sessions admitted per slice to prevent overload.','TS 23.501 §5.15.11','Enforces per-slice UE and PDU session admission limits (Rel-17+).'],
   ['SCP','Service Communication Proxy','Provides indirect communication, load balancing, and service mesh for SBI.','TS 23.501 §6.2.15','Deployed in T-Mobile 5GC for SBI traffic management.'],
   ['UDSF','Unstructured Data Storage Function','Stores unstructured data for stateless NF operation.','TS 23.501 §6.2.16','Enables stateless NF design in T-Mobile cloud-native 5GC.'],
   ['UCMF','UE radio Capability Management Function','Stores and provides UE radio capability information to the RAN.','TS 23.501 §6.2.17','Optimizes T-Mobile RAN resource allocation per UE capability.'],
@@ -6714,7 +6714,7 @@ const GLOSSARY_DATA = [
   ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts T-Mobile calling features: Wi-Fi Calling, Visual Voicemail, etc.'],
   ['MGCF','Media Gateway Control Function','Controls media gateways for PSTN/CS interworking.','TS 23.228','Used in T-Mobile IMS for PSTN breakout scenarios.'],
   ['BGCF','Breakout Gateway Control Function','Selects network for PSTN breakout in IMS-to-PSTN calls.','TS 23.228','Routes T-Mobile VoNR calls to PSTN when needed.'],
-  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','T-Mobile nationwide 5G SA gNB deployment on n25/n41/n71/n77/n260.'],
+  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','T-Mobile nationwide 5G SA gNB deployment on n25/n41/n71/n260.'],
   ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in T-Mobile O-RAN/vRAN disaggregated deployments.'],
   ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at T-Mobile cell sites in split-architecture configurations.'],
   ['O-RU','O-RAN Radio Unit','Open RAN radio unit handling PHY-low and RF. Connected to O-DU via open fronthaul.','O-RAN Alliance','Part of T-Mobile Open RAN architecture strategy.'],
@@ -6742,7 +6742,7 @@ const GLOSSARY_DATA = [
   ['N27','N27 Reference Point','NRF ↔ NSSF for NF set information.','TS 23.501 §5.2','NSSF queries NRF for AMF sets serving specific slices.'],
   ['N33','N33 Reference Point','AF ↔ NEF for network capability exposure.','TS 23.501 §5.2','T-Mobile DevEdge APIs and AF traffic influence use N33.'],
   ['N40','N40 Reference Point','SMF ↔ CHF for converged charging.','TS 32.291','All T-Mobile 5G charging flows use N40 interface.'],
-  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','T-Mobile 5G NR air interface on n25/n41/n71/n77/n260 bands.'],
+  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','T-Mobile 5G NR air interface on n25/n41/n71/n260 bands.'],
   ['F1','F1 Interface','Interface between gNB-CU and gNB-DU (F1-C control, F1-U user).','TS 38.470/473','Used in T-Mobile CU/DU split RAN deployments.'],
   ['E1','E1 Interface','Interface between gNB-CU-CP and gNB-CU-UP.','TS 38.460/463','Separates control and user plane processing in CU.'],
   ['Xn','Xn Interface','Inter-gNB interface for handover and dual connectivity.','TS 38.420/423','Supports T-Mobile inter-gNB handover and EN-DC/NR-DC.'],
@@ -6794,8 +6794,8 @@ const GLOSSARY_DATA = [
   ['Edge Control','Edge Control','T-Mobile 5G Advanced edge computing solution using ULCL for local breakout.','T-Mobile product','Launched Oct 2025. Uses ULCL + EAS for sub-10ms application hosting.'],
   ['T-Platform','T-Platform','T-Mobile enterprise platform for hosting edge applications on 5G infrastructure.','T-Mobile product','Launched Oct 2025 with Edge Control for enterprise edge workloads.'],
   ['DevEdge','DevEdge','T-Mobile developer platform providing APIs for network capabilities.','T-Mobile product','APIs for QoD, slicing, edge discovery. devedge.t-mobile.com.'],
-  ['T-Priority','T-Priority','T-Mobile network slicing product for first responders with prioritized connectivity.','T-Mobile product','Deployed 2024. Uses dedicated URLLC-like slice for priority access.'],
-  ['SuperMobile','SuperMobile','T-Mobile consumer network slicing product for premium mobile experience.','T-Mobile product','Launched Sep 2025. Dedicated slice with enhanced QoS for subscribers.'],
+  ['T-Priority','T-Priority','T-Mobile 5G network slicing solution for first responders with priority access and preemption.','T-Mobile product','Announced Sep 2024; launched Feb 2025. Uses dedicated network slice with 5x resources for first responders.'],
+  ['SuperMobile','SuperMobile','T-Mobile business network slicing plan combining intelligent performance, built-in security, and satellite coverage.','T-Mobile product','Launched Aug 27, 2025. First business plan with nationwide network slice, Threat Protect, and T-Satellite.'],
   ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware, eliminating dedicated AI accelerators.','AI-RAN Alliance','Under validation at T-Mobile Bellevue Innovation Center with NVIDIA and Nokia/Ericsson.'],
   ['Digital Twin','Network Digital Twin','Virtual replica of the physical network enabling simulation, prediction, and optimization of network behavior before applying changes to the live network.','ITU-R M.2160, 3GPP 6G studies','Envisioned for T-Mobile 6G network planning, fault prediction, and autonomous optimization.'],
   ['Intent Engine','Intent-Based Management Engine','6G management function that translates high-level operator intents (e.g., "guarantee 10 Gbps for AR zone") into concrete network configurations using AI/ML.','TM Forum, ETSI ZSM','Envisioned for T-Mobile 6G autonomous network management and slice orchestration.'],
@@ -6838,18 +6838,19 @@ function renderTimeline(el) {
     {date:'2021', text:'DevEdge platform launch — developer APIs for network capabilities', cls:''},
     {date:'2022', text:'IoT Developer Kit — enabling IoT innovation on 5G', cls:''},
     {date:'Apr 2023', text:'Network slicing developer beta (nationwide)', cls:''},
-    {date:'2024', text:'T-Priority (first responder slice) and SASE launched', cls:''},
+    {date:'Sep 2024', text:'T-Priority announced at Capital Markets Day (launched Feb 2025); SASE launched', cls:''},
     {date:'Sep 2024', text:'AI-RAN Innovation Center announced (T-Mobile + NVIDIA + Nokia + Ericsson)', cls:''},
     {date:'Apr 2025', text:'5G Advanced deployed nationwide', cls:''},
     {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
-    {date:'Sep 2025', text:'SuperMobile with network slice launched for consumers', cls:''},
+    {date:'Aug 2025', text:'SuperMobile with network slice launched for business', cls:''},
     {date:'Oct 2025', text:'Edge Control + T-Platform launched for enterprise edge computing', cls:''},
     {date:'Oct 2025', text:'NVIDIA $1B investment in Nokia for AI-RAN infrastructure', cls:''},
-    {date:'Oct 2025', text:'5G On Demand — dynamic on-demand network slicing for enterprise', cls:''},
-    {date:'Dec 2025', text:'3-way UL Tx Switching (iPhone 17 Pro, Samsung GS25 Ultra, etc.)', cls:''},
+    {date:'Oct 2024', text:'5G On Demand — portable 5G private network solution for enterprise', cls:''},
+    {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
     {date:'Mar 2026', text:'MWC: Nokia/T-Mobile/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + T-Mobile 6G innovation hub established.', cls:''},
     {date:'Mar 2026', text:'GTC: Physical AI on AI-RAN demonstrated (Metropolis VSS 3). RTX PRO Blackwell pilot announced at MSOs.', cls:''},
+    {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed MWC 2026)', cls:'projected'},
     {date:'~2027', text:'Nokia first commercial AI-RAN release (projected)', cls:'projected'},
     {date:'~2028', text:'Widespread AI-RAN deployment across T-Mobile network (estimated)', cls:'projected'},
     {date:'~2029', text:'First 3GPP 6G specifications expected (IMT-2030)', cls:'vision'},
@@ -6870,7 +6871,6 @@ function renderBandMap(el) {
     ['n71','600 MHz','FDD Low-band','5–10 MHz','Nationwide, excellent building penetration','Extended Range 5G'],
     ['n25','1900 MHz','FDD Mid-band','5–20 MHz','Urban/suburban','PCS capacity layer'],
     ['n41','2.5 GHz','TDD Mid-band','Up to 100 MHz','Metro/urban, high capacity','Ultra Capacity 5G — primary capacity'],
-    ['n77','3.7 GHz','TDD Mid-band','20–40 MHz','Urban','C-Band supplement'],
     ['n260','39 GHz','TDD mmWave','Up to 800 MHz','Dense urban, venues','Ultra-high throughput hotspots'],
   ];
   let html = '<h2><span class="tm">T-Mobile</span> 5G Band Map <span class="badge badge-fact">FACT</span></h2>';
@@ -6879,7 +6879,7 @@ function renderBandMap(el) {
   bands.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
   html += '<div style="margin-top:18px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">';
-  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center demonstrations use <strong>n41 (2.5 GHz)</strong> as the primary band for GPU-accelerated processing validation.</div>';
+  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center OTA demonstrations use <strong>n77 (3.7 GHz C-Band)</strong> with Nokia AirScale Massive MIMO radios on NVIDIA Grace Hopper. T-Mobile\'s primary commercial mid-band is <strong>n41 (2.5 GHz)</strong>.</div>';
   el.innerHTML = html;
 }
 

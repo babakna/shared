@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive 5G and 6G protocol flow simulators — step through registration, PDU sessions, AI-RAN, and more with real 3GPP payloads. No logins, no install, no tracking.">
+<title>3GPP Protocol Flows — 5G &amp; 6G Interactive Simulators</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f5f7fb;--card:#ffffff;--text:#0c1222;--text-sec:#4a5568;
+--text-muted:#8896ab;--border:#e4e9f2;--surface:#eef2f9;
+--accent:#4a6cf7;--accent-end:#6366f1;
+--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+
+.page-wrap{position:relative;min-height:100vh;overflow-x:hidden}
+.bg-glow{position:absolute;border-radius:50%;pointer-events:none;z-index:0}
+.bg-glow-1{width:500px;height:500px;top:-100px;right:-80px;background:radial-gradient(circle,rgba(74,108,247,0.12) 0%,transparent 70%)}
+.bg-glow-2{width:450px;height:450px;bottom:300px;left:-100px;background:radial-gradient(circle,rgba(99,102,241,0.10) 0%,transparent 70%)}
+.bg-glow-3{width:400px;height:400px;top:600px;right:-60px;background:radial-gradient(circle,rgba(74,108,247,0.08) 0%,transparent 70%)}
+
+.content{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:48px 24px 32px}
+
+header{text-align:center;margin-bottom:40px}
+.hero-icon{display:block;margin:0 auto 24px}
+.hero-title{font-size:clamp(26px,4vw,38px);font-weight:800;color:var(--text);letter-spacing:-.03em;margin-bottom:4px;line-height:1.2}
+.hero-title .hl{background:linear-gradient(135deg,var(--accent),var(--accent-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-byline{font-size:1rem;color:var(--text-sec);margin:12px auto 24px}
+.hero-byline strong{color:var(--accent);font-weight:700}
+.hero-desc{font-size:1.05rem;color:var(--text-sec);max-width:640px;margin:0 auto 12px;line-height:1.7}
+.hero-sub{font-size:.9rem;color:var(--text-muted);max-width:600px;margin:0 auto 24px;line-height:1.65}
+.stats-bar{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 22px;font-size:.82rem;color:var(--text-sec);font-weight:500;letter-spacing:.01em}
+
+nav.scope{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 36px;flex-wrap:wrap;padding:0 8px}
+.scope-pill{font-size:.78rem;font-weight:600;padding:6px 16px;border-radius:14px;background:var(--surface);color:var(--text-sec);white-space:nowrap}
+.scope-mobile{display:none;font-size:.82rem;color:var(--text-muted);font-weight:500;text-align:center;margin:0 auto 28px}
+
+.cards{display:flex;flex-direction:column;gap:14px;margin-bottom:48px}
+.card-link{text-decoration:none;color:inherit;display:block;border-radius:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s ease,box-shadow .2s ease}
+.card-link:hover{transform:translateY(-2px)}
+.card{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:16px;padding:24px 28px;gap:10px;transition:box-shadow .2s ease}
+.card-link:hover .card{box-shadow:0 6px 24px rgba(74,108,247,0.14)}
+.card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.03em;color:#fff;background:var(--accent)}
+.cat-badge{font-size:.68rem;font-weight:600;padding:3px 10px;border-radius:10px;color:#fff}
+.cat-deployed{background:#10b981}
+.cat-exploring{background:#8b5cf6}
+.card-title{font-size:1.12rem;font-weight:700;color:var(--text)}
+.card-desc{font-size:.9rem;color:var(--text-sec);line-height:1.6}
+.card-stats{font-size:.78rem;color:var(--text-muted);font-weight:500}
+.card-arrow{position:absolute;top:20px;right:22px;font-size:1.3rem;color:var(--text-muted);transition:color .2s ease}
+.card-link:hover .card-arrow{color:var(--accent)}
+
+footer{text-align:center;padding:24px 0 32px;border-top:1px solid var(--border);font-size:.82rem;color:var(--text-muted)}
+
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(16px)}
+to{opacity:1;transform:translateY(0)}
+}
+.anim{animation:fadeUp .5s ease both}
+.anim-d0{animation-delay:0s}
+.anim-d1{animation-delay:.1s}
+.anim-d15{animation-delay:.15s}
+.anim-d2{animation-delay:.2s}
+.anim-d25{animation-delay:.25s}
+.anim-d3{animation-delay:.3s}
+.anim-d35{animation-delay:.35s}
+.anim-d4{animation-delay:.4s}
+
+@media(prefers-reduced-motion:reduce){
+.anim{animation:none!important;opacity:1!important;transform:none!important}
+.card-link,.card-link:hover{transition:none!important;transform:none!important}
+.card,.card-link:hover .card{transition:none!important;box-shadow:none!important}
+.card-arrow{transition:none!important}
+}
+
+@media(max-width:768px){
+.content{padding:40px 16px 28px}
+.card{padding:20px 22px}
+.stats-bar{font-size:.78rem;padding:7px 18px}
+.scope-pill{font-size:.72rem;padding:5px 12px}
+}
+
+@media(max-width:480px){
+.content{padding:32px 12px 24px}
+.hero-icon{width:90px;height:90px}
+.hero-desc{font-size:.875rem;line-height:1.65}
+.hero-sub{font-size:.8rem}
+.stats-bar{font-size:.75rem;padding:7px 16px}
+nav.scope{display:none}
+.scope-mobile{display:block}
+.cards{gap:10px;margin-bottom:36px}
+.card{padding:16px;gap:8px}
+.card-title{font-size:.9375rem}
+.card-desc{font-size:.8125rem;line-height:1.5}
+.card-stats{font-size:.6875rem}
+.card-arrow{font-size:1.1rem;top:14px;right:14px}
+footer{font-size:.75rem;padding:20px 0 24px}
+}
+
+@media(max-width:360px){
+.content{padding:28px 10px 20px}
+.hero-icon{width:80px;height:80px}
+.card{padding:12px}
+.card-top{flex-direction:column;align-items:flex-start;gap:4px}
+}
+
+@media print{
+.bg-glow{display:none!important}
+.card{border:1px solid #ccc!important;box-shadow:none!important;break-inside:avoid}
+.card-link,.card-link:hover{transform:none!important}
+body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<main class="content">
+
+<header>
+<svg class="hero-icon anim anim-d0" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <rect width="120" height="120" rx="24" fill="url(#bg-grad)" fill-opacity=".08"/>
+  <circle cx="35" cy="40" r="8" fill="url(#node-grad)" fill-opacity=".9"/>
+  <circle cx="85" cy="40" r="8" fill="url(#node-grad)" fill-opacity=".9"/>
+  <circle cx="60" cy="80" r="8" fill="url(#node-grad)" fill-opacity=".9"/>
+  <circle cx="60" cy="40" r="5" fill="url(#node-grad)" fill-opacity=".5"/>
+  <circle cx="47" cy="60" r="5" fill="url(#node-grad)" fill-opacity=".5"/>
+  <circle cx="73" cy="60" r="5" fill="url(#node-grad)" fill-opacity=".5"/>
+  <line x1="43" y1="40" x2="55" y2="40" stroke="url(#line-grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="65" y1="40" x2="77" y2="40" stroke="url(#line-grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="38" y1="47" x2="45" y2="57" stroke="url(#line-grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="82" y1="47" x2="75" y2="57" stroke="url(#line-grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="50" y1="64" x2="57" y2="75" stroke="url(#line-grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="70" y1="64" x2="63" y2="75" stroke="url(#line-grad)" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="54,38 56,40 54,42" fill="var(--accent)" opacity=".8"/>
+  <polygon points="78,38 76,40 78,42" fill="var(--accent)" opacity=".8"/>
+  <polygon points="46,56 44,58 46.5,58.5" fill="var(--accent)" opacity=".8"/>
+  <polygon points="74,56 76,58 73.5,58.5" fill="var(--accent)" opacity=".8"/>
+  <polygon points="58,74 56,76 58.5,76.5" fill="var(--accent)" opacity=".8"/>
+  <polygon points="62,74 64,76 61.5,76.5" fill="var(--accent)" opacity=".8"/>
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="120" y2="120"><stop stop-color="#4a6cf7"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+    <linearGradient id="node-grad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4a6cf7"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+    <linearGradient id="line-grad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4a6cf7"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+  </defs>
+</svg>
+
+<h1 class="hero-title anim anim-d1">3GPP <span class="hl">Protocol</span> Flows</h1>
+<p class="hero-byline anim anim-d15">Brought to you by <strong>Babak</strong></p>
+<p class="hero-desc anim anim-d2">Step through 5G and 6G protocol flows message by message — from registration and PDU sessions to AI-RAN, intent-based slicing, and digital twins. Interactive sequence diagrams with real 3GPP payloads, topology views, and reference pages. No logins, no install, no tracking. Just open and explore.</p>
+<p class="hero-sub anim anim-d25">Built for network engineers, architects, and anyone working with 3GPP specifications — whether you're debugging a call flow, studying for certification, or designing next-gen systems.</p>
+<div class="stats-bar anim anim-d3">2 Interactive Simulators · 34 Protocol Flows · 240+ Glossary Terms · 12 Reference Pages</div>
+</header>
+
+<nav class="scope anim anim-d3" aria-label="Scope overview">
+<span class="scope-pill">5G SA — Deployed</span>
+<span class="scope-pill">6G &amp; AI-RAN — Vision</span>
+</nav>
+<p class="scope-mobile anim anim-d3">5G SA — Deployed · 6G &amp; AI-RAN — Vision</p>
+
+<section class="cards" aria-label="Protocol simulators">
+
+<a class="card-link anim anim-d35" href="./3GPP-Flows-5G.html" aria-label="5G SA Protocol Simulator — 20 flows across 5 domains with 120+ glossary terms and 6 reference pages">
+<article class="card">
+<span class="card-arrow" aria-hidden="true">↗</span>
+<div class="card-top">
+<span class="badge">5G</span>
+<span class="cat-badge cat-deployed">Deployed</span>
+</div>
+<h2 class="card-title">5G SA Protocol Simulator</h2>
+<p class="card-desc">The complete 5G Standalone core — 20 interactive protocol flows across registration, PDU sessions, mobility, edge computing (ULCL), network slicing, VoNR, SMS, analytics, and converged charging. Every step shows real 3GPP JSON payloads with inline annotations.</p>
+<p class="card-stats">20 flows · 5 domains · 120+ glossary terms · 6 reference pages</p>
+</article>
+</a>
+
+<a class="card-link anim anim-d4" href="./3GPP-Flows-6G.html" aria-label="6G and AI-RAN Protocol Simulator — 14 flows across 3 domains with 160+ glossary terms and 6 reference pages">
+<article class="card">
+<span class="card-arrow" aria-hidden="true">↗</span>
+<div class="card-top">
+<span class="badge">6G</span>
+<span class="cat-badge cat-exploring">Exploring</span>
+</div>
+<h2 class="card-title">6G &amp; AI-RAN Protocol Simulator</h2>
+<p class="card-desc">AI-RAN at T-Mobile's Innovation Center, plus 6G AI-native flows — intent-based slicing, autonomous scaling, ISAC sensing, digital twins, and AI-driven charging. Uses FACT / VALIDATED / PROJECTED / VISION badges to distinguish deployed technology from forward-looking concepts.</p>
+<p class="card-stats">14 flows · 3 domains · 160+ glossary terms · 6 reference pages</p>
+</article>
+</a>
+
+</section>
+
+</main>
+
+<footer class="anim anim-d4">
+T-Mobile perspective · Not affiliated with 3GPP · For educational use
+</footer>
+
+</div>
+</body>
+</html>

@@ -615,7 +615,7 @@ FLOWS.registration_5gaka = {
       "5G-IA": ["IA1","IA2"]
     },
     "Requested NSSAI": [
-      { "SST": 1, "SD": "000001" }
+      { "SST": 1, "SD": "ABCD01" }
     ]
   }
 }`}, egress:{title:'gNB → Selects AMF via NGAP',
@@ -661,7 +661,7 @@ FLOWS.registration_5gaka = {
 // (TS 29.509 §6.1.3.2.2)
 {
   "supiOrSuci": "suci-0-310-260-0000-0-1-a4f2e8c891",
-  "servingNetworkName": "5G:mnc260.mcc310.3gppnetwork.org",
+  "servingNetworkName": "5G:mnc01.mcc001.3gppnetwork.org",
   "resynchronizationInfo": null
 }`}, egress:{title:'AUSF → Forwards to UDM for AV generation',
         code:`// AUSF Processing:
@@ -675,11 +675,11 @@ FLOWS.registration_5gaka = {
         code:`// POST /nudm-ueau/v1/{suci}/security-information/generate-auth-data
 // (TS 29.503 §6.1.3.2.2)
 {
-  "servingNetworkName": "5G:mnc260.mcc310.3gppnetwork.org",
-  "ausfInstanceId": "ausf-01.5gc.mnc260.mcc310"
+  "servingNetworkName": "5G:mnc01.mcc001.3gppnetwork.org",
+  "ausfInstanceId": "ausf-01.5gc.mnc01.mcc001"
 }`}, egress:{title:'UDM Processing',
         code:`// UDM Processing:
-// 1. Decrypts SUCI → SUPI (IMSI: 310260xxxxxxxxx)
+// 1. Decrypts SUCI → SUPI (IMSI format)
 // 2. Retrieves subscriber's K and OP/OPc
 // 3. Generates 5G AV:
 //    - RAND (128-bit random)
@@ -868,7 +868,7 @@ FLOWS.registration_5gaka = {
       ingress:{title:'Nudm_UECM_Registration',
         code:`// PUT /nudm-uecm/v1/{supi}/registrations/amf-3gpp-access
 {
-  "amfInstanceId": "amf-01.5gc.mnc260.mcc310",
+  "amfInstanceId": "amf-01.5gc.mnc01.mcc001",
   "deregCallbackUri": "/namf-callback/v1/dereg/{supi}",
   "guami": {
     "plmnId": { "mcc": "310", "mnc": "260" },
@@ -893,11 +893,11 @@ FLOWS.registration_5gaka = {
   },
   "nssai": {
     "defaultSingleNssais": [
-      { "sst": 1, "sd": "000001" }
+      { "sst": 1, "sd": "ABCD01" }
     ],
     "singleNssais": [
-      { "sst": 1, "sd": "000001" },
-      { "sst": 1, "sd": "000002" }
+      { "sst": 1, "sd": "ABCD01" },
+      { "sst": 1, "sd": "ABCD02" }
     ]
   },
   "subscribedDnnList": ["fast.t-mobile.com","ims"]
@@ -920,7 +920,7 @@ FLOWS.registration_5gaka = {
   "userLoc": { "nrLocation": { "tai": { "plmnId": "310260", "tac": "000001" } } },
   "servingPlmn": { "mcc": "310", "mnc": "260" },
   "ratType": "NR",
-  "groupIds": ["t-mobile-consumer"]
+  "groupIds": ["consumer-group-01"]
 }`}, egress:{title:'PCF Policy Response',
         code:`// PCF Response 201 Created:
 {
@@ -948,11 +948,11 @@ FLOWS.registration_5gaka = {
     // NAS Registration Accept embedded
     "Message Type": "Registration Accept",
     "5G-GUTI": "310260-cafe01-0001000001",
-    "Allowed NSSAI": [{ "SST": 1, "SD": "000001" }],
+    "Allowed NSSAI": [{ "SST": 1, "SD": "ABCD01" }],
     "Registration Area": { "TAI List": ["310260/000001"] }
   },
   "GUAMI": { "PLMN": "310260", "AMF ID": "010001" },
-  "Allowed NSSAI": [{ "SST": 1, "SD": "000001" }],
+  "Allowed NSSAI": [{ "SST": 1, "SD": "ABCD01" }],
   "UE-AMBR": { "UL": "500 Mbps", "DL": "1 Gbps" }
 }`}, egress:{title:'gNB Processes Context Setup',
         code:`// gNB Processing:
@@ -980,7 +980,7 @@ FLOWS.registration_5gaka = {
       "AMF Region": "CA", "AMF Set": "01",
       "AMF Pointer": "00", "5G-TMSI": "00000001"
     },
-    "Allowed NSSAI": [{ "SST": 1, "SD": "000001" }],
+    "Allowed NSSAI": [{ "SST": 1, "SD": "ABCD01" }],
     "TAI List": [{ "PLMN": "310260", "TAC": "000001" }],
     "T3512 (Periodic Reg Timer)": "54 min"
   }
@@ -1045,7 +1045,7 @@ FLOWS.pdu_session = {
   "Payload Container Type": "N1 SM information",
   "PDU Session ID": 1,
   "Request Type": "Initial Request",
-  "S-NSSAI": { "SST": 1, "SD": "000001" },
+  "S-NSSAI": { "SST": 1, "SD": "ABCD01" },
   "DNN": "fast.t-mobile.com",
   "SM PDU": {
     "Message Type": "PDU Session Establishment Request",
@@ -1074,8 +1074,8 @@ FLOWS.pdu_session = {
   "supi": "imsi-310260000000001",
   "pduSessionId": 1,
   "dnn": "fast.t-mobile.com",
-  "sNssai": { "sst": 1, "sd": "000001" },
-  "servingNfId": "amf-01.5gc.mnc260.mcc310",
+  "sNssai": { "sst": 1, "sd": "ABCD01" },
+  "servingNfId": "amf-01.5gc.mnc01.mcc001",
   "servingNetwork": { "mcc": "310", "mnc": "260" },
   "requestType": "INITIAL_REQUEST",
   "n1SmMsg": "<N1 SM PDU Session Est Request>",
@@ -1092,10 +1092,10 @@ FLOWS.pdu_session = {
     {id:3, label:'Step 3: SMF Gets Session Subscription from UDM', from:'smf', to:'udm', interface:'N10 — SBI (TS 29.503)', protocol:'HTTP/2 GET', badge:'FACT', lineType:'cp',
       description:'SMF retrieves Session Management Subscription Data for the subscriber, DNN, and S-NSSAI.',
       ingress:{title:'Nudm_SDM_Get (SM Subscription)',
-        code:`// GET /nudm-sdm/v1/{supi}/sm-data?dnn=fast.t-mobile.com&snssai={"sst":1,"sd":"000001"}
+        code:`// GET /nudm-sdm/v1/{supi}/sm-data?dnn=fast.t-mobile.com&snssai={"sst":1,"sd":"ABCD01"}
 // Response 200 OK:
 {
-  "singleNssai": { "sst": 1, "sd": "000001" },
+  "singleNssai": { "sst": 1, "sd": "ABCD01" },
   "dnnConfigurations": {
     "fast.t-mobile.com": {
       "pduSessionTypes": { "defaultType": "IPV4V6" },
@@ -1121,7 +1121,7 @@ FLOWS.pdu_session = {
   "pduSessionId": 1,
   "pduSessionType": "IPV4V6",
   "dnn": "fast.t-mobile.com",
-  "sNssai": { "sst": 1, "sd": "000001" },
+  "sNssai": { "sst": 1, "sd": "ABCD01" },
   "ipv4Address": null,
   "ratType": "NR",
   "accessType": "3GPP_ACCESS",
@@ -1146,7 +1146,7 @@ FLOWS.pdu_session = {
     }
   },
   "chgDecs": {
-    "chg1": { "chgId": "chg1", "ratingGroup": 1001, "online": true }
+    "chg1": { "chgId": "chg1", "ratingGroup": 400, "online": true }
   }
 }`}},
     {id:5, label:'Step 5: SMF → UPF PFCP Session Establishment', from:'smf', to:'upf_c', interface:'N4 — PFCP (TS 29.244)', protocol:'PFCP', badge:'FACT', lineType:'cp',
@@ -1155,7 +1155,7 @@ FLOWS.pdu_session = {
         code:`// PFCP Session Establishment Request (TS 29.244)
 // PFCP Message Type: 50
 {
-  "Node ID": "smf-01.5gc.mnc260.mcc310",
+  "Node ID": "smf-01.5gc.mnc01.mcc001",
   "F-SEID": { "SEID": 1, "IPv4": "10.0.1.1" },
   "Create PDR": [{
     "PDR ID": 1,
@@ -1233,7 +1233,7 @@ FLOWS.pdu_session = {
     "smInfo": {
       // PDU Session Resource Setup Request
       "PDU Session ID": 1,
-      "S-NSSAI": { "SST": 1, "SD": "000001" },
+      "S-NSSAI": { "SST": 1, "SD": "ABCD01" },
       "QoS Flow List": [{ "QFI": 1, "5QI": 9, "ARP": 9 }],
       "UL NG-U UP TNL Info": {
         "GTP-TEID": "0x00000064",
@@ -1253,7 +1253,7 @@ FLOWS.pdu_session = {
 {
   "PDU Session Resource Setup List": [{
     "PDU Session ID": 1,
-    "S-NSSAI": { "SST": 1, "SD": "000001" },
+    "S-NSSAI": { "SST": 1, "SD": "ABCD01" },
     "PDU Session Resource Setup Request Transfer": {
       "UL NG-U UP TNL Information": {
         "GTP Tunnel": {
@@ -1386,13 +1386,13 @@ FLOWS.pdu_session = {
         code:`// PDU Session Established:
 // - PDU Session ID: 1
 // - DNN: fast.t-mobile.com
-// - S-NSSAI: SST=1, SD=000001
+// - S-NSSAI: SST=1, SD=ABCD01
 // - PDU Type: IPv4v6
 // - SSC Mode: 1
 // - IP: 100.64.1.50
 // - QoS Flow: QFI=1, 5QI=9
 // - Session-AMBR: DL 1Gbps / UL 500Mbps
-// - Charging: Online, RG=1001
+// - Charging: Online, RG=400
 //
 // ✅ UE can now send/receive data`}}
   ]
@@ -1417,17 +1417,17 @@ FLOWS.converged_charging = {
         code:`// PDU Session State:
 // - PDU Session ID: 1
 // - DNN: fast.t-mobile.com
-// - S-NSSAI: SST=1, SD=000001
+// - S-NSSAI: SST=1, SD=ABCD01
 // - UE IP: 100.64.1.50
 // - QoS: QFI=1, 5QI=9
 //
 // PCC Rules from PCF (via N7):
-// - Rating Group: 1001
+// - Rating Group: 400
 // - Charging Method: Online
 // - Charging Key: "consumer-data"
 // - Triggers: Volume threshold, Time limit`}, egress:{title:'SMF Charging Context',
         code:`// SMF has stored from PCF PCC rules:
-// - chgDecs.chg1.ratingGroup = 1001
+// - chgDecs.chg1.ratingGroup = 400
 // - chgDecs.chg1.online = true
 // - reportingLevel = "RAT_GR_LEVEL"
 //
@@ -1441,13 +1441,13 @@ FLOWS.converged_charging = {
   "subscriberIdentifier": "imsi-310260000000001",
   "nfConsumerIdentification": {
     "nfIPv4Address": "10.0.1.1",
-    "nfName": "smf-01.5gc.mnc260.mcc310"
+    "nfName": "smf-01.5gc.mnc01.mcc001"
   },
   "invocationTimeStamp": "2026-04-01T10:00:00Z",
   "invocationSequenceNumber": 1,
   "notifyUri": "/nchf-callback/v3/chgNotify/1",
   "multipleUnitUsage": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "requestedUnit": {
       "totalVolume": 104857600,
       "downlinkVolume": 0,
@@ -1458,13 +1458,13 @@ FLOWS.converged_charging = {
   "pDUSessionChargingInformation": {
     "pduSessionId": 1,
     "dnn": "fast.t-mobile.com",
-    "sNSSAI": { "sst": 1, "sd": "000001" },
+    "sNSSAI": { "sst": 1, "sd": "ABCD01" },
     "chargingCharacteristics": "0800"
   }
 }`}, egress:{title:'CHF Processing',
         code:`// CHF Processing:
 // 1. Identify subscriber account
-// 2. Look up tariff plan for RG 1001
+// 2. Look up tariff plan for RG 400
 // 3. Check available balance/quota
 // 4. Determine granted units:
 //    - Volume: 100 MB (threshold)
@@ -1480,7 +1480,7 @@ FLOWS.converged_charging = {
   },
   "invocationSequenceNumber": 1,
   "multipleUnitInformation": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "resultCode": "SUCCESS",
     "grantedUnit": {
       "totalVolume": 104857600,
@@ -1558,7 +1558,7 @@ FLOWS.converged_charging = {
   "invocationSequenceNumber": 3,
   "invocationTimeStamp": "2026-04-01T10:42:00Z",
   "multipleUnitUsage": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "usedUnitContainer": [{
       "totalVolume": 85983232,
       "uplinkVolume": 12582912,
@@ -1585,7 +1585,7 @@ FLOWS.converged_charging = {
 {
   "invocationResult": { "resultCode": "SUCCESS" },
   "multipleUnitInformation": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "resultCode": "SUCCESS",
     "grantedUnit": {
       "totalVolume": 104857600,
@@ -1620,7 +1620,7 @@ FLOWS.converged_charging = {
 //   "Forwarding Parameters": {
 //     "Redirect Information": {
 //       "Redirect Address Type": "URL",
-//       "Redirect Address": "https://topup.t-mobile.com"
+//       "Redirect Address": "https://topup.operator.example"
 //     }
 //   }
 // }`}, egress:{title:'UPF Enforces Block/Redirect',
@@ -1638,7 +1638,7 @@ FLOWS.converged_charging = {
   "invocationSequenceNumber": 10,
   "invocationTimeStamp": "2026-04-01T12:30:00Z",
   "multipleUnitUsage": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "usedUnitContainer": [{
       "totalVolume": 15728640,
       "uplinkVolume": 2097152,
@@ -1692,21 +1692,21 @@ FLOWS.pdu_ulcl = {
   "afServiceId": "edge-gaming-svc-001",
   "afAppId": "cloud-gaming",
   "dnn": "fast.t-mobile.com",
-  "snssai": { "sst": 1, "sd": "000001" },
+  "snssai": { "sst": 1, "sd": "ABCD01" },
   "trafficFilters": [{
     "flowDescriptions": [
       "permit in ip from 10.200.0.0/16 to any"
     ]
   }],
   "trafficRoutes": [{
-    "dnai": "edge-seattle-01",
+    "dnai": "edge-site-01",
     "routeInfo": {
       "ipv4Addr": "10.200.1.0/24",
       "portNumber": 443
     }
   }],
   "appReloInd": false,
-  "validGeoZoneIds": ["zone-seattle-01"]
+  "validGeoZoneIds": ["zone-01"]
 }`}, egress:{title:'NEF Translates to Internal Policy',
         code:`// NEF Processing:
 // 1. Validate AF authorization
@@ -1721,8 +1721,8 @@ FLOWS.pdu_ulcl = {
   "afAppId": "cloud-gaming",
   "trafficSteeringRule": {
     "dnn": "fast.t-mobile.com",
-    "sNssai": { "sst": 1, "sd": "000001" },
-    "dnai": "edge-seattle-01",
+    "sNssai": { "sst": 1, "sd": "ABCD01" },
+    "dnai": "edge-site-01",
     "trafficFilter": "10.200.0.0/16",
     "routingRequirement": "ROUTE_TO_LOC",
     "ulclRequired": true,
@@ -1743,7 +1743,7 @@ FLOWS.pdu_ulcl = {
 {
   "PDU Session ID": 2,
   "Request Type": "Initial Request",
-  "S-NSSAI": { "SST": 1, "SD": "000001" },
+  "S-NSSAI": { "SST": 1, "SD": "ABCD01" },
   "DNN": "fast.t-mobile.com",
   "PDU Session Type": "IPv4v6",
   "SSC Mode": "SSC Mode 1"
@@ -1775,7 +1775,7 @@ FLOWS.pdu_ulcl = {
   "trafficControlData": {
     "tcUlcl1": {
       "tcId": "tcUlcl1",
-      "routeToLocs": [{ "dnai": "edge-seattle-01" }],
+      "routeToLocs": [{ "dnai": "edge-site-01" }],
       "upPathChgEvent": { "notifyUri": "/smf-callback" },
       "steerFun": "ULCL"
     }
@@ -1786,7 +1786,7 @@ FLOWS.pdu_ulcl = {
 // 2. SMF must select TWO UPFs:
 //    a. Edge UPF with ULCL function
 //    b. Central UPF (PSA)
-// 3. Edge UPF location: edge-seattle-01
+// 3. Edge UPF location: edge-site-01
 // 4. Traffic filter: 10.200.0.0/16 → local
 // 5. All other traffic → central PSA`}},
     {id:5, label:'Step 5: SMF → Edge UPF (ULCL) PFCP Setup', from:'smf', to:'upf_e', interface:'N4 — PFCP (TS 29.244)', protocol:'PFCP', badge:'FACT', lineType:'cp',
@@ -1957,15 +1957,15 @@ FLOWS.slice_registration = {
   "5GS Registration Type": "Initial Registration",
   "5GS Mobile Identity": { "Type": "SUCI", "MCC": "310", "MNC": "260" },
   "Requested NSSAI": [
-    { "SST": 1, "SD": "000001" },
-    { "SST": 1, "SD": "000002" },
-    { "SST": 2, "SD": "000010" }
+    { "SST": 1, "SD": "ABCD01" },
+    { "SST": 1, "SD": "ABCD02" },
+    { "SST": 2, "SD": "ABCD10" }
   ],
   "UE Security Capability": { "5G-EA": ["EA0","EA1","EA2"], "5G-IA": ["IA1","IA2"] }
 }
-// SST=1/SD=000001: eMBB default
-// SST=1/SD=000002: SuperMobile
-// SST=2/SD=000010: T-Priority (URLLC)`}, egress:{title:'AMF Evaluates NSSAI',
+// SST=1/SD=ABCD01: eMBB default
+// SST=1/SD=ABCD02: SuperMobile
+// SST=2/SD=ABCD10: T-Priority (URLLC)`}, egress:{title:'AMF Evaluates NSSAI',
         code:`// AMF Processing:
 // 1. Extract Requested NSSAI from NAS
 // 2. Need to determine:
@@ -1977,12 +1977,12 @@ FLOWS.slice_registration = {
       description:'AMF evaluates Requested NSSAI against UE Subscription data (Subscribed S-NSSAIs from UDM) and local slice configuration.',
       ingress:{title:'AMF NSSAI Evaluation',
         code:`// AMF Internal Processing:
-// UE Requested: SST=1/SD=1, SST=1/SD=2, SST=2/SD=10
+// UE Requested: SST=1/SD=ABCD01, SST=1/SD=ABCD02, SST=2/SD=ABCD10
 //
 // Subscribed S-NSSAIs (from UDM):
-// [{ "SST": 1, "SD": "000001" },  // eMBB ✓
-//  { "SST": 1, "SD": "000002" },  // SuperMobile ✓
-//  { "SST": 2, "SD": "000010" }]  // T-Priority ✓
+// [{ "SST": 1, "SD": "ABCD01" },  // eMBB ✓
+//  { "SST": 1, "SD": "ABCD02" },  // SuperMobile ✓
+//  { "SST": 2, "SD": "ABCD10" }]  // T-Priority ✓
 //
 // All requested are subscribed.
 // Need NSSF to determine:
@@ -1997,18 +1997,18 @@ FLOWS.slice_registration = {
       description:'AMF queries NSSF with Requested NSSAI, Subscribed NSSAI, TAI, and PLMN to determine Allowed NSSAI and target AMF set.',
       ingress:{title:'Nnssf_NSSelection_Get',
         code:`// GET /nnssf-nsselection/v2/network-slice-information
-// ?nf-type=AMF&nf-id=amf-01&tai=310260-000001
+// ?nf-type=AMF&nf-id=amf-01&tai=00101-000001
 // (TS 29.531 §6.1.3.2.2)
 {
   "requestedNssai": [
-    { "sst": 1, "sd": "000001" },
-    { "sst": 1, "sd": "000002" },
-    { "sst": 2, "sd": "000010" }
+    { "sst": 1, "sd": "ABCD01" },
+    { "sst": 1, "sd": "ABCD02" },
+    { "sst": 2, "sd": "ABCD10" }
   ],
   "subscribedNssai": [
-    { "subscribedSnssai": { "sst": 1, "sd": "000001" }, "defaultIndication": true },
-    { "subscribedSnssai": { "sst": 1, "sd": "000002" } },
-    { "subscribedSnssai": { "sst": 2, "sd": "000010" } }
+    { "subscribedSnssai": { "sst": 1, "sd": "ABCD01" }, "defaultIndication": true },
+    { "subscribedSnssai": { "sst": 1, "sd": "ABCD02" } },
+    { "subscribedSnssai": { "sst": 2, "sd": "ABCD10" } }
   ],
   "tai": { "plmnId": { "mcc": "310", "mnc": "260" }, "tac": "000001" },
   "homePlmnId": { "mcc": "310", "mnc": "260" }
@@ -2028,9 +2028,9 @@ FLOWS.slice_registration = {
 {
   "allowedNssaiList": [{
     "allowedNssai": [
-      { "allowedSnssai": { "sst": 1, "sd": "000001" }, "mappedHomeSnssai": { "sst": 1, "sd": "000001" } },
-      { "allowedSnssai": { "sst": 1, "sd": "000002" } },
-      { "allowedSnssai": { "sst": 2, "sd": "000010" } }
+      { "allowedSnssai": { "sst": 1, "sd": "ABCD01" }, "mappedHomeSnssai": { "sst": 1, "sd": "ABCD01" } },
+      { "allowedSnssai": { "sst": 1, "sd": "ABCD02" } },
+      { "allowedSnssai": { "sst": 2, "sd": "ABCD10" } }
     ],
     "accessType": "3GPP_ACCESS"
   }],
@@ -2042,7 +2042,7 @@ FLOWS.slice_registration = {
 }
 // All 3 slices allowed, no AMF reroute needed`}, egress:{title:'AMF Processes NSSF Response',
         code:`// AMF Processing:
-// 1. Allowed: SST=1/SD=1, SST=1/SD=2, SST=2/SD=10
+// 1. Allowed: SST=1/SD=ABCD01, SST=1/SD=ABCD02, SST=2/SD=ABCD10
 // 2. No target AMF set → no reroute needed
 // 3. Current AMF serves all slices
 // 4. Store NSI info for SMF selection later
@@ -2073,7 +2073,7 @@ FLOWS.slice_registration = {
         code:`// POST /nnsacf-nsac/v1/ue-slice-admission
 // (TS 29.536)
 {
-  "snssai": { "sst": 1, "sd": "000002" },
+  "snssai": { "sst": 1, "sd": "ABCD02" },
   "plmnId": { "mcc": "310", "mnc": "260" },
   "requestType": "REGISTRATION",
   "supi": "imsi-310260000000001",
@@ -2084,7 +2084,7 @@ FLOWS.slice_registration = {
         code:`// NSACF Processing:
 // 1. Check current UE count for SST=1/SD=2
 // 2. Compare against max UEs configured:
-//    SuperMobile: max 500,000 UEs
+//    SuperMobile: max <admission_limit> UEs (illustrative)
 //    Current: 123,456 → under limit
 // 3. Increment counter if admitted
 // 4. Return admission result`}},
@@ -2094,7 +2094,7 @@ FLOWS.slice_registration = {
         code:`// 200 OK
 {
   "admissionResult": "ADMITTED",
-  "snssai": { "sst": 1, "sd": "000002" },
+  "snssai": { "sst": 1, "sd": "ABCD02" },
   "remainingCapacity": 376544
 }
 // SuperMobile: ADMITTED ✓
@@ -2135,14 +2135,14 @@ FLOWS.slice_registration = {
   "5GS Registration Result": "3GPP access",
   "5G-GUTI": "310260-cafe02-0002000001",
   "Allowed NSSAI": [
-    { "SST": 1, "SD": "000001" },
-    { "SST": 1, "SD": "000002" },
-    { "SST": 2, "SD": "000010" }
+    { "SST": 1, "SD": "ABCD01" },
+    { "SST": 1, "SD": "ABCD02" },
+    { "SST": 2, "SD": "ABCD10" }
   ],
   "Configured NSSAI": [
-    { "SST": 1, "SD": "000001" },
-    { "SST": 1, "SD": "000002" },
-    { "SST": 2, "SD": "000010" },
+    { "SST": 1, "SD": "ABCD01" },
+    { "SST": 1, "SD": "ABCD02" },
+    { "SST": 2, "SD": "ABCD10" },
     { "SST": 3, "SD": "000020" }
   ],
   "Rejected NSSAI": [],
@@ -2151,9 +2151,9 @@ FLOWS.slice_registration = {
 // All 3 requested slices allowed ✓`}, egress:{title:'UE Stores Slice Configuration',
         code:`// UE Processing:
 // 1. Store Allowed NSSAI:
-//    - eMBB (SST=1/SD=1): available
-//    - SuperMobile (SST=1/SD=2): available
-//    - T-Priority (SST=2/SD=10): available
+//    - eMBB (SST=1/SD=ABCD01): available
+//    - SuperMobile (SST=1/SD=ABCD02): available
+//    - T-Priority (SST=2/SD=ABCD10): available
 // 2. Store Configured NSSAI for future
 // 3. Can request PDU sessions per slice
 // 4. Registration Complete sent to AMF`}},
@@ -2163,20 +2163,20 @@ FLOWS.slice_registration = {
         code:`// Alternative scenario — NSACF rejected SuperMobile:
 // {
 //   "Allowed NSSAI": [
-//     { "SST": 1, "SD": "000001" },
-//     { "SST": 2, "SD": "000010" }
+//     { "SST": 1, "SD": "ABCD01" },
+//     { "SST": 2, "SD": "ABCD10" }
 //   ],
 //   "Rejected NSSAI": [{
-//     "S-NSSAI": { "SST": 1, "SD": "000002" },
+//     "S-NSSAI": { "SST": 1, "SD": "ABCD02" },
 //     "Cause": "S-NSSAI not available due to slice admission control"
 //   }]
 // }
 // UE cannot use SuperMobile slice
 // UE can retry later or use available slices`}, egress:{title:'Slice Registration Summary',
         code:`// T-Mobile Slice-Aware Registration Complete:
-// ✅ eMBB default slice: SST=1/SD=000001
-// ✅ SuperMobile: SST=1/SD=000002
-// ✅ T-Priority: SST=2/SD=000010
+// ✅ eMBB default slice: SST=1/SD=ABCD01
+// ✅ SuperMobile: SST=1/SD=ABCD02
+// ✅ T-Priority: SST=2/SD=ABCD10
 //
 // UE can now request PDU sessions
 // specifying S-NSSAI per slice.
@@ -2203,12 +2203,12 @@ FLOWS.slice_charging = {
   ],
   steps:[
     {id:1, label:'Step 1: Active PDU Session on Specific Slice', from:'ue', to:'upf_c', interface:'N3 — GTP-U', protocol:'User Plane Active', badge:'FACT', lineType:'dp', through:['ran'],
-      description:'UE has an active PDU session on the SuperMobile slice (S-NSSAI: SST=1, SD=000002).',
+      description:'UE has an active PDU session on the SuperMobile slice (S-NSSAI: SST=1, SD=ABCD02).',
       ingress:{title:'Slice-Specific PDU Session Context',
         code:`// Active PDU Session:
 // - PDU Session ID: 3
 // - DNN: fast.t-mobile.com
-// - S-NSSAI: SST=1, SD=000002 (SuperMobile)
+// - S-NSSAI: SST=1, SD=ABCD02 (SuperMobile)
 // - UE IP: 100.64.3.75
 // - QoS: QFI=1, 5QI=8 (prioritized)
 // - Session-AMBR: DL 2Gbps / UL 1Gbps
@@ -2227,26 +2227,26 @@ FLOWS.slice_charging = {
   "chgDecs": {
     "chgSlice": {
       "chgId": "chgSlice",
-      "ratingGroup": 9001,
+      "ratingGroup": 100,
       "online": true,
       "meteringMethod": "VOLUME",
-      "sNSSAI": { "sst": 1, "sd": "000002" }
+      "sNSSAI": { "sst": 1, "sd": "ABCD02" }
     }
   }
 }
 // Slice-specific rating groups:
-// RG 1001: Default eMBB (SST=1/SD=1) — standard rate
-// RG 9001: SuperMobile (SST=1/SD=2) — premium rate
-// RG 5001: T-Priority (SST=2/SD=10) — flat rate`}, egress:{title:'Charging Differentiation',
+// RG 400: Default eMBB (SST=1/SD=ABCD01) — standard rate
+// RG 100: SuperMobile (SST=1/SD=ABCD02) — premium rate
+// RG 200: T-Priority (SST=2/SD=ABCD10) — flat rate`}, egress:{title:'Charging Differentiation',
         code:`// Per-slice charging model:
 // eMBB Default: usage-based, standard rate
-//   → RG 1001, $10/GB
+//   → RG 400, $10/GB
 // SuperMobile: usage-based, premium rate
-//   → RG 9001, $15/GB (premium QoS included)
+//   → RG 100, $15/GB (premium QoS included)
 // T-Priority: flat-rate monthly
-//   → RG 5001, event-based (monthly renewal)
+//   → RG 200, event-based (monthly renewal)
 // 5G On Demand: time-bound event
-//   → RG 7001, per-hour or per-event`}},
+//   → RG 500, per-hour or per-event`}},
     {id:3, label:'Step 3: SMF → CHF Create (Slice-Tagged)', from:'smf', to:'chf', interface:'N40 — SBI (TS 32.291)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
       description:'SMF creates charging session with CHF. The request includes S-NSSAI identifying the slice, and the slice-specific rating group.',
       ingress:{title:'Nchf_ConvergedCharging_Create (Slice-Specific)',
@@ -2255,7 +2255,7 @@ FLOWS.slice_charging = {
   "subscriberIdentifier": "imsi-310260000000001",
   "invocationSequenceNumber": 1,
   "multipleUnitUsage": [{
-    "ratingGroup": 9001,
+    "ratingGroup": 100,
     "requestedUnit": {
       "totalVolume": 104857600,
       "time": 3600
@@ -2264,14 +2264,14 @@ FLOWS.slice_charging = {
   "pDUSessionChargingInformation": {
     "pduSessionId": 3,
     "dnn": "fast.t-mobile.com",
-    "sNSSAI": { "sst": 1, "sd": "000002" },
+    "sNSSAI": { "sst": 1, "sd": "ABCD02" },
     "chargingCharacteristics": "0A00"
   }
 }
-// Key: S-NSSAI and RG 9001 identify this
+// Key: S-NSSAI and RG 100 identify this
 // as SuperMobile slice charging`}, egress:{title:'CHF Applies Slice Tariff',
         code:`// CHF Processing:
-// 1. Identify slice: SST=1/SD=000002 = SuperMobile
+// 1. Identify slice: SST=1/SD=ABCD02 = SuperMobile
 // 2. Look up slice-specific tariff:
 //    SuperMobile rate card: premium
 // 3. Grant units per premium plan
@@ -2283,7 +2283,7 @@ FLOWS.slice_charging = {
         code:`// 201 Created
 {
   "multipleUnitInformation": [{
-    "ratingGroup": 9001,
+    "ratingGroup": 100,
     "resultCode": "SUCCESS",
     "grantedUnit": {
       "totalVolume": 524288000,
@@ -2337,7 +2337,7 @@ FLOWS.slice_charging = {
   }
 }
 // CHF Update includes:
-// - ratingGroup: 9001 (SuperMobile)
+// - ratingGroup: 100 (SuperMobile)
 // - sNSSAI: { sst:1, sd:"000002" }
 // - All usage attributed to this slice
 //
@@ -2348,9 +2348,9 @@ FLOWS.slice_charging = {
   "cdr": {
     "supi": "imsi-310260000000001",
     "pduSessionId": 3,
-    "sNSSAI": { "sst": 1, "sd": "000002" },
+    "sNSSAI": { "sst": 1, "sd": "ABCD02" },
     "dnn": "fast.t-mobile.com",
-    "ratingGroup": 9001,
+    "ratingGroup": 100,
     "totalVolume": { "ul": 52428800, "dl": 373293056 },
     "duration": 5400,
     "tariff": "SuperMobile Premium",
@@ -2360,7 +2360,7 @@ FLOWS.slice_charging = {
     {id:7, label:'Step 7: Per-Slice Invoice Generation', from:'chf', to:'smf', interface:'Billing System', protocol:'CDR Processing', badge:'FACT', lineType:'cp',
       description:'<span class="tm">T-Mobile</span> billing generates per-slice invoices from S-NSSAI-tagged CDRs, enabling differentiated billing per product.',
       ingress:{title:'Per-Slice Billing Disaggregation',
-        code:`// T-Mobile Per-Slice Invoice Example:
+        code:`// T-Mobile Per-Slice Invoice Example [ILLUSTRATIVE — not actual pricing]:
 //
 // ┌────────────────────────────────────┐
 // │ T-Mobile Monthly Statement         │
@@ -2368,15 +2368,15 @@ FLOWS.slice_charging = {
 // ├────────────────────────────────────┤
 // │ Default (eMBB):                    │
 // │   12.4 GB @ standard   =  $50.00  │
-// │   RG: 1001, S-NSSAI: SST=1/SD=1   │
+// │   RG: 400, S-NSSAI: SST=1/SD=ABCD01│
 // ├────────────────────────────────────┤
 // │ SuperMobile:                       │
 // │   4.2 GB @ premium     =  $63.00  │
-// │   RG: 9001, S-NSSAI: SST=1/SD=2   │
+// │   RG: 100, S-NSSAI: SST=1/SD=ABCD02│
 // ├────────────────────────────────────┤
 // │ T-Priority:                        │
 // │   Flat rate monthly    =  $15.00  │
-// │   RG: 5001, S-NSSAI: SST=2/SD=10  │
+// │   RG: 200, S-NSSAI: SST=2/SD=ABCD10│
 // ├────────────────────────────────────┤
 // │ TOTAL:                    $128.00  │
 // └────────────────────────────────────┘`}, egress:{title:'Slice Charging Summary',
@@ -2739,7 +2739,7 @@ FLOWS.af_traffic = {
   "afAppId": "enterprise-video",
   "afTransId": "txn-af-00042",
   "dnn": "fast.t-mobile.com",
-  "snssai": { "sst": 1, "sd": "000001" },
+  "snssai": { "sst": 1, "sd": "ABCD01" },
   "anyUeInd": false,
   "gpsi": "msisdn-12065551234",
   "trafficFilters": [{
@@ -2748,7 +2748,7 @@ FLOWS.af_traffic = {
     ]
   }],
   "trafficRoutes": [{
-    "dnai": "edge-seattle-01",
+    "dnai": "edge-site-01",
     "routeInfo": {
       "ipv4Addr": "10.200.1.0/24",
       "portNumber": 443
@@ -2757,7 +2757,7 @@ FLOWS.af_traffic = {
   }],
   "appReloInd": false,
   "addrPreserInd": true,
-  "validGeoZoneIds": ["zone-seattle-01","zone-seattle-02"],
+  "validGeoZoneIds": ["zone-01","zone-02"],
   "tempValidities": [{
     "startTime": "2026-04-01T08:00:00Z",
     "stopTime": "2026-04-01T20:00:00Z"
@@ -2783,20 +2783,20 @@ FLOWS.af_traffic = {
   "trafficSteeringPolicy": {
     "steerModeValue": "ROUTE_TO_LOC",
     "dnn": "fast.t-mobile.com",
-    "sNssai": { "sst": 1, "sd": "000001" },
-    "dnai": "edge-seattle-01",
+    "sNssai": { "sst": 1, "sd": "ABCD01" },
+    "dnai": "edge-site-01",
     "trafficFilterData": {
       "flowDescription": "permit in ip from 10.200.0.0/16 to any"
     },
     "routeToLoc": {
-      "dnai": "edge-seattle-01",
+      "dnai": "edge-site-01",
       "routeInfo": {
         "ipv4Addr": "10.200.1.0/24",
         "portNumber": 443
       }
     },
     "spatialValidity": {
-      "geoAreaIds": ["zone-seattle-01","zone-seattle-02"]
+      "geoAreaIds": ["zone-01","zone-02"]
     }
   }
 }
@@ -2835,7 +2835,7 @@ FLOWS.af_traffic = {
       "tcId": "tcUlcl_ev_001",
       "steerFun": "ULCL",
       "routeToLocs": [{
-        "dnai": "edge-seattle-01",
+        "dnai": "edge-site-01",
         "routeInfo": { "ipv4Addr": "10.200.1.0/24" }
       }],
       "upPathChgEvent": {
@@ -2851,7 +2851,7 @@ FLOWS.af_traffic = {
         code:`// PCF Policy Decision:
 // ✓ PCC rule created with ULCL steering
 // ✓ Traffic filter: 10.200.0.0/16
-// ✓ Routing: ROUTE_TO_LOC → edge-seattle-01
+// ✓ Routing: ROUTE_TO_LOC → edge-site-01
 // ✓ Steer function: ULCL (Uplink Classifier)
 // ✓ Local PSA required: Edge UPF at DNAI
 //
@@ -2880,14 +2880,14 @@ FLOWS.af_traffic = {
       "tcUlcl_ev_001": {
         "steerFun": "ULCL",
         "routeToLocs": [{
-          "dnai": "edge-seattle-01"
+          "dnai": "edge-site-01"
         }]
       }
     }
   }
 }
 // Pushed to SMF for all active sessions matching
-// DNN=fast.t-mobile.com + S-NSSAI=SST1/SD1
+// DNN=fast.t-mobile.com + S-NSSAI=SST1/SD=ABCD01
 // within spatial validity zone`},
       egress:{title:'SMF Processes ULCL Insertion',
         code:`// SMF Processing:
@@ -3008,7 +3008,7 @@ FLOWS.af_traffic = {
   "afTransId": "txn-af-00042",
   "self": "/3gpp-traffic-influence/v1/{afId}/subscriptions/{subId}",
   "trafficRoutes": [{
-    "dnai": "edge-seattle-01",
+    "dnai": "edge-site-01",
     "routeInfo": { "ipv4Addr": "10.200.1.0/24" }
   }],
   "events": [{
@@ -3566,11 +3566,11 @@ FLOWS.edge_charging = {
 //    URR 10 → LBO (Edge Control traffic)
 //    URR 11 → N9 (standard through-path)
 // 3. Map to charging parameters:
-//    LBO → ratingGroup 3001 (Edge Control)
-//    N9  → ratingGroup 1001 (Standard)
+//    LBO → ratingGroup 300 (Edge Control)
+//    N9  → ratingGroup 400 (Standard)
 // 4. Forward to CHF with path-specific RG`}},
     {id:4, label:'Step 4: SMF → CHF (Edge-Specific Rating)', from:'smf', to:'chf', interface:'N40 — SBI (TS 32.291)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
-      description:'Nchf_ConvergedCharging_Update with edge-specific rating. SMF maps URR-LBO to edge ratingGroup (RG 3001) and URR-N9 to standard ratingGroup. CHF applies different tariffs per path.',
+      description:'Nchf_ConvergedCharging_Update with edge-specific rating. SMF maps URR-LBO to edge ratingGroup (RG 300) and URR-N9 to standard ratingGroup. CHF applies different tariffs per path.',
       ingress:{title:'Nchf_ConvergedCharging_Update (Edge)',
         code:`// POST /nchf-convergedcharging/v3/chargingdata/{chargingDataRef}/update
 // (TS 32.291)
@@ -3578,7 +3578,7 @@ FLOWS.edge_charging = {
   "subscriberIdentifier": "imsi-310260000000001",
   "invocationSequenceNumber": 4,
   "multipleUnitUsage": [{
-    "ratingGroup": 3001,
+    "ratingGroup": 300,
     "usedUnitContainer": [{
       "totalVolume": 104857600,
       "uplinkVolume": 31457280,
@@ -3595,19 +3595,19 @@ FLOWS.edge_charging = {
   "pDUSessionChargingInformation": {
     "pduSessionId": 2,
     "dnn": "fast.t-mobile.com",
-    "sNSSAI": { "sst": 1, "sd": "000001" },
+    "sNSSAI": { "sst": 1, "sd": "ABCD01" },
     "3gppPSDataOffStatus": "ACTIVE"
   }
 }
-// RG 3001 = Edge Control (Local Breakout)
-// RG 1001 = Standard (Through-Path) — reported separately`},
+// RG 300 = Edge Control (Local Breakout)
+// RG 400 = Standard (Through-Path) — reported separately`},
       egress:{title:'CHF Edge Tariff Application',
         code:`// CHF Processing:
-// 1. Identify ratingGroup 3001 → Edge Control
+// 1. Identify ratingGroup 300 → Edge Control
 // 2. Look up edge-specific tariff:
 //    Edge Control rate: enterprise SLA pricing
 //    or included in Edge Control subscription
-// 3. vs ratingGroup 1001 → standard rate
+// 3. vs ratingGroup 400 → standard rate
 // 4. Grant new units for edge path
 // 5. Different quotas per path type`}},
     {id:5, label:'Step 5: CHF Applies Edge Tariff', from:'chf', to:'smf', interface:'N40 — SBI (TS 32.291)', protocol:'HTTP/2 200 OK', badge:'FACT', lineType:'cp',
@@ -3617,7 +3617,7 @@ FLOWS.edge_charging = {
 {
   "invocationSequenceNumber": 4,
   "multipleUnitInformation": [{
-    "ratingGroup": 3001,
+    "ratingGroup": 300,
     "resultCode": "SUCCESS",
     "grantedUnit": {
       "totalVolume": 209715200,
@@ -3632,7 +3632,7 @@ FLOWS.edge_charging = {
 // Edge subscribers get larger quotas`},
       egress:{title:'SMF Updates Edge UPF URR',
         code:`// SMF Processing:
-// 1. Received new grant for RG 3001 (edge)
+// 1. Received new grant for RG 300 (edge)
 // 2. PFCP Session Modification to Edge UPF:
 //    Update URR 10 with new thresholds
 // 3. Edge usage monitoring continues
@@ -3647,7 +3647,7 @@ FLOWS.edge_charging = {
   "cdr_edge": {
     "supi": "imsi-310260000000001",
     "pduSessionId": 2,
-    "ratingGroup": 3001,
+    "ratingGroup": 300,
     "pathType": "LOCAL_BREAKOUT",
     "totalVolume": { "ul": 125829120, "dl": 367001600 },
     "duration": 10800,
@@ -3660,7 +3660,7 @@ FLOWS.edge_charging = {
   "cdr_standard": {
     "supi": "imsi-310260000000001",
     "pduSessionId": 2,
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "pathType": "THROUGH_PATH_N9",
     "totalVolume": { "ul": 52428800, "dl": 209715200 },
     "duration": 10800,
@@ -3669,7 +3669,7 @@ FLOWS.edge_charging = {
   }
 }`},
       egress:{title:'Enterprise Invoice Example',
-        code:`// T-Mobile Enterprise Invoice:
+        code:`// T-Mobile Enterprise Invoice [ILLUSTRATIVE — not actual pricing]:
 // ┌────────────────────────────────────┐
 // │ T-Mobile Edge Control Invoice      │
 // │ Enterprise: Acme Corp              │
@@ -3677,11 +3677,11 @@ FLOWS.edge_charging = {
 // ├────────────────────────────────────┤
 // │ Edge Control (Local Breakout):     │
 // │   0.47 GB @ edge rate   =  $7.35  │
-// │   RG: 3001, Path: LBO → EAS       │
+// │   RG: 300, Path: LBO → EAS       │
 // ├────────────────────────────────────┤
 // │ Standard (Through-Path):           │
 // │   0.25 GB @ std rate    =  $2.50  │
-// │   RG: 1001, Path: N9 → PSA → DN   │
+// │   RG: 400, Path: N9 → PSA → DN   │
 // ├────────────────────────────────────┤
 // │ TOTAL:                     $9.85  │
 // └────────────────────────────────────┘
@@ -3707,7 +3707,7 @@ FLOWS.slice_pdu = {
   ],
   steps:[
     {id:1, label:'Step 1: UE Requests PDU Session on Slice', from:'ue', to:'amf', interface:'N1/N2 — NAS via NGAP (TS 24.501, TS 38.413)', protocol:'NAS 5GSM', badge:'FACT', lineType:'cp', through:['ran'],
-      description:'UE sends PDU Session Establishment Request specifying PDU Session ID, Requested S-NSSAI (e.g., SST=1, SD=000002 for SuperMobile), DNN, PDU Session Type, and requested QoS.',
+      description:'UE sends PDU Session Establishment Request specifying PDU Session ID, Requested S-NSSAI (e.g., SST=1, SD=ABCD02 for SuperMobile), DNN, PDU Session Type, and requested QoS.',
       ingress:{title:'NAS PDU Session Establishment Request (Slice)',
         code:`// NAS: PDU Session Establishment Request
 // (TS 24.501 §8.3.1)
@@ -3719,7 +3719,7 @@ FLOWS.slice_pdu = {
   "Request Type": "Initial Request",
   "S-NSSAI": {
     "SST": 1,
-    "SD": "000002"
+    "SD": "ABCD02"
   },
   "DNN": "fast.t-mobile.com",
   "PDU Session Type": "IPv4v6",
@@ -3733,7 +3733,7 @@ FLOWS.slice_pdu = {
     "Multi-homed IPv6 PDU Session": true
   }
 }
-// S-NSSAI SST=1/SD=000002 = SuperMobile slice
+// S-NSSAI SST=1/SD=ABCD02 = SuperMobile slice
 // UE has this in Allowed NSSAI from registration`},
       egress:{title:'gNB Forwards to AMF',
         code:`// gNB processing:
@@ -3748,15 +3748,15 @@ FLOWS.slice_pdu = {
         code:`// AMF Slice Routing Logic:
 // 1. Extract S-NSSAI from PDU Session Request:
 {
-  "Requested S-NSSAI": { "SST": 1, "SD": "000002" }
+  "Requested S-NSSAI": { "SST": 1, "SD": "ABCD02" }
 }
 
 // 2. Validate against Allowed NSSAI:
 {
   "Allowed NSSAI": [
-    { "SST": 1, "SD": "000001" },
-    { "SST": 1, "SD": "000002" },
-    { "SST": 2, "SD": "000010" }
+    { "SST": 1, "SD": "ABCD01" },
+    { "SST": 1, "SD": "ABCD02" },
+    { "SST": 2, "SD": "ABCD10" }
   ],
   "Requested in Allowed": true
 }
@@ -3764,12 +3764,12 @@ FLOWS.slice_pdu = {
 // 3. NRF Discovery for slice-specific SMF:
 // GET /nnrf-disc/v1/nf-instances?
 //   target-nf-type=SMF&
-//   snssais={"sst":1,"sd":"000002"}&
+//   snssais={"sst":1,"sd":"ABCD02"}&
 //   dnn=fast.t-mobile.com
 {
-  "Selected SMF": "smf-supermobile-01.5gc.mnc260.mcc310",
+  "Selected SMF": "smf-supermobile-01.5gc.mnc01.mcc001",
   "Dedicated": true,
-  "Slice": "SuperMobile (SST=1/SD=2)"
+  "Slice": "SuperMobile (SST=1/SD=ABCD02)"
 }`},
       egress:{title:'SMF Selection Decision',
         code:`// AMF Decision:
@@ -3792,8 +3792,8 @@ FLOWS.slice_pdu = {
   "supi": "imsi-310260000000001",
   "pduSessionId": 3,
   "dnn": "fast.t-mobile.com",
-  "sNssai": { "sst": 1, "sd": "000002" },
-  "servingNfId": "amf-01.5gc.mnc260.mcc310",
+  "sNssai": { "sst": 1, "sd": "ABCD02" },
+  "servingNfId": "amf-01.5gc.mnc01.mcc001",
   "requestType": "INITIAL_REQUEST",
   "anType": "3GPP_ACCESS",
   "ratType": "NR",
@@ -3806,7 +3806,7 @@ FLOWS.slice_pdu = {
   "pduSessionType": "IPV4V6",
   "sscMode": "SSC_MODE_1"
 }
-// sNssai: SST=1/SD=000002 → SuperMobile
+// sNssai: SST=1/SD=ABCD02 → SuperMobile
 // This SMF instance serves SuperMobile slice`},
       egress:{title:'Slice-Specific SMF Processing',
         code:`// SMF (SuperMobile-dedicated) Processing:
@@ -3820,11 +3820,11 @@ FLOWS.slice_pdu = {
       ingress:{title:'Nudm_SDM_Get (Slice Session Data)',
         code:`// GET /nudm-sdm/v2/{supi}/sm-data?
 //   dnn=fast.t-mobile.com&
-//   snssai={"sst":1,"sd":"000002"}
+//   snssai={"sst":1,"sd":"ABCD02"}
 // (TS 29.503 §6.2.2)
 // Response:
 {
-  "singleNssai": { "sst": 1, "sd": "000002" },
+  "singleNssai": { "sst": 1, "sd": "ABCD02" },
   "dnnConfigurations": {
     "fast.t-mobile.com": {
       "pduSessionTypes": { "defaultType": "IPV4V6" },
@@ -3891,27 +3891,27 @@ FLOWS.slice_pdu = {
   "chgDecs": {
     "chgSlice1": {
       "chgId": "chgSlice1",
-      "ratingGroup": 9001,
+      "ratingGroup": 100,
       "online": true,
-      "sNSSAI": { "sst": 1, "sd": "000002" }
+      "sNSSAI": { "sst": 1, "sd": "ABCD02" }
     }
   }
 }
 // SuperMobile PCC: premium 5QI, higher AMBR
-// Charging: RG 9001 (premium rate)`},
+// Charging: RG 100 (premium rate)`},
       egress:{title:'PCF Slice Policy Decision',
         code:`// PCF applies slice-specific rules:
 // SuperMobile gets:
 // ✓ 5QI=8 (higher priority scheduling)
 // ✓ Session AMBR: DL 2Gbps / UL 1Gbps
 // ✓ ARP priority 4 (may preempt)
-// ✓ Premium charging (RG 9001)
+// ✓ Premium charging (RG 100)
 //
-// vs Default eMBB (SST=1/SD=1):
+// vs Default eMBB (SST=1/SD=ABCD01):
 // ✗ 5QI=9 (best effort)
 // ✗ Session AMBR: DL 1Gbps / UL 500Mbps
 // ✗ ARP priority 9 (no preemption)
-// ✗ Standard charging (RG 1001)`}},
+// ✗ Standard charging (RG 400)`}},
     {id:6, label:'Step 6: SMF → UPF (Slice-Dedicated)', from:'smf', to:'upf_c', interface:'N4 — PFCP (TS 29.244)', protocol:'PFCP Session Establishment', badge:'FACT', lineType:'cp',
       description:'SMF selects a slice-dedicated UPF (or shared UPF with slice isolation). PFCP Session Establishment with slice-aware QER (per-slice AMBR enforcement), PDR, FAR.',
       ingress:{title:'PFCP Session Establishment (Slice UPF)',
@@ -3967,7 +3967,7 @@ FLOWS.slice_pdu = {
         code:`// SuperMobile PDU Session Active:
 {
   "PDU Session ID": 3,
-  "S-NSSAI": { "SST": 1, "SD": "000002" },
+  "S-NSSAI": { "SST": 1, "SD": "ABCD02" },
   "DNN": "fast.t-mobile.com",
   "UE IP": "100.64.3.75",
   "Session AMBR": { "DL": "2 Gbps", "UL": "1 Gbps" },
@@ -3980,7 +3980,7 @@ FLOWS.slice_pdu = {
     "SMF": "smf-supermobile-01 (dedicated)",
     "PCF": "pcf-supermobile-01 (dedicated)",
     "UPF": "upf-supermobile-01 (dedicated)",
-    "Charging": "RG 9001 (premium rate)"
+    "Charging": "RG 100 (premium rate)"
   }
 }
 // Every NF in the path is slice-specific`},
@@ -3989,12 +3989,12 @@ FLOWS.slice_pdu = {
 // │ SuperMobile Session (this flow):       │
 // │ 5QI=8, AMBR DL 2G/UL 1G, ARP=4       │
 // │ Dedicated NF instances                 │
-// │ Premium charging (RG 9001)             │
+// │ Premium charging (RG 100)             │
 // ├─────────────────────────────────────────┤
 // │ Default eMBB Session (baseline):       │
 // │ 5QI=9, AMBR DL 1G/UL 500M, ARP=9     │
 // │ Shared NF instances                    │
-// │ Standard charging (RG 1001)            │
+// │ Standard charging (RG 400)            │
 // └─────────────────────────────────────────┘`}},
     {id:8, label:'Step 8: Multi-Slice on Single UE', from:'ue', to:'ue', interface:'Internal — UE Multi-Session', protocol:'NAS 5GSM (TS 24.501)', badge:'FACT',
       description:'A single UE can have multiple PDU sessions on different slices simultaneously — e.g., Session 1 on default eMBB (browsing), Session 2 on SuperMobile (business video). Each session has independent QoS, charging, and potentially different UPF instances.',
@@ -4006,7 +4006,7 @@ FLOWS.slice_pdu = {
     {
       "Session 1": {
         "PDU Session ID": 1,
-        "S-NSSAI": { "SST": 1, "SD": "000001" },
+        "S-NSSAI": { "SST": 1, "SD": "ABCD01" },
         "DNN": "fast.t-mobile.com",
         "UE IP": "100.64.1.50",
         "5QI": 9,
@@ -4014,13 +4014,13 @@ FLOWS.slice_pdu = {
         "Use Case": "General browsing, streaming",
         "SMF": "smf-shared-pool",
         "UPF": "upf-embb-shared",
-        "Charging RG": 1001
+        "Charging RG": 400
       }
     },
     {
       "Session 2": {
         "PDU Session ID": 3,
-        "S-NSSAI": { "SST": 1, "SD": "000002" },
+        "S-NSSAI": { "SST": 1, "SD": "ABCD02" },
         "DNN": "fast.t-mobile.com",
         "UE IP": "100.64.3.75",
         "5QI": 8,
@@ -4028,7 +4028,7 @@ FLOWS.slice_pdu = {
         "Use Case": "Business video conferencing",
         "SMF": "smf-supermobile-01",
         "UPF": "upf-supermobile-01",
-        "Charging RG": 9001
+        "Charging RG": 100
       }
     }
   ]
@@ -4098,7 +4098,7 @@ FLOWS.slice_devedge = {
 // 2. Authorize: enterprise has ANPA subscription?
 // 3. Rate limit check
 // 4. Map "QOS_LOW_LATENCY" to 3GPP params:
-//    → S-NSSAI: SST=1, SD=000003 (ANPA slice)
+//    → S-NSSAI: SST=1, SD=ABCD03 (ANPA slice)
 //    → 5QI: 7 (voice-like low latency)
 //    → GBR: 10 Mbps DL / 5 Mbps UL
 // 5. Map device identifier → GPSI/SUPI
@@ -4115,7 +4115,7 @@ FLOWS.slice_devedge = {
     "ipv4Addr": "100.64.1.50"
   },
   "dnn": "fast.t-mobile.com",
-  "snssai": { "sst": 1, "sd": "000003" },
+  "snssai": { "sst": 1, "sd": "ABCD03" },
   "qosReference": "anpa-low-latency-01",
   "altQoSReferences": ["anpa-medium-latency-01"],
   "flowInfo": [{
@@ -4133,7 +4133,7 @@ FLOWS.slice_devedge = {
       { "event": "QOS_GUARANTEED" },
       { "event": "QOS_NOT_GUARANTEED" }
     ],
-    "notifUri": "https://devedge.t-mobile.com/nef-callback"
+    "notifUri": "https://nef-gw.operator.example/devedge-callback"
   }
 }
 // 3GPP Nnef API with slice + QoS parameters`},
@@ -4156,7 +4156,7 @@ FLOWS.slice_devedge = {
   "policyAuthorizationRequest": {
     "afAppId": "enterprise-video-conf-001",
     "gpsi": "msisdn-12065551234",
-    "sNssai": { "sst": 1, "sd": "000003" },
+    "sNssai": { "sst": 1, "sd": "ABCD03" },
     "medComponents": {
       "1": {
         "medType": "DATA",
@@ -4211,7 +4211,7 @@ FLOWS.slice_devedge = {
         },
         "chgDecs": {
           "chgAnpa1": {
-            "ratingGroup": 8001,
+            "ratingGroup": 600,
             "online": true,
             "sponsorIdentity": "enterprise-acme-001"
           }
@@ -4354,14 +4354,14 @@ FLOWS.slice_devedge = {
 {
   "anpaCharging": {
     "sponsorId": "enterprise-acme-001",
-    "ratingGroup": 8001,
+    "ratingGroup": 600,
     "duration": 7200,
     "volume": { "ul": 450000000, "dl": 1200000000 },
     "qosProfile": "QOS_LOW_LATENCY",
-    "sliceId": "SST=1/SD=000003"
+    "sliceId": "SST=1/SD=ABCD03"
   }
 }
-// Enterprise Invoice:
+// Enterprise Invoice [ILLUSTRATIVE — not actual pricing]:
 // ┌──────────────────────────────────────┐
 // │ T-Mobile DevEdge ANPA Invoice        │
 // │ Enterprise: Acme Corp                │
@@ -5254,7 +5254,7 @@ FLOWS.deregistration = {
   },
   "invocationSequenceNumber": 10,
   "multipleUnitUsage": [{
-    "ratingGroup": 1001,
+    "ratingGroup": 400,
     "usedUnitContainer": [{
       "totalVolume": 1500000000,
       "uplinkVolume": 200000000,
@@ -5277,7 +5277,7 @@ FLOWS.deregistration = {
       ingress:{title:'UE CM Deregistration',
         code:`// POST /nudm-uecm/v1/{ueId}/registrations/amf-3gpp-access/deregistration
 {
-  "amfInstanceId": "amf-01-uuid",
+  "amfInstanceId": "amf-01-example-uuid",
   "deregReason": "UE_INITIAL_DEREGISTRATION"
 }`}, egress:{title:'UDM confirms deregistration',
         code:`// 204 No Content (success)
@@ -5367,7 +5367,7 @@ FLOWS.nwdaf_analytics = {
     "snssais": [{"sst": 1}],
     "loadLevelThreshold": 80
   }],
-  "notificationURI": "https://pcf-01.t-mobile.com/callback",
+  "notificationURI": "https://pcf-01.5gc.operator.example/callback",
   "suppFeat": "1"
 }`}, egress:{title:'Subscription Created',
         code:`// 201 Created
@@ -5391,7 +5391,7 @@ FLOWS.nwdaf_analytics = {
     "type": "LOCATION_REPORT",
     "immediateFlag": false
   }],
-  "eventsNotifyUri": "https://nwdaf-01.t-mobile.com/events",
+  "eventsNotifyUri": "https://nwdaf-01.5gc.operator.example/events",
   "notifyCorrelationId": "nwdaf-corr-123"
 }`}, egress:{title:'AMF Subscription Active',
         code:`// 201 Created
@@ -5412,7 +5412,7 @@ FLOWS.nwdaf_analytics = {
     "event": "UE_IP_CH",
     "immediateFlag": false
   }],
-  "notifUri": "https://nwdaf-01.t-mobile.com/events",
+  "notifUri": "https://nwdaf-01.5gc.operator.example/events",
   "notifId": "nwdaf-notif-456"
 }`}, egress:{title:'SMF Subscription Active',
         code:`// 201 Created
@@ -5424,7 +5424,7 @@ FLOWS.nwdaf_analytics = {
     {id:4, label:'Step 4: SMF Event Notification', from:'smf', to:'nwdaf', interface:'Callback', protocol:'Event Notification (TS 29.508)', badge:'FACT', lineType:'cp',
       description:'SMF sends event notification to NWDAF via the subscription callback established in Step 3.',
       ingress:{title:'Event Notifications',
-        code:`// POST /nwdaf-01.t-mobile.com/events (callback)
+        code:`// POST /nwdaf-01.5gc.operator.example/events (callback)
 {
   "notifId": "nwdaf-notif-456",
   "eventNotifs": [{
@@ -5450,7 +5450,7 @@ FLOWS.nwdaf_analytics = {
     {id:5, label:'Step 5: AMF Event Notification', from:'amf', to:'nwdaf', interface:'Callback', protocol:'Event Notification (TS 29.518)', badge:'FACT', lineType:'cp',
       description:'AMF sends UE mobility event notifications to NWDAF via the subscription callback established in Step 2.',
       ingress:{title:'AMF Event Notification',
-        code:`// POST /nwdaf-01.t-mobile.com/events (callback)
+        code:`// POST /nwdaf-01.5gc.operator.example/events (callback)
 {
   "notifCorrelationId": "nwdaf-corr-123",
   "reportList": [{
@@ -5496,7 +5496,7 @@ FLOWS.nwdaf_analytics = {
     {id:7, label:'Step 7: Analytics Notification', from:'nwdaf', to:'pcf', interface:'Callback', protocol:'Nnwdaf_AnalyticsSubscription_Notify (TS 23.288)', badge:'FACT', lineType:'cp',
       description:'NWDAF sends analytics result to PCF via callback.',
       ingress:{title:'Analytics Notification',
-        code:`// POST /pcf-01.t-mobile.com/callback
+        code:`// POST /pcf-01.5gc.operator.example/callback
 {
   "subscriptionId": "sub-12345",
   "eventNotifications": [{
@@ -5576,7 +5576,7 @@ FLOWS.vonr_call = {
         code:`// SIP REGISTER (TS 24.229)
 {
   "method": "REGISTER",
-  "Request-URI": "sip:ims.mnc260.mcc310.3gppnetwork.org",
+  "Request-URI": "sip:ims.mnc01.mcc001.3gppnetwork.org",
   "From": "tel:+12065551234",
   "To": "tel:+12065551234",
   "Contact": "<sip:ue@10.0.5.1:5060>",
@@ -5620,7 +5620,7 @@ FLOWS.vonr_call = {
   "iFC": {
     "Priority": 0,
     "TriggerPoint": "INVITE",
-    "ApplicationServer": "sip:tas.ims.mnc260.mcc310"
+    "ApplicationServer": "sip:tas.ims.mnc01.mcc001"
   }
 }
 // 4. Forward INVITE to TAS via ISC interface`}, egress:{title:'TAS applies supplementary services',
@@ -6429,7 +6429,7 @@ function drawArchSlicing(container) {
   const s3 = svgEl('rect', {x:160,y:s3y,width:700,height:75,rx:8,fill:'none',stroke:'var(--accent)','stroke-width':2,'stroke-dasharray':'8 4'});
   svg.appendChild(s3);
   const s3t = svgEl('text', {x:175,y:s3y+16,fill:'var(--accent)','font-size':'10','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
-  s3t.textContent = 'Slice 3: Operator-Defined (SST=3/4) — SuperMobile / 5G On Demand'; svg.appendChild(s3t);
+  s3t.textContent = 'Slice 3: eMBB (SST=1, operator SD) — SuperMobile / 5G On Demand'; svg.appendChild(s3t);
   svgBox(svg, 200,s3y+25,80,35,'SMF₃','Custom'); svgBox(svg, 350,s3y+25,80,35,'UPF₃','Custom'); svgBox(svg, 500,s3y+25,80,35,'PCF₃',''); svgBox(svg, 650,s3y+25,80,35,'DN₃','Enterprise');
   svgLine(svg, 280,s3y+42, 350,s3y+42, 'N4'); svgLine(svg, 430,s3y+42, 500,s3y+42); svgLine(svg, 580,s3y+42, 650,s3y+42, 'N6');
   const ref = svgEl('text', {x:450,y:455,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
@@ -6552,7 +6552,7 @@ function renderSpecLibrary(el) {
       ['TS 29.244','PFCP — Packet Forwarding Control (N4)','PDR, FAR, QER, URR — user plane rule definitions','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3111'],
       ['TS 29.281','GTP-U — GPRS Tunnelling Protocol User Plane','GTP-U tunnel management for N3/N9 interfaces','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=1699'],
       ['TS 29.536','Nnsacf — NSACF Services','Network slice admission control — manages UE/PDU session count per slice','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3621'],
-      ['TS 29.540','Nsmsf — SMSF Services','SMS over NAS service operations via SMSF','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3339'],
+      ['TS 29.540','Nsmsf — SMSF Services','SMS over NAS service operations via SMSF','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3344'],
       ['TS 23.040','Technical Realization of SMS','SMS point-to-point service, TP-layer protocol, SMSC procedures','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=747'],
     ]},
     { title:'Security', specs:[
@@ -6566,7 +6566,7 @@ function renderSpecLibrary(el) {
     { title:'Analytics', specs:[
       ['TS 23.288','NWDAF — Network Data Analytics','Data collection, analytics, ML model training/inference','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3579'],
       ['TS 29.520','Nnwdaf — NWDAF Services','Analytics info, events subscription, ML model provision','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3355'],
-      ['TS 29.508','Nsmf_EventExposure','SMF event exposure for analytics and policy','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3384'],
+      ['TS 29.508','Nsmf_EventExposure','SMF event exposure for analytics and policy','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3349'],
     ]},
     { title:'RAN', specs:[
       ['TS 38.300','NR Overall Description — Stage 2','NR architecture, protocol stack, channel structure','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3191'],
@@ -6596,7 +6596,7 @@ function renderSpecLibrary(el) {
     ['T-Platform','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Enterprise platform for edge application hosting'],
     ['DevEdge APIs','<a href="https://devedge.t-mobile.com" target="_blank">devedge.t-mobile.com</a>','Developer APIs for network slicing, edge, QoD'],
     ['5G Advanced + L4S','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
-    ['SuperMobile / Network Slicing','<a href="https://www.t-mobile.com/business" target="_blank">t-mobile.com/business</a>','Consumer and enterprise network slicing products'],
+    ['SuperMobile / Network Slicing','<a href="https://www.t-mobile.com/business" target="_blank">t-mobile.com/business</a>','Business and enterprise network slicing products'],
   ];
   const alliances = [
     ['O-RAN Alliance','<a href="https://www.o-ran.org" target="_blank">o-ran.org</a>','Open RAN architecture, RIC, open fronthaul specifications'],
@@ -6642,13 +6642,13 @@ const GLOSSARY_DATA = [
   ['EASDF','Edge Application Server Discovery Function','Assists in EAS discovery via DNS-based mechanisms for edge computing scenarios.','TS 23.548','Part of T-Mobile Edge Control architecture for edge app discovery.'],
   ['EES','Edge Enabler Server','Provides edge service APIs, manages EAS lifecycle and edge connectivity.','TS 23.558','Component of T-Mobile T-Platform edge application hosting.'],
   ['ECS','Edge Configuration Server','Provides EES discovery and edge configuration information to edge clients.','TS 23.558','Supports T-Platform edge service configuration.'],
-  ['NSACF','Network Slice Admission Control Function','Controls the number of UEs or PDU sessions admitted per slice to prevent overload.','TS 23.501 §5.15.11','Enforces T-Mobile slice admission limits (Rel-17+).'],
+  ['NSACF','Network Slice Admission Control Function','Controls the number of UEs or PDU sessions admitted per slice to prevent overload.','TS 23.501 §5.15.11','Enforces per-slice UE and PDU session admission limits (Rel-17+).'],
   ['SCP','Service Communication Proxy','Provides indirect communication, load balancing, and service mesh for SBI.','TS 23.501 §6.2.15','Deployed in T-Mobile 5GC for SBI traffic management.'],
   ['AF','Application Function','Any application that interacts with the 5GC to influence traffic routing, QoS, or policy.','TS 23.501 §6.2.10','Enterprise and partner applications interfacing with T-Mobile 5GC.'],
   ['P-CSCF','Proxy Call Session Control Function','First IMS contact point for UE. Handles SIP signaling, IPsec, policy interaction.','TS 23.228','Entry point for T-Mobile VoNR calls into the IMS domain.'],
   ['S-CSCF','Serving CSCF','Core IMS session control. Handles SIP registration, session routing, service trigger.','TS 23.228','Manages T-Mobile VoNR session state and TAS invocation.'],
   ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts T-Mobile calling features: Wi-Fi Calling, Visual Voicemail, etc.'],
-  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','T-Mobile nationwide 5G SA gNB deployment on n25/n41/n71/n77/n260.'],
+  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','T-Mobile nationwide 5G SA gNB deployment on n25/n41/n71/n260.'],
   ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in T-Mobile O-RAN/vRAN disaggregated deployments.'],
   ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at T-Mobile cell sites in split-architecture configurations.'],
   ['UE','User Equipment','Mobile device (phone, IoT device, CPE) connecting to the 5G network.','TS 23.501','All T-Mobile subscriber devices: phones, FWA, IoT, wearables.'],
@@ -6663,7 +6663,7 @@ const GLOSSARY_DATA = [
   ['N22','N22 Reference Point','AMF ↔ NSSF for network slice selection.','TS 23.501 §5.2','AMF queries NSSF for allowed slices during T-Mobile registration.'],
   ['N33','N33 Reference Point','AF ↔ NEF for network capability exposure.','TS 23.501 §5.2','T-Mobile DevEdge APIs and AF traffic influence use N33.'],
   ['N40','N40 Reference Point','SMF ↔ CHF for converged charging.','TS 32.291','All T-Mobile 5G charging flows use N40 interface.'],
-  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','T-Mobile 5G NR air interface on n25/n41/n71/n77/n260 bands.'],
+  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','T-Mobile 5G NR air interface on n25/n41/n71/n260 bands.'],
   ['SBI','Service-Based Interface','HTTP/2-based interfaces between 5GC NFs using RESTful APIs.','TS 29.500','All T-Mobile 5GC control plane NFs communicate via SBI.'],
   ['NAS','Non-Access Stratum','Protocol between UE and core network (AMF/SMF) for registration, auth, session mgmt.','TS 24.501','Carries all T-Mobile 5GMM and 5GSM signaling messages.'],
   ['NGAP','NG Application Protocol','Protocol on N2 between gNB and AMF for UE context and PDU session management.','TS 38.413','All T-Mobile gNB↔AMF control signaling uses NGAP.'],
@@ -6673,7 +6673,7 @@ const GLOSSARY_DATA = [
   ['S-NSSAI','Single Network Slice Selection Assistance Information','Identifies a network slice: SST (type) + optional SD (differentiator).','TS 23.501 §5.15.2','T-Mobile uses S-NSSAI to identify slices like T-Priority, SuperMobile.'],
   ['SST','Slice/Service Type','8-bit value identifying the expected slice behavior (1=eMBB, 2=URLLC, 3=MIoT).','TS 23.501 §5.15.2.2','Standard slice types used across T-Mobile network.'],
   ['DNN','Data Network Name','Identifies the data network the PDU session connects to (like APN in 4G).','TS 23.501 §5.6.1','T-Mobile DNNs include "fast.t-mobile.com", "ims", etc.'],
-  ['SUPI','Subscription Permanent Identifier','Globally unique permanent subscriber ID (usually IMSI format).','TS 23.501 §5.9.2','T-Mobile SUPI format: IMSI 310260xxxxxxxxx.'],
+  ['SUPI','Subscription Permanent Identifier','Globally unique permanent subscriber ID (usually IMSI format).','TS 23.501 §5.9.2','Example SUPI in this tool uses IMSI format with T-Mobile public PLMN (310260) + illustrative subscriber numbers.'],
   ['SUCI','Subscription Concealed Identifier','Privacy-preserving encrypted form of SUPI sent over the air.','TS 23.501 §5.9.2','UE encrypts MSIN using T-Mobile home network public key.'],
   ['5G-GUTI','5G Globally Unique Temporary Identifier','Temporary ID assigned by AMF to hide SUPI over the air.','TS 23.501 §5.9.4','AMF assigns new 5G-GUTI on every T-Mobile registration.'],
   ['PDU Session','Protocol Data Unit Session','Logical connection between UE and data network through 5GC. Has QoS flows, IP address.','TS 23.501 §5.6','T-Mobile establishes PDU sessions per DNN/slice combination.'],
@@ -6689,11 +6689,11 @@ const GLOSSARY_DATA = [
   ['Edge Control','Edge Control','T-Mobile 5G Advanced edge computing solution using ULCL for local breakout.','T-Mobile product','Launched Oct 2025. Uses ULCL + EAS for sub-10ms application hosting.'],
   ['T-Platform','T-Platform','T-Mobile enterprise platform for hosting edge applications on 5G infrastructure.','T-Mobile product','Launched Oct 2025 with Edge Control for enterprise edge workloads.'],
   ['DevEdge','DevEdge','T-Mobile developer platform providing APIs for network capabilities.','T-Mobile product','APIs for QoD, slicing, edge discovery. devedge.t-mobile.com.'],
-  ['T-Priority','T-Priority','T-Mobile network slicing product for first responders with prioritized connectivity.','T-Mobile product','Deployed 2024. Uses dedicated URLLC-like slice for priority access.'],
-  ['SuperMobile','SuperMobile','T-Mobile consumer network slicing product for premium mobile experience.','T-Mobile product','Launched Sep 2025. Dedicated slice with enhanced QoS for subscribers.'],
+  ['T-Priority','T-Priority','T-Mobile network slicing product for first responders with prioritized connectivity.','T-Mobile product','Announced Sep 2024, launched Feb 2025. Uses dedicated URLLC-like slice for priority access.'],
+  ['SuperMobile','SuperMobile','T-Mobile business network slicing product for enterprise connectivity.','T-Mobile product','Launched Aug 2025. Dedicated slice with enhanced QoS for business subscribers.'],
   ['CAMARA','Common API framework by GSMA','Standardized network API project under GSMA Open Gateway, enabling cross-operator API exposure for QoD, slicing, device status, and more.','GSMA Open Gateway','T-Mobile DevEdge ANPA and QoD APIs align with CAMARA specifications.'],
   ['ANPA','Application Network Policy Agent','DevEdge API enabling applications to dynamically request network slices and QoS policies via CAMARA-aligned REST interfaces.','T-Mobile DevEdge','Powers dynamic slice allocation in T-Mobile DevEdge platform (Flow 16).'],
-  ['DNAI','Data Network Access Identifier','Identifies a specific point of data network access (e.g., an edge site). Used in AF traffic influence to steer traffic to a specific UPF/edge location.','TS 23.501 §5.6.7','T-Mobile uses DNAI to identify edge sites in Edge Control (e.g., "edge-seattle-01").'],
+  ['DNAI','Data Network Access Identifier','Identifies a specific point of data network access (e.g., an edge site). Used in AF traffic influence to steer traffic to a specific UPF/edge location.','TS 23.501 §5.6.7','T-Mobile uses DNAI to identify edge sites in Edge Control (e.g., "edge-site-01").'],
   ['CDR','Charging Data Record','Record generated by CHF containing subscriber usage data for billing. Includes volume, duration, rating group, and service context.','TS 32.255','T-Mobile CHF generates CDRs for all 5G sessions — per-slice and per-service.'],
   ['F-TEID','Fully Qualified Tunnel Endpoint Identifier','Uniquely identifies a GTP-U tunnel endpoint: a combination of TEID and transport layer address (IP). Used on N3/N9 interfaces.','TS 29.244, TS 29.281','Assigned by UPF during T-Mobile PDU session establishment to identify GTP-U tunnel endpoints.'],
   ['TEID','Tunnel Endpoint Identifier','32-bit identifier for a GTP-U tunnel endpoint on N3 (gNB↔UPF) and N9 (UPF↔UPF) interfaces.','TS 29.281','Each T-Mobile GTP-U tunnel is identified by a unique TEID at each end.'],
@@ -6735,15 +6735,14 @@ function renderTimeline(el) {
     {date:'Aug 2020', text:'First nationwide standalone 5G SA network in the U.S.', cls:''},
     {date:'2021', text:'Extended Range 5G and Ultra Capacity 5G expansion', cls:''},
     {date:'2021', text:'DevEdge platform launch — developer APIs for network capabilities', cls:''},
-    {date:'Feb 2022', text:'C-Band (n77) deployment begins', cls:''},
     {date:'2023', text:'Network slicing developer beta (nationwide)', cls:''},
-    {date:'Jan 2024', text:'T-Priority launched — first responder network slice', cls:''},
+    {date:'Sep 2024', text:'T-Priority announced — first responder network slice (launched Feb 2025)', cls:''},
     {date:'Apr 2025', text:'5G Advanced deployed nationwide', cls:''},
     {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
-    {date:'Sep 2025', text:'SuperMobile with network slice launched for consumers', cls:''},
-    {date:'Sep 2025', text:'5G On Demand — dynamic on-demand network slicing for enterprise', cls:''},
+    {date:'Aug 2025', text:'SuperMobile with network slice launched for business', cls:''},
+    {date:'Oct 2024', text:'5G On Demand — portable 5G private network solution for enterprise', cls:''},
     {date:'Oct 2025', text:'Edge Control (ULCL) + T-Platform launched for enterprise edge computing', cls:''},
-    {date:'Dec 2025', text:'3-way UL Tx Switching (iPhone 17 Pro, Samsung GS25 Ultra, etc.)', cls:''},
+    {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
   ];
   let html = `<h2><span class="tm">T-Mobile</span> Technology Timeline</h2><p>Key milestones in <span class="tm">T-Mobile</span>'s 5G and 5G Advanced journey.</p>`;
   html += '<div class="timeline-container"><div class="timeline-line"></div>';
@@ -6760,7 +6759,6 @@ function renderBandMap(el) {
     {band:'n71', freq:'600 MHz', type:'FDD Low-band', bw:'5–10 MHz', coverage:'Nationwide, excellent building penetration', use:'Extended Range 5G — coverage layer'},
     {band:'n25', freq:'1900 MHz', type:'FDD Mid-band', bw:'5–20 MHz', coverage:'Urban/suburban, moderate penetration', use:'PCS capacity layer'},
     {band:'n41', freq:'2.5 GHz', type:'TDD Mid-band', bw:'Up to 100 MHz', coverage:'Metro/urban, high capacity', use:'Ultra Capacity 5G — primary capacity layer'},
-    {band:'n77', freq:'3.7 GHz', type:'TDD Mid-band', bw:'20–40 MHz', coverage:'Urban, moderate capacity', use:'C-Band supplement in select markets'},
     {band:'n260', freq:'39 GHz', type:'TDD mmWave', bw:'Up to 800 MHz', coverage:'Dense urban, venues, stadiums', use:'Ultra-high throughput hotspots'},
   ];
   let html = '<h2><span class="tm">T-Mobile</span> 5G Band Map</h2>';
@@ -6802,6 +6800,9 @@ function showWelcome() {
     <h3>Getting Started</h3>
     <p>Select a flow from the sidebar to begin. Each flow shows the network topology with relevant nodes, and you can step through each message exchange to see the signaling details.</p>
     <p>This file contains 20 interactive flows covering 5G SA Baseline, 5G Advanced Edge Control, Network Slicing, 5G Mobility, and 5G Analytics, plus reference pages with architecture diagrams, specifications, a glossary, latency comparison, band map, and technology timeline.</p>
+    <div style="margin-top:18px;padding:14px 18px;border-left:4px solid #e20074;background:rgba(226,0,116,0.06);border-radius:6px;font-size:0.97em;line-height:1.6">
+<strong>⚠ Disclaimer:</strong> All NF instance names, hostnames, S-NSSAI SD values, rating groups, DNAI identifiers, capacity limits, invoice examples, and infrastructure names shown in this tool are <strong>illustrative examples</strong> created for educational purposes. They do not represent actual T-Mobile network configuration, operational parameters, or pricing. Protocol flows and message structures follow 3GPP specifications; operator-specific payload values are fictional.
+</div>
   </div>`;
 }
 
