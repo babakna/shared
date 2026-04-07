@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3GPP Protocol Flow Simulator — T-Mobile AI-RAN & 6G</title>
+<title>3GPP Protocol Flow Simulator — AI-RAN & 6G</title>
 <style>
 
 :root, [data-theme="light"] {
@@ -103,7 +103,6 @@ body {
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
-.tm { color: #e20074 !important; font-weight: 600; }
 header {
   height: 75px; display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px; background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);
@@ -421,7 +420,7 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
 </head>
 <body data-theme="light">
 <header>
-  <h1><span class="tm">T-Mobile</span> <span class="sep">—</span> 3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
+  <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
     <span class="version">v1.1</span>
@@ -548,8 +547,8 @@ const SIDEBAR_SECTIONS = [
     {num:'B', id:'spec_library',label:'Specification Library',type:'ref'},
     {num:'C', id:'glossary',label:'Glossary',type:'ref'},
     {num:'D', id:'latency_comparison',label:'Latency Comparison',type:'ref'},
-    {num:'E', id:'timeline',label:'T-Mobile Technology Timeline',type:'ref'},
-    {num:'F', id:'band_reference',label:'T-Mobile 5G Band Map',type:'ref'},
+    {num:'E', id:'timeline',label:'Technology Timeline',type:'ref'},
+    {num:'F', id:'band_reference',label:'5G Band Map',type:'ref'},
   ]},
 ];
 
@@ -560,7 +559,7 @@ const FLOWS = {};
 FLOWS['airan_registration'] = {
   id:'airan_registration', title:'Registration via AI-RAN Node', section:'airan', badge:'VALIDATED',
   specRef:'TS 23.502 §4.2.2.2, O-RAN WG3, AI-RAN Alliance',
-  narrative:'The UE registers through an AI-RAN node (Nokia AirScale + NVIDIA Grace Hopper GPU) at T-Mobile\'s Innovation Center in Bellevue. The AI-RAN node performs standard gNB functions but adds GPU-accelerated RRC processing and AI-based beam management. Registration follows the same 5G AKA procedure but the gNB is replaced by the AI-RAN node with shared-memory GPU acceleration.',
+  narrative:'The UE registers through an AI-RAN node (Nokia AirScale + NVIDIA Grace Hopper GPU) at the Innovation Center in Bellevue. The AI-RAN node performs standard gNB functions but adds GPU-accelerated RRC processing and AI-based beam management. Registration follows the same 5G AKA procedure but the gNB is replaced by the AI-RAN node with shared-memory GPU acceleration.',
   nodes:['ue','ai_ran','gpu','amf','ausf','udm'],
   connections:[
     {from:'ue',to:'ai_ran',label:'Uu',type:'data'},
@@ -719,7 +718,7 @@ FLOWS['airan_registration'] = {
   "resynchronizationInfo": null,
   "traceData": null
 }
-// HTTP/2 SBI call — T-Mobile 5GC
+// HTTP/2 SBI call — 5GC
 // AUSF will resolve SUCI → SUPI via UDM
 // and generate 5G AKA authentication vector
 //
@@ -764,7 +763,7 @@ FLOWS['airan_registration'] = {
 // 3. Generate 5G HE AV: RAND, AUTN, XRES*, KAUSF
 // 4. Increment SQN (sequence number)
 // Standard TS 33.501 §6.1.3.2
-// T-Mobile PLMN: MCC=310, MNC=260`},
+// PLMN: MCC=310, MNC=260`},
       egress:{title:'UDM Returns 5G HE AV',
         code:`// VALIDATED: AI-RAN Innovation Center Bellevue
 // UDM → AUSF: 5G Home Environment Auth Vector
@@ -878,7 +877,7 @@ FLOWS['airan_registration'] = {
 // All subsequent NAS messages are ciphered + integrity protected
 // AI-RAN handles AS security separately (KgNB → KRRCint, KRRCenc)`}},
     {id:8, label:'Step 8: Registration Accept', from:'amf', to:'ue', interface:'Uu — NAS via NGAP + AI-RAN', protocol:'NAS 5GMM (TS 24.501)', badge:'VALIDATED', lineType:'cp', through:['ai_ran'],
-      description:'AMF sends Registration Accept with 5G-GUTI, Allowed NSSAI, and registration area. UE is now registered on T-Mobile 5G SA via the AI-RAN node. Standard 3GPP registration — the innovation is WHERE it runs.',
+      description:'AMF sends Registration Accept with 5G-GUTI, Allowed NSSAI, and registration area. UE is now registered on 5G SA via the AI-RAN node. Standard 3GPP registration — the innovation is WHERE it runs.',
       ingress:{title:'NAS Registration Accept',
         code:`// VALIDATED: AI-RAN Innovation Center Bellevue
 // AMF → UE: Registration Accept (TS 24.501 §5.5.1.2.4)
@@ -905,7 +904,7 @@ FLOWS['airan_registration'] = {
 }`},
       egress:{title:'Registration Complete — AI-RAN Innovation',
         code:`// VALIDATED: AI-RAN Innovation Center Bellevue
-// UE is fully registered on T-Mobile 5G SA
+// UE is fully registered on 5G SA
 // via AI-RAN node at Bellevue Innovation Center
 {
   "registrationSummary": {
@@ -966,7 +965,7 @@ FLOWS['airan_pdu_shared'] = {
       "priorityLevel": 8
     },
     "s-nssai": { "sst": 1, "sd": "ABCD01" },
-    "dnn": "fast.t-mobile.com"
+    "dnn": "internet"
   }
 }
 // AI-RAN receives on GPU-accelerated L1/L2
@@ -1016,7 +1015,7 @@ FLOWS['airan_pdu_shared'] = {
   }
 }
 // AMF performs SMF selection:
-// DNN: fast.t-mobile.com, S-NSSAI: SST=1/SD=ABCD01
+// DNN: internet, S-NSSAI: SST=1/SD=ABCD01
 // Subscription data from UDM (retrieved at registration)`},
       egress:{title:'AMF Selects SMF and Forwards',
         code:`// PROJECTED: based on NVIDIA Aerial SDK
@@ -1027,7 +1026,7 @@ FLOWS['airan_pdu_shared'] = {
     "selected_smf": "smf-01.5gc.mnc01.mcc001.3gppnetwork.org",
     "selection_criteria": {
       "s_nssai": { "sst": 1, "sd": "ABCD01" },
-      "dnn": "fast.t-mobile.com",
+      "dnn": "internet",
       "ue_location": "TAC=000042",
       "smf_load": "32%"
     },
@@ -1048,7 +1047,7 @@ FLOWS['airan_pdu_shared'] = {
 {
   "supi": "imsi-310260000042781",
   "pduSessionId": 5,
-  "dnn": "fast.t-mobile.com",
+  "dnn": "internet",
   "sNssai": { "sst": 1, "sd": "ABCD01" },
   "servingNfId": "amf-01-uuid",
   "servingNetwork": { "mcc": "310", "mnc": "260" },
@@ -1094,7 +1093,7 @@ FLOWS['airan_pdu_shared'] = {
   "supi": "imsi-310260000042781",
   "pduSessionId": 5,
   "pduSessionType": "IPV4",
-  "dnn": "fast.t-mobile.com",
+  "dnn": "internet",
   "sNssai": { "sst": 1, "sd": "ABCD01" },
   "ipv4Address": "10.42.17.93",
   "ratType": "NR",
@@ -1149,7 +1148,7 @@ FLOWS['airan_pdu_shared'] = {
     "precedence": 100,
     "pdi": {
       "sourceInterface": "ACCESS",
-      "networkInstance": "fast.t-mobile.com",
+      "networkInstance": "internet",
       "ueIpAddress": "10.42.17.93"
     },
     "farId": 1, "qerId": 1, "urrId": 1
@@ -2051,7 +2050,7 @@ FLOWS['airan_telemetry'] = {
 FLOWS['sixg_registration'] = {
   id:'sixg_registration', title:'6G AI-Native Registration', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160 (IMT-2030), 3GPP SA2 6G Study (SP-231442), NGMN 6G Vision',
-  narrative:'In the 6G AI-native architecture, registration is orchestrated by an AI Core function that replaces the traditional AMF/AUSF/UDM split with a unified, AI-driven access and mobility manager. The intent engine configures registration policy dynamically. A digital twin of the network predicts optimal cell assignment before the UE even completes RRC. Authentication uses quantum-safe algorithms (PQC). This is <span class="tm">T-Mobile</span>\'s vision for 2029+ registration.',
+  narrative:'In the 6G AI-native architecture, registration is orchestrated by an AI Core function that replaces the traditional AMF/AUSF/UDM split with a unified, AI-driven access and mobility manager. The intent engine configures registration policy dynamically. A digital twin of the network predicts optimal cell assignment before the UE even completes RRC. Authentication uses quantum-safe algorithms (PQC). This is the vision for 2029+ registration.',
   nodes:['ue','ai_ran','gpu','ai_core','intent','dig_twin','udm'],
   connections:[
     {from:'ue',to:'ai_ran',label:'6G-Uu',type:'data'},
@@ -3058,7 +3057,7 @@ FLOWS['sixg_data'] = {
 FLOWS['sixg_intent_slice'] = {
   id:'sixg_intent_slice', title:'Intent-Based Slice Request', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160 (IMT-2030), ETSI ZSM 002, 3GPP SA2 6G Study (SP-231442)',
-  narrative:'A 6G intent-based slice request where the consumer submits a high-level intent and the network autonomously provisions the slice. <span class="tm">T-Mobile</span>\'s 6G vision automates the entire slice lifecycle.',
+  narrative:'A 6G intent-based slice request where the consumer submits a high-level intent and the network autonomously provisions the slice. the 6G vision automates the entire slice lifecycle.',
   nodes:['af','intent','ai_core','dig_twin','nssf','ai_ran','upf_c'],
   connections:[
     {from:'af',to:'intent',label:'Intent NBI',type:'control'},
@@ -3446,7 +3445,7 @@ FLOWS['sixg_intent_slice'] = {
 FLOWS['sixg_ai_scaling'] = {
   id:'sixg_ai_scaling', title:'AI-Driven Slice Scaling', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, ETSI ZSM 002, 3GPP TS 23.288 (NWDAF) + 6G Extensions',
-  narrative:'The 6G network autonomously scales a slice based on AI prediction. Closed-loop, zero-touch automation \u2014 <span class="tm">T-Mobile</span>\'s vision for truly autonomous networks.',
+  narrative:'The 6G network autonomously scales a slice based on AI prediction. Closed-loop, zero-touch automation \u2014 the vision for truly autonomous networks.',
   nodes:['nwdaf','dig_twin','ai_core','ai_ran','gpu','upf_c','intent'],
   connections:[
     {from:'nwdaf',to:'ai_core',label:'Nnwdaf',type:'control'},
@@ -3762,7 +3761,7 @@ FLOWS['sixg_ai_scaling'] = {
 FLOWS['sixg_sensing_slice'] = {
   id:'sixg_sensing_slice', title:'Sensing-Aware Physical AI Slice', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, 3GPP SA1 6G ISAC Study, NVIDIA Metropolis VSS, GTC 2026',
-  narrative:'A 6G slice for Physical AI \u2014 ISAC fuses sub-THz radar sensing with communication. Conceptually demonstrated at <span class="tm">T-Mobile</span>\'s GTC 2026 showcase with NVIDIA Metropolis VSS.',
+  narrative:'A 6G slice for Physical AI \u2014 ISAC fuses sub-THz radar sensing with communication. Conceptually demonstrated at the GTC 2026 showcase with NVIDIA Metropolis VSS.',
   nodes:['sense','ue','ai_ran','gpu','upf_c','af','ai_core','dig_twin'],
   connections:[
     {from:'sense',to:'ai_ran',label:'6G-ISAC',type:'data'},
@@ -4162,7 +4161,7 @@ FLOWS['sixg_sensing_slice'] = {
 FLOWS['sixg_charging'] = {
   id:'sixg_charging', title:'6G Evolved Charging', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, 3GPP TS 32.255 + 6G Extensions, ETSI ZSM, NGMN 6G Vision',
-  narrative:'6G evolved charging is AI-driven, intent-aware, and real-time. Compute resources, sensing data, and digital twin access are all chargeable dimensions. <span class="tm">T-Mobile</span>\'s vision for charging beyond bytes.',
+  narrative:'6G evolved charging is AI-driven, intent-aware, and real-time. Compute resources, sensing data, and digital twin access are all chargeable dimensions. the vision for charging beyond bytes.',
   nodes:['ai_core','chf','nwdaf','dig_twin','intent'],
   connections:[
     {from:'ai_core',to:'chf',label:'AI-N40',type:'control'},
@@ -6267,7 +6266,7 @@ function drawArchSlicing(container) {
   svgLine(svg, 280,s3y+42, 350,s3y+42, 'N4'); svgLine(svg, 430,s3y+42, 500,s3y+42); svgLine(svg, 580,s3y+42, 650,s3y+42, 'N6');
   // Ref
   const ref = svgEl('text', {x:450,y:455,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: TS 23.501 §5.15 — Network Slicing. T-Mobile products mapped to slice types.'; svg.appendChild(ref);
+  ref.textContent = 'Ref: TS 23.501 §5.15 — Network Slicing. products mapped to slice types.'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 function drawArchAIRAN(container) {
@@ -6436,7 +6435,7 @@ function drawArchDevEdge(container) {
   const svg = svgEl('svg', {viewBox:'0 0 900 400', width:'100%', style:'max-height:400px'});
   // External side
   svgBox(svg, 30,90,100,50,'Developer / AF','External App',{stroke:'var(--badge-projected)',sw:1.5});
-  svgBox(svg, 210,90,140,50,'DevEdge API GW','T-Mobile DevEdge',{stroke:'var(--accent)',sw:2.5});
+  svgBox(svg, 210,90,140,50,'DevEdge API GW','DevEdge',{stroke:'var(--accent)',sw:2.5});
   svgBox(svg, 430,90,90,50,'NEF','Network Exposure');
   svgLine(svg, 130,115, 210,115, 'HTTPS', {sw:2});
   svgLine(svg, 350,115, 430,115, 'N33', {sw:2,stroke:'var(--accent)'});
@@ -6462,7 +6461,7 @@ function drawArchDevEdge(container) {
   const note = svgEl('text', {x:450,y:310,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'10','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
   note.textContent = 'NEF exposes network capabilities to external AFs via standardized APIs (CAMARA / Open Gateway)'; svg.appendChild(note);
   const ref = svgEl('text', {x:450,y:385,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: TS 29.522, GSMA Open Gateway / CAMARA, devedge.t-mobile.com'; svg.appendChild(ref);
+  ref.textContent = 'Ref: TS 29.522, GSMA Open Gateway / CAMARA'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 
@@ -6560,7 +6559,7 @@ function drawArchComparison(container) {
   });
 
   const ref = svgEl('text', {x:480,y:550,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: AI-RAN Alliance, O-RAN WG3, NVIDIA Aerial SDK — T-Mobile Innovation Center Bellevue'; svg.appendChild(ref);
+  ref.textContent = 'Ref: AI-RAN Alliance, O-RAN WG3, NVIDIA Aerial SDK — Innovation Center Bellevue'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 
@@ -6573,11 +6572,11 @@ function renderLatency(el) {
     ['AI-RAN (Converged)','Validating (Bellevue)','1–4 ms (target)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load'],
     ['6G AI-Native','Vision (~2030)','<1 ms (target)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
   ];
-  let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from <span class="tm">T-Mobile</span> network perspective.</p>';
+  let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective.</p>';
   html += '<table class="ref-table"><thead><tr><th>Architecture</th><th>Status</th><th>Estimated Range</th><th>Best For</th><th>Depends On</th></tr></thead><tbody>';
   rows.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
-  html += `<div class="latency-disclaimer">⚠ All values are estimates based on architecture analysis and hop-count modeling. These are NOT measured or guaranteed <span class="tm">T-Mobile</span> SLA commitments. Actual latency depends on radio conditions, network load, geographic placement, and many other factors.</div>`;
+  html += `<div class="latency-disclaimer">⚠ All values are estimates based on architecture analysis and hop-count modeling. These are NOT measured or guaranteed SLA commitments. Actual latency depends on radio conditions, network load, geographic placement, and many other factors.</div>`;
   el.innerHTML = html;
 }
 
@@ -6649,13 +6648,13 @@ function renderSpecLibrary(el) {
       ['ITU-R M.2160','IMT-2030 Framework','Framework and overall objectives of the future development of IMT for 2030 and beyond (6G)','https://www.itu.int/rec/R-REC-M.2160'],
     ]},
   ];
-  const tmProducts = [
-    ['Edge Control','<a href="https://www.t-mobile.com/business/solutions/5g-advanced-solutions/edge-computing-solution" target="_blank">t-mobile.com/business — Edge Computing</a>','5G Advanced edge computing with ULCL and local breakout'],
-    ['T-Platform','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Enterprise platform for edge application hosting'],
-    ['DevEdge APIs','<a href="https://devedge.t-mobile.com" target="_blank">devedge.t-mobile.com</a>','Developer APIs for network slicing, edge, QoD'],
-    ['5G Advanced + L4S','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
-    ['AI-RAN Innovation Center','<a href="https://www.t-mobile.com/news" target="_blank">t-mobile.com newsroom</a>','Converged AI+RAN with NVIDIA and Nokia/Ericsson'],
-    ['SuperMobile / Network Slicing','<a href="https://www.t-mobile.com/business/plans/supermobile" target="_blank">t-mobile.com/business — SuperMobile</a>','Business network slicing plan with intelligent performance, security, and satellite'],
+  const deployedProducts = [
+    ['Edge Control','Edge Computing','5G Advanced edge computing with ULCL and local breakout'],
+    ['T-Platform','Enterprise Edge','Enterprise platform for edge application hosting'],
+    ['DevEdge APIs','Developer APIs','Developer APIs for network slicing, edge, QoD'],
+    ['5G Advanced + L4S','Deployed','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
+    ['AI-RAN Innovation Center','AI-RAN','Converged AI+RAN with NVIDIA and Nokia/Ericsson'],
+    ['SuperMobile / Network Slicing','Enterprise Slicing','Business network slicing plan with intelligent performance, security, and satellite'],
   ];
   const alliances = [
     ['O-RAN Alliance','<a href="https://www.o-ran.org" target="_blank">o-ran.org</a>','Open RAN architecture, RIC, open fronthaul specifications'],
@@ -6677,8 +6676,8 @@ function renderSpecLibrary(el) {
     });
     html += '</ul></div>';
   });
-  html += '<div class="spec-section"><h3><span class="tm">T-Mobile</span> Deployed Products</h3><ul class="spec-list">';
-  tmProducts.forEach(p => { html += `<li><span class="spec-num">${p[0]}</span><span class="spec-title">${p[1]}</span><span class="spec-desc">${p[2]}</span></li>`; });
+  html += '<div class="spec-section"><h3>Deployed Products</h3><ul class="spec-list">';
+  deployedProducts.forEach(p => { html += `<li><span class="spec-num">${p[0]}</span><span class="spec-title">${p[1]}</span><span class="spec-desc">${p[2]}</span></li>`; });
   html += '</ul></div>';
   html += '<div class="spec-section"><h3>Industry Alliances &amp; Standards</h3><ul class="spec-list">';
   alliances.forEach(a => { html += `<li><span class="spec-num">${a[0]}</span><span class="spec-title">${a[1]}</span><span class="spec-desc">${a[2]}</span></li>`; });
@@ -6688,129 +6687,129 @@ function renderSpecLibrary(el) {
 
 /* -- Glossary -- */
 const GLOSSARY_DATA = [
-  ['AMF','Access and Mobility Management Function','Core NF handling UE registration, connection, reachability, and mobility management in the 5G Core.','TS 23.501 §6.2.1','Central to all T-Mobile 5G SA signaling; every UE registers through AMF.'],
-  ['SMF','Session Management Function','Manages PDU sessions: establishment, modification, release. Selects UPFs, installs PFCP rules.','TS 23.501 §6.2.2','Drives T-Mobile data session setup and UPF rule programming.'],
-  ['UPF','User Plane Function','Packet processing, forwarding, QoS enforcement, usage reporting. The data plane anchor.','TS 23.501 §6.2.3','Deployed centrally and at edge in T-Mobile network for ULCL/Edge Control.'],
-  ['PCF','Policy Control Function','Makes policy decisions (QoS, charging, gating) and provides PCC rules to SMF/AMF.','TS 23.501 §6.2.5','Drives T-Mobile QoS differentiation, slicing policy, and edge steering rules.'],
-  ['UDM','Unified Data Management','Stores subscriber data, generates authentication vectors, manages registration state.','TS 23.501 §6.2.4','Holds all T-Mobile subscriber profiles, SUPI→SUCI resolution, subscription data.'],
-  ['AUSF','Authentication Server Function','Executes 5G AKA / EAP-AKA\' authentication, manages authentication vectors and key derivation.','TS 23.501 §6.2.6','Authenticates every T-Mobile 5G SA subscriber during registration.'],
-  ['NRF','NF Repository Function','Service registry for all NF instances. Supports NF discovery and selection.','TS 23.501 §6.2.7','Enables dynamic NF discovery in T-Mobile\'s service-based 5GC.'],
+  ['AMF','Access and Mobility Management Function','Core NF handling UE registration, connection, reachability, and mobility management in the 5G Core.','TS 23.501 §6.2.1','Central to all 5G SA signaling; every UE registers through AMF.'],
+  ['SMF','Session Management Function','Manages PDU sessions: establishment, modification, release. Selects UPFs, installs PFCP rules.','TS 23.501 §6.2.2','Drives data session setup and UPF rule programming.'],
+  ['UPF','User Plane Function','Packet processing, forwarding, QoS enforcement, usage reporting. The data plane anchor.','TS 23.501 §6.2.3','Deployed centrally and at edge in network for ULCL/Edge Control.'],
+  ['PCF','Policy Control Function','Makes policy decisions (QoS, charging, gating) and provides PCC rules to SMF/AMF.','TS 23.501 §6.2.5','Drives QoS differentiation, slicing policy, and edge steering rules.'],
+  ['UDM','Unified Data Management','Stores subscriber data, generates authentication vectors, manages registration state.','TS 23.501 §6.2.4','Holds all subscriber profiles, SUPI→SUCI resolution, subscription data.'],
+  ['AUSF','Authentication Server Function','Executes 5G AKA / EAP-AKA\' authentication, manages authentication vectors and key derivation.','TS 23.501 §6.2.6','Authenticates every 5G SA subscriber during registration.'],
+  ['NRF','NF Repository Function','Service registry for all NF instances. Supports NF discovery and selection.','TS 23.501 §6.2.7','Enables dynamic NF discovery in the service-based 5GC.'],
   ['NSSF','Network Slice Selection Function','Determines Allowed NSSAI, selects appropriate AMF set for requested network slices.','TS 23.501 §6.2.8','Used for T-Priority, SuperMobile, and enterprise slice selection.'],
-  ['NEF','Network Exposure Function','Exposes network capabilities to AFs via APIs. Translates external requests to internal policies.','TS 23.501 §6.2.9','Powers T-Mobile DevEdge APIs and AF traffic influence for Edge Control.'],
-  ['CHF','Converged Charging Function','Provides converged online/offline charging. Manages quota, rating, and CDR generation.','TS 32.291','Handles all T-Mobile 5G charging; supports per-slice and per-service rating.'],
-  ['NWDAF','Network Data Analytics Function','Collects network data, provides analytics and ML-based predictions to other NFs.','TS 23.288','Supports T-Mobile network optimization, anomaly detection, load prediction.'],
-  ['SMSF','SMS Function','Handles SMS delivery over NAS (non-IMS path) for 5G-connected UEs.','TS 23.501 §6.2.11','Used for NAS-based SMS in T-Mobile 5G SA when IMS SMS not available.'],
-  ['EASDF','Edge Application Server Discovery Function','Assists in EAS discovery via DNS-based mechanisms for edge computing scenarios.','TS 23.548','Part of T-Mobile Edge Control architecture for edge app discovery.'],
-  ['EES','Edge Enabler Server','Provides edge service APIs, manages EAS lifecycle and edge connectivity.','TS 23.558','Component of T-Mobile T-Platform edge application hosting.'],
+  ['NEF','Network Exposure Function','Exposes network capabilities to AFs via APIs. Translates external requests to internal policies.','TS 23.501 §6.2.9','Powers DevEdge APIs and AF traffic influence for Edge Control.'],
+  ['CHF','Converged Charging Function','Provides converged online/offline charging. Manages quota, rating, and CDR generation.','TS 32.291','Handles all 5G charging; supports per-slice and per-service rating.'],
+  ['NWDAF','Network Data Analytics Function','Collects network data, provides analytics and ML-based predictions to other NFs.','TS 23.288','Supports network optimization, anomaly detection, load prediction.'],
+  ['SMSF','SMS Function','Handles SMS delivery over NAS (non-IMS path) for 5G-connected UEs.','TS 23.501 §6.2.11','Used for NAS-based SMS in 5G SA when IMS SMS not available.'],
+  ['EASDF','Edge Application Server Discovery Function','Assists in EAS discovery via DNS-based mechanisms for edge computing scenarios.','TS 23.548','Part of Edge Control architecture for edge app discovery.'],
+  ['EES','Edge Enabler Server','Provides edge service APIs, manages EAS lifecycle and edge connectivity.','TS 23.558','Component of T-Platform edge application hosting.'],
   ['ECS','Edge Configuration Server','Provides EES discovery and edge configuration information to edge clients.','TS 23.558','Supports T-Platform edge service configuration.'],
   ['NSACF','Network Slice Admission Control Function','Controls the number of UEs or PDU sessions admitted per slice to prevent overload.','TS 23.501 §5.15.11','Enforces per-slice UE and PDU session admission limits (Rel-17+).'],
-  ['SCP','Service Communication Proxy','Provides indirect communication, load balancing, and service mesh for SBI.','TS 23.501 §6.2.15','Deployed in T-Mobile 5GC for SBI traffic management.'],
-  ['UDSF','Unstructured Data Storage Function','Stores unstructured data for stateless NF operation.','TS 23.501 §6.2.16','Enables stateless NF design in T-Mobile cloud-native 5GC.'],
-  ['UCMF','UE radio Capability Management Function','Stores and provides UE radio capability information to the RAN.','TS 23.501 §6.2.17','Optimizes T-Mobile RAN resource allocation per UE capability.'],
-  ['AF','Application Function','Any application that interacts with the 5GC to influence traffic routing, QoS, or policy.','TS 23.501 §6.2.10','Enterprise and partner applications interfacing with T-Mobile 5GC.'],
-  ['P-CSCF','Proxy Call Session Control Function','First IMS contact point for UE. Handles SIP signaling, IPsec, policy interaction.','TS 23.228','Entry point for T-Mobile VoNR calls into the IMS domain.'],
-  ['I-CSCF','Interrogating CSCF','Routes SIP to correct S-CSCF during registration/session setup. Provides topology hiding.','TS 23.228','Handles T-Mobile IMS routing and inter-network SIP queries.'],
-  ['S-CSCF','Serving CSCF','Core IMS session control. Handles SIP registration, session routing, service trigger.','TS 23.228','Manages T-Mobile VoNR session state and TAS invocation.'],
-  ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts T-Mobile calling features: Wi-Fi Calling, Visual Voicemail, etc.'],
-  ['MGCF','Media Gateway Control Function','Controls media gateways for PSTN/CS interworking.','TS 23.228','Used in T-Mobile IMS for PSTN breakout scenarios.'],
-  ['BGCF','Breakout Gateway Control Function','Selects network for PSTN breakout in IMS-to-PSTN calls.','TS 23.228','Routes T-Mobile VoNR calls to PSTN when needed.'],
-  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','T-Mobile nationwide 5G SA gNB deployment on n25/n41/n71/n260.'],
-  ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in T-Mobile O-RAN/vRAN disaggregated deployments.'],
-  ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at T-Mobile cell sites in split-architecture configurations.'],
-  ['O-RU','O-RAN Radio Unit','Open RAN radio unit handling PHY-low and RF. Connected to O-DU via open fronthaul.','O-RAN Alliance','Part of T-Mobile Open RAN architecture strategy.'],
-  ['O-DU','O-RAN Distributed Unit','Open RAN DU with standardized interfaces per O-RAN specs.','O-RAN Alliance','Deployed in T-Mobile Open RAN sites.'],
-  ['O-CU','O-RAN Central Unit','Open RAN CU with O-RAN compliant interfaces (E2, A1, O1).','O-RAN Alliance','Managed by T-Mobile RIC in Open RAN deployments.'],
-  ['RIC','RAN Intelligent Controller','Near-RT and Non-RT controller for RAN optimization via xApps/rApps.','O-RAN Alliance','T-Mobile uses RIC for AI/ML-driven RAN optimization.'],
-  ['AI-RAN Node','AI-RAN Converged Node','GPU-accelerated node combining RAN processing and AI inference on shared hardware.','AI-RAN Alliance','Under validation at T-Mobile Bellevue Innovation Center with NVIDIA.'],
-  ['UE','User Equipment','Mobile device (phone, IoT device, CPE) connecting to the 5G network.','TS 23.501','All T-Mobile subscriber devices: phones, FWA, IoT, wearables.'],
+  ['SCP','Service Communication Proxy','Provides indirect communication, load balancing, and service mesh for SBI.','TS 23.501 §6.2.15','Deployed in 5GC for SBI traffic management.'],
+  ['UDSF','Unstructured Data Storage Function','Stores unstructured data for stateless NF operation.','TS 23.501 §6.2.16','Enables stateless NF design in cloud-native 5GC.'],
+  ['UCMF','UE radio Capability Management Function','Stores and provides UE radio capability information to the RAN.','TS 23.501 §6.2.17','Optimizes RAN resource allocation per UE capability.'],
+  ['AF','Application Function','Any application that interacts with the 5GC to influence traffic routing, QoS, or policy.','TS 23.501 §6.2.10','Enterprise and partner applications interfacing with 5GC.'],
+  ['P-CSCF','Proxy Call Session Control Function','First IMS contact point for UE. Handles SIP signaling, IPsec, policy interaction.','TS 23.228','Entry point for VoNR calls into the IMS domain.'],
+  ['I-CSCF','Interrogating CSCF','Routes SIP to correct S-CSCF during registration/session setup. Provides topology hiding.','TS 23.228','Handles IMS routing and inter-network SIP queries.'],
+  ['S-CSCF','Serving CSCF','Core IMS session control. Handles SIP registration, session routing, service trigger.','TS 23.228','Manages VoNR session state and TAS invocation.'],
+  ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts calling features: Wi-Fi Calling, Visual Voicemail, etc.'],
+  ['MGCF','Media Gateway Control Function','Controls media gateways for PSTN/CS interworking.','TS 23.228','Used in IMS for PSTN breakout scenarios.'],
+  ['BGCF','Breakout Gateway Control Function','Selects network for PSTN breakout in IMS-to-PSTN calls.','TS 23.228','Routes VoNR calls to PSTN when needed.'],
+  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','nationwide 5G SA gNB deployment on n25/n41/n71/n260.'],
+  ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in O-RAN/vRAN disaggregated deployments.'],
+  ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at cell sites in split-architecture configurations.'],
+  ['O-RU','O-RAN Radio Unit','Open RAN radio unit handling PHY-low and RF. Connected to O-DU via open fronthaul.','O-RAN Alliance','Part of Open RAN architecture strategy.'],
+  ['O-DU','O-RAN Distributed Unit','Open RAN DU with standardized interfaces per O-RAN specs.','O-RAN Alliance','Deployed in Open RAN sites.'],
+  ['O-CU','O-RAN Central Unit','Open RAN CU with O-RAN compliant interfaces (E2, A1, O1).','O-RAN Alliance','Managed by RIC in Open RAN deployments.'],
+  ['RIC','RAN Intelligent Controller','Near-RT and Non-RT controller for RAN optimization via xApps/rApps.','O-RAN Alliance','uses RIC for AI/ML-driven RAN optimization.'],
+  ['AI-RAN Node','AI-RAN Converged Node','GPU-accelerated node combining RAN processing and AI inference on shared hardware.','AI-RAN Alliance','Under validation at Bellevue Innovation Center with NVIDIA.'],
+  ['UE','User Equipment','Mobile device (phone, IoT device, CPE) connecting to the 5G network.','TS 23.501','All subscriber devices: phones, FWA, IoT, wearables.'],
   ['N1','N1 Reference Point','NAS signaling between UE and AMF (carried over N2 via gNB).','TS 23.501 §5.2','Carries registration, authentication, session management NAS messages.'],
-  ['N2','N2 Reference Point','Control plane interface between gNB and AMF. Carries NGAP.','TS 23.501 §5.2','All T-Mobile gNB↔AMF signaling flows over N2.'],
-  ['N3','N3 Reference Point','User plane between gNB and UPF. Carries GTP-U tunnels.','TS 23.501 §5.2','Primary user data path in T-Mobile 5G SA network.'],
-  ['N4','N4 Reference Point','Control plane between SMF and UPF. Carries PFCP.','TS 23.501 §5.2','SMF programs UPF forwarding rules via N4 in T-Mobile 5GC.'],
-  ['N5','N5 Reference Point','AF ↔ PCF for application-level policy authorization (IMS, MEC, AF-triggered QoS).','TS 23.501 §5.2, TS 29.514','Used for T-Mobile IMS policy and AF-triggered QoS/edge policy via PCF.'],
-  ['N6','N6 Reference Point','User plane between UPF and Data Network (DN).','TS 23.501 §5.2','Connects T-Mobile UPF to internet/enterprise networks.'],
-  ['N7','N7 Reference Point','SMF ↔ PCF for SM policy control (PCC rules, QoS decisions).','TS 23.501 §5.2','PCF provides T-Mobile QoS and charging policy to SMF via N7.'],
-  ['N8','N8 Reference Point','AMF ↔ UDM for subscriber data access.','TS 23.501 §5.2','AMF retrieves T-Mobile subscriber data from UDM via N8.'],
-  ['N9','N9 Reference Point','User plane between two UPFs (e.g., ULCL → PSA). GTP-U tunnel.','TS 23.501 §5.2','Connects edge UPF to central UPF in T-Mobile Edge Control architecture.'],
+  ['N2','N2 Reference Point','Control plane interface between gNB and AMF. Carries NGAP.','TS 23.501 §5.2','All gNB↔AMF signaling flows over N2.'],
+  ['N3','N3 Reference Point','User plane between gNB and UPF. Carries GTP-U tunnels.','TS 23.501 §5.2','Primary user data path in 5G SA network.'],
+  ['N4','N4 Reference Point','Control plane between SMF and UPF. Carries PFCP.','TS 23.501 §5.2','SMF programs UPF forwarding rules via N4 in 5GC.'],
+  ['N5','N5 Reference Point','AF ↔ PCF for application-level policy authorization (IMS, MEC, AF-triggered QoS).','TS 23.501 §5.2, TS 29.514','Used for IMS policy and AF-triggered QoS/edge policy via PCF.'],
+  ['N6','N6 Reference Point','User plane between UPF and Data Network (DN).','TS 23.501 §5.2','Connects UPF to internet/enterprise networks.'],
+  ['N7','N7 Reference Point','SMF ↔ PCF for SM policy control (PCC rules, QoS decisions).','TS 23.501 §5.2','PCF provides QoS and charging policy to SMF via N7.'],
+  ['N8','N8 Reference Point','AMF ↔ UDM for subscriber data access.','TS 23.501 §5.2','AMF retrieves subscriber data from UDM via N8.'],
+  ['N9','N9 Reference Point','User plane between two UPFs (e.g., ULCL → PSA). GTP-U tunnel.','TS 23.501 §5.2','Connects edge UPF to central UPF in Edge Control architecture.'],
   ['N10','N10 Reference Point','SMF ↔ UDM for session management subscription data.','TS 23.501 §5.2','SMF retrieves DNN/slice subscription from UDM via N10.'],
-  ['N11','N11 Reference Point','AMF ↔ SMF for PDU session lifecycle management.','TS 23.501 §5.2','AMF forwards session requests to SMF via N11 in T-Mobile 5GC.'],
-  ['N12','N12 Reference Point','AMF ↔ AUSF for UE authentication.','TS 23.501 §5.2','Authentication vectors exchanged via N12 during T-Mobile 5G AKA.'],
+  ['N11','N11 Reference Point','AMF ↔ SMF for PDU session lifecycle management.','TS 23.501 §5.2','AMF forwards session requests to SMF via N11 in 5GC.'],
+  ['N12','N12 Reference Point','AMF ↔ AUSF for UE authentication.','TS 23.501 §5.2','Authentication vectors exchanged via N12 during 5G AKA.'],
   ['N13','N13 Reference Point','AUSF ↔ UDM for authentication credential retrieval.','TS 23.501 §5.2','UDM provides AV to AUSF during subscriber authentication.'],
-  ['N14','N14 Reference Point','AMF ↔ AMF for UE context transfer during AMF reroute.','TS 23.501 §5.2','Used when T-Mobile AMF reroutes UE to slice-specific AMF.'],
+  ['N14','N14 Reference Point','AMF ↔ AMF for UE context transfer during AMF reroute.','TS 23.501 §5.2','Used when AMF reroutes UE to slice-specific AMF.'],
   ['N15','N15 Reference Point','AMF ↔ PCF for AM policy control.','TS 23.501 §5.2','PCF provides RFSP and service area restrictions to AMF.'],
-  ['N22','N22 Reference Point','AMF ↔ NSSF for network slice selection.','TS 23.501 §5.2','AMF queries NSSF for allowed slices during T-Mobile registration.'],
+  ['N22','N22 Reference Point','AMF ↔ NSSF for network slice selection.','TS 23.501 §5.2','AMF queries NSSF for allowed slices during registration.'],
   ['N27','N27 Reference Point','NRF ↔ NSSF for NF set information.','TS 23.501 §5.2','NSSF queries NRF for AMF sets serving specific slices.'],
-  ['N33','N33 Reference Point','AF ↔ NEF for network capability exposure.','TS 23.501 §5.2','T-Mobile DevEdge APIs and AF traffic influence use N33.'],
-  ['N40','N40 Reference Point','SMF ↔ CHF for converged charging.','TS 32.291','All T-Mobile 5G charging flows use N40 interface.'],
-  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','T-Mobile 5G NR air interface on n25/n41/n71/n260 bands.'],
-  ['F1','F1 Interface','Interface between gNB-CU and gNB-DU (F1-C control, F1-U user).','TS 38.470/473','Used in T-Mobile CU/DU split RAN deployments.'],
+  ['N33','N33 Reference Point','AF ↔ NEF for network capability exposure.','TS 23.501 §5.2','DevEdge APIs and AF traffic influence use N33.'],
+  ['N40','N40 Reference Point','SMF ↔ CHF for converged charging.','TS 32.291','All 5G charging flows use N40 interface.'],
+  ['Uu','Uu Interface','Air interface between UE and gNB (NR radio).','TS 38.300','5G NR air interface on n25/n41/n71/n260 bands.'],
+  ['F1','F1 Interface','Interface between gNB-CU and gNB-DU (F1-C control, F1-U user).','TS 38.470/473','Used in CU/DU split RAN deployments.'],
   ['E1','E1 Interface','Interface between gNB-CU-CP and gNB-CU-UP.','TS 38.460/463','Separates control and user plane processing in CU.'],
-  ['Xn','Xn Interface','Inter-gNB interface for handover and dual connectivity.','TS 38.420/423','Supports T-Mobile inter-gNB handover and EN-DC/NR-DC.'],
-  ['SBI','Service-Based Interface','HTTP/2-based interfaces between 5GC NFs using RESTful APIs.','TS 29.500','All T-Mobile 5GC control plane NFs communicate via SBI.'],
-  ['Fronthaul','O-RAN Fronthaul','Open fronthaul interface between O-DU and O-RU (eCPRI-based).','O-RAN Alliance','T-Mobile Open RAN fronthaul specification adoption.'],
-  ['E2','E2 Interface','Near-RT RIC to RAN nodes for real-time control and monitoring.','O-RAN Alliance','xApps on T-Mobile RIC control RAN via E2.'],
-  ['A1','A1 Interface','Non-RT RIC to Near-RT RIC for policy and ML model delivery.','O-RAN Alliance','Delivers AI/ML policies from T-Mobile SMO to Near-RT RIC.'],
-  ['O1','O1 Interface','Management interface for O-RAN elements (FCAPS, PM, CM).','O-RAN Alliance','T-Mobile network management of Open RAN elements.'],
-  ['O2','O2 Interface','SMO to O-Cloud for infrastructure management.','O-RAN Alliance','Manages T-Mobile cloud infrastructure hosting RAN workloads.'],
-  ['R1','R1 Interface','Between hosting platform and rApp/xApp.','O-RAN Alliance','Application hosting interface in T-Mobile RIC.'],
-  ['NAS','Non-Access Stratum','Protocol between UE and core network (AMF/SMF) for registration, auth, session mgmt.','TS 24.501','Carries all T-Mobile 5GMM and 5GSM signaling messages.'],
-  ['NGAP','NG Application Protocol','Protocol on N2 between gNB and AMF for UE context and PDU session management.','TS 38.413','All T-Mobile gNB↔AMF control signaling uses NGAP.'],
-  ['GTP-U','GPRS Tunnelling Protocol — User Plane','Tunneling protocol for user data on N3 and N9 interfaces.','TS 29.281','Encapsulates T-Mobile user data between gNB↔UPF and UPF↔UPF.'],
-  ['PFCP','Packet Forwarding Control Protocol','Protocol on N4 for SMF to program UPF forwarding rules (PDR/FAR/QER/URR).','TS 29.244','SMF programs all T-Mobile UPF packet handling via PFCP.'],
-  ['HTTP/2','Hypertext Transfer Protocol version 2','Transport for all SBI communications between 5GC NFs.','TS 29.500, RFC 7540','Foundation of T-Mobile 5GC service-based architecture.'],
-  ['SIP','Session Initiation Protocol','Signaling protocol for IMS voice/video session establishment.','TS 24.229, RFC 3261','Carries T-Mobile VoNR call setup through IMS CSCFs.'],
-  ['Diameter','Diameter Protocol','AAA protocol used in 4G EPC (S6a, Gx, Gy). Replaced by SBI/HTTP/2 in 5GC.','RFC 6733','Legacy in T-Mobile LTE; 5GC uses SBI instead.'],
-  ['eCPRI','enhanced Common Public Radio Interface','Fronthaul protocol between O-DU and O-RU carrying IQ samples.','eCPRI Spec v2.0','Used in T-Mobile Open RAN fronthaul deployments.'],
-  ['5QI','5G QoS Identifier','Scalar identifying QoS characteristics (priority, delay budget, error rate).','TS 23.501 §5.7.4','T-Mobile maps services to 5QI values for QoS differentiation.'],
-  ['S-NSSAI','Single Network Slice Selection Assistance Information','Identifies a network slice: SST (type) + optional SD (differentiator).','TS 23.501 §5.15.2','T-Mobile uses S-NSSAI to identify slices like T-Priority, SuperMobile.'],
-  ['SST','Slice/Service Type','8-bit value identifying the expected slice behavior (1=eMBB, 2=URLLC, 3=MIoT).','TS 23.501 §5.15.2.2','Standard slice types used across T-Mobile network.'],
-  ['SD','Slice Differentiator','24-bit value distinguishing slices with same SST (e.g., different enterprise slices).','TS 23.501 §5.15.2.2','T-Mobile uses SD to differentiate custom enterprise slices.'],
+  ['Xn','Xn Interface','Inter-gNB interface for handover and dual connectivity.','TS 38.420/423','Supports inter-gNB handover and EN-DC/NR-DC.'],
+  ['SBI','Service-Based Interface','HTTP/2-based interfaces between 5GC NFs using RESTful APIs.','TS 29.500','All 5GC control plane NFs communicate via SBI.'],
+  ['Fronthaul','O-RAN Fronthaul','Open fronthaul interface between O-DU and O-RU (eCPRI-based).','O-RAN Alliance','Open RAN fronthaul specification adoption.'],
+  ['E2','E2 Interface','Near-RT RIC to RAN nodes for real-time control and monitoring.','O-RAN Alliance','xApps on RIC control RAN via E2.'],
+  ['A1','A1 Interface','Non-RT RIC to Near-RT RIC for policy and ML model delivery.','O-RAN Alliance','Delivers AI/ML policies from SMO to Near-RT RIC.'],
+  ['O1','O1 Interface','Management interface for O-RAN elements (FCAPS, PM, CM).','O-RAN Alliance','network management of Open RAN elements.'],
+  ['O2','O2 Interface','SMO to O-Cloud for infrastructure management.','O-RAN Alliance','Manages cloud infrastructure hosting RAN workloads.'],
+  ['R1','R1 Interface','Between hosting platform and rApp/xApp.','O-RAN Alliance','Application hosting interface in RIC.'],
+  ['NAS','Non-Access Stratum','Protocol between UE and core network (AMF/SMF) for registration, auth, session mgmt.','TS 24.501','Carries all 5GMM and 5GSM signaling messages.'],
+  ['NGAP','NG Application Protocol','Protocol on N2 between gNB and AMF for UE context and PDU session management.','TS 38.413','All gNB↔AMF control signaling uses NGAP.'],
+  ['GTP-U','GPRS Tunnelling Protocol — User Plane','Tunneling protocol for user data on N3 and N9 interfaces.','TS 29.281','Encapsulates user data between gNB↔UPF and UPF↔UPF.'],
+  ['PFCP','Packet Forwarding Control Protocol','Protocol on N4 for SMF to program UPF forwarding rules (PDR/FAR/QER/URR).','TS 29.244','SMF programs all UPF packet handling via PFCP.'],
+  ['HTTP/2','Hypertext Transfer Protocol version 2','Transport for all SBI communications between 5GC NFs.','TS 29.500, RFC 7540','Foundation of 5GC service-based architecture.'],
+  ['SIP','Session Initiation Protocol','Signaling protocol for IMS voice/video session establishment.','TS 24.229, RFC 3261','Carries VoNR call setup through IMS CSCFs.'],
+  ['Diameter','Diameter Protocol','AAA protocol used in 4G EPC (S6a, Gx, Gy). Replaced by SBI/HTTP/2 in 5GC.','RFC 6733','Legacy in LTE; 5GC uses SBI instead.'],
+  ['eCPRI','enhanced Common Public Radio Interface','Fronthaul protocol between O-DU and O-RU carrying IQ samples.','eCPRI Spec v2.0','Used in Open RAN fronthaul deployments.'],
+  ['5QI','5G QoS Identifier','Scalar identifying QoS characteristics (priority, delay budget, error rate).','TS 23.501 §5.7.4','maps services to 5QI values for QoS differentiation.'],
+  ['S-NSSAI','Single Network Slice Selection Assistance Information','Identifies a network slice: SST (type) + optional SD (differentiator).','TS 23.501 §5.15.2','uses S-NSSAI to identify slices like T-Priority, SuperMobile.'],
+  ['SST','Slice/Service Type','8-bit value identifying the expected slice behavior (1=eMBB, 2=URLLC, 3=MIoT).','TS 23.501 §5.15.2.2','Standard slice types used across network.'],
+  ['SD','Slice Differentiator','24-bit value distinguishing slices with same SST (e.g., different enterprise slices).','TS 23.501 §5.15.2.2','uses SD to differentiate custom enterprise slices.'],
   ['NSSAI','Network Slice Selection Assistance Information','Set of S-NSSAIs — Requested, Allowed, Configured, or Subscribed.','TS 23.501 §5.15.2','UE provides Requested NSSAI; AMF returns Allowed NSSAI.'],
-  ['DNN','Data Network Name','Identifies the data network the PDU session connects to (like APN in 4G).','TS 23.501 §5.6.1','T-Mobile DNNs include "fast.t-mobile.com", "ims", etc.'],
-  ['SUPI','Subscription Permanent Identifier','Globally unique permanent subscriber ID (usually IMSI format).','TS 23.501 §5.9.2','T-Mobile SUPI format: IMSI 310260xxxxxxxxx.'],
-  ['SUCI','Subscription Concealed Identifier','Privacy-preserving encrypted form of SUPI sent over the air.','TS 23.501 §5.9.2','UE encrypts MSIN using T-Mobile home network public key.'],
-  ['5G-GUTI','5G Globally Unique Temporary Identifier','Temporary ID assigned by AMF to hide SUPI over the air.','TS 23.501 §5.9.4','AMF assigns new 5G-GUTI on every T-Mobile registration.'],
-  ['PDU Session','Protocol Data Unit Session','Logical connection between UE and data network through 5GC. Has QoS flows, IP address.','TS 23.501 §5.6','T-Mobile establishes PDU sessions per DNN/slice combination.'],
-  ['QoS Flow','Quality of Service Flow','Finest granularity of QoS within a PDU session, identified by QFI.','TS 23.501 §5.7','T-Mobile maps traffic to QoS flows with specific 5QI values.'],
-  ['PCC Rule','Policy and Charging Control Rule','Rule from PCF specifying QoS, charging, and gating for specific traffic.','TS 23.503','PCF provides PCC rules driving T-Mobile QoS and charging behavior.'],
-  ['URR','Usage Reporting Rule','PFCP rule in UPF for monitoring and reporting traffic usage to SMF.','TS 29.244','Triggers T-Mobile charging reports based on volume/time thresholds.'],
-  ['PDR','Packet Detection Rule','PFCP rule in UPF defining how to match incoming packets.','TS 29.244','UPF matches T-Mobile user traffic to PDRs for processing.'],
-  ['FAR','Forwarding Action Rule','PFCP rule defining what to do with matched packets (forward, drop, buffer).','TS 29.244','Controls T-Mobile UPF forwarding decisions per matched PDR.'],
-  ['QER','QoS Enforcement Rule','PFCP rule for rate limiting and QoS enforcement at UPF.','TS 29.244','Enforces T-Mobile session-AMBR and flow-level QoS at UPF.'],
-  ['AMBR','Aggregate Maximum Bit Rate','Maximum data rate aggregate for a UE (UE-AMBR) or session (Session-AMBR).','TS 23.501 §5.7','T-Mobile sets AMBR per subscription tier and per slice.'],
-  ['ULCL','Uplink Classifier','UPF function that classifies UL traffic and steers it to local or central path.','TS 23.501 §5.6.4','Core of T-Mobile Edge Control: steers traffic to EAS or central DN.'],
-  ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','T-Mobile central UPF acting as PSA for non-edge traffic.'],
-  ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','T-Mobile Edge Control uses ULCL-based LBO to reach edge applications.'],
-  ['TSN','Time-Sensitive Networking','IEEE 802.1 deterministic networking integrated with 5G for industrial automation.','TS 23.501 §5.27','T-Mobile enterprise offering for industrial IoT use cases.'],
-  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','Deployed nationwide on T-Mobile 5G Advanced (Jul 2025).'],
-  ['RedCap','Reduced Capability NR','NR devices with reduced bandwidth/antenna for IoT and wearables.','TR 38.875, Rel-17','T-Mobile supports RedCap for cost-optimized IoT devices.'],
-  ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','T-Mobile URLLC slices for T-Priority and enterprise critical apps.'],
-  ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','T-Mobile default 5G slice for consumer broadband services.'],
-  ['mMTC','massive Machine Type Communication','5G service category for massive IoT (high device density, low data).','TS 23.501','T-Mobile IoT/NB-IoT service category.'],
-  ['ISAC','Integrated Sensing and Communication','6G capability combining radar-like sensing with communication.','3GPP 6G studies','Envisioned for T-Mobile 6G physical AI and environmental sensing.'],
-  ['SSC Mode','Session and Service Continuity Mode','Defines how IP address continuity is handled during UPF changes (1/2/3).','TS 23.501 §5.6.9','T-Mobile uses SSC1 (default), SSC2/3 for edge mobility scenarios.'],
-  ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','T-Mobile deployed slicing: T-Priority, SuperMobile, 5G On Demand.'],
-  ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','T-Mobile SASE offering integrating SD-WAN with 5G and security.'],
-  ['Edge Control','Edge Control','T-Mobile 5G Advanced edge computing solution using ULCL for local breakout.','T-Mobile product','Launched Oct 2025. Uses ULCL + EAS for sub-10ms application hosting.'],
-  ['T-Platform','T-Platform','T-Mobile enterprise platform for hosting edge applications on 5G infrastructure.','T-Mobile product','Launched Oct 2025 with Edge Control for enterprise edge workloads.'],
-  ['DevEdge','DevEdge','T-Mobile developer platform providing APIs for network capabilities.','T-Mobile product','APIs for QoD, slicing, edge discovery. devedge.t-mobile.com.'],
-  ['T-Priority','T-Priority','T-Mobile 5G network slicing solution for first responders with priority access and preemption.','T-Mobile product','Announced Sep 2024; launched Feb 2025. Uses dedicated network slice with 5x resources for first responders.'],
-  ['SuperMobile','SuperMobile','T-Mobile business network slicing plan combining intelligent performance, built-in security, and satellite coverage.','T-Mobile product','Launched Aug 27, 2025. First business plan with nationwide network slice, Threat Protect, and T-Satellite.'],
-  ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware, eliminating dedicated AI accelerators.','AI-RAN Alliance','Under validation at T-Mobile Bellevue Innovation Center with NVIDIA and Nokia/Ericsson.'],
-  ['Digital Twin','Network Digital Twin','Virtual replica of the physical network enabling simulation, prediction, and optimization of network behavior before applying changes to the live network.','ITU-R M.2160, 3GPP 6G studies','Envisioned for T-Mobile 6G network planning, fault prediction, and autonomous optimization.'],
-  ['Intent Engine','Intent-Based Management Engine','6G management function that translates high-level operator intents (e.g., "guarantee 10 Gbps for AR zone") into concrete network configurations using AI/ML.','TM Forum, ETSI ZSM','Envisioned for T-Mobile 6G autonomous network management and slice orchestration.'],
-  ['PQC','Post-Quantum Cryptography','Cryptographic algorithms designed to resist attacks from quantum computers. Includes lattice-based schemes like CRYSTALS-Kyber (KEM) and CRYSTALS-Dilithium (signatures).','NIST PQC Standards','Envisioned for T-Mobile 6G authentication to protect against harvest-now-decrypt-later quantum threats.'],
-  ['DCGM','NVIDIA Data Center GPU Manager','Monitoring and management tool for NVIDIA GPUs in data center environments, providing health, diagnostics, and telemetry metrics.','NVIDIA','Used in T-Mobile AI-RAN telemetry for GPU health monitoring and performance tracking.'],
-  ['cuPHY','NVIDIA Aerial cuPHY','GPU-accelerated 5G NR Layer 1 (PHY) implementation from the NVIDIA Aerial SDK, running physical layer processing on CUDA cores.','NVIDIA Aerial SDK','Core L1 engine in T-Mobile AI-RAN Innovation Center for GPU-based RAN processing.'],
-  ['cuMAC','NVIDIA Aerial cuMAC','GPU-accelerated MAC scheduler from the NVIDIA Aerial SDK, enabling real-time scheduling decisions on GPU hardware.','NVIDIA Aerial SDK','MAC layer component in T-Mobile AI-RAN for GPU-native scheduling and resource allocation.'],
-  ['NVLink','NVIDIA NVLink','High-bandwidth, low-latency GPU-to-GPU interconnect enabling direct memory access between GPUs without CPU involvement.','NVIDIA','Used in T-Mobile AI-RAN node architecture for GPU interconnect in multi-GPU configurations.'],
+  ['DNN','Data Network Name','Identifies the data network the PDU session connects to (like APN in 4G).','TS 23.501 §5.6.1','DNNs include "internet", "ims", etc.'],
+  ['SUPI','Subscription Permanent Identifier','Globally unique permanent subscriber ID (usually IMSI format).','TS 23.501 §5.9.2','SUPI format: IMSI 310260xxxxxxxxx.'],
+  ['SUCI','Subscription Concealed Identifier','Privacy-preserving encrypted form of SUPI sent over the air.','TS 23.501 §5.9.2','UE encrypts MSIN using home network public key.'],
+  ['5G-GUTI','5G Globally Unique Temporary Identifier','Temporary ID assigned by AMF to hide SUPI over the air.','TS 23.501 §5.9.4','AMF assigns new 5G-GUTI on every registration.'],
+  ['PDU Session','Protocol Data Unit Session','Logical connection between UE and data network through 5GC. Has QoS flows, IP address.','TS 23.501 §5.6','establishes PDU sessions per DNN/slice combination.'],
+  ['QoS Flow','Quality of Service Flow','Finest granularity of QoS within a PDU session, identified by QFI.','TS 23.501 §5.7','maps traffic to QoS flows with specific 5QI values.'],
+  ['PCC Rule','Policy and Charging Control Rule','Rule from PCF specifying QoS, charging, and gating for specific traffic.','TS 23.503','PCF provides PCC rules driving QoS and charging behavior.'],
+  ['URR','Usage Reporting Rule','PFCP rule in UPF for monitoring and reporting traffic usage to SMF.','TS 29.244','Triggers charging reports based on volume/time thresholds.'],
+  ['PDR','Packet Detection Rule','PFCP rule in UPF defining how to match incoming packets.','TS 29.244','UPF matches user traffic to PDRs for processing.'],
+  ['FAR','Forwarding Action Rule','PFCP rule defining what to do with matched packets (forward, drop, buffer).','TS 29.244','Controls UPF forwarding decisions per matched PDR.'],
+  ['QER','QoS Enforcement Rule','PFCP rule for rate limiting and QoS enforcement at UPF.','TS 29.244','Enforces session-AMBR and flow-level QoS at UPF.'],
+  ['AMBR','Aggregate Maximum Bit Rate','Maximum data rate aggregate for a UE (UE-AMBR) or session (Session-AMBR).','TS 23.501 §5.7','sets AMBR per subscription tier and per slice.'],
+  ['ULCL','Uplink Classifier','UPF function that classifies UL traffic and steers it to local or central path.','TS 23.501 §5.6.4','Core of Edge Control: steers traffic to EAS or central DN.'],
+  ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','central UPF acting as PSA for non-edge traffic.'],
+  ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','Edge Control uses ULCL-based LBO to reach edge applications.'],
+  ['TSN','Time-Sensitive Networking','IEEE 802.1 deterministic networking integrated with 5G for industrial automation.','TS 23.501 §5.27','enterprise offering for industrial IoT use cases.'],
+  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','Deployed nationwide on 5G Advanced (Jul 2025).'],
+  ['RedCap','Reduced Capability NR','NR devices with reduced bandwidth/antenna for IoT and wearables.','TR 38.875, Rel-17','supports RedCap for cost-optimized IoT devices.'],
+  ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for T-Priority and enterprise critical apps.'],
+  ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','default 5G slice for consumer broadband services.'],
+  ['mMTC','massive Machine Type Communication','5G service category for massive IoT (high device density, low data).','TS 23.501','IoT/NB-IoT service category.'],
+  ['ISAC','Integrated Sensing and Communication','6G capability combining radar-like sensing with communication.','3GPP 6G studies','Envisioned for 6G physical AI and environmental sensing.'],
+  ['SSC Mode','Session and Service Continuity Mode','Defines how IP address continuity is handled during UPF changes (1/2/3).','TS 23.501 §5.6.9','uses SSC1 (default), SSC2/3 for edge mobility scenarios.'],
+  ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','deployed slicing: T-Priority, SuperMobile, 5G On Demand.'],
+  ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','SASE offering integrating SD-WAN with 5G and security.'],
+  ['Edge Control','Edge Control','5G Advanced edge computing solution using ULCL for local breakout.','product','Launched Oct 2025. Uses ULCL + EAS for sub-10ms application hosting.'],
+  ['T-Platform','T-Platform','enterprise platform for hosting edge applications on 5G infrastructure.','product','Launched Oct 2025 with Edge Control for enterprise edge workloads.'],
+  ['DevEdge','DevEdge','developer platform providing APIs for network capabilities.','product','APIs for QoD, slicing, edge discovery.'],
+  ['T-Priority','T-Priority','5G network slicing solution for first responders with priority access and preemption.','product','Announced Sep 2024; launched Feb 2025. Uses dedicated network slice with 5x resources for first responders.'],
+  ['SuperMobile','SuperMobile','business network slicing plan combining intelligent performance, built-in security, and satellite coverage.','product','Launched Aug 27, 2025. First business plan with nationwide network slice, Threat Protect, and T-Satellite.'],
+  ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware, eliminating dedicated AI accelerators.','AI-RAN Alliance','Under validation at Bellevue Innovation Center with NVIDIA and Nokia/Ericsson.'],
+  ['Digital Twin','Network Digital Twin','Virtual replica of the physical network enabling simulation, prediction, and optimization of network behavior before applying changes to the live network.','ITU-R M.2160, 3GPP 6G studies','Envisioned for 6G network planning, fault prediction, and autonomous optimization.'],
+  ['Intent Engine','Intent-Based Management Engine','6G management function that translates high-level operator intents (e.g., "guarantee 10 Gbps for AR zone") into concrete network configurations using AI/ML.','TM Forum, ETSI ZSM','Envisioned for 6G autonomous network management and slice orchestration.'],
+  ['PQC','Post-Quantum Cryptography','Cryptographic algorithms designed to resist attacks from quantum computers. Includes lattice-based schemes like CRYSTALS-Kyber (KEM) and CRYSTALS-Dilithium (signatures).','NIST PQC Standards','Envisioned for 6G authentication to protect against harvest-now-decrypt-later quantum threats.'],
+  ['DCGM','NVIDIA Data Center GPU Manager','Monitoring and management tool for NVIDIA GPUs in data center environments, providing health, diagnostics, and telemetry metrics.','NVIDIA','Used in AI-RAN telemetry for GPU health monitoring and performance tracking.'],
+  ['cuPHY','NVIDIA Aerial cuPHY','GPU-accelerated 5G NR Layer 1 (PHY) implementation from the NVIDIA Aerial SDK, running physical layer processing on CUDA cores.','NVIDIA Aerial SDK','Core L1 engine in AI-RAN Innovation Center for GPU-based RAN processing.'],
+  ['cuMAC','NVIDIA Aerial cuMAC','GPU-accelerated MAC scheduler from the NVIDIA Aerial SDK, enabling real-time scheduling decisions on GPU hardware.','NVIDIA Aerial SDK','MAC layer component in AI-RAN for GPU-native scheduling and resource allocation.'],
+  ['NVLink','NVIDIA NVLink','High-bandwidth, low-latency GPU-to-GPU interconnect enabling direct memory access between GPUs without CPU involvement.','NVIDIA','Used in AI-RAN node architecture for GPU interconnect in multi-GPU configurations.'],
 ];
 function renderGlossary(el) {
   let html = '<h2>Glossary</h2><div class="glossary-controls"><input type="text" class="glossary-search" id="glossary-search" placeholder="Search terms..." oninput="filterGlossary()"><button class="glossary-sort" onclick="sortGlossary()">Sort A→Z ↕</button></div>';
-  html += '<div style="overflow:auto;max-height:calc(100vh - 250px)"><table class="ref-table" id="glossary-table"><thead><tr><th onclick="sortGlossaryBy(0)">Term</th><th onclick="sortGlossaryBy(1)">Full Name</th><th onclick="sortGlossaryBy(2)">Definition</th><th onclick="sortGlossaryBy(3)">Spec Ref</th><th onclick="sortGlossaryBy(4)"><span class="tm">T-Mobile</span> Context</th></tr></thead><tbody>';
+  html += '<div style="overflow:auto;max-height:calc(100vh - 250px)"><table class="ref-table" id="glossary-table"><thead><tr><th onclick="sortGlossaryBy(0)">Term</th><th onclick="sortGlossaryBy(1)">Full Name</th><th onclick="sortGlossaryBy(2)">Definition</th><th onclick="sortGlossaryBy(3)">Spec Ref</th><th onclick="sortGlossaryBy(4)">Context</th></tr></thead><tbody>';
   GLOSSARY_DATA.sort((a,b) => a[0].localeCompare(b[0]));
   GLOSSARY_DATA.forEach(g => {
-    html += `<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${g[3]}</td><td>${tmHighlight(g[4])}</td></tr>`;
+    html += `<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${g[3]}</td><td>${highlightText(g[4])}</td></tr>`;
   });
   html += '</tbody></table></div>';
   el.innerHTML = html;
@@ -6839,7 +6838,7 @@ function renderTimeline(el) {
     {date:'2022', text:'IoT Developer Kit — enabling IoT innovation on 5G', cls:''},
     {date:'Apr 2023', text:'Network slicing developer beta (nationwide)', cls:''},
     {date:'Sep 2024', text:'T-Priority announced at Capital Markets Day (launched Feb 2025); SASE launched', cls:''},
-    {date:'Sep 2024', text:'AI-RAN Innovation Center announced (T-Mobile + NVIDIA + Nokia + Ericsson)', cls:''},
+    {date:'Sep 2024', text:'AI-RAN Innovation Center announced (+ NVIDIA + Nokia + Ericsson)', cls:''},
     {date:'Apr 2025', text:'5G Advanced deployed nationwide', cls:''},
     {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
     {date:'Aug 2025', text:'SuperMobile with network slice launched for business', cls:''},
@@ -6848,18 +6847,18 @@ function renderTimeline(el) {
     {date:'Oct 2024', text:'5G On Demand — portable 5G private network solution for enterprise', cls:''},
     {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
-    {date:'Mar 2026', text:'MWC: Nokia/T-Mobile/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + T-Mobile 6G innovation hub established.', cls:''},
+    {date:'Mar 2026', text:'MWC: Nokia/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + 6G innovation hub established.', cls:''},
     {date:'Mar 2026', text:'GTC: Physical AI on AI-RAN demonstrated (Metropolis VSS 3). RTX PRO Blackwell pilot announced at MSOs.', cls:''},
     {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed MWC 2026)', cls:'projected'},
     {date:'~2027', text:'Nokia first commercial AI-RAN release (projected)', cls:'projected'},
-    {date:'~2028', text:'Widespread AI-RAN deployment across T-Mobile network (estimated)', cls:'projected'},
+    {date:'~2028', text:'Widespread AI-RAN deployment across network (estimated)', cls:'projected'},
     {date:'~2029', text:'First 3GPP 6G specifications expected (IMT-2030)', cls:'vision'},
     {date:'~2030', text:'6G commercialization target — AI-native, sensing, sub-THz', cls:'vision'},
   ];
-  let html = `<h2><span class="tm">T-Mobile</span> Technology Timeline</h2><p>Key milestones in <span class="tm">T-Mobile</span>'s 5G, 5G Advanced, AI-RAN, and 6G journey.</p>`;
+  let html = `<h2>Technology Timeline</h2><p>Key milestones in the 5G, 5G Advanced, AI-RAN, and 6G journey.</p>`;
   html += '<div class="timeline-container"><div class="timeline-line"></div>';
   events.forEach(e => {
-    html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${tmHighlight(e.text)}</div></div>`;
+    html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${highlightText(e.text)}</div></div>`;
   });
   html += '</div>';
   el.innerHTML = html;
@@ -6873,19 +6872,19 @@ function renderBandMap(el) {
     ['n41','2.5 GHz','TDD Mid-band','Up to 100 MHz','Metro/urban, high capacity','Ultra Capacity 5G — primary capacity'],
     ['n260','39 GHz','TDD mmWave','Up to 800 MHz','Dense urban, venues','Ultra-high throughput hotspots'],
   ];
-  let html = '<h2><span class="tm">T-Mobile</span> 5G Band Map <span class="badge badge-fact">FACT</span></h2>';
-  html += '<p>Active NR bands deployed across the <span class="tm">T-Mobile</span> US network.</p>';
+  let html = '<h2>5G Band Map <span class="badge badge-fact">FACT</span></h2>';
+  html += '<p>Active NR bands deployed across the US network.</p>';
   html += '<table class="ref-table"><thead><tr><th>Band</th><th>Frequency</th><th>Type</th><th>Bandwidth</th><th>Coverage</th><th>Primary Use</th></tr></thead><tbody>';
   bands.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
   html += '<div style="margin-top:18px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">';
-  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center OTA demonstrations use <strong>n77 (3.7 GHz C-Band)</strong> with Nokia AirScale Massive MIMO radios on NVIDIA Grace Hopper. T-Mobile\'s primary commercial mid-band is <strong>n41 (2.5 GHz)</strong>.</div>';
+  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center OTA demonstrations use <strong>n77 (3.7 GHz C-Band)</strong> with Nokia AirScale Massive MIMO radios on NVIDIA Grace Hopper. the primary commercial mid-band is <strong>n41 (2.5 GHz)</strong>.</div>';
   el.innerHTML = html;
 }
 
-/* ======== T-MOBILE TEXT HIGHLIGHT ======== */
-function tmHighlight(html) {
-  return html.replace(/T-Mobile/g, '<span class="tm">T-Mobile</span>');
+/* ======== TEXT HIGHLIGHT ======== */
+function highlightText(html) {
+  return html;
 }
 
 /* ======== WELCOME PAGE ======== */
@@ -6893,13 +6892,13 @@ function showWelcome() {
   showView('welcome');
   document.getElementById('welcome-view').innerHTML = '<div class="welcome-container">' +
     '<h2>3GPP Protocol Flow Simulator — AI-RAN & 6G</h2>' +
-    '<p>An interactive tool from <span class="tm">T-Mobile</span>\'s perspective for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus 6 reference pages including architecture diagrams and a band map.</p>' +
+    '<p>An interactive tool from the perspective for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus 6 reference pages including architecture diagrams and a band map.</p>' +
     '<h3>Badge System</h3>' +
     '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">' +
-    '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and <span class="tm">T-Mobile</span> production</span></div>' +
+    '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-validated">VALIDATED</span><span>Demonstrated / validated in lab or Innovation Center</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-projected">PROJECTED</span><span>Engineering projection based on current trajectory</span></div>' +
-    '<div class="badge-legend-item"><span class="badge badge-vision">VISION</span><span><span class="tm">T-Mobile</span> forward-looking vision for 6G era</span></div>' +
+    '<div class="badge-legend-item"><span class="badge badge-vision">VISION</span><span>forward-looking vision for 6G era</span></div>' +
     '</div>' +
     '<div style="margin:14px 0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.7;">' +
     '<strong>Badge → Section mapping:</strong> AI-RAN flows (1–5) are <span class="badge badge-validated" style="font-size:10px;">VALIDATED</span> or <span class="badge badge-projected" style="font-size:10px;">PROJECTED</span> based on Innovation Center status. 6G flows (6–14) are <span class="badge badge-vision" style="font-size:10px;">VISION</span> — forward-looking concepts for the 2030 era. Reference pages use <span class="badge badge-fact" style="font-size:10px;">FACT</span> for deployed capabilities.</div>' +
@@ -6910,7 +6909,7 @@ function showWelcome() {
     '<div class="shortcut-item"><kbd>R</kbd> <span>Reset current flow to beginning</span></div>' +
     '</div>' +
     '<h3>Getting Started</h3>' +
-    '<p>Select a flow or reference page from the sidebar. AI-RAN flows cover the Innovation Center demonstrations and projections. 6G flows present <span class="tm">T-Mobile</span>\'s vision for the AI-native network era (2029+). Reference pages provide architecture diagrams, specifications, a glossary, latency comparison, and technology timeline.</p>' +
+    '<p>Select a flow or reference page from the sidebar. AI-RAN flows cover the Innovation Center demonstrations and projections. 6G flows present the vision for the AI-native network era (2029+). Reference pages provide architecture diagrams, specifications, a glossary, latency comparison, and technology timeline.</p>' +
     '</div>';
 }
 
