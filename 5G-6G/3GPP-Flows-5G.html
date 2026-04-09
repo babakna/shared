@@ -530,6 +530,13 @@ const NODES = {
 
 /* ======== SIDEBAR CONFIG ======== */
 const SIDEBAR_SECTIONS = [
+  { title:'Introduction to 5G', items:[
+    {num:'i', id:'intro_what_is_5g', label:'What is 5G?', type:'ref'},
+    {num:'ii', id:'intro_5g_vs_4g', label:'5G vs. 4G — What Changed', type:'ref'},
+    {num:'iii', id:'intro_network_functions', label:'The 5G Network Functions', type:'ref'},
+    {num:'iv', id:'intro_interfaces', label:'Interfaces & Protocols', type:'ref'},
+    {num:'v', id:'intro_5g_advanced', label:'What 5G Advanced Adds', type:'ref'},
+  ]},
   { title:'5G SA Baseline (Deployed)', items:[
     {num:1, id:'registration_5gaka',label:'Registration & 5G AKA',type:'flow'},
     {num:2, id:'pdu_session',label:'PDU Session Establishment',type:'flow'},
@@ -5347,7 +5354,7 @@ FLOWS.deregistration = {
 FLOWS.nwdaf_analytics = {
   id:'nwdaf_analytics', title:'NWDAF Load Analytics & Prediction', section:'analytics', badge:'FACT',
   specRef:'TS 23.288 §6.1, §6.2',
-  narrative:'The Network Data Analytics Function (NWDAF) collects data from various NFs, applies ML models, and provides analytics to consumer NFs. In this flow, PCF subscribes to load analytics for proactive policy adjustment. This enables to optimize network performance using AI/ML — a key building block toward AI-RAN, where analytics-driven decisions further reduce latency (see Latency Comparison reference page).',
+  narrative:'The Network Data Analytics Function (NWDAF) collects data from various NFs, applies ML models, and provides analytics to consumer NFs. In this flow, PCF subscribes to load analytics for proactive policy adjustment. This enables the network to optimize performance using AI/ML — analytics-driven decisions can proactively adjust QoS policies, predict congestion, and rebalance load before users are affected.',
   nodes:['amf','smf','pcf','nwdaf'],
   connections:[
     {from:'pcf',to:'nwdaf',label:'Nnwdaf',type:'control'},
@@ -6224,6 +6231,11 @@ function showReference(id) {
   showView('reference');
   const rc = document.getElementById('ref-content');
   switch(id) {
+    case 'intro_what_is_5g': renderIntroWhatIs5G(rc); break;
+    case 'intro_5g_vs_4g': renderIntro5Gvs4G(rc); break;
+    case 'intro_network_functions': renderIntroNetworkFunctions(rc); break;
+    case 'intro_interfaces': renderIntroInterfaces(rc); break;
+    case 'intro_5g_advanced': renderIntro5GAdvanced(rc); break;
     case 'ref_architecture': renderArchDiagrams(rc); break;
     case 'ref_specs': renderSpecLibrary(rc); break;
     case 'ref_glossary': renderGlossary(rc); break;
@@ -6775,7 +6787,361 @@ function renderBandMap(el) {
   el.innerHTML = html;
 }
 
+/* ======== INTRODUCTION PAGES ======== */
 
+/* -- Page 1: What is 5G? -- */
+function renderIntroWhatIs5G(el) {
+  let html = '<h2>What is 5G?</h2>';
+  html += '<p>5G is the fifth generation of mobile network technology, defined by the ITU-R under the IMT-2020 framework (ITU-R M.2083). It represents a fundamental redesign of the mobile network — not just faster speeds, but an entirely new architecture built for three distinct usage scenarios with very different requirements.</p>';
+
+  html += '<h3>The Three Usage Scenarios</h3>';
+  html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">eMBB</strong><span style="font-weight:600;color:var(--text-primary);">Enhanced Mobile Broadband</span><span>High-speed, high-capacity data for consumers and enterprises</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: 4K/8K streaming, AR/VR, cloud gaming, high-speed downloads</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">Peak: 20 Gbps downlink</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">URLLC</strong><span style="font-weight:600;color:var(--text-primary);">Ultra-Reliable Low-Latency Communication</span><span>Extremely low delay with guaranteed delivery for critical applications</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: Industrial automation, remote surgery, autonomous vehicle communication</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">1 ms latency, 99.999% reliability</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">mMTC</strong><span style="font-weight:600;color:var(--text-primary);">Massive Machine-Type Communication</span><span>Connecting very large numbers of low-power devices</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: Smart city sensors, agricultural IoT, asset tracking, smart meters</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">1,000,000 devices per km²</span></div>';
+  html += '</div>';
+
+  html += '<h3>ITU-R IMT-2020 Performance Targets</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Metric</th><th>Target</th><th>Comparison to 4G (IMT-Advanced)</th></tr></thead><tbody>';
+  html += '<tr><td>Peak Data Rate (DL)</td><td>20 Gbps</td><td>20× improvement</td></tr>';
+  html += '<tr><td>Peak Data Rate (UL)</td><td>10 Gbps</td><td>20× improvement</td></tr>';
+  html += '<tr><td>User Experienced Data Rate</td><td>100 Mbps DL / 50 Mbps UL</td><td>10× improvement</td></tr>';
+  html += '<tr><td>User-Plane Latency (eMBB)</td><td>4 ms</td><td>2.5× improvement</td></tr>';
+  html += '<tr><td>User-Plane Latency (URLLC)</td><td>1 ms</td><td>10× improvement</td></tr>';
+  html += '<tr><td>Connection Density</td><td>1,000,000 devices/km²</td><td>10× improvement</td></tr>';
+  html += '<tr><td>Mobility</td><td>500 km/h</td><td>Same</td></tr>';
+  html += '<tr><td>Peak Spectrum Efficiency</td><td>30 bps/Hz DL / 15 bps/Hz UL</td><td>3× improvement</td></tr>';
+  html += '<tr><td>Area Traffic Capacity</td><td>10 Mbit/s/m²</td><td>100× improvement</td></tr>';
+  html += '</tbody></table>';
+  html += '<p style="font-size:12px;color:var(--text-tertiary);font-style:italic;margin-top:8px;"><em>Source: ITU-R M.2083 (IMT Vision), ITU-R M.2410 (Minimum Requirements). These are system-level targets; real-world performance depends on deployment, spectrum, load, and device capability.</em></p>';
+
+  html += '<h3>5G SA vs. 5G NSA</h3>';
+  html += '<p>5G can operate in two modes. <strong>Non-Standalone (NSA)</strong> uses the existing 4G LTE core network (EPC) with a 5G NR radio — this was the initial deployment approach for quick coverage using existing infrastructure. <strong>Standalone (SA)</strong> uses a completely new 5G Core (5GC) with the 5G NR radio — this unlocks the full 5G feature set including network slicing, edge computing, and the service-based architecture. All flows in this tool are based on the 5G SA architecture.</p>';
+  html += '<div class="arch-svg-container" id="intro-sa-nsa-svg"></div>';
+
+  html += '<h3>3GPP Release Timeline</h3>';
+  html += '<div class="timeline-container"><div class="timeline-line"></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-15 (2018)</div><div class="timeline-text">First 5G NR specification. Defines 5G SA architecture, 5GC service-based architecture, basic network slicing, 5G AKA security. Foundation for all flows in this tool.</div></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-16 (2020)</div><div class="timeline-text">URLLC enhancements, NR positioning, NR-U (unlicensed spectrum), Integrated Access and Backhaul (IAB), NR V2X (Vehicle-to-Everything).</div></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-17 (2022)</div><div class="timeline-text">Reduced Capability (RedCap) devices, Non-Terrestrial Networks (satellite), enhanced edge computing (TS 23.548), NSACF for slice admission control, NWDAF analytics enhancements, Multicast/Broadcast Services (MBS).</div></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-18 (2024) — "5G-Advanced"</div><div class="timeline-text">AI/ML for NR air interface, ambient IoT, XR (extended reality) support, network energy savings, duplex evolution.</div></div>';
+  html += '</div>';
+
+  html += '<p>The flows in this tool cover capabilities from Rel-15 through Rel-18, with each flow\'s specification references noted in the sidebar narrative. The badge system marks all content in this file as FACT — grounded in deployed 3GPP specifications.</p>';
+
+  el.innerHTML = html;
+
+  const container = document.getElementById('intro-sa-nsa-svg');
+  if (container) {
+    const svg = svgEl('svg', {viewBox:'0 0 800 200', width:'100%', style:'max-height:220px'});
+
+    const bgL = svgEl('rect', {x:10,y:10,width:360,height:180,rx:8,fill:'var(--bg-tertiary)',stroke:'var(--border-color)','stroke-width':1});
+    svg.appendChild(bgL);
+    const lblL = svgEl('text', {x:190,y:30,'text-anchor':'middle',fill:'var(--text-tertiary)','font-size':'11','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    lblL.textContent = '5G NSA'; svg.appendChild(lblL);
+
+    svgBox(svg,30,60,70,40,'UE','');
+    svgBox(svg,140,50,70,40,'gNB','NR');
+    svgBox(svg,140,110,70,40,'eNB','LTE anchor');
+    svgBox(svg,270,80,90,40,'EPC','4G Core');
+    svgLine(svg,100,80,140,70,'Uu');
+    svgLine(svg,210,70,270,95,'');
+    svgLine(svg,210,130,270,105,'');
+    svgLine(svg,140,90,140,110,'',{dash:'4 2'});
+
+    const bgR = svgEl('rect', {x:430,y:10,width:360,height:180,rx:8,fill:'var(--bg-tertiary)',stroke:'var(--border-color)','stroke-width':1});
+    svg.appendChild(bgR);
+    const lblR = svgEl('text', {x:610,y:30,'text-anchor':'middle',fill:'var(--text-tertiary)','font-size':'11','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    lblR.textContent = '5G SA'; svg.appendChild(lblR);
+
+    svgBox(svg,450,75,70,40,'UE','');
+    svgBox(svg,560,75,70,40,'gNB','NR');
+    svgBox(svg,680,75,90,40,'5GC','5G Core — SBA');
+    svgLine(svg,520,95,560,95,'Uu');
+    svgLine(svg,630,95,680,95,'N2/N3');
+
+    svgLine(svg,370,100,430,100,'',{dash:'6 3',stroke:'var(--accent)'});
+    const note = svgEl('text', {x:400,y:145,'text-anchor':'middle',fill:'var(--accent)','font-size':'9','font-weight':'600','font-family':"'Segoe UI',system-ui,sans-serif"});
+    note.textContent = 'This tool covers 5G SA'; svg.appendChild(note);
+
+    container.appendChild(svg);
+  }
+}
+
+/* -- Page 2: 5G vs. 4G — What Changed -- */
+function renderIntro5Gvs4G(el) {
+  let html = '<h2>5G vs. 4G — What Changed</h2>';
+  html += '<p>Understanding 5G is much easier when you see what changed from 4G LTE. The shift from 4G to 5G is not incremental — it is an architectural redesign. The monolithic Evolved Packet Core (EPC) is replaced by a cloud-native, service-based 5G Core (5GC) where every network function exposes APIs over HTTP/2. This section maps every major 4G component to its 5G equivalent, highlights what is entirely new, and notes what stayed the same.</p>';
+
+  html += '<h3>Architecture Comparison Diagram</h3>';
+  html += '<div class="arch-svg-container" id="intro-4g-vs-5g-svg"></div>';
+
+  html += '<h3>Component-by-Component Mapping</h3>';
+  html += '<table class="ref-table"><thead><tr><th>4G LTE (EPC)</th><th>5G SA (5GC)</th><th>Protocol Change</th><th>What Changed</th></tr></thead><tbody>';
+  html += '<tr><td>MME</td><td>AMF + SMF</td><td>S1-AP → NGAP (N2), GTP-C → SBI (N11)</td><td>Mobility and session management split into separate functions. AMF handles registration, mobility, NAS security. SMF handles PDU sessions, QoS, UPF control.</td></tr>';
+  html += '<tr><td>HSS</td><td>UDM + AUSF + UDR</td><td>Diameter (S6a) → SBI (N8, N12, N13)</td><td>Authentication (AUSF), subscription data (UDM), and data storage (UDR) are separate. SUPI/SUCI replaces IMSI exposure.</td></tr>';
+  html += '<tr><td>SGW</td><td>Absorbed into UPF</td><td>GTP-C (S11) → PFCP (N4)</td><td>No separate serving gateway. UPF handles all user-plane forwarding.</td></tr>';
+  html += '<tr><td>PGW (User Plane)</td><td>UPF</td><td>—</td><td>User-plane forwarding consolidated. UPF supports ULCL for edge computing.</td></tr>';
+  html += '<tr><td>PGW (Control Plane)</td><td>SMF</td><td>GTP-C (S5) → PFCP (N4) + SBI</td><td>Session management control absorbed into SMF.</td></tr>';
+  html += '<tr><td>PCRF</td><td>PCF</td><td>Diameter (Gx, Rx) → SBI (N7, N5)</td><td>Same policy role, new protocol. Integrates with NWDAF for analytics-driven policy.</td></tr>';
+  html += '<tr><td>eNodeB</td><td>gNB</td><td>S1 → N2/N3, optional CU/DU split</td><td>New Radio (NR) air interface. Supports massive MIMO, beamforming, mmWave. Optional CU/DU split via F1 interface.</td></tr>';
+  html += '<tr><td><em>No equivalent</em></td><td>NRF</td><td><em>New</em></td><td>NF Repository Function — service discovery for the SBA. All NFs register and discover each other via NRF.</td></tr>';
+  html += '<tr><td><em>No equivalent</em></td><td>NSSF</td><td><em>New</em></td><td>Network Slice Selection Function — determines which slice a UE should be served on.</td></tr>';
+  html += '<tr><td><em>No equivalent</em></td><td>NEF</td><td><em>New</em></td><td>Network Exposure Function — exposes 5G capabilities to external applications via APIs (CAMARA/Open Gateway).</td></tr>';
+  html += '<tr><td><em>No equivalent</em></td><td>NWDAF</td><td><em>New</em></td><td>Network Data Analytics — collects data from NFs, runs ML models, provides predictions for optimization.</td></tr>';
+  html += '<tr><td><em>No equivalent</em></td><td>CHF</td><td><em>New</em> (replaces OCS/OFCS)</td><td>Converged Charging Function — unified online/offline charging via SBI (N40), replacing Diameter Gy/Ro.</td></tr>';
+  html += '<tr><td><em>No equivalent</em></td><td>NSACF</td><td><em>New</em> (Rel-17)</td><td>Network Slice Admission Control — manages per-slice UE/session count limits.</td></tr>';
+  html += '</tbody></table>';
+
+  html += '<h3>What Stayed the Same</h3>';
+  html += '<p>Not everything changed. GTP-U tunneling on the user plane (N3, N9) carries over from 4G — it remains the standard encapsulation for moving user data between RAN and core. SIM-based mutual authentication is still fundamental, though 5G enhances it with SUPI concealment (SUCI) and the 5G AKA protocol. The UE still initiates registration and session establishment. The basic flow pattern of "attach, authenticate, establish bearer/session, transfer data" persists — the difference is in how each step is executed and which components are involved.</p>';
+
+  html += '<h3>The Fundamental Shift — Service-Based Architecture (SBA)</h3>';
+  html += '<p>The single biggest architectural change is that the 5G Core uses a Service-Based Architecture (SBA). In 4G, network elements communicated via dedicated point-to-point interfaces with specialized protocols (mostly Diameter and GTP-C). In 5G, all control-plane NFs expose services via RESTful APIs over HTTP/2. Any NF can discover and call any other NF\'s services through the NRF. This makes the 5GC modular, cloud-native, and extensible — new functions (like NWDAF or NEF) can be added without redesigning existing interfaces. The only exceptions to SBI are N2 (NGAP — for RAN signaling, which requires lower latency than HTTP/2) and N4 (PFCP — for user-plane rule programming, which is a specialized binary protocol).</p>';
+
+  el.innerHTML = html;
+
+  const container = document.getElementById('intro-4g-vs-5g-svg');
+  if (container) {
+    const svg = svgEl('svg', {viewBox:'0 0 900 500', width:'100%', style:'max-height:520px'});
+
+    const bgL = svgEl('rect', {x:5,y:5,width:390,height:490,rx:10,fill:'rgba(100,150,200,0.06)',stroke:'var(--border-color)','stroke-width':1});
+    svg.appendChild(bgL);
+    const ttlL = svgEl('text', {x:200,y:28,'text-anchor':'middle',fill:'var(--text-tertiary)','font-size':'13','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    ttlL.textContent = '4G LTE (EPC)'; svg.appendChild(ttlL);
+
+    svgBox(svg,30,60,70,36,'UE','');
+    svgBox(svg,140,60,80,36,'eNodeB','');
+    svgBox(svg,270,45,90,36,'MME','');
+    svgBox(svg,270,110,90,36,'HSS','');
+    svgBox(svg,140,160,80,36,'SGW','');
+    svgBox(svg,270,180,90,36,'PGW','');
+    svgBox(svg,270,250,90,36,'PCRF','');
+    svgBox(svg,140,300,70,36,'DN','');
+
+    svgLine(svg,100,78,140,78,'LTE-Uu');
+    svgLine(svg,220,78,270,63,'S1-MME');
+    svgLine(svg,220,78,140,178,'S1-U');
+    svgLine(svg,315,81,315,110,'S6a / Diameter');
+    svgLine(svg,220,178,270,198,'S5');
+    svgLine(svg,270,268,270,216,'Gx / Diameter');
+    svgLine(svg,315,216,210,316,'SGi');
+    svgLine(svg,270,63,220,178,'S11 / GTP-C',{dash:'4 2'});
+
+    const bgR = svgEl('rect', {x:505,y:5,width:390,height:490,rx:10,fill:'rgba(100,200,120,0.06)',stroke:'var(--border-color)','stroke-width':1});
+    svg.appendChild(bgR);
+    const ttlR = svgEl('text', {x:700,y:28,'text-anchor':'middle',fill:'var(--text-tertiary)','font-size':'13','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    ttlR.textContent = '5G SA (5GC)'; svg.appendChild(ttlR);
+
+    svgBox(svg,520,60,70,36,'UE','');
+    svgBox(svg,630,60,80,36,'gNB','');
+    svgBox(svg,760,45,80,36,'AMF','');
+    svgBox(svg,760,100,80,36,'UDM','');
+    svgBox(svg,760,150,80,36,'AUSF','');
+    svgBox(svg,760,205,80,36,'SMF','');
+    svgBox(svg,630,205,80,36,'UPF','');
+    svgBox(svg,760,265,80,36,'PCF','');
+    svgBox(svg,760,320,80,36,'NRF','');
+    svgBox(svg,760,370,80,36,'NSSF','');
+    svgBox(svg,760,420,80,36,'NEF','');
+    svgBox(svg,630,310,70,36,'DN','');
+
+    svgLine(svg,590,78,630,78,'NR Uu');
+    svgLine(svg,710,78,760,63,'N2 / NGAP');
+    svgLine(svg,710,78,670,205,'N3 / GTP-U');
+    svgLine(svg,800,81,800,100,'N8 / SBI');
+    svgLine(svg,800,136,800,150,'N12 / SBI');
+    svgLine(svg,760,223,710,223,'N4 / PFCP');
+    svgLine(svg,800,241,800,265,'N7 / SBI');
+    svgLine(svg,670,241,665,310,'N6');
+    svgLine(svg,760,63,760,205,'N11 / SBI',{dash:'4 2'});
+
+    const mappings = [
+      {y1:63,y2:63,lbl:'Split into two'},
+      {y1:128,y2:118,lbl:'Split into two'},
+      {y1:170,y2:213,lbl:'Merged'},
+      {y1:200,y2:233,lbl:'Absorbed'},
+      {y1:268,y2:283,lbl:''},
+    ];
+    mappings.forEach(m => {
+      svgLine(svg,395,m.y1,505,m.y2,'',{dash:'6 3',stroke:'var(--accent)'});
+      if(m.lbl) {
+        const mt = svgEl('text', {x:450,y:(m.y1+m.y2)/2-4,'text-anchor':'middle',fill:'var(--accent)','font-size':'8','font-weight':'600','font-family':"'Segoe UI',system-ui,sans-serif"});
+        mt.textContent = m.lbl; svg.appendChild(mt);
+      }
+    });
+
+    container.appendChild(svg);
+  }
+}
+
+/* -- Page 3: The 5G Network Functions -- */
+function renderIntroNetworkFunctions(el) {
+  let html = '<h2>The 5G Network Functions</h2>';
+  html += '<p>Every flow in this tool involves messages between 5G network functions (NFs). This page is your "cast of characters" — a reference for what each NF does and when you will see it in the flows. NFs are grouped by their primary role: control plane, data plane, and specialized functions.</p>';
+
+  html += '<h3>Interactive NF Map</h3>';
+  html += '<div class="arch-svg-container" id="intro-nf-map-svg"></div>';
+
+  html += '<h3>Network Function Reference</h3>';
+  html += '<table class="ref-table"><thead><tr><th>NF</th><th>Full Name</th><th>Primary Role</th><th>Key Interfaces</th><th>Key Flows</th></tr></thead><tbody>';
+  html += '<tr><td>AMF</td><td>Access and Mobility Management Function</td><td>Handles UE registration, mobility (tracking area updates, handover), NAS security (authentication relay, ciphering), and connection management. First point of contact in the core for all UE signaling.</td><td>N1 (UE), N2 (gNB), N8 (UDM), N11 (SMF), N12 (AUSF), N15 (PCF), N22 (NSSF)</td><td>1, 2, 7, 8, 14, 18, 19</td></tr>';
+  html += '<tr><td>SMF</td><td>Session Management Function</td><td>Manages PDU sessions — creation, modification, release. Selects UPFs, programs forwarding rules (PDR/FAR/QER/URR) via PFCP, applies QoS policy from PCF, and initiates charging with CHF.</td><td>N4 (UPF), N7 (PCF), N10 (UDM), N11 (AMF), N40 (CHF)</td><td>2, 6, 7, 9, 10, 13, 15, 16, 17</td></tr>';
+  html += '<tr><td>UPF</td><td>User Plane Function</td><td>Forwards user data packets. Performs packet detection (PDR matching), QoS enforcement (rate limiting, gating), GTP-U encapsulation/decapsulation, usage measurement for charging, and traffic steering (ULCL). The only NF that handles user data.</td><td>N3 (gNB), N4 (SMF), N6 (DN), N9 (other UPF)</td><td>2, 3, 6, 9, 11, 12, 13</td></tr>';
+  html += '<tr><td>PCF</td><td>Policy Control Function</td><td>Makes policy decisions — QoS rules, charging rules, traffic steering. Generates PCC rules that SMF translates into PFCP rules for the UPF. Receives analytics from NWDAF. Receives AF requests via N5 for IMS/voice QoS.</td><td>N5 (AF/P-CSCF), N7 (SMF), N15 (AMF)</td><td>1, 2, 4, 6, 7, 10, 15, 16, 17, 20</td></tr>';
+  html += '<tr><td>UDM</td><td>Unified Data Management</td><td>Stores and manages subscriber data — subscription profiles, authentication credentials, registered AMF/SMF. Contains ARPF (Authentication Repository) and SIDF (SUCI de-concealment).</td><td>N8 (AMF), N10 (SMF), N13 (AUSF)</td><td>1, 2, 14</td></tr>';
+  html += '<tr><td>AUSF</td><td>Authentication Server Function</td><td>Executes the 5G AKA authentication protocol. Receives SUCI from AMF, requests auth vectors from UDM, verifies RES* from UE, and returns KSEAF for key derivation.</td><td>N12 (AMF), N13 (UDM)</td><td>1, 14</td></tr>';
+  html += '<tr><td>NRF</td><td>NF Repository Function</td><td>Service registry and discovery. All NFs register their profiles (capabilities, endpoints, supported slices). Other NFs query NRF to discover available service instances. Enables the SBA\'s loosely-coupled architecture.</td><td>SBI (all NFs register/discover)</td><td>Implicit in all flows (discovery)</td></tr>';
+  html += '<tr><td>NSSF</td><td>Network Slice Selection Function</td><td>Determines the Allowed NSSAI for a UE during registration. Evaluates Requested NSSAI against subscribed slices and current network configuration. May redirect to a different AMF set if needed.</td><td>N22 (AMF)</td><td>14</td></tr>';
+  html += '<tr><td>NEF</td><td>Network Exposure Function</td><td>Exposes 5G network capabilities to external applications (AFs) via northbound APIs. Translates external API requests into internal 3GPP procedures. Handles traffic influence, monitoring events, and device triggering.</td><td>N33 (AF), Npcf (PCF)</td><td>10, 16</td></tr>';
+  html += '<tr><td>CHF</td><td>Converged Charging Function</td><td>Handles both online (quota-based) and offline (CDR-based) charging. Receives usage reports from SMF, evaluates rating/tariff plans, grants quota. Replaces the 4G-era OCS and OFCS.</td><td>N40 (SMF)</td><td>6, 13, 17</td></tr>';
+  html += '<tr><td>NWDAF</td><td>Network Data Analytics Function</td><td>Collects data from NFs (AMF, SMF, etc.), runs ML models, and provides analytics (load predictions, anomaly detection) to consumer NFs like PCF. Enables AI-driven network optimization.</td><td>Nnwdaf (consumer NFs subscribe)</td><td>20</td></tr>';
+  html += '<tr><td>NSACF</td><td>Network Slice Admission Control Function</td><td>Controls the number of UEs and PDU sessions admitted to each network slice. Prevents slice overload by enforcing configured capacity limits. Introduced in Rel-17.</td><td>SBI (AMF queries)</td><td>14</td></tr>';
+  html += '<tr><td>SMSF</td><td>SMS Function</td><td>Routes SMS over NAS (without requiring a circuit-switched fallback). Relays SMS-PP between UE/AMF and the SMS-SC/SMSC.</td><td>N20 (AMF)</td><td>5</td></tr>';
+  html += '<tr><td>gNB</td><td>Next-Generation NodeB</td><td>The 5G NR base station. Handles radio resource management, scheduling, beamforming, RRC connection management, and air-interface security (AS encryption/integrity). Can optionally split into CU (Central Unit) and DU (Distributed Unit) via F1 interface.</td><td>Uu (UE), N2 (AMF), N3 (UPF), Xn (other gNB)</td><td>All flows involving radio</td></tr>';
+  html += '<tr><td>P-CSCF</td><td>Proxy Call Session Control Function</td><td>IMS entry point for the UE. Handles SIP signaling for VoNR, requests QoS resources from PCF via N5 (Rx interface equivalent).</td><td>SIP (UE), N5 (PCF)</td><td>4</td></tr>';
+  html += '<tr><td>S-CSCF</td><td>Serving Call Session Control Function</td><td>IMS call routing. Applies initial Filter Criteria (iFC) to trigger application servers (TAS). Manages IMS registration and SIP session routing.</td><td>SIP (P-CSCF, TAS)</td><td>4</td></tr>';
+  html += '<tr><td>TAS</td><td>Telephony Application Server</td><td>Executes supplementary voice services — call forwarding, call waiting, call barring, conferencing. Invoked by S-CSCF via ISC interface.</td><td>ISC (S-CSCF)</td><td>4</td></tr>';
+  html += '</tbody></table>';
+
+  html += '<h3>How to Read the Flows</h3>';
+  html += '<p>When you step through a flow, each step highlights the source and destination NFs on the topology diagram. The ingress pane (left) shows what the receiving NF gets, and the egress pane (right) shows how it processes and responds. The step description bar explains what is happening and why. If you see an NF you don\'t recognize, come back to this page — it is your reference card for the entire tool.</p>';
+
+  el.innerHTML = html;
+
+  const container = document.getElementById('intro-nf-map-svg');
+  if (container) {
+    const svg = svgEl('svg', {viewBox:'0 0 900 450', width:'100%', style:'max-height:470px'});
+
+    const rTop = svgEl('rect', {x:5,y:5,width:890,height:55,rx:8,fill:'rgba(255,160,50,0.06)',stroke:'var(--badge-projected)','stroke-width':0.8,'stroke-dasharray':'4 2'});
+    svg.appendChild(rTop);
+    const lblTop = svgEl('text', {x:14,y:22,fill:'var(--badge-projected)','font-size':'9','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    lblTop.textContent = 'Common Services'; svg.appendChild(lblTop);
+
+    svgBox(svg,200,28,70,28,'NRF','',{stroke:'var(--badge-projected)'});
+    svgBox(svg,420,28,70,28,'UDM','',{stroke:'var(--badge-projected)'});
+    svgBox(svg,620,28,70,28,'AUSF','',{stroke:'var(--badge-projected)'});
+
+    const rMid = svgEl('rect', {x:5,y:70,width:890,height:190,rx:8,fill:'rgba(50,100,255,0.04)',stroke:'var(--highlight)','stroke-width':0.8,'stroke-dasharray':'4 2'});
+    svg.appendChild(rMid);
+    const lblMid = svgEl('text', {x:14,y:87,fill:'var(--highlight)','font-size':'9','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    lblMid.textContent = 'Control & Policy Plane'; svg.appendChild(lblMid);
+
+    const busLine = svgEl('line', {x1:40,y1:115,x2:860,y2:115,stroke:'var(--accent)','stroke-width':2,'stroke-dasharray':'8 4'});
+    svg.appendChild(busLine);
+    const busLbl = svgEl('text', {x:450,y:110,'text-anchor':'middle',fill:'var(--accent)','font-size':'9','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    busLbl.textContent = 'Service-Based Interface — HTTP/2 / SBI'; svg.appendChild(busLbl);
+
+    const cpNfs = [
+      {l:'AMF',x:40},{l:'SMF',x:140},{l:'PCF',x:240},{l:'NSSF',x:340},{l:'NEF',x:440},
+      {l:'NWDAF',x:540},{l:'CHF',x:650},{l:'NSACF',x:750},{l:'SMSF',x:840}
+    ];
+    cpNfs.forEach(nf => {
+      svgBox(svg,nf.x,130,70,28,nf.l,'',{stroke:'var(--highlight)'});
+      svgLine(svg,nf.x+35,130,nf.x+35,117,'');
+    });
+
+    svgLine(svg,235,56,235,70,'');
+    svgLine(svg,455,56,455,70,'');
+    svgLine(svg,655,56,655,70,'');
+
+    const rBot = svgEl('rect', {x:5,y:270,width:890,height:175,rx:8,fill:'rgba(34,197,94,0.04)',stroke:'#22c55e','stroke-width':0.8,'stroke-dasharray':'4 2'});
+    svg.appendChild(rBot);
+    const lblBot = svgEl('text', {x:14,y:287,fill:'#22c55e','font-size':'9','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
+    lblBot.textContent = 'Data Plane & RAN'; svg.appendChild(lblBot);
+
+    svgBox(svg,40,320,80,40,'UE','',{stroke:'var(--accent)'});
+    svgBox(svg,200,320,80,40,'gNB','',{stroke:'var(--accent)'});
+    svgBox(svg,460,320,80,40,'UPF','',{stroke:'#22c55e'});
+    svgBox(svg,700,320,80,40,'AF / DN','',{stroke:'#22c55e'});
+
+    svgLine(svg,120,340,200,340,'Uu');
+    svgLine(svg,240,320,75,158,'N2');
+    svgLine(svg,280,340,460,340,'N3');
+    svgLine(svg,175,158,500,320,'N4');
+    svgLine(svg,540,340,700,340,'N6');
+
+    container.appendChild(svg);
+  }
+}
+
+/* -- Page 4: Interfaces & Protocols -- */
+function renderIntroInterfaces(el) {
+  let html = '<h2>Interfaces &amp; Protocols</h2>';
+  html += '<p>In 5G SA, network functions communicate through defined reference points (interfaces), each with a specific protocol. Understanding which protocol runs on which interface tells you what you are looking at in the payload inspector. This page groups interfaces by type and maps them to what you will see in the flows.</p>';
+
+  html += '<h3>The Protocol Landscape</h3>';
+  html += '<p>The 5G Core uses three distinct protocol families. The control plane is overwhelmingly SBI — RESTful HTTP/2 with JSON payloads — making it cloud-native and inspectable. Two critical interfaces break this pattern: N2 (gNB to AMF) uses NGAP, a binary ASN.1 protocol optimized for RAN signaling latency, and N4 (SMF to UPF) uses PFCP, a binary protocol purpose-built for programming user-plane forwarding rules. The data plane uses GTP-U (GPRS Tunnelling Protocol — User Plane) for all tunneled user traffic.</p>';
+
+  html += '<h3>Interface Reference Table</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Interface</th><th>Between</th><th>Protocol</th><th>Plane</th><th>Description</th></tr></thead><tbody>';
+  html += '<tr><td>Uu</td><td>UE ↔ gNB</td><td>NR Air Interface (RRC, NAS over RRC)</td><td>Both</td><td>The radio interface. Carries both user data (SDAP/PDCP/RLC/MAC/PHY) and control signaling (RRC + NAS encapsulated in RRC).</td></tr>';
+  html += '<tr><td>N1</td><td>UE ↔ AMF</td><td>NAS (5GMM, 5GSM)</td><td>Control</td><td>NAS signaling for registration, authentication, session management. Transported transparently through gNB — gNB cannot read NAS.</td></tr>';
+  html += '<tr><td>N2</td><td>gNB ↔ AMF</td><td>NGAP (TS 38.413)</td><td>Control</td><td>RAN-to-core signaling. UE context management, PDU session resource setup, handover, paging. Binary ASN.1 encoding over SCTP.</td></tr>';
+  html += '<tr><td>N3</td><td>gNB ↔ UPF</td><td>GTP-U (TS 29.281)</td><td>Data</td><td>User-plane tunnel carrying encapsulated user IP packets. GTP-U header includes TEID (tunnel ID) and QFI (QoS Flow ID) in extension header.</td></tr>';
+  html += '<tr><td>N4</td><td>SMF ↔ UPF</td><td>PFCP (TS 29.244)</td><td>Control</td><td>Programs the UPF forwarding behavior. Installs PDRs (packet detection), FARs (forwarding action), QERs (QoS enforcement), URRs (usage reporting). Binary protocol over UDP.</td></tr>';
+  html += '<tr><td>N6</td><td>UPF ↔ DN</td><td>IP</td><td>Data</td><td>Exit point from the mobile network. Native IP packets (GTP-U stripped). Equivalent to 4G SGi interface.</td></tr>';
+  html += '<tr><td>N7</td><td>SMF ↔ PCF</td><td>SBI / HTTP/2 (TS 29.512)</td><td>Control</td><td>SM policy control. PCF provides PCC rules (QoS, charging, traffic steering) to SMF. SMF reports policy triggers back.</td></tr>';
+  html += '<tr><td>N8</td><td>AMF ↔ UDM</td><td>SBI / HTTP/2 (TS 29.503)</td><td>Control</td><td>Access and mobility subscription data retrieval. AMF registration with UDM.</td></tr>';
+  html += '<tr><td>N9</td><td>UPF ↔ UPF</td><td>GTP-U (TS 29.281)</td><td>Data</td><td>Inter-UPF tunnel. Used in ULCL edge architecture for the through-path between Edge UPF and Central UPF (PSA).</td></tr>';
+  html += '<tr><td>N10</td><td>SMF ↔ UDM</td><td>SBI / HTTP/2 (TS 29.503)</td><td>Control</td><td>Session management subscription data retrieval.</td></tr>';
+  html += '<tr><td>N11</td><td>AMF ↔ SMF</td><td>SBI / HTTP/2 (TS 29.502)</td><td>Control</td><td>PDU session lifecycle. AMF relays N1 (NAS SM) and N2 (RAN SM info) between UE/gNB and SMF.</td></tr>';
+  html += '<tr><td>N12</td><td>AMF ↔ AUSF</td><td>SBI / HTTP/2 (TS 29.509)</td><td>Control</td><td>UE authentication. AMF sends SUCI, AUSF returns auth challenge, AMF forwards RES* for verification.</td></tr>';
+  html += '<tr><td>N13</td><td>AUSF ↔ UDM</td><td>SBI / HTTP/2 (TS 29.503)</td><td>Control</td><td>Authentication vector generation. AUSF requests 5G HE AV from UDM (ARPF).</td></tr>';
+  html += '<tr><td>N14</td><td>AMF ↔ AMF</td><td>SBI / HTTP/2 (TS 29.518)</td><td>Control</td><td>UE context transfer during AMF reroute (e.g., slice-based AMF reselection).</td></tr>';
+  html += '<tr><td>N15</td><td>AMF ↔ PCF</td><td>SBI / HTTP/2 (TS 29.507)</td><td>Control</td><td>AM policy — RFSP index, service area restrictions, UE-level policy.</td></tr>';
+  html += '<tr><td>N22</td><td>AMF ↔ NSSF</td><td>SBI / HTTP/2 (TS 29.531)</td><td>Control</td><td>Network slice selection. AMF sends Requested NSSAI, NSSF returns Allowed NSSAI and target AMF set.</td></tr>';
+  html += '<tr><td>N33</td><td>AF ↔ NEF</td><td>SBI / HTTP/2 (TS 29.522)</td><td>Control</td><td>External application API. Traffic influence, QoS requests, monitoring events, device triggering.</td></tr>';
+  html += '<tr><td>N40</td><td>SMF ↔ CHF</td><td>SBI / HTTP/2 (TS 32.291)</td><td>Control</td><td>Converged charging. Session creation, quota grants, usage reporting, re-authorization.</td></tr>';
+  html += '<tr><td>N5</td><td>P-CSCF ↔ PCF</td><td>SBI / HTTP/2 (TS 29.514)</td><td>Control</td><td>IMS policy authorization. P-CSCF requests dedicated QoS (e.g., 5QI=1 for voice) based on SDP media in SIP signaling.</td></tr>';
+  html += '<tr><td>Xn</td><td>gNB ↔ gNB</td><td>XnAP (TS 38.423)</td><td>Control</td><td>Inter-gNB handover signaling and dual connectivity.</td></tr>';
+  html += '<tr><td>N20</td><td>AMF ↔ SMSF</td><td>SBI / HTTP/2 (TS 29.540)</td><td>Control</td><td>SMS over NAS relay. AMF forwards NAS SM messages to/from SMSF.</td></tr>';
+  html += '</tbody></table>';
+
+  html += '<h3>Protocol Quick-Reference</h3>';
+  html += '<div class="badge-legend" style="grid-template-columns:1fr;">';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">SBI (Service-Based Interface)</strong><span>HTTP/2, JSON body, RESTful verbs (GET, POST, PUT, DELETE, PATCH). Used by all control-plane NF-to-NF communication except N2 and N4. Discoverable via NRF.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">NGAP (NG Application Protocol)</strong><span>Binary ASN.1 (PER), over SCTP. Purpose-built for RAN↔Core signaling. Low overhead, fast encoding.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">PFCP (Packet Forwarding Control Protocol)</strong><span>Binary, over UDP port 8805. Programs UPF with detection/forwarding/QoS/usage rules. Heartbeat mechanism for path management.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">GTP-U (GPRS Tunnelling Protocol — User)</strong><span>Binary header, over UDP port 2152. Carries user IP packets in tunnels identified by TEID. Extension headers carry QFI for QoS flow identification.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">NAS (Non-Access Stratum)</strong><span>End-to-end between UE and AMF. Transported inside RRC (over Uu) and inside NGAP (over N2). The gNB relays NAS transparently. Two sub-protocols: 5GMM (mobility management) and 5GSM (session management).</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">RRC (Radio Resource Control)</strong><span>Between UE and gNB only. Manages radio connection: setup, reconfiguration, measurement, handover. Carries NAS messages as opaque containers.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><strong style="color:var(--highlight);">SIP (Session Initiation Protocol)</strong><span>IMS voice signaling. Carried over the IMS PDU session (5QI=5 default QoS). Routes through P-CSCF → S-CSCF → TAS.</span></div>';
+  html += '</div>';
+
+  html += '<h3>Reading the Payload Inspector</h3>';
+  html += '<p>In each flow step, the ingress pane (left) shows the message as received by the destination NF, and the egress pane (right) shows the processing result or outgoing message. JSON payloads correspond to SBI interfaces. Structured comments in the payload indicate NGAP, PFCP, GTP-U, or NAS content — these are binary protocols shown in a readable format for educational purposes. The protocol type is displayed in the pane header.</p>';
+
+  el.innerHTML = html;
+}
+
+/* -- Page 5: What 5G Advanced Adds -- */
+function renderIntro5GAdvanced(el) {
+  let html = '<h2>What 5G Advanced Adds</h2>';
+  html += '<p>The term "5G Advanced" refers to 3GPP Releases 16 through 18, which build on the Rel-15 baseline with significant enhancements. The flows in this tool cover capabilities across these releases — this page explains what each release introduced and maps the enhancements to the flow sections in the sidebar.</p>';
+
+  html += '<h3>Release-by-Release Enhancements</h3>';
+  html += '<div class="timeline-container"><div class="timeline-line"></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-15 (2018) — The 5G Baseline</div><div class="timeline-text">First complete 5G NR and 5GC specification. Defines the service-based architecture, basic PDU session management, 5G AKA security, initial network slicing (S-NSSAI), and converged charging. This is the foundation that all subsequent releases build on.</div><div class="timeline-detail">→ Sidebar section: "5G SA Baseline"</div></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-16 (2020) — Industrial &amp; Positioning</div><div class="timeline-text">URLLC enhancements for industrial automation (tighter latency bounds, higher reliability). NR-U for operation in unlicensed spectrum. NR positioning (location services using NR signals). Integrated Access and Backhaul (IAB) for flexible mesh deployment. NR V2X for vehicle-to-everything communication. Control/User Plane Separation (CUPS) formalization. Initial ULCL concept for dual connectivity to local and central UPF.</div></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-17 (2022) — Edge, Analytics &amp; IoT</div><div class="timeline-text">Enhanced edge computing support (TS 23.548) with ULCL steering, Edge Application Server Discovery (EASDF), and AF traffic influence — the basis for the ULCL Edge flows. NSACF for per-slice admission control — used in the Slicing flows. NWDAF analytics enhancements with ML model training and inference — covered in the Analytics flows. RedCap (Reduced Capability) devices for mid-tier IoT (smartwatches, sensors). Non-Terrestrial Networks (NTN) for satellite-based NR. Multicast Broadcast Services (MBS).</div><div class="timeline-detail">→ Sidebar sections: "5G Advanced — ULCL Edge," "Network Slicing," "5G Analytics"</div></div>';
+  html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-18 (2024) — 5G-Advanced</div><div class="timeline-text">AI/ML for NR air interface — beam management prediction, CSI feedback enhancement, positioning. Ambient IoT for zero-power and low-power tag devices. XR (Extended Reality) traffic handling optimizations. Network energy savings features. Duplex evolution (sub-band full-duplex exploration). Multi-carrier enhancements.</div></div>';
+  html += '</div>';
+
+  html += '<h3>Mapping Releases to This Tool</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Sidebar Section</th><th>Primary Release</th><th>Key Capabilities</th></tr></thead><tbody>';
+  html += '<tr><td>5G SA Baseline</td><td>Rel-15/16</td><td>Registration, PDU sessions, data transfer, VoNR, SMS, charging, QoS modification, deregistration</td></tr>';
+  html += '<tr><td>5G Advanced — ULCL Edge</td><td>Rel-16/17</td><td>ULCL dual-path UPF, AF traffic influence via NEF, local breakout, through-path N9, edge charging</td></tr>';
+  html += '<tr><td>Network Slicing</td><td>Rel-15/16/17</td><td>Slice-aware registration, NSSF selection, NSACF admission control, slice-specific PDU sessions and charging, dynamic slice API</td></tr>';
+  html += '<tr><td>5G Mobility</td><td>Rel-15/16</td><td>Xn-based handover, service request (idle-to-connected)</td></tr>';
+  html += '<tr><td>5G Analytics</td><td>Rel-17</td><td>NWDAF load analytics, ML inference, proactive policy adjustment</td></tr>';
+  html += '</tbody></table>';
+
+  html += '<h3>Looking Forward</h3>';
+  html += '<p>5G Advanced (Rel-18+) represents the next evolution of mobile networking. Features like AI/ML for the air interface, ambient IoT, and network energy optimization push the boundaries of what the 5G platform can do and lay groundwork for future generations of mobile technology. Within this tool, the NWDAF Analytics flow (Flow 20) demonstrates the analytics-driven optimization pattern that 5G Advanced and beyond will increasingly rely on.</p>';
+
+  el.innerHTML = html;
+}
 
 /* ======== WELCOME PAGE ======== */
 function showWelcome() {
@@ -6783,6 +7149,7 @@ function showWelcome() {
   document.getElementById('welcome-view').innerHTML = `<div class="welcome-container">
     <h2>3GPP Protocol Flow Simulator — 5G / 5G Advanced</h2>
     <p>An interactive tool for stepping through complete 5G SA, 5G Advanced ULCL Edge, and Network Slicing message flows. Each flow animates messages between network nodes on a topology diagram, with a payload inspector showing protocol details.</p>
+    <p><strong>New to 5G?</strong> Start with the "Introduction to 5G" section in the sidebar — five pages that build your understanding from the ground up: what 5G is, how it differs from 4G, the network functions you will encounter in every flow, the interfaces and protocols that connect them, and what 5G Advanced adds beyond the baseline.</p>
     <h3>Badge System</h3>
     <div class="badge-legend" style="grid-template-columns:1fr;">
       <div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production network architecture</span></div>
@@ -6795,7 +7162,7 @@ function showWelcome() {
     </div>
     <h3>Getting Started</h3>
     <p>Select a flow from the sidebar to begin. Each flow shows the network topology with relevant nodes, and you can step through each message exchange to see the signaling details.</p>
-    <p>This file contains 20 interactive flows covering 5G SA Baseline, 5G Advanced ULCL Edge, Network Slicing, 5G Mobility, and 5G Analytics, plus reference pages with architecture diagrams, specifications, a glossary, latency comparison, band map, and technology timeline.</p>
+    <p>This file contains 20 interactive flows covering 5G SA Baseline, 5G Advanced ULCL Edge, Network Slicing, 5G Mobility, and 5G Analytics, plus an introductory learning section, and reference pages with architecture diagrams, specifications, a glossary, latency comparison, band map, and technology timeline.</p>
     <div style="margin-top:18px;padding:14px 18px;border-left:4px solid #e20074;background:rgba(226,0,116,0.06);border-radius:6px;font-size:0.97em;line-height:1.6">
 <strong>⚠ Disclaimer:</strong> All NF instance names, hostnames, S-NSSAI SD values, rating groups, DNAI identifiers, capacity limits, invoice examples, and infrastructure names shown in this tool are <strong>illustrative examples</strong> created for educational purposes. They do not represent actual network configuration, operational parameters, or pricing. Protocol flows and message structures follow 3GPP specifications; operator-specific payload values are fictional.
 </div>

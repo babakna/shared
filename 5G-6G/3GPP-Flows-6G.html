@@ -522,6 +522,13 @@ const NODES = {
 
 /* ======== SIDEBAR CONFIG ======== */
 const SIDEBAR_SECTIONS = [
+  { title:'Introduction', items:[
+    {num:'i', id:'intro_road_to_6g', label:'The Road from 5G to 6G', type:'ref'},
+    {num:'ii', id:'intro_what_is_airan', label:'What is AI-RAN?', type:'ref'},
+    {num:'iii', id:'intro_airan_vs_gnb', label:'AI-RAN vs. Traditional gNB', type:'ref'},
+    {num:'iv', id:'intro_what_is_6g', label:'What is 6G?', type:'ref'},
+    {num:'v', id:'intro_6g_technologies', label:'6G Key Technologies', type:'ref'},
+  ]},
   { title:'AI-RAN (Innovation Center)', items:[
     {num:1, id:'airan_registration',label:'Registration via AI-RAN Node',type:'flow'},
     {num:2, id:'airan_pdu_shared',label:'PDU Session — Shared Memory',type:'flow'},
@@ -6033,6 +6040,11 @@ function showReference(id) {
   showView('reference');
   const rc = document.getElementById('ref-content');
   switch(id) {
+    case 'intro_road_to_6g': renderIntroRoadTo6G(rc); break;
+    case 'intro_what_is_airan': renderIntroWhatIsAIRAN(rc); break;
+    case 'intro_airan_vs_gnb': renderIntroAIRANvsGNB(rc); break;
+    case 'intro_what_is_6g': renderIntroWhatIs6G(rc); break;
+    case 'intro_6g_technologies': renderIntro6GTechnologies(rc); break;
     case 'arch_diagrams': renderArchDiagrams(rc); break;
     case 'latency_comparison': renderLatency(rc); break;
     case 'spec_library': renderSpecLibrary(rc); break;
@@ -6882,13 +6894,271 @@ function renderBandMap(el) {
   el.innerHTML = html;
 }
 
+/* -- Introduction: The Road from 5G to 6G -- */
+function renderIntroRoadTo6G(el) {
+  let html = '<h2>The Road from 5G to 6G <span class="badge badge-fact">FACT</span></h2>';
+  html += '<p>This tool covers two distinct layers of network evolution: AI-RAN, which enhances the existing 5G network with GPU-accelerated RAN intelligence, and 6G, which envisions an entirely new AI-native network architecture for the 2030 era. Understanding where each sits on the maturity spectrum is essential to interpreting the flows in this tool.</p>';
+  html += '<h3>The Evolution Path</h3>';
+  html += '<div class="arch-svg-container" id="intro-evo-path"></div>';
+  html += '<div style="margin-top:12px;padding:12px 16px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">AI-RAN is a bridge — it enhances 5G infrastructure with AI while remaining fully 3GPP-compliant, paving the way for the architectural transformation that 6G represents.</div>';
+  html += '<h3>Understanding the Badge System</h3>';
+  html += '<p>Unlike the 5G Protocol Flow Simulator where all flows are FACT (grounded in deployed specifications), this tool spans multiple maturity levels. The badge on each flow tells you exactly how far from production reality that content is. Interpreting badges correctly is critical to using this tool responsibly — especially if you are sharing insights with colleagues or stakeholders.</p>';
+  html += '<div class="badge-legend" style="grid-template-columns:1fr;">';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-fact">FACT</span></div><span>Content grounded in deployed 3GPP specifications and production network architecture. Used for reference pages that describe existing standards.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-validated">VALIDATED</span></div><span>Demonstrated or validated in a lab or Innovation Center environment. The AI-RAN Registration flow (Flow 1) and AI-RAN Performance Comparison (Flow 5) carry this badge — they reflect what has been demonstrated on real hardware (Nokia AirScale + NVIDIA Grace Hopper) in lab conditions.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-projected">PROJECTED</span></div><span>Engineering projection based on current technology trajectory. The AI-RAN PDU Session (Flow 2), Data Transfer (Flow 3), and Telemetry (Flow 4) carry this badge — the shared-memory data path and zero-hop architecture are based on NVIDIA Aerial SDK capabilities and O-RAN WG3 directions, but have not yet been demonstrated end-to-end in the Innovation Center.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-vision">VISION</span></div><span>Forward-looking vision for the 6G era (~2030). All 6G flows (Flows 6–14) carry this badge. These flows illustrate concepts from ITU-R IMT-2030 studies and 3GPP preliminary 6G research. Protocols, message formats, and architectures shown are speculative projections — they will change significantly as standards develop.</span></div>';
+  html += '</div>';
+  html += '<h3>How to Use This Tool</h3>';
+  html += '<p>Start with the AI-RAN flows (Flows 1–5) if you want to see near-term innovation — GPU-accelerated RAN processing that enhances 5G today. Move to the 6G flows (Flows 6–14) if you want to explore the architectural vision for the next decade. The reference pages (Architecture Diagrams, Specification Library, Glossary, Latency Comparison, Technology Timeline, Band Map) provide supporting context for both sections.</p>';
+  html += '<h3>Mapping to the Sidebar</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Sidebar Section</th><th>Badge Level</th><th>Maturity</th><th>What It Covers</th></tr></thead><tbody>';
+  html += '<tr><td>AI-RAN (Innovation Center)</td><td>VALIDATED / PROJECTED</td><td>Lab demo → Engineering target</td><td>GPU-accelerated RAN using Nokia AirScale + NVIDIA Grace Hopper. Standard 3GPP compliance with AI-enhanced L1/L2 processing.</td></tr>';
+  html += '<tr><td>6G AI-Native (Foundational)</td><td>VISION</td><td>Research vision (~2030)</td><td>Registration, session establishment, and data transfer on a speculative AI-native 6G architecture with unified AI Core, post-quantum cryptography, and sub-THz air interface.</td></tr>';
+  html += '<tr><td>6G Advanced Concepts</td><td>VISION</td><td>Research vision (~2030)</td><td>Intent-based slicing, AI-driven scaling, sensing-aware physical AI slices, evolved charging, network digital twins, and Integrated Sensing and Communication (ISAC).</td></tr>';
+  html += '</tbody></table>';
+  el.innerHTML = html;
+  const evoContainer = document.getElementById('intro-evo-path');
+  if (evoContainer) {
+    const svg = svgEl('svg', {viewBox:'0 0 900 220', width:'100%', style:'max-height:220px'});
+    const defs = svgEl('defs');
+    const marker = svgEl('marker', {id:'intro-arrow', viewBox:'0 0 10 10', refX:'9', refY:'5', markerWidth:'6', markerHeight:'6', orient:'auto-start-reverse'});
+    const path = svgEl('path', {d:'M 0 0 L 10 5 L 0 10 z', fill:'var(--svg-line)'});
+    marker.appendChild(path); defs.appendChild(marker); svg.appendChild(defs);
+    const stages = [
+      {x:10, color:'#16a34a', label:'5G SA Baseline', sub:'Deployed (Rel-15/16/17)', detail:'SBA, Network Slicing, Edge Computing, NWDAF'},
+      {x:230, color:'#2563eb', label:'5G Advanced', sub:'Deployed (Rel-18)', detail:'AI/ML Air Interface, Ambient IoT, XR Support'},
+      {x:450, color:'#ea580c', label:'AI-RAN', sub:'Validating / Projected', detail:'GPU-Accelerated RAN, AI Beam Mgmt, Shared Memory'},
+      {x:670, color:'#e20074', label:'6G', sub:'Vision (~2030)', detail:'AI-Native Core, ISAC, Digital Twins, Sub-THz'}
+    ];
+    stages.forEach((s, i) => {
+      const g = svgEl('g');
+      const r = svgEl('rect', {x:s.x, y:30, width:200, height:150, rx:8, fill:s.color, opacity:'0.12', stroke:s.color, 'stroke-width':2});
+      g.appendChild(r);
+      const t1 = svgEl('text', {x:s.x+100, y:65, 'text-anchor':'middle', 'dominant-baseline':'middle', fill:'var(--svg-text)', 'font-size':'14', 'font-weight':'700', 'font-family':"'Segoe UI',system-ui,sans-serif"});
+      t1.textContent = s.label; g.appendChild(t1);
+      const t2 = svgEl('text', {x:s.x+100, y:88, 'text-anchor':'middle', 'dominant-baseline':'middle', fill:s.color, 'font-size':'10', 'font-weight':'600', 'font-family':"'Consolas',monospace"});
+      t2.textContent = s.sub; g.appendChild(t2);
+      const words = s.detail.split(', ');
+      words.forEach((w, wi) => {
+        const t3 = svgEl('text', {x:s.x+100, y:115 + wi*16, 'text-anchor':'middle', 'dominant-baseline':'middle', fill:'var(--svg-text)', 'font-size':'10', opacity:'0.75', 'font-family':"'Segoe UI',system-ui,sans-serif"});
+        t3.textContent = w; g.appendChild(t3);
+      });
+      svg.appendChild(g);
+      if (i < stages.length - 1) {
+        const ax1 = s.x + 200 + 4;
+        const ax2 = stages[i+1].x - 4;
+        const ay = 105;
+        const arrow = svgEl('line', {x1:ax1, y1:ay, x2:ax2, y2:ay, stroke:'var(--svg-line)', 'stroke-width':2, 'marker-end':'url(#intro-arrow)'});
+        svg.appendChild(arrow);
+      }
+    });
+    evoContainer.appendChild(svg);
+  }
+}
+
+/* -- Introduction: What is AI-RAN? -- */
+function renderIntroWhatIsAIRAN(el) {
+  let html = '<h2>What is AI-RAN? <span class="badge badge-fact">FACT</span></h2>';
+  html += '<p>AI-RAN is the integration of artificial intelligence directly into the Radio Access Network (RAN) infrastructure. Instead of running AI as an external optimization layer (like traditional SON or the O-RAN Near-RT RIC), AI-RAN places GPU compute physically alongside or within the RAN node itself, enabling real-time AI inference on live radio signals at microsecond timescales.</p>';
+  html += '<h3>The Core Idea</h3>';
+  html += '<p>In a traditional gNB, the baseband unit (BBU) performs L1 PHY processing (channel estimation, LDPC decoding, beam management) using dedicated ASICs or FPGAs. These are fast but inflexible — they execute fixed algorithms defined at design time. AI-RAN replaces or augments these fixed processing stages with GPU-accelerated AI models that can learn, adapt, and predict. A trained neural network performing beam prediction can find the optimal beam pair in ~42 microseconds with 97% confidence, compared to ~500 microseconds for traditional codebook search — and it improves over time with more data.</p>';
+  html += '<h3>The AI-RAN Alliance</h3>';
+  html += '<p>The AI-RAN Alliance was established in February 2024 to accelerate the integration of AI into mobile networks. It brings together mobile operators, infrastructure vendors (Nokia, Ericsson, Samsung), GPU/AI platform providers (NVIDIA), and research institutions. The alliance focuses on three areas: AI for RAN (using AI to optimize existing RAN operations), AI on RAN (running AI workloads on RAN infrastructure), and AI and RAN (new architectures where AI is a native component of the radio network).</p>';
+  html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">AI for RAN</strong><span>Using AI models to optimize existing RAN operations: beam management, interference mitigation, power control, scheduling. The AI improves what the RAN already does.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">AI on RAN</strong><span>Using the GPU infrastructure deployed for RAN processing to also run non-RAN AI workloads (computer vision, natural language processing, edge inference) during low-traffic periods. The RAN infrastructure becomes a multi-purpose AI compute platform.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">AI and RAN</strong><span>New architectures where AI is not an add-on but a native component of the radio stack. The protocol stack itself is AI-driven. This is the long-term vision that bridges toward 6G.</span></div>';
+  html += '</div>';
+  html += '<h3>The Innovation Center</h3>';
+  html += '<p>The Innovation Center is a lab environment where AI-RAN concepts are validated on real hardware. The current platform pairs Nokia AirScale radio units with NVIDIA Grace Hopper GH200 Superchip GPUs. The NVIDIA Aerial SDK provides the software stack: cuPHY for GPU-accelerated L1 PHY processing (LDPC decode, channel estimation, FFT/IFFT) and cuMAC for L2 MAC scheduling. Over-the-air (OTA) demonstrations use n77 (3.7 GHz C-Band) with Massive MIMO antenna configurations.</p>';
+  html += '<p>A key principle: AI-RAN is fully 3GPP-compliant. The AMF, SMF, UPF, and all core network functions see a standard gNB. The UE sees a standard NR cell. The innovation is entirely within the RAN node\'s internal processing — the external interfaces (N2, N3, Uu) are unchanged. This means AI-RAN can be deployed incrementally into an existing 5G SA network without core network modifications.</p>';
+  html += '<h3>Key Hardware and Software</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Component</th><th>Role</th><th>Detail</th></tr></thead><tbody>';
+  html += '<tr><td>Nokia AirScale</td><td>Radio Unit (RU) + Baseband</td><td>Provides the RF front-end and baseline BBU. Massive MIMO antenna panels (64T64R).</td></tr>';
+  html += '<tr><td>NVIDIA Grace Hopper GH200</td><td>GPU Superchip</td><td>ARM-based Grace CPU + Hopper H100 GPU on a single module. NVLink-C2C interconnect provides 900 GB/s bandwidth between CPU and GPU with unified memory.</td></tr>';
+  html += '<tr><td>NVIDIA Aerial SDK</td><td>Software Stack</td><td>cuPHY: GPU-accelerated L1 PHY (LDPC, channel estimation, FFT). cuMAC: GPU-accelerated L2 scheduling. Enables zero-copy shared-memory data paths between PHY processing and higher layers.</td></tr>';
+  html += '<tr><td>NVIDIA Aerial cuBB</td><td>Baseband Reference</td><td>Reference implementation of the 5G NR baseband on GPU. Demonstrates that the entire L1/L2 stack can run on general-purpose GPU hardware rather than custom ASICs.</td></tr>';
+  html += '<tr><td>O-RAN Interfaces</td><td>RAN Intelligence</td><td>E2 interface for Near-RT RIC integration. Enables AI-RAN to receive policy and optimization inputs from the O-RAN controller layer (AI-RAN Controller in the flows).</td></tr>';
+  html += '</tbody></table>';
+  html += '<h3>Deployment Timeline</h3>';
+  const events = [
+    {date:'Sep 2024', text:'AI-RAN Innovation Center announced with Nokia, Ericsson, NVIDIA partnership.', cls:''},
+    {date:'Oct 2025', text:'NVIDIA strategic investment in Nokia for AI-RAN infrastructure acceleration.', cls:''},
+    {date:'Mar 2026 (MWC)', text:'Nokia/NVIDIA over-the-air AI-RAN demonstration on Grace Hopper. Ericsson Cloud RAN on NVIDIA GPU showcased.', cls:''},
+    {date:'Mar 2026 (GTC)', text:'Physical AI on AI-RAN demonstrated (NVIDIA Metropolis).', cls:''},
+    {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed at MWC 2026).', cls:'projected'},
+    {date:'~2027', text:'First commercial AI-RAN deployment (projected).', cls:'projected'},
+    {date:'~2028', text:'Wider AI-RAN network deployment (estimated).', cls:'projected'},
+  ];
+  html += '<div class="timeline-container"><div class="timeline-line"></div>';
+  events.forEach(e => {
+    html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${e.text}</div></div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+/* -- Introduction: AI-RAN vs. Traditional gNB -- */
+function renderIntroAIRANvsGNB(el) {
+  let html = '<h2>AI-RAN vs. Traditional gNB <span class="badge badge-fact">FACT</span></h2>';
+  html += '<p>The AI-RAN node performs the same role as a traditional gNB — it is a 5G NR base station that connects UEs to the 5G Core. The difference is entirely in how it processes radio signals internally. This page provides a side-by-side comparison so you can see exactly what changes and what stays the same.</p>';
+  html += '<h3>Architecture Comparison Diagram</h3>';
+  html += '<div class="arch-svg-container" id="intro-arch-compare"></div>';
+  html += '<h3>What Changes</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Aspect</th><th>Traditional gNB</th><th>AI-RAN Node</th></tr></thead><tbody>';
+  html += '<tr><td>L1 PHY Processing</td><td>Dedicated ASIC/FPGA — fixed algorithms, optimized at chip design time</td><td>GPU-accelerated (NVIDIA cuPHY) — AI models that learn and adapt, updateable via software</td></tr>';
+  html += '<tr><td>Beam Management</td><td>Codebook-based beam search — UE and gNB cycle through beam pairs, ~500 μs</td><td>AI beam prediction — trained neural network predicts optimal beam pair in ~42 μs with ~97% confidence</td></tr>';
+  html += '<tr><td>Channel Estimation</td><td>Traditional least-squares or MMSE estimation</td><td>AI-enhanced CSI — deeper channel understanding, better MU-MIMO spatial multiplexing</td></tr>';
+  html += '<tr><td>MAC Scheduling</td><td>Rule-based or heuristic schedulers (proportional fair, round-robin variants)</td><td>GPU-accelerated scheduling with potential for ML-informed resource allocation</td></tr>';
+  html += '<tr><td>L1/L2 Data Path</td><td>DMA transfers between ASIC/FPGA and memory, packet copies between processing stages</td><td>Shared-memory zero-copy pipeline — L1 PHY output directly available to L2 and GTP-U encapsulation via GPU unified memory</td></tr>';
+  html += '<tr><td>Compute Platform</td><td>Purpose-built DSP/ASIC/FPGA silicon per vendor</td><td>NVIDIA Grace Hopper GPU — general-purpose AI compute that can also run non-RAN AI workloads</td></tr>';
+  html += '<tr><td>Software Update Model</td><td>Firmware updates requiring hardware compatibility validation</td><td>AI model updates via software — retrain and deploy new beam management or scheduling models without hardware changes</td></tr>';
+  html += '</tbody></table>';
+  html += '<h3>What Stays the Same</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Aspect</th><th>Behavior</th></tr></thead><tbody>';
+  html += '<tr><td>N2 Interface (NGAP)</td><td>Identical. AMF cannot distinguish AI-RAN from traditional gNB. Standard NG Setup, UE Context, PDU Session Resource procedures.</td></tr>';
+  html += '<tr><td>N3 Interface (GTP-U)</td><td>Identical. Same GTP-U tunnel encapsulation, same TEID management, same QFI in extension headers.</td></tr>';
+  html += '<tr><td>Uu Air Interface</td><td>Identical from UE perspective. Standard NR waveform, same SSB, same PRACH, same DCI/UCI. UE is completely unaware of AI-RAN.</td></tr>';
+  html += '<tr><td>NAS Signaling</td><td>Unchanged. NAS is end-to-end UE ↔ AMF. AI-RAN relays NAS PDUs transparently, same as any gNB.</td></tr>';
+  html += '<tr><td>3GPP Compliance</td><td>Full compliance with TS 38.331 (RRC), TS 38.413 (NGAP), TS 38.214 (PHY procedures), TS 29.281 (GTP-U).</td></tr>';
+  html += '<tr><td>Security</td><td>Same AS security (KgNB → KRRCenc, KRRCint, KUPenc, KUPint). Same NAS security (KAMF-based). No changes to the 5G AKA authentication flow.</td></tr>';
+  html += '<tr><td>Handover</td><td>Standard Xn-based and N2-based handover procedures. AI-RAN node participates as a standard gNB in mobility.</td></tr>';
+  html += '</tbody></table>';
+  html += '<h3>The Key Insight</h3>';
+  html += '<p>AI-RAN is not a new generation of mobile technology — it is a new way of implementing the existing generation. Every protocol, every interface, every message format in the AI-RAN flows follows the same 3GPP specifications as baseline 5G SA. The difference is speed (GPU parallelism), intelligence (AI inference on live signals), and flexibility (software-defined radio processing). This is why AI-RAN can be deployed incrementally into an existing network — it is an infrastructure upgrade, not a standards change.</p>';
+  el.innerHTML = html;
+  const cmpContainer = document.getElementById('intro-arch-compare');
+  if (cmpContainer) {
+    const svg = svgEl('svg', {viewBox:'0 0 900 400', width:'100%', style:'max-height:400px'});
+    const bgL = svgEl('rect', {x:10, y:10, width:420, height:380, rx:10, fill:'var(--svg-box-fill)', stroke:'var(--svg-box-stroke)', 'stroke-width':1.5});
+    svg.appendChild(bgL);
+    const titleL = svgEl('text', {x:220, y:35, 'text-anchor':'middle', fill:'var(--svg-text)', 'font-size':'15', 'font-weight':'700', 'font-family':"'Segoe UI',system-ui,sans-serif"});
+    titleL.textContent = 'Traditional gNB'; svg.appendChild(titleL);
+    svgBox(svg, 55, 55, 330, 42, 'RRC / PDCP / SDAP', 'L3/L2 Upper');
+    svgBox(svg, 55, 110, 330, 42, 'MAC Scheduler', 'L2 — ASIC/FPGA');
+    svgBox(svg, 55, 165, 330, 42, 'L1 PHY: LDPC, FFT, Beamforming', 'L1 — ASIC/FPGA');
+    svgBox(svg, 55, 220, 330, 42, 'RF / Antenna', 'Radio Unit');
+    const n2L = svgEl('text', {x:100, y:290, 'text-anchor':'start', fill:'var(--svg-text)', 'font-size':'9', 'font-family':"'Consolas',monospace"});
+    n2L.textContent = '→ N2 (NGAP) → AMF'; svg.appendChild(n2L);
+    const n3L = svgEl('text', {x:100, y:308, 'text-anchor':'start', fill:'var(--svg-text)', 'font-size':'9', 'font-family':"'Consolas',monospace"});
+    n3L.textContent = '→ N3 (GTP-U) → UPF'; svg.appendChild(n3L);
+    const labelL = svgEl('text', {x:220, y:370, 'text-anchor':'middle', fill:'var(--text-tertiary)', 'font-size':'11', 'font-style':'italic', 'font-family':"'Segoe UI',system-ui,sans-serif"});
+    labelL.textContent = 'Fixed algorithms, dedicated hardware'; svg.appendChild(labelL);
+    const bgR = svgEl('rect', {x:470, y:10, width:420, height:380, rx:10, fill:'var(--svg-box-fill)', stroke:'#2563eb', 'stroke-width':1.5});
+    svg.appendChild(bgR);
+    const titleR = svgEl('text', {x:680, y:35, 'text-anchor':'middle', fill:'var(--svg-text)', 'font-size':'15', 'font-weight':'700', 'font-family':"'Segoe UI',system-ui,sans-serif"});
+    titleR.textContent = 'AI-RAN Node'; svg.appendChild(titleR);
+    svgBox(svg, 515, 55, 330, 42, 'RRC / PDCP / SDAP', 'L3/L2 Upper');
+    svgBox(svg, 515, 110, 330, 42, 'cuMAC — GPU Scheduler', 'L2 — GPU', {stroke:'#16a34a', sw:2});
+    svgBox(svg, 515, 165, 330, 42, 'cuPHY — GPU L1: AI Beam, AI CSI, LDPC', 'L1 — GPU', {stroke:'#16a34a', sw:2});
+    svgBox(svg, 515, 220, 330, 42, 'RF / Antenna', 'Radio Unit');
+    svgBox(svg, 555, 285, 250, 36, 'GPU Pool (Grace Hopper)', 'PCIe / NVLink', {stroke:'#16a34a', sw:2});
+    svgLine(svg, 680, 207, 680, 285, '', {stroke:'#16a34a', dash:'4 3'});
+    const n2R = svgEl('text', {x:560, y:340, 'text-anchor':'start', fill:'var(--svg-text)', 'font-size':'9', 'font-family':"'Consolas',monospace"});
+    n2R.textContent = '→ N2 (NGAP) → AMF'; svg.appendChild(n2R);
+    const n3R = svgEl('text', {x:560, y:358, 'text-anchor':'start', fill:'var(--svg-text)', 'font-size':'9', 'font-family':"'Consolas',monospace"});
+    n3R.textContent = '→ N3 (GTP-U) → UPF'; svg.appendChild(n3R);
+    const labelR = svgEl('text', {x:680, y:380, 'text-anchor':'middle', fill:'var(--text-tertiary)', 'font-size':'11', 'font-style':'italic', 'font-family':"'Segoe UI',system-ui,sans-serif"});
+    labelR.textContent = 'AI models, GPU-accelerated, adaptive'; svg.appendChild(labelR);
+    const midT = svgEl('text', {x:450, y:200, 'text-anchor':'middle', fill:'var(--accent)', 'font-size':'9', 'font-weight':'600', 'font-family':"'Segoe UI',system-ui,sans-serif", transform:'rotate(-90, 450, 200)'});
+    midT.textContent = 'External interfaces identical — N2, N3, Uu unchanged'; svg.appendChild(midT);
+    cmpContainer.appendChild(svg);
+  }
+}
+
+/* -- Introduction: What is 6G? -- */
+function renderIntroWhatIs6G(el) {
+  let html = '<h2>What is 6G? <span class="badge badge-fact">FACT</span></h2>';
+  html += '<p>6G is the next generation of mobile network technology, targeted for initial standardization around 2029 and commercial deployment beginning around 2030. While 5G was designed for three usage scenarios (eMBB, URLLC, mMTC), 6G expands to six — adding integrated sensing, AI-native communication, and ubiquitous global connectivity. The vision is defined by the ITU-R under the IMT-2030 framework (Recommendation ITU-R M.2160, approved November 2023).</p>';
+  html += '<h3>Six Usage Scenarios (IMT-2030)</h3>';
+  html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Immersive Communication</strong><span>Holographic telepresence, extended reality (XR), multi-sensory experiences. Requires massive throughput (200+ Gbps peak target) and extremely low latency.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Hyper Reliable and Low-Latency Communication</strong><span>Mission-critical applications beyond 5G URLLC: autonomous systems, remote precision control, industrial digital twins. Target: sub-millisecond latency with 99.99999% reliability.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Massive Communication</strong><span>Scaling IoT to tens of billions of devices: ambient IoT (zero-power tags), dense sensor networks, smart infrastructure at unprecedented scale. Target: 10 million devices per km².</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Ubiquitous Connectivity</strong><span>Global coverage including underserved areas, rural regions, airborne/maritime/space. Integration with non-terrestrial networks (LEO satellites, HAPS) as native 6G components, not add-ons.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Integrated AI and Communication</strong><span>AI is not just an optimization tool but a native part of the protocol stack. The network learns, predicts, and self-optimizes. AI models are trained, distributed, and executed as a core network service.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Integrated Sensing and Communication (ISAC)</strong><span>The same radio waveform that carries data also senses the physical environment: detecting objects, measuring distance/velocity, creating spatial maps. Communication and radar-like sensing converge into a single system.</span></div>';
+  html += '</div>';
+  html += '<h3>Proposed Performance Targets</h3>';
+  html += '<p style="font-size:12px;font-style:italic;color:var(--text-tertiary);">These targets are from ITU-R study documents and industry proposals. Final requirements are still under development by ITU-R and will be defined before the 6G evaluation process.</p>';
+  html += '<table class="ref-table"><thead><tr><th>Metric</th><th>6G Target (Proposed)</th><th>5G IMT-2020</th><th>Improvement</th></tr></thead><tbody>';
+  html += '<tr><td>Peak Data Rate</td><td>200 Gbps</td><td>20 Gbps</td><td>10×</td></tr>';
+  html += '<tr><td>User Experienced Data Rate</td><td>1 Gbps</td><td>100 Mbps</td><td>10×</td></tr>';
+  html += '<tr><td>User-Plane Latency</td><td>0.1 ms</td><td>1 ms (URLLC)</td><td>10×</td></tr>';
+  html += '<tr><td>Connection Density</td><td>10,000,000 devices/km²</td><td>1,000,000 devices/km²</td><td>10×</td></tr>';
+  html += '<tr><td>Reliability</td><td>99.99999% (seven 9s)</td><td>99.999% (five 9s)</td><td>100×</td></tr>';
+  html += '<tr><td>Mobility</td><td>1,000 km/h</td><td>500 km/h</td><td>2×</td></tr>';
+  html += '<tr><td>Spectrum Range</td><td>Up to sub-THz (100–300 GHz)</td><td>Up to mmWave (71 GHz)</td><td>New bands</td></tr>';
+  html += '<tr><td>Sensing Resolution</td><td>cm-level spatial resolution</td><td>N/A (no sensing)</td><td>New capability</td></tr>';
+  html += '<tr><td>AI Integration</td><td>Native (models in protocol stack)</td><td>External (NWDAF, O-RAN RIC)</td><td>Architectural shift</td></tr>';
+  html += '<tr><td>Energy Efficiency</td><td>100× vs 5G (per bit)</td><td>100× vs 4G (per bit)</td><td>Continued</td></tr>';
+  html += '<tr><td>Positioning</td><td>cm-level accuracy</td><td>meter-level accuracy</td><td>10–100×</td></tr>';
+  html += '</tbody></table>';
+  html += '<p style="font-size:11px;font-style:italic;color:var(--text-tertiary);margin-top:8px;">Sources: ITU-R M.2160 (IMT-2030 Framework), ITU-R Working Party 5D contributions, Next G Alliance, Hexa-X / Hexa-X-II European 6G projects. Exact targets remain under active study.</p>';
+  html += '<h3>6G Standardization Timeline</h3>';
+  const events = [
+    {date:'Nov 2023', text:'ITU-R approves Recommendation M.2160 — IMT-2030 Framework and overall objectives. Defines the six usage scenarios and high-level capability targets. Marks the official start of the 6G era in standards terms.', cls:''},
+    {date:'2024–2025', text:'3GPP begins 6G study items (SA1, SA2 service requirements and architecture studies). IMT-2030 technology trends and evaluation methodology development at ITU-R.', cls:''},
+    {date:'2025–2027', text:'3GPP Rel-19/20 — advanced 5G features and preliminary 6G architecture studies. ITU-R defines detailed performance requirements and evaluation criteria.', cls:'projected'},
+    {date:'~2028', text:'3GPP Rel-21 expected to begin normative 6G specifications. Technology candidates submitted to ITU-R for IMT-2030 evaluation.', cls:'projected'},
+    {date:'~2029', text:'First 3GPP 6G specifications (initial release). IMT-2030 technology evaluation completed.', cls:'vision'},
+    {date:'~2030', text:'Target for initial 6G commercial deployment.', cls:'vision'},
+  ];
+  html += '<div class="timeline-container"><div class="timeline-line"></div>';
+  events.forEach(e => {
+    html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${e.text}</div></div>`;
+  });
+  html += '</div>';
+  html += '<h3>6G vs. 5G — The Fundamental Differences</h3>';
+  html += '<p>If 5G was an evolution from 4G (new architecture, same paradigm of "connect and transport"), 6G represents a paradigm expansion. The network does not just connect devices and transport data — it senses the physical world, runs AI as a native service, and autonomously adapts in real time. The AI Core in the 6G flows (Flows 6–8) replaces the separate AMF, SMF, and PCF with a unified AI-driven network function that makes decisions through ML inference rather than static policy rules. The Digital Twin (Flow 13) maintains a real-time virtual replica of the entire network for predictive optimization. Integrated Sensing and Communication (Flow 14) uses the same waveform for both data and environmental perception. These are not incremental improvements — they are new capabilities that do not exist in any form in 5G.</p>';
+  el.innerHTML = html;
+}
+
+/* -- Introduction: 6G Key Technologies -- */
+function renderIntro6GTechnologies(el) {
+  let html = '<h2>6G Key Technologies <span class="badge badge-fact">FACT</span></h2>';
+  html += '<p>The 6G flows in this tool reference several technologies that do not exist in 5G. This page explains each one so you can follow the flow logic without prior 6G background. These technologies are at varying stages of research — none are standardized yet.</p>';
+  html += '<h3>AI-Native Network Architecture</h3>';
+  html += '<p>In 5G, the network functions (AMF, SMF, PCF, etc.) are discrete, independently deployed services that communicate via SBI. AI is an add-on — NWDAF collects data and provides analytics, but policy decisions are still made by rules-based engines in the PCF. In 6G, the vision is to merge these functions into a unified AI Core that makes decisions through ML inference. Instead of the PCF sending static PCC rules to the SMF, the AI Core observes network conditions in real time and directly programs the user plane based on learned patterns. The "AI-Native Service Mesh" shown in the 6G architecture diagram replaces the SBI bus.</p>';
+  html += '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">5G Approach</strong><span>Discrete NFs (AMF, SMF, PCF, UDM) → SBI HTTP/2 → Rules-based decisions → Static PCC rules → PFCP to UPF</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">6G Vision</strong><span>Unified AI Core → AI-Native Service Mesh → ML inference decisions → Direct UPF programming → Continuous adaptation</span></div>';
+  html += '</div>';
+  html += '<h3>Integrated Sensing and Communication (ISAC)</h3>';
+  html += '<p>ISAC is one of the defining new capabilities of 6G. Today, communication and sensing (radar) use separate systems on separate spectrum. ISAC unifies them: the same waveform that carries user data also bounces off objects in the environment, and the returned signal is analyzed to detect position, velocity, and characteristics of physical objects. This enables the network to "see" its environment — detecting pedestrians, vehicles, drones, weather patterns — while simultaneously providing connectivity. Flow 14 (ISAC) demonstrates how a gNB transmits a joint waveform, receives reflected returns, and feeds fused sensing data to applications.</p>';
+  html += '<p>The sensing capability uses the existing OFDM waveform structure extended to higher frequencies (sub-THz bands at 100–300 GHz provide the bandwidth needed for cm-level spatial resolution). The gNB acts as both a communication node and a monostatic or bistatic radar. Processing the sensing returns requires significant compute — this is where the GPU infrastructure from AI-RAN becomes essential for 6G.</p>';
+  html += '<h3>Network Digital Twin</h3>';
+  html += '<p>A Network Digital Twin is a continuously updated virtual replica of the physical network — every cell, every UE, every link, every load metric — running in real time. In 5G, NWDAF provides analytics on collected data, but it operates on historical or near-real-time snapshots. The 6G Digital Twin (Flow 13) goes further: it maintains a live simulation of the entire network that can predict the impact of configuration changes before they are applied. The Digital Twin Engine ingests telemetry from all network elements, runs what-if scenarios (e.g., "what happens if we add 5,000 UEs to this sector?"), and recommends or autonomously executes optimizations.</p>';
+  html += '<p>The Digital Twin closes a loop: Physical Network → Telemetry → Digital Twin Model → Predictive Simulation → Optimization Decision → Physical Network. The twin must process network state at sub-second granularity to be useful for real-time decisions. In the 6G flows, the Digital Twin works in concert with the AI Core and Intent Engine.</p>';
+  html += '<h3>Intent-Based Network Management</h3>';
+  html += '<p>In 5G, network slicing requires explicit configuration: an operator defines S-NSSAIs, configures per-slice AMF sets, provisions SMF/UPF instances, and programs PCC rules. Intent-Based Management (Flow 9) abstracts this away. Instead of specifying how the network should be configured, the operator (or an enterprise customer) expresses what they need: "I need a slice for 500 autonomous vehicles in downtown Seattle with sub-5ms latency and 99.999% reliability for 48 hours." The Intent Engine translates this natural-language-like intent into concrete network configuration — selecting the right slice type, computing resource requirements, setting QoS parameters, and provisioning infrastructure automatically.</p>';
+  html += '<p>The Intent Engine works with the AI Core (for resource prediction), the Digital Twin (for capacity simulation), and the existing slice management functions. This pattern exists in embryonic form in 5G (CAMARA/Network Slice APIs represent a simplified version), but 6G envisions full intent decomposition with autonomous fulfillment.</p>';
+  html += '<h3>Post-Quantum Cryptography (PQC)</h3>';
+  html += '<p>5G authentication (5G AKA) relies on cryptographic primitives (ECIES for SUCI concealment, SHA-256 for key derivation) that are considered secure against classical computers but potentially vulnerable to quantum computers. 6G envisions replacing these with post-quantum cryptographic (PQC) algorithms — specifically, lattice-based schemes like CRYSTALS-Kyber (for key exchange) and CRYSTALS-Dilithium (for digital signatures) — that are designed to resist both classical and quantum attacks. In the 6G Registration flow (Flow 6), the SUCI concealment and key derivation steps use PQC algorithms instead of ECIES.</p>';
+  html += '<p>NIST finalized its first set of PQC standards in 2024 (FIPS 203, 204, 205). The 6G flows assume these or their successors will be adopted into the 6G security architecture. PQC introduces larger key sizes and ciphertext — a consideration for air interface overhead.</p>';
+  html += '<h3>Sub-THz Spectrum</h3>';
+  html += '<p>5G uses spectrum up to mmWave (24–71 GHz, with commercial deployments primarily at 28 GHz and 39 GHz). 6G is expected to extend into sub-terahertz (sub-THz) frequencies, roughly 100–300 GHz. These bands offer enormous bandwidth (potentially 10–50 GHz channels) that would enable the 200 Gbps peak data rates targeted for 6G. The tradeoff is severe propagation loss — sub-THz signals attenuate rapidly over distance and are blocked by most obstacles. This makes sub-THz suitable for short-range, high-density deployments (indoor, campus, venue) rather than wide-area coverage. The 6G architecture compensates with dense deployments, advanced beamforming with very large antenna arrays, and reconfigurable intelligent surfaces (RIS) that can redirect signals around obstacles.</p>';
+  html += '<h3>Technology Maturity Summary</h3>';
+  html += '<table class="ref-table"><thead><tr><th>Technology</th><th>Maturity Level</th><th>Relevant Flows</th><th>Exists in 5G?</th></tr></thead><tbody>';
+  html += '<tr><td>AI-Native Core (Unified AI Core)</td><td>Research / Pre-standard</td><td>6, 7, 8, 9, 10, 12, 13</td><td>No — 5G uses discrete NFs with rules-based policy</td></tr>';
+  html += '<tr><td>ISAC (Integrated Sensing &amp; Communication)</td><td>Active research, ITU-R M.2160</td><td>11, 14</td><td>No — 5G is communication-only</td></tr>';
+  html += '<tr><td>Network Digital Twin</td><td>Early research / Proof-of-concept</td><td>13</td><td>Embryonic — NWDAF analytics provides a subset</td></tr>';
+  html += '<tr><td>Intent-Based Management</td><td>Research / Concept</td><td>9</td><td>Embryonic — CAMARA APIs provide simplified version</td></tr>';
+  html += '<tr><td>Post-Quantum Cryptography</td><td>Standards finalized (NIST 2024), not yet in 3GPP</td><td>6</td><td>No — 5G uses ECIES, AES, SHA-256</td></tr>';
+  html += '<tr><td>Sub-THz Spectrum (100–300 GHz)</td><td>Active research, pre-commercial</td><td>8 (mentioned), 14</td><td>No — 5G max is mmWave (~71 GHz)</td></tr>';
+  html += '<tr><td>AI-RAN (GPU-Accelerated RAN)</td><td>Lab validated / Commercial trial</td><td>1, 2, 3, 4, 5</td><td>No — 5G uses ASIC/FPGA baseband (though compatible with 5G standards)</td></tr>';
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
 
 /* ======== WELCOME PAGE ======== */
 function showWelcome() {
   showView('welcome');
   document.getElementById('welcome-view').innerHTML = '<div class="welcome-container">' +
     '<h2>3GPP Protocol Flow Simulator — AI-RAN & 6G</h2>' +
-    '<p>An interactive tool for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus 6 reference pages including architecture diagrams and a band map.</p>' +
+    '<p>An interactive tool for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus an introductory learning section and 6 reference pages including architecture diagrams, specifications, glossary, latency comparison, technology timeline, and band map.</p>' +
+    '<p><strong>New to AI-RAN or 6G?</strong> Start with the "Introduction" section in the sidebar — five pages that build your understanding progressively: the evolutionary context from 5G to 6G, what AI-RAN is and how it works, how AI-RAN compares to a traditional gNB, the 6G vision and timeline, and the key technologies you will encounter in the flows.</p>' +
     '<h3>Badge System</h3>' +
     '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">' +
     '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production network architecture</span></div>' +
