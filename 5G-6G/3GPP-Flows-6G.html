@@ -565,8 +565,8 @@ const FLOWS = {};
 /* ====== FLOW 1: Registration via AI-RAN Node ====== */
 FLOWS['airan_registration'] = {
   id:'airan_registration', title:'Registration via AI-RAN Node', section:'airan', badge:'VALIDATED',
-  specRef:'TS 23.502 §4.2.2.2, O-RAN WG3, AI-RAN Alliance',
-  narrative:'The UE registers through an AI-RAN node (Nokia AirScale + NVIDIA Grace Hopper GPU) at the Innovation Center. The AI-RAN node performs standard gNB functions but adds GPU-accelerated RRC processing and AI-based beam management. Registration follows the same 5G AKA procedure but the gNB is replaced by the AI-RAN node with shared-memory GPU acceleration.',
+  specRef:'TS 23.502 §4.2.2.2, TR 38.843 (AI/ML for NR), O-RAN WG3, AI-RAN Alliance',
+  narrative:'The UE registers through an AI-RAN node (Nokia AirScale + NVIDIA Grace Hopper GPU) at the Innovation Center. The AI-RAN node performs standard gNB functions but adds GPU-accelerated RRC processing and AI-based beam management. Registration follows the same 5G AKA procedure but the gNB is replaced by the AI-RAN node with shared-memory GPU acceleration. The AI beam management demonstrated here aligns with 3GPP Rel-19 AI/ML for NR — which normatively specifies ML-based beam prediction, CSI feedback enhancement, and positioning at the NR physical layer. AI-RAN implements these capabilities at GPU-native speed on real hardware.',
   nodes:['ue','ai_ran','gpu','amf','ausf','udm'],
   connections:[
     {from:'ue',to:'ai_ran',label:'Uu',type:'data'},
@@ -4922,8 +4922,8 @@ FLOWS['sixg_digital_twin'] = {
 /* ====== FLOW 13: AI-RAN Performance Comparison ====== */
 FLOWS['airan_performance'] = {
   id:'airan_performance', title:'AI-RAN Performance Comparison', section:'airan', badge:'VALIDATED',
-  specRef:'AI-RAN Alliance, NVIDIA Aerial SDK, O-RAN WG3',
-  narrative:'Shows how the AI-RAN node collects and reports performance metrics, comparing GPU-accelerated processing vs conventional. The same GPU pool handles L1 PHY, scheduling, and AI inference through time-multiplexed scheduling — validating the core AI-RAN value proposition.',
+  specRef:'AI-RAN Alliance, NVIDIA Aerial SDK, O-RAN WG3, TR 38.843 (AI/ML for NR)',
+  narrative:'Shows how the AI-RAN node collects and reports performance metrics, comparing GPU-accelerated processing vs conventional. The same GPU pool handles L1 PHY, scheduling, and AI inference through time-multiplexed scheduling — validating the core AI-RAN value proposition. The compared functions (beam management, CSI processing, scheduling optimization) map directly to the three AI/ML use cases that 3GPP Rel-19 normatively specifies for NR. AI-RAN demonstrates that these standardized capabilities can achieve dramatically better performance when executed on GPU hardware with AI-native processing rather than conventional ASIC-based approaches.',
   nodes:['ai_ran','gpu','aictl','nwdaf','pcf'],
   connections:[
     {from:'ai_ran',to:'gpu',label:'PCIe/NVLink',type:'data'},
@@ -6323,7 +6323,7 @@ function drawArchAIRAN(container) {
   const note = svgEl('text', {x:450,y:320,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'10','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
   note.textContent = 'NVIDIA Aerial SDK — cuPHY L1, cuMAC L2, shared-memory zero-copy pipeline'; svg.appendChild(note);
   const ref = svgEl('text', {x:450,y:385,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: O-RAN WG3, AI-RAN Alliance, NVIDIA Aerial'; svg.appendChild(ref);
+  ref.textContent = 'Ref: O-RAN WG3, AI-RAN Alliance, NVIDIA Aerial, 3GPP Rel-19 AI/ML for NR (TR 38.843)'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 function drawArch6G(container) {
@@ -6382,7 +6382,7 @@ function drawArch6G(container) {
   const note = svgEl('text', {x:450,y:350,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'10','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
   note.textContent = 'AI Core unifies AMF+SMF+PCF — intent-driven, ML-inferred QoS, no static PCC rules'; svg.appendChild(note);
   const ref = svgEl('text', {x:450,y:435,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: ITU-R M.2160 (IMT-2030), 3GPP SA2 6G Study'; svg.appendChild(ref);
+  ref.textContent = 'Ref: ITU-R M.2160 (IMT-2030), 3GPP SA2 6G Study. Rel-19 precursors: AI/ML for NR, NTN, ambient IoT, cm-level positioning'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 function drawArchIMS(container) {
@@ -6581,10 +6581,12 @@ function renderLatency(el) {
     ['5G SA Centralized','Deployed','3–12 ms','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
     ['Through-Path N9 (Edge)','Deployed','8–15 ms','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
     ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
-    ['AI-RAN (Converged)','Validating (Lab)','1–4 ms (target)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load'],
+    ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','<5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
+    ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), regenerative vs transparent, ground station coverage'],
+    ['AI-RAN (Converged)','Validating (Lab)','1–4 ms (target)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load. Aligns with Rel-19 AI/ML for NR.'],
     ['6G AI-Native','Vision (~2030)','<1 ms (target)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
   ];
-  let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective.</p>';
+  let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective. Includes Rel-19 5G-Advanced capabilities (L1/L2 mobility, NTN satellite) as the bridge between deployed 5G and the 6G vision.</p>';
   html += '<table class="ref-table"><thead><tr><th>Architecture</th><th>Status</th><th>Estimated Range</th><th>Best For</th><th>Depends On</th></tr></thead><tbody>';
   rows.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
@@ -6636,7 +6638,10 @@ function renderSpecLibrary(el) {
       ['TS 38.470/473','F1 Interface','F1-C and F1-U between gNB-CU and gNB-DU','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3257'],
       ['TS 38.460/463','E1 Interface','E1 between gNB-CU-CP and gNB-CU-UP','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3255'],
       ['TS 38.420/423','Xn Interface','Inter-gNB handover, dual connectivity signaling','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3227'],
-      ['TR 38.843','AI/ML for NR Air Interface','Study on AI/ML beam management, CSI, positioning','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3891'],
+      ['TR 38.843','AI/ML for NR Air Interface','Rel-18 study item on AI/ML beam management, CSI, positioning — basis for Rel-19 normative specifications','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3891'],
+      ['TS 38.305','NR Positioning (Rel-19)','Positioning methods (DL-TDoA, UL-AoA, multi-RTT). Rel-19 adds cm-level accuracy and sidelink-based positioning — precursor to 6G ISAC sensing','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
+      ['TR 38.821','NTN Solutions for NR','Non-terrestrial network architecture, satellite mobility, regenerative payload — Rel-19 evolves NTN toward 6G ubiquitous connectivity','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3525'],
+      ['TR 38.848','Study on Ambient IoT','Rel-18/19 ambient IoT device classes (passive, semi-passive, active-assisted) — precursor to 6G massive communication','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4037'],
       ['O-RAN WG3','Near-RT RIC and E2 Interface','Near-RT RIC architecture, E2 service models, xApp framework','https://www.o-ran.org/specifications'],
     ]},
     { title:'Edge Computing', specs:[
@@ -6654,10 +6659,12 @@ function renderSpecLibrary(el) {
     ]},
     { title:'V2X & Specialized', specs:[
       ['TS 23.287','V2X Application Layer Architecture','V2X communication modes, PC5 sidelink, Uu-based V2X','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3580'],
-      ['TR 38.875','RedCap Study','Reduced Capability NR devices for IoT/wearables','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3770'],
+      ['TR 38.875','RedCap / eRedCap Study','Reduced Capability NR devices — Rel-17 RedCap extended to Rel-19 eRedCap (5 MHz, 1 Rx) for lower-tier IoT','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3770'],
+      ['TS 23.304','Proximity-based Services (ProSe) in 5GS','UE-to-UE and UE-to-network relay, sidelink discovery. Rel-19 enhances relay for coverage extension — precursor to 6G mesh','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3855'],
     ]},
     { title:'6G & Future Standards', specs:[
       ['ITU-R M.2160','IMT-2030 Framework','Framework and overall objectives of the future development of IMT for 2030 and beyond (6G)','https://www.itu.int/rec/R-REC-M.2160'],
+      ['3GPP Rel-19','Final 5G-Advanced (closed Mar 2026)','AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, slicing Phase 3, NWDAF federated learning. The standards bridge between 5G and 6G.','https://www.3gpp.org/specifications-technologies/releases/release-19'],
     ]},
   ];
   const deployedProducts = [
@@ -6798,7 +6805,7 @@ const GLOSSARY_DATA = [
   ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
   ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','default 5G slice for consumer broadband services.'],
   ['mMTC','massive Machine Type Communication','5G service category for massive IoT (high device density, low data).','TS 23.501','IoT/NB-IoT service category.'],
-  ['ISAC','Integrated Sensing and Communication','6G capability combining radar-like sensing with communication.','3GPP 6G studies','Envisioned for 6G physical AI and environmental sensing.'],
+  ['ISAC','Integrated Sensing and Communication','Using the same radio waveform for both data communication and radar-like environmental sensing simultaneously. Rel-19 enhances NR positioning to centimeter-level accuracy as a sensing precursor; 6G envisions full native ISAC where every base station is simultaneously a communication node and a radar sensor.','3GPP 6G studies, ITU-R M.2160, TS 38.305 (Rel-19 positioning)','6G capability for environmental awareness. Rel-19 cm-level positioning is the 5G-Advanced stepping stone toward full ISAC.'],
   ['SSC Mode','Session and Service Continuity Mode','Defines how IP address continuity is handled during UPF changes (1/2/3).','TS 23.501 §5.6.9','Operator uses SSC1 (default), SSC2/3 for edge mobility scenarios.'],
   ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','Example slicing products: Priority URLLC, Enterprise eMBB, Portable Private 5G.'],
   ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','Example: SASE offering integrating SD-WAN with 5G and security.'],
@@ -6815,6 +6822,12 @@ const GLOSSARY_DATA = [
   ['cuPHY','NVIDIA Aerial cuPHY','GPU-accelerated 5G NR Layer 1 (PHY) implementation from the NVIDIA Aerial SDK, running physical layer processing on CUDA cores.','NVIDIA Aerial SDK','Core L1 engine in AI-RAN Innovation Center for GPU-based RAN processing.'],
   ['cuMAC','NVIDIA Aerial cuMAC','GPU-accelerated MAC scheduler from the NVIDIA Aerial SDK, enabling real-time scheduling decisions on GPU hardware.','NVIDIA Aerial SDK','MAC layer component in AI-RAN for GPU-native scheduling and resource allocation.'],
   ['NVLink','NVIDIA NVLink','High-bandwidth, low-latency GPU-to-GPU interconnect enabling direct memory access between GPUs without CPU involvement.','NVIDIA','Used in AI-RAN node architecture for GPU interconnect in multi-GPU configurations.'],
+  ['AI/ML for NR','AI/ML for NR Air Interface (Rel-19)','3GPP-standardized use of machine learning at the NR physical layer. Rel-19 normatively specifies beam management prediction, CSI feedback enhancement, and ML-assisted positioning. These are the same capabilities AI-RAN implements at GPU-native speed — Rel-19 provides the standards framework.','TR 38.843, Rel-19 NR TS series','5G-Advanced precursor to AI-native communication in 6G. Standards track that AI-RAN implementations align with.'],
+  ['NTN','Non-Terrestrial Networks (Rel-17/19)','Satellite-based NR access integrated into 5GC. Rel-17 introduced basic NTN; Rel-19 adds regenerative satellite payloads, IoT-NTN, and store-and-forward. Precursor to the ubiquitous connectivity pillar of 6G.','TR 38.821, TS 38.300','5G-Advanced precursor to 6G ubiquitous connectivity — extends coverage to satellite without architectural redesign.'],
+  ['Ambient IoT','Ambient IoT (Rel-18/19)','Zero-battery or near-zero-battery devices using RF energy harvesting and backscatter communication. Rel-19 specifies three device classes: passive (backscatter), semi-passive (small storage), and active-assisted (larger storage). 5G-Advanced precursor to the massive communication scenario in 6G.','TR 38.848, Rel-19 specs','Bridge from 5G IoT (NB-IoT, RedCap) to 6G massive communication (tens of billions of devices).'],
+  ['eRedCap','Enhanced Reduced Capability NR (Rel-19)','Further reduction of NR device complexity beyond Rel-17 RedCap: 5 MHz bandwidth, single Rx antenna, lower power class. Targets industrial sensors, meters, and low-tier wearables.','TS 38.300 (Rel-19), TR 38.875','Expands the 5G device ecosystem downward — between NB-IoT and full NR capability.'],
+  ['Federated Learning','Federated Learning (NWDAF, Rel-19)','Distributed ML model training across multiple NWDAF instances — each trains on local data and shares model updates (not raw data). Rel-19 NWDAF enhancement. Precursor to the distributed AI-native analytics envisioned for 6G.','TS 23.288 (Rel-19)','Bridge between single-instance NWDAF inference (Rel-17) and fully autonomous AI-native 6G network intelligence.'],
+  ['Rel-19','3GPP Release 19 (5G-Advanced Final)','The last 5G-Advanced release, closed March 2026. Normatively specifies AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, network slicing Phase 3, NWDAF federated learning, and more. Marks the end of the 5G standardization era — 3GPP focus shifts to 6G (Rel-20+).','3GPP','The standards bridge between deployed 5G and the 6G vision. Many Rel-19 features are direct precursors to 6G pillars.'],
 ];
 function renderGlossary(el) {
   let html = '<h2>Glossary</h2><div class="glossary-controls"><input type="text" class="glossary-search" id="glossary-search" placeholder="Search terms..." oninput="filterGlossary()"><button class="glossary-sort" onclick="sortGlossary()">Sort A→Z ↕</button></div>';
@@ -6859,6 +6872,7 @@ function renderTimeline(el) {
     {date:'Oct 2024', text:'Portable Private 5G — on-demand private network solution for enterprise', cls:''},
     {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
+    {date:'Mar 2026', text:'3GPP Rel-19 closed — final 5G Advanced release. Standardization focus shifts to 6G (Rel-20 study items begin).', cls:''},
     {date:'Mar 2026', text:'MWC: Nokia/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + 6G innovation hub established.', cls:''},
     {date:'Mar 2026', text:'GTC: Physical AI on AI-RAN demonstrated (Metropolis VSS 3). RTX PRO Blackwell pilot announced at MSOs.', cls:''},
     {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed MWC 2026)', cls:'projected'},
@@ -6898,6 +6912,7 @@ function renderBandMap(el) {
 function renderIntroRoadTo6G(el) {
   let html = '<h2>The Road from 5G to 6G <span class="badge badge-fact">FACT</span></h2>';
   html += '<p>This tool covers two distinct layers of network evolution: AI-RAN, which enhances the existing 5G network with GPU-accelerated RAN intelligence, and 6G, which envisions an entirely new AI-native network architecture for the 2030 era. Understanding where each sits on the maturity spectrum is essential to interpreting the flows in this tool.</p>';
+  html += '<p>The bridge between these layers is <strong>3GPP Release 19</strong> — the final 5G-Advanced release, closed March 2026. Rel-19 is not just an incremental update; it normatively specifies AI/ML at the NR air interface (beam management, CSI, positioning), expands Non-Terrestrial Networks (satellite NR), introduces ambient IoT device classes, evolves NWDAF with federated learning, and enhances positioning to centimeter-level accuracy. Several of these capabilities are <strong>direct precursors</strong> to 6G pillars: AI/ML for NR leads to AI-native communication, NTN evolution leads to ubiquitous connectivity, ambient IoT leads to massive communication, and enhanced positioning leads to integrated sensing. With Rel-19 closed, 3GPP standardization focus now shifts fully to 6G — Rel-20 opens the 6G study phase.</p>';
   html += '<h3>The Evolution Path</h3>';
   html += '<div class="arch-svg-container" id="intro-evo-path"></div>';
   html += '<div style="margin-top:12px;padding:12px 16px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">AI-RAN is a bridge — it enhances 5G infrastructure with AI while remaining fully 3GPP-compliant, paving the way for the architectural transformation that 6G represents.</div>';
@@ -6927,7 +6942,7 @@ function renderIntroRoadTo6G(el) {
     marker.appendChild(path); defs.appendChild(marker); svg.appendChild(defs);
     const stages = [
       {x:10, color:'#16a34a', label:'5G SA Baseline', sub:'Deployed (Rel-15/16/17)', detail:'SBA, Network Slicing, Edge Computing, NWDAF'},
-      {x:230, color:'#2563eb', label:'5G Advanced', sub:'Deployed (Rel-18)', detail:'AI/ML Air Interface, Ambient IoT, XR Support'},
+      {x:230, color:'#2563eb', label:'5G Advanced', sub:'Deployed (Rel-18/19)', detail:'AI/ML Air Interface, Ambient IoT, eRedCap, NTN'},
       {x:450, color:'#ea580c', label:'AI-RAN', sub:'Validating / Projected', detail:'GPU-Accelerated RAN, AI Beam Mgmt, Shared Memory'},
       {x:670, color:'#e20074', label:'6G', sub:'Vision (~2030)', detail:'AI-Native Core, ISAC, Digital Twins, Sub-THz'}
     ];
@@ -6973,6 +6988,8 @@ function renderIntroWhatIsAIRAN(el) {
   html += '<h3>The Innovation Center</h3>';
   html += '<p>The Innovation Center is a lab environment where AI-RAN concepts are validated on real hardware. The current platform pairs Nokia AirScale radio units with NVIDIA Grace Hopper GH200 Superchip GPUs. The NVIDIA Aerial SDK provides the software stack: cuPHY for GPU-accelerated L1 PHY processing (LDPC decode, channel estimation, FFT/IFFT) and cuMAC for L2 MAC scheduling. Over-the-air (OTA) demonstrations use n77 (3.7 GHz C-Band) with Massive MIMO antenna configurations.</p>';
   html += '<p>A key principle: AI-RAN is fully 3GPP-compliant. The AMF, SMF, UPF, and all core network functions see a standard gNB. The UE sees a standard NR cell. The innovation is entirely within the RAN node\'s internal processing — the external interfaces (N2, N3, Uu) are unchanged. This means AI-RAN can be deployed incrementally into an existing 5G SA network without core network modifications.</p>';
+  html += '<h3>3GPP Alignment — Release 19 AI/ML for NR</h3>';
+  html += '<p>While AI-RAN is an implementation approach (GPU-native RAN processing), 3GPP Rel-19 provides the <strong>standards track</strong> for AI/ML at the air interface. Rel-19 normatively specifies three AI/ML use cases: <strong>beam management prediction</strong> (ML models predict optimal beam pairs — the same problem AI-RAN solves with GPU inference), <strong>CSI feedback enhancement</strong> (ML-based channel state compression — reducing UL overhead while maintaining DL precoding accuracy), and <strong>ML-assisted positioning</strong> (sub-meter accuracy using learned timing/angle models). The AI-RAN Innovation Center demonstrations (Flows 1–5) implement these same capabilities at GPU-native speed. The difference is scope: Rel-19 standardizes the <strong>interface and signaling</strong> for ML model management (training, distribution, activation) between gNB and UE, while AI-RAN focuses on the <strong>infrastructure</strong> (GPU hardware and software stack) that executes those models. Together, they represent the two halves of bringing AI into the RAN — standards and implementation.</p>';
   html += '<h3>Key Hardware and Software</h3>';
   html += '<table class="ref-table"><thead><tr><th>Component</th><th>Role</th><th>Detail</th></tr></thead><tbody>';
   html += '<tr><td>Nokia AirScale</td><td>Radio Unit (RU) + Baseband</td><td>Provides the RF front-end and baseline BBU. Massive MIMO antenna panels (64T64R).</td></tr>';
@@ -7027,6 +7044,7 @@ function renderIntroAIRANvsGNB(el) {
   html += '</tbody></table>';
   html += '<h3>The Key Insight</h3>';
   html += '<p>AI-RAN is not a new generation of mobile technology — it is a new way of implementing the existing generation. Every protocol, every interface, every message format in the AI-RAN flows follows the same 3GPP specifications as baseline 5G SA. The difference is speed (GPU parallelism), intelligence (AI inference on live signals), and flexibility (software-defined radio processing). This is why AI-RAN can be deployed incrementally into an existing network — it is an infrastructure upgrade, not a standards change.</p>';
+  html += '<p><strong>Where Rel-19 fits:</strong> While external signaling (N2, N3, Uu) is unchanged, Rel-19 <em>does</em> evolve the NR PHY/RRC layers with AI/ML-aware procedures — standardized model management, ML-based CSI reporting formats, and beam prediction signaling. These Rel-19 enhancements give the AI-RAN approach a standards-backed framework for the AI functions it performs at the GPU level. The Innovation Center demonstrations effectively implement what Rel-19 now standardizes — making AI-RAN both a deployment reality and a 3GPP-aligned evolution path.</p>';
   el.innerHTML = html;
   const cmpContainer = document.getElementById('intro-arch-compare');
   if (cmpContainer) {
@@ -7071,6 +7089,7 @@ function renderIntroAIRANvsGNB(el) {
 function renderIntroWhatIs6G(el) {
   let html = '<h2>What is 6G? <span class="badge badge-fact">FACT</span></h2>';
   html += '<p>6G is the next generation of mobile network technology, targeted for initial standardization around 2029 and commercial deployment beginning around 2030. While 5G was designed for three usage scenarios (eMBB, URLLC, mMTC), 6G expands to six — adding integrated sensing, AI-native communication, and ubiquitous global connectivity. The vision is defined by the ITU-R under the IMT-2030 framework (Recommendation ITU-R M.2160, approved November 2023).</p>';
+  html += '<p>Importantly, 6G does not start from zero. <strong>3GPP Release 19</strong> (the final 5G-Advanced release, closed March 2026) already introduces early forms of several 6G capabilities: AI/ML at the NR air interface (→ Integrated AI and Communication), NTN satellite evolution and UE relay (→ Ubiquitous Connectivity), ambient IoT device classes (→ Massive Communication), centimeter-level NR positioning (→ precursor to ISAC), and NWDAF federated learning (→ AI-native network automation). The 6G vision flows in this tool (Flows 6–14) show where these seeds grow into fully native 6G architectures — but the roots are already in deployed 5G-Advanced specifications.</p>';
   html += '<h3>Six Usage Scenarios (IMT-2030)</h3>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Immersive Communication</strong><span>Holographic telepresence, extended reality (XR), multi-sensory experiences. Requires massive throughput (200+ Gbps peak target) and extremely low latency.</span></div>';
@@ -7100,7 +7119,8 @@ function renderIntroWhatIs6G(el) {
   const events = [
     {date:'Nov 2023', text:'ITU-R approves Recommendation M.2160 — IMT-2030 Framework and overall objectives. Defines the six usage scenarios and high-level capability targets. Marks the official start of the 6G era in standards terms.', cls:''},
     {date:'2024–2025', text:'3GPP begins 6G study items (SA1, SA2 service requirements and architecture studies). IMT-2030 technology trends and evaluation methodology development at ITU-R.', cls:''},
-    {date:'2025–2027', text:'3GPP Rel-19/20 — advanced 5G features and preliminary 6G architecture studies. ITU-R defines detailed performance requirements and evaluation criteria.', cls:'projected'},
+    {date:'Mar 2026', text:'3GPP Rel-19 closed — the final 5G Advanced release. Expanded AI/ML for air interface, ambient IoT Phase 2, NTN evolution, advanced MIMO, eRedCap, and network slicing Phase 3. Standardization focus now shifts fully to 6G.', cls:''},
+    {date:'2026–2028', text:'3GPP Rel-20 — 6G study and architecture phase. ITU-R defines detailed IMT-2030 performance requirements and evaluation criteria.', cls:'projected'},
     {date:'~2028', text:'3GPP Rel-21 expected to begin normative 6G specifications. Technology candidates submitted to ITU-R for IMT-2030 evaluation.', cls:'projected'},
     {date:'~2029', text:'First 3GPP 6G specifications (initial release). IMT-2030 technology evaluation completed.', cls:'vision'},
     {date:'~2030', text:'Target for initial 6G commercial deployment.', cls:'vision'},
@@ -7111,14 +7131,15 @@ function renderIntroWhatIs6G(el) {
   });
   html += '</div>';
   html += '<h3>6G vs. 5G — The Fundamental Differences</h3>';
-  html += '<p>If 5G was an evolution from 4G (new architecture, same paradigm of "connect and transport"), 6G represents a paradigm expansion. The network does not just connect devices and transport data — it senses the physical world, runs AI as a native service, and autonomously adapts in real time. The AI Core in the 6G flows (Flows 6–8) replaces the separate AMF, SMF, and PCF with a unified AI-driven network function that makes decisions through ML inference rather than static policy rules. The Digital Twin (Flow 13) maintains a real-time virtual replica of the entire network for predictive optimization. Integrated Sensing and Communication (Flow 14) uses the same waveform for both data and environmental perception. These are not incremental improvements — they are new capabilities that do not exist in any form in 5G.</p>';
+  html += '<p>If 5G was an evolution from 4G (new architecture, same paradigm of "connect and transport"), 6G represents a paradigm expansion. The network does not just connect devices and transport data — it senses the physical world, runs AI as a native service, and autonomously adapts in real time. The AI Core in the 6G flows (Flows 6–8) replaces the separate AMF, SMF, and PCF with a unified AI-driven network function that makes decisions through ML inference rather than static policy rules. The Digital Twin (Flow 13) maintains a real-time virtual replica of the entire network for predictive optimization. Integrated Sensing and Communication (Flow 14) uses the same waveform for both data and environmental perception.</p>';
+  html += '<p>While 5G-Advanced (Rel-19) introduces early forms of some of these concepts — AI/ML at the air interface, centimeter-level positioning as a sensing precursor, NWDAF federated learning as a step toward distributed AI, and NTN/relay for coverage extension — the 6G versions are <strong>architecturally native</strong> rather than additions to an existing framework. In 6G, AI is not an optimization layer on top of a traditional protocol stack; it <em>is</em> the protocol stack. Sensing is not a separate measurement function; it shares the same waveform as communication. The difference is fundamental — 5G-Advanced adds AI capabilities to a human-designed system, while 6G envisions an AI-designed system from the ground up.</p>';
   el.innerHTML = html;
 }
 
 /* -- Introduction: 6G Key Technologies -- */
 function renderIntro6GTechnologies(el) {
   let html = '<h2>6G Key Technologies <span class="badge badge-fact">FACT</span></h2>';
-  html += '<p>The 6G flows in this tool reference several technologies that do not exist in 5G. This page explains each one so you can follow the flow logic without prior 6G background. These technologies are at varying stages of research — none are standardized yet.</p>';
+  html += '<p>The 6G flows in this tool reference several technologies that do not exist in 5G in their full 6G-native form. This page explains each one so you can follow the flow logic without prior 6G background. While the full 6G architecture remains a research vision, several of these technologies have <strong>5G-Advanced precursors in Rel-19</strong>: AI/ML for the air interface is now standardized at the NR physical layer, NTN satellite access is operational, ambient IoT device classes are specified, and centimeter-level positioning is defined. The 6G versions shown in the flows represent the <em>fully native</em> evolution of these capabilities — where they are architectural pillars rather than additions to an existing framework.</p>';
   html += '<h3>AI-Native Network Architecture</h3>';
   html += '<p>In 5G, the network functions (AMF, SMF, PCF, etc.) are discrete, independently deployed services that communicate via SBI. AI is an add-on — NWDAF collects data and provides analytics, but policy decisions are still made by rules-based engines in the PCF. In 6G, the vision is to merge these functions into a unified AI Core that makes decisions through ML inference. Instead of the PCF sending static PCC rules to the SMF, the AI Core observes network conditions in real time and directly programs the user plane based on learned patterns. The "AI-Native Service Mesh" shown in the 6G architecture diagram replaces the SBI bus.</p>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">';
@@ -7142,7 +7163,7 @@ function renderIntro6GTechnologies(el) {
   html += '<h3>Technology Maturity Summary</h3>';
   html += '<table class="ref-table"><thead><tr><th>Technology</th><th>Maturity Level</th><th>Relevant Flows</th><th>Exists in 5G?</th></tr></thead><tbody>';
   html += '<tr><td>AI-Native Core (Unified AI Core)</td><td>Research / Pre-standard</td><td>6, 7, 8, 9, 10, 12, 13</td><td>No — 5G uses discrete NFs with rules-based policy</td></tr>';
-  html += '<tr><td>ISAC (Integrated Sensing &amp; Communication)</td><td>Active research, ITU-R M.2160</td><td>11, 14</td><td>No — 5G is communication-only</td></tr>';
+  html += '<tr><td>ISAC (Integrated Sensing &amp; Communication)</td><td>Active research, ITU-R M.2160</td><td>11, 14</td><td>Precursor: Rel-19 cm-level NR positioning (TS 38.305). Full ISAC (unified sensing+communication waveform) is 6G-native.</td></tr>';
   html += '<tr><td>Network Digital Twin</td><td>Early research / Proof-of-concept</td><td>13</td><td>Embryonic — NWDAF analytics provides a subset</td></tr>';
   html += '<tr><td>Intent-Based Management</td><td>Research / Concept</td><td>9</td><td>Embryonic — CAMARA APIs provide simplified version</td></tr>';
   html += '<tr><td>Post-Quantum Cryptography</td><td>Standards finalized (NIST 2024), not yet in 3GPP</td><td>6</td><td>No — 5G uses ECIES, AES, SHA-256</td></tr>';
