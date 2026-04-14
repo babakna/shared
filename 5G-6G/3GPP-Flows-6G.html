@@ -187,7 +187,7 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
 .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 #welcome-view, #flow-view, #reference-view { display: none; flex-direction: column; height: 100%; overflow: auto; }
 #welcome-view.active, #flow-view.active, #reference-view.active { display: flex; }
-#flow-view.active { overflow: hidden; }
+#flow-view.active { overflow-x: hidden; overflow-y: auto; }
 .welcome-container {
   max-width: 860px; margin: 40px auto; padding: 0 32px;
 }
@@ -211,8 +211,8 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
   border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; color: var(--text-primary);
 }
 #topology-area {
-  min-height: 450px; height: 50vh; position: relative; background: var(--bg-primary);
-  overflow: hidden; flex-shrink: 0;
+  min-height: 200px; height: 30vh; max-height: 320px; position: relative; background: var(--bg-primary);
+  overflow: hidden; flex-shrink: 1;
 }
 .flow-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -292,7 +292,7 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
 }
 @keyframes fadeInMsg { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 #payload-inspector {
-  min-height: 250px; flex: 1; display: flex; border-top: 2px solid var(--border-color);
+  min-height: 280px; flex: 1; display: flex; border-top: 2px solid var(--border-color);
   background: var(--bg-secondary); overflow: hidden;
 }
 .payload-pane {
@@ -408,18 +408,33 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
   .payload-pane:first-child { border-right: none; border-bottom: 1px solid var(--border-color); }
   .badge-legend { grid-template-columns: 1fr; }
 }
+@media (max-width: 480px) {
+  .sidebar { position: fixed; left: -280px; width: 280px; min-width: 280px; z-index: 200; transition: left 0.3s; height: calc(100% - 75px); top: 75px; }
+  .sidebar.mobile-open { left: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
+  .main-content { margin-left: 0 !important; }
+  header h1 { font-size: 12px; }
+  .topo-node { font-size: 9px; padding: 4px 6px; }
+  #mobile-menu-btn { display: inline-block !important; }
+}
 @media print {
-  .sidebar, .flow-controls, #theme-toggle, .version { display: none !important; }
+  html, body { overflow: visible; height: auto; }
+  .sidebar, .flow-controls, #theme-toggle, .version, #mobile-menu-btn { display: none !important; }
   header { position: static; }
-  .app-container { position: static; }
-  .main-content { overflow: visible; }
-  #topology-area { min-height: 400px; }
+  .app-container { position: static; display: block; }
+  .main-content { overflow: visible; margin-left: 0; }
+  #flow-view.active { overflow: visible; height: auto; }
+  #topology-area { min-height: 400px; height: auto; max-height: none; }
+  #payload-inspector { background: #f8f8f8 !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .payload-pane { background: #f8f8f8 !important; }
+  .payload-body { background: #f8f8f8 !important; color: #1a1a1a !important; overflow: visible; height: auto; }
+  #flow-title, .step-bar { page-break-inside: avoid; }
 }
 
 </style>
 </head>
 <body data-theme="light">
 <header>
+  <button id="mobile-menu-btn" style="display:none;background:none;border:none;color:var(--text-primary);font-size:22px;cursor:pointer;padding:0 8px" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">☰</button>
   <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
@@ -490,12 +505,12 @@ function refreshSVGs() {
 
 /* ======== NODES ======== */
 const NODES = {
-  ue:       { id:'ue',       label:'UE',          sub:'User Equipment',          x:8,  y:82, plane:'data' },
-  ran:      { id:'ran',      label:'gNB',         sub:'NR Base Station',         x:24, y:82, plane:'data' },
-  upf_e:    { id:'upf_e',    label:'UPF (Edge)',   sub:'ULCL / Local PSA',       x:44, y:82, plane:'data' },
-  eas:      { id:'eas',      label:'EAS',          sub:'Edge App Server',         x:44, y:95, plane:'data' },
-  upf_c:    { id:'upf_c',    label:'UPF (PSA)',    sub:'Central / PDU Anchor',    x:66, y:82, plane:'data' },
-  af:       { id:'af',       label:'AF / DN',      sub:'Application / Data Net',  x:88, y:82, plane:'data' },
+  ue:       { id:'ue',       label:'UE',          sub:'User Equipment',          x:8,  y:78, plane:'data' },
+  ran:      { id:'ran',      label:'gNB',         sub:'NR Base Station',         x:24, y:78, plane:'data' },
+  upf_e:    { id:'upf_e',    label:'UPF (Edge)',   sub:'ULCL / Local PSA',       x:44, y:78, plane:'data' },
+  eas:      { id:'eas',      label:'EAS',          sub:'Edge App Server',         x:44, y:91, plane:'data' },
+  upf_c:    { id:'upf_c',    label:'UPF (PSA)',    sub:'Central / PDU Anchor',    x:66, y:78, plane:'data' },
+  af:       { id:'af',       label:'AF / DN',      sub:'Application / Data Net',  x:88, y:78, plane:'data' },
   amf:      { id:'amf',      label:'AMF',          sub:'Access & Mobility',       x:24, y:50, plane:'control' },
   smf:      { id:'smf',      label:'SMF',          sub:'Session Management',      x:44, y:30, plane:'control' },
   pcf:      { id:'pcf',      label:'PCF',          sub:'Policy Control',          x:68, y:50, plane:'control' },
@@ -511,11 +526,11 @@ const NODES = {
   pcscf:    { id:'pcscf',    label:'P-CSCF',       sub:'Proxy CSCF (IMS)',        x:50, y:62, plane:'control' },
   scscf:    { id:'scscf',    label:'S-CSCF',       sub:'Serving CSCF (IMS)',      x:65, y:62, plane:'control' },
   tas:      { id:'tas',      label:'TAS',          sub:'Telephony App Server',    x:80, y:62, plane:'control' },
-  ai_ran:   { id:'ai_ran',   label:'AI-RAN',       sub:'AI-Native RAN Node',      x:24, y:82, plane:'data' },
-  gpu:      { id:'gpu',      label:'GPU Pool',     sub:'NVIDIA Grace Hopper',     x:24, y:95, plane:'data' },
+  ai_ran:   { id:'ai_ran',   label:'AI-RAN',       sub:'AI-Native RAN Node',      x:24, y:78, plane:'data' },
+  gpu:      { id:'gpu',      label:'GPU Pool',     sub:'NVIDIA Grace Hopper',     x:24, y:91, plane:'data' },
   aictl:    { id:'aictl',    label:'AI-RAN Ctrl',  sub:'AI Orchestrator',         x:12, y:15, plane:'control' },
   ai_core:  { id:'ai_core',  label:'AI Core',      sub:'6G AI-Native Core',       x:44, y:30, plane:'control' },
-  sense:    { id:'sense',    label:'Sensor',       sub:'6G Sensing Node',         x:8,  y:95, plane:'data' },
+  sense:    { id:'sense',    label:'Sensor',       sub:'6G Sensing Node',         x:8,  y:91, plane:'data' },
   dig_twin: { id:'dig_twin', label:'Digital Twin',  sub:'Network Twin Engine',    x:68, y:15, plane:'control' },
   intent:   { id:'intent',   label:'Intent Eng.',   sub:'Intent-Based Mgmt',      x:55, y:10, plane:'control' },
 };
@@ -2053,7 +2068,7 @@ FLOWS['airan_telemetry'] = {
 };
 
 
-/* ====== FLOW 5: 6G AI-Native Registration ====== */
+/* ====== FLOW 6: 6G AI-Native Registration ====== */
 FLOWS['sixg_registration'] = {
   id:'sixg_registration', title:'6G AI-Native Registration', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160 (IMT-2030), 3GPP SA2 6G Study (SP-231442), NGMN 6G Vision',
@@ -2363,11 +2378,11 @@ FLOWS['sixg_registration'] = {
   ]
 };
 
-/* ====== FLOW 6: 6G AI-Native Session ====== */
+/* ====== FLOW 7: 6G AI-Native Session ====== */
 FLOWS['sixg_session'] = {
   id:'sixg_session', title:'6G AI-Native Session', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, 3GPP SA2 6G Study, ETSI ISG ENI',
-  narrative:'6G session establishment is AI-orchestrated end to end. The AI Core replaces the traditional SMF/PCF split — it generates QoS policy using AI inference rather than static PCC rules, and configures the UPF with AI-predicted traffic patterns. The digital twin continuously simulates the session before it begins, enabling predictive resource reservation. Intent-driven — the UE expresses what it needs, not how.',
+  narrative:'6G session establishment is AI-orchestrated end-to-end. The AI Core replaces the traditional SMF/PCF split — it generates QoS policy using AI inference rather than static PCC rules, and configures the UPF with AI-predicted traffic patterns. The digital twin continuously simulates the session before it begins, enabling predictive resource reservation. Intent-driven — the UE expresses what it needs, not how.',
   nodes:['ue','ai_ran','gpu','ai_core','dig_twin','upf_c','af'],
   connections:[
     {from:'ue',to:'ai_ran',label:'6G-Uu',type:'data'},
@@ -2729,7 +2744,7 @@ FLOWS['sixg_session'] = {
   ]
 };
 
-/* ====== FLOW 7: 6G AI-Native Data Transfer ====== */
+/* ====== FLOW 8: 6G AI-Native Data Transfer ====== */
 FLOWS['sixg_data'] = {
   id:'sixg_data', title:'6G AI-Native Data Transfer', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, NGMN 6G Use Cases, 3GPP SA2 6G Study',
@@ -3060,11 +3075,11 @@ FLOWS['sixg_data'] = {
 };
 
 
-/* ====== FLOW 8: Intent-Based Slice Request ====== */
+/* ====== FLOW 9: Intent-Based Slice Request ====== */
 FLOWS['sixg_intent_slice'] = {
   id:'sixg_intent_slice', title:'Intent-Based Slice Request', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160 (IMT-2030), ETSI ZSM 002, 3GPP SA2 6G Study (SP-231442)',
-  narrative:'A 6G intent-based slice request where the consumer submits a high-level intent and the network autonomously provisions the slice. the 6G vision automates the entire slice lifecycle.',
+  narrative:'A 6G intent-based slice request where the consumer submits a high-level intent and the network autonomously provisions the slice. The 6G vision automates the entire slice lifecycle.',
   nodes:['af','intent','ai_core','dig_twin','nssf','ai_ran','upf_c'],
   connections:[
     {from:'af',to:'intent',label:'Intent NBI',type:'control'},
@@ -3448,7 +3463,7 @@ FLOWS['sixg_intent_slice'] = {
   ]
 };
 
-/* ====== FLOW 9: AI-Driven Slice Scaling ====== */
+/* ====== FLOW 10: AI-Driven Slice Scaling ====== */
 FLOWS['sixg_ai_scaling'] = {
   id:'sixg_ai_scaling', title:'AI-Driven Slice Scaling', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, ETSI ZSM 002, 3GPP TS 23.288 (NWDAF) + 6G Extensions',
@@ -3764,7 +3779,7 @@ FLOWS['sixg_ai_scaling'] = {
   ]
 };
 
-/* ====== FLOW 10: Sensing-Aware Physical AI Slice ====== */
+/* ====== FLOW 11: Sensing-Aware Physical AI Slice ====== */
 FLOWS['sixg_sensing_slice'] = {
   id:'sixg_sensing_slice', title:'Sensing-Aware Physical AI Slice', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, 3GPP SA1 6G ISAC Study, NVIDIA Metropolis VSS, GTC 2026',
@@ -4164,11 +4179,11 @@ FLOWS['sixg_sensing_slice'] = {
   ]
 };
 
-/* ====== FLOW 11: 6G Evolved Charging ====== */
+/* ====== FLOW 12: 6G Evolved Charging ====== */
 FLOWS['sixg_charging'] = {
   id:'sixg_charging', title:'6G Evolved Charging', section:'6g', badge:'VISION',
   specRef:'ITU-R M.2160, 3GPP TS 32.255 + 6G Extensions, ETSI ZSM, NGMN 6G Vision',
-  narrative:'6G evolved charging is AI-driven, intent-aware, and real-time. Compute resources, sensing data, and digital twin access are all chargeable dimensions. the vision for charging beyond bytes.',
+  narrative:'6G evolved charging is AI-driven, intent-aware, and real-time. Compute resources, sensing data, and digital twin access are all chargeable dimensions. The vision for charging beyond bytes.',
   nodes:['ai_core','chf','nwdaf','dig_twin','intent'],
   connections:[
     {from:'ai_core',to:'chf',label:'AI-N40',type:'control'},
@@ -4506,7 +4521,7 @@ FLOWS['sixg_charging'] = {
   ]
 };
 
-/* ====== FLOW 12: Network Digital Twin Loop ====== */
+/* ====== FLOW 13: Network Digital Twin Loop ====== */
 FLOWS['sixg_digital_twin'] = {
   id:'sixg_digital_twin', title:'Network Digital Twin Loop', section:'6g_advanced', badge:'VISION',
   specRef:'ITU-T Y.3090, 3GPP 6G Studies, ETSI ZSM, NGMN 6G Vision',
@@ -4919,7 +4934,7 @@ FLOWS['sixg_digital_twin'] = {
   ]
 };
 
-/* ====== FLOW 13: AI-RAN Performance Comparison ====== */
+/* ====== FLOW 5: AI-RAN Performance Comparison ====== */
 FLOWS['airan_performance'] = {
   id:'airan_performance', title:'AI-RAN Performance Comparison', section:'airan', badge:'VALIDATED',
   specRef:'AI-RAN Alliance, NVIDIA Aerial SDK, O-RAN WG3, TR 38.843 (AI/ML for NR)',
@@ -5762,7 +5777,7 @@ function buildSidebar() {
     html += `<div class="sidebar-section-body">`;
     sec.items.forEach(it => {
       const flow = FLOWS[it.id];
-      const bdg = flow ? flow.badge : (it.id.startsWith('6g') ? 'VISION' : it.id.startsWith('airan') ? 'VALIDATED' : 'FACT');
+      const bdg = flow ? flow.badge : (it.id.startsWith('sixg') ? 'VISION' : it.id.startsWith('airan') ? 'VALIDATED' : 'FACT');
       html += `<button class="sidebar-item" data-id="${it.id}" data-type="${it.type}" data-num="${it.num}" onclick="navigate('${it.id}','${it.type}')">
         <span class="sidebar-num">${it.num}</span>
         <span class="sidebar-item-content"><span class="sidebar-item-label">${it.label}</span>
@@ -5815,6 +5830,8 @@ function navigate(id, type) {
   const btn = document.querySelector(`.sidebar-item[data-id="${id}"]`);
   if (btn) btn.classList.add('active');
   state.activeItem = id;
+  const sb = document.getElementById('sidebar');
+  if(sb) sb.classList.remove('mobile-open');
   if (type === 'flow') {
     if (FLOWS[id]) { loadFlow(id); }
     else { showPlaceholder(id); }
@@ -5822,7 +5839,9 @@ function navigate(id, type) {
 }
 function showView(v) {
   ['welcome-view','flow-view','reference-view'].forEach(id => {
-    document.getElementById(id).classList.toggle('active', id === v+'-view');
+    const el = document.getElementById(id);
+    el.classList.toggle('active', id === v+'-view');
+    if(id === v+'-view') el.scrollTop = 0;
   });
   state.view = v;
 }
@@ -5847,14 +5866,15 @@ function loadFlow(id) {
   fb.textContent = flow.badge; fb.className = 'badge badge-' + flow.badge.toLowerCase();
   renderTopology(flow);
   updateStepUI(flow);
+  document.getElementById('flow-view').scrollTop = 0;
 }
 function renderTopology(flow) {
   const tc = document.getElementById('topology-container');
   tc.innerHTML = '';
   // plane labels & divider
   tc.innerHTML += `<div class="plane-label" style="top:3%;left:50%;transform:translateX(-50%)">CONTROL &amp; CHARGING PLANE</div>`;
-  tc.innerHTML += `<hr class="plane-divider" style="top:66%">`;
-  tc.innerHTML += `<div class="plane-label" style="top:69%;left:50%;transform:translateX(-50%)">DATA PLANE</div>`;
+  tc.innerHTML += `<hr class="plane-divider" style="top:68%">`;
+  tc.innerHTML += `<div class="plane-label" style="top:71%;left:50%;transform:translateX(-50%)">DATA PLANE</div>`;
   // nodes
   flow.nodes.forEach(nid => {
     const n = NODES[nid]; if(!n) return;
@@ -5986,11 +6006,17 @@ function updatePayload(step) {
 function highlightPayload(code) {
   if(!code) return '';
   let h = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  h = h.replace(/(\/\/.*)/g, '<span class="pc">$1</span>');
-  h = h.replace(/"([^"]+)"(\s*:)/g, '<span class="pk">"$1"</span>$2');
-  h = h.replace(/:\s*"([^"]*)"/g, ': <span class="pv">"$1"</span>');
-  h = h.replace(/:\s*(\d+[\d.]*)/g, ': <span class="pn">$1</span>');
-  h = h.replace(/\b(true|false|null)\b/g, '<span class="pp">$1</span>');
+  h = h.split('\n').map(line => {
+    const trimmed = line.trimStart();
+    if(trimmed.startsWith('//')) {
+      return line.replace(/(\/\/.*)/, '<span class="pc">$1</span>');
+    }
+    line = line.replace(/"([^"]+)"(\s*:)/g, '<span class="pk">"$1"</span>$2');
+    line = line.replace(/:\s*"([^"]*)"/g, ': <span class="pv">"$1"</span>');
+    line = line.replace(/:\s*(\d+[\d.]*)/g, ': <span class="pn">$1</span>');
+    line = line.replace(/\b(true|false|null)\b/g, '<span class="pp">$1</span>');
+    return line;
+  }).join('\n');
   return h;
 }
 function updateStepUI(flow) {
@@ -6052,13 +6078,14 @@ function showReference(id) {
     case 'timeline': renderTimeline(rc); break;
     case 'band_reference': renderBandMap(rc); break;
   }
+  rc.scrollTop = 0;
 }
 
 /* -- Architecture Diagrams -- */
 function renderArchDiagrams(el) {
   const tabs = [
     {id:'sba', label:'5G SA Baseline (SBA)', badge:'FACT'},
-    {id:'ulcl', label:'5G Advanced — ULCL / Edge', badge:'FACT'},
+    {id:'ulcl', label:'5G-Advanced — ULCL / Edge', badge:'FACT'},
     {id:'slicing', label:'Network Slicing', badge:'FACT'},
     {id:'airan', label:'AI-RAN', badge:'VALIDATED'},
     {id:'airan_vs', label:'AI-RAN vs Conventional RAN', badge:'VALIDATED'},
@@ -6578,19 +6605,19 @@ function drawArchComparison(container) {
 /* -- Latency Comparison -- */
 function renderLatency(el) {
   const rows = [
-    ['5G SA Centralized','Deployed','3–12 ms','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
-    ['Through-Path N9 (Edge)','Deployed','8–15 ms','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
-    ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
+    ['5G SA Centralized','Deployed','3–12 ms (RTT)','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
+    ['Through-Path N9 (Edge)','Deployed','8–15 ms (RTT)','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
+    ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
     ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','<5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
     ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), regenerative vs transparent, ground station coverage'],
-    ['AI-RAN (Converged)','Validating (Lab)','1–4 ms (target)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load. Aligns with Rel-19 AI/ML for NR.'],
-    ['6G AI-Native','Vision (~2030)','<1 ms (target)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
+    ['AI-RAN (Converged)','Validating (Lab)','1–4 ms target (RTT)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load. Aligns with Rel-19 AI/ML for NR.'],
+    ['6G AI-Native','Vision (~2030)','<1 ms target (RTT)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
   ];
   let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective. Includes Rel-19 5G-Advanced capabilities (L1/L2 mobility, NTN satellite) as the bridge between deployed 5G and the 6G vision.</p>';
   html += '<table class="ref-table"><thead><tr><th>Architecture</th><th>Status</th><th>Estimated Range</th><th>Best For</th><th>Depends On</th></tr></thead><tbody>';
   rows.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
-  html += `<div class="latency-disclaimer">⚠ All values are estimates based on architecture analysis and hop-count modeling. These are NOT measured or guaranteed SLA commitments. Actual latency depends on radio conditions, network load, geographic placement, and many other factors.</div>`;
+  html += `<div class="latency-disclaimer">⚠ All values are estimates based on architecture analysis and hop-count modeling. Terrestrial values are round-trip time (RTT) unless noted otherwise; NTN satellite values are one-way propagation delay. These are NOT measured or guaranteed SLA commitments. Actual latency depends on radio conditions, network load, geographic placement, and many other factors.</div>`;
   el.innerHTML = html;
 }
 
@@ -6612,7 +6639,6 @@ function renderSpecLibrary(el) {
       ['TS 29.514','Npcf_PolicyAuthorization (N5)','AF-triggered policy authorization for IMS, MEC, etc.','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3351'],
       ['TS 29.518','Namf — AMF Services','AMF service operations, N1N2 message transfer','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3339'],
       ['TS 29.522','NEF Northbound APIs (N33)','Traffic influence, monitoring events, device triggering','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3437'],
-      ['TS 29.531','Nnssf — NSSF Services','Network slice selection, AMF set determination','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3438'],
       ['TS 29.244','PFCP — Packet Forwarding Control (N4)','PDR, FAR, QER, URR — user plane rule definitions','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3111'],
       ['TS 29.281','GTP-U — GPRS Tunnelling Protocol User Plane','GTP-U tunnel management for N3/N9 interfaces','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=1699'],
     ]},
@@ -6638,7 +6664,7 @@ function renderSpecLibrary(el) {
       ['TS 38.470/473','F1 Interface','F1-C and F1-U between gNB-CU and gNB-DU','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3257'],
       ['TS 38.460/463','E1 Interface','E1 between gNB-CU-CP and gNB-CU-UP','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3255'],
       ['TS 38.420/423','Xn Interface','Inter-gNB handover, dual connectivity signaling','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3227'],
-      ['TR 38.843','AI/ML for NR Air Interface','Rel-18 study item on AI/ML beam management, CSI, positioning — basis for Rel-19 normative specifications','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3891'],
+      ['TR 38.843','AI/ML for NR Air Interface','Rel-18 study item on AI/ML beam management, CSI, positioning — basis for Rel-19 normative specifications','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4015'],
       ['TS 38.305','NR Positioning (Rel-19)','Positioning methods (DL-TDoA, UL-AoA, multi-RTT). Rel-19 adds cm-level accuracy and sidelink-based positioning — precursor to 6G ISAC sensing','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
       ['TR 38.821','NTN Solutions for NR','Non-terrestrial network architecture, satellite mobility, regenerative payload — Rel-19 evolves NTN toward 6G ubiquitous connectivity','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3525'],
       ['TR 38.848','Study on Ambient IoT','Rel-18/19 ambient IoT device classes (passive, semi-passive, active-assisted) — precursor to 6G massive communication','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4037'],
@@ -6650,7 +6676,7 @@ function renderSpecLibrary(el) {
     ]},
     { title:'Slicing', specs:[
       ['TS 23.501 §5.15','Network Slicing','Slice architecture, NSSAI, slice selection, admission control','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3144'],
-      ['TS 29.531','NSSF — Network Slice Selection','Nnssf_NSSelection service operations','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3438'],
+      ['TS 29.531','Nnssf — NSSF Services','Network slice selection service operations — Allowed NSSAI, AMF set determination','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3438'],
       ['TS 29.536','Nnsacf — NSACF Services','Network slice admission control — manages UE/PDU session count per slice','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3621'],
     ]},
     { title:'IMS / Voice', specs:[
@@ -6659,19 +6685,19 @@ function renderSpecLibrary(el) {
     ]},
     { title:'V2X & Specialized', specs:[
       ['TS 23.287','V2X Application Layer Architecture','V2X communication modes, PC5 sidelink, Uu-based V2X','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3580'],
-      ['TR 38.875','RedCap / eRedCap Study','Reduced Capability NR devices — Rel-17 RedCap extended to Rel-19 eRedCap (5 MHz, 1 Rx) for lower-tier IoT','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3770'],
+      ['TR 38.875','RedCap / eRedCap Study','Reduced Capability NR devices — Rel-17 RedCap extended to Rel-19 eRedCap (5 MHz, 1 Rx) for lower-tier IoT','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3946'],
       ['TS 23.304','Proximity-based Services (ProSe) in 5GS','UE-to-UE and UE-to-network relay, sidelink discovery. Rel-19 enhances relay for coverage extension — precursor to 6G mesh','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3855'],
     ]},
     { title:'6G & Future Standards', specs:[
       ['ITU-R M.2160','IMT-2030 Framework','Framework and overall objectives of the future development of IMT for 2030 and beyond (6G)','https://www.itu.int/rec/R-REC-M.2160'],
-      ['3GPP Rel-19','Final 5G-Advanced (closed Mar 2026)','AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, slicing Phase 3, NWDAF federated learning. The standards bridge between 5G and 6G.','https://www.3gpp.org/specifications-technologies/releases/release-19'],
+      ['3GPP Rel-19','5G-Advanced Release 2 (frozen Dec 2025)','AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, slicing Phase 3, NWDAF federated learning. The standards bridge between 5G and 6G.','https://www.3gpp.org/specifications-technologies/releases/release-19'],
     ]},
   ];
   const deployedProducts = [
-    ['ULCL Edge','Edge Computing','5G Advanced edge computing with ULCL and local breakout'],
+    ['ULCL Edge','Edge Computing','5G-Advanced edge computing with ULCL and local breakout'],
     ['Edge Platform','Enterprise Edge','Enterprise platform for edge application hosting'],
     ['Operator APIs','Developer APIs','Developer APIs for network slicing, edge, QoD'],
-    ['5G Advanced + L4S','Deployed','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
+    ['5G-Advanced + L4S','Deployed','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
     ['AI-RAN Innovation Center','AI-RAN','Converged AI+RAN with NVIDIA and Nokia/Ericsson'],
     ['Enterprise eMBB / Network Slicing','Enterprise Slicing','Business network slicing plan with intelligent performance, security, and satellite'],
   ];
@@ -6800,7 +6826,7 @@ const GLOSSARY_DATA = [
   ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','central UPF acting as PSA for non-edge traffic.'],
   ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','ULCL-based LBO steers traffic to local edge applications.'],
   ['TSN','Time-Sensitive Networking','IEEE 802.1 deterministic networking integrated with 5G for industrial automation.','TS 23.501 §5.27','enterprise offering for industrial IoT use cases.'],
-  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G Advanced feature for ultra-low queuing delay (from Jul 2025).'],
+  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G-Advanced feature for ultra-low queuing delay (from Jul 2025).'],
   ['RedCap','Reduced Capability NR','NR devices with reduced bandwidth/antenna for IoT and wearables.','TR 38.875, Rel-17','Operator supports RedCap for cost-optimized IoT devices.'],
   ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
   ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','default 5G slice for consumer broadband services.'],
@@ -6809,7 +6835,7 @@ const GLOSSARY_DATA = [
   ['SSC Mode','Session and Service Continuity Mode','Defines how IP address continuity is handled during UPF changes (1/2/3).','TS 23.501 §5.6.9','Operator uses SSC1 (default), SSC2/3 for edge mobility scenarios.'],
   ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','Example slicing products: Priority URLLC, Enterprise eMBB, Portable Private 5G.'],
   ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','Example: SASE offering integrating SD-WAN with 5G and security.'],
-  ['ULCL Edge','ULCL Edge','5G Advanced edge computing solution using ULCL for local breakout.','product','Example: edge computing with ULCL + EAS for sub-10ms application hosting.'],
+  ['ULCL Edge','ULCL Edge','5G-Advanced edge computing solution using ULCL for local breakout.','product','Example: edge computing with ULCL + EAS for sub-10ms application hosting.'],
   ['Edge Platform','Edge Platform','enterprise platform for hosting edge applications on 5G infrastructure.','product','Example: enterprise edge hosting platform for edge workloads.'],
   ['Operator API','Operator API','developer platform providing APIs for network capabilities.','product','APIs for QoD, slicing, edge discovery.'],
   ['Priority URLLC','Priority URLLC','5G network slicing solution for first responders with priority access and preemption.','product','Example: dedicated URLLC slice with priority resources for first responders.'],
@@ -6827,7 +6853,7 @@ const GLOSSARY_DATA = [
   ['Ambient IoT','Ambient IoT (Rel-18/19)','Zero-battery or near-zero-battery devices using RF energy harvesting and backscatter communication. Rel-19 specifies three device classes: passive (backscatter), semi-passive (small storage), and active-assisted (larger storage). 5G-Advanced precursor to the massive communication scenario in 6G.','TR 38.848, Rel-19 specs','Bridge from 5G IoT (NB-IoT, RedCap) to 6G massive communication (tens of billions of devices).'],
   ['eRedCap','Enhanced Reduced Capability NR (Rel-19)','Further reduction of NR device complexity beyond Rel-17 RedCap: 5 MHz bandwidth, single Rx antenna, lower power class. Targets industrial sensors, meters, and low-tier wearables.','TS 38.300 (Rel-19), TR 38.875','Expands the 5G device ecosystem downward — between NB-IoT and full NR capability.'],
   ['Federated Learning','Federated Learning (NWDAF, Rel-19)','Distributed ML model training across multiple NWDAF instances — each trains on local data and shares model updates (not raw data). Rel-19 NWDAF enhancement. Precursor to the distributed AI-native analytics envisioned for 6G.','TS 23.288 (Rel-19)','Bridge between single-instance NWDAF inference (Rel-17) and fully autonomous AI-native 6G network intelligence.'],
-  ['Rel-19','3GPP Release 19 (5G-Advanced Final)','The last 5G-Advanced release, closed March 2026. Normatively specifies AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, network slicing Phase 3, NWDAF federated learning, and more. Marks the end of the 5G standardization era — 3GPP focus shifts to 6G (Rel-20+).','3GPP','The standards bridge between deployed 5G and the 6G vision. Many Rel-19 features are direct precursors to 6G pillars.'],
+  ['Rel-19','3GPP Release 19 (5G-Advanced)','The second 5G-Advanced release, frozen December 2025. Normatively specifies AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, network slicing Phase 3, NWDAF federated learning, and more. Rel-20 continues 5G-Advanced evolution alongside initial 6G studies.','3GPP','The standards bridge between deployed 5G and the 6G vision. Many Rel-19 features are direct precursors to 6G pillars.'],
 ];
 function renderGlossary(el) {
   let html = '<h2>Glossary</h2><div class="glossary-controls"><input type="text" class="glossary-search" id="glossary-search" placeholder="Search terms..." oninput="filterGlossary()"><button class="glossary-sort" onclick="sortGlossary()">Sort A→Z ↕</button></div>';
@@ -6864,15 +6890,15 @@ function renderTimeline(el) {
     {date:'Apr 2023', text:'Network slicing developer beta (nationwide)', cls:''},
     {date:'Sep 2024', text:'Priority URLLC slice announced (launched Feb 2025); SASE launched', cls:''},
     {date:'Sep 2024', text:'AI-RAN Innovation Center announced (+ NVIDIA + Nokia + Ericsson)', cls:''},
-    {date:'Apr 2025', text:'5G Advanced deployed nationwide', cls:''},
+    {date:'Oct 2024', text:'Portable Private 5G — on-demand private network solution for enterprise', cls:''},
+    {date:'Apr 2025', text:'5G-Advanced deployed nationwide', cls:''},
     {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
     {date:'Aug 2025', text:'Enterprise eMBB slice launched for business subscribers', cls:''},
     {date:'Oct 2025', text:'ULCL Edge + Edge Platform launched for enterprise edge computing', cls:''},
     {date:'Oct 2025', text:'NVIDIA $1B investment in Nokia for AI-RAN infrastructure', cls:''},
-    {date:'Oct 2024', text:'Portable Private 5G — on-demand private network solution for enterprise', cls:''},
+    {date:'Dec 2025', text:'3GPP Rel-19 frozen — second 5G-Advanced release. Rel-20 continues 5G-Advanced work alongside first 6G study items.', cls:''},
     {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
-    {date:'Mar 2026', text:'3GPP Rel-19 closed — final 5G Advanced release. Standardization focus shifts to 6G (Rel-20 study items begin).', cls:''},
     {date:'Mar 2026', text:'MWC: Nokia/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + 6G innovation hub established.', cls:''},
     {date:'Mar 2026', text:'GTC: Physical AI on AI-RAN demonstrated (Metropolis VSS 3). RTX PRO Blackwell pilot announced at MSOs.', cls:''},
     {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed MWC 2026)', cls:'projected'},
@@ -6881,7 +6907,7 @@ function renderTimeline(el) {
     {date:'~2029', text:'First 3GPP 6G specifications expected (IMT-2030)', cls:'vision'},
     {date:'~2030', text:'6G commercialization target — AI-native, sensing, sub-THz', cls:'vision'},
   ];
-  let html = `<h2>Technology Timeline</h2><p>Key milestones in the 5G, 5G Advanced, AI-RAN, and 6G journey.</p>`;
+  let html = `<h2>Technology Timeline</h2><p>Key milestones in the 5G, 5G-Advanced, AI-RAN, and 6G journey.</p>`;
   html += '<div class="timeline-container"><div class="timeline-line"></div>';
   events.forEach(e => {
     html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${e.text}</div></div>`;
@@ -6912,7 +6938,7 @@ function renderBandMap(el) {
 function renderIntroRoadTo6G(el) {
   let html = '<h2>The Road from 5G to 6G <span class="badge badge-fact">FACT</span></h2>';
   html += '<p>This tool covers two distinct layers of network evolution: AI-RAN, which enhances the existing 5G network with GPU-accelerated RAN intelligence, and 6G, which envisions an entirely new AI-native network architecture for the 2030 era. Understanding where each sits on the maturity spectrum is essential to interpreting the flows in this tool.</p>';
-  html += '<p>The bridge between these layers is <strong>3GPP Release 19</strong> — the final 5G-Advanced release, closed March 2026. Rel-19 is not just an incremental update; it normatively specifies AI/ML at the NR air interface (beam management, CSI, positioning), expands Non-Terrestrial Networks (satellite NR), introduces ambient IoT device classes, evolves NWDAF with federated learning, and enhances positioning to centimeter-level accuracy. Several of these capabilities are <strong>direct precursors</strong> to 6G pillars: AI/ML for NR leads to AI-native communication, NTN evolution leads to ubiquitous connectivity, ambient IoT leads to massive communication, and enhanced positioning leads to integrated sensing. With Rel-19 closed, 3GPP standardization focus now shifts fully to 6G — Rel-20 opens the 6G study phase.</p>';
+  html += '<p>The bridge between these layers is <strong>3GPP Release 19</strong> — the second 5G-Advanced release, frozen December 2025. Rel-19 is not just an incremental update; it normatively specifies AI/ML at the NR air interface (beam management, CSI, positioning), expands Non-Terrestrial Networks (satellite NR), introduces ambient IoT device classes, evolves NWDAF with federated learning, and enhances positioning to centimeter-level accuracy. Several of these capabilities are <strong>direct precursors</strong> to 6G pillars: AI/ML for NR leads to AI-native communication, NTN evolution leads to ubiquitous connectivity, ambient IoT leads to massive communication, and enhanced positioning leads to integrated sensing. Rel-20 now continues 5G-Advanced evolution while simultaneously opening the 6G study phase.</p>';
   html += '<h3>The Evolution Path</h3>';
   html += '<div class="arch-svg-container" id="intro-evo-path"></div>';
   html += '<div style="margin-top:12px;padding:12px 16px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">AI-RAN is a bridge — it enhances 5G infrastructure with AI while remaining fully 3GPP-compliant, paving the way for the architectural transformation that 6G represents.</div>';
@@ -6942,9 +6968,9 @@ function renderIntroRoadTo6G(el) {
     marker.appendChild(path); defs.appendChild(marker); svg.appendChild(defs);
     const stages = [
       {x:10, color:'#16a34a', label:'5G SA Baseline', sub:'Deployed (Rel-15/16/17)', detail:'SBA, Network Slicing, Edge Computing, NWDAF'},
-      {x:230, color:'#2563eb', label:'5G Advanced', sub:'Deployed (Rel-18/19)', detail:'AI/ML Air Interface, Ambient IoT, eRedCap, NTN'},
+      {x:230, color:'#2563eb', label:'5G-Advanced', sub:'Deployed (Rel-18/19)', detail:'AI/ML Air Interface, Ambient IoT, eRedCap, NTN'},
       {x:450, color:'#ea580c', label:'AI-RAN', sub:'Validating / Projected', detail:'GPU-Accelerated RAN, AI Beam Mgmt, Shared Memory'},
-      {x:670, color:'#e20074', label:'6G', sub:'Vision (~2030)', detail:'AI-Native Core, ISAC, Digital Twins, Sub-THz'}
+      {x:670, color:'#1E3A5F', label:'6G', sub:'Vision (~2030)', detail:'AI-Native Core, ISAC, Digital Twins, Sub-THz'}
     ];
     stages.forEach((s, i) => {
       const g = svgEl('g');
@@ -7089,7 +7115,7 @@ function renderIntroAIRANvsGNB(el) {
 function renderIntroWhatIs6G(el) {
   let html = '<h2>What is 6G? <span class="badge badge-fact">FACT</span></h2>';
   html += '<p>6G is the next generation of mobile network technology, targeted for initial standardization around 2029 and commercial deployment beginning around 2030. While 5G was designed for three usage scenarios (eMBB, URLLC, mMTC), 6G expands to six — adding integrated sensing, AI-native communication, and ubiquitous global connectivity. The vision is defined by the ITU-R under the IMT-2030 framework (Recommendation ITU-R M.2160, approved November 2023).</p>';
-  html += '<p>Importantly, 6G does not start from zero. <strong>3GPP Release 19</strong> (the final 5G-Advanced release, closed March 2026) already introduces early forms of several 6G capabilities: AI/ML at the NR air interface (→ Integrated AI and Communication), NTN satellite evolution and UE relay (→ Ubiquitous Connectivity), ambient IoT device classes (→ Massive Communication), centimeter-level NR positioning (→ precursor to ISAC), and NWDAF federated learning (→ AI-native network automation). The 6G vision flows in this tool (Flows 6–14) show where these seeds grow into fully native 6G architectures — but the roots are already in deployed 5G-Advanced specifications.</p>';
+  html += '<p>Importantly, 6G does not start from zero. <strong>3GPP Release 19</strong> (the second 5G-Advanced release, frozen December 2025) already introduces early forms of several 6G capabilities: AI/ML at the NR air interface (→ Integrated AI and Communication), NTN satellite evolution and UE relay (→ Ubiquitous Connectivity), ambient IoT device classes (→ Massive Communication), centimeter-level NR positioning (→ precursor to ISAC), and NWDAF federated learning (→ AI-native network automation). The 6G vision flows in this tool (Flows 6–14) show where these seeds grow into fully native 6G architectures — but the roots are already in deployed 5G-Advanced specifications.</p>';
   html += '<h3>Six Usage Scenarios (IMT-2030)</h3>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Immersive Communication</strong><span>Holographic telepresence, extended reality (XR), multi-sensory experiences. Requires massive throughput (200+ Gbps peak target) and extremely low latency.</span></div>';
@@ -7119,8 +7145,8 @@ function renderIntroWhatIs6G(el) {
   const events = [
     {date:'Nov 2023', text:'ITU-R approves Recommendation M.2160 — IMT-2030 Framework and overall objectives. Defines the six usage scenarios and high-level capability targets. Marks the official start of the 6G era in standards terms.', cls:''},
     {date:'2024–2025', text:'3GPP begins 6G study items (SA1, SA2 service requirements and architecture studies). IMT-2030 technology trends and evaluation methodology development at ITU-R.', cls:''},
-    {date:'Mar 2026', text:'3GPP Rel-19 closed — the final 5G Advanced release. Expanded AI/ML for air interface, ambient IoT Phase 2, NTN evolution, advanced MIMO, eRedCap, and network slicing Phase 3. Standardization focus now shifts fully to 6G.', cls:''},
-    {date:'2026–2028', text:'3GPP Rel-20 — 6G study and architecture phase. ITU-R defines detailed IMT-2030 performance requirements and evaluation criteria.', cls:'projected'},
+    {date:'Dec 2025', text:'3GPP Rel-19 frozen — the second 5G-Advanced release. AI/ML for NR air interface, ambient IoT Phase 2, NTN evolution, advanced MIMO, eRedCap, and network slicing Phase 3. Rel-20 begins 5G-Advanced evolution + 6G studies.', cls:''},
+    {date:'2026–2028', text:'3GPP Rel-20 — third 5G-Advanced release + initial 6G study and architecture phase. ITU-R defines detailed IMT-2030 performance requirements and evaluation criteria.', cls:'projected'},
     {date:'~2028', text:'3GPP Rel-21 expected to begin normative 6G specifications. Technology candidates submitted to ITU-R for IMT-2030 evaluation.', cls:'projected'},
     {date:'~2029', text:'First 3GPP 6G specifications (initial release). IMT-2030 technology evaluation completed.', cls:'vision'},
     {date:'~2030', text:'Target for initial 6G commercial deployment.', cls:'vision'},
