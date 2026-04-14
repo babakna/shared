@@ -187,7 +187,7 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
 .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 #welcome-view, #flow-view, #reference-view { display: none; flex-direction: column; height: 100%; overflow: auto; }
 #welcome-view.active, #flow-view.active, #reference-view.active { display: flex; }
-#flow-view.active { overflow-x: hidden; overflow-y: auto; }
+#flow-view.active { overflow: hidden; display: flex; flex-direction: column; }
 .welcome-container {
   max-width: 860px; margin: 40px auto; padding: 0 32px;
 }
@@ -211,7 +211,7 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
   border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; color: var(--text-primary);
 }
 #topology-area {
-  height: 30vh; min-height: 220px; max-height: 320px; position: relative; background: var(--bg-primary);
+  height: 38vh; position: relative; background: var(--bg-primary);
   overflow: hidden; flex-shrink: 0;
 }
 .flow-header {
@@ -291,12 +291,23 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
   animation: fadeInMsg 0.3s ease;
 }
 @keyframes fadeInMsg { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.resize-handle {
+  height: 6px; flex-shrink: 0; cursor: row-resize; background: var(--border-color);
+  position: relative; z-index: 2; transition: background 0.15s; touch-action: none;
+}
+.resize-handle:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+.resize-handle:hover, .resize-handle.dragging { background: var(--accent); }
+.resize-handle::after {
+  content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 40px; height: 4px; border-top: 1px solid var(--text-tertiary);
+  border-bottom: 1px solid var(--text-tertiary);
+}
 #payload-inspector {
-  height: 50vh; min-height: 350px; flex-shrink: 0; display: flex; border-top: 2px solid var(--border-color);
+  flex: 1; min-height: 0; display: flex; border-top: none;
   background: var(--bg-secondary); overflow: hidden;
 }
 .payload-pane {
-  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
 }
 .payload-pane:first-child { border-right: 1px solid var(--border-color); }
 .payload-header {
@@ -305,6 +316,8 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
   background: var(--bg-tertiary); display: flex; justify-content: space-between;
 }
 .payload-header .proto { font-weight: 400; font-family: 'Consolas', monospace; text-transform: none; }
+.copy-btn { background: none; border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 6px; cursor: pointer; font-size: 11px; color: var(--text-tertiary); margin-left: 8px; transition: all 0.2s; }
+.copy-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 .payload-body {
   flex: 1; overflow: auto; padding: 12px 16px; background: var(--bg-terminal);
   font-family: 'Consolas', monospace; font-size: 12px; line-height: 1.6;
@@ -423,7 +436,8 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
   .app-container { position: static; display: block; }
   .main-content { overflow: visible; margin-left: 0; }
   #flow-view.active { overflow: visible; height: auto; }
-  #topology-area { min-height: 400px; height: auto; max-height: none; }
+  #topology-area { min-height: 400px; height: auto !important; max-height: none; }
+  .resize-handle { display: none; }
   #payload-inspector { background: #f8f8f8 !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .payload-pane { background: #f8f8f8 !important; }
   .payload-body { background: #f8f8f8 !important; color: #1a1a1a !important; overflow: visible; height: auto; }
@@ -434,7 +448,7 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
 </head>
 <body data-theme="light">
 <header>
-  <button id="mobile-menu-btn" style="display:none;background:none;border:none;color:var(--text-primary);font-size:22px;cursor:pointer;padding:0 8px" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">☰</button>
+  <button id="mobile-menu-btn" aria-label="Open menu" aria-controls="sidebar" style="display:none;background:none;border:none;color:var(--text-primary);font-size:22px;cursor:pointer;padding:0 8px" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">☰</button>
   <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
@@ -459,13 +473,14 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
         <div id="topology-container"></div>
       </div>
       <div class="step-bar" id="step-bar"></div>
+      <div class="resize-handle" id="resize-handle" role="separator" aria-orientation="horizontal" aria-label="Resize topology and payload panels" tabindex="0" title="Drag to resize"></div>
       <div id="payload-inspector">
         <div class="payload-pane">
-          <div class="payload-header"><span>Ingress Payload (Received)</span><span class="proto" id="ingress-proto"></span></div>
+          <div class="payload-header"><span>Ingress Payload (Received)</span><span class="proto" id="ingress-proto"></span><button class="copy-btn" onclick="copyPayload('ingress-body')" aria-label="Copy ingress payload" title="Copy to clipboard">📋</button></div>
           <div class="payload-body" id="ingress-body"></div>
         </div>
         <div class="payload-pane">
-          <div class="payload-header"><span>Egress Transformation (Transmitted)</span><span class="proto" id="egress-proto"></span></div>
+          <div class="payload-header"><span>Egress Transformation (Transmitted)</span><span class="proto" id="egress-proto"></span><button class="copy-btn" onclick="copyPayload('egress-body')" aria-label="Copy egress payload" title="Copy to clipboard">📋</button></div>
           <div class="payload-body" id="egress-body"></div>
         </div>
       </div>
@@ -502,6 +517,76 @@ function refreshSVGs() {
     p.appendChild(c);
   });
 }
+
+/* ======== RESIZABLE SPLIT ======== */
+(function initResizer() {
+  const handle = document.getElementById('resize-handle');
+  const topoArea = document.getElementById('topology-area');
+  if (!handle || !topoArea) return;
+  let dragging = false, startY = 0, startH = 0;
+
+  function clampHeight(h) {
+    const maxH = window.innerHeight - 75 - 250;
+    return Math.min(Math.max(h, 100), Math.max(maxH, 100));
+  }
+
+  function onPointerDown(e) {
+    dragging = true;
+    startY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+    startH = topoArea.offsetHeight;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    e.preventDefault();
+  }
+  function onPointerMove(e) {
+    if (!dragging) return;
+    const touch = e.touches && e.touches[0];
+    if (e.touches && !touch) return;
+    const clientY = touch ? touch.clientY : e.clientY;
+    const newH = clampHeight(startH + (clientY - startY));
+    topoArea.style.height = newH + 'px';
+    if (e.cancelable) e.preventDefault();
+  }
+  function onPointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
+    try { localStorage.setItem('topo-height', topoArea.style.height); } catch(e) {}
+  }
+
+  handle.addEventListener('mousedown', onPointerDown);
+  document.addEventListener('mousemove', onPointerMove);
+  document.addEventListener('mouseup', onPointerUp);
+  handle.addEventListener('touchstart', onPointerDown, {passive: false});
+  document.addEventListener('touchmove', onPointerMove, {passive: false});
+  document.addEventListener('touchend', onPointerUp);
+  document.addEventListener('touchcancel', onPointerUp);
+  window.addEventListener('blur', onPointerUp);
+
+  handle.addEventListener('keydown', function(e) {
+    const step = 20;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const delta = e.key === 'ArrowUp' ? -step : step;
+      const newH = clampHeight(topoArea.offsetHeight + delta);
+      topoArea.style.height = newH + 'px';
+      try { localStorage.setItem('topo-height', topoArea.style.height); } catch(ex) {}
+    }
+  });
+
+  try {
+    const saved = localStorage.getItem('topo-height');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed > 0) topoArea.style.height = clampHeight(parsed) + 'px';
+    }
+  } catch(e) {}
+})();
 
 /* ======== NODES ======== */
 const NODES = {
@@ -5840,6 +5925,7 @@ function navigate(id, type) {
 function showView(v) {
   ['welcome-view','flow-view','reference-view'].forEach(id => {
     const el = document.getElementById(id);
+    if(!el) return;
     el.classList.toggle('active', id === v+'-view');
     if(id === v+'-view') el.scrollTop = 0;
   });
@@ -5870,6 +5956,7 @@ function loadFlow(id) {
 }
 function renderTopology(flow) {
   const tc = document.getElementById('topology-container');
+  if(!tc) return;
   tc.innerHTML = '';
   // plane labels & divider
   tc.innerHTML += `<div class="plane-label" style="top:3%;left:50%;transform:translateX(-50%)">CONTROL &amp; CHARGING PLANE</div>`;
@@ -6003,6 +6090,35 @@ function updatePayload(step) {
   document.getElementById('ingress-body').innerHTML = step.ingress ? highlightPayload(step.ingress.code) : '<div class="payload-empty">Select a step to view payload</div>';
   document.getElementById('egress-body').innerHTML = step.egress ? highlightPayload(step.egress.code) : '<div class="payload-empty">No egress for this step</div>';
 }
+function copyPayload(bodyId) {
+  const el = document.getElementById(bodyId);
+  if(!el) return;
+  const text = el.innerText || el.textContent;
+  function showFeedback(success) {
+    const btn = el.parentElement && el.parentElement.querySelector('.copy-btn');
+    if(!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = success ? '✓ Copied' : '✗ Failed';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }
+  function fallbackCopy() {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      showFeedback(ok);
+    } catch(e) { showFeedback(false); }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showFeedback(true)).catch(() => fallbackCopy());
+  } else {
+    fallbackCopy();
+  }
+}
 function highlightPayload(code) {
   if(!code) return '';
   let h = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -6022,12 +6138,15 @@ function highlightPayload(code) {
 function updateStepUI(flow) {
   const total = flow.steps.length;
   const cur = state.step;
-  document.getElementById('step-counter').textContent = cur === 0 ? `0 of ${total}` : `Step ${cur} of ${total}`;
+  const sc = document.getElementById('step-counter');
+  if(sc) sc.textContent = cur === 0 ? `0 of ${total}` : `Step ${cur} of ${total}`;
   const btn = document.getElementById('btn-step');
   const btnPrev = document.getElementById('btn-prev');
-  if(cur >= total) { btn.textContent = 'Flow Complete'; btn.disabled = true; }
-  else { btn.textContent = cur === 0 ? 'Start Flow →' : `Step ${cur+1}: ${flow.steps[cur].label.replace(/^Step \d+:\s*/,'')}`.substring(0,50); btn.disabled = false; }
-  btnPrev.disabled = (cur <= 0);
+  if(btn) {
+    if(cur >= total) { btn.textContent = 'Flow Complete'; btn.disabled = true; }
+    else { btn.textContent = cur === 0 ? 'Start Flow →' : `Step ${cur+1}: ${flow.steps[cur].label.replace(/^Step \d+:\s*/,'')}`.substring(0,50); btn.disabled = false; }
+  }
+  if(btnPrev) btnPrev.disabled = (cur <= 0);
   if(cur > 0) activateStep(flow, cur-1);
   else {
     document.querySelectorAll('.topo-node').forEach(el => {
@@ -6077,8 +6196,9 @@ function showReference(id) {
     case 'glossary': renderGlossary(rc); break;
     case 'timeline': renderTimeline(rc); break;
     case 'band_reference': renderBandMap(rc); break;
+    default: if(rc) rc.innerHTML = '<div class="placeholder-msg"><h3>Unknown reference</h3><p>This reference page was not found.</p></div>';
   }
-  rc.scrollTop = 0;
+  if(rc) rc.scrollTop = 0;
 }
 
 /* -- Architecture Diagrams -- */
@@ -6116,8 +6236,9 @@ function renderArchDiagrams(el) {
 function switchArchTab(id, btn) {
   document.querySelectorAll('#ref-content .ref-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#ref-content .ref-tab-content').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('arch-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const panel = document.getElementById('arch-'+id);
+  if(panel) panel.classList.add('active');
 }
 function svgEl(tag, attrs) {
   const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -6608,10 +6729,10 @@ function renderLatency(el) {
     ['5G SA Centralized','Deployed','3–12 ms (RTT)','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
     ['Through-Path N9 (Edge)','Deployed','8–15 ms (RTT)','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
     ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
-    ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','<5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
+    ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','&lt;5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
     ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), regenerative vs transparent, ground station coverage'],
     ['AI-RAN (Converged)','Validating (Lab)','1–4 ms target (RTT)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load. Aligns with Rel-19 AI/ML for NR.'],
-    ['6G AI-Native','Vision (~2030)','<1 ms target (RTT)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
+    ['6G AI-Native','Vision (~2030)','&lt;1 ms target (RTT)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
   ];
   let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective. Includes Rel-19 5G-Advanced capabilities (L1/L2 mobility, NTN satellite) as the bridge between deployed 5G and the 6G vision.</p>';
   html += '<table class="ref-table"><thead><tr><th>Architecture</th><th>Status</th><th>Estimated Range</th><th>Best For</th><th>Depends On</th></tr></thead><tbody>';
@@ -6702,14 +6823,14 @@ function renderSpecLibrary(el) {
     ['Enterprise eMBB / Network Slicing','Enterprise Slicing','Business network slicing plan with intelligent performance, security, and satellite'],
   ];
   const alliances = [
-    ['O-RAN Alliance','<a href="https://www.o-ran.org" target="_blank">o-ran.org</a>','Open RAN architecture, RIC, open fronthaul specifications'],
-    ['AI-RAN Alliance','<a href="https://www.ai-ran.org" target="_blank">ai-ran.org</a>','Converged AI and RAN infrastructure standards'],
-    ['TM Forum','<a href="https://www.tmforum.org" target="_blank">tmforum.org</a>','Open APIs, intent-based networking, autonomous networks'],
-    ['ETSI ISG MEC','<a href="https://www.etsi.org/technologies/multi-access-edge-computing" target="_blank">etsi.org</a>','Multi-access Edge Computing standards'],
-    ['ETSI ZSM','<a href="https://www.etsi.org/technologies/zero-touch-network-service-management" target="_blank">etsi.org</a>','Zero-Touch Service Management'],
-    ['5G-ACIA','<a href="https://www.5g-acia.org" target="_blank">5g-acia.org</a>','Connected Industries and Automation'],
-    ['NGMN Alliance','<a href="https://www.ngmn.org" target="_blank">ngmn.org</a>','6G Vision and Requirements'],
-    ['GSMA Open Gateway / CAMARA','<a href="https://open-gateway.gsma.com" target="_blank">open-gateway.gsma.com</a>','Cross-operator API standardization'],
+    ['O-RAN Alliance','<a href="https://www.o-ran.org" target="_blank" rel="noopener noreferrer">o-ran.org</a>','Open RAN architecture, RIC, open fronthaul specifications'],
+    ['AI-RAN Alliance','<a href="https://www.ai-ran.org" target="_blank" rel="noopener noreferrer">ai-ran.org</a>','Converged AI and RAN infrastructure standards'],
+    ['TM Forum','<a href="https://www.tmforum.org" target="_blank" rel="noopener noreferrer">tmforum.org</a>','Open APIs, intent-based networking, autonomous networks'],
+    ['ETSI ISG MEC','<a href="https://www.etsi.org/technologies/multi-access-edge-computing" target="_blank" rel="noopener noreferrer">etsi.org</a>','Multi-access Edge Computing standards'],
+    ['ETSI ZSM','<a href="https://www.etsi.org/technologies/zero-touch-network-service-management" target="_blank" rel="noopener noreferrer">etsi.org</a>','Zero-Touch Service Management'],
+    ['5G-ACIA','<a href="https://www.5g-acia.org" target="_blank" rel="noopener noreferrer">5g-acia.org</a>','Connected Industries and Automation'],
+    ['NGMN Alliance','<a href="https://www.ngmn.org" target="_blank" rel="noopener noreferrer">ngmn.org</a>','6G Vision and Requirements'],
+    ['GSMA Open Gateway / CAMARA','<a href="https://open-gateway.gsma.com" target="_blank" rel="noopener noreferrer">open-gateway.gsma.com</a>','Cross-operator API standardization'],
     ['IEEE 1588-2019 (PTP)','—','Precision Time Protocol for network synchronization'],
     ['ITU-T G.8275.1','—','PTP Telecom Profile for phase/time synchronization'],
   ];
@@ -6717,7 +6838,7 @@ function renderSpecLibrary(el) {
   sections.forEach(sec => {
     html += `<div class="spec-section"><h3>${sec.title}</h3><ul class="spec-list">`;
     sec.specs.forEach(s => {
-      html += `<li><span class="spec-num"><a href="${s[3]}" target="_blank">${s[0]}</a></span><span class="spec-title">${s[1]}</span><span class="spec-desc">${s[2]}</span></li>`;
+      html += `<li><span class="spec-num"><a href="${s[3]}" target="_blank" rel="noopener noreferrer">${s[0]}</a></span><span class="spec-title">${s[1]}</span><span class="spec-desc">${s[2]}</span></li>`;
     });
     html += '</ul></div>';
   });
@@ -6858,8 +6979,7 @@ const GLOSSARY_DATA = [
 function renderGlossary(el) {
   let html = '<h2>Glossary</h2><div class="glossary-controls"><input type="text" class="glossary-search" id="glossary-search" placeholder="Search terms..." oninput="filterGlossary()"><button class="glossary-sort" onclick="sortGlossary()">Sort A→Z ↕</button></div>';
   html += '<div style="overflow:auto;max-height:calc(100vh - 250px)"><table class="ref-table" id="glossary-table"><thead><tr><th onclick="sortGlossaryBy(0)">Term</th><th onclick="sortGlossaryBy(1)">Full Name</th><th onclick="sortGlossaryBy(2)">Definition</th><th onclick="sortGlossaryBy(3)">Spec Ref</th><th onclick="sortGlossaryBy(4)">Context</th></tr></thead><tbody>';
-  GLOSSARY_DATA.sort((a,b) => a[0].localeCompare(b[0]));
-  GLOSSARY_DATA.forEach(g => {
+  [...GLOSSARY_DATA].sort((a,b) => a[0].localeCompare(b[0])).forEach(g => {
     html += `<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${g[3]}</td><td>${g[4]}</td></tr>`;
   });
   html += '</tbody></table></div>';
@@ -6867,7 +6987,9 @@ function renderGlossary(el) {
 }
 let glossarySortDir = 1;
 function filterGlossary() {
-  const q = document.getElementById('glossary-search').value.toLowerCase();
+  const searchEl = document.getElementById('glossary-search');
+  if(!searchEl) return;
+  const q = searchEl.value.toLowerCase();
   document.querySelectorAll('#glossary-table tbody tr').forEach(tr => {
     tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
@@ -6875,6 +6997,7 @@ function filterGlossary() {
 function sortGlossary() { sortGlossaryBy(0); }
 function sortGlossaryBy(col) {
   const tbody = document.querySelector('#glossary-table tbody');
+  if(!tbody) return;
   const rows = Array.from(tbody.rows);
   glossarySortDir *= -1;
   rows.sort((a,b) => glossarySortDir * a.cells[col].textContent.localeCompare(b.cells[col].textContent));
@@ -7228,7 +7351,7 @@ function showWelcome() {
 
 /* ======== KEYBOARD SHORTCUTS ======== */
 document.addEventListener('keydown', e => {
-  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.isContentEditable) return;
   if(e.key === 'ArrowRight' || e.key === ' ') {
     if(state.view === 'flow') { e.preventDefault(); stepForward(); }
   }
@@ -7242,7 +7365,7 @@ document.addEventListener('keydown', e => {
 
 /* ======== DOM VALIDATION ======== */
 function validateDOM() {
-  const required = ['sidebar','welcome-view','flow-view','reference-view','topology-container','topology-area','payload-inspector','ingress-body','egress-body','flow-title','step-counter','btn-prev','btn-step','btn-reset','theme-toggle','step-bar'];
+  const required = ['sidebar','welcome-view','flow-view','reference-view','ref-content','topology-container','topology-area','payload-inspector','ingress-body','egress-body','ingress-proto','egress-proto','flow-title','flow-badge','step-counter','btn-prev','btn-step','btn-reset','theme-toggle','step-bar','resize-handle','mobile-menu-btn'];
   required.forEach(id => {
     if(!document.getElementById(id)) console.warn(`[3GPP Validator] Missing DOM element: #${id}`);
   });
