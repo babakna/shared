@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family SS Planner v10</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f6f9;--bg2:#ffffff;--bg3:#f0f2f6;--bg4:#e4e8ef;
+  --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.12);
+  --text:#141624;--text2:#3a4058;--text3:#606c8a;
+  --accent:#2f54eb;--accent2:#1939b7;--accent-light:#eef2ff;
+  --green:#10b981;--green-light:#ecfdf5;--green-dark:#065f46;
+  --amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;
+  --blue:#1d4ed8;--blue-light:#eff6ff;
+  --c62:#dc2626;--c65:#7c3aed;--c67:#d97706;--c70:#10b981;--cnof:#2563eb;
+  --sh:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
+  --sh2:0 4px 16px rgba(0,0,0,0.09),0 2px 6px rgba(0,0,0,0.05);
+  --sh3:0 8px 32px rgba(0,0,0,0.12),0 4px 8px rgba(0,0,0,0.06);
+  --radius:10px;--radius2:14px;
+}
+.dark{
+  --bg:#0d0f18;--bg2:#131520;--bg3:#1a1d2e;--bg4:#22263a;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --text:#e8ecf8;--text2:#a8b1cf;--text3:#7e8aab;
+  --accent:#4d72f8;--accent2:#6b8dff;--accent-light:#141b3a;
+  --green:#34d399;--green-light:#052e1c;--green-dark:#a7f3d0;
+  --amber:#fbbf24;--amber-light:#1c1200;
+  --red:#f87171;--red-light:#1c0505;
+  --blue:#60a5fa;--blue-light:#0c1a3a;
+  --sh:0 1px 3px rgba(0,0,0,0.3);--sh2:0 4px 16px rgba(0,0,0,0.4);--sh3:0 8px 32px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;line-height:1.5;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:var(--sh);position:sticky;top:0;z-index:200;}
+.hdr-l{display:flex;align-items:center;gap:10px;}
+.logo{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo svg{width:16px;height:16px;fill:#fff;}
+.hdr-title{font-size:14px;font-weight:700;letter-spacing:-0.3px;margin:0;line-height:1.2;}
+.hdr-sub{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px;}
+/* Reset h2 defaults so existing class styles still drive presentation. */
+h2{font-size:inherit;font-weight:inherit;line-height:inherit;margin:0;}
+h2.sens-title,h2.exp-hd-title{display:flex;align-items:center;gap:7px;}
+.hdr-r{display:flex;align-items:center;gap:6px;}
+.ibtn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text2);}
+.ibtn:hover{background:var(--bg4);}
+.ibtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.hdr-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:'Manrope',sans-serif;transition:all .15s;}
+.hdr-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 52px);}
+.sidebar{background:var(--bg2);border-right:none;overflow-y:auto;min-width:240px;max-width:500px;position:relative;}
+.resize-handle{width:5px;position:absolute;top:0;right:0;bottom:0;cursor:col-resize;background:var(--border);transition:background .15s;z-index:10;}
+.resize-handle:hover,.resize-handle.active{background:var(--accent);width:5px;}
+.main-area{overflow-y:auto;padding:18px 20px;background:var(--bg);}
+
+/* SIDEBAR ACCORDION */
+.acc{border-bottom:1px solid var(--border);}
+.acc-hd{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background .12s;width:100%;border:0;background:transparent;color:inherit;font:inherit;text-align:left;}
+.acc-hd:hover{background:var(--bg3);}
+.acc-hd:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+.exp-hd,.yby-hd,.yby-dec-hd{border:0;background:var(--bg3);width:100%;color:inherit;font:inherit;text-align:left;}
+.exp-hd:focus-visible,.yby-hd:focus-visible,.yby-dec-hd:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+.acc-icon{width:16px;height:16px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:7px;}
+.acc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);flex:1;}
+.acc-arr{transition:transform .18s;color:var(--text3);}
+.acc-arr svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;}
+.acc.closed .acc-arr{transform:rotate(-90deg);}
+.acc.closed .acc-body{display:none;}
+.acc-body{padding:2px 14px 12px;}
+
+/* FORM */
+.fld{margin-bottom:8px;}
+.fld>label{display:block;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;}
+.fld input[type=text],.fld input[type=number],.fld select{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 9px;
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.fld input:focus,.fld select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,84,235,.1);}
+.fld select option{background:var(--bg2);}
+.fld-2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.fld-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+
+/* SLIDER */
+.sld{margin-bottom:8px;}
+.sld-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.sld-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;}
+.sld-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--text);background:var(--bg3);padding:1px 6px;border-radius:4px;border:1px solid var(--border);}
+input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:var(--bg4);border-radius:2px;outline:none;cursor:pointer;transition:background .15s;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg2);box-shadow:0 1px 4px rgba(0,0,0,.2);}
+
+/* PERSON ROW */
+.person-row{display:grid;grid-template-columns:1fr 80px;gap:7px;align-items:end;margin-bottom:8px;}
+.person-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;}
+
+/* INFO */
+.info{background:var(--bg3);border-radius:6px;padding:6px 9px;font-size:10px;color:var(--text3);line-height:1.5;margin-top:3px;border-left:2px solid var(--border2);}
+.info strong{color:var(--text2);}
+.info.note-blue{border-left-color:var(--accent);background:var(--accent-light);}
+
+/* ACTION BTN */
+.act-btn{display:block;width:calc(100% - 28px);margin:10px 14px;padding:9px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:background .15s,transform .1s;}
+.act-btn:hover{background:var(--accent2);}
+.act-btn:active{transform:scale(.98);}
+
+/* MILESTONE */
+.ms-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.ms-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;box-shadow:var(--sh);}
+.ms-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--accent);line-height:1;}
+.ms-lbl{font-size:10px;color:var(--text3);margin-top:3px;line-height:1.3;}
+
+/* METRICS */
+.met-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
+.met{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:13px 14px;position:relative;box-shadow:var(--sh);transition:box-shadow .15s;}
+.met:hover{box-shadow:var(--sh2);}
+.met::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius2) var(--radius2) 0 0;}
+.met.c62::before{background:var(--c62);}
+.met.c65::before{background:var(--c65);}
+.met.c67::before{background:var(--c67);}
+.met.c70::before{background:var(--c70);}
+.met.cnof::before{background:var(--cnof);}
+.met.winner{border-color:var(--green);box-shadow:0 0 0 2px rgba(16,185,129,.12),var(--sh);}
+.met-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:7px;}
+.met-val{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;line-height:1;}
+.met.c62 .met-val{color:var(--c62);}
+.met.c65 .met-val{color:var(--c65);}
+.met.c67 .met-val{color:var(--c67);}
+.met.c70 .met-val{color:var(--c70);}
+.met.cnof .met-val{color:var(--cnof);}
+.met-sub{font-size:9px;color:var(--text3);margin-top:4px;}
+.met-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:var(--green);background:var(--green-light);padding:2px 7px;border-radius:20px;margin-top:5px;border:1px solid var(--green);}
+
+/* CHART CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 16px;margin-bottom:16px;box-shadow:var(--sh);}
+.card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.card-title{font-size:12px;font-weight:700;color:var(--text);}
+.chart-inner{position:relative;width:100%;height:270px;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);}
+.leg-line{width:18px;height:2px;border-radius:1px;flex-shrink:0;}
+
+/* VIEW TOGGLE */
+.vtog{display:flex;background:var(--bg3);border-radius:6px;padding:2px;gap:2px;border:1px solid var(--border);}
+.vt{padding:3px 9px;border-radius:5px;border:none;background:transparent;font-size:10px;font-weight:600;cursor:pointer;color:var(--text3);transition:all .15s;font-family:'Manrope',sans-serif;}
+.vt.on{background:var(--bg2);color:var(--text);box-shadow:var(--sh);}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg3);}
+th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;}
+td:first-child{font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;}
+tr:last-child td{border-bottom:none;}
+tr.best-row td{background:var(--green-light);}
+tr.best-row td:first-child{color:var(--green);font-weight:700;}
+tbody tr:hover td{background:var(--bg3);}
+tbody tr.best-row:hover td{background:var(--green-light);}
+
+/* SCENARIOS */
+.sc-bar{display:flex;gap:7px;margin-bottom:16px;align-items:stretch;}
+.sc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);display:flex;align-items:center;margin-right:2px;white-space:nowrap;}
+.sc-slot{flex:1;border:1px dashed var(--border2);border-radius:var(--radius);padding:7px 9px;background:var(--bg2);transition:all .15s;min-width:0;}
+.sc-slot.filled{border-style:solid;border-color:var(--accent);background:var(--accent-light);}
+.sc-slot-name{font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-slot-sub{font-size:9px;color:var(--text3);margin-top:1px;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-slot-actions{display:flex;gap:4px;margin-top:5px;}
+.sc-mini-btn{font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600;transition:all .15s;white-space:nowrap;}
+.sc-mini-btn:hover{background:var(--bg4);}
+.sc-mini-btn.danger:hover{background:var(--red-light);color:var(--red);border-color:var(--red);}
+.sc-mini-btn.primary{background:var(--accent-light);color:var(--accent);border-color:var(--accent);}
+.sc-mini-btn.primary:hover{background:var(--accent);color:#fff;}
+.sc-add-btn{padding:7px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg2);color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .15s;white-space:nowrap;align-self:center;}
+.sc-add-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+
+/* COMPARE */
+.compare-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);}
+.compare-hd{padding:11px 14px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;justify-content:space-between;align-items:center;}
+.compare-hd-title{font-size:12px;font-weight:700;color:var(--text);}
+
+/* WINNER */
+.winner-card{background:var(--green-light);border:1px solid var(--green);border-radius:var(--radius2);padding:16px 18px;box-shadow:var(--sh);}
+.w-eye{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.w-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:5px;letter-spacing:-.3px;}
+.w-body{font-size:12px;color:var(--text2);line-height:1.6;}
+.w-body strong{color:var(--text);font-weight:700;}
+.w-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.ws{background:var(--bg2);border-radius:8px;padding:9px 11px;border:1px solid var(--border);}
+.ws-l{font-size:9px;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;}
+.ws-v{font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--green);}
+.w-disc{font-size:10px;color:var(--text3);margin-top:10px;line-height:1.5;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg2);border-radius:var(--radius2);width:680px;max-width:94vw;max-height:86vh;overflow:hidden;box-shadow:var(--sh3);border:1px solid var(--border2);}
+.modal-hd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.modal-hd-title{font-size:15px;font-weight:800;color:var(--text);}
+.modal-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text2);transition:all .15s;}
+.modal-close:hover{background:var(--bg4);}
+.modal-body{padding:18px 20px;overflow-y:auto;max-height:calc(86vh - 60px);}
+.h-sec{margin-bottom:18px;}
+.h-sec-t{font-size:11px;font-weight:800;color:var(--accent);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.05em;}
+.h-row{display:grid;grid-template-columns:150px 1fr;gap:8px;margin-bottom:7px;font-size:11px;}
+.h-term{font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:10px;padding-top:1px;}
+.h-def{color:var(--text2);line-height:1.55;}
+.h-note{background:var(--accent-light);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:9px 12px;font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6;}
+.h-note strong{color:var(--text);}
+
+/* RENAME MODAL */
+.rename-modal{background:var(--bg2);border-radius:var(--radius2);width:380px;max-width:94vw;box-shadow:var(--sh3);border:1px solid var(--border2);padding:20px;}
+.rename-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;}
+.rename-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;padding:8px 10px;outline:none;margin-bottom:12px;}
+.rename-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,84,235,.1);}
+.rename-btns{display:flex;gap:8px;justify-content:flex-end;}
+.btn-ghost{padding:7px 14px;border:1px solid var(--border2);border-radius:7px;background:var(--bg3);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;}
+.btn-primary{padding:7px 14px;border:1px solid var(--accent);border-radius:7px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;}
+.btn-primary:hover{background:var(--accent2);}
+
+/* EXPLANATION PANEL */
+.exp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);}
+.exp-hd{padding:11px 14px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+.exp-hd:hover{background:var(--bg4);}
+.exp-hd-title{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+.exp-hd-sub{font-size:10px;color:var(--text3);}
+.exp-toggle-arr{transition:transform .18s;color:var(--text3);}
+.exp-toggle-arr svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;}
+.exp-card.exp-closed .exp-toggle-arr{transform:rotate(-90deg);}
+.exp-card.exp-closed .exp-body{display:none;}
+.exp-body{padding:14px 16px;}
+.exp-sc{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.exp-sc:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.exp-sc-title{font-size:12px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.exp-sc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.exp-rows{/* container for explanation rows */}
+.exp-row{display:grid;grid-template-columns:180px 1fr;gap:8px;margin-bottom:7px;font-size:11px;line-height:1.55;}
+.exp-row-label{font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--text2);padding-top:1px;}
+.exp-row-val{color:var(--text2);}
+.exp-row-val strong{color:var(--text);font-weight:700;}
+.exp-row-val .num{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent);}
+.exp-row-val .formula{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);display:block;margin-top:1px;}
+.exp-divider{height:1px;background:var(--border);margin:10px 0;}
+.exp-global{background:var(--bg3);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.7;}
+.exp-global strong{color:var(--text);font-weight:700;}
+.exp-global .num{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent);}
+
+/* RUNNER-UP BADGE */
+.met.runner-up{border-color:var(--amber);box-shadow:0 0 0 2px rgba(217,119,6,.12),var(--sh);}
+.met-badge-ru{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-light);padding:2px 7px;border-radius:20px;margin-top:5px;border:1px solid var(--amber);}
+.met.runner-up-2{border-color:var(--blue);box-shadow:0 0 0 2px rgba(29,78,216,.12),var(--sh);}
+.met-badge-ru2{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:var(--blue);background:var(--blue-light);padding:2px 7px;border-radius:20px;margin-top:5px;border:1px solid var(--blue);}
+
+/* METRIC TOOLTIP */
+.met-tip{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:100;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;box-shadow:var(--sh2);white-space:nowrap;font-size:10px;color:var(--text2);margin-top:6px;min-width:180px;}
+.met:hover .met-tip{display:block;}
+.met-tip-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:3px;}
+.met-tip-row:last-child{margin-bottom:0;}
+.met-tip-lbl{color:var(--text3);}
+.met-tip-val{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--text);}
+
+/* SENSITIVITY HEATMAP */
+.sens-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 16px;margin-top:12px;box-shadow:var(--sh);}
+.sens-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.sens-grid{display:grid;gap:0;font-size:11px;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.sens-cell{padding:8px 6px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:11px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.sens-cell:last-child{border-right:none;}
+.sens-cell.hdr-cell{background:var(--bg3);color:var(--text3);font-family:'Manrope',sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;}
+.sens-cell.corner{background:var(--bg4);}
+.sens-bullets{margin-top:10px;font-size:11px;color:var(--text2);line-height:1.7;}
+.sens-bullets strong{color:var(--text);}
+
+/* YEAR-BY-YEAR */
+.yby-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);}
+.yby-hd{padding:11px 14px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+.yby-hd:hover{background:var(--bg4);}
+.yby-title{font-size:12px;font-weight:700;color:var(--text);}
+.yby-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.yby-card.yby-open .yby-body{max-height:none;}
+.yby-decade{border-bottom:1px solid var(--border);}
+.yby-decade:last-child{border-bottom:none;}
+.yby-dec-hd{padding:8px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;font-size:11px;font-weight:700;color:var(--text2);background:var(--bg3);}
+.yby-dec-hd:hover{background:var(--bg4);}
+.yby-dec-hd .yby-dec-sum{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:var(--text3);}
+.yby-dec-body{display:none;}
+.yby-decade.yby-dec-open .yby-dec-body{display:block;}
+.yby-yr{display:grid;grid-template-columns:55px 1fr 1fr 1fr 1fr;gap:0;font-size:10px;border-bottom:1px solid var(--border);}
+.yby-yr:last-child{border-bottom:none;}
+.yby-yr>div{padding:4px 8px;font-family:'JetBrains Mono',monospace;}
+.yby-yr.yby-hdr>div{font-family:'Manrope',sans-serif;font-weight:700;font-size:9px;color:var(--text3);text-transform:uppercase;background:var(--bg3);}
+.yby-yr.milestone{background:var(--accent-light);}
+.yby-yr.phase-husband{border-left:3px solid var(--c62);}
+.yby-yr.phase-wife{border-left:3px solid var(--blue);}
+.yby-yr.phase-child{border-left:3px solid var(--green);}
+
+/* RESET BTN */
+.reset-btn{display:block;width:calc(100% - 28px);margin:6px 14px;padding:7px;background:transparent;border:1px solid var(--border2);border-radius:8px;color:var(--text3);font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.02em;transition:all .15s;}
+.reset-btn:hover{background:var(--red-light);color:var(--red);border-color:var(--red);}
+
+/* PRINT */
+@media print{
+  .hdr,.sidebar,.sc-bar,.ibtn,.act-btn,.vtog,.sc-mini-btn,.sc-add-btn,.reset-btn,.sens-card,.yby-card,.met-tip,#mcPanel,#survPanel{display:none!important;}
+  .layout{display:block!important;}
+  .main-area{padding:0!important;overflow:visible!important;height:auto!important;}
+  .card,.met,.ms-card,.winner-card,.compare-card,.tbl-wrap{break-inside:avoid;}
+  body{background:#fff!important;color:#000!important;}
+  .met,.card,.ms-card,.winner-card{background:#fff!important;border:1px solid #ccc!important;}
+  #printChart{display:block!important;max-width:100%;margin-bottom:16px;}
+}
+#printChart{display:none;}
+
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr;height:auto;}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border);}
+  .main-area{height:auto;}
+  .met-grid,.ms-grid{grid-template-columns:repeat(2,1fr);}
+  .w-stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="logo"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div>
+      <h1 class="hdr-title">Family Social Security Planner</h1>
+      <div class="hdr-sub">RETIREMENT PLANNING TOOL — ALL FIGURES POST-TAX</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="vtog" style="margin-right:4px">
+      <button class="vt on" id="vt-real" type="button" aria-pressed="true" onclick="setView('real')">Today's $</button>
+      <button class="vt" id="vt-nom" type="button" aria-pressed="false" onclick="setView('nominal')">Nominal</button>
+    </div>
+    <button class="ibtn" id="printBtn" onclick="printPDF()" title="Print / Save PDF" aria-label="Print or save as PDF">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    </button>
+    <button class="ibtn" id="helpBtn" onclick="toggleHelp()" title="Help" aria-label="Open help" aria-haspopup="dialog">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    </button>
+    <button class="ibtn" id="darkBtn" onclick="toggleDark()" title="Toggle dark/light mode" aria-label="Toggle dark mode" aria-pressed="false">
+      <svg id="dark-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-bg" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-hd-title" id="helpTitle">How to use this planner <span style="font-size:11px;font-weight:600;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-left:8px">v2.0</span></div>
+      <button class="modal-close" type="button" onclick="toggleHelp(false)" aria-label="Close help">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="h-sec">
+        <div class="h-sec-t">People & birth years</div>
+        <div class="h-row"><div class="h-term">Names</div><div class="h-def">Enter names for the Husband, Wife, and Child. All labels update throughout the app. Names are saved with scenarios.</div></div>
+        <div class="h-row"><div class="h-term">Birth years</div><div class="h-def">Used to calculate exact SS milestone dates. More accurate than ages. FRA is automatically determined from the husband's birth year (67 for those born 1960 or later).</div></div>
+        <div class="h-row"><div class="h-term">Life expectancy</div><div class="h-def">Age each person is assumed to live to. The model runs until the last surviving person passes. The winner scenario often changes significantly based on the wife's longevity.</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">Social Security — Husband</div>
+        <div class="h-row"><div class="h-term">FRA benefit (PIA)</div><div class="h-def">Primary Insurance Amount — what SS pays at Full Retirement Age. Find your actual number at ssa.gov/myaccount. All other SS amounts are calculated from this.</div></div>
+        <div class="h-row"><div class="h-term">File at 62</div><div class="h-def">Permanently reduces benefit to 70% of FRA (for FRA=67). Triggers the child benefit immediately (up to 5 years for a 12-year-old). Reduces wife's survivor benefit permanently.</div></div>
+        <div class="h-row"><div class="h-term">File at 65</div><div class="h-def">Moderate reduction — roughly 86.7% of FRA (for FRA=67). Balances earlier income against a smaller permanent reduction. Child may still get a few years of benefit.</div></div>
+        <div class="h-row"><div class="h-term">File at 67 (FRA)</div><div class="h-def">Full benefit, no reduction or bonus. Child benefit window closes — child turns 18 around this time. Clean baseline with no penalties.</div></div>
+        <div class="h-row"><div class="h-term">File at 70</div><div class="h-def">Maximum benefit at 124% of FRA. Best outcome for wife's survivor benefit over a long horizon. For a non-DAC minor child the benefit window is largely closed (child likely &gt;18 by then); for a DAC-qualified child the 50%-PIA benefit begins when the parent files and continues for life.</div></div>
+        <div class="h-row"><div class="h-term">Pass without filing</div><div class="h-def">Family is still protected. Wife gets survivor based on FRA (or higher if husband passed after FRA with delayed credits accumulated). Husband collects $0 while alive.</div></div>
+        <div class="h-row"><div class="h-term">Dies before file age</div><div class="h-def">If you set husband's death age earlier than a scenario's filing age (e.g., death at 64 with File at 67), the model treats that scenario as a no-filing case: husband collected $0, no Widow's Limit applies, and the wife receives a survivor benefit based on what husband would have qualified for at the time of death (full PIA if before FRA; PIA + delayed credits if after FRA, capped at age 70).</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">Social Security — Wife (spousal &amp; survivor)</div>
+        <div class="h-row"><div class="h-term">Spousal benefit</div><div class="h-def">50% of husband's FRA benefit (PIA). Available only after husband files AND wife is at least 62. The spousal amount is always based on husband's PIA — his filing age (62, 65, 67, 70) does NOT change the spousal amount. <strong>v10 applies the early-claim reduction</strong> (POMS RS 00615.201): 25/36 of 1% per month for the first 36 months early, 5/12 of 1% per month beyond. At age 62 with FRA 67, spousal = 32.5% of PIA (not 50%).</div></div>
+        <div class="h-row"><div class="h-term">Spousal eligibility</div><div class="h-def">Requires: (1) husband has filed for SS, (2) wife is at least 62, (3) married for at least 1 year. If these conditions are not met, wife receives $0 spousal (she may still collect her own SS if she has credits).</div></div>
+        <div class="h-row"><div class="h-term">Survivor benefit</div><div class="h-def">Up to 100% of whatever husband was collecting when he passes. This IS directly affected by husband's filing age — if he filed at 62, the survivor base is lower than if he filed at 70. Widow's Limit (RIB-LIM): if husband filed early, survivor = MAX(his reduced benefit, 82.5% of PIA).</div></div>
+        <div class="h-row"><div class="h-term">Survivor timing</div><div class="h-def">Claimable as early as age 60 (or 50 if disabled). Claiming before FRA (67) permanently reduces the survivor amount: 71.5% at age 60, scaling linearly to 100% at age 67. This model applies that reduction based on when the wife first becomes eligible to claim.</div></div>
+        <div class="h-row"><div class="h-term">Spousal vs survivor</div><div class="h-def">While husband is alive: wife gets spousal (50% PIA). After husband passes: wife switches to survivor (up to 100% of husband's benefit). SS always pays the higher of spousal, survivor, or wife's own benefit — never combined.</div></div>
+        <div class="h-row"><div class="h-term">Own SS credits</div><div class="h-def">If wife has her own work record, SS pays the higher of her own benefit or spousal/survivor — never both combined. She collects her own benefit from age 62 independently if she has credits, even if husband hasn't filed yet.</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">Social Security — Child (DAC)</div>
+        <div class="h-row"><div class="h-term">Child benefit</div><div class="h-def">50% of husband's FRA (PIA) while he is alive and has filed. For non-disabled minors: ends at age 18 (SSA allows 19 if still in high school — <strong>this model uses a hard 18 cutoff for simplicity</strong>). <strong>v10: for a DAC-qualified child, the 50% benefit continues for life</strong> while the parent is alive and filed (POMS DI 10115.001), then switches to the 75% DAC survivor amount on the parent's death.</div></div>
+        <div class="h-row"><div class="h-term">DAC survivor</div><div class="h-def">Disabled Adult Child benefit — 75% of husband's PIA, for child's entire lifetime after husband passes. Requires disability onset documented before age 22. The DAC amount is always based on the husband's PIA regardless of when he filed. Grows with COLA annually. While the parent is alive and filed, the DAC instead receives 50% of PIA (the child-benefit amount), with no age-18 cutoff.</div></div>
+        <div class="h-row"><div class="h-term">DAC eligibility</div><div class="h-def">Child must be unmarried, have a disability that began before age 22, and meet SSA's definition of disability. Apply through SSA — documentation of early-onset disability is critical. Call SSA at <strong>1-800-772-1213</strong> (TTY 1-800-325-0778) or visit <strong><a href="https://www.ssa.gov/benefits/disability/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/benefits/disability</a></strong>.</div></div>
+        <div class="h-row"><div class="h-term">Family Maximum</div><div class="h-def"><strong>v10 applies the FMB cap.</strong> SSA caps total family benefits at ~150–187% of PIA via a four-bracket formula on monthly PIA (POMS RS 00615.768). Auxiliaries (spousal + child + DAC while parent alive) are prorated when their sum exceeds FMB − worker's PIA. Survivor benefits after the worker passes are NOT subject to FMB (they come from a different fund). Verify with SSA for exact amounts.</div></div>
+        <div class="h-row"><div class="h-term">Living expenses</div><div class="h-def">Child's base annual cost when both parents are gone — housing, food, medical, caregivers beyond Medicaid. In today's dollars.</div></div>
+        <div class="h-row"><div class="h-term">SNT admin costs</div><div class="h-def">Annual cost to administer the Special Needs Trust — corporate trustee fees (0.5–1% of assets), CPA, rep payee, legal reviews. Typically $5K–$20K/yr. Added to living expenses when both parents are gone.</div></div>
+        <div class="h-row"><div class="h-term">Representative Payee</div><div class="h-def">SSA requires a Representative Payee to receive and manage SS/DAC payments on behalf of a beneficiary who cannot manage their own funds. The payee must keep records of how benefits are spent and file annual accounting (Form <strong>SSA-6230</strong>). A parent, family member, or corporate trustee can serve as payee. After both parents pass, the SNT trustee typically becomes rep payee. See: <strong><a href="https://www.ssa.gov/payee/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/payee</a></strong> | SSA Pub <strong><a href="https://www.ssa.gov/pubs/EN-05-10076.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10076</a></strong> (Guide for Rep Payees) | SSA Pub <strong><a href="https://www.ssa.gov/pubs/EN-05-10098.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10098</a></strong> (Benefits for Children with Disabilities) | <strong><a href="https://secure.ssa.gov/poms.nsf/lnx/0200502001" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">POMS GN 00502</a></strong> (Rep Payee policy).</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">Taxes</div>
+        <div class="h-row"><div class="h-term">Family tax rate</div><div class="h-def">Effective tax rate on portfolio withdrawals and SS income while parents are alive. Default 22%. Applied to the gap between spending needs and SS income received.</div></div>
+        <div class="h-row"><div class="h-term">SNT tax rate</div><div class="h-def">Trust tax rate after both parents pass. SNT trusts reach the 37% bracket very quickly (at ~$15K of income in 2024). Default 37%. Applied to portfolio draws needed beyond child's SS and DAC income.</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">Portfolio & spending</div>
+        <div class="h-row"><div class="h-term">Family spending</div><div class="h-def">Total annual household spending while at least one parent is alive. All amounts in today's dollars — the model inflates them forward automatically.</div></div>
+        <div class="h-row"><div class="h-term">Today's $ vs Nominal</div><div class="h-def">Today's dollars adjusts all figures back to today's purchasing power — easier to understand. Nominal shows actual dollar amounts as they grow with inflation over time.</div></div>
+        <div class="h-row"><div class="h-term">Annual return</div><div class="h-def">Expected average portfolio return. 7–8% is a common long-run assumption. Reduce to 5–6% for a conservative stress test. The model assumes constant returns — real outcomes will vary.</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">Scenarios</div>
+        <div class="h-row"><div class="h-term">Save scenario</div><div class="h-def">Save up to 3 named scenarios. Each stores all input values. Click a saved slot to load, rename, or delete it. When 2+ are saved, a comparison table appears automatically.</div></div>
+        <div class="h-row"><div class="h-term">Winner</div><div class="h-def">The filing scenario leaving the largest portfolio at end of plan — accounting for SS income, taxes, portfolio growth, and spending across the full lifetime of all three family members.</div></div>
+      </div>
+      <div class="h-sec">
+        <div class="h-sec-t">v10 — Sensitivity, Monte Carlo &amp; survivor-timing panels</div>
+        <div class="h-row"><div class="h-term">Sensitivity Grid A</div><div class="h-def">Heatmap: rows = wife's death age (80–100), cols = portfolio return rate (4–10%). Each cell shows the best filing age for that combination. Gray cells = all filing ages run out of money. Helps identify whether your winner is robust to longevity and market assumptions.</div></div>
+        <div class="h-row"><div class="h-term">Sensitivity Grid B</div><div class="h-def">Heatmap: rows = husband's death age (73–93), cols = wife's death age (80–100). The single most decision-critical pairing — file-at-70 typically wins when the husband lives long; file-at-62 wins when he dies early. Use this to see how the winning strategy depends on lifespan assumptions you can't actually know.</div></div>
+        <div class="h-row"><div class="h-term">Monte Carlo</div><div class="h-def">Runs 500 random trials per filing age with year-by-year returns drawn from a normal distribution around your assumed return (σ=12%, typical for a balanced portfolio). Addresses <em>sequence-of-returns risk</em> that the constant-return model misses. Reports: <strong>success rate</strong> (% of trials where portfolio survives), <strong>10th/median/90th percentile</strong> final values. The "robust winner" is the filing age with the highest survival rate — often different from the constant-return winner. Wide spreads = high sensitivity to return luck.</div></div>
+        <div class="h-row"><div class="h-term">Survivor timing</div><div class="h-def">When the wife has her own SS benefit, SSA allows her to claim her own benefit and survivor benefit at different ages — switching from one to the other later. This panel compares five common strategies (e.g., "survivor at 60, switch to own at 70" vs "own at 62, switch to survivor at FRA") and shows lifetime total for each. Only appears when wife's own SS &gt; $0. POMS RS 00615.482.</div></div>
+        <div class="h-row"><div class="h-term">Fractional FRA</div><div class="h-def">For birth years 1938–1942 and 1955–1959, FRA is partial-month (e.g., 1957 = 66 + 6 mo). v10 uses the exact fractional FRA in all calculations and displays it as "66 + 6 mo" wherever the FRA appears. Birth years 1960+ have FRA = 67 (whole).</div></div>
+      </div>
+      <div class="h-note"><strong>Important:</strong> This is a planning model, not financial advice. Assumes constant returns (deterministic scenarios) or random returns (Monte Carlo only), average COLA, and exact life expectancies. Real outcomes vary. Consult a fee-only financial advisor and special needs attorney for your specific situation.</div>
+      <div class="h-sec">
+        <div class="h-sec-t">SSA &amp; IRS contacts</div>
+        <div class="h-row"><div class="h-term">SSA (Social Security)</div><div class="h-def">Verify your benefit estimates: <strong><a href="https://www.ssa.gov/myaccount" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/myaccount</a></strong>. Phone: <strong>1-800-772-1213</strong> (Mon–Fri 8am–7pm local time; TTY 1-800-325-0778). Local offices: <strong><a href="https://secure.ssa.gov/ICON/main.jsp" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/locator</a></strong>.</div></div>
+        <div class="h-row"><div class="h-term">IRS (tax questions)</div><div class="h-def">For questions about taxation of SS benefits or trust income: <strong><a href="https://www.irs.gov" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">irs.gov</a></strong>. Phone: <strong>1-800-829-1040</strong> (Mon–Fri 7am–7pm). <a href="https://www.irs.gov/newsroom/how-much-of-my-social-security-is-taxable" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">IRS guide on SS taxation</a>.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME MODAL -->
+<div class="modal-bg" id="renameModal" role="dialog" aria-modal="true" aria-labelledby="renameTitle" aria-hidden="true">
+  <div class="rename-modal">
+    <div class="rename-title" id="renameTitle">Name this scenario</div>
+    <input class="rename-input" id="renameInput" aria-labelledby="renameTitle" placeholder="e.g. Optimistic — lives to 90" maxlength="60">
+    <div class="rename-btns">
+      <button class="btn-ghost" onclick="closeRename()">Cancel</button>
+      <button class="btn-primary" onclick="confirmRename()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="resize-handle" id="resizeHandle" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" aria-valuemin="240" aria-valuemax="500" aria-valuenow="300" tabindex="0"></div>
+
+    <!-- PEOPLE -->
+    <div class="acc closed" id="acc-people">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-people-body" onclick="toggleAcc('acc-people')">
+        <div class="acc-icon" style="background:#eef2ff"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2f54eb" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <span class="acc-title">People & birth years</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-people-body">
+        <div class="person-row">
+          <div class="fld"><label for="name1"><span class="person-dot" style="background:#dc2626"></span>Husband's name</label><input type="text" id="name1" value="Husband" oninput="updateLabels();compute()"></div>
+          <div class="fld"><label for="husbandBirth">Birth year</label><input type="number" id="husbandBirth" value="1975" min="1940" max="1985" onchange="onFRAChange();compute()"></div>
+        </div>
+        <div class="person-row">
+          <div class="fld"><label for="name2"><span class="person-dot" style="background:#2563eb"></span>Wife's name</label><input type="text" id="name2" value="Wife" oninput="updateLabels();compute()"></div>
+          <div class="fld"><label for="wifeBirth">Birth year</label><input type="number" id="wifeBirth" value="1978" min="1940" max="1995" onchange="compute()"></div>
+        </div>
+        <div class="person-row">
+          <div class="fld"><label for="name3"><span class="person-dot" style="background:#10b981"></span>Child's name</label><input type="text" id="name3" value="Child" oninput="updateLabels();compute()"></div>
+          <div class="fld"><label for="childBirth">Birth year</label><input type="number" id="childBirth" value="2010" min="1990" max="2022" onchange="compute()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LONGEVITY -->
+    <div class="acc closed" id="acc-life">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-life-body" onclick="toggleAcc('acc-life')">
+        <div class="acc-icon" style="background:#ecfdf5"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <span class="acc-title">Life expectancy</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-life-body">
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-h-life">Husband</span> passes at age <span class="sld-val" id="husbandDeathLbl">85</span></div><input type="range" id="husbandDeath" aria-label="Husband's death age" min="65" max="98" step="1" value="85" oninput="sl('husbandDeath','husbandDeathLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-w-life">Wife</span> passes at age <span class="sld-val" id="wifeDeathLbl">95</span></div><input type="range" id="wifeDeath" aria-label="Wife's death age" min="65" max="105" step="1" value="95" oninput="sl('wifeDeath','wifeDeathLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-c-life">Child</span> passes at age <span class="sld-val" id="childDeathLbl">95</span></div><input type="range" id="childDeath" aria-label="Child's death age" min="40" max="100" step="1" value="95" oninput="sl('childDeath','childDeathLbl');compute()"></div>
+      </div>
+    </div>
+
+    <!-- SPENDING -->
+    <div class="acc closed" id="acc-spend">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-spend-body" onclick="toggleAcc('acc-spend')">
+        <div class="acc-icon" style="background:#fffbeb"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <span class="acc-title">Spending (today's $)</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-spend-body">
+        <div class="sld"><div class="sld-hd"><span class="sld-label">Family spending (≥1 parent alive)</span><span class="sld-val" id="famSpendLbl">$150K</span></div><input type="range" id="famSpend" aria-label="Family annual spending" min="50000" max="500000" step="5000" value="150000" oninput="slK('famSpend','famSpendLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-c-spend">Child</span> living expenses (both gone)<span class="sld-val" id="childSpendLbl">$130K</span></div><input type="range" id="childSpend" aria-label="Child living expenses after both parents pass" min="10000" max="250000" step="2500" value="130000" oninput="slK('childSpend','childSpendLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label">SNT admin costs / yr</span><span class="sld-val" id="sntCostLbl">$40K</span></div><input type="range" id="sntCost" aria-label="SNT admin cost per year" min="0" max="60000" step="1000" value="40000" oninput="slK('sntCost','sntCostLbl');compute()"></div>
+        <div class="info">SNT admin = trustee fees + CPA + rep payee + legal. Added on top of living expenses once both parents are gone.</div>
+      </div>
+    </div>
+
+    <!-- TAXES -->
+    <div class="acc closed" id="acc-tax">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-tax-body" onclick="toggleAcc('acc-tax')">
+        <div class="acc-icon" style="background:#fef2f2"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <span class="acc-title">Tax rates</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-tax-body">
+        <div class="sld"><div class="sld-hd"><span class="sld-label">Family effective tax rate</span><span class="sld-val" id="famTaxLbl">22%</span></div><input type="range" id="famTax" aria-label="Family effective tax rate" min="0" max="50" step="1" value="22" oninput="slPct('famTax','famTaxLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label">SNT / <span id="lbl-c-tax">Child</span> tax rate</span><span class="sld-val" id="sntTaxLbl">37%</span></div><input type="range" id="sntTax" aria-label="SNT / child tax rate" min="0" max="50" step="1" value="37" oninput="slPct('sntTax','sntTaxLbl');compute()"></div>
+        <div class="info note-blue"><strong>SNT trusts</strong> reach the 37% bracket at ~$15K of taxable income annually. Family rate applies while at least one parent is alive.</div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="acc closed" id="acc-port">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-port-body" onclick="toggleAcc('acc-port')">
+        <div class="acc-icon" style="background:#eef2ff"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2f54eb" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <span class="acc-title">Portfolio</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-port-body">
+        <div class="sld"><div class="sld-hd"><span class="sld-label">Starting portfolio</span><span class="sld-val" id="portLbl">$4.0M</span></div><input type="range" id="port" aria-label="Starting portfolio" min="500000" max="15000000" step="100000" value="4000000" oninput="slM('port','portLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label">Annual return</span><span class="sld-val" id="retLbl">7.0%</span></div><input type="range" id="ret" aria-label="Annual portfolio return" min="3" max="12" step="0.5" value="7" oninput="slPct2('ret','retLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label">Inflation / COLA</span><span class="sld-val" id="inflLbl">3.0%</span></div><input type="range" id="infl" aria-label="Inflation / COLA rate" min="1" max="6" step="0.5" value="3" oninput="slPct2('infl','inflLbl');compute()"></div>
+      </div>
+    </div>
+
+    <!-- HUSBAND SS -->
+    <div class="acc closed" id="acc-hss">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-hss-body" onclick="toggleAcc('acc-hss')">
+        <div class="acc-icon" style="background:#fef2f2"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <span class="acc-title" id="lbl-hss-title">Husband's Social Security</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-hss-body">
+        <div class="fld">
+          <label id="lbl-fra-label" for="fraAmt">Husband's FRA benefit / yr (PIA at age <span id="lbl-fra-age">67</span>)</label>
+          <input type="text" id="fraAmt" value="49,848" onchange="onFRAChange();compute()" oninput="formatComma(this)">
+        </div>
+        <div class="info note-blue">
+          Calculated from FRA: &nbsp;
+          <strong>File 62:</strong> <span id="calc62">$34,894</span> &nbsp;
+          <strong>File 65:</strong> <span id="calc65">$43,202</span> &nbsp;
+          <strong>FRA:</strong> <span id="calcFRA">$49,848</span> &nbsp;
+          <strong>Age 70:</strong> <span id="calc70">$61,812</span>
+        </div>
+        <div class="info" style="margin-top:6px">Find your actual PIA at <strong>ssa.gov/myaccount</strong></div>
+      </div>
+    </div>
+
+    <!-- EARLY DEATH SCENARIO -->
+    <div class="acc closed" id="acc-early">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-early-body" onclick="toggleAcc('acc-early')">
+        <div class="acc-icon" style="background:#fef2f2"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <span class="acc-title" id="lbl-nof-title">Scenario 5 — Husband passes without filing</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-early-body">
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-h-early">Husband</span> passes at age (no filing) <span class="sld-val" id="earlyDeathLbl">72</span></div><input type="range" id="earlyDeath" aria-label="Husband death age without filing scenario" min="60" max="90" step="1" value="72" oninput="sl('earlyDeath','earlyDeathLbl');compute()"></div>
+        <div class="info note-blue">Models the scenario where <strong id="lbl-h-early3">Husband</strong> passes unexpectedly before filing for SS. <strong id="lbl-h-early2">Husband</strong> collects $0 while alive. <strong id="lbl-w-early">Wife</strong> and <strong id="lbl-c-early">Child</strong> receive survivor benefits immediately after passing. Survivor = MAX(<strong id="lbl-h-early4">Husband</strong>'s FRA benefit, 82.5% of PIA) since he never filed.</div>
+      </div>
+    </div>
+
+    <!-- WIFE SS -->
+    <div class="acc closed" id="acc-wss">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-wss-body" onclick="toggleAcc('acc-wss')">
+        <div class="acc-icon" style="background:#eff6ff"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <span class="acc-title" id="lbl-wss-title">Wife's SS credits</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-wss-body">
+        <div class="fld">
+          <label id="lbl-wown" for="wifeOwnSS">Wife's own benefit at her FRA (enter 0 if none)</label>
+          <input type="text" id="wifeOwnSS" value="0" onchange="compute()" oninput="formatComma(this)">
+        </div>
+        <div class="info">SS pays the higher of own benefit or spousal/survivor — never combined. If own &gt; 50% of husband's FRA, no spousal top-up.</div>
+      </div>
+    </div>
+
+    <!-- CHILD SS -->
+    <div class="acc closed" id="acc-css">
+      <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-css-body" onclick="toggleAcc('acc-css')">
+        <div class="acc-icon" style="background:#ecfdf5"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg></div>
+        <span class="acc-title" id="lbl-css-title">Child's SS benefits</span>
+        <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="acc-body" id="acc-css-body">
+        <div class="fld">
+          <label for="childDAC">DAC qualification</label>
+          <select id="childDAC" onchange="compute()">
+            <option value="1">Qualifies for DAC (disabled before age 22)</option>
+            <option value="0">Does not qualify for DAC</option>
+          </select>
+        </div>
+        <div class="info note-blue" style="margin-bottom:8px">
+          Auto-calculated from FRA: &nbsp;
+          <strong>Child benefit (while alive, under 18):</strong> <span id="calcChild">$24,924</span>/yr &nbsp;
+          <strong>DAC survivor:</strong> <span id="calcDAC">$37,386</span>/yr for life
+        </div>
+        <div class="info"><strong>Child benefit:</strong> paid while husband alive + filed, until child turns 18.<br><strong>DAC survivor:</strong> begins after husband passes, for child's entire lifetime. Both grow with COLA.</div>
+        <div class="info note-blue" style="margin-top:6px"><strong>Representative Payee:</strong> SSA requires a rep payee to manage SS/DAC payments for a beneficiary who cannot manage funds independently. The payee must file annual <strong>SSA-6230</strong> accounting forms. A corporate trustee or parent typically serves as rep payee. See <strong><a href="https://www.ssa.gov/payee/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/payee</a></strong> and SSA Publication <strong><a href="https://www.ssa.gov/pubs/EN-05-10076.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10076</a></strong>.</div>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetDefaults()">Reset to defaults</button>
+    <div style="height:14px"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-area">
+
+    <!-- PRINT CHART PLACEHOLDER -->
+    <img id="printChart" src="" alt="Portfolio chart">
+
+    <!-- INPUT VALIDATION BANNER -->
+    <div id="inputBanner" role="alert" style="display:none;background:var(--red-light);border:1px solid var(--red);border-radius:10px;padding:10px 14px;margin-bottom:14px;color:var(--red);font-size:12px;font-weight:600"></div>
+
+    <!-- MILESTONES -->
+    <div class="ms-grid" id="milestones"></div>
+
+    <!-- SCENARIO SLOTS -->
+    <div class="sc-bar">
+      <span class="sc-lbl">Scenarios</span>
+      <div class="sc-slot" id="slot0"><div class="sc-slot-name" id="sn0">Empty</div><div class="sc-slot-sub" id="ss0">Click Save to store current</div><div class="sc-slot-actions"><button class="sc-mini-btn primary" onclick="saveToSlot(0)">Save</button></div></div>
+      <div class="sc-slot" id="slot1"><div class="sc-slot-name" id="sn1">Empty</div><div class="sc-slot-sub" id="ss1">Click Save to store current</div><div class="sc-slot-actions"><button class="sc-mini-btn primary" onclick="saveToSlot(1)">Save</button></div></div>
+      <div class="sc-slot" id="slot2"><div class="sc-slot-name" id="sn2">Empty</div><div class="sc-slot-sub" id="ss2">Click Save to store current</div><div class="sc-slot-actions"><button class="sc-mini-btn primary" onclick="saveToSlot(2)">Save</button></div></div>
+    </div>
+
+    <!-- COMPARE (shown when 2+ saved) -->
+    <div class="compare-card" id="compareCard" style="display:none">
+      <div class="compare-hd"><h2 class="compare-hd-title">Saved scenario comparison</h2><span style="font-size:10px;color:var(--text3)" id="compare-mode-lbl">Today's $</span></div>
+      <div class="tbl-wrap"><table id="compareTable"></table></div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="met-grid" id="metrics"></div>
+
+    <!-- CHART -->
+    <div class="card">
+      <div class="card-hd">
+        <h2 class="card-title">Portfolio trajectory</h2>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="chart-inner"><canvas id="mainChart" role="img" aria-label="Portfolio value over time across five SS filing scenarios">Portfolio trajectory.</canvas></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <h2 class="card-title">Detailed results</h2>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="sc-mini-btn" onclick="exportCSV()" title="Download as CSV">Export CSV</button>
+          <span style="font-size:10px;font-weight:600;color:var(--text3)" id="tbl-mode-lbl">TODAY'S DOLLARS</span>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table id="resultTable"></table></div>
+    </div>
+
+    <!-- YEAR-BY-YEAR -->
+    <div class="yby-card" id="ybyCard">
+      <button class="yby-hd" type="button" aria-expanded="false" aria-controls="ybyBody" onclick="toggleYby()">
+        <h2 class="yby-title">Year-by-year breakdown (winner)</h2>
+        <span class="exp-toggle-arr" id="ybyArr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      <div class="yby-body" id="ybyBody"></div>
+    </div>
+
+    <!-- CALCULATION EXPLANATION -->
+    <div class="exp-card exp-closed" id="expCard">
+      <button class="exp-hd" type="button" aria-expanded="false" aria-controls="expBody" onclick="toggleExp()">
+        <h2 class="exp-hd-title">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+          Explain these calculations
+        </h2>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="exp-hd-sub">Click to expand — shows how every number is calculated</span>
+          <span class="exp-toggle-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div></button>
+      <div class="exp-body" id="expBody"></div>
+    </div>
+
+    <!-- WINNER -->
+    <div class="winner-card" id="winnerCard"></div>
+
+    <!-- SENSITIVITY -->
+    <div id="sensitivityPanel"></div>
+
+    <!-- MONTE CARLO -->
+    <div id="mcPanel"></div>
+
+    <!-- SURVIVOR TIMING OPTIMIZATION -->
+    <div id="survPanel"></div>
+
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<script>
+const CY = new Date().getFullYear();
+let displayMode = 'real';
+let slots = [null, null, null];
+let chartInst;
+let lastResults = [];
+let lastParams = {};
+let renameSlot = -1;
+let pendingSave = null; // staged data not yet committed
+
+// Survivor early-claim factor slope: 71.5% at age 60, scaling linearly to 100% at FRA 67.
+// Used in runScenario, simulateOnce, and survivorStrategyValue.
+const SURVIVOR_REDUCTION_AT_60 = 0.715;
+const SURVIVOR_FACTOR_PER_YR = (1.0 - SURVIVOR_REDUCTION_AT_60) / (67 - 60); // 0.04071/yr
+
+/* ---- HTML ESCAPE (XSS guard for innerHTML interpolation) ---- */
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+/* ---- DARK MODE ---- */
+// Sun and moon icon paths for the dark-mode toggle.
+const _MOON_PATH = 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z';
+const _SUN_PATH  = 'M12 17a5 5 0 100-10 5 5 0 000 10zM12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42';
+function _syncDarkIcon(){
+  const dark = document.body.classList.contains('dark');
+  const path = document.querySelector('#dark-icon path');
+  if(path && typeof path.setAttribute === 'function') path.setAttribute('d', dark ? _SUN_PATH : _MOON_PATH);
+  const btn = document.getElementById('darkBtn');
+  if(btn && typeof btn.setAttribute === 'function') btn.setAttribute('aria-pressed', String(dark));
+}
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('ssp_dark', document.body.classList.contains('dark') ? '1' : '0');
+  _syncDarkIcon();
+}
+let lastFocusedHelp = null, lastFocusedRename = null;
+function toggleHelp(open){
+  const m = document.getElementById('helpModal');
+  const isOpen = m.classList.contains('open');
+  const want = open === undefined ? !isOpen : open;
+  if(want){
+    // Capture trigger BEFORE we open/move focus.
+    const cur = document.activeElement;
+    lastFocusedHelp = (cur && cur !== document.body) ? cur : document.getElementById('helpBtn');
+  } else {
+    if(m.contains(document.activeElement)) document.activeElement.blur();
+  }
+  m.classList.toggle('open', want);
+  m.setAttribute('aria-hidden', String(!want));
+  if(want){
+    const btn = m.querySelector('.modal-close');
+    if(btn) btn.focus();
+  } else {
+    const tgt = lastFocusedHelp || document.getElementById('helpBtn');
+    if(tgt && typeof tgt.focus === 'function') tgt.focus();
+    lastFocusedHelp = null;
+  }
+}
+// Backdrop click + Esc to close modals
+document.addEventListener('click', e => {
+  const helpM = document.getElementById('helpModal');
+  if(helpM && helpM.classList.contains('open') && e.target === helpM) toggleHelp(false);
+  const renameM = document.getElementById('renameModal');
+  if(renameM && renameM.classList.contains('open') && e.target === renameM) closeRename();
+});
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  const helpM = document.getElementById('helpModal');
+  if(helpM && helpM.classList.contains('open')){ toggleHelp(false); return; }
+  const renameM = document.getElementById('renameModal');
+  if(renameM && renameM.classList.contains('open')){ closeRename(); return; }
+});
+// Focus trap inside open modal: Tab cycles within the modal's focusable elements
+function trapFocus(e){
+  if(e.key !== 'Tab') return;
+  const helpM = document.getElementById('helpModal');
+  const renameM = document.getElementById('renameModal');
+  const modal = helpM && helpM.classList.contains('open') ? helpM
+              : renameM && renameM.classList.contains('open') ? renameM : null;
+  if(!modal) return;
+  const focusable = modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+  if(!focusable.length) return;
+  const first = focusable[0], last = focusable[focusable.length-1];
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
+document.addEventListener('keydown', trapFocus);
+function toggleAcc(id){
+  const card = document.getElementById(id);
+  card.classList.toggle('closed');
+  const btn = card.querySelector('.acc-hd');
+  if(btn) btn.setAttribute('aria-expanded', String(!card.classList.contains('closed')));
+}
+
+/* ---- VIEW ---- */
+function setView(v){
+  displayMode = v;
+  const real = document.getElementById('vt-real');
+  const nom = document.getElementById('vt-nom');
+  real.classList.toggle('on', v==='real');
+  nom.classList.toggle('on', v==='nominal');
+  real.setAttribute('aria-pressed', String(v==='real'));
+  nom.setAttribute('aria-pressed', String(v==='nominal'));
+  document.getElementById('tbl-mode-lbl').textContent = v==='real' ? "TODAY'S DOLLARS" : "NOMINAL DOLLARS";
+  document.getElementById('compare-mode-lbl').textContent = v==='real' ? "Today's $" : "Nominal";
+  renderResults();
+  renderCompare();
+}
+
+/* ---- LABEL SYNC ---- */
+function updateLabels(){
+  const h = v('name1')||'Husband', w = v('name2')||'Wife', c = v('name3')||'Child';
+  ['lbl-h-life','lbl-h-early','lbl-h-early2','lbl-h-early3','lbl-h-early4'].forEach(id => el(id) && (el(id).textContent = h));
+  ['lbl-w-life','lbl-wown','lbl-w-early'].forEach(id => el(id) && (el(id).textContent = w + (id==='lbl-wown' ? "'s own benefit at her FRA (enter 0 if none)" : '')));
+  ['lbl-c-life','lbl-c-spend','lbl-c-tax','lbl-c-early'].forEach(id => el(id) && (el(id).textContent = c));
+  el('lbl-hss-title').textContent = h + "'s Social Security";
+  el('lbl-wss-title').textContent = w + "'s SS credits";
+  el('lbl-css-title').textContent = c + "'s SS benefits";
+  el('lbl-nof-title').textContent = "Scenario 5 — " + h + " passes without filing";
+  el('lbl-fra-label').innerHTML = esc(h) + "'s FRA benefit / yr (PIA at age <span id='lbl-fra-age'>" + fmtFRA(getFRA(+v('husbandBirth'))) + "</span>)";
+}
+function el(id){ return document.getElementById(id); }
+function v(id){ return document.getElementById(id) ? document.getElementById(id).value : ''; }
+
+/* ---- FRA CALCULATION ---- */
+// Returns Full Retirement Age in years (may be fractional, e.g. 66.5 for 1957)
+// per SSA Pub. 05-10035.
+function getFRA(birthYear){
+  if(birthYear <= 1937) return 65;
+  if(birthYear === 1938) return 65 + 2/12;
+  if(birthYear === 1939) return 65 + 4/12;
+  if(birthYear === 1940) return 65 + 6/12;
+  if(birthYear === 1941) return 65 + 8/12;
+  if(birthYear === 1942) return 65 + 10/12;
+  if(birthYear >= 1943 && birthYear <= 1954) return 66;
+  if(birthYear === 1955) return 66 + 2/12;
+  if(birthYear === 1956) return 66 + 4/12;
+  if(birthYear === 1957) return 66 + 6/12;
+  if(birthYear === 1958) return 66 + 8/12;
+  if(birthYear === 1959) return 66 + 10/12;
+  return 67;
+}
+// Friendly label for fractional FRA (e.g. "66 + 2 mo")
+function fmtFRA(fra){
+  const yrs = Math.floor(fra);
+  const mo = Math.round((fra - yrs) * 12);
+  return mo === 0 ? String(yrs) : yrs + ' + ' + mo + ' mo';
+}
+
+// Family Maximum Benefit (annual). SSA POMS RS 00615.768 — four-bracket formula
+// on monthly PIA, 2024 bend points. Returns annual FMB.
+// Cap applies to auxiliaries (spousal + child), NOT the worker's own benefit.
+function getFMB(annualPIA){
+  const monthlyPIA = annualPIA / 12;
+  // 2024 FMB bend points (SSA — updated annually).
+  const b1 = 1500, b2 = 2166, b3 = 2825;
+  let fmb;
+  if(monthlyPIA <= b1) fmb = 1.50 * monthlyPIA;
+  else if(monthlyPIA <= b2) fmb = 1.50*b1 + 1.272*(monthlyPIA - b1);
+  else if(monthlyPIA <= b3) fmb = 1.50*b1 + 1.272*(b2-b1) + 1.134*(monthlyPIA - b2);
+  else fmb = 1.50*b1 + 1.272*(b2-b1) + 1.134*(b3-b2) + 1.75*(monthlyPIA - b3);
+  return Math.round(fmb * 12);
+}
+
+// Spousal reduction when claimed before claimant's FRA.
+// SSA POMS RS 00615.201: 25/36 of 1% per month for first 36mo, then 5/12 of 1% per month.
+// At FRA: factor = 1.0 (full 50% of PIA).
+function getSpousalFactor(claimAge, claimantFRA){
+  if(claimAge >= claimantFRA) return 1.0;
+  const monthsEarly = (claimantFRA - claimAge) * 12;
+  const first36 = Math.min(monthsEarly, 36);
+  const beyond  = Math.max(monthsEarly - 36, 0);
+  const reduction = (first36 * 25/36/100) + (beyond * 5/12/100);
+  return Math.max(0, 1 - reduction);
+}
+
+function getHusbandBenefit(pia, fileAge, fraAge){
+  fraAge = fraAge || 67;
+  if(fileAge === fraAge) return pia;
+  if(fileAge > fraAge){
+    const monthsLate = (fileAge - fraAge) * 12;
+    return Math.round(pia * (1 + monthsLate * 8/12/100));
+  }
+  // Early filing: SSA formula
+  // First 36 months early: 5/9 of 1% per month
+  // Beyond 36 months early: 5/12 of 1% per month
+  const monthsEarly = (fraAge - fileAge) * 12;
+  const first36 = Math.min(monthsEarly, 36);
+  const beyond  = Math.max(monthsEarly - 36, 0);
+  const reduction = (first36 * 5/9/100) + (beyond * 5/12/100);
+  return Math.round(pia * (1 - reduction));
+  // NOTE: FRA=67, file at 62 = 60 months early
+  // First 36 at 5/9% = 20%, next 24 at 5/12% = 10% => 30% reduction => 70% of PIA
+  // FRA=66, file at 62 = 48 months early
+  // First 36 at 5/9% = 20%, next 12 at 5/12% = 5% => 25% reduction => 75% of PIA
+}
+
+function onFRAChange(){
+  const pia = parseDollar('fraAmt');
+  const fra = getFRA(+v('husbandBirth'));
+  el('lbl-fra-age').textContent = fmtFRA(fra);
+  const ben62 = getHusbandBenefit(pia, 62, fra);
+  const ben65 = getHusbandBenefit(pia, 65, fra);
+  const ben70 = getHusbandBenefit(pia, 70, fra);
+  el('calc62').textContent  = '$' + fmt0(ben62) + ' (' + Math.round(ben62/pia*100) + '%)';
+  el('calc65').textContent  = '$' + fmt0(ben65) + ' (' + Math.round(ben65/pia*100) + '%)';
+  el('calcFRA').textContent  = '$' + fmt0(pia);
+  el('calc70').textContent  = '$' + fmt0(ben70) + ' (' + Math.round(ben70/pia*100) + '%)';
+  el('calcChild').textContent = '$' + fmt0(Math.round(pia * 0.5));
+  el('calcDAC').textContent   = '$' + fmt0(Math.round(pia * 0.75));
+}
+
+/* ---- COMMA FORMATTING ---- */
+function parseDollar(id){
+  const raw = (document.getElementById(id).value||'0').replace(/,/g,'');
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) ? n : 0;
+}
+function formatComma(inp){
+  // Preserve a single leading minus sign so validation can flag negatives
+  // instead of silently flipping the value to positive.
+  const raw = inp.value;
+  const neg = raw.trim().startsWith('-');
+  const digits = raw.replace(/[^0-9]/g,'');
+  if(digits){
+    const n = parseInt(digits, 10) * (neg ? -1 : 1);
+    inp.value = n.toLocaleString();
+  } else {
+    inp.value = neg ? '-' : '';
+  }
+}
+function fmt0(n){ return Math.round(n).toLocaleString(); }
+function fmtV(n){
+  const abs=Math.abs(n), sign=n<0?'-':'';
+  if(abs>=1e6) return sign+'$'+(abs/1e6).toFixed(2)+'M';
+  if(abs>=1000) return sign+'$'+Math.round(abs/1000)+'K';
+  return sign+'$'+Math.round(abs);
+}
+
+/* ---- SLIDERS ---- */
+// Slider helpers — also set aria-valuetext so screen readers read formatted value.
+function _setVT(id, txt){ const e = el(id); if(e) e.setAttribute('aria-valuetext', txt); }
+function sl(id,lbl){ const t = el(id).value; el(lbl).textContent = t; _setVT(id, t); }
+function slK(id,lbl){ const v=+el(id).value; const t='$'+(v>=1000?Math.round(v/1000)+'K':v); el(lbl).textContent=t; _setVT(id, t); }
+function slM(id,lbl){ const t='$'+(+el(id).value/1e6).toFixed(1)+'M'; el(lbl).textContent=t; _setVT(id, t); }
+function slPct(id,lbl){ const t=el(id).value+'%'; el(lbl).textContent=t; _setVT(id, t); }
+function slPct2(id,lbl){ const t=(+el(id).value).toFixed(1)+'%'; el(lbl).textContent=t; _setVT(id, t); }
+
+/* ---- GET PARAMS ---- */
+function getParams(){
+  const husbandBirth = +v('husbandBirth'), wifeBirth = +v('wifeBirth'), childBirth = +v('childBirth');
+  const fraAge = getFRA(husbandBirth);
+  const pia = parseDollar('fraAmt');
+  return {
+    name1:v('name1')||'Husband', name2:v('name2')||'Wife', name3:v('name3')||'Child',
+    husbandBirth, wifeBirth, childBirth, fraAge, pia,
+    husbandDeathAge:+v('husbandDeath'), wifeDeathAge:+v('wifeDeath'), childDeathAge:+v('childDeath'),
+    famSpend:+el('famSpend').value, childSpend:+el('childSpend').value, sntCost:+el('sntCost').value,
+    famTax:+el('famTax').value/100, sntTax:+el('sntTax').value/100,
+    portfolio:+el('port').value, ret:+el('ret').value/100, infl:+el('infl').value/100,
+    wifeOwnSS: parseDollar('wifeOwnSS'),
+    childDACQual: v('childDAC')==='1',
+    childDACAmt: Math.round(pia * 0.75),
+    childBenAmt: Math.round(pia * 0.5),
+    earlyDeathAge: +el('earlyDeath').value,
+  };
+}
+
+/* ---- SURVIVOR BASE ---- */
+function getWifeSurvivorBase(p, fileAge, noFile){
+  // Returns the full survivor base Wife receives at her FRA (age 67) after Husband passes.
+  // Widow's Limit (RIB-LIM): if Husband filed early, survivor = MAX(Husband's reduced benefit, 82.5% PIA)
+  // If Husband filed at/after FRA or passed without filing: no floor needed.
+  const {pia, fraAge, husbandDeathAge, wifeOwnSS} = p;
+  let base;
+  if(noFile){
+    // Husband never filed. Survivor based on what he WOULD have received.
+    if(husbandDeathAge <= fraAge){
+      base = pia; // passed at or before FRA: full PIA
+    } else {
+      // Passed after FRA: delayed credits 2/3% per month, capped at age 70.
+      // Per-month math handles fractional FRA correctly (e.g. FRA=66.5).
+      const creditMonths = Math.min((husbandDeathAge - fraAge) * 12, (70 - fraAge) * 12);
+      base = Math.round(pia * (1 + creditMonths * (2/3) / 100));
+    }
+  } else {
+    const husbandActual = getHusbandBenefit(pia, fileAge, fraAge);
+    if(fileAge < fraAge){
+      // Husband filed early: apply Widow's Limit
+      // Survivor = MAX(what Husband was receiving, 82.5% of PIA)
+      base = Math.max(husbandActual, Math.round(pia * 0.825));
+    } else {
+      // Husband filed at or after FRA: survivor = exact amount Husband was receiving
+      base = husbandActual;
+    }
+  }
+  // Return ONLY the survivor portion at her FRA (pre-reduction).
+  // The caller is responsible for: (a) applying the survivor early-claim factor
+  // to this value, then (b) taking max() with her own benefit. Doing the max()
+  // here would wrongly subject her own benefit to the survivor reduction factor.
+  return base;
+}
+
+/* ---- RUN SCENARIO ---- */
+function runScenario(fileAge, noFile, p){
+  const {husbandBirth,wifeBirth,childBirth,fraAge,
+    husbandDeathAge,wifeDeathAge,childDeathAge,
+    famSpend,childSpend,sntCost,famTax,sntTax,
+    portfolio,ret,infl,wifeOwnSS,childDACQual,childDACAmt,childBenAmt} = p;
+
+  const husbandDeathYear   = husbandBirth + husbandDeathAge;
+  const wifeDeathYear  = wifeBirth + wifeDeathAge;
+  const childDeathYear = childBirth + childDeathAge;
+  const endYear = Math.max(husbandDeathYear, wifeDeathYear, childDeathYear);
+  const husbandFileYear = noFile ? 9999 : husbandBirth + fileAge;
+  // If Husband dies before reaching his chosen file age, he never actually filed.
+  // Survivor base must use the no-file (never-filed) path, not the "filed early" path.
+  const effectivelyNoFile = noFile || husbandDeathAge < fileAge;
+  const wifeSurBaseFull = getWifeSurvivorBase(p, fileAge, effectivelyNoFile);
+  // Survivor claim age: the later of Husband's death year or Wife turning 60
+  const wifeSurClaimAge = Math.max(60, husbandDeathYear - wifeBirth);
+  // Permanent reduction: 71.5% at 60, scaling to 100% at FRA (67)
+  const wifeSurFactor = wifeSurClaimAge >= 67 ? 1.0 : SURVIVOR_REDUCTION_AT_60 + (Math.min(wifeSurClaimAge, 67) - 60) * SURVIVOR_FACTOR_PER_YR;
+  const wifeSurBase = Math.round(wifeSurBaseFull * wifeSurFactor);
+  // Wife's spousal: locked in at her first eligible claim year.
+  // She becomes eligible when Husband has filed AND she is 62+. Spousal reduced
+  // if claim age < her FRA (67 for born >=1960).
+  const wifeFRA = 67;
+  const wifeSpousalFirstClaimYear = noFile ? null : Math.max(husbandFileYear, wifeBirth + 62);
+  const wifeSpousalClaimAge = wifeSpousalFirstClaimYear ? wifeSpousalFirstClaimYear - wifeBirth : 62;
+  const wifeSpousalFactor = getSpousalFactor(wifeSpousalClaimAge, wifeFRA);
+  const spousalMax  = p.pia * 0.5 * wifeSpousalFactor;
+  const child18Year = childBirth + 18;
+
+  // Family Maximum Benefit cap (annual).
+  // Auxiliaries (spousal + minor/DAC child) cannot together exceed FMB - worker's PIA share.
+  const fmbAnnual = getFMB(p.pia);
+  const auxCap = Math.max(0, fmbAnnual - p.pia);
+
+  let port = portfolio;
+  const portNom=[], portReal=[], portYears=[];
+  const yearRows = []; // shared with renderYearByYear to avoid duplication
+  let tHusband=0, tWife=0, tChildChild=0, tChildDAC=0, tTax=0;
+  let tFMBclip = 0;
+  let depletedYear = null;
+
+  for(let yr=CY; yr<=endYear; yr++){
+    const husbandAge   = yr - husbandBirth;
+    const wifeAge  = yr - wifeBirth;
+    const childAge = yr - childBirth;
+    const yrs = yr - CY;
+    const cola = Math.pow(1+infl, yrs);
+    const husbandAlive   = husbandAge   <= husbandDeathAge;
+    const wifeAlive  = wifeAge  <= wifeDeathAge;
+    const childAlive = childAge <= childDeathAge;
+    const anyParent  = husbandAlive || wifeAlive;
+
+    let ssHusband=0;
+    // Auxiliary components (subject to FMB cap when worker is alive & filed):
+    let auxSpousal=0, auxChild=0;
+    // Independent components (NOT subject to FMB — survivor benefits):
+    let indWifeSurvivor=0, indChildDAC=0, indWifeOwn=0;
+
+    // Husband's own SS — only if alive, filed, and past filing year
+    if(husbandAlive && !noFile && yr >= husbandFileYear){
+      ssHusband = getHusbandBenefit(p.pia, fileAge, fraAge) * cola;
+    }
+
+    // Wife's SS — four cases:
+    if(wifeAlive){
+      if(husbandAlive && !noFile && yr >= husbandFileYear && wifeAge >= 62){
+        // Husband alive and filed, Wife 62+: dual-entitlement, paid the higher.
+        // SSA: own from her record (FMB-exempt); excess of spousal over own
+        // is paid from his record and counts toward his FMB cap.
+        if(spousalMax >= wifeOwnSS){
+          indWifeOwn = wifeOwnSS * cola;
+          auxSpousal = (spousalMax - wifeOwnSS) * cola;
+        } else {
+          indWifeOwn = wifeOwnSS * cola;
+        }
+      } else if(husbandAlive && wifeOwnSS > 0 && wifeAge >= 62){
+        // Husband alive but not filed (or noFile): Wife gets own benefit only
+        indWifeOwn = wifeOwnSS * cola;
+      } else if(!husbandAlive && wifeAge >= 60){
+        const ownAvail = wifeAge >= 62 ? wifeOwnSS : 0;
+        // Survivor benefit not subject to FMB of deceased worker's auxiliaries.
+        indWifeSurvivor = Math.max(wifeSurBase, ownAvail) * cola;
+      }
+    }
+
+    // Child child benefit (50% PIA) — while Husband alive AND filed. FMB-capped.
+    // If under 18: standard minor-child benefit.
+    // If 18+ AND DAC-qualified: DAC continues lifetime at 50% while parent alive.
+    if(childAlive && husbandAlive && !noFile && yr >= husbandFileYear && childAge >= 0){
+      if(childAge < 18 || childDACQual){
+        auxChild = childBenAmt * cola;
+      }
+    }
+    // Child DAC survivor (75% PIA) — after Husband passes, DAC qualified.
+    // Under 18 with surviving parent gone uses minor-survivor rules.
+    if(childAlive && !husbandAlive && (childDACQual || childAge < 18)){
+      indChildDAC = childDACAmt * cola;
+    }
+
+    // FMB cap applies to auxiliaries while worker is alive & filed.
+    // auxCap is in today's dollars; inflate to nominal.
+    let ssWife, ssChild;
+    if(husbandAlive && !noFile && yr >= husbandFileYear && (auxSpousal + auxChild) > 0){
+      const auxCapNom = auxCap * cola;
+      const auxTotal = auxSpousal + auxChild;
+      if(auxTotal > auxCapNom){
+        const ratio = auxCapNom / auxTotal;
+        tFMBclip += (auxTotal - auxCapNom);
+        auxSpousal *= ratio;
+        auxChild *= ratio;
+      }
+    }
+    ssWife = auxSpousal + indWifeSurvivor + indWifeOwn;
+    ssChild = auxChild + indChildDAC;
+
+    // Accumulate totals
+    tHusband += ssHusband;
+    tWife += ssWife;
+    tChildChild += auxChild;
+    tChildDAC += indChildDAC;
+
+    const totalSS = ssHusband + ssWife + ssChild;
+    const taxRate  = anyParent ? famTax : sntTax;
+    const spendBase = anyParent ? famSpend : (childAlive ? (childSpend + sntCost) : 0);
+    const spendNeeded = spendBase * cola;
+
+    // Gross up portfolio draw for taxes
+    // Only draw from portfolio if SS does not cover spending
+    const gap = Math.max(0, spendNeeded - totalSS);
+    const grossDraw = (gap > 0 && taxRate < 1) ? gap / (1 - taxRate) : gap;
+    tTax += (grossDraw - gap);
+
+    // Apply to portfolio — clamp at zero, record depletion year
+    if(port > 0){
+      port = port * (1 + ret) - grossDraw;
+      if(port < 0){
+        if(!depletedYear) depletedYear = yr;
+        port = 0;
+      }
+    }
+    // If already depleted, portfolio stays at 0 (no compounding of negative)
+
+    portNom.push(Math.round(port));
+    portReal.push(Math.round(port / cola));
+    portYears.push(yr);
+
+    yearRows.push({
+      yr, husbandAge, wifeAge, childAge,
+      husbandAlive, wifeAlive, childAlive, anyParent,
+      ssHusband, ssWife, ssChild, totalSS,
+      auxSpousal, auxChild, indWifeSurvivor, indWifeOwn, indChildDAC,
+      spendNeeded, gap, grossDraw, taxPaid: grossDraw - gap,
+      portNom: Math.round(port), portReal: Math.round(port / cola),
+      cola,
+    });
+  }
+
+  return {
+    portNom, portReal, portYears,
+    finalNom: portNom[portNom.length-1]||0,
+    finalReal: portReal[portReal.length-1]||0,
+    tHusband, tWife, tChildChild, tChildDAC,
+    tChild: tChildChild + tChildDAC,
+    tTax, tFMBclip, fmbAnnual, auxCap,
+    totalSS: tHusband+tWife+tChildChild+tChildDAC,
+    depletedYear,
+    wifeSurFactor, wifeSurBase, wifeSurBaseFull, wifeSurClaimAge,
+    wifeSpousalFactor, wifeSpousalClaimAge,
+    yearRows
+  };
+}
+
+/* ---- MONTE CARLO ----
+   Box-Muller normal random number, mean 0 stdev 1. */
+function randNormal(){
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random();
+  while(v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+// Lightweight portfolio simulator that takes a per-year return array.
+// Returns {finalReal, depleted}.
+function simulateOnce(fileAge, noFile, p, yearReturns){
+  const {husbandBirth,wifeBirth,childBirth,fraAge,
+    husbandDeathAge,wifeDeathAge,childDeathAge,
+    famSpend,childSpend,sntCost,famTax,sntTax,
+    portfolio,infl,wifeOwnSS,childDACQual,childDACAmt,childBenAmt,pia} = p;
+  const husbandDeathYear = husbandBirth + husbandDeathAge;
+  const endYear = Math.max(husbandDeathYear, wifeBirth+wifeDeathAge, childBirth+childDeathAge);
+  const husbandFileYear = noFile ? 9999 : husbandBirth + fileAge;
+  const effectivelyNoFile = noFile || husbandDeathAge < fileAge;
+  const wifeSurBaseFull = getWifeSurvivorBase(p, fileAge, effectivelyNoFile);
+  const wifeSurClaimAge = Math.max(60, husbandDeathYear - wifeBirth);
+  const wifeSurFactor = wifeSurClaimAge >= 67 ? 1.0 : SURVIVOR_REDUCTION_AT_60 + (Math.min(wifeSurClaimAge,67)-60) * SURVIVOR_FACTOR_PER_YR;
+  const wifeSurBase = Math.round(wifeSurBaseFull * wifeSurFactor);
+  const wifeSpousalFirstClaimYear = noFile ? null : Math.max(husbandFileYear, wifeBirth+62);
+  const wifeSpousalClaimAge = wifeSpousalFirstClaimYear ? wifeSpousalFirstClaimYear - wifeBirth : 62;
+  const wifeSpousalFactor = getSpousalFactor(wifeSpousalClaimAge, 67);
+  const spousalMax = pia * 0.5 * wifeSpousalFactor;
+  const auxCap = Math.max(0, getFMB(pia) - pia);
+
+  let port = portfolio;
+  let depleted = false;
+  let lastReal = 0;
+  let yrIdx = 0;
+  for(let yr=CY; yr<=endYear; yr++, yrIdx++){
+    const husbandAge=yr-husbandBirth, wifeAge=yr-wifeBirth, childAge=yr-childBirth;
+    const cola = Math.pow(1+infl, yr-CY);
+    const husbandAlive=husbandAge<=husbandDeathAge, wifeAlive=wifeAge<=wifeDeathAge, childAlive=childAge<=childDeathAge;
+    const anyParent=husbandAlive||wifeAlive;
+
+    let ssHusband=0, auxSpousal=0, auxChild=0, indWifeSur=0, indWifeOwn=0, indChildDAC=0;
+    if(husbandAlive && !noFile && yr>=husbandFileYear) ssHusband = getHusbandBenefit(pia,fileAge,fraAge)*cola;
+    if(wifeAlive){
+      if(husbandAlive && !noFile && yr>=husbandFileYear && wifeAge>=62){
+        // Dual-entitlement: own paid from her record (FMB-exempt); excess
+        // of spousal over own counts toward his FMB.
+        indWifeOwn = wifeOwnSS*cola;
+        if(spousalMax > wifeOwnSS) auxSpousal = (spousalMax - wifeOwnSS)*cola;
+      } else if(husbandAlive && wifeOwnSS>0 && wifeAge>=62){
+        indWifeOwn = wifeOwnSS*cola;
+      } else if(!husbandAlive && wifeAge>=60){
+        indWifeSur = Math.max(wifeSurBase, wifeAge>=62?wifeOwnSS:0)*cola;
+      }
+    }
+    if(childAlive && husbandAlive && !noFile && yr>=husbandFileYear && childAge>=0 && (childAge<18 || childDACQual)){
+      auxChild = childBenAmt*cola;
+    }
+    if(childAlive && !husbandAlive && (childDACQual || childAge<18)){
+      indChildDAC = childDACAmt*cola;
+    }
+    if(husbandAlive && !noFile && yr>=husbandFileYear && (auxSpousal+auxChild)>0){
+      const capNom = auxCap*cola;
+      const total = auxSpousal+auxChild;
+      if(total>capNom){ const r=capNom/total; auxSpousal*=r; auxChild*=r; }
+    }
+    const totalSS = ssHusband+auxSpousal+auxChild+indWifeSur+indWifeOwn+indChildDAC;
+    const taxRate = anyParent?famTax:sntTax;
+    const spendBase = anyParent?famSpend:(childAlive?(childSpend+sntCost):0);
+    const spendNeeded = spendBase*cola;
+    const gap = Math.max(0, spendNeeded-totalSS);
+    const grossDraw = (gap>0 && taxRate<1) ? gap/(1-taxRate) : gap;
+    const ret = yearReturns[yrIdx] != null ? yearReturns[yrIdx] : 0;
+    if(port>0){
+      port = port*(1+ret) - grossDraw;
+      if(port<0){ depleted = true; port = 0; }
+    }
+    lastReal = port/cola;
+  }
+  return { finalReal: Math.round(lastReal), depleted };
+}
+
+function runMonteCarlo(trials, stdev){
+  const p = lastParams;
+  if(!p.pia) return null;
+  const meanRet = p.ret;
+  const filings = [
+    {id:'c62', label:'File 62', color:'#dc2626', fileAge:62, noFile:false},
+    {id:'c65', label:'File 65', color:'#7c3aed', fileAge:65, noFile:false},
+    {id:'c67', label:'File '+fmtFRA(p.fraAge), color:'#d97706', fileAge:p.fraAge, noFile:false},
+    {id:'c70', label:'File 70', color:'#10b981', fileAge:70, noFile:false},
+  ];
+  // Pre-compute number of years for return-array sizing.
+  const endYear = Math.max(p.husbandBirth+p.husbandDeathAge, p.wifeBirth+p.wifeDeathAge, p.childBirth+p.childDeathAge);
+  const nYears = endYear - CY + 1;
+
+  return filings.map(f => {
+    const finals = [];
+    let depletedCount = 0;
+    for(let t=0; t<trials; t++){
+      const yearReturns = new Array(nYears);
+      for(let i=0; i<nYears; i++){
+        yearReturns[i] = meanRet + stdev * randNormal();
+      }
+      const r = simulateOnce(f.fileAge, f.noFile, p, yearReturns);
+      finals.push(r.finalReal);
+      if(r.depleted) depletedCount++;
+    }
+    finals.sort((a,b)=>a-b);
+    const pct = q => finals[Math.floor(q*finals.length)];
+    return {
+      ...f,
+      successRate: 1 - depletedCount/trials,
+      median: pct(0.5), p10: pct(0.1), p90: pct(0.9),
+      worst: finals[0], best: finals[finals.length-1],
+    };
+  });
+}
+
+function renderMonteCarlo(){
+  const trials = 500, stdev = 0.12;
+  const res = runMonteCarlo(trials, stdev);
+  if(!res){ el('mcPanel').innerHTML=''; return; }
+  const fmtPctMC = v => (v*100).toFixed(1)+'%';
+  const successColor = r => r>=0.9?'var(--green)':r>=0.7?'var(--amber)':'var(--red)';
+  const rows = res.map(r => `
+    <tr>
+      <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color};margin-right:6px;vertical-align:middle"></span><strong>${r.label}</strong></td>
+      <td style="color:${successColor(r.successRate)};font-weight:700">${fmtPctMC(r.successRate)}</td>
+      <td>${fmtV(r.p10)}</td>
+      <td>${fmtV(r.median)}</td>
+      <td>${fmtV(r.p90)}</td>
+    </tr>
+  `).join('');
+  // Identify "robust winner" — highest success rate, break ties by median.
+  const sorted = [...res].sort((a,b) => (b.successRate - a.successRate) || (b.median - a.median));
+  const robust = sorted[0];
+  el('mcPanel').innerHTML = `
+    <div class="sens-card">
+      <h2 class="sens-title">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        Monte Carlo — ${trials} trials, returns ~ N(${(lastParams.ret*100).toFixed(1)}%, σ=${(stdev*100).toFixed(0)}%)
+      </div>
+      <div style="margin-bottom:10px;font-size:12px;color:var(--text2);line-height:1.7">
+        Each filing age is simulated <strong>${trials} times</strong> with random year-by-year returns drawn from a normal distribution around your assumed ${(lastParams.ret*100).toFixed(1)}% return with 12% standard deviation (typical for a balanced portfolio). Shows how often the plan survives and the spread of outcomes — addresses <em>sequence-of-returns risk</em> that the constant-return model misses.
+      </div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:480px">
+        <thead>
+          <tr style="background:var(--bg3)">
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Filing</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Success rate</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">10th pctile</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Median</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">90th pctile</th>
+          </tr>
+        </thead>
+        <tbody style="font-family:'JetBrains Mono',monospace">${rows}</tbody>
+      </table></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text2);background:var(--accent-light);border-left:3px solid var(--accent);padding:9px 12px;border-radius:0 6px 6px 0">
+        <strong>Robust winner: ${robust.label}</strong> — ${fmtPctMC(robust.successRate)} success rate, median final ${fmtV(robust.median)} (today's $). This is the choice most resilient to bad-return luck — different from the constant-return winner above when present.
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5">
+        <strong>Success</strong> = portfolio &gt; $0 at end of plan. <strong>10th/90th percentile</strong> = the worst/best 1-in-10 outcomes. Wide spreads mean your plan is sensitive to return luck.
+      </div>
+    </div>
+  `;
+}
+
+/* ---- SURVIVOR TIMING OPTIMIZATION ----
+   When Husband is gone and Wife has her own SS, SSA allows her to claim
+   one benefit early and switch to the other later. This is independent
+   of Husband's filing age (because survivor is locked at his death). We
+   compute lifetime present-value (today's dollars, COLA-deflated) of
+   each strategy across her remaining years. */
+function survivorStrategyValue(claimSurvivorAge, claimOwnAge, p, husbandDeathYear, survivorBaseFull){
+  const {wifeBirth, wifeDeathAge, wifeOwnSS} = p;
+  const wifeFRA = 67;
+  // Survivor reduction at the chosen claim age
+  const surClaim = Math.max(60, claimSurvivorAge);
+  const surFactor = surClaim >= wifeFRA ? 1.0 : SURVIVOR_REDUCTION_AT_60 + (Math.min(surClaim,wifeFRA)-60) * SURVIVOR_FACTOR_PER_YR;
+  const surAmt = survivorBaseFull * surFactor;
+  // Own benefit reduction/credit. Delayed credits cap at age 70 (no benefit
+  // from filing later than 70).
+  const ownClaim = Math.min(70, claimOwnAge);
+  let ownAmt;
+  if(ownClaim >= wifeFRA){
+    const monthsLate = (ownClaim - wifeFRA) * 12;
+    ownAmt = wifeOwnSS * (1 + monthsLate * 8/12/100);
+  } else {
+    const monthsEarly = (wifeFRA - ownClaim) * 12;
+    const first36 = Math.min(monthsEarly, 36);
+    const beyond  = Math.max(monthsEarly - 36, 0);
+    const red = (first36 * 5/9/100) + (beyond * 5/12/100);
+    ownAmt = wifeOwnSS * (1 - red);
+  }
+  // Sum across years Wife is alive after Husband. Benefits grow with COLA at the
+  // same rate as inflation, so today's-$ PV per year = surAmt or ownAmt
+  // (no discounting needed since the COLA inflation cancels the deflation).
+  let total = 0;
+  const wifeDeathYear = wifeBirth + wifeDeathAge;
+  const startYear = Math.max(husbandDeathYear, wifeBirth + 60);
+  for(let yr = startYear; yr <= wifeDeathYear; yr++){
+    const age = yr - wifeBirth;
+    let amt = 0;
+    if(age >= claimSurvivorAge && age >= claimOwnAge){
+      amt = Math.max(surAmt, ownAmt);
+    } else if(age >= claimSurvivorAge){
+      amt = surAmt;
+    } else if(age >= claimOwnAge){
+      amt = ownAmt;
+    }
+    total += amt;
+  }
+  return Math.round(total);
+}
+
+function renderSurvivorTiming(){
+  const p = lastParams;
+  if(!p.pia){ el('survPanel').innerHTML=''; return; }
+  // Only meaningful when Wife has her own benefit. If wifeOwnSS=0, no strategy choice.
+  if(!p.wifeOwnSS || p.wifeOwnSS <= 0){
+    el('survPanel').innerHTML = `
+      <div class="sens-card">
+        <h2 class="sens-title">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Survivor timing optimization (after ${esc(p.name1)} passes)
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">
+          ${esc(p.name2)} has no own SS benefit on record (set to $0), so survivor-timing optimization does not apply — she claims survivor at the earliest year (later of age 60 or ${esc(p.name1)}'s passing).
+          <br><br>
+          <strong>If ${esc(p.name2)} has any own work history</strong>, enter her FRA benefit in the sidebar to unlock this panel — switching strategies can be worth tens of thousands over a long retirement.
+        </div>
+      </div>
+    `;
+    return;
+  }
+  const name1 = esc(p.name1), name2 = esc(p.name2);
+  // Use the user's husbandDeathAge as the "early death" assumption (so the panel is
+  // meaningful regardless of which filing scenario won). We need the survivor base.
+  const husbandDeathYear = p.husbandBirth + p.husbandDeathAge;
+  const wifeDeathYear = p.wifeBirth + p.wifeDeathAge;
+  // Edge case: husband outlives wife — no survivor benefit ever paid.
+  if(husbandDeathYear > wifeDeathYear){
+    el('survPanel').innerHTML = `
+      <div class="sens-card">
+        <h2 class="sens-title">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Survivor timing optimization (after ${name1} passes)
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">
+          With the current life-expectancy settings, <strong>${name1} (passes ${husbandDeathYear}) outlives ${name2} (passes ${wifeDeathYear})</strong>. ${name2} never becomes a survivor, so survivor-timing optimization does not apply. Adjust life expectancies in the sidebar if you want to explore the survivor scenario.
+        </div>
+      </div>
+    `;
+    return;
+  }
+  // Use no-file survivor base for purity (independent of filing strategy)
+  const surBaseFull = getWifeSurvivorBase(p, p.fraAge, true);
+
+  // Test strategies. Earliest survivor = age 60. Earliest own = 62. Latest own = 70. Latest survivor = FRA (67).
+  const strategies = [
+    {name:'Claim both early (60 surv / 62 own)', surAge:60, ownAge:62},
+    {name:'Survivor at 60, switch to own at 70', surAge:60, ownAge:70},
+    {name:'Own at 62, switch to survivor at FRA (67)', surAge:67, ownAge:62},
+    {name:'Both at FRA (67)', surAge:67, ownAge:67},
+    {name:'Survivor at FRA, own at 70', surAge:67, ownAge:70},
+  ];
+  const results = strategies.map(s => ({
+    ...s,
+    total: survivorStrategyValue(s.surAge, s.ownAge, p, husbandDeathYear, surBaseFull),
+  }));
+  results.sort((a,b)=> b.total - a.total);
+  const best = results[0];
+  const worst = results[results.length-1];
+  const delta = best.total - worst.total;
+
+  const rows = results.map((r,i) => `
+    <tr style="${i===0?'background:var(--green-light)':''}">
+      <td>${i===0?'★ ':''}<strong>${r.name}</strong></td>
+      <td>${r.surAge}</td>
+      <td>${r.ownAge}</td>
+      <td style="${i===0?'color:var(--green);font-weight:700':''}">${fmtV(r.total)}</td>
+    </tr>
+  `).join('');
+
+  el('survPanel').innerHTML = `
+    <div class="sens-card">
+      <h2 class="sens-title">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Survivor timing optimization (after ${name1} passes)
+      </div>
+      <div style="margin-bottom:10px;font-size:12px;color:var(--text2);line-height:1.7">
+        ${name2} can claim her <strong>own SS</strong> and <strong>survivor benefit</strong> at different ages. SSA pays the higher of the two she has claimed in any given year. Assumes ${name1} passes at age ${p.husbandDeathAge} (year ${husbandDeathYear}). Survivor base (full): <strong>${fmtV(surBaseFull)}/yr</strong>. ${name2}'s own SS at FRA: <strong>${fmtV(p.wifeOwnSS)}/yr</strong>. <strong>Totals cover only her post-${name1} years</strong> (any own-SS she collected while ${name1} was alive is identical across strategies, so excluded for clarity). All amounts in today's $.
+      </div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:520px">
+        <thead>
+          <tr style="background:var(--bg3)">
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Strategy</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Survivor age</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Own SS age</th>
+            <th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em">Post-${name1} total (today's $)</th>
+          </tr>
+        </thead>
+        <tbody style="font-family:'JetBrains Mono',monospace">${rows}</tbody>
+      </table></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text2);background:var(--green-light);border-left:3px solid var(--green);padding:9px 12px;border-radius:0 6px 6px 0">
+        <strong>Best strategy: ${best.name}</strong> — ${fmtV(best.total)} post-${name1} total. Worth <strong>${fmtV(delta)}</strong> more than the worst option (${worst.name}).
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5">
+        <strong>Note:</strong> The main model uses MAX(survivor, own) from earliest eligibility, which roughly equals the best strategy when one benefit is much larger. This panel exposes the explicit timing choice. SSA POMS RS 00615.482.
+      </div>
+    </div>
+  `;
+}
+
+/* ---- EXPLANATION PANEL ---- */
+function toggleExp(){
+  const card = el('expCard');
+  card.classList.toggle('exp-closed');
+  const btn = card.querySelector('.exp-hd');
+  if(btn) btn.setAttribute('aria-expanded', String(!card.classList.contains('exp-closed')));
+}
+
+function renderExplanation(){
+  const p = lastParams;
+  const sc = lastResults;
+  if(!sc.length || !p.pia) return;
+  const {husbandBirth,wifeBirth,childBirth,fraAge,pia,
+    husbandDeathAge,wifeDeathAge,childDeathAge,infl,ret,
+    famSpend,childSpend,sntCost,famTax,sntTax,portfolio,wifeOwnSS,childDACQual} = p;
+  // Pre-escape names for safe innerHTML interpolation (XSS guard).
+  const name1 = esc(p.name1), name2 = esc(p.name2), name3 = esc(p.name3);
+  const real = displayMode==='real';
+  const COLORS = {c62:'#dc2626',c65:'#7c3aed',c67:'#d97706',c70:'#10b981',cnof:'#2563eb'};
+  const endYear = Math.max(husbandBirth+husbandDeathAge, wifeBirth+wifeDeathAge, childBirth+childDeathAge);
+  const spousalAmt = Math.max(Math.round(pia*0.5), wifeOwnSS||0);
+  const childAmt = Math.round(pia*0.5);
+  const dacAmt = Math.round(pia*0.75);
+  const widowFloor = Math.round(pia*0.825);
+  const fmt = n => '$'+Math.round(n).toLocaleString();
+  const fmtPct = n => (n*100).toFixed(1)+'%';
+
+  const globalHtml = `<div class="exp-global">
+    <strong>Assumptions &amp; model notes</strong><br>
+    All amounts in ${real?"today's dollars (COLA-deflated)":"nominal (future) dollars"}.
+    Plan runs ${CY}–${endYear} (until last survivor passes).<br>
+    <strong>Tax:</strong> Portfolio draws grossed up — family rate <strong>${Math.round(famTax*100)}%</strong> while ≥1 parent alive;
+    SNT rate <strong>${Math.round(sntTax*100)}%</strong> after both pass. Formula: gap ÷ (1 − tax rate).<br>
+    <strong>Widow's Limit (RIB-LIM):</strong> If ${name1} files early, ${name2}'s survivor = MAX(${name1}'s reduced benefit, 82.5% of PIA).
+    At PIA=$${pia.toLocaleString()}, floor = <strong>${fmt(widowFloor)}</strong>.<br>
+    <strong>Survivor timing:</strong> ${name2} claims survivor at the later of age 60 or ${name1}'s passing.
+    Claiming before FRA (67) permanently reduces survivor benefit — 71.5% at 60, scaling to 100% at 67. This reduction is applied in the model.<br>
+    <strong>Family Maximum Benefit (FMB):</strong> v10 applies the SSA four-bracket FMB formula (POMS RS 00615.768).
+    Auxiliaries (spousal + child + DAC while parent alive) are prorated if their sum exceeds FMB − worker's PIA.
+    Survivor benefits paid after the worker passes are NOT subject to FMB. Verify with SSA for exact amounts.<br>
+    <strong>COLA:</strong> All benefits grow ${fmtPct(infl)} annually per year from payment start.<br>
+    <strong>${name3} — Child benefit (50% PIA):</strong> <strong>${fmt(childAmt)}/yr</strong> while ${name1} is alive AND has filed.
+    ${childDACQual
+      ? `DAC-qualified: continues for life (no age-18 cutoff) while parent is alive and filed.`
+      : `Non-DAC: ends when ${name3} turns 18 in ${childBirth+18}.`}<br>
+    <strong>${name3} — Survivor (75% PIA after ${name1} passes):</strong> <strong>${fmt(dacAmt)}/yr</strong>.
+    ${childDACQual
+      ? `DAC-qualified: paid for ${name3}'s entire lifetime. Always based on PIA regardless of ${name1}'s filing age. Requires disability onset before age 22.`
+      : `Non-DAC minor: paid until age 18 only.`}<br>
+    <strong>Representative Payee:</strong> SSA requires a rep payee for beneficiaries who cannot manage their own funds.
+    The payee files annual SSA-6230 accounting. After both parents pass, the SNT trustee typically serves as rep payee.
+  </div>`;
+
+  const scenarioHtml = sc.map(s => {
+    const d = s.data;
+    const isNoFile = s.noFile;
+    const fileAge = s.fileAge;
+    const husbandBen = fileAge ? getHusbandBenefit(pia, fileAge, fraAge) : 0;
+    const husbandFileYear = fileAge ? husbandBirth+fileAge : null;
+    const actualHusbandDeathAge = isNoFile ? (p.earlyDeathAge || husbandDeathAge) : husbandDeathAge;
+    const husbandDeathYear = husbandBirth + actualHusbandDeathAge;
+    // Survivor / Widow's Limit only applies if Husband actually filed before dying.
+    // Same logic as runScenario's effectivelyNoFile.
+    const effectivelyNoFile = isNoFile || (fileAge && actualHusbandDeathAge < fileAge);
+    const husbandFiledBeforeDeath = !isNoFile && fileAge && actualHusbandDeathAge >= fileAge;
+    const wifeDeathYear = wifeBirth+wifeDeathAge;
+    const childDeathYear = childBirth+childDeathAge;
+
+    // Husband collection years
+    const husbandCollectStart = husbandFileYear ? Math.max(husbandFileYear, CY) : null;
+    const husbandCollectEnd = husbandDeathYear;
+    const husbandYears = husbandCollectStart ? Math.max(0, husbandCollectEnd - husbandCollectStart) : 0;
+
+    // Wife spousal years (while Husband alive)
+    const wifeSpousStart = fileAge ? Math.max(husbandFileYear, wifeBirth+62) : null;
+    const wifeSpousEnd = husbandDeathYear;
+    const wifeSpousYears = (wifeSpousStart && wifeSpousStart < wifeSpousEnd) ? Math.max(0, wifeSpousEnd - wifeSpousStart) : 0;
+
+    // Wife survivor years (after Husband passes)
+    const wifeSurBase = d.wifeSurBase;
+    const wifeSurBaseFull = d.wifeSurBaseFull;
+    const wifeSurFactor = d.wifeSurFactor;
+    const wifeSurClaimAge = d.wifeSurClaimAge;
+    const wifeSurStart = Math.max(husbandDeathYear, wifeBirth+60);
+    const wifeSurEnd = wifeDeathYear;
+    const wifeSurYears = Math.max(0, wifeSurEnd - wifeSurStart);
+
+    // Widow's limit note — only applies if Husband actually filed early AND died after filing.
+    const widowsLimitApplies = husbandFiledBeforeDeath && fileAge < fraAge;
+    const husbandActual = fileAge ? getHusbandBenefit(pia,fileAge,fraAge) : 0;
+    const surReductionNote = wifeSurFactor < 1
+      ? ` <em>(Early survivor claim at age ${wifeSurClaimAge}: ${Math.round(wifeSurFactor*100)}% of ${fmt(wifeSurBaseFull)} = ${fmt(wifeSurBase)})</em>`
+      : '';
+    const widowNote = widowsLimitApplies
+      ? ` <em>(Widow's Limit: MAX(${fmt(husbandActual)}, ${fmt(widowFloor)}) = ${fmt(wifeSurBaseFull)})</em>`
+      : '';
+
+    // Child child-benefit years (50% PIA while parent alive AND filed).
+    // For DAC-qualified child, child benefit continues for life (no age-18 cutoff).
+    const childStart = husbandFileYear ? Math.max(husbandFileYear, CY) : null;
+    const minorCutoff = childBirth+18;
+    const childEndForRow = childDACQual ? husbandDeathYear : Math.min(minorCutoff, husbandDeathYear);
+    const childYears = (childStart && !effectivelyNoFile) ? Math.max(0, childEndForRow - childStart) : 0;
+    const childRowEnd = childEndForRow; // display end year
+
+    // Child DAC survivor years (75% PIA after parent passes).
+    // DAC: continues for life. Non-DAC under-18: 75% PIA minor-survivor until 18.
+    const dacStart = husbandDeathYear;
+    const dacEnd = childDACQual ? childDeathYear : Math.min(minorCutoff, childDeathYear);
+    const dacYears = (childDACQual || husbandDeathYear < minorCutoff)
+      ? Math.max(0, dacEnd - dacStart) : 0;
+    const dacKind = childDACQual ? 'DAC survivor' : (husbandDeathYear < minorCutoff ? 'minor survivor' : 'none');
+
+    // Filing pct
+    const filePct = fileAge ? fmtPct(husbandBen/pia) : 'n/a';
+
+    return `<div class="exp-sc">
+      <div class="exp-sc-title">
+        <div class="exp-sc-dot" style="background:${COLORS[s.id]||'#888'}"></div>
+        ${s.label}${d.depletedYear?` — <span style="color:var(--red)">Portfolio depletes ${d.depletedYear} (${name3} age ${d.depletedYear - childBirth})</span>`:''}
+      </div>
+      <div class="exp-rows">
+
+        <div class="exp-row">
+          <div class="exp-row-label">${name1}'s benefit / yr</div>
+          <div class="exp-row-val">${isNoFile
+            ? '<strong>$0</strong> — never filed, no SS income while alive'
+            : (effectivelyNoFile
+                ? `<strong>$0</strong> — ${name1} passed at age ${actualHusbandDeathAge}, before reaching filing age ${fileAge}. No SS income collected.`
+                : `<strong>${fmt(husbandBen)}/yr</strong> starting ${husbandFileYear} (${name1} age ${fileAge})
+                   <span class="formula">PIA ${fmt(pia)} × ${filePct} = ${fmt(husbandBen)} &nbsp;|&nbsp;
+                   FRA=${fraAge}, ${fileAge<fraAge?`${(fraAge-fileAge)*12} months early: ${Math.round((1-husbandBen/pia)*100)}% total reduction`:'delayed credits: +'+(fileAge-fraAge)*8+'%'}</span>`)
+          }</div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">${name1}'s SS total</div>
+          <div class="exp-row-val">${isNoFile || effectivelyNoFile
+            ? '<strong>$0</strong>' + (effectivelyNoFile && !isNoFile ? ' — died before filing' : '')
+            : `${fmt(husbandBen)}/yr × COLA × <strong>${husbandYears} yrs</strong> (${husbandCollectStart}–${husbandDeathYear})
+               <span class="formula">Nominal sum shown in table. Grows ${fmtPct(infl)} COLA each year.</span>`
+          }</div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">${name2} spousal (${name1} alive)</div>
+          <div class="exp-row-val">${effectivelyNoFile
+            ? `<strong>$0</strong> — ${isNoFile ? name1+' never filed' : name1+' died before filing'}; spousal requires ${name1} to file first.
+               ${name2} gets own SS ${wifeOwnSS>0?fmt(wifeOwnSS)+'/yr if she is 62+':'only if she has own credits.'}`
+            : (wifeSpousYears > 0
+                ? (() => {
+                    const sf = d.wifeSpousalFactor != null ? d.wifeSpousalFactor : 1.0;
+                    const claimAge = d.wifeSpousalClaimAge != null ? d.wifeSpousalClaimAge : 62;
+                    const reducedSpousal = pia * 0.5 * sf;
+                    const winsOwn = reducedSpousal >= wifeOwnSS;
+                    const paid = winsOwn ? reducedSpousal : wifeOwnSS;
+                    const reductionNote = sf < 1
+                      ? ` Early claim at age ${claimAge}: ${(sf*100).toFixed(1)}% × 50% PIA = <strong>${(sf*50).toFixed(1)}% of PIA</strong> = ${fmt(reducedSpousal)}.`
+                      : ' Claimed at FRA — no reduction (50% of PIA).';
+                    const ownNote = wifeOwnSS > 0
+                      ? (winsOwn
+                          ? ` Own SS (${fmt(wifeOwnSS)}) is lower — she collects spousal.`
+                          : ` Own SS (${fmt(wifeOwnSS)}) is higher — she collects own benefit instead.`)
+                      : '';
+                    return `<strong>${fmt(paid)}/yr</strong> from ${wifeSpousStart} (${name2} age ${wifeSpousStart-wifeBirth}), for ${wifeSpousYears} yrs
+                       <span class="formula">${reductionNote}${ownNote}</span>`;
+                  })()
+                : `<strong>$0</strong> — ${name2} turns 62 in ${wifeBirth+62}, after ${name1} passes in ${husbandDeathYear}`)
+          }</div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">${name2} survivor (${name1} gone)</div>
+          <div class="exp-row-val">
+            <strong>${fmt(wifeSurBase)}/yr</strong> from ${wifeSurStart} (${name2} age ${wifeSurStart-wifeBirth}), for ${wifeSurYears} yrs${widowNote}${surReductionNote}
+            <span class="formula">${effectivelyNoFile
+              ? (actualHusbandDeathAge<=fraAge
+                  ? `${name1} ${isNoFile?'never filed and passed':'passed before filing at age '+fileAge} (age ${actualHusbandDeathAge}, before FRA) — ${name2} gets full PIA = ${fmt(pia)}`
+                  : `${name1} ${isNoFile?'never filed and passed':'passed before filing at age '+fileAge} at age ${actualHusbandDeathAge}, ${Math.min(actualHusbandDeathAge-fraAge,70-fraAge)} delayed credit years → ${fmt(wifeSurBaseFull)}`)
+              : (fileAge>=fraAge
+                  ? `${name1} filed at/after FRA — ${name2} gets 100% of what ${name1} was collecting = ${fmt(husbandBen)}`
+                  : `${name1} filed early (${fileAge}) → Widow's Limit: MAX(${fmt(husbandActual)}, 82.5%×PIA=${fmt(widowFloor)}) = ${fmt(wifeSurBaseFull)}`)
+            }</span>
+          </div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">${name3} child benefit</div>
+          <div class="exp-row-val">${childYears > 0
+            ? `<strong>${fmt(childAmt)}/yr</strong> × ${childYears} yrs (${childStart}–${childRowEnd})
+               <span class="formula">50% of PIA = ${fmt(childAmt)}/yr, while ${name1} alive &amp; filed${childDACQual?' (DAC: continues for life, no age-18 cutoff)':', '+name3+' under 18'}</span>`
+            : `<strong>$0</strong> — ${isNoFile ? name1+' never filed' : (childDACQual ? name1+' passes in '+husbandDeathYear+' before filing window opens' : name3+' turns 18 in '+minorCutoff+', '+name1+' files '+husbandFileYear)}`
+          }</div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">${name3} ${dacKind==='minor survivor'?'minor survivor':'DAC survivor'}</div>
+          <div class="exp-row-val">${dacKind === 'DAC survivor'
+            ? (dacYears > 0
+                ? `<strong>${fmt(dacAmt)}/yr</strong> from ${dacStart} (${name3} age ${dacStart-childBirth}), for ${dacYears} yrs
+                   <span class="formula">75% of PIA = ${fmt(dacAmt)}/yr — same regardless of ${name1}'s filing age. Grows with COLA. Lifetime DAC benefit.</span>`
+                : `<strong>$0</strong> — ${name3} passes (${childDeathYear}) before ${name1} (${husbandDeathYear}) in this scenario`)
+            : (dacKind === 'minor survivor'
+                ? `<strong>${fmt(dacAmt)}/yr</strong> from ${dacStart} (${name3} age ${dacStart-childBirth}), for ${dacYears} yrs (until ${minorCutoff} when ${name3} turns 18)
+                   <span class="formula">75% of PIA = ${fmt(dacAmt)}/yr — minor child of deceased worker. Ends at age 18 (no DAC qualification).</span>`
+                : `<strong>$0</strong> — DAC not qualified and ${name3} is 18+ when ${name1} passes`)
+          }</div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">FMB cap</div>
+          <div class="exp-row-val">${d.fmbAnnual
+            ? `Annual FMB = <strong>${fmt(d.fmbAnnual)}</strong> (SSA 4-bracket formula on monthly PIA). Auxiliary cap = FMB − PIA = <strong>${fmt(d.auxCap)}/yr</strong>.${
+                d.tFMBclip > 0
+                  ? ` Total clipped from auxiliaries over the plan: <strong style="color:var(--amber)">${fmt(d.tFMBclip)}</strong> (nominal).`
+                  : ` No clip in this scenario (auxiliaries stayed under the cap).`
+              }<span class="formula">Worker's PIA is reserved; auxiliaries (spousal + child + DAC while alive) prorated when sum exceeds cap. Survivor benefits after worker passes are exempt.</span>`
+            : 'PIA = 0, no FMB calculation.'
+          }</div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">Tax drag</div>
+          <div class="exp-row-val">
+            When SS &lt; spending, portfolio draw = gap ÷ (1−tax).
+            <strong>${Math.round(famTax*100)}%</strong> family rate while parents alive;
+            <strong>${Math.round(sntTax*100)}%</strong> SNT rate after both pass.
+            <span class="formula">Example: $120K gap at ${Math.round(famTax*100)}% → ${fmt(120000/(1-famTax))} gross draw, ${fmt(120000/(1-famTax)-120000)} tax drag</span>
+            ${d.depletedYear?`<strong style="color:var(--red)">Portfolio depletes ${d.depletedYear} (${name3} age ${d.depletedYear - childBirth}) — draws stop.</strong>`:''}
+          </div>
+        </div>
+
+        <div class="exp-row">
+          <div class="exp-row-label">Final portfolio</div>
+          <div class="exp-row-val">${d.depletedYear
+            ? `<strong style="color:var(--red)">Depleted in ${d.depletedYear} (${name3} age ${d.depletedYear - childBirth})</strong>. Increase savings, reduce spending, or extend working years.`
+            : `<strong>${fmtV(real?d.finalReal:d.finalNom)}</strong> at end of plan (${endYear}).
+               <span class="formula">Each year: balance×${(1+ret).toFixed(2)} − gross portfolio draw. ${real?"Deflated to today's purchasing power.":"Nominal dollars."}</span>`
+          }</div>
+        </div>
+
+      </div>
+    </div>`;
+  }).join('');
+
+  el('expBody').innerHTML = globalHtml + scenarioHtml;
+}
+
+/* ---- COMPUTE ---- */
+// Validate parameters; return array of human-readable warnings (empty = OK).
+function validateParams(p){
+  const errs = [];
+  const yr = CY;
+  const husbandOk = Number.isFinite(p.husbandBirth) && p.husbandBirth >= 1900 && p.husbandBirth <= yr;
+  const wifeOk = Number.isFinite(p.wifeBirth) && p.wifeBirth >= 1900 && p.wifeBirth <= yr;
+  const childOk = Number.isFinite(p.childBirth) && p.childBirth >= 1900 && p.childBirth <= yr;
+  if(!husbandOk) errs.push("Husband's birth year is missing or out of range (1900–"+yr+").");
+  if(!wifeOk) errs.push("Wife's birth year is missing or out of range.");
+  if(!childOk) errs.push("Child's birth year is missing or out of range.");
+  if(!Number.isFinite(p.pia) || p.pia <= 0) errs.push("PIA must be a positive number (enter without letters, e.g. 49,848).");
+  // Only check death-age vs current-age when birth year is valid.
+  if(husbandOk && p.husbandDeathAge < (yr - p.husbandBirth)) errs.push("Husband's death age ("+p.husbandDeathAge+") is before his current age ("+(yr-p.husbandBirth)+"). Use a future death age.");
+  if(wifeOk && p.wifeDeathAge < (yr - p.wifeBirth)) errs.push("Wife's death age is before her current age.");
+  if(childOk && p.childDeathAge < (yr - p.childBirth)) errs.push("Child's death age is before her current age.");
+  if(husbandOk && p.earlyDeathAge < (yr - p.husbandBirth)) errs.push("Husband's 'no-filing' early death age is before his current age.");
+  if(p.wifeOwnSS < 0) errs.push("Wife's own SS must be ≥ 0 (negative not allowed).");
+  if(!Number.isFinite(p.ret) || p.ret < 0) errs.push("Return rate is invalid.");
+  return errs;
+}
+
+function compute(){
+  const p = getParams();
+  lastParams = p;
+  const errors = validateParams(p);
+  const banner = el('inputBanner');
+  if(errors.length){
+    banner.style.display = 'block';
+    banner.innerHTML = '<strong>Check your inputs:</strong><br>' +
+      errors.map(e => '• ' + esc(e)).join('<br>');
+    // Clear stale results so user can't act on numbers that don't reflect inputs.
+    lastResults = [];
+    ['milestones','metrics','legend','winnerCard','expBody','ybyBody',
+     'sensitivityPanel','mcPanel','survPanel'].forEach(id => {
+      const e = el(id); if(e) e.innerHTML = '';
+    });
+    const tbl = el('resultTable'); if(tbl) tbl.innerHTML = '';
+    const cmp = el('compareCard'); if(cmp) cmp.style.display = 'none';
+    if(chartInst){ try { chartInst.destroy(); } catch(e){} chartInst = null; }
+    return;
+  } else {
+    banner.style.display = 'none';
+  }
+  onFRAChange();
+  updateLabels();
+
+  const {husbandBirth,wifeBirth,childBirth,fraAge,husbandDeathAge,wifeDeathAge} = p;
+  const name1 = esc(p.name1), name2 = esc(p.name2), name3 = esc(p.name3);
+
+  // Milestones
+  el('milestones').innerHTML = [
+    [name1+' today', (CY-husbandBirth)+' yrs old'],
+    [name2+' today', (CY-wifeBirth)+' yrs old'],
+    [name3+' today', (CY-childBirth)+' yrs old'],
+    [name3+' turns 18', 'year '+(childBirth+18)],
+    [name2+' earliest survivor', 'age 60 ('+(wifeBirth+60)+')'],
+    [name2+' earliest spousal', 'age 62 ('+(wifeBirth+62)+')'],
+    [name1+' FRA', 'age '+fmtFRA(fraAge)+' (~'+(husbandBirth+Math.round(fraAge))+')'],
+    [name2+' FRA', 'age 67 ('+(wifeBirth+67)+')'],
+  ].map(([lbl,val])=>`<div class="ms-card"><div class="ms-val">${val}</div><div class="ms-lbl">${lbl}</div></div>`).join('');
+
+  const s62  = runScenario(62,    false, p);
+  const s65  = runScenario(65,    false, p);
+  const sFRA = runScenario(fraAge,false, p);
+  const s70  = runScenario(70,    false, p);
+  const earlyP = {...p, husbandDeathAge: p.earlyDeathAge};
+  const sNof = runScenario(fraAge, true, earlyP);
+
+  // Labels are HTML-escaped at construction so they are safe to interpolate
+  // into innerHTML downstream.
+  lastResults = [
+    // `label` is HTML-escaped (safe for innerHTML). `labelRaw` is unescaped
+    // and used by Chart.js since canvas fillText renders HTML entities literally.
+    {id:'c62', label:'File at 62',           labelRaw:'File at 62', data:s62,  color:'#dc2626', dash:[],    fileAge:62, noFile:false},
+    {id:'c65', label:'File at 65',           labelRaw:'File at 65', data:s65,  color:'#7c3aed', dash:[6,3], fileAge:65, noFile:false},
+    {id:'c67', label:'File at '+fmtFRA(fraAge)+' (FRA)', labelRaw:'File at '+fmtFRA(fraAge)+' (FRA)', data:sFRA, color:'#d97706', dash:[8,4], fileAge:fraAge, noFile:false},
+    {id:'c70', label:'File at 70',           labelRaw:'File at 70', data:s70,  color:'#10b981', dash:[],    fileAge:70, noFile:false},
+    {id:'cnof',label:esc(p.name1)+' passes age '+p.earlyDeathAge+' (no filing)', labelRaw:(p.name1||'Husband')+' passes age '+p.earlyDeathAge+' (no filing)', data:sNof, color:'#2563eb', dash:[4,4], fileAge:null, noFile:true},
+  ];
+
+  renderResults();
+  renderCompare();
+  saveToLocalStorage();
+}
+
+/* ---- RENDER RESULTS ---- */
+function renderResults(){
+  const p = lastParams;
+  const sc = lastResults;
+  if(!sc.length) return;
+  const real = displayMode==='real';
+  const best = sc.reduce((a,b)=>(real?a.data.finalReal:a.data.finalNom)>(real?b.data.finalReal:b.data.finalNom)?a:b);
+  const {fraAge,pia,infl} = p;
+  const name1 = esc(p.name1), name2 = esc(p.name2), name3 = esc(p.name3);
+
+  // Metrics — with runner-up badge and tooltip
+  const sorted0 = [...sc].sort((a,b)=>(real?b.data.finalReal:b.data.finalNom)-(real?a.data.finalReal:a.data.finalNom));
+  const runnerUpId = sorted0[1] ? sorted0[1].id : null;
+  const runnerUp2Id = sorted0[2] ? sorted0[2].id : null;
+  const totalYrs0 = sc[0].data.portYears.length;
+  const midDefl0 = real ? 1/Math.pow(1+p.infl, totalYrs0/2) : 1;
+  el('metrics').innerHTML = sc.map(s=>{
+    const val = real ? s.data.finalReal : s.data.finalNom;
+    const isB = s.id===best.id;
+    const isRU = s.id===runnerUpId;
+    const isRU2 = s.id===runnerUp2Id;
+    const depleted = s.data.depletedYear;
+    const tipD = v => fmtV(Math.round(v * midDefl0));
+    return `<div class="met ${s.id}${isB?' winner':''}${isRU&&!depleted?' runner-up':''}${isRU2&&!depleted?' runner-up-2':''}${depleted?' depleted':''}">
+      <div class="met-lbl">${s.label}</div>
+      <div class="met-val" style="${depleted?'color:var(--red);font-size:14px':''}">${depleted?'Depleted '+depleted:fmtV(val)}</div>
+      <div class="met-sub">${depleted?name3+' age '+(depleted - p.childBirth)+' ('+depleted+')':''}${!depleted?(real?"Today's $":"Nominal")+' · end of plan':''}</div>
+      ${isB && !depleted?'<div class="met-badge">★ Best outcome</div>':''}
+      ${isRU && !depleted?'<div class="met-badge-ru">▲ Runner-up</div>':''}
+      ${isRU2 && !depleted?'<div class="met-badge-ru2">▲ 2nd runner-up</div>':''}
+      <div class="met-tip">
+        <div class="met-tip-row"><span class="met-tip-lbl">${name1} SS</span><span class="met-tip-val">${tipD(s.data.tHusband)}</span></div>
+        <div class="met-tip-row"><span class="met-tip-lbl">${name2} SS</span><span class="met-tip-val">${tipD(s.data.tWife)}</span></div>
+        <div class="met-tip-row"><span class="met-tip-lbl">${name3} child</span><span class="met-tip-val">${tipD(s.data.tChildChild)}</span></div>
+        <div class="met-tip-row"><span class="met-tip-lbl">${name3} DAC</span><span class="met-tip-val">${tipD(s.data.tChildDAC)}</span></div>
+        <div class="met-tip-row"><span class="met-tip-lbl">Tax drag</span><span class="met-tip-val">${fmtV(Math.round(s.data.tTax * midDefl0))}</span></div>
+        <div class="met-tip-row"><span class="met-tip-lbl">Total SS</span><span class="met-tip-val">${tipD(s.data.totalSS)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Legend
+  el('legend').innerHTML = sc.map(s=>`<div class="leg"><div class="leg-line" style="background:${s.color}"></div>${s.label}</div>`).join('');
+
+  // Chart
+  const isDark = document.body.classList.contains('dark');
+  const gc = isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)';
+  const tc = isDark?'#50597a':'#909bb8';
+  const datasets = sc.map(s=>({
+    label: s.labelRaw || s.label, data:real?s.data.portReal:s.data.portNom,
+    borderColor:s.color, borderWidth:2, borderDash:s.dash,
+    pointRadius:0, tension:0.3, fill:false
+  }));
+
+  const {husbandBirth:bb,wifeBirth:db,childBirth:ab,husbandDeathAge:bda,wifeDeathAge:dda,fraAge:fra2} = p;
+  const bestFileAge = best.fileAge;
+  const chartMilestones = {};
+  // Canvas fillText renders entities literally; use raw (unescaped) names here.
+  const rName1 = p.name1||'Husband', rName2 = p.name2||'Wife', rName3 = p.name3||'Child';
+  if(bestFileAge && !best.noFile) chartMilestones[bb+bestFileAge] = rName1+' files SS';
+  chartMilestones[ab+18] = rName3+' turns 18';
+  chartMilestones[bb+(best.noFile?(p.earlyDeathAge||bda):bda)] = rName1+' passes';
+  chartMilestones[db+dda] = rName2+' passes';
+
+  const milestonePlugin = {
+    id:'milestoneLines',
+    afterDraw(chart){
+      const {ctx, chartArea:{top,bottom}, scales:{x}} = chart;
+      const years = chart.data.labels;
+      Object.entries(chartMilestones).forEach(([yr,lbl])=>{
+        const idx = years.indexOf(+yr);
+        if(idx < 0) return;
+        const xPos = x.getPixelForValue(idx);
+        ctx.save();
+        ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.18)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4,3]);
+        ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = isDark ? '#8891b0' : '#4a5068';
+        ctx.font = '9px Manrope, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, xPos, top - 4);
+        ctx.restore();
+      });
+    }
+  };
+
+  if(chartInst){ try { chartInst.destroy(); } catch(e){ /* mid-tooltip teardown can throw — safe to ignore */ } }
+  chartInst = new Chart(el('mainChart'),{
+    type:'line',
+    data:{labels:sc[0].data.portYears, datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:18}},
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          mode:'index', intersect:false,
+          callbacks:{
+            title: items => 'Year ' + items[0].label,
+            label: item => item.dataset.label + ': ' + fmtV(item.raw)
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:gc},ticks:{color:tc,font:{size:9,family:'JetBrains Mono'},maxTicksLimit:14}},
+        y:{grid:{color:gc},ticks:{color:tc,font:{size:9,family:'JetBrains Mono'},callback:v=>fmtV(v)}}
+      }
+    },
+    plugins:[milestonePlugin]
+  });
+
+  // Table with split Child columns and depletion display
+  const totalYrs = sc[0].data.portYears.length;
+  el('resultTable').innerHTML = `<thead><tr>
+    <th>Scenario</th>
+    <th>${name1}'s SS total</th>
+    <th>${name2}'s SS total</th>
+    <th>${name3} child benefit<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(while alive, under 18)</span></th>
+    <th>${name3} DAC survivor<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(after ${name1} passes)</span></th>
+    <th>Total SS</th>
+    <th>Tax drag est.</th>
+    <th>${name1}'s benefit/yr<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(today's $, at filing)</span></th>
+    <th>Final portfolio</th>
+  </tr></thead><tbody>${sc.map(s=>{
+    const isB = s.id===best.id;
+    const fp = real ? s.data.finalReal : s.data.finalNom;
+    const midDefl = real ? 1/Math.pow(1+p.infl, totalYrs/2) : 1;
+    const d = v => fmtV(Math.round(v * midDefl));
+    const ben = s.noFile ? 'n/a' : fmtV(getHusbandBenefit(pia, s.fileAge, fraAge))+'/yr';
+    const portDisplay = s.data.depletedYear
+      ? '<span style="color:var(--red);font-weight:700">Depleted '+s.data.depletedYear+' ('+name3+' age '+(s.data.depletedYear - p.childBirth)+')</span>'
+      : fmtV(fp);
+    return `<tr class="${isB?'best-row':''}" style="${s.data.depletedYear?'opacity:0.75':''}">
+      <td>${isB?'★ ':''}${s.label}</td>
+      <td>${d(s.data.tHusband)}</td>
+      <td>${d(s.data.tWife)}</td>
+      <td>${d(s.data.tChildChild)}</td>
+      <td>${d(s.data.tChildDAC)}</td>
+      <td>${d(s.data.totalSS)}</td>
+      <td>${fmtV(Math.round(s.data.tTax * midDefl))}</td>
+      <td>${ben}</td>
+      <td>${portDisplay}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+  // Winner
+  const bv = real ? best.data.finalReal : best.data.finalNom;
+  const sorted = [...sc].sort((a,b)=>(real?b.data.finalReal:b.data.finalNom)-(real?a.data.finalReal:a.data.finalNom));
+  const runnerUp = sorted[1];
+  const rv = real ? runnerUp.data.finalReal : runnerUp.data.finalNom;
+  const bestRunnerDelta = bv - rv;
+  const deltaPct = bv > 0 ? (bestRunnerDelta / bv) * 100 : 0;
+  const runnerUp2 = sorted[2];
+  const rv2 = runnerUp2 ? (real ? runnerUp2.data.finalReal : runnerUp2.data.finalNom) : null;
+  const ru2Delta = rv2 !== null ? bv - rv2 : 0;
+  const ru2Pct = bv > 0 && rv2 !== null ? (ru2Delta / bv) * 100 : 0;
+  const endYr = sc[0].data.portYears[sc[0].data.portYears.length-1];
+  const anyDepleted = sc.filter(s=>s.data.depletedYear);
+  const wMidDefl = real ? 1/Math.pow(1+p.infl, totalYrs/2) : 1;
+
+  const allScDepleted = sc.every(s=>s.data.depletedYear);
+  const isNegligible = !allScDepleted && deltaPct < 2;
+  const isSmall = !allScDepleted && deltaPct >= 2 && deltaPct < 5;
+
+  let winnerTitle, winnerBody, ruNote, statsHtml;
+
+  if(allScDepleted){
+    const deplSorted = [...sc].filter(s=>s.data.depletedYear).sort((a,b)=>b.data.depletedYear - a.data.depletedYear);
+    const lastsLongest = deplSorted[0];
+    const deplSoonest = deplSorted[deplSorted.length-1];
+    const llAge = lastsLongest.data.depletedYear - p.childBirth;
+    const dsAge = deplSoonest.data.depletedYear - p.childBirth;
+
+    winnerTitle = `⚠ All scenarios deplete the portfolio`;
+    winnerBody = `<div class="w-body" style="color:var(--red)"><strong>${lastsLongest.label}</strong> lasts longest — portfolio depletes in <strong>${lastsLongest.data.depletedYear}</strong> (${name3} age ${llAge}). The earliest depletion is <strong>${deplSoonest.label}</strong> in ${deplSoonest.data.depletedYear} (${name3} age ${dsAge}). That is a <strong>${lastsLongest.data.depletedYear - deplSoonest.data.depletedYear}-year</strong> difference. Consider reducing spending, increasing savings, or adjusting return assumptions.</div>`;
+    ruNote = `<div style="background:var(--red-light);border:1px solid var(--red);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--red)">
+      <strong>Depletion by filing age:</strong> ${deplSorted.map(s=>s.label+' → '+s.data.depletedYear+' ('+name3+' age '+(s.data.depletedYear - p.childBirth)+')').join(' · ')}
+    </div>`;
+    statsHtml = `
+      <div class="ws"><div class="ws-l">Lasts longest</div><div class="ws-v" style="color:var(--red)">${lastsLongest.label} → ${lastsLongest.data.depletedYear}</div></div>
+      <div class="ws"><div class="ws-l">Depletes first</div><div class="ws-v" style="color:var(--red)">${deplSoonest.label} → ${deplSoonest.data.depletedYear}</div></div>
+      <div class="ws"><div class="ws-l">Difference</div><div class="ws-v" style="color:var(--red)">${lastsLongest.data.depletedYear - deplSoonest.data.depletedYear} years</div></div>
+      <div class="ws"><div class="ws-l">Total SS collected</div><div class="ws-v">${fmtV(Math.round(best.data.totalSS*wMidDefl))}</div></div>
+      <div class="ws"><div class="ws-l">Est. tax drag</div><div class="ws-v">${fmtV(Math.round(best.data.tTax*wMidDefl))}</div></div>
+    `;
+  } else {
+    if(isNegligible){
+      ruNote = `<div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--text2)">
+        <strong style="color:var(--text)">Virtually tied with ${runnerUp.label}</strong> — only ${fmtV(Math.abs(bestRunnerDelta))} apart (${deltaPct.toFixed(1)}% of portfolio). Either filing age is a fine choice; other factors like cash-flow timing or personal preference should guide the decision.
+      </div>`;
+    } else if(isSmall){
+      ruNote = `<div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--text2)">
+        <strong style="color:var(--text)">Runner-up: ${runnerUp.label}</strong> (${fmtV(rv)}) — <strong style="color:var(--accent)">${fmtV(Math.abs(bestRunnerDelta))}</strong> less (${deltaPct.toFixed(1)}%). A modest advantage; consider other factors too.
+      </div>`;
+    } else {
+      ruNote = `<div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--text2)">
+        <strong style="color:var(--text)">Runner-up: ${runnerUp.label}</strong> (${fmtV(rv)}) — <strong style="color:var(--accent)">${fmtV(Math.abs(bestRunnerDelta))}</strong> less (${deltaPct.toFixed(1)}%). A clear advantage for ${best.label}.
+      </div>`;
+    }
+    winnerTitle = `${best.label} ${isNegligible ? 'edges out marginally — essentially a toss-up' : 'produces the best long-term outcome'}`;
+    winnerBody = `<div class="w-body">Leaves <strong>${fmtV(bv)}</strong> in the portfolio at end of plan (${endYr}).</div>`;
+    const ru2Display = runnerUp2 ? (runnerUp2.data.depletedYear
+      ? `${fmtV(rv2)} — depletes ${runnerUp2.data.depletedYear} (${name3} age ${runnerUp2.data.depletedYear - p.childBirth})`
+      : `${fmtV(rv2)} (${ru2Pct.toFixed(1)}% gap)`) : '';
+    statsHtml = `
+      <div class="ws"><div class="ws-l">Final portfolio</div><div class="ws-v">${fmtV(bv)}</div></div>
+      <div class="ws"><div class="ws-l">Runner-up</div><div class="ws-v">${fmtV(rv)} (${deltaPct.toFixed(1)}% gap)</div></div>
+      ${runnerUp2?`<div class="ws"><div class="ws-l">2nd runner-up</div><div class="ws-v">${ru2Display}</div></div>`:''}
+      <div class="ws"><div class="ws-l">Total SS collected</div><div class="ws-v">${fmtV(Math.round(best.data.totalSS*wMidDefl))}</div></div>
+      <div class="ws"><div class="ws-l">Est. tax drag</div><div class="ws-v">${fmtV(Math.round(best.data.tTax*wMidDefl))}</div></div>
+    `;
+  }
+
+  el('winnerCard').innerHTML=`
+    <div class="w-eye">${allScDepleted?'⚠ All scenarios deplete':'★ Overall winner'} — ${real?"today's dollars":"nominal"}</div>
+    <h2 class="w-title">${winnerTitle}</h2>
+    ${winnerBody}
+    ${ruNote}
+    ${!allScDepleted && anyDepleted.length?`<div style="background:var(--red-light);border:1px solid var(--red);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--red)"><strong>⚠ Portfolio depletion:</strong> ${anyDepleted.map(s=>s.label+' depletes in '+s.data.depletedYear+' ('+name3+' age '+(s.data.depletedYear - p.childBirth)+')').join(', ')}. Consider reducing spending or adjusting assumptions.</div>`:''}
+    <div class="w-stats">${statsHtml}</div>
+    <div class="w-disc">Planning model only — constant returns assumed, no sequence-of-returns risk. Verify SS at ssa.gov. Not financial advice.</div>
+  `;
+  renderExplanation();
+  renderSurvivorTiming();
+  renderYearByYear();
+  // Heavy panels (sensitivity sweeps ~70 sims, Monte Carlo 500*4=2000 sims) are
+  // debounced via rAF + 120ms idle window so slider drags stay responsive.
+  scheduleHeavyRender();
+}
+let _heavyTimer = null;
+const _raf = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : (fn => setTimeout(fn, 16));
+function scheduleHeavyRender(){
+  if(_heavyTimer) clearTimeout(_heavyTimer);
+  _heavyTimer = setTimeout(() => {
+    _raf(() => {
+      renderSensitivity();
+      renderMonteCarlo();
+    });
+  }, 120);
+}
+
+/* ---- SCENARIOS ---- */
+const SLOT_VERSION = 'v10';
+// Build a slim, JSON-safe summary of each scenario — strips heavy per-year arrays
+// so localStorage payload stays under ~10 KB per slot (vs. ~200 KB if we kept yearRows).
+function slimResults(results){
+  return results.map(r => ({
+    id: r.id, label: r.label, color: r.color,
+    fileAge: r.fileAge, noFile: r.noFile,
+    data: {
+      finalReal: r.data.finalReal, finalNom: r.data.finalNom,
+      depletedYear: r.data.depletedYear,
+      tHusband: r.data.tHusband, tWife: r.data.tWife,
+      tChildChild: r.data.tChildChild, tChildDAC: r.data.tChildDAC,
+      totalSS: r.data.totalSS, tTax: r.data.tTax,
+      tFMBclip: r.data.tFMBclip,
+    },
+  }));
+}
+function saveToSlot(i){
+  const p = getParams();
+  const defaultName = (p.name1||'Husband')+' '+((p.ret*100).toFixed(1))+'% ret, age '+p.husbandDeathAge+'/'+p.wifeDeathAge;
+  pendingSave = {
+    slot: i,
+    data: {
+      version: SLOT_VERSION,
+      name: defaultName,
+      params: JSON.parse(JSON.stringify(p)),
+      results: slimResults(lastResults),
+    },
+  };
+  openRename(i);
+}
+
+function refreshSlotUI(i){
+  const sc = slots[i];
+  if(!sc){
+    el('slot'+i).classList.remove('filled');
+    el('sn'+i).textContent='Empty';
+    el('ss'+i).textContent='Click Save to store current';
+    el('slot'+i).querySelector('.sc-slot-actions').innerHTML=`<button class="sc-mini-btn primary" onclick="saveToSlot(${i})">Save</button>`;
+    return;
+  }
+  el('slot'+i).classList.add('filled');
+  el('sn'+i).textContent = sc.name;
+  el('ss'+i).textContent = 'Saved · '+new Date().toLocaleDateString();
+  el('slot'+i).querySelector('.sc-slot-actions').innerHTML=`
+    <button class="sc-mini-btn primary" onclick="loadSlot(${i})">Load</button>
+    <button class="sc-mini-btn" onclick="openRename(${i})">Rename</button>
+    <button class="sc-mini-btn danger" onclick="deleteSlot(${i})">Delete</button>`;
+}
+
+function loadSlot(i){
+  if(!slots[i]) return;
+  pendingSave = null; // clear any in-flight save
+  const p = slots[i].params;
+  el('name1').value=p.name1; el('name2').value=p.name2; el('name3').value=p.name3;
+  el('husbandBirth').value=p.husbandBirth; el('wifeBirth').value=p.wifeBirth; el('childBirth').value=p.childBirth;
+  el('husbandDeath').value=p.husbandDeathAge; el('wifeDeath').value=p.wifeDeathAge; el('childDeath').value=p.childDeathAge;
+  el('famSpend').value=p.famSpend; el('childSpend').value=p.childSpend; el('sntCost').value=p.sntCost;
+  el('famTax').value=Math.round(p.famTax*100); el('sntTax').value=Math.round(p.sntTax*100);
+  el('port').value=p.portfolio; el('ret').value=p.ret*100; el('infl').value=p.infl*100;
+  el('fraAmt').value=p.pia.toLocaleString();
+  el('wifeOwnSS').value=p.wifeOwnSS.toLocaleString();
+  el('childDAC').value=p.childDACQual?'1':'0';
+  if(p.earlyDeathAge) el('earlyDeath').value=p.earlyDeathAge;
+  slK('famSpend','famSpendLbl'); slK('childSpend','childSpendLbl'); slK('sntCost','sntCostLbl');
+  slPct('famTax','famTaxLbl'); slPct('sntTax','sntTaxLbl');
+  slM('port','portLbl'); slPct2('ret','retLbl'); slPct2('infl','inflLbl');
+  sl('husbandDeath','husbandDeathLbl'); sl('wifeDeath','wifeDeathLbl'); sl('childDeath','childDeathLbl'); sl('earlyDeath','earlyDeathLbl');
+  updateLabels(); compute();
+}
+
+function deleteSlot(i){
+  slots[i]=null;
+  refreshSlotUI(i);
+  renderCompare();
+  saveToLocalStorage();
+}
+
+function openRename(i){
+  renameSlot=i;
+  const cur = document.activeElement;
+  lastFocusedRename = (cur && cur !== document.body) ? cur : null;
+  const defaultName = pendingSave && pendingSave.slot===i
+    ? pendingSave.data.name
+    : (slots[i] ? slots[i].name : '');
+  el('renameInput').value = defaultName;
+  const m = el('renameModal');
+  m.classList.add('open');
+  m.setAttribute('aria-hidden','false');
+  el('renameInput').focus();
+  el('renameInput').select();
+}
+function closeRename(){
+  const m = el('renameModal');
+  if(m.contains(document.activeElement)) document.activeElement.blur();
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden','true');
+  renameSlot=-1;
+  pendingSave=null;
+  if(lastFocusedRename && typeof lastFocusedRename.focus === 'function'){
+    lastFocusedRename.focus();
+    lastFocusedRename = null;
+  }
+}
+function confirmRename(){
+  if(renameSlot < 0){ closeRename(); return; }
+  const slotIdx = renameSlot; // save before closeRename resets it
+  const nm = el('renameInput').value.trim();
+  if(pendingSave && pendingSave.slot === renameSlot){
+    pendingSave.data.name = nm || pendingSave.data.name;
+    slots[renameSlot] = pendingSave.data;
+    pendingSave = null;
+    refreshSlotUI(renameSlot);
+    renderCompare();
+    saveToLocalStorage();
+  } else if(slots[renameSlot]){
+    slots[renameSlot].name = nm || slots[renameSlot].name;
+    refreshSlotUI(renameSlot);
+    renderCompare();
+    saveToLocalStorage();
+  }
+  // refreshSlotUI replaced the trigger button — point lastFocusedRename at
+  // the new primary action button on the same slot so focus restore works.
+  const slotEl = document.getElementById('slot'+slotIdx);
+  const newBtn = slotEl ? slotEl.querySelector('.sc-mini-btn') : null;
+  if(newBtn) lastFocusedRename = newBtn;
+  closeRename();
+}
+el('renameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') confirmRename(); if(e.key==='Escape') closeRename(); });
+
+/* ---- COMPARE ---- */
+function renderCompare(){
+  const filled = slots.filter(Boolean);
+  if(filled.length < 2){ el('compareCard').style.display='none'; return; }
+  el('compareCard').style.display='block';
+  const real = displayMode==='real';
+  const cp = lastParams;
+  const cpName3 = esc(cp.name3);
+  const filingLabels = lastResults.length ? lastResults.map(r=>r.label) : ['File 62','File 65','File FRA','File 70','No filing'];
+  let html=`<thead><tr><th>Saved scenario</th>${filingLabels.map(l=>'<th>'+l+'</th>').join('')}</tr></thead><tbody>`;
+  slots.forEach((sc,i)=>{
+    if(!sc) return;
+    html+=`<tr><td><strong>${esc(sc.name)}</strong></td>`;
+    sc.results.forEach(r=>{
+      const v2 = real ? r.data.finalReal : r.data.finalNom;
+      const dep = r.data.depletedYear;
+      html+=`<td style="${dep?'color:var(--red)':''}">
+        ${dep ? 'Depleted '+dep+' ('+cpName3+' age '+(dep - cp.childBirth)+')' : fmtV(v2)}
+      </td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  el('compareTable').innerHTML=html;
+}
+
+/* ---- PRINT ---- */
+function printPDF(){
+  if(chartInst){
+    const img = chartInst.toBase64Image('image/png', 1.0);
+    const pi = el('printChart');
+    pi.src = img;
+    pi.style.display = 'block';
+  }
+  // Hide the placeholder after the print dialog closes (onafterprint avoids
+  // the previous 500ms race where the dialog could outlast the timer).
+  const cleanup = () => {
+    el('printChart').style.display = 'none';
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  // Fallback in case afterprint isn't fired (rare): clean up after 5s.
+  setTimeout(cleanup, 5000);
+  window.print();
+}
+
+/* ---- LOCAL STORAGE ---- */
+function saveToLocalStorage(){
+  try{
+    const state = {
+      inputs: {
+        name1:v('name1'),name2:v('name2'),name3:v('name3'),
+        husbandBirth:v('husbandBirth'),wifeBirth:v('wifeBirth'),childBirth:v('childBirth'),
+        husbandDeath:v('husbandDeath'),wifeDeath:v('wifeDeath'),childDeath:v('childDeath'),
+        famSpend:el('famSpend').value,childSpend:el('childSpend').value,sntCost:el('sntCost').value,
+        famTax:el('famTax').value,sntTax:el('sntTax').value,
+        port:el('port').value,ret:el('ret').value,infl:el('infl').value,
+        fraAmt:v('fraAmt'),wifeOwnSS:v('wifeOwnSS'),childDAC:v('childDAC'),earlyDeath:v('earlyDeath'),
+      },
+      slots, displayMode
+    };
+    localStorage.setItem('ssp_state_v10', JSON.stringify(state));
+  }catch(e){
+    // Quota exceeded or storage disabled — surface in console for diagnosis.
+    console.warn('saveToLocalStorage failed:', e && e.name, e && e.message);
+  }
+}
+
+function loadFromLocalStorage(){
+  try{
+    const raw = localStorage.getItem('ssp_state_v10');
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    const inp = s.inputs;
+    if(inp){
+      Object.entries(inp).forEach(([k,val])=>{ const e=el(k); if(e) e.value=val; });
+    }
+    if(s.slots){
+      // Drop any slot whose engine version doesn't match — calculations may diverge.
+      slots = s.slots.map(sl => sl && sl.version === SLOT_VERSION ? sl : null);
+    }
+    if(s.displayMode) displayMode = s.displayMode;
+    // restore slider labels
+    slK('famSpend','famSpendLbl'); slK('childSpend','childSpendLbl'); slK('sntCost','sntCostLbl');
+    slPct('famTax','famTaxLbl'); slPct('sntTax','sntTaxLbl');
+    slM('port','portLbl'); slPct2('ret','retLbl'); slPct2('infl','inflLbl');
+    sl('husbandDeath','husbandDeathLbl'); sl('wifeDeath','wifeDeathLbl'); sl('childDeath','childDeathLbl'); sl('earlyDeath','earlyDeathLbl');
+    el('vt-real').classList.toggle('on',displayMode==='real');
+    el('vt-nom').classList.toggle('on',displayMode==='nominal');
+    slots.forEach((_,i)=>refreshSlotUI(i));
+  }catch(e){
+    console.warn('ssp_state_v10 corrupt or unreadable — clearing.', e);
+    try{ localStorage.removeItem('ssp_state_v10'); }catch(e2){}
+  }
+}
+
+/* ---- SIDEBAR RESIZE ---- */
+(function(){
+  const handle = el('resizeHandle');
+  const layout = document.querySelector('.layout');
+  let dragging = false;
+  function start(){
+    dragging = true;
+    handle.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }
+  function move(x){
+    if(!dragging) return;
+    const w = Math.min(500, Math.max(240, x));
+    layout.style.gridTemplateColumns = w + 'px 1fr';
+    handle.setAttribute('aria-valuenow', String(w));
+  }
+  function end(){
+    if(!dragging) return;
+    dragging = false;
+    handle.classList.remove('active');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
+  // Mouse
+  handle.addEventListener('mousedown', e => { e.preventDefault(); start(); });
+  document.addEventListener('mousemove', e => move(e.clientX));
+  document.addEventListener('mouseup', end);
+  // Keyboard: arrow keys to resize, Home/End to clamp.
+  let currentWidth = 300;
+  handle.addEventListener('keydown', e => {
+    let delta = 0;
+    if(e.key === 'ArrowLeft') delta = -20;
+    else if(e.key === 'ArrowRight') delta = 20;
+    else if(e.key === 'Home'){ currentWidth = 240; }
+    else if(e.key === 'End'){ currentWidth = 500; }
+    else return;
+    e.preventDefault();
+    currentWidth = Math.min(500, Math.max(240, currentWidth + delta));
+    layout.style.gridTemplateColumns = currentWidth + 'px 1fr';
+    handle.setAttribute('aria-valuenow', String(currentWidth));
+  });
+  // Touch
+  handle.addEventListener('touchstart', e => { e.preventDefault(); start(); }, {passive:false});
+  document.addEventListener('touchmove', e => {
+    if(!dragging || !e.touches[0]) return;
+    move(e.touches[0].clientX);
+  }, {passive:true});
+  document.addEventListener('touchend', end);
+  document.addEventListener('touchcancel', end);
+})();
+
+/* ---- RESET ---- */
+function resetDefaults(){
+  localStorage.removeItem('ssp_state_v10');
+  location.reload();
+}
+
+/* ---- EXPORT CSV ---- */
+// Escape a value for a CSV cell:
+//   - coerce to string
+//   - neutralize CSV-injection chars (= + - @ \t \r) by prefixing single quote
+//   - double-up any embedded double quotes
+//   - wrap in double quotes
+function csvCell(val){
+  let s = (val == null) ? '' : String(val);
+  if(/^[=+\-@\t\r]/.test(s)) s = "'" + s; // CSV injection guard
+  return '"' + s.replace(/"/g,'""') + '"';
+}
+function exportCSV(){
+  const sc = lastResults;
+  const p = lastParams;
+  if(!sc.length) return;
+  const real = displayMode==='real';
+  const {name1,name2,name3,fraAge,pia} = p;
+  const totalYrs = sc[0].data.portYears.length;
+  const midDefl = real ? 1/Math.pow(1+p.infl, totalYrs/2) : 1;
+  const d = v => Math.round(v * midDefl);
+  const rows = [
+    [
+      'Scenario', name1+' SS', name2+' SS', name3+' Child', name3+' DAC',
+      'Total SS', 'Tax Drag', name1+' Benefit/yr', 'Final Portfolio'
+    ].map(csvCell).join(',')
+  ];
+  sc.forEach(s=>{
+    const ben = s.noFile ? 'n/a' : Math.round(getHusbandBenefit(pia,s.fileAge,fraAge));
+    const fp = real ? s.data.finalReal : s.data.finalNom;
+    const finalCell = s.data.depletedYear
+      ? 'Depleted '+s.data.depletedYear
+      : Math.round(fp);
+    rows.push([
+      s.label, d(s.data.tHusband), d(s.data.tWife), d(s.data.tChildChild), d(s.data.tChildDAC),
+      d(s.data.totalSS), Math.round(s.data.tTax*midDefl), ben, finalCell
+    ].map(csvCell).join(','));
+  });
+  // UTF-8 BOM + CRLF line terminators for Excel compatibility.
+  const csv = '﻿' + rows.join('\r\n') + '\r\n';
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ss_planner_results.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---- SENSITIVITY ANALYSIS ---- */
+function renderSensitivity(){
+  const p = lastParams;
+  const sc = lastResults;
+  if(!sc.length) return;
+  const real = displayMode==='real';
+  const name1 = esc(p.name1), name2 = esc(p.name2), name3 = esc(p.name3);
+
+  const COLORS = {c62:'#dc2626',c65:'#7c3aed',c67:'#d97706',c70:'#10b981',cnof:'#2563eb'};
+  const scenarioLabels = {c62:'File 62',c65:'File 65',c67:'File FRA',c70:'File 70',cnof:'No file'};
+
+  function findWinner(overrides){
+    const tp = {...p, ...overrides};
+    tp.childDACAmt = Math.round(tp.pia * 0.75);
+    tp.childBenAmt = Math.round(tp.pia * 0.5);
+    const results = [
+      {id:'c62', r:runScenario(62,false,tp)},
+      {id:'c65', r:runScenario(65,false,tp)},
+      {id:'c67', r:runScenario(tp.fraAge,false,tp)},
+      {id:'c70', r:runScenario(70,false,tp)},
+    ];
+    const vals = results.map(x=>({id:x.id, v:real?x.r.finalReal:x.r.finalNom, dy:x.r.depletedYear}));
+    const best = vals.reduce((a,b)=> b.v >= a.v ? b : a);
+    const ruArr = vals.filter(x=>x.id!==best.id);
+    const ru = ruArr.reduce((a,b)=> b.v >= a.v ? b : a);
+    const delta = best.v - ru.v;
+    const pct = best.v > 0 ? delta / best.v : 0;
+    const allDepleted = vals.every(x => x.v <= 0);
+    const latestDepl = vals.reduce((a,b)=> (a.dy||9999) > (b.dy||9999) ? a : b);
+    const earliestDepl = vals.reduce((a,b)=> (a.dy||9999) < (b.dy||9999) ? a : b);
+    return {id:best.id, ruId:ru.id, delta, pct, bestV:best.v, allDepleted,
+            latestDepl:latestDepl.dy, latestDeplId:latestDepl.id,
+            earliestDepl:earliestDepl.dy, earliestDeplId:earliestDepl.id, vals};
+  }
+
+  // Heatmap: rows = wife death age, cols = return rate
+  const wifeAges = [80, 85, 90, 95, 100];
+  const retRates = [0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10];
+  let heatHtml = `<div style="overflow-x:auto"><div class="sens-grid" style="grid-template-columns:120px repeat(${retRates.length},1fr);min-width:560px">`;
+  heatHtml += `<div class="sens-cell hdr-cell corner" style="text-align:left;padding:8px 10px;line-height:1.3"><span style="display:block;font-size:11px;font-weight:700">${name2} lives to ↓</span><span style="font-size:9px;opacity:.7">Return rate →</span></div>`;
+  retRates.forEach(r => { heatHtml += `<div class="sens-cell hdr-cell" style="font-size:11px;padding:8px 4px">${Math.round(r*100)}% return</div>`; });
+  let deplAges = [];
+  wifeAges.forEach(wa => {
+    heatHtml += `<div class="sens-cell hdr-cell" style="text-align:left;font-size:12px;font-weight:700;padding:8px 10px">Age ${wa}</div>`;
+    retRates.forEach(r => {
+      const w = findWinner({wifeDeathAge:wa, ret:r});
+      if(w.allDepleted){
+        const latest = w.vals.filter(x=>x.dy).sort((a,b)=>b.dy-a.dy)[0];
+        const earliest = w.vals.filter(x=>x.dy).sort((a,b)=>a.dy-b.dy)[0];
+        let deplDetail = 'All deplete';
+        if(latest && earliest && latest.id !== earliest.id){
+          const lAge = latest.dy - p.childBirth;
+          const eAge = earliest.dy - p.childBirth;
+          deplDetail = `All deplete<br><span style="font-weight:400;font-size:8px;opacity:.9">${scenarioLabels[latest.id]} lasts longest<br>${name3} age ${lAge} vs ${eAge}</span>`;
+          deplAges.push(lAge);
+        } else if(latest){
+          const lAge = latest.dy - p.childBirth;
+          deplDetail = `All deplete<br><span style="font-weight:400;font-size:8px;opacity:.9">${name3} age ${lAge}</span>`;
+          deplAges.push(lAge);
+        }
+        heatHtml += `<div class="sens-cell" style="background:#6b7280;color:#fff;font-weight:700;font-size:11px;line-height:1.4;padding:6px 5px">
+          ${deplDetail}</div>`;
+      } else {
+        const deltaLbl = w.pct < 0.01 ? '≈ toss-up' : '+'+fmtV(Math.round(w.delta));
+        heatHtml += `<div class="sens-cell" style="background:${COLORS[w.id]};color:#fff;font-weight:700;font-size:11px;line-height:1.5;padding:6px 5px">
+          ${scenarioLabels[w.id]}<br><span style="font-weight:400;font-size:9px;opacity:.9">${deltaLbl}</span>
+        </div>`;
+      }
+    });
+  });
+  heatHtml += '</div></div>';
+
+  // SECOND HEATMAP: rows = Husband death age, cols = Wife death age.
+  // This is the single most important pairing — file-at-70 wins when Husband lives long;
+  // file-at-62 wins when he dies early.
+  const husbandAges = [73, 78, 83, 88, 93];
+  const wifeAges2 = [80, 85, 90, 95, 100];
+  let heat2Html = `<div style="overflow-x:auto;margin-top:14px"><div class="sens-grid" style="grid-template-columns:120px repeat(${wifeAges2.length},1fr);min-width:540px">`;
+  heat2Html += `<div class="sens-cell hdr-cell corner" style="text-align:left;padding:8px 10px;line-height:1.3"><span style="display:block;font-size:11px;font-weight:700">${name1} lives to ↓</span><span style="font-size:9px;opacity:.7">${name2} lives to →</span></div>`;
+  wifeAges2.forEach(da => { heat2Html += `<div class="sens-cell hdr-cell" style="font-size:11px;padding:8px 4px">Age ${da}</div>`; });
+  husbandAges.forEach(ba => {
+    heat2Html += `<div class="sens-cell hdr-cell" style="text-align:left;font-size:12px;font-weight:700;padding:8px 10px">Age ${ba}</div>`;
+    wifeAges2.forEach(da => {
+      const w = findWinner({husbandDeathAge:ba, wifeDeathAge:da});
+      if(w.allDepleted){
+        heat2Html += `<div class="sens-cell" style="background:#6b7280;color:#fff;font-weight:700;font-size:11px;padding:6px 5px">All deplete</div>`;
+      } else {
+        const deltaLbl = w.pct < 0.01 ? '≈ toss-up' : '+'+fmtV(Math.round(w.delta));
+        heat2Html += `<div class="sens-cell" style="background:${COLORS[w.id]};color:#fff;font-weight:700;font-size:11px;line-height:1.5;padding:6px 5px">
+          ${scenarioLabels[w.id]}<br><span style="font-weight:400;font-size:9px;opacity:.9">${deltaLbl}</span>
+        </div>`;
+      }
+    });
+  });
+  heat2Html += '</div></div>';
+
+  let deplNote = '';
+  if(deplAges.length){
+    const minA = Math.min(...deplAges), maxA = Math.max(...deplAges);
+    const minYr = p.childBirth + minA, maxYr = p.childBirth + maxA;
+    deplNote = minA === maxA
+      ? `<strong>Gray cells:</strong> Portfolio runs out regardless of filing age — ${name3} would be age ${minA} (year ${minYr}) when funds are exhausted.`
+      : `<strong>Gray cells:</strong> Portfolio runs out regardless of filing age — ${name3} would be between age ${minA} (year ${minYr}) and age ${maxA} (year ${maxYr}) when funds are exhausted.`;
+  }
+
+  // Crossover: find the year winner overtakes runner-up
+  const sorted2 = [...sc].sort((a,b)=>(real?b.data.finalReal:b.data.finalNom)-(real?a.data.finalReal:a.data.finalNom));
+  const best2 = sorted2[0], ru2 = sorted2[1];
+  let crossoverNote = '';
+  if(best2 && ru2){
+    const bData = real ? best2.data.portReal : best2.data.portNom;
+    const rData = real ? ru2.data.portReal : ru2.data.portNom;
+    const ruEverAhead = bData.some((v,i) => rData[i] > v);
+    if(ruEverAhead){
+      let crossYear = null;
+      for(let i=1;i<bData.length;i++){
+        if(bData[i] > rData[i] && bData[i-1] <= rData[i-1]){
+          crossYear = best2.data.portYears[i]; break;
+        }
+      }
+      if(crossYear){
+        crossoverNote = `<strong>Crossover:</strong> ${best2.label} overtakes ${ru2.label} in <strong>${crossYear}</strong> (${name1} age ${crossYear - p.husbandBirth}, ${name2} age ${crossYear - p.wifeBirth}).`;
+      }
+    }
+  }
+
+  // Spending sensitivity
+  const spendNote = (function(){
+    const testSpends = [100000,150000,200000,250000,300000];
+    const winners = testSpends.map(s => ({s, w:findWinner({famSpend:s}).id}));
+    const flips = [];
+    for(let i=1;i<winners.length;i++){
+      if(winners[i].w !== winners[i-1].w){
+        flips.push(`At $${winners[i].s/1000}K/yr spending, best filing age shifts from <strong>${scenarioLabels[winners[i-1].w]}</strong> to <strong>${scenarioLabels[winners[i].w]}</strong>.`);
+      }
+    }
+    return flips.length ? flips.join(' ') : 'Same winner at every spending level tested ($100K–$300K/yr) — filing age choice is not sensitive to spending.';
+  })();
+
+  // Inflation sensitivity
+  const inflNote = (function(){
+    const inflRates = [0.02, 0.03, 0.04, 0.05];
+    const winners = inflRates.map(i => ({i, w:findWinner({infl:i}).id}));
+    const unique = [...new Set(winners.map(w=>w.w))];
+    if(unique.length === 1) return `<strong>${scenarioLabels[unique[0]]}</strong> wins at every inflation rate tested (2%–5%).`;
+    return inflRates.map(i => {
+      const w = winners.find(x=>x.i===i);
+      return `${Math.round(i*100)}% inflation → <strong>${scenarioLabels[w.w]}</strong>`;
+    }).join(' · ');
+  })();
+
+  el('sensitivityPanel').innerHTML = `
+    <div class="sens-card">
+      <h2 class="sens-title">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Sensitivity analysis — what changes the winner?
+      </div>
+      <div style="margin-bottom:10px;font-size:12px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--text)">How to read:</strong> Each colored cell shows the <strong>best filing age</strong> and how much more it leaves vs. the runner-up.
+        <strong>"≈ toss-up"</strong> = difference is negligible. <strong>Gray</strong> = money runs out no matter when you file.
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Grid A · Longevity vs return rate</div>
+      ${heatHtml}
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em">Grid B · ${name1}'s lifespan vs ${name2}'s lifespan</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.6">
+        The single most decision-critical pairing. File-at-70 wins when ${name1} lives long; file-at-62 wins when he dies early.
+      </div>
+      ${heat2Html}
+      <div style="margin-top:8px;font-size:10px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:6px 0">
+        ${Object.entries(scenarioLabels).filter(([k])=>k!=='cnof').map(([k,v])=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:${COLORS[k]};flex-shrink:0"></span><strong>${v}</strong></span>`).join('')}
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#6b7280;flex-shrink:0"></span><strong>All deplete</strong></span>
+      </div>
+      <div class="sens-bullets" style="margin-top:6px">
+        ${deplNote ? deplNote + '<br>' : ''}
+        ${crossoverNote ? crossoverNote + '<br>' : ''}
+        <strong>Spending:</strong> ${spendNote}<br>
+        <strong>Inflation:</strong> ${inflNote}
+      </div>
+    </div>
+  `;
+}
+
+/* ---- YEAR-BY-YEAR ---- */
+function toggleYby(){
+  const card = el('ybyCard');
+  card.classList.toggle('yby-open');
+  el('ybyArr').style.transform = card.classList.contains('yby-open') ? '' : 'rotate(-90deg)';
+  const btn = card.querySelector('.yby-hd');
+  if(btn) btn.setAttribute('aria-expanded', String(card.classList.contains('yby-open')));
+}
+// Persisted across renders so user-expanded decades stay open when a slider triggers compute().
+const _openDecades = new Set();
+function toggleDecade(idx){
+  const card = document.getElementById('dec-'+idx);
+  card.classList.toggle('yby-dec-open');
+  const isOpen = card.classList.contains('yby-dec-open');
+  const dec = card.getAttribute('data-decade');
+  if(dec){
+    if(isOpen) _openDecades.add(dec); else _openDecades.delete(dec);
+  }
+  const btn = card.querySelector('.yby-dec-hd');
+  if(btn) btn.setAttribute('aria-expanded', String(isOpen));
+}
+
+function renderYearByYear(){
+  const sc = lastResults;
+  const p = lastParams;
+  if(!sc.length) return;
+  const real = displayMode==='real';
+  const sorted2 = [...sc].sort((a,b)=>(real?b.data.finalReal:b.data.finalNom)-(real?a.data.finalReal:a.data.finalNom));
+  const best = sorted2[0];
+  if(!best || !best.data.yearRows) return;
+
+  const {husbandBirth,wifeBirth,childBirth,fraAge,husbandDeathAge,wifeDeathAge,childDeathAge} = p;
+  const name1 = esc(p.name1), name2 = esc(p.name2), name3 = esc(p.name3);
+  const fileAge = best.fileAge;
+  const noFile = best.noFile;
+  const actualHusbandDeathAge = noFile ? (p.earlyDeathAge||husbandDeathAge) : husbandDeathAge;
+  const husbandDeathYear = husbandBirth + actualHusbandDeathAge;
+  const wifeDeathYear = wifeBirth + wifeDeathAge;
+  const childDeathYear = childBirth + childDeathAge;
+  const husbandFileYear = noFile ? null : husbandBirth + fileAge;
+
+  const milestones = {};
+  milestones[husbandBirth+62] = name1+' turns 62';
+  milestones[husbandBirth+Math.round(fraAge)] = name1+' FRA ('+fmtFRA(fraAge)+')';
+  milestones[husbandBirth+70] = name1+' turns 70';
+  milestones[husbandDeathYear] = name1+' passes';
+  milestones[wifeBirth+60] = name2+' earliest survivor';
+  milestones[wifeBirth+62] = name2+' turns 62';
+  milestones[wifeDeathYear] = name2+' passes';
+  milestones[childBirth+18] = name3+' turns 18';
+  milestones[childDeathYear] = name3+' passes';
+  if(husbandFileYear) milestones[husbandFileYear] = name1+' files SS';
+
+  // Consume yearRows produced by runScenario — no re-simulation here.
+  const years = best.data.yearRows.map(r => {
+    const portVal = real ? r.portReal : r.portNom;
+    const ssVal = real ? Math.round(r.totalSS / r.cola) : Math.round(r.totalSS);
+    const drawVal = real ? Math.round(r.grossDraw / r.cola) : Math.round(r.grossDraw);
+    const spendVal = real ? Math.round(r.spendNeeded / r.cola) : Math.round(r.spendNeeded);
+    const phase = r.husbandAlive ? 'phase-husband' : (r.wifeAlive ? 'phase-wife' : 'phase-child');
+    return {
+      yr: r.yr,
+      portVal, ssVal, drawVal, spendVal, phase,
+      isMilestone: milestones[r.yr],
+    };
+  });
+
+  // Group by decade
+  const decades = {};
+  years.forEach(y=>{
+    const dec = Math.floor(y.yr/10)*10;
+    if(!decades[dec]) decades[dec] = [];
+    decades[dec].push(y);
+  });
+
+  let html = '';
+  Object.keys(decades).sort().forEach((dec,idx) => {
+    const dYears = decades[dec];
+    const lastY = dYears[dYears.length-1];
+    const firstY = dYears[0];
+    const isOpen = _openDecades.has(String(dec));
+    const openCls = isOpen ? ' yby-dec-open' : '';
+    html += `<div class="yby-decade${openCls}" id="dec-${idx}" data-decade="${dec}">
+      <button class="yby-dec-hd" type="button" aria-expanded="${isOpen}" onclick="toggleDecade(${idx})">
+        <span>${dec}s (${firstY.yr}–${dYears[dYears.length-1].yr})</span>
+        <span class="yby-dec-sum">End-of-decade portfolio: ${fmtV(lastY.portVal)}</span>
+      </button>
+      <div class="yby-dec-body">
+        <div class="yby-yr yby-hdr"><div>Year</div><div>SS Income</div><div>Spending</div><div>Draw</div><div>Portfolio</div></div>
+        ${dYears.map(y=>`<div class="yby-yr ${y.phase}${y.isMilestone?' milestone':''}">
+          <div>${y.yr}</div><div>${fmtV(y.ssVal)}</div><div>${fmtV(y.spendVal)}</div><div>${fmtV(y.drawVal)}</div><div>${fmtV(y.portVal)}</div>
+        </div>${y.isMilestone?'<div style="padding:2px 8px;font-size:9px;color:var(--accent);font-weight:600;background:var(--accent-light)">▸ '+y.isMilestone+'</div>':''}`).join('')}
+      </div>
+    </div>`;
+  });
+  el('ybyBody').innerHTML = html;
+  el('ybyArr').style.transform = el('ybyCard').classList.contains('yby-open') ? '' : 'rotate(-90deg)';
+}
+
+/* ---- INIT ---- */
+if(localStorage.getItem('ssp_dark')==='1') document.body.classList.add('dark');
+_syncDarkIcon();
+// Ensure slider labels and aria-valuetext are populated on first load, even
+// without cached state (loadFromLocalStorage skips this when storage is empty).
+function syncAllSliders(){
+  slK('famSpend','famSpendLbl'); slK('childSpend','childSpendLbl'); slK('sntCost','sntCostLbl');
+  slPct('famTax','famTaxLbl'); slPct('sntTax','sntTaxLbl');
+  slM('port','portLbl'); slPct2('ret','retLbl'); slPct2('infl','inflLbl');
+  sl('husbandDeath','husbandDeathLbl'); sl('wifeDeath','wifeDeathLbl'); sl('childDeath','childDeathLbl'); sl('earlyDeath','earlyDeathLbl');
+}
+loadFromLocalStorage();
+syncAllSliders();
+updateLabels();
+onFRAChange();
+compute();
+</script>
+</body>
+</html>
