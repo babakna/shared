@@ -109,6 +109,8 @@ header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
 }
 header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; }
+.header-title { display: flex; flex-direction: column; gap: 2px; }
+.byline { font-size: 12px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0; }
 header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
 .header-right { display: flex; align-items: center; gap: 12px; }
 #theme-toggle {
@@ -449,7 +451,10 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
 <body data-theme="light">
 <header>
   <button id="mobile-menu-btn" aria-label="Open menu" aria-controls="sidebar" style="display:none;background:none;border:none;color:var(--text-primary);font-size:22px;cursor:pointer;padding:0 8px" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">☰</button>
-  <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
+  <div class="header-title">
+    <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
+    <div class="byline">Brought to you by Babak</div>
+  </div>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
     <span class="version">V2.0 — Updated June 2026</span>
@@ -2372,7 +2377,7 @@ FLOWS['sixg_registration'] = {
 {
   "status": "CONTEXT_ACTIVATED",
   "securityActive": true,
-  "pqcCipherSuite": "Kyber-1024 + Dilithium-5",
+  "pqcCipherSuite": "ML-KEM-1024 + ML-DSA-87 (Kyber/Dilithium aliases)",
   "resourcesReady": {
     "prbAllocated": 48,
     "beamLocked": 247,
@@ -6545,7 +6550,7 @@ function drawArch6G(container) {
   const note = svgEl('text', {x:450,y:350,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'10','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
   note.textContent = 'AI Core unifies AMF+SMF+PCF — intent-driven, ML-inferred QoS, no static PCC rules'; svg.appendChild(note);
   const ref = svgEl('text', {x:450,y:435,'text-anchor':'middle',fill:'var(--svg-text)','font-size':'9',opacity:'0.5','font-style':'italic','font-family':"'Segoe UI',system-ui,sans-serif"});
-  ref.textContent = 'Ref: ITU-R M.2160 (IMT-2030), 3GPP SA2 6G Study. Rel-19 precursors: AI/ML for NR, NTN, ambient IoT, cm-level positioning'; svg.appendChild(ref);
+  ref.textContent = 'Ref: ITU-R M.2160 (IMT-2030), 3GPP SA2 6G Study. Rel-19 precursors: AI/ML for NR, NTN, ambient IoT, centimeter-class positioning targets'; svg.appendChild(ref);
   container.appendChild(svg);
 }
 function drawArchIMS(container) {
@@ -6625,10 +6630,10 @@ function drawArchNEF(container) {
   });
   // NEF to internal NFs
   const nfY = 90;
-  svgBox(svg, 580,50,80,40,'PCF','Policy'); svgLine(svg, 520,105, 580,70, 'N5', {dash:'6 3'});
-  svgBox(svg, 580,110,80,40,'UDM','Data Mgmt'); svgLine(svg, 520,115, 580,130, 'N52', {dash:'6 3'});
-  svgBox(svg, 710,50,80,40,'AMF','Mobility'); svgLine(svg, 520,100, 710,70, 'N51', {dash:'6 3'});
-  svgBox(svg, 710,110,80,40,'SMF','Session'); svgLine(svg, 660,130, 710,130, '', {dash:'6 3'});
+  svgBox(svg, 580,50,80,40,'PCF','Policy'); svgLine(svg, 520,105, 580,70, 'Npcf', {dash:'6 3'});
+  svgBox(svg, 580,110,80,40,'UDM','Data Mgmt'); svgLine(svg, 520,115, 580,130, 'Nudm', {dash:'6 3'});
+  svgBox(svg, 710,50,80,40,'AMF','Mobility'); svgLine(svg, 520,100, 710,70, 'Namf', {dash:'6 3'});
+  svgBox(svg, 710,110,80,40,'SMF','Session'); svgLine(svg, 660,130, 710,130, 'Nsmf', {dash:'6 3'});
   // N33 label prominent
   const n33 = svgEl('text', {x:390,y:100,'text-anchor':'middle',fill:'var(--accent)','font-size':'11','font-weight':'700','font-family':"'Consolas',monospace"});
   n33.textContent = 'N33'; svg.appendChild(n33);
@@ -6743,13 +6748,13 @@ function renderLatency(el) {
   const rows = [
     ['5G SA Centralized','Deployed','3–12 ms (RTT)','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
     ['Through-Path N9 (Edge)','Deployed','8–15 ms (RTT)','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
-    ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
+    ['ULCL Edge LBO','Operator deployment example (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
     ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','&lt;5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
     ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), regenerative vs transparent, ground station coverage'],
     ['AI-RAN (Converged)','Validating (Lab)','1–4 ms target (RTT)','Ultra-low-latency inference, autonomous systems','GPU co-location, shared memory architecture, inference load. Aligns with Rel-19 AI/ML for NR.'],
     ['6G AI-Native','Vision (~2030)','&lt;1 ms target (RTT)','Sensing, physical AI, holographic, digital twins','Entirely new air interface, AI-native protocol stack'],
   ];
-  let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective. Includes Rel-19 5G-Advanced capabilities (L1/L2 mobility, NTN satellite) as the bridge between deployed 5G and the 6G vision.</p>';
+  let html = '<h2>Latency Comparison</h2><p>Estimated end-to-end user-plane latency by architecture type, from network perspective. Includes Rel-19 5G-Advanced capabilities (L1/L2 mobility, NTN satellite) as the bridge between specified/deployed 5G capabilities and the 6G vision.</p>';
   html += '<table class="ref-table"><thead><tr><th>Architecture</th><th>Status</th><th>Estimated Range</th><th>Best For</th><th>Depends On</th></tr></thead><tbody>';
   rows.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
@@ -6833,8 +6838,8 @@ function renderSpecLibrary(el) {
     ['ULCL Edge','Edge Computing','5G-Advanced edge computing with ULCL and local breakout'],
     ['Edge Platform','Enterprise Edge','Enterprise platform for edge application hosting'],
     ['Operator APIs','Developer APIs','Developer APIs for network slicing, edge, QoD'],
-    ['5G-Advanced + L4S','Deployed','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
-    ['AI-RAN Innovation Center','AI-RAN','Converged AI+RAN with NVIDIA and Nokia/Ericsson'],
+    ['5G-Advanced + L4S','Operator deployment example','Low Latency Low Loss Scalable Throughput — illustrative rollout milestone'],
+    ['AI-RAN Innovation Center','AI-RAN','Illustrative lab context for converged AI+RAN with GPU-accelerated RAN vendors and platforms'],
     ['Enterprise eMBB / Network Slicing','Enterprise Slicing','Business network slicing plan with intelligent performance, security, and satellite'],
   ];
   const alliances = [
@@ -6857,7 +6862,7 @@ function renderSpecLibrary(el) {
     });
     html += '</ul></div>';
   });
-  html += '<div class="spec-section"><h3>Operator Products (Illustrative)</h3><ul class="spec-list">';
+  html += '<div class="spec-section"><h3>Operator Products (Illustrative)</h3><p>Product names and launch timing are examples for context; availability and packaging vary by operator and market.</p><ul class="spec-list">';
   deployedProducts.forEach(p => { html += `<li><span class="spec-num">${p[0]}</span><span class="spec-title">${p[1]}</span><span class="spec-desc">${p[2]}</span></li>`; });
   html += '</ul></div>';
   html += '<div class="spec-section"><h3>Industry Alliances &amp; Standards</h3><ul class="spec-list">';
@@ -6962,7 +6967,7 @@ const GLOSSARY_DATA = [
   ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','central UPF acting as PSA for non-edge traffic.'],
   ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','ULCL-based LBO steers traffic to local edge applications.'],
   ['TSN','Time-Sensitive Networking','IEEE 802.1 deterministic networking integrated with 5G for industrial automation.','TS 23.501 §5.27','enterprise offering for industrial IoT use cases.'],
-  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G-Advanced feature for ultra-low queuing delay (from Jul 2025).'],
+  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G-Advanced feature for ultra-low queuing delay; rollout timing varies by operator.'],
   ['RedCap','Reduced Capability NR','NR devices with reduced bandwidth/antenna for IoT and wearables.','TR 38.875, Rel-17','Operator supports RedCap for cost-optimized IoT devices.'],
   ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
   ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','default 5G slice for consumer broadband services.'],
@@ -6973,10 +6978,10 @@ const GLOSSARY_DATA = [
   ['SASE','Secure Access Service Edge','Converged networking + security service delivered from the edge.','Industry term','Example: SASE offering integrating SD-WAN with 5G and security.'],
   ['ULCL Edge','ULCL Edge','5G-Advanced edge computing solution using ULCL for local breakout.','product','Example: edge computing with ULCL + EAS for sub-10ms application hosting.'],
   ['Edge Platform','Edge Platform','enterprise platform for hosting edge applications on 5G infrastructure.','product','Example: enterprise edge hosting platform for edge workloads.'],
-  ['Operator API','Operator API','developer platform providing APIs for network capabilities.','product','APIs for QoD, slicing, edge discovery.'],
+  ['Operator API','Operator API','developer platform providing APIs for network capabilities.','product','Illustrative APIs for QoD, slicing, and edge discovery.'],
   ['Priority URLLC','Priority URLLC','5G network slicing solution for first responders with priority access and preemption.','product','Example: dedicated URLLC slice with priority resources for first responders.'],
   ['Enterprise eMBB','Enterprise eMBB','business network slicing plan combining intelligent performance, built-in security, and satellite coverage.','product','Example: dedicated eMBB slice with enhanced QoS, security integration, and satellite coverage for business subscribers.'],
-  ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware, eliminating dedicated AI accelerators.','AI-RAN Alliance','Under validation at Innovation Center with NVIDIA and Nokia/Ericsson.'],
+  ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware.','AI-RAN Alliance','Under validation in lab/innovation-center environments with GPU-accelerated RAN platforms.'],
   ['Digital Twin','Network Digital Twin','Virtual replica of the physical network enabling simulation, prediction, and optimization of network behavior before applying changes to the live network.','ITU-R M.2160, 3GPP 6G studies','Envisioned for 6G network planning, fault prediction, and autonomous optimization.'],
   ['Intent Engine','Intent-Based Management Engine','6G management function that translates high-level operator intents (e.g., "guarantee 10 Gbps for AR zone") into concrete network configurations using AI/ML.','TM Forum, ETSI ZSM','Envisioned for 6G autonomous network management and slice orchestration.'],
   ['PQC','Post-Quantum Cryptography','Cryptographic algorithms designed to resist attacks from quantum computers. Includes lattice-based schemes like CRYSTALS-Kyber (KEM) and CRYSTALS-Dilithium (signatures).','NIST PQC Standards','Envisioned for 6G authentication to protect against harvest-now-decrypt-later quantum threats.'],
@@ -7022,23 +7027,23 @@ function sortGlossaryBy(col) {
 /* -- Timeline -- */
 function renderTimeline(el) {
   const events = [
-    {date:'Aug 2020', text:'First nationwide standalone 5G SA network in the U.S.', cls:''},
-    {date:'2021', text:'Operator API platform launch — developer APIs for network capabilities', cls:''},
-    {date:'2022', text:'IoT Developer Kit — enabling IoT innovation on 5G', cls:''},
-    {date:'Apr 2023', text:'Network slicing developer beta (nationwide)', cls:''},
-    {date:'Sep 2024', text:'Priority URLLC slice announced (launched Feb 2025); SASE launched', cls:''},
-    {date:'Sep 2024', text:'AI-RAN Innovation Center announced (+ NVIDIA + Nokia + Ericsson)', cls:''},
-    {date:'Oct 2024', text:'Portable Private 5G — on-demand private network solution for enterprise', cls:''},
-    {date:'Apr 2025', text:'5G-Advanced deployed nationwide', cls:''},
-    {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
-    {date:'Aug 2025', text:'Enterprise eMBB slice launched for business subscribers', cls:''},
-    {date:'Oct 2025', text:'ULCL Edge + Edge Platform launched for enterprise edge computing', cls:''},
-    {date:'Oct 2025', text:'Reported NVIDIA-Nokia strategic investment for AI-RAN infrastructure', cls:''},
+    {date:'Aug 2020', text:'Example operator milestone: first nationwide standalone 5G SA network in the U.S.', cls:''},
+    {date:'2021', text:'Example operator milestone: API platform launch for developer network capabilities', cls:''},
+    {date:'2022', text:'Example operator milestone: IoT developer kit for 5G innovation', cls:''},
+    {date:'Apr 2023', text:'Example operator milestone: network slicing developer beta', cls:''},
+    {date:'Sep 2024', text:'Example operator milestone: Priority URLLC slice and SASE product announcements', cls:''},
+    {date:'Sep 2024', text:'Example industry milestone: AI-RAN Innovation Center announced with ecosystem partners', cls:''},
+    {date:'Oct 2024', text:'Example operator milestone: portable private 5G enterprise solution', cls:''},
+    {date:'Apr 2025', text:'Example operator milestone: 5G-Advanced service rollout', cls:''},
+    {date:'Jul 2025', text:'Example operator milestone: L4S capability rollout', cls:''},
+    {date:'Aug 2025', text:'Example operator milestone: Enterprise eMBB slice launch for business subscribers', cls:''},
+    {date:'Oct 2025', text:'Example operator milestone: ULCL Edge + Edge Platform launch for enterprise edge computing', cls:''},
+    {date:'Oct 2025', text:'Example industry milestone: reported strategic investment activity around AI-RAN infrastructure', cls:''},
     {date:'Dec 2025', text:'3GPP Rel-19 frozen — second 5G-Advanced release. Rel-20 continues 5G-Advanced work alongside first 6G study items.', cls:''},
     {date:'Dec 2025', text:'Rel-19 UE features such as UL Tx switching entering commercial device roadmaps', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
-    {date:'Mar 2026', text:'MWC: Nokia/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + 6G innovation hub established.', cls:''},
-    {date:'Mar 2026', text:'GTC: Physical AI on AI-RAN demonstrated (Metropolis VSS 3). RTX PRO Blackwell pilot announced at MSOs.', cls:''},
+    {date:'Mar 2026', text:'Example industry milestone: AI-RAN OTA demos, cloud RAN GPU showcases, and 6G innovation hub announcements around MWC', cls:''},
+    {date:'Mar 2026', text:'Example industry milestone: physical AI on AI-RAN demonstrations and GPU edge pilots around GTC', cls:''},
     {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed MWC 2026)', cls:'projected'},
     {date:'~2027', text:'Nokia first commercial AI-RAN release (projected)', cls:'projected'},
     {date:'~2028', text:'Widespread AI-RAN deployment across network (estimated)', cls:'projected'},
@@ -7068,7 +7073,7 @@ function renderBandMap(el) {
   bands.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
   html += '<div style="margin-top:18px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.6;">';
-  html += '<strong>AI-RAN Note:</strong> AI-RAN Innovation Center OTA demonstrations use <strong>n77 (3.7 GHz C-Band)</strong> with Nokia AirScale Massive MIMO radios on NVIDIA Grace Hopper. The primary commercial mid-band is <strong>n41 (2.5 GHz)</strong>.</div>';
+  html += '<strong>AI-RAN Note:</strong> AI-RAN lab/innovation-center OTA demonstrations may use bands such as <strong>n77 (3.7 GHz C-Band)</strong> with Massive MIMO radios and GPU-accelerated RAN platforms. A common commercial mid-band example is <strong>n41 (2.5 GHz)</strong>, with exact band usage varying by operator.</div>';
   el.innerHTML = html;
 }
 
@@ -7083,7 +7088,7 @@ function renderIntroRoadTo6G(el) {
   html += '<h3>Understanding the Badge System</h3>';
   html += '<p>Unlike a tool covering only deployed 5G SA specifications (where all content would be FACT), this tool spans multiple maturity levels. The badge on each flow tells you exactly how far from production reality that content is. Interpreting badges correctly is critical to using this tool responsibly — especially if you are sharing insights with colleagues or stakeholders.</p>';
   html += '<div class="badge-legend" style="grid-template-columns:1fr;">';
-  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-fact">FACT</span></div><span>Content grounded in deployed 3GPP specifications and production network architecture. Used for reference pages that describe existing standards.</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-fact">FACT</span></div><span>Content grounded in 3GPP specifications or clearly labeled operator/product examples. Used for reference pages that describe existing standards and context.</span></div>';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-validated">VALIDATED</span></div><span>Demonstrated or validated in a lab or Innovation Center environment. The AI-RAN Registration flow (Flow 1) carries this badge where it reflects demonstrated lab behavior on real hardware (for example, Nokia AirScale + NVIDIA Grace Hopper).</span></div>';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-projected">PROJECTED</span></div><span>Engineering projection based on current technology trajectory. The AI-RAN PDU Session (Flow 2), Data Transfer (Flow 3), Telemetry (Flow 4), and Performance Comparison (Flow 5) carry this badge — the shared-memory data path and zero-hop architecture are based on NVIDIA Aerial SDK capabilities and O-RAN WG3 directions, but have not yet been demonstrated end-to-end in the Innovation Center.</span></div>';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><div><span class="badge badge-vision">VISION</span></div><span>Forward-looking vision for the 6G era (~2030). All 6G flows (Flows 6–14) carry this badge. These flows illustrate concepts from ITU-R IMT-2030 studies and 3GPP preliminary 6G research. Protocols, message formats, and architectures shown are speculative projections — they will change significantly as standards develop.</span></div>';
@@ -7164,11 +7169,11 @@ function renderIntroWhatIsAIRAN(el) {
   html += '</tbody></table>';
   html += '<h3>Deployment Timeline</h3>';
   const events = [
-    {date:'Sep 2024', text:'AI-RAN Innovation Center announced with Nokia, Ericsson, NVIDIA partnership.', cls:''},
-    {date:'Oct 2025', text:'NVIDIA strategic investment in Nokia for AI-RAN infrastructure acceleration.', cls:''},
-    {date:'Mar 2026 (MWC)', text:'Nokia/NVIDIA over-the-air AI-RAN demonstration on Grace Hopper. Ericsson Cloud RAN on NVIDIA GPU showcased.', cls:''},
+    {date:'Sep 2024', text:'AI-RAN Innovation Center announced with ecosystem partner participation.', cls:''},
+    {date:'Oct 2025', text:'Reported strategic investment activity around AI-RAN infrastructure acceleration.', cls:''},
+    {date:'Mar 2026 (MWC)', text:'Over-the-air AI-RAN demonstration on GPU-accelerated RAN infrastructure; cloud RAN on GPU showcased.', cls:''},
     {date:'Mar 2026 (GTC)', text:'Physical AI on AI-RAN demonstrated (NVIDIA Metropolis).', cls:''},
-    {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed at MWC 2026).', cls:'projected'},
+    {date:'2026', text:'AI-RAN commercial trial activity begins (projected/announced industry milestone).', cls:'projected'},
     {date:'~2027', text:'First commercial AI-RAN deployment (projected).', cls:'projected'},
     {date:'~2028', text:'Wider AI-RAN network deployment (estimated).', cls:'projected'},
   ];
@@ -7253,7 +7258,7 @@ function renderIntroAIRANvsGNB(el) {
 function renderIntroWhatIs6G(el) {
   let html = '<h2>What is 6G? <span class="badge badge-vision">VISION</span></h2>';
   html += '<p>6G is the next generation of mobile network technology, targeted for initial standardization around 2029 and commercial deployment beginning around 2030. While 5G was designed for three usage scenarios (eMBB, URLLC, mMTC), 6G expands to six — adding integrated sensing, AI-native communication, and ubiquitous global connectivity. The vision is defined by the ITU-R under the IMT-2030 framework (Recommendation ITU-R M.2160, approved November 2023).</p>';
-  html += '<p>Importantly, 6G does not start from zero. <strong>3GPP Release 19</strong> (the second 5G-Advanced release, frozen December 2025) already introduces early forms of several 6G capabilities: AI/ML at the NR air interface (→ Integrated AI and Communication), NTN satellite evolution and UE relay (→ Ubiquitous Connectivity), ambient IoT device classes (→ Massive Communication), centimeter-level NR positioning (→ precursor to ISAC), and NWDAF federated learning (→ AI-native network automation). The 6G vision flows in this tool (Flows 6–14) show where these seeds grow into fully native 6G architectures — but the roots are already in deployed 5G-Advanced specifications.</p>';
+  html += '<p>Importantly, 6G does not start from zero. <strong>3GPP Release 19</strong> (the second 5G-Advanced release, frozen December 2025) already introduces early forms of several 6G capabilities: AI/ML at the NR air interface (→ Integrated AI and Communication), NTN satellite evolution and UE relay (→ Ubiquitous Connectivity), ambient IoT device classes (→ Massive Communication), centimeter-class NR positioning targets (→ precursor to ISAC), and NWDAF federated learning (→ AI-native network automation). The 6G vision flows in this tool (Flows 6–14) show where these seeds could grow into fully native 6G architectures — but the roots are already in specified 5G-Advanced work.</p>';
   html += '<h3>Six Usage Scenarios (IMT-2030)</h3>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">Immersive Communication</strong><span>Holographic telepresence, extended reality (XR), multi-sensory experiences. Requires massive throughput (200+ Gbps peak target) and extremely low latency.</span></div>';
@@ -7273,7 +7278,7 @@ function renderIntroWhatIs6G(el) {
   html += '<tr><td>Reliability</td><td>99.99999% (seven 9s)</td><td>99.999% (five 9s)</td><td>100×</td></tr>';
   html += '<tr><td>Mobility</td><td>1,000 km/h</td><td>500 km/h</td><td>2×</td></tr>';
   html += '<tr><td>Spectrum Range</td><td>Up to sub-THz (100–300 GHz)</td><td>Up to mmWave (71 GHz)</td><td>New bands</td></tr>';
-  html += '<tr><td>Sensing Resolution</td><td>cm-level spatial resolution</td><td>N/A (no sensing)</td><td>New capability</td></tr>';
+  html += '<tr><td>Sensing Resolution</td><td>centimeter-class spatial resolution target</td><td>N/A (no native sensing)</td><td>New capability</td></tr>';
   html += '<tr><td>AI Integration</td><td>Native (models in protocol stack)</td><td>External (NWDAF, O-RAN RIC)</td><td>Architectural shift</td></tr>';
   html += '<tr><td>Energy Efficiency</td><td>100× vs 5G (per bit)</td><td>100× vs 4G (per bit)</td><td>Continued</td></tr>';
   html += '<tr><td>Positioning</td><td>centimeter-class target</td><td>meter-level accuracy</td><td>10–100× target</td></tr>';
@@ -7312,7 +7317,7 @@ function renderIntro6GTechnologies(el) {
   html += '</div>';
   html += '<h3>Integrated Sensing and Communication (ISAC)</h3>';
   html += '<p>ISAC is one of the defining new capabilities of 6G. Today, communication and sensing (radar) use separate systems on separate spectrum. ISAC unifies them: the same waveform that carries user data also bounces off objects in the environment, and the returned signal is analyzed to detect position, velocity, and characteristics of physical objects. This enables the network to "see" its environment — detecting pedestrians, vehicles, drones, weather patterns — while simultaneously providing connectivity. Flow 14 (ISAC) demonstrates how an AI-RAN/base-station node transmits a joint waveform, receives reflected returns, and feeds fused sensing data to applications.</p>';
-  html += '<p>The sensing capability uses the existing OFDM waveform structure extended to higher frequencies (sub-THz bands at 100–300 GHz provide the bandwidth needed for cm-level spatial resolution). The 6G base-station node acts as both a communication node and a monostatic or bistatic radar. Processing the sensing returns requires significant compute — this is where the GPU infrastructure from AI-RAN becomes essential for 6G.</p>';
+  html += '<p>The sensing capability uses the existing OFDM waveform structure extended to higher frequencies (sub-THz bands at 100–300 GHz provide the bandwidth needed for centimeter-class spatial resolution targets). The 6G base-station node acts as both a communication node and a monostatic or bistatic radar. Processing the sensing returns requires significant compute — this is where the GPU infrastructure from AI-RAN becomes essential for 6G.</p>';
   html += '<h3>Network Digital Twin</h3>';
   html += '<p>A Network Digital Twin is a continuously updated virtual replica of the physical network — every cell, every UE, every link, every load metric — running in real time. In 5G, NWDAF provides analytics on collected data, but it operates on historical or near-real-time snapshots. The 6G Digital Twin (Flow 13) goes further: it maintains a live simulation of the entire network that can predict the impact of configuration changes before they are applied. The Digital Twin Engine ingests telemetry from all network elements, runs what-if scenarios (e.g., "what happens if we add 5,000 UEs to this sector?"), and recommends or autonomously executes optimizations.</p>';
   html += '<p>The Digital Twin closes a loop: Physical Network → Telemetry → Digital Twin Model → Predictive Simulation → Optimization Decision → Physical Network. The twin must process network state at sub-second granularity to be useful for real-time decisions. In the 6G flows, the Digital Twin works in concert with the AI Core and Intent Engine.</p>';
@@ -7327,7 +7332,7 @@ function renderIntro6GTechnologies(el) {
   html += '<h3>Technology Maturity Summary</h3>';
   html += '<table class="ref-table"><thead><tr><th>Technology</th><th>Maturity Level</th><th>Relevant Flows</th><th>Exists in 5G?</th></tr></thead><tbody>';
   html += '<tr><td>AI-Native Core (Unified AI Core)</td><td>Research / Pre-standard</td><td>6, 7, 8, 9, 10, 12, 13</td><td>No — 5G uses discrete NFs with rules-based policy</td></tr>';
-  html += '<tr><td>ISAC (Integrated Sensing &amp; Communication)</td><td>Active research, ITU-R M.2160</td><td>11, 14</td><td>Precursor: Rel-19 cm-level NR positioning (TS 38.305). Full ISAC (unified sensing+communication waveform) is 6G-native.</td></tr>';
+  html += '<tr><td>ISAC (Integrated Sensing &amp; Communication)</td><td>Active research, ITU-R M.2160</td><td>11, 14</td><td>Precursor: Rel-19 centimeter-class NR positioning targets (TS 38.305). Full ISAC (unified sensing+communication waveform) is 6G-native.</td></tr>';
   html += '<tr><td>Network Digital Twin</td><td>Early research / Proof-of-concept</td><td>13</td><td>Embryonic — NWDAF analytics provides a subset</td></tr>';
   html += '<tr><td>Intent-Based Management</td><td>Research / Concept</td><td>9</td><td>Embryonic — CAMARA APIs provide simplified version</td></tr>';
   html += '<tr><td>Post-Quantum Cryptography</td><td>Standards finalized (NIST 2024), not yet in 3GPP</td><td>6</td><td>No — 5G uses ECIES, AES, SHA-256</td></tr>';
@@ -7342,11 +7347,12 @@ function showWelcome() {
   showView('welcome');
   document.getElementById('welcome-view').innerHTML = '<div class="welcome-container">' +
     '<h2>3GPP Protocol Flow Simulator — AI-RAN &amp; 6G</h2>' +
+    '<p style="font-size:13px;color:var(--text-tertiary);font-weight:600;">Brought to you by Babak</p>' +
     '<p>An interactive tool for stepping through AI-RAN and 6G protocol flows. 14 interactive flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus 5 introduction pages and 6 reference tools including architecture diagrams, specifications, glossary, latency comparison, technology timeline, and band map.</p>' +
     '<p><strong>New to AI-RAN or 6G?</strong> Start with the "Introduction" section in the sidebar — five pages that build your understanding progressively: the evolutionary context from 5G to 6G, what AI-RAN is and how it works, how AI-RAN compares to a traditional gNB, the 6G vision and timeline, and the key technologies you will encounter in the flows.</p>' +
     '<h3>Badge System</h3>' +
     '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">' +
-    '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production network architecture</span></div>' +
+    '<div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in 3GPP specifications or clearly labeled operator/product examples</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-validated">VALIDATED</span><span>Demonstrated / validated in lab or Innovation Center</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-projected">PROJECTED</span><span>Engineering projection based on current trajectory</span></div>' +
     '<div class="badge-legend-item"><span class="badge badge-vision">VISION</span><span>Forward-looking vision for 6G era</span></div>' +
