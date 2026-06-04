@@ -108,6 +108,8 @@ header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
 }
 header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; }
+.header-title { display: flex; flex-direction: column; gap: 2px; }
+.byline { font-size: 12px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0; }
 header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
 .header-right { display: flex; align-items: center; gap: 12px; }
 #theme-toggle {
@@ -139,7 +141,7 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
 .sidebar-section-body {
   max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
 }
-.sidebar-section.expanded .sidebar-section-body { max-height: 800px; }
+.sidebar-section.expanded .sidebar-section-body { max-height: none; }
 .sidebar-section.expanded .section-arrow { transform: rotate(90deg); }
 .sidebar-item {
   display: flex; align-items: flex-start; gap: 10px; padding: 10px 18px; cursor: pointer;
@@ -161,7 +163,7 @@ header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
   max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
   padding: 0 18px 0 50px;
 }
-.sidebar-item.active + .sidebar-accordion { max-height: 300px; padding-bottom: 10px; padding-top: 6px; }
+.sidebar-item.active + .sidebar-accordion { max-height: 500px; padding-bottom: 10px; padding-top: 6px; overflow-y: auto; }
 .sidebar-narrative {
   font-size: 12px; color: var(--text-secondary); line-height: 1.5;
   border-left: 2px solid var(--accent); padding-left: 10px;
@@ -448,7 +450,10 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
 <body data-theme="light">
 <header>
   <button id="mobile-menu-btn" aria-label="Open menu" aria-controls="sidebar" style="display:none;background:none;border:none;color:var(--text-primary);font-size:22px;cursor:pointer;padding:0 8px" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">☰</button>
-  <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> 5G <span class="sep">/</span> 5G-Advanced</h1>
+  <div class="header-title">
+    <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> 5G <span class="sep">/</span> 5G-Advanced</h1>
+    <div class="byline">Brought to you by Babak</div>
+  </div>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
     <span class="version">V2.0 — Updated June 2026</span>
@@ -2283,7 +2288,7 @@ FLOWS.slice_registration = {
 FLOWS.slice_charging = {
   id:'slice_charging', title:'Slice-Specific Charging', section:'slicing', badge:'FACT',
   specRef:'TS 32.291, TS 23.503, TS 23.501 §5.15',
-  narrative:'Each network slice can have distinct charging rules — different rating groups, tariff plans, and billing models. The CHF uses S-NSSAI-tagged charging records to generate per-slice invoices, enabling slices like Priority URLLC (flat-rate) and Enterprise eMBB (premium usage-based). Rel-19 Network Slicing Phase 3 enhances this with slice SLA assurance (the RAN and core actively monitor per-slice KPIs and take corrective action when SLAs are at risk) and slice-specific charging improvements (differentiated quota management, real-time rating adjustments per slice). These enhancements make slicing operationally viable for enterprise SLA contracts with contractual guarantees.',
+  narrative:'Each network slice can have distinct charging rules — different rating groups, tariff plans, and billing models. The CHF uses S-NSSAI-tagged charging records to generate per-slice invoices, enabling illustrative slice models such as Priority URLLC-style flat-rate charging and Enterprise eMBB-style premium usage-based charging. Rel-19 Network Slicing Phase 3 enhances slice assurance and slice-specific charging support, but SLA and price examples in this flow are educational examples rather than contractual guarantees.',
   nodes:['ue','ran','upf_c','smf','pcf','chf'],
   connections:[
     {from:'ue',to:'ran',label:'Uu',type:'data'},
@@ -2362,11 +2367,12 @@ FLOWS.slice_charging = {
 // Key: S-NSSAI and RG 100 identify this
 // as Enterprise eMBB slice charging`}, egress:{title:'CHF Applies Slice Tariff',
         code:`// CHF Processing:
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // 1. Identify slice: SST=1/SD=ABCD02 = Enterprise eMBB
 // 2. Look up slice-specific tariff:
 //    Enterprise eMBB rate card: premium
 // 3. Grant units per premium plan
-// 4. Rate: $15/GB vs $10/GB (default)
+// 4. Illustrative rate example: $15/GB vs $10/GB (default)
 // 5. Different quotas per slice tier`}},
     {id:4, label:'Step 4: CHF Grants Slice-Specific Quota', from:'chf', to:'smf', interface:'N40 — SBI (TS 32.291)', protocol:'HTTP/2 201 Created', badge:'FACT', lineType:'cp',
       description:'CHF applies the slice-specific tariff plan and grants units. Different slices get different rate cards and quota sizes.',
@@ -2808,7 +2814,7 @@ FLOWS.ul_dl_data = {
 FLOWS.af_traffic = {
   id:'af_traffic', title:'AF Traffic Influence (NEF → PCF → ULCL)', section:'5g_advanced', badge:'FACT',
   specRef:'TS 29.522 (Nnef), TS 29.512 (Npcf), TS 29.244 (PFCP), TS 23.548',
-  narrative:'This is the trigger mechanism behind ULCL Edge. An Application Function (or Operator API consumer) requests traffic influence through the NEF. The request flows through PCF → SMF → UPF, installing ULCL steering rules that route matching traffic to a local Edge Application Server. In production, this is how ULCL Edge programmatically activates local breakout.',
+  narrative:'This is the trigger mechanism behind ULCL Edge. An Application Function (or Operator API consumer) requests traffic influence through the NEF. The request flows through PCF → SMF → UPF, installing ULCL steering rules that route matching traffic to a local Edge Application Server. In deployed systems, exact exposure and automation depend on the operator API product and policy controls.',
   nodes:['af','nef','pcf','smf','upf_e','eas','upf_c'],
   connections:[
     {from:'af',to:'nef',label:'N33',type:'control'},
@@ -3271,7 +3277,7 @@ FLOWS.data_lbo = {
 // Additional latency: < 1ms
 //
 // Total UL path: UE → gNB → Edge UPF → EAS
-// Estimated UL latency: ~1-3ms
+// Estimated UL latency example: ~1-3ms
 // (vs centralized: ~4-8ms)`}},
     {id:5, label:'Step 5: EAS → Edge UPF (Downlink Response)', from:'eas', to:'upf_e', interface:'N6 Loc — IP', protocol:'IP', badge:'FACT', lineType:'dp',
       description:'EAS processes request, sends response back. UPF matches downlink PDR.',
@@ -3329,11 +3335,11 @@ FLOWS.data_lbo = {
       egress:{title:'Latency Comparison',
         code:`// Local Breakout Path (this flow):
 // UE → gNB → Edge UPF → EAS → Edge UPF → gNB → UE
-// Estimated RTT: ~2-7ms
+// Estimated RTT example: ~2-7ms
 //
 // Centralized Path (standard):
 // UE → gNB → Central UPF → DN → Central UPF → gNB → UE
-// Estimated RTT: ~8-15ms
+// Estimated RTT example: ~8-15ms
 //
 // Latency savings: 50-75% reduction
 // No central core traversal
@@ -3527,11 +3533,11 @@ FLOWS.data_n9 = {
 // UE → gNB → Edge UPF → N9 → Central UPF
 //   → DN → Central UPF → N9 → Edge UPF
 //   → gNB → UE
-// Estimated RTT: ~4-14ms
+// Estimated RTT example: ~4-14ms
 //
 // vs Local Breakout (Flow 11):
 // UE → gNB → Edge UPF → EAS → Edge UPF → gNB → UE
-// Estimated RTT: ~2-7ms
+// Estimated RTT example: ~2-7ms
 //
 // N9 hop adds ~2-4ms each direction
 // Standard internet traffic unaffected
@@ -3694,15 +3700,16 @@ FLOWS.edge_charging = {
 // RG 400 = Standard (Through-Path) — reported separately`},
       egress:{title:'CHF Edge Tariff Application',
         code:`// CHF Processing:
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // 1. Identify ratingGroup 300 → ULCL Edge
 // 2. Look up edge-specific tariff:
-//    ULCL Edge rate: enterprise SLA pricing
+//    ULCL Edge rate: illustrative enterprise edge pricing
 //    or included in ULCL Edge subscription
 // 3. vs ratingGroup 400 → standard rate
 // 4. Grant new units for edge path
 // 5. Different quotas per path type`}},
     {id:5, label:'Step 5: CHF Applies Edge Tariff', from:'chf', to:'smf', interface:'N40 — SBI (TS 32.291)', protocol:'HTTP/2 200 OK', badge:'FACT', lineType:'cp',
-      description:'CHF applies edge-specific rate card. ULCL Edge traffic may be billed at premium (enterprise SLA) or included in an ULCL Edge subscription. Standard through-path billed at normal rates. Returns granted units per path.',
+      description:'CHF applies an edge-specific rating model. ULCL Edge traffic may be rated differently or included in an ULCL Edge subscription. Standard through-path billed at normal rates. Returns granted units per path.',
       ingress:{title:'CHF Edge Tariff Response',
         code:`// 200 OK — Converged Charging Update Response
 {
@@ -4267,6 +4274,7 @@ FLOWS.slice_devedge = {
 // PCF creates slice-steering PCC rules`},
       egress:{title:'PCF Policy Decision',
         code:`// PCF Processing:
+// Illustrative QoS profile — not an operational SLA commitment
 // 1. Create PCC rules for ANPA slice:
 //    - QoS: 5QI=7, GBR 10M/5M
 //    - Charging: sponsor-based (enterprise pays)
@@ -4311,7 +4319,7 @@ FLOWS.slice_devedge = {
     }
   }
 }
-// 5QI=7 with GBR — guaranteed low latency
+// 5QI=7 with GBR — illustrative low-latency QoS profile
 // Sponsor charging: enterprise pays`},
       egress:{title:'SMF Processes ANPA Policy',
         code:`// SMF Processing:
@@ -4366,12 +4374,12 @@ FLOWS.slice_devedge = {
 //
 // Traffic matching flow filter:
 //   100.64.1.50 ↔ 203.0.113.100
-//   → QFI=2, GBR guaranteed, priority scheduling
+//   → QFI=2, GBR QoS, priority scheduling
 //
 // All other traffic:
 //   → QFI=1, best-effort, standard QoS`}},
     {id:6, label:'Step 6: Slice Active — Traffic Steering', from:'smf', to:'amf', interface:'N11/N2 — Session Modification', protocol:'SBI + NGAP', badge:'FACT', lineType:'cp',
-      description:'Application traffic from the identified device/app is now routed through the dedicated slice with requested QoS. Enterprise gets guaranteed performance for the specified duration.',
+      description:'Application traffic from the identified device/app is now associated with the requested QoS profile for the specified duration; actual performance still depends on radio and network conditions.',
       ingress:{title:'ANPA Slice Activation Complete',
         code:`// SMF → AMF: N1N2MessageTransfer
 // (Session Modification for new QoS flow)
@@ -4403,14 +4411,15 @@ FLOWS.slice_devedge = {
 // gNB: create dedicated DRB for QFI=2
 // UE: accept QoS flow modification`},
       egress:{title:'Before/After QoS Comparison',
-        code:`// BEFORE ANPA activation:
+        code:`// Illustrative QoS comparison — not an operational SLA commitment
+// BEFORE ANPA activation:
 // All traffic: QFI=1, 5QI=9 (best effort)
-// Latency: variable, no guarantee
+// Latency: variable, no guaranteed SLA in this example
 // Throughput: shared, up to AMBR
 //
 // AFTER ANPA activation:
 // Enterprise app: QFI=2, 5QI=7 (GBR)
-// ✓ Guaranteed 10Mbps DL / 5Mbps UL
+// ✓ GBR target 10Mbps DL / 5Mbps UL
 // ✓ Priority scheduling (ARP=3)
 // ✓ May preempt lower-priority flows
 // ✓ Dedicated DRB at air interface
@@ -6438,7 +6447,7 @@ function drawArchSBA(container) {
   const bus = svgEl('rect', {x:60,y:90,width:780,height:24,rx:4,fill:'var(--svg-box-fill)',stroke:'var(--accent)','stroke-width':2,'stroke-dasharray':'8 4'});
   svg.appendChild(bus);
   const busT = svgEl('text', {x:450,y:104,'text-anchor':'middle','dominant-baseline':'middle',fill:'var(--accent)','font-size':'10','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
-  busT.textContent = 'Service-Based Architecture (SBA) Bus — Nservice-based interfaces'; svg.appendChild(busT);
+  busT.textContent = 'Service-Based Architecture (SBA) Bus — Nxx service-based interfaces'; svg.appendChild(busT);
   const cpNfs = [
     {l:'NRF',s:'Nnrf',x:70},{l:'NSSF',s:'Nnssf',x:155},{l:'AUSF',s:'Nausf',x:240},{l:'UDM',s:'Nudm',x:325},
     {l:'AMF',s:'Namf',x:410},{l:'SMF',s:'Nsmf',x:495},{l:'PCF',s:'Npcf',x:580},{l:'NEF',s:'Nnef',x:665},{l:'CHF',s:'Nchf',x:750}
@@ -6656,7 +6665,7 @@ function renderLatency(el) {
     ['4G LTE','Deployed (Legacy)','20–50 ms (RTT)','Baseline comparison','eNodeB backhaul, EPC routing'],
     ['5G SA Centralized','Deployed','3–12 ms (RTT)','General consumer broadband, streaming','Backhaul distance, RAN load, core routing'],
     ['Through-Path N9 (Edge)','Deployed','8–15 ms (RTT)','Traffic routed via N9 to central PSA','N9 hop adds latency vs. LBO; depends on inter-UPF distance'],
-    ['ULCL Edge LBO','Deployed (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
+    ['ULCL Edge LBO','Operator deployment example (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
     ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','&lt;5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
     ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), propagation delay, regenerative vs transparent payload'],
     ['NTN — GEO Satellite','Specified (Rel-17)','~270 ms (RTT)','Wide-area IoT, broadcast, backup coverage','Fixed GEO orbital delay (~120ms one-way); suitable for delay-tolerant IoT/store-and-forward'],
@@ -6720,7 +6729,7 @@ function renderSpecLibrary(el) {
     ]},
     { title:'Rel-19 5G-Advanced (New Capability Areas)', specs:[
       ['TR 38.843','Study on AI/ML for NR Air Interface','Study item on AI/ML for beam management, CSI, positioning at L1/PHY — basis for Rel-19 normative work','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4015'],
-      ['TS 38.305','NR Positioning','Positioning methods (DL-TDoA, UL-AoA, multi-RTT), measurement procedures. Rel-19 adds cm-level accuracy and sidelink-based positioning','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
+      ['TS 38.305','NR Positioning','Positioning methods (DL-TDoA, UL-AoA, multi-RTT), measurement procedures. Rel-19 adds centimeter-class positioning targets and sidelink-based positioning enhancements','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
       ['TR 38.821','NTN Solutions for NR','Non-terrestrial network architecture, timing advance, satellite mobility, regenerative payload — foundation for Rel-19 NTN evolution','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3525'],
       ['TS 23.304','Proximity-based Services (ProSe) in 5GS','UE-to-UE and UE-to-network relay, sidelink discovery, direct communication — updated in Rel-19 for relay enhancements','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3855'],
       ['TS 38.213','NR Physical Layer Procedures for Control','DCI formats, PUCCH, search spaces. Rel-19 adds sidelink resource allocation and ambient IoT control signaling','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3215'],
@@ -6744,7 +6753,7 @@ function renderSpecLibrary(el) {
     ['ULCL Edge','Edge Computing','5G-Advanced edge computing with ULCL and local breakout'],
     ['Edge Platform','Enterprise Edge','Enterprise platform for edge application hosting'],
     ['Operator APIs','Developer APIs','Developer APIs for network slicing, edge, QoD'],
-    ['5G-Advanced + L4S','Deployed','Low Latency Low Loss Scalable Throughput — nationwide Jul 2025'],
+    ['5G-Advanced + L4S','Operator deployment example','Low Latency Low Loss Scalable Throughput — illustrative rollout milestone'],
     ['Enterprise eMBB / Network Slicing','Enterprise Slicing','Business and enterprise network slicing products'],
   ];
   const alliances = [
@@ -6765,7 +6774,7 @@ function renderSpecLibrary(el) {
     });
     html += '</ul></div>';
   });
-  html += '<div class="spec-section"><h3>Operator Products (Illustrative)</h3><ul class="spec-list">';
+  html += '<div class="spec-section"><h3>Operator Products (Illustrative)</h3><p>Product names and launch timing are examples for context; availability and packaging vary by operator and market.</p><ul class="spec-list">';
   deployedProducts.forEach(p => { html += `<li><span class="spec-num">${p[0]}</span><span class="spec-title">${p[1]}</span><span class="spec-desc">${p[2]}</span></li>`; });
   html += '</ul></div>';
   html += '<div class="spec-section"><h3>Industry Alliances &amp; Standards</h3><ul class="spec-list">';
@@ -6831,13 +6840,13 @@ const GLOSSARY_DATA = [
   ['ULCL','Uplink Classifier','UPF function that classifies UL traffic and steers it to local or central path.','TS 23.501 §5.6.4','Core of ULCL Edge: steers traffic to EAS or central DN.'],
   ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','Central UPF acting as PSA for non-edge traffic.'],
   ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','ULCL-based LBO steers traffic to local edge applications.'],
-  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G-Advanced feature for ultra-low queuing delay (from Jul 2025).'],
+  ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G-Advanced feature for ultra-low queuing delay; rollout timing varies by operator.'],
   ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
   ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','Default 5G slice for consumer broadband services.'],
   ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','Example slicing products: Priority URLLC, Enterprise eMBB, Portable Private 5G.'],
   ['ULCL Edge','ULCL Edge','5G-Advanced edge computing solution using ULCL for local breakout.','Product','Example: edge computing with ULCL + EAS for sub-10ms application hosting.'],
   ['Edge Platform','Edge Platform','Enterprise platform for hosting edge applications on 5G infrastructure.','Product','Example: enterprise edge hosting platform for edge workloads.'],
-  ['Operator API','Operator API','Developer platform providing APIs for network capabilities.','Product','APIs for QoD, slicing, edge discovery. api.example.com.'],
+  ['Operator API','Operator API','Developer platform providing APIs for network capabilities.','Product','Illustrative APIs for QoD, slicing, and edge discovery.'],
   ['Priority URLLC','Priority URLLC','Network slicing product for first responders with prioritized connectivity.','Product','Example: dedicated URLLC-like slice for first responder priority access.'],
   ['Enterprise eMBB','Enterprise eMBB','Business network slicing product for enterprise connectivity.','Product','Example: dedicated eMBB slice with enhanced QoS for business subscribers.'],
   ['CAMARA','Common API framework by GSMA','Standardized network API project under GSMA Open Gateway, enabling cross-operator API exposure for QoD, slicing, device status, and more.','GSMA Open Gateway','Network Slice and QoD APIs align with CAMARA specifications.'],
@@ -6896,20 +6905,20 @@ function renderTimeline(el) {
   const events = [
     {date:'Apr 2018', text:'Example: Operator spectrum merger increases 5G capacity', cls:''},
     {date:'Apr 2020', text:'Example: Operator completes spectrum acquisition — expanded mid-band holdings', cls:''},
-    {date:'Aug 2020', text:'First nationwide standalone 5G SA network in the U.S.', cls:''},
-    {date:'2021', text:'Low-band and mid-band 5G nationwide expansion', cls:''},
-    {date:'2021', text:'Operator API platform launch — developer APIs for network capabilities', cls:''},
-    {date:'2023', text:'Network slicing developer beta (nationwide)', cls:''},
+    {date:'Aug 2020', text:'Example operator milestone: first nationwide standalone 5G SA network in the U.S.', cls:''},
+    {date:'2021', text:'Example operator milestone: low-band and mid-band 5G expansion', cls:''},
+    {date:'2021', text:'Example operator milestone: API platform launch for developer network capabilities', cls:''},
+    {date:'2023', text:'Example operator milestone: network slicing developer beta', cls:''},
     {date:'Sep 2024', text:'Priority URLLC slice — first responder network slice example', cls:''},
     {date:'Oct 2024', text:'Portable Private 5G — on-demand private network solution for enterprise', cls:''},
-    {date:'Apr 2025', text:'5G-Advanced deployed nationwide', cls:''},
-    {date:'Jul 2025', text:'L4S (Low Latency Low Loss Scalable Throughput) deployed nationwide', cls:''},
-    {date:'Aug 2025', text:'Enterprise eMBB slice launched for business subscribers', cls:''},
-    {date:'Oct 2025', text:'ULCL Edge + Edge Platform launched for enterprise edge computing', cls:''},
-    {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung Galaxy S25 Ultra, etc.)', cls:''},
+    {date:'Apr 2025', text:'Example operator milestone: 5G-Advanced service rollout', cls:''},
+    {date:'Jul 2025', text:'Example operator milestone: L4S (Low Latency Low Loss Scalable Throughput) rollout', cls:''},
+    {date:'Aug 2025', text:'Example operator milestone: Enterprise eMBB slice launch for business subscribers', cls:''},
+    {date:'Oct 2025', text:'Example operator milestone: ULCL Edge + Edge Platform launch for enterprise edge computing', cls:''},
+    {date:'Dec 2025', text:'Rel-19 UE features such as UL Tx switching entering commercial device roadmaps', cls:''},
     {date:'Dec 2025', text:'3GPP Rel-19 frozen — second 5G-Advanced release. 3GPP focus shifts to Rel-20 (5G-Advanced + 6G studies).', cls:''},
   ];
-  let html = `<h2>Technology Timeline</h2><p>Key milestones in the 5G and 5G-Advanced journey — through the completion of Rel-19 in December 2025.</p>`;
+  let html = `<h2>Technology Timeline</h2><p>Illustrative 5G and 5G-Advanced milestones through the completion of Rel-19 in December 2025. Operator-specific dates are examples, not universal availability.</p>`;
   html += '<div class="timeline-container"><div class="timeline-line"></div>';
   events.forEach(e => {
     html += `<div class="timeline-item ${e.cls}"><div class="timeline-dot"></div><div class="timeline-date">${e.date}</div><div class="timeline-text">${e.text}</div></div>`;
@@ -6927,16 +6936,16 @@ function renderBandMap(el) {
     {band:'n260', freq:'39 GHz', type:'TDD mmWave', bw:'Up to 800 MHz', coverage:'Dense urban, venues, stadiums', use:'Ultra-high throughput hotspots'},
   ];
   let html = '<h2>5G Band Map</h2>';
-  html += '<p>Deployed NR bands across the 5G SA network.</p>';
+  html += '<p>Illustrative low-, mid-, and mmWave NR bands used in U.S. 5G deployments. Band definitions are standardized; operator and market availability vary.</p>';
   html += '<table class="ref-table"><thead><tr><th>Band</th><th>Frequency</th><th>Type</th><th>Bandwidth</th><th>Coverage</th><th>Primary Use</th></tr></thead><tbody>';
   bands.forEach(b => {
     html += `<tr><td>${b.band}</td><td>${b.freq}</td><td>${b.type}</td><td>${b.bw}</td><td>${b.coverage}</td><td>${b.use}</td></tr>`;
   });
   html += '</tbody></table>';
   html += '<div class="spec-section" style="margin-top:24px"><h3>Key Notes</h3><ul class="spec-list">';
-  html += '<li><span class="spec-num">n41</span><span class="spec-title">Primary Differentiator</span><span class="spec-desc">2.5 GHz TDD mid-band — large channel bandwidths enable high-capacity 5G coverage</span></li>';
+  html += '<li><span class="spec-num">n41</span><span class="spec-title">Mid-Band Example</span><span class="spec-desc">2.5 GHz TDD mid-band — large channel bandwidths can enable high-capacity 5G coverage</span></li>';
   html += '<li><span class="spec-num">CA</span><span class="spec-title">Carrier Aggregation</span><span class="spec-desc">Combines multiple bands for peak throughput: e.g., n71+n41 or n25+n41</span></li>';
-  html += '<li><span class="spec-num">5G SA</span><span class="spec-title">Standalone Mode</span><span class="spec-desc">All bands support 5G SA mode on the network</span></li>';
+  html += '<li><span class="spec-num">5G SA</span><span class="spec-title">Standalone Mode</span><span class="spec-desc">5G SA support depends on device, band combination, market, and operator deployment</span></li>';
   html += '</ul></div>';
   el.innerHTML = html;
 }
@@ -6982,7 +6991,7 @@ function renderIntroWhatIs5G(el) {
   html += '<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Rel-19 (Dec 2025) — 5G-Advanced (Second Release)</div><div class="timeline-text">The second 5G-Advanced release (frozen December 2025). Key additions: normative AI/ML for NR air interface, Ambient IoT Phase 2, NTN evolution, advanced MIMO up to 128 ports, eRedCap, L1/L2 mobility (&lt;5ms handover), network energy savings Phase 2, sidelink relay, enhanced positioning, network slicing Phase 3, and NWDAF federated learning. See the "What 5G-Advanced Adds" page for the full Rel-19 deep dive.</div></div>';
   html += '</div>';
 
-  html += '<p>The flows in this tool cover capabilities from Rel-15 through Rel-19, with each flow\'s specification references noted in the sidebar narrative. See the "What 5G-Advanced Adds" page in the sidebar for a detailed breakdown of what each release — especially Rel-19 — introduces. The badge system marks all content in this file as FACT — grounded in deployed 3GPP specifications.</p>';
+  html += '<p>The flows in this tool cover capabilities from Rel-15 through Rel-19, with each flow\'s specification references noted in the sidebar narrative. See the "What 5G-Advanced Adds" page in the sidebar for a detailed breakdown of what each release — especially Rel-19 — introduces. The badge system marks content in this file as FACT where it is grounded in 3GPP specifications or clearly labeled operator/product examples.</p>';
 
   el.innerHTML = html;
 
@@ -7311,13 +7320,13 @@ function renderIntro5GAdvanced(el) {
   html += '<p>Rel-16 introduced NR sidelink (PC5 interface) for V2X. Rel-19 extends sidelink to <strong>UE-to-network relay</strong> (a UE out of coverage can relay through a nearby UE that has network access), <strong>public safety relay</strong> (multi-hop relaying for first responder communications), and <strong>commercial device-to-device</strong> (D2D) proximity services. Sidelink enhancements also include improved resource allocation, power control, and support for higher QoS classes — enabling the same PC5 air interface to serve automotive, industrial, and consumer use cases.</p>';
 
   html += '<h4>Enhanced Positioning</h4>';
-  html += '<p>Building on Rel-16/17 NR positioning, Rel-19 targets <strong>centimeter-level accuracy</strong> using a combination of DL-TDoA, UL-AoA, multi-RTT, and carrier-phase measurements. Sidelink-based positioning is also introduced (devices assist each other for indoor/industrial scenarios). This is significant for warehouse robotics, indoor navigation, and AR/VR spatial anchoring — and a precursor to the integrated sensing capabilities of 6G ISAC.</p>';
+  html += '<p>Building on Rel-16/17 NR positioning, Rel-19 targets <strong>centimeter-class positioning enhancements</strong> using a combination of DL-TDoA, UL-AoA, multi-RTT, and carrier-phase measurements. Sidelink-based positioning is also introduced (devices assist each other for indoor/industrial scenarios). This is significant for warehouse robotics, indoor navigation, and AR/VR spatial anchoring — and a precursor to the integrated sensing capabilities of 6G ISAC.</p>';
 
   html += '<h4>Mobility Enhancements</h4>';
   html += '<p>Rel-19 introduces <strong>L1/L2-based inter-cell mobility</strong> — the UE can switch serving cells using fast L1/L2 signaling (MAC CE and PHY-layer commands) instead of the traditional RRC reconfiguration path. This reduces handover interruption time from ~30-50ms to potentially <strong>&lt;5ms</strong>. Combined with <strong>conditional handover (CHO) improvements</strong>, the network can pre-configure multiple target cells and the UE executes instantly when conditions are met. This is critical for XR, cloud gaming, and automotive applications that cannot tolerate handover gaps.</p>';
 
   html += '<h4>Network Slicing Phase 3</h4>';
-  html += '<p>Rel-19 enhances slicing with <strong>slice SLA assurance</strong> (the RAN and core actively monitor and enforce per-slice KPIs — throughput, latency, reliability — with corrective actions when SLAs are at risk), <strong>slice-specific charging enhancements</strong> (differentiated rating and quota management per slice, enabling distinct pricing models), and <strong>improved slice interworking</strong> (seamless UE transition between slices and cross-PLMN slicing for roaming). These capabilities make network slicing operationally production-ready for enterprise SLA contracts.</p>';
+  html += '<p>Rel-19 enhances slicing with <strong>slice assurance</strong> (the RAN and core monitor per-slice KPIs — throughput, latency, reliability — and can take corrective actions when service objectives are at risk), <strong>slice-specific charging enhancements</strong> (differentiated rating and quota management per slice, enabling distinct pricing models), and <strong>improved slice interworking</strong> (seamless UE transition between slices and cross-PLMN slicing for roaming). Commercial SLA packaging and guarantees remain operator-specific.</p>';
 
   html += '<h4>Additional Rel-19 Capabilities</h4>';
   html += '<table class="ref-table"><thead><tr><th>Feature</th><th>What It Does</th><th>Significance</th></tr></thead><tbody>';
@@ -7343,7 +7352,7 @@ function renderIntro5GAdvanced(el) {
   html += '<tr><td>AI/ML for NR air interface</td><td>Integrated AI and Communication</td><td>Standardized AI at L1/PHY → full AI-native protocol stack in 6G</td></tr>';
   html += '<tr><td>Ambient IoT Phase 2</td><td>Massive Communication</td><td>RF-harvesting tags at 5G scale → tens of billions of devices in 6G</td></tr>';
   html += '<tr><td>NTN evolution + UE relay</td><td>Ubiquitous Connectivity</td><td>Satellite access + mesh relay → native NTN + global coverage in 6G</td></tr>';
-  html += '<tr><td>Enhanced positioning</td><td>Integrated Sensing and Communication</td><td>cm-level NR positioning → unified ISAC waveform in 6G</td></tr>';
+  html += '<tr><td>Enhanced positioning</td><td>Integrated Sensing and Communication</td><td>centimeter-class NR positioning targets → unified ISAC waveform in 6G</td></tr>';
   html += '<tr><td>NWDAF federated learning</td><td>AI-Native Network</td><td>Distributed analytics → network-wide autonomous AI in 6G</td></tr>';
   html += '<tr><td>RAN-visible QoE</td><td>Intent-Driven Networking</td><td>App QoE feedback → intent-based autonomous optimization in 6G</td></tr>';
   html += '</tbody></table>';
@@ -7361,7 +7370,7 @@ function showWelcome() {
     <p><strong>New to 5G?</strong> Start with the "Introduction to 5G" section in the sidebar — five pages that build your understanding from the ground up: what 5G is, how it differs from 4G, the network functions you will encounter in every flow, the interfaces and protocols that connect them, and what 5G-Advanced adds beyond the baseline.</p>
     <h3>Badge System</h3>
     <div class="badge-legend" style="grid-template-columns:1fr;">
-      <div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in deployed 3GPP specs and production network architecture</span></div>
+      <div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in 3GPP specifications, with operator/product examples clearly labeled as illustrative</span></div>
     </div>
     <h3>Keyboard Shortcuts</h3>
     <div class="shortcut-grid">
