@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3GPP Protocol Flow Simulator — AI-RAN & 6G</title>
+<title>3GPP Protocol Flow Simulator — AI-RAN &amp; 6G</title>
 <style>
 
 :root, [data-theme="light"] {
@@ -1812,7 +1812,7 @@ FLOWS['airan_data_zerohop'] = {
 /* ====== FLOW 4: AI-RAN Telemetry & Charging ====== */
 FLOWS['airan_telemetry'] = {
   id:'airan_telemetry', title:'AI-RAN Telemetry & Charging', section:'airan', badge:'PROJECTED',
-  specRef:'TS 32.255, TS 32.290, O-RAN WG3, NVIDIA Base Command',
+  specRef:'TS 32.255, TS 32.291, O-RAN WG3, NVIDIA Base Command',
   narrative:'AI-RAN generates rich telemetry data from GPU processing — beam prediction accuracy, L1 decode latency, GPU utilization, shared-memory throughput — and reports it via O-RAN E2 interface to NWDAF for analytics. Charging follows the standard converged charging framework (CHF) but includes AI-RAN-specific usage attributes.',
   nodes:['ai_ran','gpu','nwdaf','chf','smf','aictl'],
   connections:[
@@ -1927,22 +1927,21 @@ FLOWS['airan_telemetry'] = {
 // for network-wide correlation and charging input
 // via Nnwdaf_EventsSubscription service`}},
     {id:3, label:'Step 3: Analytics Subscription', from:'aictl', to:'nwdaf', interface:'Nnwdaf — Analytics Service', protocol:'HTTP/2 (SBI)', badge:'PROJECTED', lineType:'cp',
-      description:'AI-RAN Controller forwards enriched telemetry to NWDAF via Nnwdaf_EventsSubscription. NWDAF correlates AI-RAN metrics with network-wide analytics for capacity planning and anomaly detection.',
-      ingress:{title:'Nnwdaf_EventsSubscription Notification',
+      description:'AI-RAN Controller creates a projected NWDAF analytics subscription and provides AI-RAN metrics as input context. In current 5GC, NWDAF sends notifications to the consumer callback URI rather than receiving a /notify POST on its own subscription endpoint.',
+      ingress:{title:'Nnwdaf_EventsSubscription Create Request',
         code:`// PROJECTED: based on NVIDIA Aerial SDK
-// AI-RAN Controller → NWDAF: Analytics notification
+// AI-RAN Controller → NWDAF: create analytics subscription
 // POST /nnwdaf-eventssubscription/v1/subscriptions
-//      /{subscriptionId}/notify
 {
-  "notificationUri": "nnwdaf-01.5gc.mnc01.mcc001.3gppnetwork.org",
-  "subscriptionId": "SUB-AIRAN-ANALYTICS-001",
-  "eventNotifications": [{
-    "event": "AI_RAN_PERFORMANCE",
-    "timestamp": "2026-04-01T15:30:00.200Z",
-    "aiRanAnalytics": {
+  "notificationUri": "https://airan-ctrl.operator.example/callbacks/nwdaf",
+  "eventSubscriptions": [{
+    "event": "AI_RAN_PERFORMANCE",  // projected analytics event name
+    "eventFilter": {
       "nodeId": "airan-ic-node-01",
       "plmn": { "mcc": "001", "mnc": "01" },
-      "cellId": "00A100042",
+      "cellId": "00A100042"
+    },
+    "analyticsInput": {
       "gpu_utilization_pct": 67,
       "beam_prediction_accuracy": 0.968,
       "l1_latency_us": { "avg": 89, "p50": 82, "p99": 142 },
@@ -1979,11 +1978,11 @@ FLOWS['airan_telemetry'] = {
 }
 // NWDAF provides analytics to SMF for
 // policy adjustment and charging enrichment`}},
-    {id:4, label:'Step 4: NWDAF Analytics Notification', from:'nwdaf', to:'smf', interface:'Nnwdaf — Analytics Info', protocol:'HTTP/2 (SBI)', badge:'PROJECTED', lineType:'cp',
-      description:'NWDAF sends analytics notification to SMF with AI-RAN performance insights. SMF uses this for session-level QoS adjustment and to enrich charging data with AI-RAN-specific attributes.',
-      ingress:{title:'NWDAF → SMF Analytics Notification',
+    {id:4, label:'Step 4: NWDAF Analytics Notification', from:'nwdaf', to:'smf', interface:'Nnwdaf — Analytics Notification', protocol:'HTTP/2 (SBI)', badge:'PROJECTED', lineType:'cp',
+      description:'NWDAF sends an analytics notification callback to the SMF notification URI with AI-RAN performance insights. SMF uses this for session-level QoS adjustment and to enrich charging data with AI-RAN-specific attributes.',
+      ingress:{title:'NWDAF → SMF Analytics Notification Callback',
         code:`// PROJECTED: based on NVIDIA Aerial SDK
-// NWDAF → SMF: Nnwdaf_AnalyticsInfo_Notify
+// NWDAF → SMF callback: Nnwdaf_EventsSubscription_Notify
 {
   "analyticsNotification": {
     "analyticsId": "AI_RAN_PERFORMANCE",
@@ -2897,7 +2896,7 @@ FLOWS['sixg_data'] = {
 //
 // Twin accuracy: 95% at 500ms horizon
 // Result: zero jitter, zero buffer underrun`}},
-    {id:2, label:'Step 2: UL: 6G Sub-THz Transmission', from:'ue', to:'ai_ran', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'6G NR (Sub-THz Waveform)', badge:'VISION', lineType:'dp',
+    {id:2, label:'Step 2: UL: 6G Sub-THz Transmission', from:'ue', to:'ai_ran', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'6G Air Interface (Sub-THz Waveform)', badge:'VISION', lineType:'dp',
       description:'UE transmits uplink data on the sub-THz band (142.5 GHz, 2 GHz bandwidth). AI-RAN receives with AI-predicted beam already aligned — zero beam-search latency.',
       ingress:{title:'Sub-THz Uplink Transmission',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -2955,7 +2954,8 @@ FLOWS['sixg_data'] = {
 // AI-RAN GPU → N3 → UPF: zero-copy uplink
 {
   "n3Header": {
-    "version": "GTPv2-6G",
+    "version": 1,
+    "profile": "6G-enhanced GTP-U (illustrative)",
     "teid": "0x60742001",
     "sequenceNumber": 847291,
     "qfi": 1,
@@ -3099,7 +3099,7 @@ FLOWS['sixg_data'] = {
 //   buffer → queue → schedule → encode (~500μs)
 // 6G (predictive): buffer waiting → immediate
 //   process → encode (~58μs, 8.6x faster)`}},
-    {id:6, label:'Step 6: DL: Predictive Beam Transmission', from:'ai_ran', to:'ue', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'6G NR (Predictive Beam)', badge:'VISION', lineType:'dp',
+    {id:6, label:'Step 6: DL: Predictive Beam Transmission', from:'ai_ran', to:'ue', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'6G Air Interface (Predictive Beam)', badge:'VISION', lineType:'dp',
       description:'AI-RAN transmits downlink on the sub-THz band using AI-predicted optimal beam path. The beam was pre-configured by the twin before the data even arrived — zero beam-alignment delay.',
       ingress:{title:'Sub-THz Downlink — Predictive Beam',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -3447,7 +3447,7 @@ FLOWS['sixg_intent_slice'] = {
       "packetErrorBudget": 1e-7
     },
     "tunnelConfig": {
-      "protocol": "GTP-U-6G-enhanced",
+      "protocol": "GTP-U with 6G-enhanced extensions (illustrative)",
       "headerCompression": "AI-adaptive",
       "segmentRouting": true
     },
@@ -5443,7 +5443,7 @@ FLOWS['sixg_isac'] = {
       "mimoLayers": 16
     },
     "targetArea": {
-      "sectorId": "sector-7-n260-ISAC",
+      "sectorId": "sector-7-subthz-ISAC",
       "coverageRadius_m": 200,
       "sensingRange_m": 300
     }
@@ -5470,7 +5470,7 @@ FLOWS['sixg_isac'] = {
     "readyForTransmission": true
   }
 }`}},
-    {id:2, label:'Step 2: ISAC Waveform Transmission', from:'ai_ran', to:'ue', interface:'Uu — Sub-THz ISAC', protocol:'6G NR-ISAC', badge:'VISION', lineType:'dp',
+    {id:2, label:'Step 2: ISAC Waveform Transmission', from:'ai_ran', to:'ue', interface:'Uu — Sub-THz ISAC', protocol:'6G ISAC Air Interface', badge:'VISION', lineType:'dp',
       description:'Transmit combined sensing/communication signal on sub-THz band. Data encoded normally; sensing uses reflected energy from the same waveform.',
       ingress:{title:'Joint Sensing + Communication Signal',
         code:`// VISION: 6G ISAC waveform transmission
@@ -5528,7 +5528,7 @@ FLOWS['sixg_isac'] = {
     "sensingTransparency": "UE unaware of sensing — standard DL reception"
   }
 }`}},
-    {id:3, label:'Step 3: Response + Reflected Signal', from:'ue', to:'ai_ran', interface:'Uu — Uplink + Reflections', protocol:'6G NR-ISAC Echo', badge:'VISION', lineType:'dp',
+    {id:3, label:'Step 3: Response + Reflected Signal', from:'ue', to:'ai_ran', interface:'Uu — Uplink + Reflections', protocol:'6G ISAC Echo / Uplink', badge:'VISION', lineType:'dp',
       description:'UE sends uplink data. Simultaneously, reflected signals from environment return to the AI-RAN antenna array for sensing processing.',
       ingress:{title:'UE Uplink + Environmental Reflections',
         code:`// VISION: UE sends UL data + environment reflects DL signal
@@ -6284,7 +6284,7 @@ function drawArchSBA(container) {
   const bus = svgEl('rect', {x:60,y:90,width:780,height:24,rx:4,fill:'var(--svg-box-fill)',stroke:'var(--accent)','stroke-width':2,'stroke-dasharray':'8 4'});
   svg.appendChild(bus);
   const busT = svgEl('text', {x:450,y:104,'text-anchor':'middle','dominant-baseline':'middle',fill:'var(--accent)','font-size':'10','font-weight':'700','font-family':"'Segoe UI',system-ui,sans-serif"});
-  busT.textContent = 'Service-Based Architecture (SBA) Bus — Nservice-based interfaces'; svg.appendChild(busT);
+  busT.textContent = 'Service-Based Architecture (SBA) Bus — Nxx service-based interfaces'; svg.appendChild(busT);
   // CP NFs on bus
   const cpNfs = [
     {l:'NRF',s:'Nnrf',x:70},{l:'NSSF',s:'Nnssf',x:155},{l:'AUSF',s:'Nausf',x:240},{l:'UDM',s:'Nudm',x:325},
@@ -7304,8 +7304,8 @@ function renderIntro6GTechnologies(el) {
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--text-primary);">6G Vision</strong><span>Unified AI Core → AI-Native Service Mesh → ML inference decisions → Direct UPF programming → Continuous adaptation</span></div>';
   html += '</div>';
   html += '<h3>Integrated Sensing and Communication (ISAC)</h3>';
-  html += '<p>ISAC is one of the defining new capabilities of 6G. Today, communication and sensing (radar) use separate systems on separate spectrum. ISAC unifies them: the same waveform that carries user data also bounces off objects in the environment, and the returned signal is analyzed to detect position, velocity, and characteristics of physical objects. This enables the network to "see" its environment — detecting pedestrians, vehicles, drones, weather patterns — while simultaneously providing connectivity. Flow 14 (ISAC) demonstrates how a gNB transmits a joint waveform, receives reflected returns, and feeds fused sensing data to applications.</p>';
-  html += '<p>The sensing capability uses the existing OFDM waveform structure extended to higher frequencies (sub-THz bands at 100–300 GHz provide the bandwidth needed for cm-level spatial resolution). The gNB acts as both a communication node and a monostatic or bistatic radar. Processing the sensing returns requires significant compute — this is where the GPU infrastructure from AI-RAN becomes essential for 6G.</p>';
+  html += '<p>ISAC is one of the defining new capabilities of 6G. Today, communication and sensing (radar) use separate systems on separate spectrum. ISAC unifies them: the same waveform that carries user data also bounces off objects in the environment, and the returned signal is analyzed to detect position, velocity, and characteristics of physical objects. This enables the network to "see" its environment — detecting pedestrians, vehicles, drones, weather patterns — while simultaneously providing connectivity. Flow 14 (ISAC) demonstrates how an AI-RAN/base-station node transmits a joint waveform, receives reflected returns, and feeds fused sensing data to applications.</p>';
+  html += '<p>The sensing capability uses the existing OFDM waveform structure extended to higher frequencies (sub-THz bands at 100–300 GHz provide the bandwidth needed for cm-level spatial resolution). The 6G base-station node acts as both a communication node and a monostatic or bistatic radar. Processing the sensing returns requires significant compute — this is where the GPU infrastructure from AI-RAN becomes essential for 6G.</p>';
   html += '<h3>Network Digital Twin</h3>';
   html += '<p>A Network Digital Twin is a continuously updated virtual replica of the physical network — every cell, every UE, every link, every load metric — running in real time. In 5G, NWDAF provides analytics on collected data, but it operates on historical or near-real-time snapshots. The 6G Digital Twin (Flow 13) goes further: it maintains a live simulation of the entire network that can predict the impact of configuration changes before they are applied. The Digital Twin Engine ingests telemetry from all network elements, runs what-if scenarios (e.g., "what happens if we add 5,000 UEs to this sector?"), and recommends or autonomously executes optimizations.</p>';
   html += '<p>The Digital Twin closes a loop: Physical Network → Telemetry → Digital Twin Model → Predictive Simulation → Optimization Decision → Physical Network. The twin must process network state at sub-second granularity to be useful for real-time decisions. In the 6G flows, the Digital Twin works in concert with the AI Core and Intent Engine.</p>';
@@ -7334,7 +7334,7 @@ function renderIntro6GTechnologies(el) {
 function showWelcome() {
   showView('welcome');
   document.getElementById('welcome-view').innerHTML = '<div class="welcome-container">' +
-    '<h2>3GPP Protocol Flow Simulator — AI-RAN & 6G</h2>' +
+    '<h2>3GPP Protocol Flow Simulator — AI-RAN &amp; 6G</h2>' +
     '<p>An interactive tool for stepping through AI-RAN and 6G protocol flows. 14 flows across AI-RAN (Innovation Center), 6G AI-Native foundational, and 6G advanced concepts, plus an introductory learning section and 6 reference pages including architecture diagrams, specifications, glossary, latency comparison, technology timeline, and band map.</p>' +
     '<p><strong>New to AI-RAN or 6G?</strong> Start with the "Introduction" section in the sidebar — five pages that build your understanding progressively: the evolutionary context from 5G to 6G, what AI-RAN is and how it works, how AI-RAN compares to a traditional gNB, the 6G vision and timeline, and the key technologies you will encounter in the flows.</p>' +
     '<h3>Badge System</h3>' +
