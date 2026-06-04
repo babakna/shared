@@ -35,6 +35,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 .hdr{background:var(--bg1);border-bottom:1px solid var(--bdr);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;transition:background .3s,border-color .3s}
 .hdr-l{display:flex;align-items:center;gap:14px}
 .hdr-ico{width:36px;height:36px;background:var(--mag);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;flex-shrink:0}
+.ver{display:inline-flex;align-items:center;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--mag);color:#fff;font-size:11px;font-weight:800;letter-spacing:.4px;vertical-align:middle}
 .hdr-t{font-size:20px;font-weight:700;color:var(--tx0)}
 .hdr-s{font-size:12px;color:var(--tx2);margin-top:1px}
 .thm{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background .2s,border-color .2s;color:var(--tx1);flex-shrink:0}
@@ -261,7 +262,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer</div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; <span style="color:#1E3A5F">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Content audit: June 2026 &middot; <span style="color:#1E3A5F">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -297,7 +298,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
    All spec-dependent data lives here.
    To update: modify entries in this section ONLY.
    Rendering logic below reads from these objects.
-   Last updated: April 2026
+   Content audit: June 2026. Public GSMA version labels and draft timelines should be re-verified against GSMA source pages before operational use.
    ═══════════════════════════════════════════════════════════ */
 
 // ── 1. Spec Versions ──
@@ -307,7 +308,7 @@ const SPEC_VERSIONS = {
   'SGP.16':'v2.1','SGP.21':'v3.1','SGP.22':'v3.1','SGP.22_v2':'v2.6.1',
   'SGP.23':'v3.1','SGP.24':'v2.2','SGP.25':'v1.0','SGP.26':'v1.0',
   'SGP.29':'v2.1','SGP.31':'v1.2','SGP.32':'v1.2','SGP.33':'v1.0',
-  'SGP.41':'v1.0 (Feb 2025)','SGP.42':'Draft (target Q3 2026 \u2014 verify timeline)','FS.18':'\u2014'
+  'SGP.41':'v1.0 (public listing; verify current revision)','SGP.42':'Draft / source-verification needed','FS.18':'\u2014'
 };
 
 // ── 2. Entity Colors ──
@@ -328,14 +329,13 @@ const EC={
 // These follow the same schema comment pattern and are referenced by tools.
 
 // ── 13. CI PKID Reference Table ──
-// VERIFY: CI PKID hex values must be confirmed against GSMA CI certificate registry.
-// The hex values below are PLACEHOLDER EXAMPLES awaiting verification against GSMA PKI portal.
-// Status as of April 2026: UNVERIFIED. Cross-reference with GSMA SAS-SM audit reports.
+// SOURCE-VERIFICATION NEEDED: CI PKID rows below are illustrative placeholders.
+// Confirm CI PKID, certificate chain, and production/test status against the current GSMA PKI/CI registry before use.
 var CI_PKIDS=[
-  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795AEBFB',gen:'GSMA CI v1 (Production)',usage:'Primary production CI for SM-DP+ and eUICC certificates. Most deployed eUICCs trust this CI.',status:'Active'},
-  {pkid:'3C4FB01011E3F9CECAF83CCDB5EBB36F49B8B85A',gen:'GSMA CI v2 (Production)',usage:'Second-generation production CI. Newer eUICCs trust both v1 and v2.',status:'Active'},
-  {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'GSMA Test CI (EUM)',usage:'Test CI for lab environments. NEVER present in production eUICCs.',status:'Test Only'},
-  {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'GSMA Test CI (SM-DP+)',usage:'Test CI for SM-DP+ in test environments. Will fail against production eUICCs.',status:'Test Only'}
+  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795AEBFB',gen:'Example CI PKID',usage:'Illustrative placeholder only. Verify CI PKID, certificate chain, and production/test status against the GSMA PKI/CI registry before use.',status:'Unverified'},
+  {pkid:'3C4FB01011E3F9CECAF83CCDB5EBB36F49B8B85A',gen:'Example CI PKID',usage:'Illustrative placeholder only. Do not treat this as a live production trust anchor without source verification.',status:'Unverified'},
+  {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'Example test CI PKID',usage:'Illustrative lab/test placeholder only. Confirm against the current GSMA test certificate material before use.',status:'Unverified'},
+  {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'Example test CI PKID',usage:'Illustrative lab/test placeholder only. Confirm against the current GSMA test certificate material before use.',status:'Unverified'}
 ];
 
 // ── 14. Error Flow Decision Tree ──
@@ -382,26 +382,25 @@ var DECISION_TREE={
 // Vendor behavior may vary by firmware version, deployment configuration, and contractual customization.
 var VENDOR_QUIRKS=[
   {vendor:'Thales',roles:'SM-DP+ / SM-SR / eUICC',items:[
-    'SM-SR uses SCP80 (Binary SMS) by default for M2M remote channel',
-    'eUICC OS versions may have different euiccInfo2 field support',
-    'Notification retry: 3 attempts at 5-minute intervals, then queued',
-    'EUM prefix: 89033023, 89033090'
+    'M2M remote-channel transport and retry behavior are deployment-specific; verify SCP80/SCP81/SCP03t settings with the vendor.',
+    'eUICC OS versions may expose different euiccInfo2 fields and optional capabilities.',
+    'EUM prefix mappings are not authoritative in this file; confirm against GSMA/EUM documentation.'
   ]},
   {vendor:'IDEMIA',roles:'SM-DP+ / eUICC',items:[
-    'SM-DP+ returns extended profile metadata in ES9+.AuthenticateClient response',
-    'eUICC supports both GSMA CI v1 and v2 in production',
-    'EUM prefix: 89033024'
+    'Profile metadata returned during authentication may vary by platform release and operator configuration.',
+    'Trusted CI lists vary by eUICC product, certificate personalization, and production/test environment.',
+    'EUM prefix mappings are not authoritative in this file; confirm against GSMA/EUM documentation.'
   ]},
   {vendor:'G+D',roles:'SM-DP+ / SM-SR / eUICC',items:[
-    'SM-DP+ supports batch profile preparation via ES2+ extensions',
-    'ARA-M (Access Rule Application Master) handling differs between eUICC OS versions',
-    'EUM prefix: 89049032, 89049038'
+    'Batch preparation and portal/API behavior may be product-specific rather than GSMA-interface behavior.',
+    'ARA-M (Access Rule Application Master) handling can differ between eUICC OS versions.',
+    'EUM prefix mappings are not authoritative in this file; confirm against GSMA/EUM documentation.'
   ]},
   {vendor:'General Quirks',roles:'Cross-Vendor',items:[
     'Profile size varies significantly between vendors \u2014 always test profile installation on target eUICC before bulk ordering',
     'Notification handling timing varies: some SM-DP+ implementations wait for notification before confirming ES2+ status to Operator; others update immediately',
-    'CI PKID list differences: older eUICCs may only trust GSMA CI v1; newer eUICCs trust both v1 and v2',
-    'Test vs production CI mismatch is the #1 cause of mutual authentication failures in lab environments'
+    'CI PKID list differences are common; compare the eUICC trusted CI list with the SM-DP+/SM-DS certificate chain for each deployment',
+    'Test vs production CI mismatch is a common cause of mutual authentication failures in lab environments'
   ]}
 ];
 
@@ -434,8 +433,8 @@ entities:['Operator','SM-DP+','SM-DS','eIM','IPAd','IPAe','eUICC (IoT)'],
 flows:{'iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
 
 ifpp:{badge:'SGP.41 '+SPEC_VERSIONS['SGP.41']+' / SGP.42 '+SPEC_VERSIONS['SGP.42'],title:'In-Factory Profile Provisioning (IFPP)',
-whatsNew:'First release (Feb 2025). Defines architecture and requirements for in-factory provisioning. Technical specification (SGP.42) expected Q3 2026.',
-overview:['SGP.41 and SGP.42 define the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 (Architecture and Requirements) was published in February 2025; SGP.42 (Technical Specification) is expected to be finalized by Q3 2026.','IFPP addresses a critical gap in the eSIM ecosystem. With SGP.22 and SGP.32, profile provisioning requires an online connection to the SM-DP+ and multiple round-trip exchanges, which introduces delays and complexity on factory floors where production speed is paramount. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The security model ensures that even though the BPP is pre-generated, it remains cryptographically bound to a specific eUICC, maintaining the same security guarantees as online provisioning.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Since SGP.42 is not yet finalized, the flows below represent the architectural framework from SGP.41 v1.0. They will be updated as the technical specification matures.','<b>Real-World Deployments:</b> <b>Consumer devices are a prime use case</b> \u2014 specifically, installing provisioning (bootstrap) profiles outside the EUM manufacturing plant. This has been done for years and is one of the most practical applications of IFPP. Other use cases include: smart meters manufactured in bulk with a known target operator; automotive modules where factory line speed is critical \u2014 each eUICC gets its profile loaded in seconds via local interface, not minutes over the network; global IoT devices where the shipping destination determines the operator \u2014 Late Binding assigns the profile at the last moment during packaging/configuration.'],
+whatsNew:'SGP.41 architecture/requirements are public; SGP.42 technical details remain draft/source-verification-needed for this page.',
+overview:['SGP.41 and SGP.42 define the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 covers architecture and requirements; the SGP.42 technical specification status and timeline should be verified against current GSMA source pages before relying on implementation details.','IFPP addresses a critical gap in the eSIM ecosystem. With SGP.22 and SGP.32, profile provisioning requires an online connection to the SM-DP+ and multiple round-trip exchanges, which introduces delays and complexity on factory floors where production speed is paramount. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The security model ensures that even though the BPP is pre-generated, it remains cryptographically bound to a specific eUICC, maintaining the same security guarantees as online provisioning.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Since SGP.42 implementation details are draft/source-verification-needed for this page, the flows below are conceptual and based on the SGP.41 architectural framework. Update them against the final technical specification before using as an implementation checklist.','<b>Deployment Examples (illustrative):</b> Consumer bootstrap-profile installation, smart meters, automotive modules, and global IoT devices are example IFPP use cases. Treat these as illustrative, not claims about specific vendor, operator, or production deployment. Late Binding examples are conceptual until verified against final SGP.42 text and implementation guidance.'],
 entities:['Operator','SM-DP+ (Profile Provider)','Factory System','eUICC'],
 flows:{'ifpp-prep':'Profile Preparation for Factory','ifpp-install':'Factory Installation','ifpp-late-binding':'Late Binding \u2014 Configuration-Time Provisioning'}}
 };
@@ -1167,7 +1166,7 @@ function diagHTML(fid){
   var isIfpp=fid.indexOf('ifpp')===0;
   var nodes=parseNodes(fl),nc=nodes.length,step=gs(fid),total=fl.steps.length;
   var h='';
-  if(isIfpp)h+='<div style="padding:10px 16px;margin-bottom:10px;background:rgba(217,119,6,.1);border:1px solid #D97706;border-radius:8px;font-size:12px;color:#92400E;font-weight:600">\u26A0 Draft: SGP.42 technical specification is not yet finalized. These flow steps represent the architectural framework from SGP.41 v1.0 and may change.</div>';
+  if(isIfpp)h+='<div style="padding:10px 16px;margin-bottom:10px;background:rgba(217,119,6,.1);border:1px solid #D97706;border-radius:8px;font-size:12px;color:#92400E;font-weight:600">\u26A0 Draft/source-verification needed: SGP.42 implementation details should be checked against current GSMA publications. These flow steps are conceptual and may change.</div>';
   h+='<div class="dbox" id="dx-'+fid+'">';
   h+='<div class="dctrl">';
   h+='<button class="cbtn" data-a="reset" data-f="'+fid+'">\u23EE Reset</button>';
@@ -1264,6 +1263,7 @@ function drawArrows(){
 /* ── eSIM 101 Tab ── */
 function esim101HTML(){
   var h='';
+  h+='<div class="ocard"><span class="badge">V2.0 &mdash; AUDITED JUNE 2026</span><h2 class="otitle">Technical Accuracy Notes</h2><div class="otxt"><p>This reference is educational. Version labels, draft timelines, CI PKIDs, EUM/device pattern mappings, vendor behavior, and deployment examples must be source-verified against current GSMA publications, PKI material, vendor documentation, and operator implementation data before operational use.</p></div></div>';
   
   /* Section 1: What Is eSIM? */
   h+='<div class="ocard"><span class="badge">START HERE</span><h2 class="otitle">What Is eSIM?</h2>';
@@ -1318,7 +1318,7 @@ function esim101HTML(){
   h+='<tr><td style="font-weight:700">Provisioning model</td><td>Push (network-initiated via SM-SR)</td><td>Pull (device-initiated via LPA)</td><td>Both (Direct = push, Indirect = pull)</td><td>Local (factory wired interface)</td></tr>';
   h+='<tr><td style="font-weight:700">Key backend entity</td><td>SM-DP + SM-SR</td><td>SM-DP+</td><td>SM-DP+ + eIM</td><td>SM-DP+ + Factory System</td></tr>';
   h+='<tr><td style="font-weight:700">Connectivity at install</td><td>Yes (SMS/IP)</td><td>Yes (HTTPS)</td><td>Yes (IP/CoAP/MQTT/SMS)</td><td>No (key advantage)</td></tr>';
-  h+='<tr><td style="font-weight:700">Spec maturity</td><td>Mature/stable</td><td>Mature/evolving</td><td>Published, certification active</td><td>SGP.41 published; SGP.42 draft</td></tr>';
+  h+='<tr><td style="font-weight:700">Spec maturity</td><td>Mature/stable</td><td>Mature/evolving</td><td>Published; verify current certification status</td><td>SGP.41 published; SGP.42 draft/source-verification needed</td></tr>';
   h+='</tbody></table></div>';
   
   /* Section 3: Terminology Cheat Sheet */
@@ -1480,11 +1480,11 @@ function qrHTML(){
   ['Requires user UI?','No','Yes (consent mandatory)','No','No'],
   ['Key backend entity','SM-DP + SM-SR (separate)','SM-DP+ (combined)','SM-DP+ + eIM','SM-DP+ + Factory System'],
   ['Remote channel','SCP03t / SCP80 / SCP81 via SM-SR','HTTPS (LPA \u2194 SM-DP+)','IP/CoAP/MQTT/SMS (eIM \u2194 IPA)','Local wired interface'],
-  ['Supports MEP?','No','Yes (v3.0+)','Not yet (under discussion)','N/A (factory provisioning only)'],
+  ['Supports MEP?','No','Yes (v3.0+)','Not a baseline SGP.32 feature in this reference','N/A (factory provisioning only)'],
   ['Discovery mechanism','N/A (SM-SR knows all eUICCs)','SM-DS or Activation Code','SM-DS or eIM-triggered','N/A (EID known at factory)'],
   ['Typical devices','Connected cars, smart meters, vending machines, industrial modules','Smartphones, tablets, wearables, laptops','LPWAN sensors, NB-IoT modules, constrained IoT','Any device manufactured in a factory with eUICC'],
   ['Connectivity at install?','Yes (SMS/IP)','Yes (HTTPS)','Yes (eIM channel)','No (local interface \u2014 key advantage)'],
-  ['Spec status','Mature / stable ('+SPEC_VERSIONS['SGP.02']+')','Mature / evolving ('+SPEC_VERSIONS['SGP.22_v2']+' + '+SPEC_VERSIONS['SGP.22']+')','Published, certification active ('+SPEC_VERSIONS['SGP.32']+')','SGP.41 '+SPEC_VERSIONS['SGP.41']+' published; SGP.42 '+SPEC_VERSIONS['SGP.42']]
+  ['Spec status','Mature / stable ('+SPEC_VERSIONS['SGP.02']+')','Mature / evolving ('+SPEC_VERSIONS['SGP.22_v2']+' + '+SPEC_VERSIONS['SGP.22']+')','Published; verify current certification status ('+SPEC_VERSIONS['SGP.32']+')','SGP.41 '+SPEC_VERSIONS['SGP.41']+' published; SGP.42 '+SPEC_VERSIONS['SGP.42']]
   ];
   mx.forEach(function(r){h+='<tr>';r.forEach(function(c,i){h+=(i===0?'<td style="font-weight:700;white-space:nowrap">':'<td>')+c+'</td>'});h+='</tr>'});
   h+='</tbody></table></div></div>';
@@ -1494,10 +1494,10 @@ function qrHTML(){
   h+='<div style="padding:10px 14px;background:rgba(30,58,95,0.06);border:1px solid var(--mag);border-radius:8px;margin-bottom:14px;font-size:13px;color:var(--tx1);line-height:1.7">';
   h+='<b style="color:var(--mag)">Diagnosing mutual authentication failures:</b> Extract <code>euiccCiPKIdListForVerification</code> from ES10a.GetEUICCInfo1, then compare each PKID against this table. If the SM-DP+ certificate was issued by a CI whose PKID is NOT in the eUICC\u2019s trusted list, authentication will fail.';
   h+='</div>';
-  h+='<p style="font-size:12px;color:#D97706;font-weight:600;margin-bottom:10px">\u26A0 PKID hex values are placeholders \u2014 verify against GSMA CI certificate registry before use.</p>';
+  h+='<p style="font-size:12px;color:#D97706;font-weight:600;margin-bottom:10px">\u26A0 PKID rows are illustrative placeholders \u2014 verify against GSMA PKI/CI registry before use.</p>';
   h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>PKID (hex)</th><th>Generation</th><th>Usage</th><th>Status</th></tr></thead><tbody>';
   CI_PKIDS.forEach(function(c){
-    var sColor=c.status==='Active'?'#059669':'#D97706';
+    var sColor=c.status==='Unverified'?'#D97706':(c.status==='Active'?'#059669':'#D97706');
     h+='<tr><td><code title="'+c.pkid+'" style="cursor:help">'+c.pkid.substring(0,16)+'\u2026</code></td><td>'+c.gen+'</td><td style="font-size:12px">'+c.usage+'</td><td><span style="display:inline-block;background:'+sColor+';color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:12px">'+c.status+'</span></td></tr>';
   });
   h+='</tbody></table></div></div>';
@@ -1548,7 +1548,7 @@ function qrHTML(){
   h+='<div style="font-size:12px;color:var(--tx2);margin-top:10px;line-height:1.8">';
   h+='<div><b>*</b> Compatible = works but v3-only features (MEP, enhanced metadata) not available</div>';
   h+='<div><b>**</b> Partial = basic download/enable/disable works; MEP operations and v3 metadata not supported</div>';
-  h+='<div style="margin-top:8px">The SM-DP+ and eUICC negotiate the highest mutually supported version during ES9+.InitiateAuthentication (via the <code>svn</code> field in euiccInfo1).</div>';
+  h+='<div style="margin-top:8px">Compatibility varies by certified implementation and feature support. Treat this matrix as conceptual; verify against GSMA test coverage, vendor release notes, and the <code>svn</code>/capability data exposed by the target eUICC/LPA/SM-DP+.</div>';
   h+='</div></div>';
 
   /* C4: Deployment Readiness Checklist */
@@ -1688,7 +1688,7 @@ function toolsIdHTML(){
 
   /* EID Analyzer (Decoder, Validator & SM-DS Pattern Match) — TOP */
   h+='<div class="asec"><h2>EID Analyzer (Decoder, Validator &amp; SM-DS Pattern Match)</h2>';
-  h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a 32-digit EID into its components (EUM prefix, manufacturer, country, platform, serial), validate the Mod97 checksum, and check against known Google SM-DS device patterns.</p>';
+  h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a 32-digit EID into its components (EUM prefix, manufacturer, country, platform, serial), validate the Mod97 checksum, and compare against illustrative Google SM-DS pattern examples.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="eid-input" class="ac-input" placeholder="Enter 32-digit EID \u2014 press Enter to decode" maxlength="40" />';
   h+='<button class="cbtn pri" id="eid-decode">Decode</button>';
   h+='<button class="cbtn" id="eid-clear">Clear</button></div>';
@@ -1761,7 +1761,7 @@ function toolsIdHTML(){
 
   /* Reference Databases — at bottom */
   h+='<div class="asec"><h2>Device Pattern Database</h2>';
-  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">EID patterns are used to determine the target SM-DS when a match is found. The patterns below are for the <b>Google Discovery Server (SM-DS)</b>. Digit positions are 1-indexed (i.e., "Digits 14-16" means the 14th through 16th characters of the 32-digit EID).</p>';
+  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">EID pattern examples can help identify likely Google SM-DS routing behavior, but this table is not authoritative. The patterns below are illustrative examples for the <b>Google Discovery Server (SM-DS)</b>. Digit positions are 1-indexed (i.e., "Digits 14-16" means the 14th through 16th characters of the 32-digit EID).</p>';
   h+='<details class="ts-card"><summary>View All Patterns ('+DEVICE_PATTERNS.length+' total)</summary><div class="ts-body">';
   h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>Pattern Name</th><th>EUM Prefix</th><th>Digit Rules</th><th>Device</th></tr></thead><tbody>';
   DEVICE_PATTERNS.forEach(function(p){
@@ -1868,7 +1868,7 @@ function appxHTML(){
   var h='';
 
   h+='<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-size:12px;color:var(--tx2);">';
-  h+='Spec versions last verified: <strong style="color:var(--tx0)">April 2026</strong> &mdash; ';
+  h+='Content audit: <strong style="color:var(--tx0)">June 2026</strong> &mdash; ';
   h+='<a href="https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/" target="_blank">Check Consumer/IoT Specs</a> \u00B7 ';
   h+='<a href="https://www.gsma.com/solutions-and-impact/technologies/esim/esim-m2m-specifications/" target="_blank">Check M2M Specs</a>';
   h+='</div>';
@@ -2024,7 +2024,7 @@ function appxHTML(){
   /* C5: Vendor-Specific Quirks Reference */
   h+='<div class="asec"><h2>Vendor-Specific Quirks Reference</h2>';
   h+='<div style="padding:10px 14px;background:rgba(217,119,6,0.08);border:1px solid #D97706;border-radius:8px;margin-bottom:14px;font-size:12px;color:var(--tx1);line-height:1.6">';
-  h+='<b style="color:#D97706">Disclaimer:</b> Information based on publicly available documentation and field experience. Vendor behavior may vary by firmware version, deployment configuration, and contractual customization. Always verify with your vendor\u2019s technical support for your specific deployment.';
+  h+='<b style="color:#D97706">Disclaimer:</b> Illustrative field notes only. Vendor behavior may vary by firmware version, deployment configuration, product SKU, and contractual customization. Always verify with your vendor\u2019s technical support for your specific deployment.';
   h+='</div>';
   VENDOR_QUIRKS.forEach(function(v){
     h+='<details class="ts-card"><summary>'+v.vendor+' <span style="font-size:12px;font-weight:400;color:var(--tx2);margin-left:8px">('+v.roles+')</span></summary><div class="ts-body">';
@@ -2245,7 +2245,7 @@ function bindGlossarySearch(){
 /* ── EID Analyzer (Decoder, Validator & SM-DS Pattern Match) ── */
 
 // ── 9. EUM Manufacturer Table ──
-// Format: '8-digit-prefix': 'Manufacturer Name'
+// Format: '8-digit-prefix': 'Manufacturer Name' (reference subset; source-verification needed)
 var EUM_TABLE={
   '89033023':'Thales','89033024':'IDEMIA','89033090':'Thales',
   '89034011':'Valid','89043051':'NXP','89043052':'NXP',
@@ -2258,7 +2258,7 @@ var EUM_TABLE={
 };
 
 // ── 10. Device Patterns (Google Discovery Server SM-DS) ──
-// Format: {name:'Pattern Name', eum:'8-digit-prefix', rules:{'startPos_endPos':'digits'}, device:'Device Name'}
+// Format: {name:'Pattern Name', eum:'8-digit-prefix', rules:{'startPos_endPos':'digits'}, device:'Device Name'} (illustrative; source-verification needed)
 // Rule keys use 1-indexed digit positions: '14_16' means digits at positions 14 through 16 (inclusive) of the 32-digit EID.
 // In code, these are converted to 0-indexed: substring(startPos-1, endPos).
 var DEVICE_PATTERNS=[
@@ -2549,9 +2549,9 @@ function bindEIDDecoder(){
     rh+='<div class="eid-row"><b>Country</b><span>'+countryName+'</span></div>';
     rh+='<div class="eid-row"><b>EUM (Manufacturer)</b><span>'+(eumName||'Unknown EUM (prefix: '+prefix8+')')+'</span></div>';
     rh+='<div class="eid-row"><b>Device</b><span>'+(deviceMatch?deviceMatch:'Not identified')+'</span></div>';
-    rh+='<div class="eid-row"><b>Google SM-DS Pattern</b><span>'+(patternName?patternName+' \u2014 Google SM-DS supported':'No pattern matched')+'</span></div>';
+    rh+='<div class="eid-row"><b>Google SM-DS Pattern</b><span>'+(patternName?patternName+' \u2014 illustrative Google SM-DS match':'No pattern matched')+'</span></div>';
     rh+='</div>';
-    rh+='<div class="eid-note">EID format and checksum defined in GSMA SGP.29 (EID Definition and Assignment). Historical reference: SGP.02 Annex H.</div>';
+    rh+='<div class="eid-note">EID format and checksum are defined in GSMA SGP.29 (EID Definition and Assignment). EUM/device mappings here are reference examples and need source verification. Historical reference: SGP.02 Annex H.</div>';
     result.innerHTML=rh;
   }
   btn.onclick=decode;
