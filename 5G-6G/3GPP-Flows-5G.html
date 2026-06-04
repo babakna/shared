@@ -1887,7 +1887,7 @@ FLOWS.pdu_ulcl = {
 // Edge UPF with ULCL function
 {
   "Create PDR": [
-    { "PDR ID": 1, "Precedence": 10,
+    { "PDR ID": 1, "Precedence": 100,
       "PDI": { "Source Interface": "Access" },
       "FAR ID": 1, "URR ID": 1
     },
@@ -5026,7 +5026,8 @@ FLOWS.pdu_modification = {
     {id:1, label:'Step 1: PCF Policy Update', from:'pcf', to:'smf', interface:'N7 — SBI', protocol:'Npcf_SMPolicyControl_UpdateNotify (TS 29.512)', badge:'FACT', lineType:'cp',
       description:'PCF pushes updated PCC rules to SMF based on subscription change, AF request, or network condition.',
       ingress:{title:'SM Policy Update Notify',
-        code:`// POST /npcf-smpolicycontrol/v1/sm-policies/{smPolicyId}/update
+        code:`// POST {smPolicyNotifyUri}
+// (Npcf_SMPolicyControl_UpdateNotify — TS 29.512 §4.2.4.12)
 {
   "pccRules": {
     "rule1": {
