@@ -5956,7 +5956,7 @@ function showPlaceholder(id) {
   const item = SIDEBAR_SECTIONS.flatMap(s=>s.items).find(i=>i.id===id);
   const bdg = id.startsWith('sixg')?'VISION':id.startsWith('airan')?'VALIDATED':'FACT';
   document.getElementById('ref-content').innerHTML = `<div class="placeholder-msg">
-    <h3>${item?item.label:id}</h3>
+    <h3>${escapeHtml(item?item.label:id)}</h3>
     <p>This flow will be added in a future update.</p>
     <p>Badge: <span class="badge badge-${bdg.toLowerCase()}">${bdg}</span></p></div>`;
 }
@@ -6918,7 +6918,7 @@ const GLOSSARY_DATA = [
   ['O-DU','O-RAN Distributed Unit','Open RAN DU with standardized interfaces per O-RAN specs.','O-RAN Alliance','Deployed in Open RAN sites.'],
   ['O-CU','O-RAN Central Unit','Open RAN CU with O-RAN compliant interfaces (E2, A1, O1).','O-RAN Alliance','Managed by RIC in Open RAN deployments.'],
   ['RIC','RAN Intelligent Controller','Near-RT and Non-RT controller for RAN optimization via xApps/rApps.','O-RAN Alliance','Operator uses RIC for AI/ML-driven RAN optimization.'],
-  ['AI-RAN Node','AI-RAN Converged Node','GPU-accelerated node combining RAN processing and AI inference on shared hardware.','AI-RAN Alliance','Under validation at Innovation Center with NVIDIA.'],
+  ['AI-RAN Node','AI-RAN Converged Node','GPU-accelerated node combining RAN processing and AI inference on shared hardware.','AI-RAN Alliance','Under validation in lab/innovation-center environments with GPU-accelerated RAN platforms.'],
   ['UE','User Equipment','Mobile device (phone, IoT device, CPE) connecting to the 5G network.','TS 23.501','All subscriber devices: phones, FWA, IoT, wearables.'],
   ['N1','N1 Reference Point','NAS signaling between UE and AMF (carried over N2 via gNB).','TS 23.501 §5.2','Carries registration, authentication, session management NAS messages.'],
   ['N2','N2 Reference Point','Control plane interface between gNB and AMF. Carries NGAP.','TS 23.501 §5.2','All gNB↔AMF signaling flows over N2.'],
@@ -6996,7 +6996,7 @@ const GLOSSARY_DATA = [
   ['AI-RAN','AI-RAN (Artificial Intelligence Radio Access Network)','5G-Advanced RAN evolution using GPU-accelerated processing to converge RAN workloads and AI inference on shared hardware.','AI-RAN Alliance','Under validation in lab/innovation-center environments with GPU-accelerated RAN platforms.'],
   ['Digital Twin','Network Digital Twin','Virtual replica of the physical network enabling simulation, prediction, and optimization of network behavior before applying changes to the live network.','ITU-R M.2160, 3GPP 6G studies','Envisioned for 6G network planning, fault prediction, and autonomous optimization.'],
   ['Intent Engine','Intent-Based Management Engine','6G management function that translates high-level operator intents (e.g., "guarantee 10 Gbps for AR zone") into concrete network configurations using AI/ML.','TM Forum, ETSI ZSM','Envisioned for 6G autonomous network management and slice orchestration.'],
-  ['PQC','Post-Quantum Cryptography','Cryptographic algorithms designed to resist attacks from quantum computers. Includes lattice-based schemes like CRYSTALS-Kyber (KEM) and CRYSTALS-Dilithium (signatures).','NIST PQC Standards','Envisioned for 6G authentication to protect against harvest-now-decrypt-later quantum threats.'],
+  ['PQC','Post-Quantum Cryptography','Cryptographic algorithms designed to resist attacks from quantum computers. Includes NIST-standardized lattice-based schemes such as ML-KEM (formerly CRYSTALS-Kyber) for key encapsulation and ML-DSA (formerly CRYSTALS-Dilithium) for signatures.','NIST PQC Standards','Envisioned for 6G authentication to protect against harvest-now-decrypt-later quantum threats.'],
   ['DCGM','NVIDIA Data Center GPU Manager','Monitoring and management tool for NVIDIA GPUs in data center environments, providing health, diagnostics, and telemetry metrics.','NVIDIA','Used in AI-RAN telemetry for GPU health monitoring and performance tracking.'],
   ['cuPHY','NVIDIA Aerial cuPHY','GPU-accelerated 5G NR Layer 1 (PHY) implementation from the NVIDIA Aerial SDK, running physical layer processing on CUDA cores.','NVIDIA Aerial SDK','Core L1 engine in AI-RAN Innovation Center for GPU-based RAN processing.'],
   ['cuMAC','NVIDIA Aerial cuMAC','GPU-accelerated MAC scheduler from the NVIDIA Aerial SDK, enabling real-time scheduling decisions on GPU hardware.','NVIDIA Aerial SDK','MAC layer component in AI-RAN for GPU-native scheduling and resource allocation.'],
@@ -7056,9 +7056,9 @@ function renderTimeline(el) {
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
     {date:'Mar 2026', text:'Example industry milestone: AI-RAN OTA demos, cloud RAN GPU showcases, and 6G innovation hub announcements around MWC', cls:''},
     {date:'Mar 2026', text:'Example industry milestone: physical AI on AI-RAN demonstrations and GPU edge pilots around GTC', cls:''},
-    {date:'2026', text:'Nokia AI-RAN commercial trial begins (confirmed MWC 2026)', cls:'projected'},
-    {date:'~2027', text:'Nokia first commercial AI-RAN release (projected)', cls:'projected'},
-    {date:'~2028', text:'Widespread AI-RAN deployment across network (estimated)', cls:'projected'},
+    {date:'2026', text:'Example industry milestone: AI-RAN commercial trial activity begins (projected/announced)', cls:'projected'},
+    {date:'~2027', text:'Example industry milestone: first commercial AI-RAN releases projected', cls:'projected'},
+    {date:'~2028', text:'Wider AI-RAN network deployment estimates', cls:'projected'},
     {date:'~2029', text:'First 3GPP 6G specifications expected (IMT-2030)', cls:'vision'},
     {date:'~2030', text:'6G commercialization target — AI-native, sensing, sub-THz', cls:'vision'},
   ];
@@ -7314,7 +7314,7 @@ function renderIntroWhatIs6G(el) {
   html += '</div>';
   html += '<h3>6G vs. 5G — The Fundamental Differences</h3>';
   html += '<p>If 5G was an evolution from 4G (new architecture, same paradigm of "connect and transport"), 6G represents a paradigm expansion. The network does not just connect devices and transport data — it senses the physical world, runs AI as a native service, and autonomously adapts in real time. The AI Core in the 6G flows (Flows 6–8) replaces the separate AMF, SMF, and PCF with a unified AI-driven network function that makes decisions through ML inference rather than static policy rules. The Digital Twin (Flow 13) maintains a real-time virtual replica of the entire network for predictive optimization. Integrated Sensing and Communication (Flow 14) uses the same waveform for both data and environmental perception.</p>';
-  html += '<p>While 5G-Advanced (Rel-19) introduces early forms of some of these concepts — AI/ML at the air interface, centimeter-level positioning as a sensing precursor, NWDAF federated learning as a step toward distributed AI, and NTN/relay for coverage extension — the 6G versions are <strong>architecturally native</strong> rather than additions to an existing framework. In 6G, AI is not an optimization layer on top of a traditional protocol stack; it <em>is</em> the protocol stack. Sensing is not a separate measurement function; it shares the same waveform as communication. The difference is fundamental — 5G-Advanced adds AI capabilities to a human-designed system, while 6G envisions an AI-designed system from the ground up.</p>';
+  html += '<p>While 5G-Advanced (Rel-19) introduces early forms of some of these concepts — AI/ML at the air interface, centimeter-class positioning targets as a sensing precursor, NWDAF federated learning as a step toward distributed AI, and NTN/relay for coverage extension — the 6G versions are <strong>architecturally native</strong> rather than additions to an existing framework. In 6G, AI is not an optimization layer on top of a traditional protocol stack; it <em>is</em> the protocol stack. Sensing is not a separate measurement function; it shares the same waveform as communication. The difference is fundamental — 5G-Advanced adds AI capabilities to a human-designed system, while 6G envisions an AI-designed system from the ground up.</p>';
   el.innerHTML = html;
 }
 
