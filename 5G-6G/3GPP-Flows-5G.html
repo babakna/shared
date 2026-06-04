@@ -107,7 +107,7 @@ header {
   padding: 0 24px; background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
 }
-header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; }
+header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; white-space: normal; }
 .header-title { display: flex; flex-direction: column; gap: 2px; }
 .byline { font-size: 12px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0; }
 header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
@@ -2163,7 +2163,7 @@ FLOWS.slice_registration = {
 // 1. Slice admission control (NSACF)
 // 2. Authentication (5G AKA)
 // 3. Registration completion`}},
-    {id:6, label:'Step 6: AMF → NSACF Slice Admission Control', from:'amf', to:'nsacf', interface:'SBI (TS 29.536)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
+    {id:6, label:'Step 6: AMF → NSACF Slice Admission Control', from:'amf', to:'nsacf', interface:'Nnsacf — SBI (TS 29.536)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
       description:'AMF queries NSACF to check if max UEs per slice limit has been reached for each Allowed S-NSSAI (Rel-17+).',
       ingress:{title:'Nnsacf_SliceAdmissionControl',
         code:`// POST /nnsacf-nsac/v1/ue-slice-admission
@@ -2184,7 +2184,7 @@ FLOWS.slice_registration = {
 //    Current: 123,456 → under limit
 // 3. Increment counter if admitted
 // 4. Return admission result`}},
-    {id:7, label:'Step 7: NSACF Admits UE to Slices', from:'nsacf', to:'amf', interface:'SBI (TS 29.536)', protocol:'HTTP/2 200 OK', badge:'FACT', lineType:'cp',
+    {id:7, label:'Step 7: NSACF Admits UE to Slices', from:'nsacf', to:'amf', interface:'Nnsacf — SBI (TS 29.536)', protocol:'HTTP/2 200 OK', badge:'FACT', lineType:'cp',
       description:'NSACF confirms admission to all requested slices. UE count is within configured limits.',
       ingress:{title:'NSACF Admission Response',
         code:`// 200 OK
@@ -6052,7 +6052,7 @@ function buildSidebar() {
         <span class="badge badge-${bdg.toLowerCase()}">${bdg}</span></span>
       </button>`;
       html += `<div class="sidebar-accordion" id="acc-${it.id}">`;
-      if (flow) html += `<div class="sidebar-narrative">${flow.narrative}</div>`;
+      if (flow) html += `<div class="sidebar-narrative">${escapeHtml(flow.narrative)}</div>`;
       html += `</div>`;
     });
     html += `</div></div>`;
@@ -6131,7 +6131,7 @@ function showPlaceholder(id) {
   showView('welcome');
   const item = SIDEBAR_SECTIONS.flatMap(s=>s.items).find(i=>i.id===id);
   document.getElementById('welcome-view').innerHTML = `<div class="welcome-container"><div class="placeholder-msg">
-    <h3>${item?item.label:id}</h3>
+    <h3>${escapeHtml(item?item.label:id)}</h3>
     <p>This flow will be added in a future update.</p>
     <p>Badge: <span class="badge badge-fact">FACT</span></p></div></div>`;
 }
@@ -6255,7 +6255,7 @@ function activateStep(flow, stepIdx) {
     }
   }
   // step description in step-bar
-  document.getElementById('step-bar').innerHTML = linkifyFlowRefs(step.description) || `<span style="opacity:0.5">Step ${stepIdx+1} — ${step.label}</span>`;
+  document.getElementById('step-bar').innerHTML = linkifyFlowRefs(step.description) || `<span style="opacity:0.5">Step ${stepIdx+1} — ${escapeHtml(step.label)}</span>`;
   // payload
   updatePayload(step);
 }
@@ -6265,12 +6265,21 @@ function updatePayload(step) {
   document.getElementById('ingress-body').innerHTML = step.ingress ? highlightPayload(step.ingress.code) : '<div class="payload-empty">Select a step to view payload</div>';
   document.getElementById('egress-body').innerHTML = step.egress ? highlightPayload(step.egress.code) : '<div class="payload-empty">No egress for this step</div>';
 }
+function escapeHtml(text) {
+  if(text == null) return '';
+  return String(text).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function allowSafeFormatting(html) {
+  return html
+    .replace(/&lt;(\/?strong)&gt;/g, '<$1>')
+    .replace(/&lt;(\/?em)&gt;/g, '<$1>');
+}
 function linkifyFlowRefs(text) {
-  if(!text) return text;
+  if(!text) return '';
   const flowMap = {};
   SIDEBAR_SECTIONS.forEach(s => s.items.forEach(i => { if(FLOWS[i.id]) flowMap[i.num] = i; }));
-  return text.replace(/Flow (\d+)/g, (m, num) => {
-    const item = flowMap[parseInt(num)];
+  return allowSafeFormatting(escapeHtml(text)).replace(/Flow (\d+)/g, (m, num) => {
+    const item = flowMap[parseInt(num, 10)];
     if(item) return `<a href="#" onclick="navigate('${item.id}','flow');return false" style="color:var(--accent);text-decoration:underline;cursor:pointer">${m}</a>`;
     return m;
   });
@@ -6668,7 +6677,7 @@ function renderLatency(el) {
     ['ULCL Edge LBO','Operator deployment example (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
     ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','&lt;5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
     ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), propagation delay, regenerative vs transparent payload'],
-    ['NTN — GEO Satellite','Specified (Rel-17)','~240 ms (RTT est.)','Wide-area IoT, broadcast, backup coverage','Fixed GEO orbital delay (~120ms one-way); suitable for delay-tolerant IoT/store-and-forward'],
+    ['NTN — GEO Satellite','Specified (Rel-17)','~240 ms one-way / ~480 ms RTT est.','Wide-area IoT, broadcast, backup coverage','Fixed GEO orbital path delay; suitable for delay-tolerant IoT/store-and-forward'],
     ['Sidelink PC5 (D2D)','Specified (Rel-16/19)','1–5 ms (RTT)','V2X direct, UE relay, proximity services','Direct UE-to-UE path (no core traversal); sidelink resource allocation mode'],
     ['AI-RAN (Projected)','~2027 (projected)','1–4 ms target (RTT)','Safety-critical IoT, autonomous systems, real-time control','AI-native RAN scheduling, on-device inference, radio-aware compute'],
   ];
@@ -6676,7 +6685,7 @@ function renderLatency(el) {
   html += '<table class="ref-table"><thead><tr><th>Architecture</th><th>Status</th><th>Estimated Range</th><th>Best For</th><th>Depends On</th></tr></thead><tbody>';
   rows.forEach(r => { html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'; });
   html += '</tbody></table>';
-  html += `<div class="latency-disclaimer">⚠ All values are estimates based on architecture analysis and hop-count modeling. Terrestrial values are round-trip time (RTT) unless noted otherwise; NTN satellite values are one-way propagation delay. These are NOT measured or guaranteed SLA commitments. Actual latency depends on radio conditions, network load, geographic placement, and many other factors.</div>`;
+  html += `<div class="latency-disclaimer">⚠ All values are estimates based on architecture analysis and hop-count modeling. Terrestrial values are round-trip time (RTT) unless noted otherwise; NTN satellite values distinguish one-way propagation from estimated RTT where shown. These are NOT measured or guaranteed SLA commitments. Actual latency depends on radio conditions, network load, geographic placement, and many other factors.</div>`;
   el.innerHTML = html;
 }
 
@@ -6806,7 +6815,7 @@ const GLOSSARY_DATA = [
   ['P-CSCF','Proxy Call Session Control Function','First IMS contact point for UE. Handles SIP signaling, IPsec, policy interaction.','TS 23.228','Entry point for VoNR calls into the IMS domain.'],
   ['S-CSCF','Serving CSCF','Core IMS session control. Handles SIP registration, session routing, service trigger.','TS 23.228','Manages VoNR session state and TAS invocation.'],
   ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts calling features: Wi-Fi Calling, Visual Voicemail, etc.'],
-  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','Nationwide 5G SA gNB deployment across low/mid/mmWave bands.'],
+  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','Typical operator 5G SA gNB deployments; bands vary by market.'],
   ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in O-RAN/vRAN disaggregated deployments.'],
   ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at cell sites in split-architecture configurations.'],
   ['UE','User Equipment','Mobile device (phone, IoT device, CPE) connecting to the 5G network.','TS 23.501','All subscriber devices: phones, FWA, IoT, wearables.'],
@@ -6960,7 +6969,7 @@ function renderIntroWhatIs5G(el) {
   html += '<h3>The Three Usage Scenarios</h3>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">eMBB</strong><span style="font-weight:600;color:var(--text-primary);">Enhanced Mobile Broadband</span><span>High-speed, high-capacity data for consumers and enterprises</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: 4K/8K streaming, AR/VR, cloud gaming, high-speed downloads</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">Peak: 20 Gbps downlink</span></div>';
-  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">URLLC</strong><span style="font-weight:600;color:var(--text-primary);">Ultra-Reliable Low-Latency Communication</span><span>Extremely low delay with guaranteed delivery for critical applications</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: Industrial automation, remote surgery, autonomous vehicle communication</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">1 ms latency, 99.999% reliability</span></div>';
+  html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">URLLC</strong><span style="font-weight:600;color:var(--text-primary);">Ultra-Reliable Low-Latency Communication</span><span>Extremely low delay with high reliability for critical applications</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: Industrial automation, remote surgery, autonomous vehicle communication</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">1 ms target latency, 99.999% target reliability</span></div>';
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">mMTC</strong><span style="font-weight:600;color:var(--text-primary);">Massive Machine-Type Communication</span><span>Connecting very large numbers of low-power devices</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: Smart city sensors, agricultural IoT, asset tracking, smart meters</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">1,000,000 devices per km²</span></div>';
   html += '</div>';
 
@@ -7261,7 +7270,7 @@ function renderIntroInterfaces(el) {
   html += '<tr><td>Xn</td><td>gNB ↔ gNB</td><td>XnAP (TS 38.423)</td><td>Control</td><td>Inter-gNB handover signaling and dual connectivity.</td></tr>';
   html += '<tr><td>N20</td><td>AMF ↔ SMSF</td><td>SBI / HTTP/2 (TS 29.540)</td><td>Control</td><td>SMS over NAS relay. AMF forwards NAS SM messages to/from SMSF.</td></tr>';
   html += '<tr><td>PC5</td><td>UE ↔ UE</td><td>NR Sidelink (TS 23.287, TS 38.300)</td><td>Both</td><td>Direct device-to-device air interface for V2X, UE-to-network relay, public safety relay, and commercial D2D proximity services. Operates independently of the Uu interface — a UE can simultaneously use Uu (to gNB) and PC5 (to nearby UEs). Rel-19 extends PC5 with relay enhancements and commercial D2D support.</td></tr>';
-  html += '<tr><td>NTN Link</td><td>UE ↔ Satellite ↔ gNB/Gateway</td><td>NR over NTN (TR 38.821)</td><td>Both</td><td>Non-terrestrial network access where the Uu interface extends through a satellite (LEO, MEO, or GEO). Can be transparent (satellite acts as RF repeater) or regenerative (satellite runs gNB functions, Rel-19). Introduces long propagation delay (LEO: 5-20ms, GEO: ~270ms RTT) and Doppler/timing advance challenges. Rel-19 adds IoT-NTN for eMTC/NB-IoT over satellite and store-and-forward for intermittent ground connectivity.</td></tr>';
+  html += '<tr><td>NTN Link</td><td>UE ↔ Satellite ↔ gNB/Gateway</td><td>NR over NTN (TR 38.821)</td><td>Both</td><td>Non-terrestrial network access where the Uu interface extends through a satellite (LEO, MEO, or GEO). Can be transparent (satellite acts as RF repeater) or regenerative (satellite runs gNB functions, Rel-19). Introduces long propagation delay (LEO: roughly 5-20ms one-way depending on orbit/path; GEO: roughly 240ms one-way / 480ms RTT propagation estimate) and Doppler/timing advance challenges. Rel-19 adds IoT-NTN for eMTC/NB-IoT over satellite and store-and-forward for intermittent ground connectivity.</td></tr>';
   html += '</tbody></table>';
 
   html += '<h3>Protocol Quick-Reference</h3>';
@@ -7299,7 +7308,7 @@ function renderIntro5GAdvanced(el) {
   html += '<p>Rel-19 (frozen December 2025) is not incremental — it represents the maturation of the 5G platform. Where Rel-18 introduced AI/ML, ambient IoT, and energy savings as study items or initial frameworks, Rel-19 turns them into production-grade specifications and adds entirely new capability areas. Below is what Rel-19 brings to each technology domain.</p>';
 
   html += '<h4>AI/ML for NR Air Interface</h4>';
-  html += '<p>Rel-18 introduced the framework for AI/ML in the NR physical layer (TR 38.843). Rel-19 <strong>normatively specifies</strong> three AI/ML use cases: <strong>beam management prediction</strong> (the gNB or UE uses ML models to predict optimal beam pairs, reducing beam sweeping overhead and improving mobility), <strong>CSI feedback enhancement</strong> (ML-based compression/reconstruction of channel state information, reducing UL overhead while maintaining DL precoding accuracy), and <strong>positioning</strong> (ML-assisted timing/angle measurements for sub-meter accuracy). These are the first 3GPP-standardized AI functions at the air interface — a foundational step toward the AI-native RAN architecture envisioned for 6G.</p>';
+  html += '<p>Rel-18 introduced the framework for AI/ML in the NR physical layer (TR 38.843). Rel-19 <strong>normatively specifies</strong> three AI/ML use cases: <strong>beam management prediction</strong> (the gNB or UE uses ML models to predict optimal beam pairs, reducing beam sweeping overhead and improving mobility), <strong>CSI feedback enhancement</strong> (ML-based compression/reconstruction of channel state information, reducing UL overhead while maintaining DL precoding accuracy), and <strong>positioning</strong> (ML-assisted timing/angle measurement enhancements). These are among the first 3GPP-standardized AI/ML functions at the air interface — a foundational step toward the AI-native RAN architecture envisioned for 6G.</p>';
 
   html += '<h4>Ambient IoT (Phase 2)</h4>';
   html += '<p>Rel-18 defined ambient IoT as a concept — devices that harvest energy from RF signals and require zero battery. Rel-19 expands this into <strong>three device classes</strong>: <strong>Device A</strong> (passive, backscatter-only, no energy storage — similar to UHF RFID), <strong>Device B</strong> (semi-passive, small energy storage, can initiate transmissions), and <strong>Device C</strong> (active-assisted, larger energy storage, supports higher data rates and longer range). Rel-19 specifies the air-interface waveforms, inventory protocols, and network architecture for managing billions of these devices within the 5G system — directly paving the way for the "massive communication" scenario in 6G.</p>';
