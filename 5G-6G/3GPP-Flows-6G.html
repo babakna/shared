@@ -452,7 +452,7 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
   <h1>3GPP Protocol Flow Simulator <span class="sep">|</span> AI-RAN <span class="sep">&amp;</span> 6G</h1>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
-    <span class="version">v1.1</span>
+    <span class="version">V2.0 — Updated June 2026</span>
   </div>
 </header>
 <div class="app-container">
@@ -2039,6 +2039,7 @@ FLOWS['airan_telemetry'] = {
       description:'SMF sends converged charging update to CHF with standard usage data enriched by AI-RAN-specific attributes — GPU compute time, inference count, zero-hop data volume — enabling new billing models.',
       ingress:{title:'Nchf_ConvergedCharging_Update (AI-RAN Enriched)',
         code:`// PROJECTED: based on NVIDIA Aerial SDK
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // SMF → CHF: Converged charging with AI-RAN attributes
 // POST /nchf-convergedcharging/v3/chargingdata
 //      /{chargingDataRef}/update
@@ -2066,6 +2067,7 @@ FLOWS['airan_telemetry'] = {
 }`},
       egress:{title:'CHF Processes AI-RAN Charging',
         code:`// PROJECTED: based on NVIDIA Aerial SDK
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // CHF processes AI-RAN enriched charging data
 {
   "chfProcessing": {
@@ -2181,7 +2183,7 @@ FLOWS['sixg_registration'] = {
     "encapsulatedKey": "b7e4f1a0...d93c"
   },
   "radioCapability": {
-    "bands": ["FR3-A (92-114.25 GHz)", "FR3-B (140-300 GHz)"],
+    "bands": ["sub-THz candidate range (92-114.25 GHz)", "sub-THz candidate range (140-300 GHz)"],
     "maxBandwidth_mhz": 2000,
     "mimoLayers": 16,
     "beamCapability": "AI-assisted"
@@ -3387,7 +3389,7 @@ FLOWS['sixg_intent_slice'] = {
   "ranConfig": {
     "targetNodes": ["ai-ran-sector-142", "ai-ran-sector-143", "ai-ran-sector-144"],
     "spectrum": {
-      "band": "FR3-B (140-300 GHz)",
+      "band": "sub-THz candidate range (140-300 GHz)",
       "bandwidth_mhz": 400,
       "isolation": "dedicated-carrier"
     },
@@ -4440,6 +4442,7 @@ FLOWS['sixg_charging'] = {
       description:'CHF sends all context back to AI Core for dynamic rate computation — the AI model generates a real-time price that considers network context, value delivered, intent SLA, and consumer profile.',
       ingress:{title:'Dynamic Rating Request',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // CHF → AI Core: compute dynamic rate
 {
   "ratingRequest": "AI_DYNAMIC",
@@ -4471,6 +4474,7 @@ FLOWS['sixg_charging'] = {
 // AI rates based on context + value + usage`},
       egress:{title:'AI-Generated Rate',
         code:`// AI Core returns dynamic rate
+// Pricing values below are ILLUSTRATIVE — not actual rates
 {
   "ratingResult": {
     "totalCharge_usd": 1247.80,
@@ -4492,11 +4496,12 @@ FLOWS['sixg_charging'] = {
   "nextRatingUpdate_sec": 30,
   "aiModel": "chargingOptimizer-v6.4"
 }
-// AI-generated: $1247.80 for 24h of 6G slice`}},
+// AI-generated illustrative example: $1247.80 for 24h of 6G slice`}},
     {id:5, label:'Step 5: Intent SLA Reconciliation', from:'ai_core', to:'intent', interface:'Intent API — Charging Reconciliation', protocol:'6G Intent Protocol (ETSI ZSM)', badge:'VISION', lineType:'cp',
       description:'AI Core reconciles the charging with the original intent SLA — ensuring the consumer is charged fairly relative to what was promised and what was delivered.',
       ingress:{title:'Charging-Intent Reconciliation',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // AI Core → Intent Engine: reconcile charging with intent
 {
   "reconciliationType": "CHARGING_VS_INTENT",
@@ -4518,6 +4523,7 @@ FLOWS['sixg_charging'] = {
 // Verify charging is fair vs. intent promise`},
       egress:{title:'Intent Reconciliation Result',
         code:`// Intent Engine reconciles and approves
+// Pricing values below are ILLUSTRATIVE — not actual rates
 {
   "reconciliationResult": "APPROVED",
   "intentId": "INT-2030-0742-SLICE",
@@ -4546,6 +4552,7 @@ FLOWS['sixg_charging'] = {
       description:'AI Core pushes the final charging confirmation to CHF, which commits the rated charging record and activates real-time quota enforcement — in 6G, AI Core subsumes the SMF role for session-level policy.',
       ingress:{title:'Charging Confirmation Push',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
+// Pricing values below are ILLUSTRATIVE — not actual rates
 // AI Core → CHF: push charging confirmation
 {
   "policyUpdate": "CHARGING_CONFIRMATION",
@@ -4572,6 +4579,7 @@ FLOWS['sixg_charging'] = {
 // AI Core confirms — SMF subsumed in 6G`},
       egress:{title:'CHF Charging Committed',
         code:`// CHF commits charging record
+// Pricing values below are ILLUSTRATIVE — not actual rates
 {
   "acknowledgement": "CHARGING_COMMITTED",
   "sliceInstanceId": "NSI-2030-0742-V2X",
@@ -7020,7 +7028,7 @@ function renderTimeline(el) {
     {date:'Oct 2025', text:'ULCL Edge + Edge Platform launched for enterprise edge computing', cls:''},
     {date:'Oct 2025', text:'NVIDIA $1B investment in Nokia for AI-RAN infrastructure', cls:''},
     {date:'Dec 2025', text:'3GPP Rel-19 frozen — second 5G-Advanced release. Rel-20 continues 5G-Advanced work alongside first 6G study items.', cls:''},
-    {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung GS25 Ultra, etc.)', cls:''},
+    {date:'Dec 2025', text:'5G-Advanced UL Tx Switching (iPhone 17, Samsung Galaxy S25 Ultra, etc.)', cls:''},
     {date:'Q1 2026', text:'Dynamic network slicing — real-time slice-on-demand (target)', cls:'projected'},
     {date:'Mar 2026', text:'MWC: Nokia/NVIDIA OTA demo demonstrated (Grace Hopper). Ericsson Cloud RAN on NVIDIA showcased. 6G open platform commitment announced. DT + 6G innovation hub established.', cls:''},
     {date:'Mar 2026', text:'GTC: Physical AI on AI-RAN demonstrated (Metropolis VSS 3). RTX PRO Blackwell pilot announced at MSOs.', cls:''},
@@ -7346,6 +7354,9 @@ function showWelcome() {
     '</div>' +
     '<h3>Getting Started</h3>' +
     '<p>Select a flow or reference page from the sidebar. AI-RAN flows cover the Innovation Center demonstrations and projections. 6G flows present the vision for the AI-native network era (2029+). Reference pages provide architecture diagrams, specifications, a glossary, latency comparison, and technology timeline.</p>' +
+    '<div style="margin-top:18px;padding:14px 18px;border-left:4px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:0.97em;line-height:1.6">' +
+    '<strong>⚠ Disclaimer:</strong> 6G protocols, AI-native interfaces, sub-THz examples, charging models, latency values, SLA metrics, and all dollar amounts shown in this tool are <strong>illustrative educational examples</strong>. They do not represent actual network configuration, operational commitments, or pricing. 6G content is vision-stage and will evolve as 3GPP and ITU-R standards mature.' +
+    '</div>' +
     '</div>';
 }
 
