@@ -391,7 +391,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 .scroll-top:hover{background:var(--primary-dark);transform:translateY(-2px)}
 .scroll-top.vis{display:flex}
 
-.flow-btn:focus-visible,.quiz-opt:focus-visible,.comp-tab:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.flow-btn:focus-visible,.quiz-opt:focus-visible,.comp-tab:focus-visible,.toc-card:focus-visible,.trail-stop:focus-visible,.search-item:focus-visible,.mob-drawer-item:focus-visible,.prompt-block:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
 
 .toc-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;box-shadow:var(--shadow-sm);transition:all .2s;cursor:pointer}
 .toc-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--primary-light)}
@@ -973,7 +973,7 @@ const ICONS = {
 const LANDING_DESCS = [
   {desc:'Understand the AI landscape from the ground up. Explore how Artificial Intelligence, Machine Learning, Deep Learning, and Generative AI relate to each other through an animated visual taxonomy. Separate fact from fiction with interactive myth-busting cards, and trace AI\u2019s journey from the 1950 Turing Test to today\u2019s agentic systems.',feat:'Animated taxonomy diagram \u2022 6 myth vs. reality cards \u2022 Historical timeline \u2022 5 quiz questions'},
   {desc:'Discover the three fundamental approaches to machine learning \u2014 supervised, unsupervised, and reinforcement learning \u2014 through concrete examples from content workflows. Train your own text classifier by labeling support tickets and watching the model learn from your examples. Understand the critical difference between training and inference.',feat:'Interactive classifier simulation \u2022 Training vs. inference visual \u2022 Case study \u2022 5 quiz questions'},
-  {desc:'Demystify the technology behind ChatGPT, Claude, and Gemini. Walk through a Transformer model step by step, see how text is tokenized, visualize context windows, and experiment with temperature settings. Step through a complete flow simulation showing exactly what happens between your prompt and the AI\u2019s response.',feat:'Token visualizer \u2022 Temperature demo \u2022 Flow simulator (eSIM-style) \u2022 Case study \u2022 5 quiz questions'},
+  {desc:'Demystify the technology behind ChatGPT, Claude, and Gemini. Walk through a Transformer model step by step, see how text is tokenized, visualize context windows, and experiment with temperature settings. Step through a conceptual flow simulation showing what typically happens between your prompt and the AI\u2019s response.',feat:'Token visualizer \u2022 Temperature demo \u2022 Flow simulator (eSIM-style) \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Master the skill that matters most for working with AI tools. Learn the six components of an effective prompt, compare weak vs. strong prompts side by side with real output, and identify the five most common prompting mistakes. Walk away with practical techniques you can use immediately.',feat:'Prompt anatomy diagram \u2022 Side-by-side comparator \u2022 5 anti-pattern warnings \u2022 5 quiz questions'},
   {desc:'Put your knowledge to work with practical, task-specific prompt templates for the six most common content editing tasks: research, drafting, editing, content transformation, metadata generation, and QA review. Each includes a ready-to-use prompt template and real-world tips.',feat:'6 interactive task cards with prompt templates \u2022 Before/after case study \u2022 5 quiz questions'},
   {desc:'Develop your critical eye for AI output. Understand why hallucinations happen mechanically, identify sources of bias, and practice spotting fabricated content in realistic exercises. Build the editorial judgment skills that make you the essential quality gatekeeper between AI and publication.',feat:'Spot the Hallucination exercise \u2022 3 decision scenarios \u2022 Bias awareness cards \u2022 5 quiz questions'},
@@ -996,7 +996,7 @@ function pickRandom(arr, count) {
 
 const ALL_MYTHS = [
   {m:'AI thinks like a human brain',r:'AI uses statistical pattern matching to predict likely outputs based on training data. It has no understanding, consciousness, intent, or common sense. When an LLM writes a grammatically perfect sentence, it\u2019s selecting statistically likely word sequences \u2014 not comprehending meaning. This is why it can write beautifully about a topic while getting basic facts completely wrong.'},
-  {m:'AI will replace writers and editors',r:'AI dramatically accelerates parts of the writing process \u2014 first drafts, summarization, content transformation, and consistency checking. But it cannot replace editorial judgment, brand voice intuition, audience awareness, or the ability to verify claims against reality. The writers who will struggle are those who refuse to learn AI tools. The writers who will thrive are those who use AI to handle routine work while focusing on judgment, creativity, and quality.'},
+  {m:'AI will replace writers and editors',r:'AI can accelerate parts of the writing process \u2014 first drafts, summarization, content transformation, and consistency checking. But it does not remove the need for editorial judgment, brand voice intuition, audience awareness, or source verification. Writers and editors who learn AI tools can shift more time toward judgment, creativity, and quality.'},
   {m:'AI is always right',r:'AI \u201challucinates\u201d \u2014 it can generate confident, well-written text that is completely fabricated. It invents citations, makes up statistics, and states falsehoods with the same polished tone it uses for accurate information. There is no correlation between how confident AI sounds and how accurate it is. This is the single most important thing for content editors to understand.'},
   {m:'You need to code to use AI',r:'Most AI tools are used through natural language prompts \u2014 your writing skills are literally your superpower. The better you are at clear, specific written communication, the better results you\u2019ll get from AI. Prompt engineering is a writing skill, not a programming skill. Strong writers often produce better prompts than strong coders.'},
   {m:'All AI tools are the same',r:'Different models and product versions can have different architectures, training data, context limits, tool integrations, safety behavior, and multimodal capabilities. Do not assume a vendor brand guarantees a specific behavior; test the model version you plan to use on your actual task. Choosing the right model matters, and re-checking assumptions matters when models change.'},
@@ -1118,10 +1118,10 @@ function renderTrail(){
   const t = document.getElementById('trail');
   const homeCls = currentModule === -1 ? 'active' : '';
   t.innerHTML = '<div class="trail-line"></div>' +
-    '<div class="trail-stop ' + homeCls + '" onclick="showLanding()" title="Home"><div class="trail-dot" style="' + (currentModule === -1 ? '' : 'background:var(--tx-muted);border-color:var(--tx-muted)') + '"></div><div class="trail-lbl">Home</div></div>' +
+    '<div class="trail-stop ' + homeCls + '" role="button" tabindex="0" onclick="showLanding()" onkeydown="activateOnKey(event, showLanding)" title="Home"><div class="trail-dot" style="' + (currentModule === -1 ? '' : 'background:var(--tx-muted);border-color:var(--tx-muted)') + '"></div><div class="trail-lbl">Home</div></div>' +
     MODULES.map((m,i) => {
       const cls = completedModules.has(i) ? 'done' : (i === currentModule ? 'active' : '');
-      return '<div class="trail-stop ' + cls + '" onclick="goModule(' + i + ')" title="' + m.title + '"><div class="trail-dot"></div><div class="trail-lbl">' + m.short + '</div></div>';
+      return '<div class="trail-stop ' + cls + '" role="button" tabindex="0" onclick="goModule(' + i + ')" onkeydown="activateOnKey(event, function(){goModule(' + i + ')})" title="' + m.title + '"><div class="trail-dot"></div><div class="trail-lbl">' + m.short + '</div></div>';
     }).join('');
 }
 
@@ -1167,7 +1167,7 @@ function renderLanding(){
     </div>
     <div class="sec-title" style="justify-content:center">\u2500\u2500 What You\u2019ll Learn \u2500\u2500</div>
     <div class="grid-2" style="text-align:left">
-      ${MODULES.map((m,i)=>`<div class="toc-card" onclick="goModule(${i})">
+      ${MODULES.map((m,i)=>`<div class="toc-card" role="button" tabindex="0" onclick="goModule(${i})" onkeydown="activateOnKey(event, function(){goModule(${i})})">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <div style="width:40px;height:40px;border-radius:10px;background:${m.color};display:flex;align-items:center;justify-content:center;flex-shrink:0">${ICONS[m.icon]}</div>
           <div><div style="font-size:11px;color:var(--tx-muted);font-weight:600">Module ${i+1} · ${m.time}</div><div style="font-size:16px;font-weight:700;color:var(--tx-primary)">${m.title}</div></div>
@@ -1178,7 +1178,7 @@ function renderLanding(){
       </div>`).join('')}
     </div>
     <div style="text-align:center;margin-top:32px">
-      <button class="btn-start" onclick="goModule(0)">Start Learning <span>\u2192</span></button>
+      <button type="button" class="btn-start" onclick="goModule(0)">Start Learning <span>\u2192</span></button>
     </div>
   </div>`;
 }
@@ -1188,8 +1188,8 @@ function renderModule(idx){
   const qp = ['mod1','mod2','mod3','mod4','mod5','mod6'][idx];
   if(qp) Object.keys(quizStates).forEach(k => { if(k.startsWith(qp + '-')) delete quizStates[k]; });
   const nav = `<div class="nav-btns">
-    ${idx > 0 ? `<button class="nav-btn secondary" onclick="goModule(${idx-1})">\u2190 ${MODULES[idx-1].title}</button>` : '<div></div>'}
-    ${idx < MODULES.length - 1 ? `<button class="nav-btn primary" onclick="completeAndNext(${idx})">Next: ${MODULES[idx+1].title} \u2192</button>` : `<button class="nav-btn primary" onclick="showFinalAssessment()">Final Assessment \u2192</button>`}
+    ${idx > 0 ? `<button type="button" class="nav-btn secondary" onclick="goModule(${idx-1})">\u2190 ${MODULES[idx-1].title}</button>` : '<div></div>'}
+    ${idx < MODULES.length - 1 ? `<button type="button" class="nav-btn primary" onclick="completeAndNext(${idx})">Next: ${MODULES[idx+1].title} \u2192</button>` : `<button type="button" class="nav-btn primary" onclick="showFinalAssessment()">Final Assessment \u2192</button>`}
   </div>`;
   const hdr = `<div class="mod-hdr"><div class="mod-ico" style="background:${m.color}">${ICONS[m.icon]}</div><div><div class="mod-title">${m.title}</div><div class="mod-desc">${LANDING_DESCS[idx].desc}</div></div></div>`;
   const content = getModuleContent(idx);
@@ -1302,9 +1302,9 @@ function mod1Content(){
         {y:'2012',t:'Deep learning breakthrough (AlexNet)'},
         {y:'2017',t:'Transformer architecture ("Attention Is All You Need")'},
         {y:'2022',t:'ChatGPT launches \u2014 GenAI goes mainstream'},
-        {y:'2024',t:'Agentic AI, MCP protocol, multi-modal models, 1M+ token context'},
-        {y:'2025',t:'Reasoning models, open-weight frontier models, AI agents go mainstream'},
-        {y:'2026',t:'Agentic workflows reshape enterprise, AI-native development tools'}
+        {y:'2024',t:'Agentic AI, MCP protocol, multimodal models, very large context windows'},
+        {y:'2025',t:'Reasoning models, stronger open-weight models, broader AI-agent adoption'},
+        {y:'2026',t:'Agentic workflows and AI-native development tools continue maturing'}
       ].map(e=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-year">${e.y}</div><div class="tl-text">${e.t}</div></div>`).join('')}
     </div>
   </div>
@@ -1342,7 +1342,7 @@ function mod2Content(){
         <div class="bucket" data-cat="technical"><div class="bucket-label">\uD83D\uDD27 Technical Problem</div></div>
         <div class="bucket" data-cat="account"><div class="bucket-label">\uD83D\uDC64 Account Request</div></div>
       </div>
-      <div style="text-align:center"><button class="train-btn" id="train-btn" disabled>\uD83E\uDD16 Train Model</button><span id="label-count" style="margin-left:12px;font-size:13px;color:var(--tx-muted)">0 / 6 tickets labeled</span></div>
+      <div style="text-align:center"><button type="button" class="train-btn" id="train-btn" disabled>\uD83E\uDD16 Train Model</button><span id="label-count" style="margin-left:12px;font-size:13px;color:var(--tx-muted)">0 / 6 tickets labeled</span></div>
       <div id="predictions" style="display:none;margin-top:16px">
         <div class="callout success">You just did supervised learning! You provided labeled examples, the model found patterns, and it can now classify new tickets \u2014 but it\u2019s not perfect.</div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px" id="pred-results"></div>
@@ -1414,10 +1414,10 @@ function mod3Content(){
   <div class="sim-area sim-focusable" tabindex="0" data-sim="tx">
     <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Step through each stage of how an LLM processes your input. Use the controls or arrow keys below.</p>
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
-      <button class="flow-btn" tabindex="0" onclick="txStep(0)">\u23EE Reset</button>
-      <button class="flow-btn" tabindex="0" onclick="txStep(Math.max(0,txCur-1))">\u25C0 Prev</button>
-      <button class="flow-btn pri" tabindex="0" onclick="txStep(txCur+1)">Next \u25B6</button>
-      <button class="flow-btn" tabindex="0" onclick="txStep(TX_STEPS.length)">Show All \u23ED</button>
+      <button type="button" class="flow-btn" tabindex="0" onclick="txStep(0)">\u23EE Reset</button>
+      <button type="button" class="flow-btn" tabindex="0" onclick="txStep(Math.max(0,txCur-1))">\u25C0 Prev</button>
+      <button type="button" class="flow-btn pri" tabindex="0" onclick="txStep(txCur+1)">Next \u25B6</button>
+      <button type="button" class="flow-btn" tabindex="0" onclick="txStep(TX_STEPS.length)">Show All \u23ED</button>
       <span class="flow-step-ind" id="tx-step-ind">Step 0 / 6</span>
     </div>
     <div class="tx-step-visual" id="tx-steps"></div>
@@ -1466,10 +1466,10 @@ function mod3Content(){
   <div class="sec-title">Flow Simulation: How an LLM Responds</div>
   <div class="flow-box sim-focusable" tabindex="0" data-sim="flow-llm" id="llm-flow-box">
     <div class="flow-ctrl">
-      <button class="flow-btn" tabindex="0" onclick="flowStep('llm',0)">\u23EE Reset</button>
-      <button class="flow-btn" tabindex="0" onclick="flowStep('llm',Math.max(0,flowCur.llm-1))">\u25C0 Prev</button>
-      <button class="flow-btn pri" tabindex="0" onclick="flowStep('llm',flowCur.llm+1)">Next \u25B6</button>
-      <button class="flow-btn" tabindex="0" onclick="flowStep('llm',99)">Show All \u23ED</button>
+      <button type="button" class="flow-btn" tabindex="0" onclick="flowStep('llm',0)">\u23EE Reset</button>
+      <button type="button" class="flow-btn" tabindex="0" onclick="flowStep('llm',Math.max(0,flowCur.llm-1))">\u25C0 Prev</button>
+      <button type="button" class="flow-btn pri" tabindex="0" onclick="flowStep('llm',flowCur.llm+1)">Next \u25B6</button>
+      <button type="button" class="flow-btn" tabindex="0" onclick="flowStep('llm',99)">Show All \u23ED</button>
       <span class="flow-step-ind" id="flow-ind-llm">Step 0 / 7</span>
     </div>
     <div class="flow-scroll"><div class="flow-inner" id="flow-inner-llm"></div></div>
@@ -1543,7 +1543,7 @@ function mod4Content(){
       <textarea id="workshop-input" style="width:100%;min-height:120px;padding:14px;font-size:14px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);color:var(--tx-primary);background:var(--bg-card);resize:vertical;line-height:1.6" placeholder="Write your prompt here. Try to include: a role, context, a specific task, constraints, output format, and examples if possible..."></textarea>
     </div>
     <div style="text-align:center">
-      <button class="train-btn" onclick="scoreWorkshop()" id="workshop-submit">Score My Prompt \u2192</button>
+      <button type="button" class="train-btn" onclick="scoreWorkshop()" id="workshop-submit">Score My Prompt \u2192</button>
     </div>
     <div id="workshop-results" style="display:none;margin-top:20px">
       <div id="workshop-scorecard"></div>
@@ -1672,7 +1672,7 @@ function mod6Content(){
   <div class="sec-title">Interactive: Spot the Hallucination</div>
   <p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Click on sentences you think are hallucinated (fabricated or incorrect). Then check your answers.</p>
   <div id="spot-area"></div>
-  <div style="text-align:center;margin:16px 0"><button class="flow-btn pri" id="spot-check-btn" onclick="checkSpot()">Check My Answers</button></div>
+  <div style="text-align:center;margin:16px 0"><button type="button" class="flow-btn pri" id="spot-check-btn" onclick="checkSpot()">Check My Answers</button></div>
   <div id="spot-feedback" style="display:none"></div>
 
   <div class="sec-title">Sources of Bias in AI</div>
@@ -1850,7 +1850,7 @@ function renderQuiz(id, questions){
           <div class="quiz-opt" data-qid="${qid}" data-val="true" onclick="selectQuizOpt(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuizOpt(this)}" tabindex="0"><div class="opt-marker">T</div>True</div>
           <div class="quiz-opt" data-qid="${qid}" data-val="false" onclick="selectQuizOpt(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuizOpt(this)}" tabindex="0"><div class="opt-marker">F</div>False</div>
         </div>
-        <button class="quiz-check" id="btn-${qid}" onclick="checkQuiz('${qid}',${q.a},'${esc(q.exp)}')" disabled>Check Answer</button>
+        <button type="button" class="quiz-check" id="btn-${qid}" onclick="checkQuiz('${qid}',${q.a},'${esc(q.exp)}')" disabled>Check Answer</button>
         <div class="quiz-fb" id="fb-${qid}"></div>
       </div>`;
     } else {
@@ -1859,7 +1859,7 @@ function renderQuiz(id, questions){
         <div class="quiz-opts">
           ${q.opts.map((o,j)=>`<div class="quiz-opt" data-qid="${qid}" data-val="${j}" onclick="selectQuizOpt(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuizOpt(this)}" tabindex="0"><div class="opt-marker">${String.fromCharCode(65+j)}</div>${o}</div>`).join('')}
         </div>
-        <button class="quiz-check" id="btn-${qid}" onclick="checkQuiz('${qid}',${q.a},'${esc(q.exp)}')" disabled>Check Answer</button>
+        <button type="button" class="quiz-check" id="btn-${qid}" onclick="checkQuiz('${qid}',${q.a},'${esc(q.exp)}')" disabled>Check Answer</button>
         <div class="quiz-fb" id="fb-${qid}"></div>
       </div>`;
     }
@@ -1867,6 +1867,12 @@ function renderQuiz(id, questions){
 }
 
 function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,"&quot;").replace(/`/g,'\\`')}
+function activateOnKey(event, action){
+  if(event.key === 'Enter' || event.key === ' '){
+    event.preventDefault();
+    action();
+  }
+}
 
 function selectQuizOpt(el){
   const qid = el.dataset.qid;
@@ -2077,7 +2083,7 @@ function txStep(n){
 let ctxSize = 200000;
 function initTokenizer(){
   const ctxSizes = [{l:'4K',v:4000},{l:'8K',v:8000},{l:'32K',v:32000},{l:'128K',v:128000},{l:'200K',v:200000},{l:'1M',v:1000000}];
-  document.getElementById('ctx-select').innerHTML = ctxSizes.map(c=>`<button class="ctx-btn ${c.v===ctxSize?'active':''}" onclick="setCtx(${c.v},this)">${c.l}</button>`).join('');
+  document.getElementById('ctx-select').innerHTML = ctxSizes.map(c=>`<button type="button" class="ctx-btn ${c.v===ctxSize?'active':''}" onclick="setCtx(${c.v},this)">${c.l}</button>`).join('');
   tokenize();
 }
 function setCtx(v,btn){
@@ -2272,10 +2278,10 @@ function initMod4(){
     {label:'Task',color:'#06B6D4',text:'Write a 200-word section explaining the offline mode to end users.',exp:'Be specific about what you want the AI to produce. \u201cWrite a section\u201d is clearer than \u201chelp me with documentation.\u201d Include the content type (section, FAQ, summary), the subject matter (offline mode), and any scope boundaries. Vague tasks produce vague output. The more precisely you define the task, the less time you\u2019ll spend editing the result.'},
     {label:'Constraints',color:'#F59E0B',text:'Use simple language (8th grade reading level). Avoid jargon. Include a numbered list of steps.',exp:'Constraints prevent the AI from going off-track and define the boundaries of acceptable output. They cover format (bullet points, numbered steps), length (200 words, 3 paragraphs), style (reading level, tone), and exclusions (no jargon, no promotional language). Without constraints, the AI will make its own choices about all of these \u2014 and they probably won\u2019t match your needs.'},
     {label:'Output Format',color:'#10B981',text:'Format as a user guide section with heading, brief introduction, and step-by-step instructions.',exp:'Explicit format instructions prevent you from having to manually reformat AI output. Specify the structure (heading + intro + steps), the markup if relevant (markdown, HTML), and any specific formatting requirements (tables, code blocks, callout boxes). One of the most common prompt mistakes is getting good content in the wrong format.'},
-    {label:'Examples',color:'#94A3B8',text:'Here\u2019s an example of the tone and style from another section of our guide: [example text]',exp:'Showing the AI what good output looks like (few-shot prompting) is often worth more than a paragraph of written instructions. One good example communicates format, tone, length, detail level, and style simultaneously. For recurring tasks, save your best examples and include them in every prompt for that task type. This is the single highest-ROI prompting technique.'}
+    {label:'Examples',color:'#94A3B8',text:'Here\u2019s an example of the tone and style from another section of our guide: [example text]',exp:'Showing the AI what good output looks like (few-shot prompting) is often worth more than a paragraph of written instructions. One good example communicates format, tone, length, detail level, and style simultaneously. For recurring tasks, save your best examples and include them in prompts for that task type. This is often one of the highest-ROI prompting techniques.'}
   ];
   document.getElementById('prompt-anatomy').innerHTML = blocks.map(b=>`
-    <div class="prompt-block" style="background:${b.color}15;border-color:${b.color}" onclick="this.classList.toggle('expanded')">
+    <div class="prompt-block" role="button" tabindex="0" style="background:${b.color}15;border-color:${b.color}" onclick="this.classList.toggle('expanded')" onkeydown="activateOnKey(event, () => this.classList.toggle('expanded'))">
       <div class="pb-label" style="color:${b.color}">${b.label}</div>
       <div class="pb-text">\u201c${b.text}\u201d</div>
       <div class="pb-expand">${b.exp}</div>
@@ -2287,7 +2293,7 @@ function initMod4(){
     {name:'Editing',weak:'Fix this paragraph.',strong:'Review the following paragraph for: (1) factual accuracy against our product docs, (2) AP style consistency, active voice, present tense, (3) clarity for a non-technical audience. Suggest specific revisions with brief explanations.',weakOut:'The paragraph looks mostly fine. There are a few grammatical issues that could be improved. Consider rewording some sentences for better clarity.',strongOut:'<strong>Revision 1:</strong> \u201cThe data was processed by the system\u201d \u2192 \u201cThe system processes the data\u201d <em>(Changed passive to active voice per AP style)</em><br><strong>Revision 2:</strong> \u201cutilizing the new API endpoint\u201d \u2192 \u201cusing the new API endpoint\u201d <em>(Simplified language for non-technical audience)</em><br><strong>Revision 3:</strong> \u201csupports up to 10TB of storage\u201d \u2192 <em>\u26A0\uFE0F Verify against product docs \u2014 I found references to 5TB in the current spec</em>'}
   ];
   let compIdx = 0;
-  document.getElementById('comp-tabs').innerHTML = scenarios.map((s,i)=>`<button class="comp-tab ${i===0?'active':''}" onclick="switchComp(${i},this)">${s.name}</button>`).join('');
+  document.getElementById('comp-tabs').innerHTML = scenarios.map((s,i)=>`<button type="button" class="comp-tab ${i===0?'active':''}" onclick="switchComp(${i},this)">${s.name}</button>`).join('');
   function renderComp(i){
     const s = scenarios[i];
     document.getElementById('comparator').innerHTML = `
@@ -2414,7 +2420,7 @@ let activeWorkshopScenarios = [];
 function initWorkshop(){
   activeWorkshopScenarios = pickRandom(ALL_WORKSHOP_SCENARIOS, 3);
   document.getElementById('workshop-tabs').innerHTML = activeWorkshopScenarios.map((s,i) =>
-    `<button class="comp-tab ${i===0?'active':''}" onclick="switchWorkshop(${i},this)">${s.name}</button>`
+    `<button type="button" class="comp-tab ${i===0?'active':''}" onclick="switchWorkshop(${i},this)">${s.name}</button>`
   ).join('');
   renderWorkshop(0);
 }
@@ -2537,9 +2543,9 @@ const ALL_SPOT_PASSAGES = [
     {s:'It was created by Guido van Rossum and first released in 1991.',h:false},
     {s:'Python\'s simple syntax makes it accessible to beginners while remaining powerful enough for complex applications.',h:false}
   ]},
-  {text:'The Chicago Manual of Style was first published in 1906 and is now in its 17th edition. It recommends using the serial comma in all cases. According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',sentences:[
-    {s:'The Chicago Manual of Style was first published in 1906 and is now in its 17th edition.',h:false},
-    {s:'It recommends using the serial comma in all cases.',h:false},
+  {text:'The Chicago Manual of Style was first published in 1906 and is now in its 18th edition. It recommends using the serial comma in most cases. According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',sentences:[
+    {s:'The Chicago Manual of Style was first published in 1906 and is now in its 18th edition.',h:false},
+    {s:'It recommends using the serial comma in most cases.',h:false},
     {s:'According to a 2023 survey by the Editorial Freelancers Association, 67.3% of professional editors consider it the definitive style reference.',h:true,why:'This survey and statistic are fabricated. AI frequently invents specific survey data with precise percentages to sound authoritative.'}
   ]},
   {text:'Markdown was created by John Gruber in 2004 as a lightweight markup language. It allows writers to format text using simple syntax like asterisks for bold and hash marks for headings. Markdown files use the .md or .markdown extension and can be converted to HTML using any standard compiler.',sentences:[
@@ -2573,7 +2579,7 @@ function initScenarios(){
   document.getElementById('scenarios-area').innerHTML = scenarios.map((s,i)=>`
     <div class="scenario-card" id="sc-${i}">
       <div style="font-size:14px;color:var(--tx-primary);line-height:1.6;margin-bottom:12px"><strong>Scenario ${i+1}:</strong> ${s.ctx}</div>
-      <div class="scenario-opts">${s.opts.map((o,j)=>`<button class="scenario-opt" onclick="checkScenario(${i},${j},${s.best},'${esc(s.exp)}')">${o}</button>`).join('')}</div>
+      <div class="scenario-opts">${s.opts.map((o,j)=>`<button type="button" class="scenario-opt" onclick="checkScenario(${i},${j},${s.best},'${esc(s.exp)}')">${o}</button>`).join('')}</div>
       <div class="quiz-fb" id="sc-fb-${i}"></div>
     </div>`).join('');
 }
@@ -2673,12 +2679,12 @@ const GLOSSARY = [
   {term:'API (Application Programming Interface)',cat:'Infrastructure',def:'Rules and protocols allowing software applications to communicate. In AI: the interface for sending prompts and receiving responses.',why:'Understanding APIs helps you know why different tools using the same model behave differently.',rel:['Model','Inference']},
   {term:'Model',cat:'Infrastructure',def:'The trained AI system that processes inputs and generates outputs. Refers to a specific version (e.g., Claude Opus 4.6).',why:'Different models have different capabilities, speeds, and costs.',rel:['Large Language Model (LLM)','Parameters','API (Application Programming Interface)']},
   {term:'Open-Source Model',cat:'Infrastructure',def:'An AI model whose weights and code are publicly available (e.g., Llama, Mistral).',why:'Open-source gives more control but requires expertise to deploy.',rel:['Model','Proprietary Model']},
-  {term:'Proprietary Model',cat:'Infrastructure',def:'An AI model owned by a company, accessible only through their API (e.g., Claude, GPT, Gemini).',why:'These are what you use through Claude.ai and ChatGPT.',rel:['Model','API (Application Programming Interface)','Open-Source Model']},
+  {term:'Proprietary Model',cat:'Infrastructure',def:'An AI model owned by a company and typically accessed through that company\u2019s app, platform, or API (e.g., Claude, GPT, Gemini).',why:'These are the models you use through products such as Claude, ChatGPT, and Gemini.',rel:['Model','API (Application Programming Interface)','Open-Source Model']},
   {term:'Latency',cat:'Infrastructure',def:'The time delay between sending a prompt and receiving a response.',why:'Larger models and longer prompts = higher latency.',rel:['Inference','Model']},
-  {term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: AI runs locally. Cloud: AI runs on remote servers.',why:'Cloud requires internet and sends data externally. On-device is private but limited.',rel:['Inference','Latency']},
-  {term:'RAG (Retrieval-Augmented Generation)',cat:'Protocols',def:'A technique where AI retrieves relevant documents from a knowledge base before generating a response.',why:'RAG grounds AI in your actual documentation, reducing hallucination significantly.',rel:['Embedding','Vector Database','Grounding']},
+  {term:'On-Device vs. Cloud Inference',cat:'Infrastructure',def:'On-device: AI runs locally. Cloud: AI runs on remote servers.',why:'Cloud inference usually requires network access and may send data to an external service. On-device inference can improve privacy but is constrained by local hardware.',rel:['Inference','Latency']},
+  {term:'RAG (Retrieval-Augmented Generation)',cat:'Protocols',def:'A technique where AI retrieves relevant documents from a knowledge base before generating a response.',why:'RAG can ground AI in your actual documentation and reduce hallucination risk when retrieval quality and source content are strong.',rel:['Embedding','Vector Database','Grounding']},
   {term:'Vector Database',cat:'Protocols',def:'A database optimized for storing and searching vector embeddings, enabling fast similarity search.',why:'The backend powering RAG and semantic search in AI knowledge bases.',rel:['Vector','Embedding','RAG (Retrieval-Augmented Generation)']},
-  {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard by Anthropic for connecting AI apps to external tools, data sources, and services.',why:'MCP is how AI tools connect to your company\'s systems.',rel:['Function Calling / Tool Use','API (Application Programming Interface)']},
+  {term:'MCP (Model Context Protocol)',cat:'Protocols',def:'An open standard introduced by Anthropic for connecting AI apps to external tools, data sources, and services.',why:'MCP is one way AI tools can connect to company systems and external context.',rel:['Function Calling / Tool Use','API (Application Programming Interface)']},
   {term:'Function Calling / Tool Use',cat:'Protocols',def:'The ability of an AI to invoke external tools (search, database queries, code execution) as part of generating a response.',why:'This makes AI tools go beyond text generation \u2014 they can look things up and take actions.',rel:['MCP (Model Context Protocol)','Agent (AI Agent)','API (Application Programming Interface)']},
   {term:'Structured Output',cat:'Protocols',def:'AI output in a defined format like JSON, XML, or a specific template.',why:'Essential when output feeds into other systems (CMS, databases, publishing pipelines).',rel:['Output Format','API (Application Programming Interface)']},
   {term:'Chunking Strategy',cat:'Protocols',def:'The method used to split documents into smaller pieces for embedding and storage in a RAG system. Strategies include fixed-size chunks, sentence-based splitting, and semantic chunking.',why:'Chunk size directly affects retrieval quality \u2014 too small loses context, too large dilutes relevance. Getting this right is critical for RAG performance.',rel:['RAG (Retrieval-Augmented Generation)','Vector Database','Embedding']},
@@ -2687,7 +2693,7 @@ const GLOSSARY = [
   {term:'Reranking',cat:'Protocols',def:'Using a secondary, more precise model to re-score and reorder search results after initial retrieval, improving the relevance of the final set of documents sent to the LLM.',why:'Reranking is a key technique for improving RAG quality \u2014 the initial retrieval casts a wide net, and reranking narrows it to the most relevant results.',rel:['RAG (Retrieval-Augmented Generation)','Hybrid Search','Vector Database']},
   {term:'Vector Similarity',cat:'Protocols',def:'A mathematical measure of how close two vectors are in embedding space, indicating how semantically similar two pieces of text are.',why:'The core mechanism behind semantic search and RAG retrieval \u2014 "find documents with similar meaning" is implemented as "find vectors that are close together."',rel:['Cosine Similarity','Embedding','Vector']},
   {term:'Agent (AI Agent)',cat:'Agents',def:'An AI system that autonomously plans, makes decisions, uses tools, and takes multi-step actions.',why:'Agents can complete entire workflows \u2014 monitoring repos, drafting updates, flagging reviews.',rel:['Function Calling / Tool Use','MCP (Model Context Protocol)','Planning (in Agents)']},
-  {term:'Agentic AI',cat:'Agents',def:'The paradigm of AI systems that act autonomously toward goals \u2014 planning multi-step strategies, using tools, making decisions, and self-correcting without human intervention at each step. Distinct from individual agents, agentic AI describes the broader shift from reactive chatbots to proactive, goal-directed AI systems.',why:'The defining trend of 2024\u20132026. Understanding agentic AI as a paradigm (not just a product feature) helps you anticipate how AI tools will evolve from assistants you prompt into collaborators that take initiative.',rel:['Agent (AI Agent)','Agent Loop','Multi-Agent Systems','Planning (in Agents)']},
+  {term:'Agentic AI',cat:'Agents',def:'The paradigm of AI systems that act autonomously toward goals \u2014 planning multi-step strategies, using tools, making decisions, and self-correcting without human intervention at each step. Distinct from individual agents, agentic AI describes the broader shift from reactive chatbots to proactive, goal-directed AI systems.',why:'A major trend in 2024\u20132026. Understanding agentic AI as a paradigm (not just a product feature) helps you anticipate how AI tools may evolve from assistants you prompt into collaborators that take more initiative.',rel:['Agent (AI Agent)','Agent Loop','Multi-Agent Systems','Planning (in Agents)']},
   {term:'Copilot',cat:'Agents',def:'An AI assistant integrated into a software tool that provides suggestions within your workflow.',why:'Copilots bring AI into tools you already use, reducing context-switching.',rel:['Agent (AI Agent)','Function Calling / Tool Use']},
   {term:'Planning (in Agents)',cat:'Agents',def:'An AI agent\u2019s ability to analyze a complex task, break it into ordered subtasks, determine dependencies between steps, and select which tools to use at each stage.',why:'Planning is what distinguishes agents from chatbots. A chatbot responds to one message; an agent plans a multi-step strategy.',rel:['Agent (AI Agent)','Agent Loop','Prompt Chaining']},
   {term:'Context Injection',cat:'Agents',def:'Inserting relevant information into the AI\'s context at request time.',why:'Every time you paste a document into AI chat, you\'re doing context injection.',rel:['RAG (Retrieval-Augmented Generation)','Context Window','Prompt']},
@@ -2733,9 +2739,9 @@ let glossAlpha = '';
 let glossSearch = '';
 
 function initMod8(){
-  document.getElementById('gloss-filters').innerHTML = ALL_CATS.map(c=>`<button class="gloss-filter ${c==='All'?'active':''}" onclick="setGlossFilter('${c}',this)">${c}</button>`).join('');
+  document.getElementById('gloss-filters').innerHTML = ALL_CATS.map(c=>`<button type="button" class="gloss-filter ${c==='All'?'active':''}" onclick="setGlossFilter('${c}',this)">${c}</button>`).join('');
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  document.getElementById('alpha-bar').innerHTML = letters.map(l=>`<button class="alpha-btn" onclick="setGlossAlpha('${l}',this)">${l}</button>`).join('');
+  document.getElementById('alpha-bar').innerHTML = letters.map(l=>`<button type="button" class="alpha-btn" onclick="setGlossAlpha('${l}',this)">${l}</button>`).join('');
   renderGlossary();
 }
 window.setGlossFilter = function(c,btn){
@@ -2796,9 +2802,9 @@ function showFinalAssessment(){
   mainEl.innerHTML = `
     <div class="mod-hdr"><div class="mod-ico" style="background:var(--gradient-primary)"><svg viewBox="0 0 24 24" fill="#fff" width="26" height="26"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><div><div class="mod-title">Final Assessment</div><div class="mod-desc">15 questions covering all modules. Test your AI knowledge!</div></div></div>
     ${renderQuiz('final', questions)}
-    <div style="text-align:center;margin-top:24px"><button class="btn-start" onclick="scoreFinal()">Calculate My Score</button></div>
+    <div style="text-align:center;margin-top:24px"><button type="button" class="btn-start" onclick="scoreFinal()">Calculate My Score</button></div>
     <div id="final-score"></div>
-    <div class="nav-btns"><button class="nav-btn secondary" onclick="goModule(0)">\u2190 Back to Module 1</button><button class="nav-btn primary" onclick="showLanding()">\uD83C\uDFE0 Home</button></div>`;
+    <div class="nav-btns"><button type="button" class="nav-btn secondary" onclick="goModule(0)">\u2190 Back to Module 1</button><button type="button" class="nav-btn primary" onclick="showLanding()">\uD83C\uDFE0 Home</button></div>`;
 }
 
 function scoreFinal(){
@@ -2850,7 +2856,7 @@ function scoreFinal(){
   if(correct >= 12){ cls = 'excellent'; msg = "Excellent! You've built a strong AI foundation."; }
   else if(correct >= 8){ cls = 'good'; msg = 'Good progress! Review the modules where you missed questions.'; }
   else { cls = 'keep'; msg = 'Keep learning! Revisit the modules and try again.'; }
-  el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div><button class="btn-start" style="margin-top:16px;font-size:14px;padding:10px 24px" onclick="printCertificate(${correct},${total})">🎓 Print Completion Summary</button></div>`;
+  el.innerHTML = `<div class="score-banner ${cls}"><div class="score-num">${correct} / ${total}</div><div class="score-msg">${msg}</div><button type="button" class="btn-start" style="margin-top:16px;font-size:14px;padding:10px 24px" onclick="printCertificate(${correct},${total})">🎓 Print Completion Summary</button></div>`;
   el.scrollIntoView({behavior:'smooth'});
 }
 
@@ -2875,7 +2881,7 @@ function printCertificate(correct,total){
     <div class="label">${pct}% — Final Assessment Score</div>
     <div class="date">${date}</div>
     <div style="margin-top:24px;font-size:13px;color:#64748B">Brought to you by Babak</div>
-    <button onclick="window.print()">Print</button>
+    <button type="button" onclick="window.print()">Print</button>
   </div></body></html>`);
   w.document.close();
 }
@@ -2930,14 +2936,16 @@ function renderSearchResults(query){
   if(!results.length){ container.innerHTML = '<div class="search-empty">No results found.</div>'; return; }
   container.innerHTML = results.map(r=>{
     const hl = r.text.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<mark>$1</mark>');
-    return `<div class="search-item" data-idx="${searchIndex.indexOf(r)}"><div class="search-cat">${r.type}</div><div class="search-txt">${hl}</div></div>`;
+    return `<div class="search-item" role="button" tabindex="0" data-idx="${searchIndex.indexOf(r)}"><div class="search-cat">${r.type}</div><div class="search-txt">${hl}</div></div>`;
   }).join('');
   container.querySelectorAll('.search-item').forEach(el=>{
-    el.onclick = ()=>{
+    const runResult = ()=>{
       const idx = parseInt(el.dataset.idx);
       searchIndex[idx].action();
       closeSearch();
     };
+    el.onclick = runResult;
+    el.onkeydown = event => activateOnKey(event, runResult);
   });
 }
 
@@ -3025,17 +3033,17 @@ scrollBtn.addEventListener('click', () => {
 function renderMobDrawer(){
   const list = document.getElementById('mob-drawer-list');
   if(!list) return;
-  list.innerHTML = '<div class="mob-drawer-item" onclick="showLanding();closeMobDrawer()" style="border-bottom:2px solid var(--border);margin-bottom:4px">' +
+  list.innerHTML = '<div class="mob-drawer-item" role="button" tabindex="0" onclick="showLanding();closeMobDrawer()" onkeydown="activateOnKey(event, function(){showLanding();closeMobDrawer()})" style="border-bottom:2px solid var(--border);margin-bottom:4px">' +
     '<div class="mob-drawer-ico" style="background:var(--tx-secondary)"><svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V10" fill="none" stroke="#fff" stroke-width="2"/></svg></div>' +
     '<div><div class="mob-drawer-name">Home</div></div>' +
   '</div>' + MODULES.map((m,i) => {
     const cls = (i === currentModule ? 'active' : '') + (completedModules.has(i) ? ' done' : '');
-    return `<div class="mob-drawer-item ${cls}" onclick="goModule(${i});closeMobDrawer()">
+    return `<div class="mob-drawer-item ${cls}" role="button" tabindex="0" onclick="goModule(${i});closeMobDrawer()" onkeydown="activateOnKey(event, function(){goModule(${i});closeMobDrawer()})">
       <div class="mob-drawer-ico" style="background:${m.color}">${ICONS[m.icon]}</div>
       <div><div class="mob-drawer-name">${m.title}</div></div>
       <span class="mob-check">✓</span>
     </div>`;
-  }).join('') + `<div class="mob-drawer-item" onclick="showFinalAssessment();closeMobDrawer()">
+  }).join('') + `<div class="mob-drawer-item" role="button" tabindex="0" onclick="showFinalAssessment();closeMobDrawer()" onkeydown="activateOnKey(event, function(){showFinalAssessment();closeMobDrawer()})">
     <div class="mob-drawer-ico" style="background:var(--gradient-primary)"><svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
     <div><div class="mob-drawer-name">Final Assessment</div></div>
   </div>` + `<div class="mob-drawer-footer">Brought to you by Babak</div>`;
