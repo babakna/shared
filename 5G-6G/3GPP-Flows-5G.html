@@ -1308,8 +1308,8 @@ FLOWS.pdu_session = {
 // 4. Prepare N1 SM container:
 //    - PDU Session Establishment Accept
 //    - QoS rules, Session AMBR, IP addr`}},
-    {id:7, label:'Step 7: SMF → AMF N1N2 Message Transfer', from:'smf', to:'amf', interface:'N11 — SBI (TS 29.518)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
-      description:'SMF sends N2 SM Info (for gNB) and N1 SM container (for UE) to AMF via N1N2MessageTransfer.',
+    {id:7, label:'Step 7: SMF → AMF N1N2 Message Transfer', from:'smf', to:'amf', interface:'N11 — Namf Communication (TS 29.518)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
+      description:'SMF sends N2 SM Info (for gNB) and N1 SM container (for UE) to AMF via the AMF Namf_Communication service over the N11 reference point.',
       ingress:{title:'Namf_Communication_N1N2MessageTransfer',
         code:`// POST /namf-comm/v1/ue-contexts/{supi}/n1-n2-messages
 {
@@ -2178,7 +2178,7 @@ FLOWS.slice_registration = {
 // Check for Enterprise eMBB slice
 // (also check Priority URLLC separately)`}, egress:{title:'NSACF Admission Check',
         code:`// NSACF Processing:
-// 1. Check current UE count for SST=1/SD=2
+// 1. Check current UE count for SST=1/SD=ABCD02
 // 2. Compare against max UEs configured:
 //    Enterprise eMBB: max <admission_limit> UEs (illustrative)
 //    Current: 123,456 → under limit
@@ -2253,8 +2253,8 @@ FLOWS.slice_registration = {
 // 2. Store Configured NSSAI for future
 // 3. Can request PDU sessions per slice
 // 4. Registration Complete sent to AMF`}},
-    {id:10, label:'Step 10: Rejected Slice Scenario', from:'amf', to:'ue', interface:'Conceptual — Alternative', protocol:'NAS 5GMM', badge:'FACT',
-      description:'If NSACF had rejected a slice (max UEs reached), that S-NSSAI would appear in Rejected NSSAI with cause value.',
+    {id:10, label:'Step 10: Rejected Slice Scenario', from:'amf', to:'ue', interface:'Conceptual — Alternative', protocol:'NAS 5GMM', badge:'VALIDATED',
+      description:'Educational alternate scenario: if NSACF had rejected a slice (max UEs reached), that S-NSSAI would appear in Rejected NSSAI with cause value. This is not the primary successful path.',
       ingress:{title:'Registration Accept (with Rejection)',
         code:`// Alternative scenario — NSACF rejected Enterprise eMBB:
 // {
@@ -2440,7 +2440,7 @@ FLOWS.slice_charging = {
 //
 // Standard re-auth cycle continues
 // (see Flow 6 for detailed steps)`}, egress:{title:'Slice Billing Records',
-        code:`// CHF generates slice-tagged CDR:
+        code:`// CHF generates slice-tagged CDR [ILLUSTRATIVE — charges are not actual pricing]:
 {
   "cdr": {
     "supi": "imsi-00101000000001",
@@ -2455,7 +2455,7 @@ FLOWS.slice_charging = {
   }
 }`}},
     {id:7, label:'Step 7: Per-Slice Invoice Generation', from:'chf', to:'smf', interface:'Billing System', protocol:'CDR Processing', badge:'FACT', lineType:'cp',
-      description:'billing generates per-slice invoices from S-NSSAI-tagged CDRs, enabling differentiated billing per product.',
+      description:'Billing generates per-slice invoices from S-NSSAI-tagged CDRs, enabling differentiated billing per product.',
       ingress:{title:'Per-Slice Billing Disaggregation',
         code:`// Per-Slice Invoice Example [ILLUSTRATIVE — prices are not actual or guaranteed SLA commitments]:
 //
@@ -5668,11 +5668,11 @@ FLOWS.vonr_call = {
     {from:'upf_c',to:'pcscf',label:'N6',type:'data'},
     {from:'pcscf',to:'scscf',label:'SIP',type:'control'},
     {from:'scscf',to:'tas',label:'ISC',type:'control'},
-    {from:'pcf',to:'pcscf',label:'Rx/N5',type:'control'},
+    {from:'pcf',to:'pcscf',label:'N5',type:'control'},
   ],
   steps:[
     {id:1, label:'Step 1: IMS Registration (Precondition)', from:'ue', to:'pcscf', interface:'SIP over IMS PDU Session', protocol:'SIP REGISTER (TS 24.229)', badge:'FACT', lineType:'dp', through:['ran','upf_c'],
-      description:'<strong>Prerequisite:</strong> Before VoNR can proceed, the UE must have (a) completed 5G registration (Flow 1) and (b) established a separate <strong>IMS PDU session</strong> (DNN="ims", default QoS flow 5QI=5 for SIP signaling) — this is distinct from the data PDU session. With the IMS PDU session active, the UE performs SIP REGISTER through P-CSCF → I-CSCF → S-CSCF, binding its contact address to its IMS identity (IMPU).',
+      description:'<strong>Prerequisite:</strong> Before VoNR can proceed, the UE must have (a) completed 5G registration (Flow 1) and (b) established a separate <strong>IMS PDU session</strong> (DNN="ims", default QoS flow 5QI=5 for SIP signaling) — this is distinct from the data PDU session. With the IMS PDU session active, the UE performs SIP REGISTER through P-CSCF → S-CSCF (I-CSCF omitted for topology simplicity), binding its contact address to its IMS identity (IMPU).',
       ingress:{title:'SIP REGISTER Message',
         code:`// SIP REGISTER (TS 24.229)
 {
@@ -5731,7 +5731,7 @@ FLOWS.vonr_call = {
 // 3. Check call waiting → ready
 // 4. Return INVITE to S-CSCF
 // 5. S-CSCF routes to terminating side`}},
-    {id:4, label:'Step 4: P-CSCF → PCF: IMS Policy (Rx/N5)', from:'pcscf', to:'pcf', interface:'N5 — Npcf_PolicyAuthorization (TS 29.514)', protocol:'HTTP/2', badge:'FACT', lineType:'cp',
+    {id:4, label:'Step 4: P-CSCF → PCF: IMS Policy (N5)', from:'pcscf', to:'pcf', interface:'N5 — Npcf_PolicyAuthorization (TS 29.514)', protocol:'HTTP/2', badge:'FACT', lineType:'cp',
       description:'P-CSCF extracts media requirements from SDP and sends policy authorization to PCF requesting dedicated QoS resources for the voice bearer.',
       ingress:{title:'Policy Authorization Request',
         code:`// Npcf_PolicyAuthorization (TS 29.514)
@@ -6646,7 +6646,7 @@ function drawArchNEFAPI(container) {
     svgBox(svg, 210+col*110, 160+row*50, 100, 36, a, '', {stroke:'var(--accent)',sw:1});
   });
   const nfY = 90;
-  svgBox(svg, 580,50,80,40,'PCF','Policy'); svgLine(svg, 520,105, 580,70, 'N5', {dash:'6 3'});
+  svgBox(svg, 580,50,80,40,'PCF','Policy'); svgLine(svg, 520,105, 580,70, 'Npcf', {dash:'6 3'});
   svgBox(svg, 580,110,80,40,'UDM','Data Mgmt'); svgLine(svg, 520,115, 580,130, 'SBI', {dash:'6 3'});
   svgBox(svg, 710,50,80,40,'AMF','Mobility'); svgLine(svg, 520,100, 710,70, 'SBI', {dash:'6 3'});
   svgBox(svg, 710,110,80,40,'SMF','Session'); svgLine(svg, 660,130, 710,130, '', {dash:'6 3'});
@@ -6668,7 +6668,7 @@ function renderLatency(el) {
     ['ULCL Edge LBO','Operator deployment example (Oct 2025)','2–7 ms (RTT)','Real-time gaming, AR/VR, enterprise edge apps','ULCL proximity, EAS placement, radio conditions'],
     ['5G-Adv L1/L2 Mobility (Rel-19)','Specified (Rel-19)','&lt;5 ms interruption','Handover gap during cell change — critical for XR, V2X, cloud gaming','L1/L2 signaling vs RRC path; CHO pre-configuration; beam availability'],
     ['NTN — LEO Satellite (Rel-19)','Specified (Rel-19)','15–40 ms (one-way)','Remote/maritime/aviation connectivity where terrestrial is unavailable','Satellite altitude (LEO ~550km), propagation delay, regenerative vs transparent payload'],
-    ['NTN — GEO Satellite','Specified (Rel-17)','~270 ms (RTT)','Wide-area IoT, broadcast, backup coverage','Fixed GEO orbital delay (~120ms one-way); suitable for delay-tolerant IoT/store-and-forward'],
+    ['NTN — GEO Satellite','Specified (Rel-17)','~240 ms (RTT est.)','Wide-area IoT, broadcast, backup coverage','Fixed GEO orbital delay (~120ms one-way); suitable for delay-tolerant IoT/store-and-forward'],
     ['Sidelink PC5 (D2D)','Specified (Rel-16/19)','1–5 ms (RTT)','V2X direct, UE relay, proximity services','Direct UE-to-UE path (no core traversal); sidelink resource allocation mode'],
     ['AI-RAN (Projected)','~2027 (projected)','1–4 ms target (RTT)','Safety-critical IoT, autonomous systems, real-time control','AI-native RAN scheduling, on-device inference, radio-aware compute'],
   ];
@@ -6858,7 +6858,7 @@ const GLOSSARY_DATA = [
   ['N14','N14 Reference Point','Control plane interface between two AMF instances, used for AMF-to-AMF rerouting during registration or mobility.','TS 23.501 §5.2','Used in slice-aware registration when AMF reroute to a slice-specific AMF is needed.'],
   ['N20','N20 Reference Point','Control plane interface between AMF and SMSF for SMS over NAS delivery.','TS 23.501 §5.2','AMF routes SMS messages to SMSF via N20 in 5G SA.'],
   ['N21','N21 Reference Point','Control plane interface between SMSF and UDM for SMS subscription verification.','TS 23.501 §5.2','SMSF queries UDM via N21 to verify subscriber SMS authorization.'],
-  ['AI/ML for NR','AI/ML for NR Air Interface','3GPP-standardized use of machine learning at the NR physical layer. Rel-19 normatively specifies three use cases: beam management prediction (ML predicts optimal beam pairs to reduce sweeping overhead), CSI feedback enhancement (ML-based compression of channel state information), and positioning (ML-assisted timing/angle measurements for sub-meter accuracy). Based on Rel-18 study item TR 38.843.','TR 38.843, Rel-19 NR TS series','First standardized AI functions at the air interface — foundational step toward AI-native 6G RAN.'],
+  ['AI/ML for NR','AI/ML for NR Air Interface','3GPP-standardized use of machine learning at the NR physical layer. Rel-19 normatively specifies selected use cases such as beam management prediction, CSI feedback enhancement, and positioning, building on the Rel-18 study item TR 38.843.','TR 38.843, Rel-19 NR TS series','First standardized AI functions at the air interface — foundational step toward AI-native 6G RAN.'],
   ['eRedCap','Enhanced Reduced Capability NR','Rel-19 evolution of RedCap (Rel-17) that further reduces NR device complexity: 5 MHz minimum bandwidth (vs 20 MHz), single Rx antenna, lower peak data rate, and reduced power class. Targets industrial sensors, smart meters, and low-tier wearables that need NR coverage but not NR throughput.','TS 38.300 (Rel-19), TR 38.875','Fills the gap between NB-IoT/eMTC and full NR devices in the 5G device ecosystem.'],
   ['NTN','Non-Terrestrial Networks','Satellite-based NR access integrated into 5GC. Rel-17 introduced basic NTN; Rel-19 adds regenerative satellite payloads (satellite runs a full gNB), IoT-NTN (eMTC/NB-IoT over satellite), improved LEO mobility, and store-and-forward for intermittent ground station coverage.','TS 38.300, TR 38.821, TS 38.101-5','Precursor to the "ubiquitous connectivity" pillar of 6G (IMT-2030).'],
   ['Sidelink','NR Sidelink (PC5)','Direct device-to-device communication over the PC5 air interface without routing through the gNB. Rel-16 introduced V2X sidelink; Rel-19 extends to UE-to-network relay (out-of-coverage UEs relay through in-coverage peers), public safety relay, and commercial D2D proximity services.','TS 23.304, TS 38.331','Enables coverage extension, V2X, and D2D — foundation for 6G mesh architectures.'],
@@ -7160,7 +7160,7 @@ function renderIntroNetworkFunctions(el) {
   html += '<tr><td>NEF</td><td>Network Exposure Function</td><td>Exposes 5G network capabilities to external applications (AFs) via northbound APIs. Translates external API requests into internal 3GPP procedures. Handles traffic influence, monitoring events, and device triggering.</td><td>N33 (AF), Npcf (PCF)</td><td>10, 16</td></tr>';
   html += '<tr><td>CHF</td><td>Converged Charging Function</td><td>Handles both online (quota-based) and offline (CDR-based) charging. Receives usage reports from SMF, evaluates rating/tariff plans, grants quota. Replaces the 4G-era OCS and OFCS.</td><td>N40 (SMF)</td><td>6, 13, 17</td></tr>';
   html += '<tr><td>NWDAF</td><td>Network Data Analytics Function</td><td>Collects data from NFs (AMF, SMF, etc.), runs ML models, and provides analytics (load predictions, anomaly detection) to consumer NFs like PCF. Enables AI-driven network optimization. Rel-19 adds federated learning (distributed model training across NWDAF instances), QoE-aware analytics, and enhanced RAN energy optimization analytics.</td><td>Nnwdaf (consumer NFs subscribe)</td><td>20</td></tr>';
-  html += '<tr><td>NSACF</td><td>Network Slice Admission Control Function</td><td>Controls the number of UEs and PDU sessions admitted to each network slice. Prevents slice overload by enforcing configured capacity limits. Introduced in Rel-17. Rel-19 slicing Phase 3 adds SLA assurance — active monitoring and enforcement of per-slice KPIs.</td><td>SBI (AMF queries)</td><td>14</td></tr>';
+  html += '<tr><td>NSACF</td><td>Network Slice Admission Control Function</td><td>Controls the number of UEs and PDU sessions admitted to each network slice. Prevents slice overload by enforcing configured capacity limits. Introduced in Rel-17. Rel-17+ admission/count control per S-NSSAI; broader Rel-19 slice assurance involves additional RAN/core mechanisms beyond NSACF.</td><td>SBI (AMF queries)</td><td>14</td></tr>';
   html += '<tr><td>SMSF</td><td>SMS Function</td><td>Routes SMS over NAS (without requiring a circuit-switched fallback). Relays SMS-PP between UE/AMF and the SMS-SC/SMSC.</td><td>N20 (AMF)</td><td>5</td></tr>';
   html += '<tr><td>gNB</td><td>Next-Generation NodeB</td><td>The 5G NR base station. Handles radio resource management, scheduling, beamforming, RRC connection management, and air-interface security (AS encryption/integrity). Can optionally split into CU (Central Unit) and DU (Distributed Unit) via F1 interface. Rel-19 adds AI/ML-based beam management and CSI at L1/PHY, L1/L2-based inter-cell mobility for &lt;5ms handover, cell DTX/DRX for energy savings, RAN-visible QoE feedback, and support for the PC5 sidelink interface for relay and D2D.</td><td>Uu (UE), N2 (AMF), N3 (UPF), Xn (other gNB), PC5 (sidelink)</td><td>All flows involving radio</td></tr>';
   html += '<tr><td>P-CSCF</td><td>Proxy Call Session Control Function</td><td>IMS entry point for the UE. Handles SIP signaling for VoNR, requests QoS resources from PCF via N5 (Rx interface equivalent).</td><td>SIP (UE), N5 (PCF)</td><td>4</td></tr>';
@@ -7340,7 +7340,7 @@ function renderIntro5GAdvanced(el) {
   html += '<table class="ref-table"><thead><tr><th>Sidebar Section</th><th>Primary Release</th><th>Key Capabilities</th></tr></thead><tbody>';
   html += '<tr><td>5G SA Baseline</td><td>Rel-15/16</td><td>Registration, PDU sessions, data transfer, VoNR, SMS, charging, QoS modification, deregistration</td></tr>';
   html += '<tr><td>ULCL Edge Computing</td><td>Rel-16/17</td><td>ULCL dual-path UPF, AF traffic influence via NEF, local breakout, through-path N9, edge charging</td></tr>';
-  html += '<tr><td>Network Slicing</td><td>Rel-15/16/17/19</td><td>Slice-aware registration, NSSF selection, NSACF admission control, slice-specific PDU sessions and charging, dynamic slice API. Rel-19 adds slice SLA assurance and enhanced per-slice charging.</td></tr>';
+  html += '<tr><td>Network Slicing</td><td>Rel-15/16/17/19</td><td>Slice-aware registration, NSSF selection, NSACF admission control, slice-specific PDU sessions and charging, dynamic slice API. Rel-19 adds broader slice assurance and enhanced per-slice charging.</td></tr>';
   html += '<tr><td>5G Mobility</td><td>Rel-15/16/19</td><td>Xn-based handover, service request (idle-to-connected). Rel-19 adds L1/L2-based inter-cell mobility (&lt;5ms interruption) and conditional handover improvements.</td></tr>';
   html += '<tr><td>5G Analytics</td><td>Rel-17/19</td><td>NWDAF load analytics, ML inference, proactive policy adjustment. Rel-19 adds federated learning, QoE-aware analytics, and RAN energy optimization.</td></tr>';
   html += '</tbody></table>';
@@ -7369,8 +7369,9 @@ function showWelcome() {
     <p>An interactive tool for stepping through complete 5G SA, 5G-Advanced ULCL Edge, and Network Slicing message flows. Each flow animates messages between network nodes on a topology diagram, with a payload inspector showing protocol details.</p>
     <p><strong>New to 5G?</strong> Start with the "Introduction to 5G" section in the sidebar — five pages that build your understanding from the ground up: what 5G is, how it differs from 4G, the network functions you will encounter in every flow, the interfaces and protocols that connect them, and what 5G-Advanced adds beyond the baseline.</p>
     <h3>Badge System</h3>
-    <div class="badge-legend" style="grid-template-columns:1fr;">
+    <div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">
       <div class="badge-legend-item"><span class="badge badge-fact">FACT</span><span>Grounded in 3GPP specifications, with operator/product examples clearly labeled as illustrative</span></div>
+      <div class="badge-legend-item"><span class="badge badge-validated">VALIDATED</span><span>Standards-aligned educational variant or alternate scenario, not the primary successful path</span></div>
     </div>
     <h3>Keyboard Shortcuts</h3>
     <div class="shortcut-grid">
@@ -7382,7 +7383,7 @@ function showWelcome() {
     <p>Select a flow from the sidebar to begin. Each flow shows the network topology with relevant nodes, and you can step through each message exchange to see the signaling details.</p>
     <p>This file contains 20 interactive flows covering 5G SA Baseline, 5G-Advanced ULCL Edge, Network Slicing, 5G Mobility, and 5G Analytics, plus an introductory learning section, and reference pages with architecture diagrams, specifications, a glossary, latency comparison, band map, and technology timeline.</p>
     <div style="margin-top:18px;padding:14px 18px;border-left:4px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:0.97em;line-height:1.6">
-<strong>⚠ Disclaimer:</strong> All NF instance names, hostnames, S-NSSAI SD values, rating groups, DNAI identifiers, capacity limits, invoice examples, and infrastructure names shown in this tool are <strong>illustrative examples</strong> created for educational purposes. They do not represent actual network configuration, operational parameters, or pricing. Protocol flows and message structures follow 3GPP specifications; operator-specific payload values are fictional.
+<strong>⚠ Disclaimer:</strong> Badge labels distinguish standards-grounded flows from clearly labeled illustrative or alternate examples. All NF instance names, hostnames, S-NSSAI SD values, rating groups, DNAI identifiers, capacity limits, invoice examples, and infrastructure names shown in this tool are <strong>illustrative examples</strong> created for educational purposes. They do not represent actual network configuration, operational parameters, or pricing. Protocol flows and message structures follow 3GPP specifications; operator-specific payload values are fictional.
 </div>
   </div>`;
 }
