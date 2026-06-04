@@ -108,7 +108,7 @@ header {
   padding: 0 24px; background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
 }
-header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; }
+header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; white-space: normal; }
 .header-title { display: flex; flex-direction: column; gap: 2px; }
 .byline { font-size: 12px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0; }
 header h1 .sep { color: var(--text-tertiary); margin: 0 6px; }
@@ -628,11 +628,11 @@ const NODES = {
 /* ======== SIDEBAR CONFIG ======== */
 const SIDEBAR_SECTIONS = [
   { title:'Introduction', items:[
-    {num:'i', id:'intro_road_to_6g', label:'The Road from 5G to 6G', type:'ref'},
-    {num:'ii', id:'intro_what_is_airan', label:'What is AI-RAN?', type:'ref'},
-    {num:'iii', id:'intro_airan_vs_gnb', label:'AI-RAN vs. Traditional gNB', type:'ref'},
-    {num:'iv', id:'intro_what_is_6g', label:'What is 6G?', type:'ref'},
-    {num:'v', id:'intro_6g_technologies', label:'6G Key Technologies', type:'ref'},
+    {num:'i', id:'intro_road_to_6g', label:'The Road from 5G to 6G', type:'ref', badge:'FACT'},
+    {num:'ii', id:'intro_what_is_airan', label:'What is AI-RAN?', type:'ref', badge:'VALIDATED'},
+    {num:'iii', id:'intro_airan_vs_gnb', label:'AI-RAN vs. Traditional gNB', type:'ref', badge:'PROJECTED'},
+    {num:'iv', id:'intro_what_is_6g', label:'What is 6G?', type:'ref', badge:'VISION'},
+    {num:'v', id:'intro_6g_technologies', label:'6G Key Technologies', type:'ref', badge:'VISION'},
   ]},
   { title:'AI-RAN (Innovation Center)', items:[
     {num:1, id:'airan_registration',label:'Registration via AI-RAN Node',type:'flow'},
@@ -2787,7 +2787,7 @@ FLOWS['sixg_session'] = {
 // Full data path: UE ↔ AI-RAN(GPU) ↔ UPF ↔ AF
 // AI-predicted scheduling active
 // Ready to deliver session accept to UE`}},
-    {id:7, label:'Step 7: Session Accept to UE', from:'ai_ran', to:'ue', interface:'6G-Uu — Sub-THz Air Interface', protocol:'6G NAS Session Accept', badge:'VISION', lineType:'dp',
+    {id:7, label:'Step 7: Session Accept to UE', from:'ai_ran', to:'ue', interface:'6G-Uu — Sub-THz Air Interface', protocol:'Vision — illustrative 6G NAS Session Accept', badge:'VISION', lineType:'dp',
       description:'AI-RAN delivers the 6G session accept to the UE over the sub-THz air interface. Session is fully established with AI-orchestrated QoS, predictive scheduling, and twin-optimized path.',
       ingress:{title:'6G Session Accept',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -2905,7 +2905,7 @@ FLOWS['sixg_data'] = {
 //
 // Twin accuracy: 95% at 500ms horizon
 // Result: zero jitter, zero buffer underrun`}},
-    {id:2, label:'Step 2: UL: 6G Sub-THz Transmission', from:'ue', to:'ai_ran', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'6G Air Interface (Sub-THz Waveform)', badge:'VISION', lineType:'dp',
+    {id:2, label:'Step 2: UL: 6G Sub-THz Transmission', from:'ue', to:'ai_ran', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'Vision — illustrative 6G air interface (sub-THz waveform)', badge:'VISION', lineType:'dp',
       description:'UE transmits uplink data on the sub-THz band (142.5 GHz, 2 GHz bandwidth). AI-RAN receives with AI-predicted beam already aligned — zero beam-search latency.',
       ingress:{title:'Sub-THz Uplink Transmission',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -3109,7 +3109,7 @@ FLOWS['sixg_data'] = {
 //   buffer → queue → schedule → encode (~500μs)
 // 6G (predictive): buffer waiting → immediate
 //   process → encode (~58μs, 8.6x faster)`}},
-    {id:6, label:'Step 6: DL: Predictive Beam Transmission', from:'ai_ran', to:'ue', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'6G Air Interface (Predictive Beam)', badge:'VISION', lineType:'dp',
+    {id:6, label:'Step 6: DL: Predictive Beam Transmission', from:'ai_ran', to:'ue', interface:'6G-Uu — Sub-THz (142.5 GHz)', protocol:'Vision — illustrative 6G air interface (predictive beam)', badge:'VISION', lineType:'dp',
       description:'AI-RAN transmits downlink on the sub-THz band using AI-predicted optimal beam path. The beam was pre-configured by the twin before the data even arrived — zero beam-alignment delay.',
       ingress:{title:'Sub-THz Downlink — Predictive Beam',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -3235,7 +3235,7 @@ FLOWS['sixg_intent_slice'] = {
   }
 }
 // Intent accepted — autonomous decomposition begins`}},
-    {id:2, label:'Step 2: Intent Decomposition', from:'intent', to:'ai_core', interface:'Intent API — Decomposed Directives', protocol:'6G Intent-to-Core Protocol (ETSI ZSM)', badge:'VISION', lineType:'cp',
+    {id:2, label:'Step 2: Intent Decomposition', from:'intent', to:'ai_core', interface:'Intent API — Decomposed Directives', protocol:'Vision — illustrative intent-to-core procedure (ETSI ZSM)', badge:'VISION', lineType:'cp',
       description:'The Intent Engine decomposes the high-level intent into concrete network directives — slice type, QoS profile, topology, and resource requirements — and passes them to AI Core for orchestration.',
       ingress:{title:'Decomposed Slice Directives',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -3339,7 +3339,7 @@ FLOWS['sixg_intent_slice'] = {
 }
 // Twin validates slice will meet SLA
 // Optimizations suggested before deployment`}},
-    {id:4, label:'Step 4: Slice ID Allocation', from:'ai_core', to:'nssf', interface:'Nnssf — Slice Selection', protocol:'Nnssf_NSSelection (TS 23.502 + 6G Extensions)', badge:'VISION', lineType:'cp',
+    {id:4, label:'Step 4: Slice ID Allocation', from:'ai_core', to:'nssf', interface:'Nnssf — Slice Selection', protocol:'Vision — illustrative slice selection (TS 23.502 baseline + speculative 6G extensions)', badge:'VISION', lineType:'cp',
       description:'AI Core requests the NSSF to allocate a unique S-NSSAI and register the new slice in the network slice registry.',
       ingress:{title:'Slice Allocation Request',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -3498,7 +3498,7 @@ FLOWS['sixg_intent_slice'] = {
   "provisionTime_ms": 62
 }
 // UPF ready — latency verified at 42µs`}},
-    {id:7, label:'Step 7: Intent Fulfillment', from:'intent', to:'af', interface:'Intent NBI — Fulfillment Notification', protocol:'6G Intent Protocol (ETSI ZSM)', badge:'VISION', lineType:'cp',
+    {id:7, label:'Step 7: Intent Fulfillment', from:'intent', to:'af', interface:'Intent NBI — Fulfillment Notification', protocol:'Vision — illustrative intent procedure (ETSI ZSM)', badge:'VISION', lineType:'cp',
       description:'The Intent Engine notifies the application that the slice intent has been fully fulfilled — the network autonomously provisioned everything from a single high-level intent.',
       ingress:{title:'Intent Fulfillment Report',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -3821,7 +3821,7 @@ FLOWS['sixg_ai_scaling'] = {
   "scaleTime_ms": 45
 }
 // UPF scaled: 10 → 15 Gbps in 45ms`}},
-    {id:6, label:'Step 6: Intent SLA Verification', from:'ai_core', to:'intent', interface:'Intent API — SLA Verification', protocol:'6G Intent Protocol (ETSI ZSM)', badge:'VISION', lineType:'cp',
+    {id:6, label:'Step 6: Intent SLA Verification', from:'ai_core', to:'intent', interface:'Intent API — SLA Verification', protocol:'Vision — illustrative intent procedure (ETSI ZSM)', badge:'VISION', lineType:'cp',
       description:'AI Core reports the scaling outcome to the Intent Engine, which verifies the original intent SLA is still met — or exceeded — after scaling.',
       ingress:{title:'Scaling Outcome Report',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -4046,7 +4046,7 @@ FLOWS['sixg_sensing_slice'] = {
   }
 }
 // Twin predicts trajectories + risk assessment`}},
-    {id:4, label:'Step 4: Communication Data Path', from:'ue', to:'upf_c', interface:'6G-Uu / N3 — User Data Path', protocol:'6G Uu + GTP-U (TS 29.281 Enhanced)', badge:'VISION', lineType:'dp', through:['ai_ran'],
+    {id:4, label:'Step 4: Communication Data Path', from:'ue', to:'upf_c', interface:'6G-Uu / N3 — User Data Path', protocol:'Vision — illustrative 6G Uu + GTP-U (TS 29.281 baseline + speculative extensions)', badge:'VISION', lineType:'dp', through:['ai_ran'],
       description:'Concurrent with sensing, the UE communication data flows through AI-RAN to UPF — the standard data path, but enhanced with ISAC-aware scheduling that avoids sensing duty cycles.',
       ingress:{title:'UE Communication Data',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -4508,7 +4508,7 @@ FLOWS['sixg_charging'] = {
   "aiModel": "chargingOptimizer-v6.4"
 }
 // AI-generated illustrative example: $1247.80 for 24h of 6G slice`}},
-    {id:5, label:'Step 5: Intent SLA Reconciliation', from:'ai_core', to:'intent', interface:'Intent API — Charging Reconciliation', protocol:'6G Intent Protocol (ETSI ZSM)', badge:'VISION', lineType:'cp',
+    {id:5, label:'Step 5: Intent SLA Reconciliation', from:'ai_core', to:'intent', interface:'Intent API — Charging Reconciliation', protocol:'Vision — illustrative intent procedure (ETSI ZSM)', badge:'VISION', lineType:'cp',
       description:'AI Core reconciles the charging with the original intent SLA — ensuring the consumer is charged fairly relative to what was promised and what was delivered.',
       ingress:{title:'Charging-Intent Reconciliation',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -4643,8 +4643,8 @@ FLOWS['sixg_digital_twin'] = {
     {from:'smf',to:'dig_twin',label:'Confirm',type:'control'}
   ],
   steps:[
-    {id:1, label:'Step 1: Telemetry Ingestion', from:'ran', to:'dig_twin', interface:'6G Telemetry Stream', protocol:'gRPC / OpenTelemetry (6G)', badge:'VISION', lineType:'dp',
-      description:'gNB, UPF, and AMF stream real-time KPIs (load, latency, error rates, spectrum usage) to the Digital Twin engine.',
+    {id:1, label:'Step 1: Telemetry Ingestion', from:'ran', to:'dig_twin', interface:'6G Telemetry Stream', protocol:'Vision — illustrative telemetry over gRPC / OpenTelemetry', badge:'VISION', lineType:'dp',
+      description:'gNB telemetry is shown as the animated path; UPF and AMF metrics in the payload are illustrative companion telemetry for the same Digital Twin ingestion batch.',
       ingress:{title:'Network Telemetry to Digital Twin',
         code:`// VISION: 6G Network Digital Twin — Telemetry Ingestion
 // gNB / UPF / AMF → Digital Twin Engine
@@ -4695,7 +4695,7 @@ FLOWS['sixg_digital_twin'] = {
     "driftDetected": false
   }
 }`}},
-    {id:2, label:'Step 2: State Synchronization', from:'dig_twin', to:'dig_twin', interface:'Internal — Twin Engine', protocol:'Digital Twin Sync Protocol', badge:'VISION', lineType:'cp',
+    {id:2, label:'Step 2: State Synchronization', from:'dig_twin', to:'dig_twin', interface:'Internal — Twin Engine', protocol:'Vision — illustrative digital twin sync procedure', badge:'VISION', lineType:'cp',
       description:'The twin engine updates its internal model to reflect the current physical network state, maintaining sub-second accuracy.',
       ingress:{title:'Twin Model Update Trigger',
         code:`// VISION: Digital Twin internal sync
@@ -4742,7 +4742,7 @@ FLOWS['sixg_digital_twin'] = {
     }
   }
 }`}},
-    {id:3, label:'Step 3: What-If Query', from:'intent', to:'dig_twin', interface:'Intent → Twin API', protocol:'6G Intent Query Protocol', badge:'VISION', lineType:'cp',
+    {id:3, label:'Step 3: What-If Query', from:'intent', to:'dig_twin', interface:'Intent → Twin API', protocol:'Vision — illustrative intent query procedure', badge:'VISION', lineType:'cp',
       description:'Intent Engine asks: "What happens if we add 2000 devices to slice X in sector Y?"',
       ingress:{title:'What-If Query from Intent Engine',
         code:`// VISION: Intent Engine queries Digital Twin
@@ -4782,7 +4782,7 @@ FLOWS['sixg_digital_twin'] = {
     "baselineModel": "twin-v4.2.1-sync-08224105"
   }
 }`}},
-    {id:4, label:'Step 4: Simulation Run', from:'dig_twin', to:'dig_twin', interface:'Internal — Simulation Engine', protocol:'Monte Carlo Simulation', badge:'VISION', lineType:'dp',
+    {id:4, label:'Step 4: Simulation Run', from:'dig_twin', to:'dig_twin', interface:'Internal — Simulation Engine', protocol:'Vision — illustrative Monte Carlo simulation', badge:'VISION', lineType:'dp',
       description:'The twin runs Monte Carlo simulation using its synchronized model to predict impact of the proposed change.',
       ingress:{title:'Monte Carlo Simulation Parameters',
         code:`// VISION: Digital Twin simulation
@@ -4837,7 +4837,7 @@ FLOWS['sixg_digital_twin'] = {
     "confidence_pct": 94.2
   }
 }`}},
-    {id:5, label:'Step 5: Simulation Result Returned', from:'dig_twin', to:'intent', interface:'Twin → Intent API', protocol:'6G Twin Result Protocol', badge:'VISION', lineType:'cp',
+    {id:5, label:'Step 5: Simulation Result Returned', from:'dig_twin', to:'intent', interface:'Twin → Intent API', protocol:'Vision — illustrative twin result procedure', badge:'VISION', lineType:'cp',
       description:'Twin returns predicted impact: "Slice X latency increases 3.2ms, recommend scaling UPF-E capacity."',
       ingress:{title:'Digital Twin Prediction',
         code:`// VISION: Twin returns actionable prediction
@@ -4882,7 +4882,7 @@ FLOWS['sixg_digital_twin'] = {
     "confidenceAboveThreshold": true
   }
 }`}},
-    {id:6, label:'Step 6: Policy Recommendation', from:'intent', to:'ai_core', interface:'Intent → AI Core', protocol:'6G Intent Translation', badge:'VISION', lineType:'cp',
+    {id:6, label:'Step 6: Policy Recommendation', from:'intent', to:'ai_core', interface:'Intent → AI Core', protocol:'Vision — illustrative intent translation', badge:'VISION', lineType:'cp',
       description:'Intent Engine translates twin recommendation into actionable network policy for AI Core.',
       ingress:{title:'Intent-to-Policy Translation',
         code:`// VISION: Intent Engine → AI Core
@@ -4935,8 +4935,8 @@ FLOWS['sixg_digital_twin'] = {
     }
   }
 }`}},
-    {id:7, label:'Step 7: Automated Scaling Action', from:'ai_core', to:'smf', interface:'AI Core → SMF/AMF', protocol:'6G Autonomous Policy Enforcement', badge:'VISION', lineType:'cp',
-      description:'AI Core applies policy: scale UPF, adjust admission control, modify QoS parameters.',
+    {id:7, label:'Step 7: Automated Scaling Action', from:'ai_core', to:'smf', interface:'AI Core → SMF/AMF', protocol:'Vision — illustrative autonomous policy enforcement', badge:'VISION', lineType:'cp',
+      description:'AI Core applies policy toward SMF and AMF in this illustrative combined step: scale UPF, adjust admission control, and modify QoS parameters.',
       ingress:{title:'Automated Network Action',
         code:`// VISION: AI Core → SMF/AMF
 // Apply twin-recommended actions
@@ -4990,7 +4990,7 @@ FLOWS['sixg_digital_twin'] = {
     "overallStatus": "ACTIONS_APPLIED"
   }
 }`}},
-    {id:8, label:'Step 8: Action Confirmation to Twin', from:'smf', to:'dig_twin', interface:'SMF → Digital Twin', protocol:'6G Twin Feedback Loop', badge:'VISION', lineType:'cp',
+    {id:8, label:'Step 8: Action Confirmation to Twin', from:'smf', to:'dig_twin', interface:'SMF → Digital Twin', protocol:'Vision — illustrative twin feedback loop', badge:'VISION', lineType:'cp',
       description:'Twin receives confirmation and updates its model to reflect the applied changes, closing the loop.',
       ingress:{title:'Action Feedback to Digital Twin',
         code:`// VISION: SMF/AMF → Digital Twin
@@ -5051,10 +5051,10 @@ FLOWS['airan_performance'] = {
     {from:'nwdaf',to:'pcf',label:'Nnwdaf',type:'control'}
   ],
   steps:[
-    {id:1, label:'Step 1: L1 PHY Processing on GPU', from:'ai_ran', to:'ai_ran', interface:'Internal — GPU vDU', protocol:'NVIDIA Aerial cuPHY', badge:'VALIDATED', lineType:'dp',
+    {id:1, label:'Step 1: L1 PHY Processing on GPU', from:'ai_ran', to:'ai_ran', interface:'Internal — GPU vDU', protocol:'NVIDIA Aerial cuPHY', badge:'PROJECTED', lineType:'dp',
       description:'cuPHY processes LDPC decode, channel estimation, and beam management on the Grace Hopper GPU. All L1 processing runs as CUDA kernels.',
       ingress:{title:'L1 PHY Processing Trigger',
-        code:`// VALIDATED: AI-RAN Innovation Center
+        code:`// PROJECTED: illustrative lab/model comparison based on AI-RAN validation context
 // Illustrative lab comparison vs modeled conventional baseline — not a production SLA
 // AI-RAN L1 PHY processing on NVIDIA Grace Hopper GPU
 // cuPHY handles all L1 operations as CUDA kernels
@@ -5117,10 +5117,10 @@ FLOWS['airan_performance'] = {
     "gpuUtilization_pct": 42
   }
 }`}},
-    {id:2, label:'Step 2: GPU Telemetry Report', from:'ai_ran', to:'aictl', interface:'AI-RAN → AI-RAN Ctrl', protocol:'gRPC Telemetry', badge:'VALIDATED', lineType:'cp',
+    {id:2, label:'Step 2: GPU Telemetry Report', from:'ai_ran', to:'aictl', interface:'E2 — O-RAN Near-RT RIC (AI-RAN Controller)', protocol:'E2AP (O-RAN WG3)', badge:'PROJECTED', lineType:'cp',
       description:'AI-RAN reports GPU performance metrics: L1 latency (87μs vs 200μs conventional), GPU utilization (42%), LDPC iterations (4 vs 8), beam prediction accuracy (94%).',
       ingress:{title:'GPU Performance Telemetry',
-        code:`// VALIDATED: AI-RAN Innovation Center
+        code:`// PROJECTED: illustrative lab/model comparison based on AI-RAN validation context
 // AI-RAN → AI-RAN Controller telemetry report
 {
   "gpuTelemetry": {
@@ -5169,10 +5169,10 @@ FLOWS['airan_performance'] = {
     }
   }
 }`}},
-    {id:3, label:'Step 3: GPU Scheduling Decision', from:'aictl', to:'aictl', interface:'Internal — AI-RAN Controller', protocol:'GPU Resource Scheduler', badge:'VALIDATED', lineType:'cp',
+    {id:3, label:'Step 3: GPU Scheduling Decision', from:'aictl', to:'aictl', interface:'Internal — AI-RAN Controller', protocol:'GPU Resource Scheduler', badge:'PROJECTED', lineType:'cp',
       description:'AI-RAN controller evaluates GPU capacity and determines it can accept AI inference workloads during low-RAN periods.',
       ingress:{title:'Scheduling Decision Input',
-        code:`// VALIDATED: AI-RAN Innovation Center
+        code:`// PROJECTED: illustrative lab/model comparison based on AI-RAN validation context
 // AI-RAN Controller scheduling decision
 {
   "schedulingEval": {
@@ -5213,10 +5213,10 @@ FLOWS['airan_performance'] = {
     }
   }
 }`}},
-    {id:4, label:'Step 4: AI Inference on Shared GPU', from:'ai_ran', to:'gpu', interface:'PCIe/NVLink — GPU Pool', protocol:'CUDA / TensorRT', badge:'VALIDATED', lineType:'dp',
+    {id:4, label:'Step 4: AI Inference on Shared GPU', from:'ai_ran', to:'gpu', interface:'PCIe/NVLink — GPU Pool', protocol:'CUDA / TensorRT', badge:'PROJECTED', lineType:'dp',
       description:'During RAN idle cycles, the GPU runs edge AI inference (object detection, anomaly detection) on the shared hardware.',
       ingress:{title:'Edge AI Inference Request',
-        code:`// VALIDATED: AI-RAN Innovation Center
+        code:`// PROJECTED: illustrative lab/model comparison based on AI-RAN validation context
 // AI-RAN → GPU Pool: edge inference during RAN idle
 {
   "inferenceRequest": {
@@ -5261,10 +5261,10 @@ FLOWS['airan_performance'] = {
   },
   "performanceNote": "12ms inference on SAME GPU running L1 PHY — no separate server needed"
 }`}},
-    {id:5, label:'Step 5: Inference Result Returned', from:'gpu', to:'ai_ran', interface:'NVLink — Shared Memory', protocol:'CUDA Stream Callback', badge:'VALIDATED', lineType:'dp',
+    {id:5, label:'Step 5: Inference Result Returned', from:'gpu', to:'ai_ran', interface:'NVLink — Shared Memory', protocol:'CUDA Stream Callback', badge:'PROJECTED', lineType:'dp',
       description:'Inference complete in 12ms. GPU returns to RAN processing priority with zero-copy result delivery.',
       ingress:{title:'GPU Result via Shared Memory',
-        code:`// VALIDATED: AI-RAN Innovation Center
+        code:`// PROJECTED: illustrative lab/model comparison based on AI-RAN validation context
 // GPU → AI-RAN: inference result via shared memory
 {
   "resultDelivery": {
@@ -5423,7 +5423,7 @@ FLOWS['sixg_isac'] = {
     {from:'ai_core',to:'af',label:'Application',type:'data'}
   ],
   steps:[
-    {id:1, label:'Step 1: ISAC Configuration', from:'ai_core', to:'ai_ran', interface:'AI Core → AI-RAN', protocol:'6G RAN Configuration', badge:'VISION', lineType:'cp',
+    {id:1, label:'Step 1: ISAC Configuration', from:'ai_core', to:'ai_ran', interface:'AI Core → AI-RAN', protocol:'Vision — illustrative 6G RAN configuration', badge:'VISION', lineType:'cp',
       description:'[6G-era capability] AI Core configures the AI-RAN node for joint sensing+communication: allocate sensing subcarriers, set sensing periodicity. This uses a speculative 6G-native interface — not a current 3GPP reference point.',
       ingress:{title:'ISAC Waveform Configuration',
         code:`// VISION: 6G Integrated Sensing & Communication
@@ -5482,7 +5482,7 @@ FLOWS['sixg_isac'] = {
     "readyForTransmission": true
   }
 }`}},
-    {id:2, label:'Step 2: ISAC Waveform Transmission', from:'ai_ran', to:'ue', interface:'Uu — Sub-THz ISAC', protocol:'6G ISAC Air Interface', badge:'VISION', lineType:'dp',
+    {id:2, label:'Step 2: ISAC Waveform Transmission', from:'ai_ran', to:'ue', interface:'Uu — Sub-THz ISAC', protocol:'Vision — illustrative 6G ISAC air interface', badge:'VISION', lineType:'dp',
       description:'Transmit combined sensing/communication signal on sub-THz band. Data encoded normally; sensing uses reflected energy from the same waveform.',
       ingress:{title:'Joint Sensing + Communication Signal',
         code:`// VISION: 6G ISAC waveform transmission
@@ -5540,7 +5540,7 @@ FLOWS['sixg_isac'] = {
     "sensingTransparency": "UE unaware of sensing — standard DL reception"
   }
 }`}},
-    {id:3, label:'Step 3: Response + Reflected Signal', from:'ue', to:'ai_ran', interface:'Uu — Uplink + Reflections', protocol:'6G ISAC Echo / Uplink', badge:'VISION', lineType:'dp',
+    {id:3, label:'Step 3: Response + Reflected Signal', from:'ue', to:'ai_ran', interface:'Uu — Uplink + Reflections', protocol:'Vision — illustrative 6G ISAC echo / uplink', badge:'VISION', lineType:'dp',
       description:'UE sends uplink data. Simultaneously, reflected signals from environment return to the AI-RAN antenna array for sensing processing.',
       ingress:{title:'UE Uplink + Environmental Reflections',
         code:`// VISION: UE sends UL data + environment reflects DL signal
@@ -5584,7 +5584,7 @@ FLOWS['sixg_isac'] = {
     }
   }
 }`}},
-    {id:4, label:'Step 4: Sensing Processing on GPU', from:'ai_ran', to:'ai_ran', interface:'Internal — GPU Sensing Pipeline', protocol:'CUDA Radar DSP', badge:'VISION', lineType:'dp',
+    {id:4, label:'Step 4: Sensing Processing on GPU', from:'ai_ran', to:'ai_ran', interface:'Internal — GPU Sensing Pipeline', protocol:'Vision — illustrative GPU sensing DSP', badge:'VISION', lineType:'dp',
       description:'GPU processes reflected signals: extract range, velocity, angle-of-arrival. Builds spatial awareness of objects within the cell coverage area.',
       ingress:{title:'GPU Sensing Signal Processing',
         code:`// VISION: GPU processes reflected signals for sensing
@@ -5636,7 +5636,7 @@ FLOWS['sixg_isac'] = {
     }
   }
 }`}},
-    {id:5, label:'Step 5: Sensing Data Fusion', from:'ai_ran', to:'sense', interface:'AI-RAN → Sensor Fusion Node', protocol:'6G Sensor Fusion Protocol', badge:'VISION', lineType:'dp',
+    {id:5, label:'Step 5: Sensing Data Fusion', from:'ai_ran', to:'sense', interface:'AI-RAN → Sensor Fusion Node', protocol:'Vision — illustrative sensor fusion procedure', badge:'VISION', lineType:'dp',
       description:'Combine radar-like sensing data with dedicated sensor inputs (LiDAR, camera) for a comprehensive environmental model.',
       ingress:{title:'Multi-Modal Sensor Fusion',
         code:`// VISION: ISAC sensing + dedicated sensors
@@ -5692,7 +5692,7 @@ FLOWS['sixg_isac'] = {
     }
   }
 }`}},
-    {id:6, label:'Step 6: Environment Update to Digital Twin', from:'sense', to:'dig_twin', interface:'Sensor → Digital Twin', protocol:'6G Twin Environment Sync', badge:'VISION', lineType:'dp',
+    {id:6, label:'Step 6: Environment Update to Digital Twin', from:'sense', to:'dig_twin', interface:'Sensor → Digital Twin', protocol:'Vision — illustrative twin environment sync', badge:'VISION', lineType:'dp',
       description:'Fused sensing data updates the digital twin\'s physical world model in real-time.',
       ingress:{title:'Physical World Model Update',
         code:`// VISION: Sensor Fusion → Digital Twin
@@ -5741,7 +5741,7 @@ FLOWS['sixg_isac'] = {
     ]
   }
 }`}},
-    {id:7, label:'Step 7: Spatial Awareness Analytics', from:'dig_twin', to:'ai_core', interface:'Digital Twin → AI Core', protocol:'6G Spatial Intelligence', badge:'VISION', lineType:'cp',
+    {id:7, label:'Step 7: Spatial Awareness Analytics', from:'dig_twin', to:'ai_core', interface:'Digital Twin → AI Core', protocol:'Vision — illustrative spatial intelligence', badge:'VISION', lineType:'cp',
       description:'Digital twin provides actionable intelligence: "Pedestrian cluster detected at intersection, vehicle approaching at 45 km/h."',
       ingress:{title:'Spatial Intelligence Report',
         code:`// VISION: Digital Twin → AI Core
@@ -5801,7 +5801,7 @@ FLOWS['sixg_isac'] = {
     }
   }
 }`}},
-    {id:8, label:'Step 8: Physical AI Application Response', from:'ai_core', to:'af', interface:'AI Core → AF / DN', protocol:'6G Application Service', badge:'VISION', lineType:'dp',
+    {id:8, label:'Step 8: Physical AI Application Response', from:'ai_core', to:'af', interface:'AI Core → AF / DN', protocol:'Vision — illustrative application service', badge:'VISION', lineType:'dp',
       description:'Applications receive real-time spatial data for autonomous driving, drone navigation, or smart city management.',
       ingress:{title:'Application Response Delivery',
         code:`// VISION: AI Core → AF / DN
@@ -5882,14 +5882,14 @@ function buildSidebar() {
     html += `<div class="sidebar-section-body">`;
     sec.items.forEach(it => {
       const flow = FLOWS[it.id];
-      const bdg = flow ? flow.badge : (it.id.startsWith('sixg') ? 'VISION' : it.id.startsWith('airan') ? 'VALIDATED' : 'FACT');
+      const bdg = flow ? flow.badge : (it.badge || (it.id.startsWith('sixg') ? 'VISION' : it.id.startsWith('airan') ? 'PROJECTED' : 'FACT'));
       html += `<button class="sidebar-item" data-id="${it.id}" data-type="${it.type}" data-num="${it.num}" onclick="navigate('${it.id}','${it.type}')">
         <span class="sidebar-num">${it.num}</span>
         <span class="sidebar-item-content"><span class="sidebar-item-label">${it.label}</span>
         <span class="badge badge-${bdg.toLowerCase()}">${bdg}</span></span>
       </button>`;
       html += `<div class="sidebar-accordion" id="acc-${it.id}">`;
-      if (flow) html += `<div class="sidebar-narrative">${flow.narrative}</div>`;
+      if (flow) html += `<div class="sidebar-narrative">${escapeHtml(flow.narrative)}</div>`;
       html += `</div>`;
     });
     html += `</div></div>`;
@@ -6098,11 +6098,23 @@ function activateStep(flow, stepIdx) {
     if(selfEl) { selfEl.classList.remove('dimmed','highlight'); selfEl.classList.add('active-node'); }
   }
   // step description in step-bar
-  if(step.description) {
-    document.getElementById('step-bar').innerHTML = step.description;
-  }
+  document.getElementById('step-bar').innerHTML = linkifyFlowRefs(step.description) || `<span style="opacity:0.5">Step ${stepIdx+1} — ${escapeHtml(step.label)}</span>`;
   // payload
   updatePayload(step);
+}
+function escapeHtml(text) {
+  if(text == null) return '';
+  return String(text).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function linkifyFlowRefs(text) {
+  if(!text) return '';
+  const flowMap = {};
+  SIDEBAR_SECTIONS.forEach(s => s.items.forEach(i => { if(FLOWS[i.id]) flowMap[i.num] = i; }));
+  return escapeHtml(text).replace(/Flow (\d+)/g, (m, num) => {
+    const item = flowMap[parseInt(num, 10)];
+    if(item) return `<a href="#" onclick="navigate('${item.id}','flow');return false" style="color:var(--accent);text-decoration:underline;cursor:pointer">${m}</a>`;
+    return m;
+  });
 }
 function updatePayload(step) {
   document.getElementById('ingress-proto').textContent = step.ingress ? step.ingress.title : '';
@@ -6233,7 +6245,7 @@ function renderArchDiagrams(el) {
     {id:'ims', label:'IMS / VoNR', badge:'FACT'},
     {id:'devedge', label:'NEF API Exposure', badge:'FACT'},
   ];
-  let html = '<h2>Architecture Diagrams</h2><p>Static diagrams; classic 5G SA step-by-step flows live in the companion 5G HTML.</p><div class="ref-tabs">';
+  let html = '<h2>Architecture Diagrams</h2><p>Static diagrams; classic 5G SA step-by-step flows live in <a href="3GPP-Flows-5G.html">3GPP-Flows-5G.html</a>.</p><div class="ref-tabs">';
   tabs.forEach((t,i) => {
     html += `<button class="ref-tab${i===0?' active':''}" onclick="switchArchTab('${t.id}', this)">${t.label} <span class="badge badge-${t.badge.toLowerCase()}">${t.badge}</span></button>`;
   });
@@ -6899,7 +6911,7 @@ const GLOSSARY_DATA = [
   ['TAS','Telephony Application Server','Provides supplementary services (call forwarding, hold, conference, etc.) for VoLTE/VoNR.','TS 23.228','Hosts operator supplementary services; exact services are implementation-specific.'],
   ['MGCF','Media Gateway Control Function','Controls media gateways for PSTN/CS interworking.','TS 23.228','Used in IMS for PSTN breakout scenarios.'],
   ['BGCF','Breakout Gateway Control Function','Selects network for PSTN breakout in IMS-to-PSTN calls.','TS 23.228','Routes VoNR calls to PSTN when needed.'],
-  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','Nationwide 5G SA gNB deployment across low/mid/mmWave bands.'],
+  ['gNB','Next Generation Node B','5G NR base station. Handles radio resource management, scheduling, and RRC signaling.','TS 38.300, TS 38.401','Typical operator 5G SA gNB deployments; bands vary by market.'],
   ['gNB-CU','gNB Central Unit','Handles RRC and PDCP layers. Split into CU-CP and CU-UP.','TS 38.401','Used in O-RAN/vRAN disaggregated deployments.'],
   ['gNB-DU','gNB Distributed Unit','Handles RLC, MAC, and PHY-high layers. Connected to CU via F1.','TS 38.401','Deployed at cell sites in split-architecture configurations.'],
   ['O-RU','O-RAN Radio Unit','Open RAN radio unit handling PHY-low and RF. Connected to O-DU via open fronthaul.','O-RAN Alliance','Part of Open RAN architecture strategy.'],
@@ -7143,10 +7155,10 @@ function renderIntroRoadTo6G(el) {
 
 /* -- Introduction: What is AI-RAN? -- */
 function renderIntroWhatIsAIRAN(el) {
-  let html = '<h2>What is AI-RAN? <span class="badge badge-fact">FACT</span></h2>';
+  let html = '<h2>What is AI-RAN? <span class="badge badge-validated">VALIDATED</span></h2>';
   html += '<p>AI-RAN is the integration of artificial intelligence directly into the Radio Access Network (RAN) infrastructure. Instead of running AI as an external optimization layer (like traditional SON or the O-RAN Near-RT RIC), AI-RAN places GPU compute physically alongside or within the RAN node itself, enabling real-time AI inference on live radio signals at microsecond timescales.</p>';
   html += '<h3>The Core Idea</h3>';
-  html += '<p>In a traditional gNB, the baseband unit (BBU) performs L1 PHY processing (channel estimation, LDPC decoding, beam management) using dedicated ASICs or FPGAs. These are fast but inflexible — they execute fixed algorithms defined at design time. AI-RAN replaces or augments these fixed processing stages with GPU-accelerated AI models that can learn, adapt, and predict. A trained neural network performing beam prediction can find the optimal beam pair in ~42 microseconds with 97% confidence, compared to ~500 microseconds for traditional codebook search — and it improves over time with more data.</p>';
+  html += '<p>In a traditional gNB, the baseband unit (BBU) performs L1 PHY processing (channel estimation, LDPC decoding, beam management) using dedicated ASICs or FPGAs. These are fast but inflexible — they execute fixed algorithms defined at design time. AI-RAN replaces or augments these fixed processing stages with GPU-accelerated AI models that can learn, adapt, and predict. Illustrative lab/model comparisons show beam prediction examples around ~42 microseconds with high confidence versus ~500 microseconds for traditional codebook search; actual results depend on model, radio conditions, and implementation.</p>';
   html += '<h3>The AI-RAN Alliance</h3>';
   html += '<p>The AI-RAN Alliance was established in February 2024 to accelerate the integration of AI into mobile networks. It brings together mobile operators, infrastructure vendors (Nokia, Ericsson, Samsung), GPU/AI platform providers (NVIDIA), and research institutions. The alliance focuses on three areas: AI for RAN (using AI to optimize existing RAN operations), AI on RAN (running AI workloads on RAN infrastructure), and AI and RAN (new architectures where AI is a native component of the radio network).</p>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(3,1fr);">';
@@ -7187,20 +7199,21 @@ function renderIntroWhatIsAIRAN(el) {
 
 /* -- Introduction: AI-RAN vs. Traditional gNB -- */
 function renderIntroAIRANvsGNB(el) {
-  let html = '<h2>AI-RAN vs. Traditional gNB <span class="badge badge-fact">FACT</span></h2>';
+  let html = '<h2>AI-RAN vs. Traditional gNB <span class="badge badge-projected">PROJECTED</span></h2>';
   html += '<p>The AI-RAN node performs the same role as a traditional gNB — it is a 5G NR base station that connects UEs to the 5G Core. The difference is entirely in how it processes radio signals internally. This page provides a side-by-side comparison so you can see exactly what changes and what stays the same.</p>';
   html += '<h3>Architecture Comparison Diagram</h3>';
   html += '<div class="arch-svg-container" id="intro-arch-compare"></div>';
   html += '<h3>What Changes</h3>';
   html += '<table class="ref-table"><thead><tr><th>Aspect</th><th>Traditional gNB</th><th>AI-RAN Node</th></tr></thead><tbody>';
   html += '<tr><td>L1 PHY Processing</td><td>Dedicated ASIC/FPGA — fixed algorithms, optimized at chip design time</td><td>GPU-accelerated (NVIDIA cuPHY) — AI models that learn and adapt, updateable via software</td></tr>';
-  html += '<tr><td>Beam Management</td><td>Codebook-based beam search — UE and gNB cycle through beam pairs, ~500 μs</td><td>AI beam prediction — trained neural network predicts optimal beam pair in ~42 μs with ~97% confidence</td></tr>';
+  html += '<tr><td>Beam Management</td><td>Codebook-based beam search — UE and gNB cycle through beam pairs; timing varies by implementation</td><td>AI beam prediction — illustrative lab/model comparison around ~42 μs with high confidence</td></tr>';
   html += '<tr><td>Channel Estimation</td><td>Traditional least-squares or MMSE estimation</td><td>AI-enhanced CSI — deeper channel understanding, better MU-MIMO spatial multiplexing</td></tr>';
   html += '<tr><td>MAC Scheduling</td><td>Rule-based or heuristic schedulers (proportional fair, round-robin variants)</td><td>GPU-accelerated scheduling with potential for ML-informed resource allocation</td></tr>';
   html += '<tr><td>L1/L2 Data Path</td><td>DMA transfers between ASIC/FPGA and memory, packet copies between processing stages</td><td>Shared-memory zero-copy pipeline — L1 PHY output directly available to L2 and GTP-U encapsulation via GPU unified memory</td></tr>';
   html += '<tr><td>Compute Platform</td><td>Purpose-built DSP/ASIC/FPGA silicon per vendor</td><td>NVIDIA Grace Hopper GPU — general-purpose AI compute that can also run non-RAN AI workloads</td></tr>';
   html += '<tr><td>Software Update Model</td><td>Firmware updates requiring hardware compatibility validation</td><td>AI model updates via software — retrain and deploy new beam management or scheduling models without hardware changes</td></tr>';
   html += '</tbody></table>';
+  html += '<p style="font-size:12px;font-style:italic;color:var(--text-tertiary);">Illustrative lab/model comparison — not a production SLA or universal performance claim.</p>';
   html += '<h3>What Stays the Same</h3>';
   html += '<table class="ref-table"><thead><tr><th>Aspect</th><th>Behavior</th></tr></thead><tbody>';
   html += '<tr><td>N2 Interface (NGAP)</td><td>Identical. AMF cannot distinguish AI-RAN from traditional gNB. Standard NG Setup, UE Context, PDU Session Resource procedures.</td></tr>';
@@ -7213,7 +7226,7 @@ function renderIntroAIRANvsGNB(el) {
   html += '</tbody></table>';
   html += '<h3>The Key Insight</h3>';
   html += '<p>AI-RAN is not a new generation of mobile technology — it is a new way of implementing the existing generation. Every protocol, every interface, every message format in the AI-RAN flows follows the same 3GPP specifications as baseline 5G SA. The difference is speed (GPU parallelism), intelligence (AI inference on live signals), and flexibility (software-defined radio processing). This is why AI-RAN can be deployed incrementally into an existing network — it is an infrastructure upgrade, not a standards change.</p>';
-  html += '<p><strong>Where Rel-19 fits:</strong> While external signaling (N2, N3, Uu) is unchanged, Rel-19 evolves the NR PHY/RRC layers with AI/ML-aware procedures studied in TR 38.843 and carried forward into Rel-19 specifications — including model management, ML-based CSI reporting, and beam prediction support. These Rel-19 enhancements give the AI-RAN approach a standards-backed framework for the AI functions it performs at the GPU level. The Innovation Center demonstrations effectively implement what Rel-19 now standardizes — making AI-RAN both a deployment reality and a 3GPP-aligned evolution path.</p>';
+  html += '<p><strong>Where Rel-19 fits:</strong> While external signaling (N2, N3, Uu) is unchanged, Rel-19 evolves the NR PHY/RRC layers with AI/ML-aware procedures studied in TR 38.843 and carried forward into Rel-19 specifications — including model management, ML-based CSI reporting, and beam prediction support. These Rel-19 enhancements give the AI-RAN approach a standards-backed framework for the AI functions it performs at the GPU level. The Innovation Center demonstrations explore capability areas aligned with Rel-19 AI/ML for NR study and normative work; they are not a certified Rel-19 conformance claim.</p>';
   el.innerHTML = html;
   const cmpContainer = document.getElementById('intro-arch-compare');
   if (cmpContainer) {
@@ -7308,7 +7321,7 @@ function renderIntroWhatIs6G(el) {
 /* -- Introduction: 6G Key Technologies -- */
 function renderIntro6GTechnologies(el) {
   let html = '<h2>6G Key Technologies <span class="badge badge-vision">VISION</span></h2>';
-  html += '<p>The 6G flows in this tool reference several technologies that do not exist in 5G in their full 6G-native form. This page explains each one so you can follow the flow logic without prior 6G background. While the full 6G architecture remains a research vision, several of these technologies have <strong>5G-Advanced precursors in Rel-19</strong>: AI/ML for the air interface is now standardized at the NR physical layer, NTN satellite access is operational, ambient IoT device classes are specified, and centimeter-level positioning is defined. The 6G versions shown in the flows represent the <em>fully native</em> evolution of these capabilities — where they are architectural pillars rather than additions to an existing framework.</p>';
+  html += '<p>The 6G flows in this tool reference several technologies that do not exist in 5G in their full 6G-native form. This page explains each one so you can follow the flow logic without prior 6G background. While the full 6G architecture remains a research vision, several of these technologies have <strong>5G-Advanced precursors in Rel-19</strong>: Rel-19 advances normative AI/ML for NR, including model management and selected use cases, NTN satellite access is operational, ambient IoT device classes are specified, and centimeter-class positioning targets are being advanced. The 6G versions shown in the flows represent the <em>fully native</em> evolution of these capabilities — where they are architectural pillars rather than additions to an existing framework.</p>';
   html += '<h3>AI-Native Network Architecture</h3>';
   html += '<p>In 5G, the network functions (AMF, SMF, PCF, etc.) are discrete, independently deployed services that communicate via SBI. AI is an add-on — NWDAF collects data and provides analytics, but policy decisions are still made by rules-based engines in the PCF. In 6G, the vision is to merge these functions into a unified AI Core that makes decisions through ML inference. Instead of the PCF sending static PCC rules to the SMF, the AI Core observes network conditions in real time and directly programs the user plane based on learned patterns. The "AI-Native Service Mesh" shown in the 6G architecture diagram replaces the SBI bus.</p>';
   html += '<div class="badge-legend" style="grid-template-columns:repeat(2,1fr);">';
