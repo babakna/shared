@@ -38,15 +38,22 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 .ver{display:inline-flex;align-items:center;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--mag);color:#fff;font-size:11px;font-weight:800;letter-spacing:.4px;vertical-align:middle}
 .hdr-t{font-size:20px;font-weight:700;color:var(--tx0)}
 .hdr-s{font-size:12px;color:var(--tx2);margin-top:1px}
+.byline-name{color:#1E3A5F}
 .thm{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background .2s,border-color .2s;color:var(--tx1);flex-shrink:0}
 .thm:hover{border-color:var(--mag)}
 
 /* ── Tab Bar ── */
-.tabs{display:flex;border-bottom:2px solid var(--bdr);background:var(--bg1);overflow-x:auto;-webkit-overflow-scrolling:touch;transition:background .3s,border-color .3s}
+.tab-shell{position:sticky;top:0;z-index:20;display:flex;align-items:stretch;background:var(--bg1);border-bottom:2px solid var(--bdr);box-shadow:0 2px 8px rgba(0,0,0,.04);transition:background .3s,border-color .3s}
+.tabs{display:flex;flex:1;background:var(--bg1);overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;transition:background .3s,border-color .3s}
 .tabs::-webkit-scrollbar{height:3px}.tabs::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
 .tbtn{background:none;border:none;padding:12px 22px;font-size:13px;font-weight:600;color:var(--tx2);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:inherit}
 .tbtn:hover{background:var(--thov);color:var(--tx1)}
 .tbtn.on{color:var(--mag);border-bottom-color:var(--mag);background:var(--tact)}
+.tab-scroll-btn{width:44px;min-width:44px;border:none;border-inline-end:1px solid var(--bdr);background:var(--bg2);color:var(--mag);font-size:20px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s,background .2s,color .2s}
+.tab-scroll-btn:last-child{border-inline-end:none;border-inline-start:1px solid var(--bdr)}
+.tab-scroll-btn:hover:not(:disabled){background:var(--mag);color:#fff}
+.tab-scroll-btn:focus-visible,.tbtn:focus-visible,.hdr-btn:focus-visible,.thm:focus-visible,.btt:focus-visible{outline:2px solid var(--mag);outline-offset:-2px}
+.tab-scroll-btn:disabled{opacity:.32;cursor:default}
 
 /* ── Content ── */
 .wrap{max-width:1400px;margin:0 auto;padding:24px}
@@ -196,13 +203,14 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 .arch-toggle{display:flex;gap:6px;margin-bottom:14px}
 .arch-wrap svg text{font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
 
-.btt{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--mag);color:#fff;border:none;font-size:20px;cursor:pointer;display:none;z-index:999;box-shadow:0 2px 10px rgba(0,0,0,.2);transition:opacity .2s,transform .2s}
-.btt:hover{transform:scale(1.1)}
+.btt{position:fixed;bottom:24px;right:24px;min-width:92px;height:46px;border-radius:999px;background:var(--mag);color:#fff;border:none;font-size:13px;font-weight:800;cursor:pointer;display:none;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.26);transition:opacity .2s,transform .2s;padding:0 16px;gap:6px}
+.btt:hover{transform:translateY(-2px)}
 .btt.show{display:flex;align-items:center;justify-content:center}
 
 @media(max-width:768px){
   .hdr{padding:14px 16px}.hdr-t{font-size:16px}.wrap{padding:16px}
   .ocard{padding:18px}.tbtn{padding:10px 14px;font-size:12px}
+  .tab-scroll-btn{width:40px;min-width:40px}
   .qr-grid{grid-template-columns:1fr}
   .ac-input-wrap{flex-direction:column}
   .eid-info{grid-template-columns:1fr}
@@ -236,7 +244,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 .cert-tbl td{padding:6px 10px;border-bottom:1px solid var(--bdr)}
 .cert-tbl td:first-child{font-weight:700;color:var(--mag);white-space:nowrap;width:160px}
 @media print{
-  .hdr,.tabs,.thm,.cbtn,.fbtn,.kbd-bar,.btt,.ac-input-wrap,.hdr-actions,.search-overlay,.search-backdrop{display:none!important}
+  .hdr,.tab-shell,.tabs,.thm,.cbtn,.fbtn,.kbd-bar,.btt,.ac-input-wrap,.hdr-actions,.search-overlay,.search-backdrop{display:none!important}
   .pane{display:block!important}
   .pane:not(.on){display:none!important}
   .dbox{max-height:none!important;overflow:visible!important}
@@ -262,34 +270,38 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated June 2026 &middot; <span style="color:#1E3A5F">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated June 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
-    <button class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
-    <button class="hdr-btn" id="share-btn" title="Copy link to current view" aria-label="Share">&#128279;</button>
-    <button class="hdr-btn" id="print-btn" title="Print current view" aria-label="Print">&#9113;</button>
-    <button class="thm" id="thm" aria-label="Toggle light/dark mode" title="Toggle theme"></button>
+    <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
+    <button type="button" class="hdr-btn" id="share-btn" title="Copy link to current view" aria-label="Share">&#128279;</button>
+    <button type="button" class="hdr-btn" id="print-btn" title="Print current view" aria-label="Print">&#9113;</button>
+    <button type="button" class="thm" id="thm" aria-label="Toggle light/dark mode" title="Toggle theme"></button>
   </div>
 </header>
 <div class="search-backdrop" id="search-backdrop"></div>
 <div class="search-overlay" id="search-overlay">
-  <input type="text" id="search-input" placeholder="Search flows, glossary, troubleshooting&#8230;" autocomplete="off" />
+  <input type="text" id="search-input" placeholder="Search flows, glossary, troubleshooting&#8230;" autocomplete="off">
   <div class="search-results" id="search-results"></div>
 </div>
-<nav class="tabs" id="tabs" role="tablist">
-  <button class="tbtn on" data-t="esim101" role="tab" id="tab-esim101" aria-selected="true">eSIM 101</button>
-  <button class="tbtn" data-t="m2m" role="tab" id="tab-m2m" aria-selected="false">SGP.01 / .02 &mdash; M2M</button>
-  <button class="tbtn" data-t="consumer" role="tab" id="tab-consumer" aria-selected="false">SGP.21 / .22 &mdash; Consumer</button>
-  <button class="tbtn" data-t="iot" role="tab" id="tab-iot" aria-selected="false">SGP.31 / .32 &mdash; IoT</button>
-  <button class="tbtn" data-t="ifpp" role="tab" id="tab-ifpp" aria-selected="false">SGP.41 / .42 &mdash; IFPP</button>
-  <button class="tbtn" data-t="troubleshoot" role="tab" id="tab-troubleshoot" aria-selected="false">Troubleshooting</button>
-  <button class="tbtn" data-t="quickref" role="tab" id="tab-quickref" aria-selected="false">Quick Reference</button>
-  <button class="tbtn" data-t="tools-id" role="tab" id="tab-tools-id" aria-selected="false">Tools &mdash; Identifiers</button>
-  <button class="tbtn" data-t="tools-dbg" role="tab" id="tab-tools-dbg" aria-selected="false">Tools &mdash; Debug</button>
-  <button class="tbtn" data-t="appendix" role="tab" id="tab-appendix" aria-selected="false">Appendix &amp; References</button>
-</nav>
+<div class="tab-shell" aria-label="Section navigation">
+  <button type="button" class="tab-scroll-btn" id="tab-left" aria-label="Scroll tabs left" title="Scroll tabs left">&lsaquo;</button>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button type="button" class="tbtn on" data-t="esim101" role="tab" id="tab-esim101" aria-selected="true">eSIM 101</button>
+    <button type="button" class="tbtn" data-t="m2m" role="tab" id="tab-m2m" aria-selected="false">SGP.01 / .02 &mdash; M2M</button>
+    <button type="button" class="tbtn" data-t="consumer" role="tab" id="tab-consumer" aria-selected="false">SGP.21 / .22 &mdash; Consumer</button>
+    <button type="button" class="tbtn" data-t="iot" role="tab" id="tab-iot" aria-selected="false">SGP.31 / .32 &mdash; IoT</button>
+    <button type="button" class="tbtn" data-t="ifpp" role="tab" id="tab-ifpp" aria-selected="false">SGP.41 / .42 &mdash; IFPP</button>
+    <button type="button" class="tbtn" data-t="troubleshoot" role="tab" id="tab-troubleshoot" aria-selected="false">Troubleshooting</button>
+    <button type="button" class="tbtn" data-t="quickref" role="tab" id="tab-quickref" aria-selected="false">Quick Reference</button>
+    <button type="button" class="tbtn" data-t="tools-id" role="tab" id="tab-tools-id" aria-selected="false">Tools &mdash; Identifiers</button>
+    <button type="button" class="tbtn" data-t="tools-dbg" role="tab" id="tab-tools-dbg" aria-selected="false">Tools &mdash; Debug</button>
+    <button type="button" class="tbtn" data-t="appendix" role="tab" id="tab-appendix" aria-selected="false">Appendix &amp; References</button>
+  </nav>
+  <button type="button" class="tab-scroll-btn" id="tab-right" aria-label="Scroll tabs right" title="Scroll tabs right">&rsaquo;</button>
+</div>
 <main class="wrap" id="mc"></main>
-<button id="btt" class="btt" title="Back to top" aria-label="Back to top">&uarr;</button>
+<button type="button" id="btt" class="btt" title="Back to top" aria-label="Back to top">&uarr; Top</button>
 
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -308,7 +320,7 @@ const SPEC_VERSIONS = {
   'SGP.16':'v2.1','SGP.21':'v3.1','SGP.22':'v3.1','SGP.22_v2':'v2.6.1',
   'SGP.23':'v3.1','SGP.24':'v2.2','SGP.25':'v1.0','SGP.26':'v1.0',
   'SGP.29':'v2.1','SGP.31':'v1.2','SGP.32':'v1.2','SGP.33':'v1.0',
-  'SGP.41':'v1.0 (public listing; verify current revision)','SGP.42':'Draft / source-verification needed','FS.18':'\u2014'
+  'SGP.41':'v1.0 (public listing; verify current revision)','SGP.42':'source-verification needed','FS.18':'\u2014'
 };
 
 // ── 2. Entity Colors ──
@@ -416,7 +428,7 @@ function ec(n){return EC[n]||'#888'}
 const SPEC={
 m2m:{badge:'SGP.01 '+SPEC_VERSIONS['SGP.01']+' / SGP.02 '+SPEC_VERSIONS['SGP.02'],title:'M2M Remote Provisioning Architecture',
 whatsNew:'v4.x added SM-SR swap (ES6), profile interoperability across SM-SR platforms, and MNO-SD support for operator-controlled security domains.',
-overview:['SGP.01 and SGP.02 define the original GSMA architecture for Machine-to-Machine (M2M) Remote SIM Provisioning (RSP). This architecture was designed for devices where there is no end-user interaction \u2014 connected cars, smart meters, industrial IoT modules, and vending machines. The key principle is that an Operator or M2M Service Provider (M2M-SP) remotely manages profiles on an embedded UICC (eUICC) through backend platform-to-platform communication.','The architecture introduces two critical backend entities: the Subscription Manager \u2013 Data Preparation (SM-DP), which securely prepares and encrypts profile packages, and the Subscription Manager \u2013 Secure Routing (SM-SR), which manages the secure transport channel to the eUICC and handles the lifecycle of profiles on it. The SM-SR maintains a secure remote channel to each eUICC using SCP03t or SCP80/SCP81, and acts as a gatekeeper \u2014 no entity other than the SM-SR communicates directly with the eUICC.','A key design decision in the M2M architecture is the \u201cpush\u201d model: the SM-SR pushes commands to the eUICC via the remote channel, which is why no Local Profile Assistant (LPA) or end-user UI is required. Profile operations (download, enable, disable, delete) are all initiated from the network side. This makes M2M RSP suitable for unattended devices but introduces dependencies on the SM-SR having continuous connectivity to the eUICC.','The SM-DP and SM-SR can be operated by the same entity or different entities. In many deployments, the eUICC manufacturer (EUM) provides the initial SM-SR, and Operators can request SM-SR changes (\u201cSM-SR swap\u201d) to move eUICC management to their preferred platform. Inter-SM-SR handover is defined in the spec but is complex and not universally deployed.','<b>Operational Realities:</b> Many M2M deployments use Binary SMS through the MNO\u2019s SMS-C (Short Message Service Center) for the remote channel, while others use IP-based secure channels. Operational complexity depends on bearer choice, SM-SR topology, key management, and deployment contracts. Compared with Consumer and IoT RSP architectures, SGP.02 deployments can involve more backend coordination, especially for SM-SR onboarding, key exchange, EIS updates, and multi-operator integration.','<b>Deployment Examples (illustrative):</b> Connected vehicles, smart meters, vending machines, industrial modules, and asset trackers. SM-SR operating models vary by EUM, platform vendor, operator, and service-provider contract. Treat vendor and product associations as deployment-specific and source-verification-needed.','<b>ES4 vs No-ES4 Flows:</b> Flows below are grouped by whether the Operator uses the ES4 interface to interact with the SM-SR. <b>No-ES4 flows</b> represent deployments where profiles are preloaded on the eUICC (e.g., at the factory or by the EUM), and the SM-SR manages lifecycle operations without direct Operator commands via ES4. <b>ES4 flows</b> represent the full architecture where the Operator triggers profile operations through ES4 commands to the SM-SR.'],
+overview:['SGP.01 and SGP.02 define the original GSMA architecture for Machine-to-Machine (M2M) Remote SIM Provisioning (RSP). This architecture was designed for devices where there is no end-user interaction \u2014 connected cars, smart meters, industrial IoT modules, and vending machines. The key principle is that an Operator or M2M Service Provider (M2M-SP) remotely manages profiles on an eUICC through backend platform-to-platform communication.','The architecture introduces two critical backend entities: the Subscription Manager \u2013 Data Preparation (SM-DP), which securely prepares and encrypts profile packages, and the Subscription Manager \u2013 Secure Routing (SM-SR), which manages the secure transport channel to the eUICC and handles the lifecycle of profiles on it. The SM-SR maintains a secure remote channel to each eUICC using SCP03t or SCP80/SCP81, and acts as a gatekeeper \u2014 no entity other than the SM-SR communicates directly with the eUICC.','A key design decision in the M2M architecture is the \u201cpush\u201d model: the SM-SR pushes commands to the eUICC via the remote channel, which is why no Local Profile Assistant (LPA) or end-user UI is required. Profile operations (download, enable, disable, delete) are all initiated from the network side. This makes M2M RSP suitable for unattended devices but introduces dependencies on the SM-SR having continuous connectivity to the eUICC.','The SM-DP and SM-SR can be operated by the same entity or different entities. In many deployments, the eUICC manufacturer (EUM) provides the initial SM-SR, and Operators can request SM-SR changes (\u201cSM-SR swap\u201d) to move eUICC management to their preferred platform. Inter-SM-SR handover is defined in the spec but is complex and not universally deployed.','<b>Operational Realities:</b> Many M2M deployments use Binary SMS through the MNO\u2019s SMS-C (Short Message Service Center) for the remote channel, while others use IP-based secure channels. Operational complexity depends on bearer choice, SM-SR topology, key management, and deployment contracts. Compared with Consumer and IoT RSP architectures, SGP.02 deployments can involve more backend coordination, especially for SM-SR onboarding, key exchange, EIS updates, and multi-operator integration.','<b>Deployment Examples (illustrative):</b> Connected vehicles, smart meters, vending machines, industrial modules, and asset trackers. SM-SR operating models vary by EUM, platform vendor, operator, and service-provider contract. Treat vendor and product associations as deployment-specific and source-verification-needed.','<b>ES4 vs No-ES4 Flows:</b> Flows below are grouped by whether the Operator uses the ES4 interface to interact with the SM-SR. <b>No-ES4 flows</b> represent deployments where profiles are preloaded on the eUICC (e.g., at the factory or by the EUM), and the SM-SR manages lifecycle operations without direct Operator commands via ES4. <b>ES4 flows</b> represent the full architecture where the Operator triggers profile operations through ES4 commands to the SM-SR.'],
 entities:['Operator (M2M-SP)','SM-DP','SM-SR','eUICC'],
 flows:{'m2m-download':'Download & Install (ES4)','m2m-enable':'Profile Enable (ES4)','m2m-disable':'Profile Disable (ES4)','m2m-delete':'Profile Delete (ES4)','m2m-download-noes4':'Download (No ES4 \u2014 Preloaded Profiles)','m2m-enable-noes4':'Enable (No ES4)','m2m-disable-noes4':'Disable (No ES4)','m2m-delete-noes4':'Delete (No ES4)'}},
 
@@ -427,14 +439,14 @@ entities:['Operator','SM-DP+','SM-DS','LPA (Device)','eUICC'],
 flows:{'consumer-prep':'Profile Preparation (ES2+)','consumer-ac':'Download \u2014 Activation Code','consumer-ds':'Download \u2014 Discovery Server','consumer-enable':'Enable','consumer-disable':'Disable','consumer-delete':'Profile Delete','consumer-mep':'MEP \u2014 Multi-Port Enable (v3.x)'}},
 
 iot:{badge:'SGP.31 '+SPEC_VERSIONS['SGP.31']+' / SGP.32 '+SPEC_VERSIONS['SGP.32'],title:'IoT eSIM Architecture',
-whatsNew:'v1.1 added clarifications for IPAd/IPAe deployment models, eIM configuration bootstrapping, and CoAP transport binding. Refined ESeim message set.',
+whatsNew:'SGP.32 v1.2 is the published IoT technical baseline used by this page. SGP.32 v1.3 is pending/source-verification-needed and should be checked against current GSMA releases before implementation planning.',
 overview:['SGP.31 and SGP.32 define the IoT RSP architecture for eSIM profile management across a broad range of IoT device categories, from capable connected vehicles to constrained sensors. This architecture is designed to address many operational challenges seen in M2M deployments, including bearer constraints, SM-SR complexity, and multi-hop latency, while supporting a wider IoT deployment spectrum.','The architecture introduces the <b>eIM (eSIM IoT Remote Manager)</b> \u2014 a management platform that acts on behalf of the device owner or IoT service provider. The eIM orchestrates profile lifecycle operations (download, enable, disable, delete) without requiring an LPA on the device. The device runs an <b>IPA (IoT Profile Assistant)</b> that handles local eUICC interaction. Two IPA variants exist: <b>IPAd</b> (IPA in Device) runs as software on the IoT device itself, and <b>IPAe</b> (IPA embedded in eUICC) is a software component within the eUICC that performs IPA functions internally for constrained devices.','<b>Direct Mode:</b> The eIM delivers pre-encrypted profiles directly to the IPA on the device via the ESeim interface. The SM-DP+ generates and encrypts the BPP bound to the target eUICC, then delivers it to the eIM. The eIM stores and delivers it to the IPA when the device is reachable. This mode is suitable for capable devices where the eIM has direct connectivity.','<b>Indirect Mode:</b> Originally introduced to handle constrained devices, but now broadly favored for practical reasons. The IPA connects to the SM-DP+ (similar to the Consumer model) with the eIM orchestrating the operation. The eIM triggers the IPA to download from the SM-DP+, and the IPA performs the authentication and BPP retrieval directly with the SM-DP+. IPAe (embedded IPA in the eUICC) implementations typically use Indirect Mode, allowing the eUICC itself to handle the download without requiring device-side software complexity.','The architecture supports both IP and non-IP transport, and operations can be performed over protocols like CoAP, MQTT, or SMS. This flexibility allows SGP.32 to serve devices across the connectivity spectrum \u2014 from NB-IoT modules to LTE-M gateways to Wi-Fi connected industrial equipment.','<b>Prerequisite \u2014 eIM Configuration:</b> Before any eIM-based flow works, the eUICC must be configured to trust the eIM. This is done via <code>ESeim.ConfigureEim</code>, typically during eUICC manufacturing or via an initial bootstrap process. The eUICC stores a list of authorized eIM identifiers and will reject commands from unrecognized eIMs. This trust bootstrap is a critical deployment step \u2014 without it, neither Direct nor Indirect mode operations will succeed.','<b>Deployment Examples (illustrative):</b> Candidate use cases include connected vehicles, smart meters and utilities, industrial equipment, asset trackers, smart agriculture, consumer IoT devices, and constrained sensors. The choice between Direct and Indirect mode depends on deployment requirements, device capabilities, certification status, and connectivity patterns rather than device \u201cconstrainedness\u201d alone.'],
 entities:['Operator','SM-DP+','SM-DS','eIM','IPAd','IPAe','eUICC (IoT)'],
 flows:{'iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
 
 ifpp:{badge:'SGP.41 '+SPEC_VERSIONS['SGP.41']+' / SGP.42 '+SPEC_VERSIONS['SGP.42'],title:'In-Factory Profile Provisioning (IFPP)',
-whatsNew:'SGP.41 architecture/requirements are public; SGP.42 technical details remain draft/source-verification-needed for this page.',
-overview:['SGP.41 and SGP.42 define the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 covers architecture and requirements; the SGP.42 technical specification status and timeline should be verified against current GSMA source pages before relying on implementation details.','IFPP addresses a manufacturing provisioning use case in the eSIM ecosystem. With online SGP.22 and SGP.32 provisioning flows, profile download commonly requires a connection to the SM-DP+ and multiple round-trip exchanges, which can introduce delays and complexity on factory floors where production speed is important. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The intended security model keeps a pre-generated BPP cryptographically bound to a specific eUICC; exact controls and assurance claims should be verified against current SGP.41/SGP.42 text and vendor implementation guidance.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Since SGP.42 implementation details are draft/source-verification-needed for this page, the flows below are conceptual and based on the SGP.41 architectural framework. Update them against the final technical specification before using as an implementation checklist.','<b>Deployment Examples (illustrative):</b> Consumer bootstrap-profile installation, smart meters, automotive modules, and global IoT devices are example IFPP use cases. Treat these as illustrative, not claims about specific vendor, operator, or production deployment. Late Binding examples are conceptual until verified against final SGP.42 text and implementation guidance.'],
+whatsNew:'SGP.41 architecture/requirements are public; SGP.42 technical details are source-verification-needed for this page.',
+overview:['SGP.41 and SGP.42 define the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 covers architecture and requirements; the SGP.42 technical specification status, version, and implementation details should be verified against current GSMA source pages before relying on this page for implementation planning.','IFPP addresses a manufacturing provisioning use case in the eSIM ecosystem. With online SGP.22 and SGP.32 provisioning flows, profile download commonly requires a connection to the SM-DP+ and multiple round-trip exchanges, which can introduce delays and complexity on factory floors where production speed is important. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The intended security model keeps a pre-generated BPP cryptographically bound to a specific eUICC; exact controls and assurance claims should be verified against current SGP.41/SGP.42 text and vendor implementation guidance.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Because SGP.42 technical details are source-verification-needed for this page, the flows below are conceptual and based on the SGP.41 architectural framework. Update them against the current technical specification before using as an implementation checklist.','<b>Deployment Examples (illustrative):</b> Consumer bootstrap-profile installation, smart meters, automotive modules, and global IoT devices are example IFPP use cases. Treat these as illustrative, not claims about specific vendor, operator, or production deployment. Late Binding examples are conceptual until verified against current SGP.42 text and implementation guidance.'],
 entities:['Operator','SM-DP+ (Profile Provider)','Factory System','eUICC'],
 flows:{'ifpp-prep':'Profile Preparation for Factory','ifpp-install':'Factory Installation','ifpp-late-binding':'Late Binding \u2014 Configuration-Time Provisioning'}}
 };
@@ -761,7 +773,7 @@ logs:['ES10b.GetProfilesInfo \u2192 profilePolicyRules field','Error code: subje
 // ── 11. Glossary ──
 // Format: {term:'Term', def:'Definition', spec:'Spec reference'}
 const GLOSSARY=[
-{term:'eUICC',def:'Embedded Universal Integrated Circuit Card \u2014 the physical eSIM chip soldered into the device. Unlike a removable SIM, it can be reprogrammed remotely.',spec:'All SGP specs'},
+{term:'eUICC',def:'Embedded Universal Integrated Circuit Card \u2014 the secure element class that supports GSMA remote SIM provisioning and downloadable profile lifecycle management. It is different from a conventional UICC placed in an embedded or soldered form factor.',spec:'All SGP specs'},
 {term:'EID',def:'eUICC Identifier \u2014 a 32-digit globally unique identifier for a specific eUICC. Think of it as the serial number of the eSIM chip. Format: 89049032...',spec:'SGP.29 (current), SGP.02 Annex H (legacy)'},
 {term:'ICCID',def:'Integrated Circuit Card Identifier \u2014 identifies a specific profile (subscription). This is the "SIM card number" equivalent. Typically 19\u201320 digits.',spec:'All SGP specs'},
 {term:'IMSI',def:'International Mobile Subscriber Identity \u2014 the identity used by the network to identify the subscriber. Stored inside the profile.',spec:'All SGP specs'},
@@ -814,8 +826,8 @@ function archDiagHTML(tab){
   var h='<div class="arch-wrap">';
   if(tab==='m2m'){
     h+='<div class="arch-toggle">';
-    h+='<button class="fbtn on" data-av="v3" data-atab="m2m">v3.x</button>';
-    h+='<button class="fbtn" data-av="v4" data-atab="m2m">v4.x</button>';
+    h+='<button type="button" class="fbtn on" data-av="v3" data-atab="m2m">v3.x</button>';
+    h+='<button type="button" class="fbtn" data-av="v4" data-atab="m2m">v4.x</button>';
     h+='</div>';
     h+='<div id="arch-m2m-v3">';
     h+=archM2Mv3();
@@ -825,8 +837,8 @@ function archDiagHTML(tab){
     h+='</div>';
   } else if(tab==='consumer'){
     h+='<div class="arch-toggle">';
-    h+='<button class="fbtn on" data-av="v2" data-atab="consumer">v2.x</button>';
-    h+='<button class="fbtn" data-av="v3" data-atab="consumer">v3.x</button>';
+    h+='<button type="button" class="fbtn on" data-av="v2" data-atab="consumer">v2.x</button>';
+    h+='<button type="button" class="fbtn" data-av="v3" data-atab="consumer">v3.x</button>';
     h+='</div>';
     h+='<div id="arch-consumer-v2">';
     h+=archConsumerV2();
@@ -836,8 +848,8 @@ function archDiagHTML(tab){
     h+='</div>';
   } else if(tab==='iot'){
     h+='<div class="arch-toggle">';
-    h+='<button class="fbtn on" data-av="ipad" data-atab="iot">IPAd (IPA in Device)</button>';
-    h+='<button class="fbtn" data-av="ipae" data-atab="iot">IPAe (IPA in eUICC)</button>';
+    h+='<button type="button" class="fbtn on" data-av="ipad" data-atab="iot">IPAd (IPA in Device)</button>';
+    h+='<button type="button" class="fbtn" data-av="ipae" data-atab="iot">IPAe (IPA in eUICC)</button>';
     h+='</div>';
     h+='<div id="arch-iot-ipad">';
     h+=archIotIPAd();
@@ -1148,12 +1160,12 @@ function specHTML(tab){
     var es4Flows=flowKeys.filter(function(k){return k.indexOf('-noes4')===-1});
     var noEs4Flows=flowKeys.filter(function(k){return k.indexOf('-noes4')!==-1});
     h+='<span class="fsel-label">With ES4 (Standard):</span>';
-    es4Flows.forEach(function(id){h+='<button class="fbtn'+(id===fid?' on':'')+'" data-fl="'+id+'" data-tab="'+tab+'">'+s.flows[id]+'</button>'});
+    es4Flows.forEach(function(id){h+='<button type="button" class="fbtn'+(id===fid?' on':'')+'" data-fl="'+id+'" data-tab="'+tab+'">'+s.flows[id]+'</button>'});
     h+='<span class="fsel-divider"></span>';
     h+='<span class="fsel-label">Without ES4:</span>';
-    noEs4Flows.forEach(function(id){h+='<button class="fbtn'+(id===fid?' on':'')+'" data-fl="'+id+'" data-tab="'+tab+'">'+s.flows[id]+'</button>'});
+    noEs4Flows.forEach(function(id){h+='<button type="button" class="fbtn'+(id===fid?' on':'')+'" data-fl="'+id+'" data-tab="'+tab+'">'+s.flows[id]+'</button>'});
   } else {
-    Object.keys(s.flows).forEach(function(id){h+='<button class="fbtn'+(id===fid?' on':'')+'" data-fl="'+id+'" data-tab="'+tab+'">'+s.flows[id]+'</button>'});
+    Object.keys(s.flows).forEach(function(id){h+='<button type="button" class="fbtn'+(id===fid?' on':'')+'" data-fl="'+id+'" data-tab="'+tab+'">'+s.flows[id]+'</button>'});
   }
   h+='</div>';
   h+='<div class="kbd-bar">\u2328 <b>Keyboard:</b> Space or \u2192 = Next step \u00B7 \u2190 = Previous \u00B7 R = Reset \u00B7 End = Show all \u00B7 Click any step label for details</div>';
@@ -1166,13 +1178,13 @@ function diagHTML(fid){
   var isIfpp=fid.indexOf('ifpp')===0;
   var nodes=parseNodes(fl),nc=nodes.length,step=gs(fid),total=fl.steps.length;
   var h='';
-  if(isIfpp)h+='<div style="padding:10px 16px;margin-bottom:10px;background:rgba(217,119,6,.1);border:1px solid #D97706;border-radius:8px;font-size:12px;color:#92400E;font-weight:600">\u26A0 Draft/source-verification needed: SGP.42 implementation details should be checked against current GSMA publications. These flow steps are conceptual and may change.</div>';
+  if(isIfpp)h+='<div style="padding:10px 16px;margin-bottom:10px;background:rgba(217,119,6,.1);border:1px solid #D97706;border-radius:8px;font-size:12px;color:#92400E;font-weight:600">\u26A0 Source-verification needed: SGP.42 implementation details should be checked against current GSMA publications. These flow steps are conceptual and may change.</div>';
   h+='<div class="dbox" id="dx-'+fid+'">';
   h+='<div class="dctrl">';
-  h+='<button class="cbtn" data-a="reset" data-f="'+fid+'">\u23EE Reset</button>';
-  h+='<button class="cbtn" data-a="prev" data-f="'+fid+'">\u25C0 Prev</button>';
-  h+='<button class="cbtn pri" data-a="next" data-f="'+fid+'">Next \u25B6</button>';
-  h+='<button class="cbtn" data-a="showall" data-f="'+fid+'">Show All \u23ED</button>';
+  h+='<button type="button" class="cbtn" data-a="reset" data-f="'+fid+'">\u23EE Reset</button>';
+  h+='<button type="button" class="cbtn" data-a="prev" data-f="'+fid+'">\u25C0 Prev</button>';
+  h+='<button type="button" class="cbtn pri" data-a="next" data-f="'+fid+'">Next \u25B6</button>';
+  h+='<button type="button" class="cbtn" data-a="showall" data-f="'+fid+'">Show All \u23ED</button>';
   h+='<span class="sind" id="si-'+fid+'">Step '+step+' / '+total+'</span>';
   h+='</div><div class="dscroll"><div class="dinner">';
 
@@ -1263,13 +1275,13 @@ function drawArrows(){
 /* ── eSIM 101 Tab ── */
 function esim101HTML(){
   var h='';
-  h+='<div class="ocard"><span class="badge">V2.0</span><h2 class="otitle">Updated June 2026</h2></div>';
-  
+
   /* Section 1: What Is eSIM? */
   h+='<div class="ocard"><span class="badge">START HERE</span><h2 class="otitle">What Is eSIM?</h2>';
   h+='<div class="otxt">';
   h+='<p>A traditional SIM card is a small physical chip you insert into your phone. It contains your mobile subscription \u2014 your phone number, network credentials, and operator identity. If you switch carriers, you swap the card.</p>';
-  h+='<p><b>eSIM (embedded SIM)</b> replaces the removable card with a chip soldered directly onto the device\'s circuit board during manufacturing. This chip \u2014 called an <b>eUICC (embedded Universal Integrated Circuit Card)</b> \u2014 can hold multiple downloadable <b>profiles</b>. Each profile is the digital equivalent of a physical SIM card: it contains the same subscription credentials (IMSI, Ki, OPc), network configuration (APN, PLMN), and applications.</p>';
+  h+='<p><b>eSIM</b> in the GSMA Remote SIM Provisioning context means an <b>eUICC (embedded Universal Integrated Circuit Card)</b>: a secure element that can hold multiple downloadable <b>profiles</b> and support remote profile lifecycle operations. It is often soldered into a device, but the defining feature is the eUICC/RSP capability, not the package shape. Each profile is the digital equivalent of a physical SIM card: it contains subscription credentials (IMSI, Ki, OPc), network configuration (APN, PLMN), and applications.</p>';
+  h+='<p><b>Important terminology:</b> A GSMA <b>eSIM/eUICC</b> is fundamentally different from a conventional <b>UICC</b> placed in an embedded, soldered, or MFF-style form factor. A soldered UICC can still behave like a fixed SIM with one preloaded subscription and no GSMA remote profile lifecycle. An eUICC is a different class of secure element that supports remote SIM provisioning, downloadable profiles, profile enable/disable/delete operations, and GSMA-defined management interfaces. Some literature loosely uses "embedded SIM" for both, so verify whether the source means eUICC/RSP capability or only embedded packaging.</p>';
   h+='<p>The key innovation: profiles can be <b>remotely downloaded, enabled, disabled, and deleted</b> over the air \u2014 no physical swap needed. This is called <b>Remote SIM Provisioning (RSP)</b>, and it\'s standardized by the GSMA.</p>';
   h+='</div></div>';
   
@@ -1305,7 +1317,7 @@ function esim101HTML(){
   
   /* Section 2: Architecture Characteristics Comparison */
   h+='<div class="ocard"><span class="badge">DECISION GUIDE</span><h2 class="otitle">Which eSIM Architecture Do I Need?</h2>';
-  h+='<div class="otxt"><p>Compare the four GSMA RSP architectures to determine which best fits your device and deployment scenario.</p><p style="font-size:12px;color:var(--tx3);margin-top:6px">See also: <a href="#quickref" style="cursor:pointer" onclick="event.preventDefault();jumpToFlow(null,null,0);curTab=\'quickref\';document.querySelectorAll(\'.tbtn\').forEach(function(t){t.classList.toggle(\'on\',t.dataset.t===\'quickref\');t.setAttribute(\'aria-selected\',String(t.dataset.t===\'quickref\'))});document.querySelectorAll(\'.pane\').forEach(function(p){p.classList.toggle(\'on\',p.id===\'p-quickref\')});refreshPane(\'quickref\')">Architecture Comparison Matrix</a> on the Quick Reference tab for a more detailed comparison.</p></div></div>';
+  h+='<div class="otxt"><p>Compare the four GSMA RSP architectures to determine which best fits your device and deployment scenario.</p><p style="font-size:12px;color:var(--tx3);margin-top:6px">See also: <a href="#quickref" style="cursor:pointer" onclick="event.preventDefault();jumpToFlow(\'quickref\',null,0)">Architecture Comparison Matrix</a> on the Quick Reference tab for a more detailed comparison.</p></div></div>';
   h+='<div class="rtwrap" style="margin-bottom:24px"><table class="rtbl" style="font-size:12px">';
   h+='<thead><tr><th style="min-width:140px">Characteristic</th>';
   h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'m2m\',null,0)">M2M (SGP.01/.02)</th>';
@@ -1314,11 +1326,11 @@ function esim101HTML(){
   h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'ifpp\',null,0)">IFPP (SGP.41/.42)</th>';
   h+='</tr></thead><tbody>';
   h+='<tr><td style="font-weight:700">Device type</td><td>Unattended devices (vehicles, meters, vending, industrial modules)</td><td>Smartphones, tablets, wearables, laptops</td><td>Broad IoT range \u2014 from constrained sensors to connected vehicles</td><td>Devices manufactured with eUICC where factory provisioning is required</td></tr>';
-  h+='<tr><td style="font-weight:700">User interaction</td><td>None</td><td>Required (LPA UI + consent)</td><td>None (eIM manages)</td><td>None (factory process)</td></tr>';
+  h+='<tr><td style="font-weight:700">User interaction</td><td>None</td><td>Typically user-mediated through LPA UI and consent; enterprise/OEM flows vary</td><td>None for device user; eIM manages remotely</td><td>None for device user; factory process</td></tr>';
   h+='<tr><td style="font-weight:700">Provisioning model</td><td>Push (network-initiated via SM-SR)</td><td>Pull (device-initiated via LPA)</td><td>Both (Direct = push, Indirect = pull)</td><td>Local (factory wired interface)</td></tr>';
   h+='<tr><td style="font-weight:700">Key backend entity</td><td>SM-DP + SM-SR</td><td>SM-DP+</td><td>SM-DP+ + eIM</td><td>SM-DP+ + Factory System</td></tr>';
   h+='<tr><td style="font-weight:700">Connectivity at install</td><td>Yes (SMS/IP)</td><td>Yes (HTTPS)</td><td>Yes (IP/CoAP/MQTT/SMS)</td><td>No for local install path</td></tr>';
-  h+='<tr><td style="font-weight:700">Spec status</td><td>Established; verify current revision</td><td>Established/evolving; verify current revision</td><td>Published; verify current revision and certification status</td><td>SGP.41 public; SGP.42 draft/source-verification needed</td></tr>';
+  h+='<tr><td style="font-weight:700">Spec status</td><td>Established; verify current revision</td><td>Established/evolving; verify current revision</td><td>Published baseline used here: SGP.32 v1.2; v1.3 pending/source-verification-needed</td><td>SGP.41 public; SGP.42 source-verification needed</td></tr>';
   h+='</tbody></table></div>';
   
   /* Section 3: Terminology Cheat Sheet */
@@ -1326,7 +1338,7 @@ function esim101HTML(){
   h+='<div class="otxt"><p>Key terms explained without jargon. Share this with stakeholders who need context without spec-level detail.</p></div></div>';
   h+='<div class="qr-grid" style="margin-bottom:20px">';
   var terms=[
-    {term:'eUICC',what:'The eSIM chip soldered in the device',analogy:'A multi-slot SD card reader built into the phone'},
+    {term:'eUICC',what:'The GSMA RSP-capable secure element that stores and manages downloadable profiles',analogy:'A remotely managed multi-slot secure vault for subscription profiles'},
     {term:'Profile',what:'The software equivalent of a physical SIM card \u2014 contains subscription credentials, network configuration, and applications',analogy:'Equivalent to a physical SIM card, but stored digitally on the eUICC'},
     {term:'SM-DP+',what:'Server that prepares and delivers profiles',analogy:'A secure vending machine \u2014 the device authenticates, then gets its profile'},
     {term:'SM-DS',what:'Discovery server for finding pending downloads',analogy:'A mailbox \u2014 SM-DP+ leaves a note, the device checks for messages'},
@@ -1349,23 +1361,24 @@ function esim101HTML(){
     h+='</div>';
   });
   h+='</div>';
-  h+='<div style="margin-bottom:24px"><button class="cbtn" onclick="window.print()">Print Cheat Sheet</button></div>';
+  h+='<div style="margin-bottom:24px"><button type="button" class="cbtn" onclick="window.print()">Print Cheat Sheet</button></div>';
   
   /* Section 4: Spec Evolution Timeline */
   h+='<div class="ocard"><span class="badge">HISTORY</span><h2 class="otitle">eSIM Specification Evolution</h2>';
   h+='<div class="otxt"><p>How the GSMA RSP ecosystem evolved from M2M to Consumer to IoT to Factory provisioning.</p></div></div>';
   h+='<div class="arch-wrap">';
-  h+='<svg viewBox="0 0 1000 320" style="width:100%;display:block">';
+  h+='<svg viewBox="0 0 1000 350" style="width:100%;display:block">';
   /* Timeline base */
   h+='<line x1="50" y1="80" x2="950" y2="80" stroke="var(--bdr)" stroke-width="3"/>';
   /* Milestones */
   var milestones=[
-    {year:'2013',x:100,spec:'SGP.02 v3',label:'M2M RSP',desc:'(illustrative milestone)',color:'#2563EB',tab:'m2m'},
-    {year:'2016',x:270,spec:'SGP.22 v1',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
-    {year:'2019',x:440,spec:'SGP.22 v2',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
-    {year:'2023',x:610,spec:'SGP.32 v1',label:'IoT RSP',desc:'(illustrative milestone)',color:'#0891B2',tab:'iot'},
-    {year:'2023',x:780,spec:'SGP.22 v3',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
-    {year:'2025',x:920,spec:'SGP.41 v1',label:'IFPP',desc:'(source-verify)',color:'#B45309',tab:'ifpp'}
+    {year:'2013',x:90,spec:'SGP.02 v3',label:'M2M RSP',desc:'(illustrative milestone)',color:'#2563EB',tab:'m2m'},
+    {year:'2016',x:235,spec:'SGP.22 v1',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
+    {year:'2019',x:380,spec:'SGP.22 v2',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
+    {year:'2023',x:525,spec:'SGP.32 v1',label:'IoT RSP',desc:'(illustrative milestone)',color:'#0891B2',tab:'iot'},
+    {year:'2023',x:670,spec:'SGP.22 v3',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
+    {year:'2025',x:815,spec:'SGP.41 v1',label:'IFPP',desc:'(source-verify)',color:'#B45309',tab:'ifpp'},
+    {year:'2026',x:940,spec:'SGP.32 v1.2',label:'IoT RSP',desc:'(v1.3 pending)',color:'#0891B2',tab:'iot'}
   ];
   milestones.forEach(function(m){
     h+='<g style="cursor:pointer" onclick="jumpToFlow(\''+m.tab+'\',null,0)">';
@@ -1377,7 +1390,7 @@ function esim101HTML(){
     h+='</g>';
   });
   /* Legend */
-  h+='<g transform="translate(50,180)">';
+  h+='<g transform="translate(50,185)">';
   var legendItems=[{color:'#2563EB',label:'M2M'},{color:'#1E3A5F',label:'Consumer'},{color:'#0891B2',label:'IoT'},{color:'#B45309',label:'IFPP'}];
   legendItems.forEach(function(l,i){
     h+='<rect x="'+(i*100)+'" y="0" width="14" height="14" rx="3" fill="'+l.color+'"/>';
@@ -1385,13 +1398,14 @@ function esim101HTML(){
   });
   h+='</g>';
   /* Descriptions */
-  h+='<g transform="translate(50,220)">';
+  h+='<g transform="translate(50,225)">';
   h+='<text x="0" y="0" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2013 \u2014 SGP.02:</tspan> Early GSMA RSP technical specification for unattended M2M devices.</text>';
   h+='<text x="0" y="20" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2016 \u2014 SGP.22 v1:</tspan> Consumer eSIM. Pull-model with Activation Codes.</text>';
   h+='<text x="0" y="40" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2019 \u2014 SGP.22 v2:</tspan> Added Discovery Server path and Confirmation Codes.</text>';
   h+='<text x="0" y="60" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.32:</tspan> IoT RSP architecture with eIM for a broad IoT device range.</text>';
   h+='<text x="0" y="80" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.22 v3:</tspan> Multiple Enabled Profiles (MEP) support.</text>';
   h+='<text x="0" y="100" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2025 \u2014 SGP.41:</tspan> In-Factory Profile Provisioning for manufacturing lines.</text>';
+  h+='<text x="0" y="120" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2026 \u2014 SGP.32 v1.2:</tspan> Published IoT technical baseline used here; SGP.32 v1.3 is pending/source-verification-needed.</text>';
   h+='</g>';
   h+='</svg></div>';
   
@@ -1441,16 +1455,16 @@ function qrHTML(){
   h+='<thead><tr><th></th><th>M2M</th><th>Consumer</th><th>IoT</th><th>IFPP</th></tr></thead><tbody>';
   var sm=[
   ['Architecture','SGP.01','SGP.21','SGP.31','SGP.41'],
-  ['Technical Spec','SGP.02','SGP.22','SGP.32','SGP.42 (draft)'],
-  ['Test Spec','SGP.11','SGP.23','SGP.33','TBD'],
-  ['Compliance','SGP.16','SGP.24','SGP.24 (IoT ext.)','TBD'],
+  ['Technical Spec','SGP.02','SGP.22','SGP.32','SGP.42 (source-verify)'],
+  ['Test Spec','SGP.11','SGP.23','SGP.33','source-verify'],
+  ['Compliance','SGP.16','SGP.24','SGP.24 / current GSMA compliance scope (verify)','source-verify'],
   ['eUICC Security','SGP.08','SGP.25','SGP.25','SGP.25'],
   ['EID Format','SGP.02 Annex H','SGP.29','SGP.29','SGP.29'],
   ['Test Profiles','\u2014','SGP.26','SGP.26','SGP.26']
   ];
   sm.forEach(function(r){h+='<tr>';r.forEach(function(c,i){
     if(i===0)h+='<td style="font-weight:700;white-space:nowrap">'+c+'</td>';
-    else if(c==='TBD'||c==='\u2014')h+='<td style="color:var(--tx3)">'+c+'</td>';
+    else if(c==='source-verify'||c==='\u2014')h+='<td style="color:var(--tx3)">'+c+'</td>';
     else h+='<td>'+c+'</td>';
   });h+='</tr>'});
   h+='</tbody></table></div>';
@@ -1477,14 +1491,14 @@ function qrHTML(){
   ['Model','Push (network-initiated)','Pull (device-initiated)','Both (Direct=push, Indirect=pull)','Factory (local install)'],
   ['Who initiates?','Operator via SM-SR (ES4) or SM-DP-initiated (preloaded profiles)','End user via LPA (scan QR / UI)','eIM (remote manager)','Factory System (manufacturing)'],
   ['Requires LPA?','No','Yes','No (uses IPA)','No'],
-  ['Requires user UI?','No','Yes (consent mandatory)','No','No'],
+  ['Requires user UI?','No','Usually yes for Consumer LPA consent; enterprise/OEM flows vary','No for device user','No for device user'],
   ['Key backend entity','SM-DP + SM-SR (separate)','SM-DP+ (combined)','SM-DP+ + eIM','SM-DP+ + Factory System'],
   ['Remote channel','SCP03t / SCP80 / SCP81 via SM-SR','HTTPS (LPA \u2194 SM-DP+)','IP/CoAP/MQTT/SMS (eIM \u2194 IPA)','Local wired interface'],
   ['Supports MEP?','No','Yes (v3.0+)','Not a baseline SGP.32 feature in this reference','N/A (factory provisioning only)'],
   ['Discovery mechanism','N/A (SM-SR knows all eUICCs)','SM-DS or Activation Code','SM-DS or eIM-triggered','N/A (EID known at factory)'],
   ['Typical devices','Connected cars, smart meters, vending machines, industrial modules','Smartphones, tablets, wearables, laptops','LPWAN sensors, NB-IoT modules, constrained IoT','Any device manufactured in a factory with eUICC'],
   ['Connectivity at install?','Yes (SMS/IP)','Yes (HTTPS)','Yes (eIM channel)','No (local interface \u2014 key advantage)'],
-  ['Spec status','Mature / stable ('+SPEC_VERSIONS['SGP.02']+')','Mature / evolving ('+SPEC_VERSIONS['SGP.22_v2']+' + '+SPEC_VERSIONS['SGP.22']+')','Published; verify current certification status ('+SPEC_VERSIONS['SGP.32']+')','SGP.41 '+SPEC_VERSIONS['SGP.41']+' published; SGP.42 '+SPEC_VERSIONS['SGP.42']]
+  ['Spec status','Established; verify current revision ('+SPEC_VERSIONS['SGP.02']+')','Established/evolving; verify current revision ('+SPEC_VERSIONS['SGP.22_v2']+' + '+SPEC_VERSIONS['SGP.22']+')','Published baseline used here: SGP.32 '+SPEC_VERSIONS['SGP.32']+'; v1.3 pending/source-verification-needed','SGP.41 '+SPEC_VERSIONS['SGP.41']+'; SGP.42 '+SPEC_VERSIONS['SGP.42']]
   ];
   mx.forEach(function(r){h+='<tr>';r.forEach(function(c,i){h+=(i===0?'<td style="font-weight:700;white-space:nowrap">':'<td>')+c+'</td>'});h+='</tr>'});
   h+='</tbody></table></div></div>';
@@ -1555,9 +1569,9 @@ function qrHTML(){
   h+='<div class="asec"><h2>Deployment Readiness Checklist</h2>';
   h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Interactive checklist for eSIM deployment preparation. Select architecture type, check off items, and print when ready.</p>';
   h+='<div style="display:flex;gap:6px;margin-bottom:14px">';
-  h+='<button class="fbtn on" onclick="showChecklist(\'consumer\',this)">Consumer</button>';
-  h+='<button class="fbtn" onclick="showChecklist(\'m2m\',this)">M2M</button>';
-  h+='<button class="fbtn" onclick="showChecklist(\'iot\',this)">IoT</button>';
+  h+='<button type="button" class="fbtn on" onclick="showChecklist(\'consumer\',this)">Consumer</button>';
+  h+='<button type="button" class="fbtn" onclick="showChecklist(\'m2m\',this)">M2M</button>';
+  h+='<button type="button" class="fbtn" onclick="showChecklist(\'iot\',this)">IoT</button>';
   h+='</div>';
   var checklists={
     consumer:['CI compatibility verified \u2014 SM-DP+ CI PKID is in target eUICC\u2019s trusted CI list','SM-DP+ HTTPS connectivity tested from device network (port 443, TLS 1.2+)','SM-DS event registration tested (if using Discovery Server path)','Activation Code format validated (1$address$matchingId)','Profile template tested on target eUICC form factor','eUICC available memory sufficient for profile size','Notification endpoint (SM-DP+ FQDN) reachable from device','PPR flags reviewed and documented for each profile type','LPA version supports required SGP.22 version (v2.x vs v3.x)','MEP port mapping tested (if SGP.22 v3.x with MEP)','Confirmation Code flow tested (if AC includes OID)','DNS resolution for SM-DP+ and SM-DS FQDNs verified'],
@@ -1578,7 +1592,7 @@ function qrHTML(){
     h+='</div>';
   }
   h+='</div>';
-  h+='<div style="margin-top:12px"><button class="cbtn" onclick="window.print()">Print Checklist</button></div>';
+  h+='<div style="margin-top:12px"><button type="button" class="cbtn" onclick="window.print()">Print Checklist</button></div>';
   h+='</div>';
 
   /* Security Domain Hierarchy Diagram */
@@ -1690,8 +1704,8 @@ function toolsIdHTML(){
   h+='<div class="asec"><h2>EID Analyzer (Decoder, Validator &amp; SM-DS Pattern Match)</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a 32-digit EID into its components (EUM prefix, manufacturer, country, platform, serial), validate the Mod97 checksum, and compare against illustrative Google SM-DS pattern examples.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="eid-input" class="ac-input" placeholder="Enter 32-digit EID \u2014 press Enter to decode" maxlength="40" />';
-  h+='<button class="cbtn pri" id="eid-decode">Decode</button>';
-  h+='<button class="cbtn" id="eid-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn pri" id="eid-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="eid-clear">Clear</button></div>';
   h+='<div id="eid-result" class="ac-result"></div>';
   h+='</div></div>';
 
@@ -1700,17 +1714,17 @@ function toolsIdHTML(){
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Paste multiple EIDs (one per line) or upload a CSV/TXT file to validate all at once.</p>';
   h+='<div style="margin-bottom:10px"><label class="cbtn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px">\ud83d\udcc1 Upload CSV/TXT<input type="file" id="batch-file" accept=".csv,.txt,.tsv" style="display:none"></label><span id="batch-file-name" style="font-size:12px;color:var(--tx3);margin-left:8px"></span></div>';
   h+='<textarea id="batch-input" class="ac-textarea" placeholder="Paste EIDs, one per line" rows="4"></textarea>';
-  h+='<div class="ac-input-wrap" style="margin-top:10px"><button class="cbtn pri" id="batch-validate">Validate All</button>';
-  h+='<button class="cbtn" id="batch-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap" style="margin-top:10px"><button type="button" class="cbtn pri" id="batch-validate">Validate All</button>';
+  h+='<button type="button" class="cbtn" id="batch-clear">Clear</button></div>';
   h+='<div id="batch-result" class="ac-result"></div></div></div>';
 
   /* Activation Code Parser */
   h+='<div class="asec"><h2>Activation Code Parser</h2>';
   h+='<div class="ac-tool">';
   h+='<div class="ac-input-wrap"><input type="text" id="ac-input" class="ac-input" placeholder="Paste activation code \u2014 press Enter to parse" />';
-  h+='<button class="cbtn pri" id="ac-parse">Parse</button>';
+  h+='<button type="button" class="cbtn pri" id="ac-parse">Parse</button>';
   h+='<label class="cbtn" style="cursor:pointer">\ud83d\udcf7 Upload QR<input type="file" id="ac-qr-upload" accept=".png,.jpg,.jpeg,.gif,.bmp,.webp" style="display:none"></label>';
-  h+='<button class="cbtn" id="ac-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn" id="ac-clear">Clear</button></div>';
   h+='<div id="ac-qr-status" style="font-size:12px;color:var(--tx2);margin-bottom:8px;display:none"></div>';
   h+='<div id="ac-result" class="ac-result"></div>';
   h+='</div></div>';
@@ -1727,8 +1741,8 @@ function toolsIdHTML(){
   h+='<input type="text" id="acgen-oid" class="ac-input" placeholder="SM-DP+ OID (optional)" />';
   h+='<input type="text" id="acgen-cc" class="ac-input" placeholder="Confirmation Code (optional)" />';
   h+='</div></details>';
-  h+='<div class="ac-input-wrap"><button class="cbtn pri" id="acgen-gen">Generate QR Code</button>';
-  h+='<button class="cbtn" id="acgen-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap"><button type="button" class="cbtn pri" id="acgen-gen">Generate QR Code</button>';
+  h+='<button type="button" class="cbtn" id="acgen-clear">Clear</button></div>';
   h+='<div id="acgen-qr" style="text-align:center;margin-top:16px"></div>';
   h+='<div id="acgen-result" class="ac-result"></div></div></div>';
 
@@ -1737,26 +1751,26 @@ function toolsIdHTML(){
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Paste a CSV of SM-DP+ addresses and matching IDs to generate a printable page of QR codes. Format: <code>SM-DP+ Address, Matching ID</code> (one per line). <em>Note: Fields containing commas are not supported \u2014 do not use quoted CSV fields.</em></p>';
   h+='<div style="margin-bottom:10px"><label class="cbtn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px">\ud83d\udcc1 Upload CSV/TXT<input type="file" id="batchqr-file" accept=".csv,.txt" style="display:none"></label><span id="batchqr-file-name" style="font-size:12px;color:var(--tx3);margin-left:8px"></span></div>';
   h+='<textarea id="batchqr-input" class="ac-textarea" placeholder="smdp.example.com, ABCD-1234\nsmdp.example.com, EFGH-5678\nsmdp.example.com, IJKL-9012" rows="5"></textarea>';
-  h+='<div class="ac-input-wrap" style="margin-top:10px"><button class="cbtn pri" id="batchqr-gen">Generate QR Codes</button>';
-  h+='<button class="cbtn" id="batchqr-print">Print All</button>';
-  h+='<button class="cbtn" id="batchqr-download">Download as PNG</button>';
-  h+='<button class="cbtn" id="batchqr-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap" style="margin-top:10px"><button type="button" class="cbtn pri" id="batchqr-gen">Generate QR Codes</button>';
+  h+='<button type="button" class="cbtn" id="batchqr-print">Print All</button>';
+  h+='<button type="button" class="cbtn" id="batchqr-download">Download as PNG</button>';
+  h+='<button type="button" class="cbtn" id="batchqr-clear">Clear</button></div>';
   h+='<div id="batchqr-result" style="margin-top:16px"></div></div></div>';
 
   /* ICCID Decoder */
   h+='<div class="asec"><h2>ICCID Decoder</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode an ICCID (SIM card number) into its components. Typically 19\u201320 digits. <em>Note: Issuer database is a reference subset \u2014 not all operators are represented.</em></p>';
   h+='<div class="ac-input-wrap"><input type="text" id="iccid-input" class="ac-input" placeholder="Enter ICCID \u2014 press Enter to decode" maxlength="22" />';
-  h+='<button class="cbtn pri" id="iccid-decode">Decode</button>';
-  h+='<button class="cbtn" id="iccid-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn pri" id="iccid-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="iccid-clear">Clear</button></div>';
   h+='<div id="iccid-result" class="ac-result"></div></div></div>';
 
   /* IMSI Decoder */
   h+='<div class="asec"><h2>IMSI Decoder</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode an IMSI into MCC (country), MNC (operator), and MSIN (subscriber ID). <em>Note: Operator database is a reference subset \u2014 not all MCC/MNC combinations are represented.</em></p>';
   h+='<div class="ac-input-wrap"><input type="text" id="imsi-input" class="ac-input" placeholder="Enter IMSI \u2014 press Enter to decode" maxlength="15" />';
-  h+='<button class="cbtn pri" id="imsi-decode">Decode</button>';
-  h+='<button class="cbtn" id="imsi-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn pri" id="imsi-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="imsi-clear">Clear</button></div>';
   h+='<div id="imsi-result" class="ac-result"></div></div></div>';
 
   /* Reference Databases — at bottom */
@@ -1790,8 +1804,8 @@ function toolsDbgHTML(){
   h+='<div class="asec"><h2>APDU Status Word Decoder</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Paste a 2-byte status word (4 hex characters) returned by the eUICC to decode its meaning.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="apdu-input" class="ac-input" placeholder="Enter status word \u2014 press Enter to decode" maxlength="6" />';
-  h+='<button class="cbtn pri" id="apdu-decode">Decode</button>';
-  h+='<button class="cbtn" id="apdu-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn pri" id="apdu-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="apdu-clear">Clear</button></div>';
   h+='<div id="apdu-result" class="ac-result"></div></div></div>';
 
   /* SGP.22 RSP Error Code Decoder */
@@ -1799,14 +1813,14 @@ function toolsDbgHTML(){
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode SM-DP+ error codes from ES9+ / ES2+ responses. Enter the subjectCode and reasonCode.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="sgp-subj" class="ac-input" placeholder="Subject Code (e.g. 8.1)" style="max-width:180px" />';
   h+='<input type="text" id="sgp-reason" class="ac-input" placeholder="Reason Code (e.g. 3.8)" style="max-width:180px" />';
-  h+='<button class="cbtn pri" id="sgp-decode">Decode</button>';
-  h+='<button class="cbtn" id="sgp-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn pri" id="sgp-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="sgp-clear">Clear</button></div>';
   h+='<div id="sgp-result" class="ac-result"></div></div></div>';
 
   /* Profile State Machine */
   h+='<div class="asec"><h2>eSIM Profile State Machine</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Interactive diagram showing profile lifecycle states and transitions. Click a state for details.</p>';
-  h+='<div class="sm-toggle"><button class="fbtn on" id="sm-consumer">Consumer (SGP.22)</button><button class="fbtn" id="sm-m2m">M2M (SGP.02)</button><button class="fbtn" id="sm-iot">IoT (SGP.32)</button></div>';
+  h+='<div class="sm-toggle"><button type="button" class="fbtn on" id="sm-consumer">Consumer (SGP.22)</button><button type="button" class="fbtn" id="sm-m2m">M2M (SGP.02)</button><button type="button" class="fbtn" id="sm-iot">IoT (SGP.32)</button></div>';
   h+='<div id="sm-svg">'+stateMachineSVG('consumer')+'</div>';
   h+='<div class="sm-detail" id="sm-detail"></div>';
   h+='<p style="font-size:11px;color:var(--tx3);margin-top:10px;font-style:italic">States shown are conceptual and for single active profile mode. For Consumer MEP (v3.x), multiple profiles can be in Enabled state simultaneously on different eSIM ports. IoT (SGP.32) uses ESeim commands initiated by the eIM, not the end user.</p>';
@@ -1816,8 +1830,8 @@ function toolsDbgHTML(){
   h+='<div class="asec"><h2>ASN.1 TLV Parser</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Paste raw hex from an eSIM message to parse it into a Tag-Length-Value tree. Supports BER-TLV encoding used in ES9+/ES10x messages.</p>';
   h+='<textarea id="tlv-input" class="ac-textarea" placeholder="Paste hex data (e.g. BF370A...)" rows="3"></textarea>';
-  h+='<div class="ac-input-wrap" style="margin-top:10px"><button class="cbtn pri" id="tlv-parse">Parse</button>';
-  h+='<button class="cbtn" id="tlv-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap" style="margin-top:10px"><button type="button" class="cbtn pri" id="tlv-parse">Parse</button>';
+  h+='<button type="button" class="cbtn" id="tlv-clear">Clear</button></div>';
   h+='<div id="tlv-result" class="ac-result"></div></div></div>';
 
   /* Hex / Base64 / UTF-8 Converter */
@@ -1829,17 +1843,17 @@ function toolsDbgHTML(){
   h+='</div>';
   h+='<textarea id="conv-input" class="ac-textarea" placeholder="Enter input value..." rows="3"></textarea>';
   h+='<textarea id="conv-output" class="ac-textarea" placeholder="Output will appear here..." rows="3" readonly style="margin-top:10px;background:var(--bg2)"></textarea>';
-  h+='<div class="ac-input-wrap" style="margin-top:10px"><button class="cbtn pri" id="conv-convert">Convert</button>';
-  h+='<button class="cbtn" id="conv-copy">Copy Output</button>';
-  h+='<button class="cbtn" id="conv-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap" style="margin-top:10px"><button type="button" class="cbtn pri" id="conv-convert">Convert</button>';
+  h+='<button type="button" class="cbtn" id="conv-copy">Copy Output</button>';
+  h+='<button type="button" class="cbtn" id="conv-clear">Clear</button></div>';
   h+='</div></div>';
 
   /* Certificate Viewer */
   h+='<div class="asec"><h2>Certificate Viewer (X.509)</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Paste a Base64-encoded X.509 certificate (PEM format) to extract key fields. Useful for verifying SM-DP+ and eUICC certificate chains.</p>';
   h+='<textarea id="cert-input" class="ac-textarea" placeholder="Paste PEM certificate (-----BEGIN CERTIFICATE-----...)" rows="4"></textarea>';
-  h+='<div class="ac-input-wrap" style="margin-top:10px"><button class="cbtn pri" id="cert-parse">Parse</button>';
-  h+='<button class="cbtn" id="cert-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap" style="margin-top:10px"><button type="button" class="cbtn pri" id="cert-parse">Parse</button>';
+  h+='<button type="button" class="cbtn" id="cert-clear">Clear</button></div>';
   h+='<div id="cert-result" class="ac-result"></div>';
   h+='<p style="font-size:11px;color:var(--tx3);margin-top:8px;font-style:italic">Best-effort parser for standard RSA and EC certificates. For complete analysis, use OpenSSL or an online ASN.1 decoder.</p>';
   h+='</div></div>';
@@ -1848,16 +1862,16 @@ function toolsDbgHTML(){
   h+='<div class="asec"><h2>euiccInfo Decoder (euiccInfo1 / euiccInfo2)</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Paste raw hex (TLV-encoded euiccInfo1 or euiccInfo2 response) to decode fields into human-readable format. Cross-references CI PKIDs against the known CI table.</p>';
   h+='<textarea id="euicc-input" class="ac-textarea" placeholder="Paste euiccInfo hex data (e.g. BF200F...)" rows="3"></textarea>';
-  h+='<div class="ac-input-wrap" style="margin-top:10px"><button class="cbtn pri" id="euicc-decode">Decode</button>';
-  h+='<button class="cbtn" id="euicc-clear">Clear</button></div>';
+  h+='<div class="ac-input-wrap" style="margin-top:10px"><button type="button" class="cbtn pri" id="euicc-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="euicc-clear">Clear</button></div>';
   h+='<div id="euicc-result" class="ac-result"></div></div></div>';
 
   /* Remote Command Decoder */
   h+='<div class="asec"><h2>Remote Command Decoder (SCP80/SCP81)</h2>';
   h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a remote command APDU used in M2M RSP (ES1 interface). Paste the hex APDU.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="ota-input" class="ac-input" placeholder="Enter hex APDU (e.g. 80E60000...)" />';
-  h+='<button class="cbtn pri" id="ota-decode">Decode</button>';
-  h+='<button class="cbtn" id="ota-clear">Clear</button></div>';
+  h+='<button type="button" class="cbtn pri" id="ota-decode">Decode</button>';
+  h+='<button type="button" class="cbtn" id="ota-clear">Clear</button></div>';
   h+='<div id="ota-result" class="ac-result"></div></div></div>';
 
   return h;
@@ -2946,8 +2960,8 @@ function bindACGenerator(){
     }
     var rh='<div style="margin-bottom:12px"><b style="color:var(--tx0)">Activation Code String:</b><div class="eid-formatted" style="margin-top:6px;cursor:pointer;user-select:all" title="Click to select">'+lpa.replace(/</g,'&lt;')+'</div></div>';
     rh+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">';
-    rh+='<button class="cbtn pri" onclick="navigator.clipboard.writeText(\''+lpa.replace(/'/g,"\\'")+'\');this.textContent=\'Copied!\';var b=this;setTimeout(function(){b.textContent=\'Copy AC String\'},1500)">Copy AC String</button>';
-    rh+='<button class="cbtn" id="acgen-download-qr">Download QR (PNG)</button>';
+    rh+='<button type="button" class="cbtn pri" onclick="navigator.clipboard.writeText(\''+lpa.replace(/'/g,"\\'")+'\');this.textContent=\'Copied!\';var b=this;setTimeout(function(){b.textContent=\'Copy AC String\'},1500)">Copy AC String</button>';
+    rh+='<button type="button" class="cbtn" id="acgen-download-qr">Download QR (PNG)</button>';
     rh+='</div>';
     rh+='<div class="eid-note" style="margin-top:10px">Scan this QR code with a device LPA or use the string for manual entry.</div>';
     res.innerHTML=rh;
@@ -3009,7 +3023,7 @@ function bindBatchValidator(){
     if(formatErr)summary+=', <span style="color:#D97706">'+formatErr+' format errors</span>';
     summary+=' out of '+total+' total';
     if(total>=2){
-      summary+='<button class="cbtn" id="batch-csv" style="margin-left:12px;font-size:12px">Download CSV</button>';
+      summary+='<button type="button" class="cbtn" id="batch-csv" style="margin-left:12px;font-size:12px">Download CSV</button>';
     }
     summary+='</div>';
     res.innerHTML=summary+rh;
@@ -3074,7 +3088,7 @@ function bindDecisionTree(){
     if(!node)return;
     var h='';
     if(nodeId!=='root'){
-      h+='<div style="margin-bottom:10px"><button class="cbtn" onclick="renderDT(\'root\')" style="font-size:11px">\u2190 Start Over</button></div>';
+      h+='<div style="margin-bottom:10px"><button type="button" class="cbtn" onclick="renderDT(\'root\')" style="font-size:11px">\u2190 Start Over</button></div>';
     }
     if(node.result){
       h+='<div style="padding:14px;border:2px solid var(--mag);border-radius:8px;background:var(--bg2)">';
@@ -3096,7 +3110,7 @@ function bindDecisionTree(){
       h+='<div style="font-size:15px;font-weight:700;color:var(--tx0);margin-bottom:12px">'+node.q+'</div>';
       h+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
       node.opts.forEach(function(opt){
-        h+='<button class="fbtn" onclick="renderDT(\''+opt.next+'\')">'+opt.label+'</button>';
+        h+='<button type="button" class="fbtn" onclick="renderDT(\''+opt.next+'\')">'+opt.label+'</button>';
       });
       h+='</div>';
     }
@@ -3409,8 +3423,24 @@ document.getElementById('tabs').onclick=function(e){
   curTab=b.dataset.t;
   document.querySelectorAll('.tbtn').forEach(function(t){t.classList.toggle('on',t.dataset.t===curTab);t.setAttribute('aria-selected',String(t.dataset.t===curTab))});
   document.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.id==='p-'+curTab)});
+  b.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
   requestAnimationFrame(function(){drawArrows()});
 };
+
+function bindTabScroll(){
+  var tabs=document.getElementById('tabs'),left=document.getElementById('tab-left'),right=document.getElementById('tab-right');
+  if(!tabs||!left||!right)return;
+  function update(){
+    var max=tabs.scrollWidth-tabs.clientWidth;
+    left.disabled=tabs.scrollLeft<=2;
+    right.disabled=tabs.scrollLeft>=max-2;
+  }
+  left.onclick=function(){tabs.scrollBy({left:-Math.max(240,tabs.clientWidth*.65),behavior:'smooth'})};
+  right.onclick=function(){tabs.scrollBy({left:Math.max(240,tabs.clientWidth*.65),behavior:'smooth'})};
+  tabs.addEventListener('scroll',update);
+  window.addEventListener('resize',update);
+  requestAnimationFrame(update);
+}
 
 /* Theme */
 (function(){
@@ -3443,11 +3473,12 @@ var rt;window.onresize=function(){clearTimeout(rt);rt=setTimeout(drawArrows,200)
 
 var bttBtn=document.getElementById('btt');
 window.addEventListener('scroll',function(){
-  if(bttBtn) bttBtn.classList.toggle('show',window.scrollY>400);
+  if(bttBtn) bttBtn.classList.toggle('show',window.scrollY>160);
 });
 if(bttBtn) bttBtn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
 
 boot();
+bindTabScroll();
 buildSearchIndex();
 bindSearch();
 bindPrint();
