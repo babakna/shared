@@ -689,8 +689,8 @@ var LANDING_DESCS = [
   {desc:'Explore the frontier of AI capability. Understand what AI agents are, how they plan and execute multi-step tasks, how they orchestrate tools, and what the agent loop looks like in practice. See a complete agentic workflow animated step by step.',feat:'Agent loop flow simulation \u2022 Planning visual \u2022 Tool orchestration diagram \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Take your daily AI practice to the next level. Build systematic prompt libraries, implement multi-document consistency analysis, develop content governance frameworks, learn to evaluate AI output quality rigorously, and design workflows that scale across your team.',feat:'Prompt library builder exercise \u2022 Evaluation rubric tool \u2022 Multi-doc analysis templates \u2022 Case study \u2022 5 quiz questions'},
   {desc:'Develop sophisticated judgment for AI governance. Examine bias sources in training data with real examples, understand alignment and guardrail mechanisms, learn red-teaming concepts, navigate copyright and IP considerations for content creators, and build organizational AI usage guidelines.',feat:'Bias source analysis exercise \u2022 Red-teaming scenarios \u2022 Copyright decision tree \u2022 AI governance template \u2022 5 quiz questions'},
-  {desc:'Your curated path for continued growth. Foundation refreshers, intermediate skill-building, advanced resources, and seminal papers \u2014 DeepLearning.AI specialized courses, Stanford HAI research, Anthropic\u2019s MCP and alignment science, interactive tools, and the foundational research that shaped modern AI. Every resource annotated with \u2018why this one\u2019 and time estimates.',feat:'37 curated resources with live links \u2022 Tier 1 (Foundation), Tier 2 (Applied), Tier 3 (Advanced), and Tier 4 (Seminal Papers) paths'},
-  {desc:'105 AI terms defined for content professionals, covering both foundational and advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, and more. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 9 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
+  {desc:'Your curated path for continued growth. Foundation refreshers, intermediate skill-building, advanced resources, and seminal papers \u2014 DeepLearning.AI specialized courses, Stanford HAI research, Anthropic\u2019s MCP and alignment science, interactive tools, and the foundational research that shaped modern AI. Every resource annotated with \u2018why this one\u2019 and time estimates.',feat:'40 curated resources with live links \u2022 Tier 1 (Foundation), Tier 2 (Applied), Tier 3 (Advanced), and Tier 4 (Seminal Papers) paths'},
+  {desc:'112 AI terms defined for content professionals, covering both foundational and advanced concepts: embeddings, vector databases, RLHF, Constitutional AI, red-teaming, fine-tuning strategies, agentic patterns, prompt injection, provenance, AI observability, and governance standards. Fully searchable with category filters and cross-links.',feat:'Full-text search \u2022 9 category filters \u2022 Alphabetical index \u2022 Cross-linked related terms'}
 ];
 
 var currentModule = -1;
@@ -1207,6 +1207,8 @@ function mod4Content(){
 
   '<div class="callout"><strong>MCP vs. function calling:</strong> Function calling is model-specific (Claude\u2019s tool use, GPT\u2019s function calling). MCP is protocol-level \u2014 build one MCP server for Jira, and it can work with MCP-compatible AI clients. Think of function calling as teaching one specific AI to use a tool, and MCP as building a standard connector pattern for compatible clients.</div>'+
 
+  '<div class="callout warning"><strong>Tool-security note:</strong> Any system that lets AI read untrusted documents or call tools needs prompt-injection defenses. Treat retrieved text, web pages, tickets, and comments as data rather than instructions; restrict tool permissions; log tool calls; and require approval before high-impact actions such as publishing, deleting, purchasing, or changing customer-facing records.</div>'+
+
   '<div class="sec-title">Function Calling vs. MCP</div>'+
   '<div class="comparator">'+
     '<div class="comp-panel"><div class="comp-header" style="background:rgba(37,99,235,0.08);color:var(--primary)">Function Calling</div><div class="comp-body"><strong>Single-tool invocation.</strong> You define specific functions the AI can call (e.g., get_weather, search_docs). The AI decides when to call them and with what parameters. Each function is custom-built for a specific API. Works well for simple integrations but doesn\u2019t scale.</div></div>'+
@@ -1327,11 +1329,11 @@ function mod6Content(){
   '<div class="sim-area" id="rubric-builder">'+
     '<p style="font-size:14px;color:var(--tx-secondary);margin-bottom:16px">Select and weight the criteria that matter most for your content type. This creates a custom evaluation checklist for reviewing AI output.</p>'+
     '<div id="rubric-items">'+
-      '<div class="rubric-item"><input type="checkbox" id="rb-acc" checked><label for="rb-acc">Factual Accuracy</label><input type="number" class="rubric-weight" value="30" min="0" max="100">%</div>'+
-      '<div class="rubric-item"><input type="checkbox" id="rb-tone" checked><label for="rb-tone">Tone & Voice</label><input type="number" class="rubric-weight" value="20" min="0" max="100">%</div>'+
-      '<div class="rubric-item"><input type="checkbox" id="rb-fmt"><label for="rb-fmt">Format Compliance</label><input type="number" class="rubric-weight" value="15" min="0" max="100">%</div>'+
-      '<div class="rubric-item"><input type="checkbox" id="rb-comp" checked><label for="rb-comp">Completeness</label><input type="number" class="rubric-weight" value="20" min="0" max="100">%</div>'+
-      '<div class="rubric-item"><input type="checkbox" id="rb-src"><label for="rb-src">Source Attribution</label><input type="number" class="rubric-weight" value="15" min="0" max="100">%</div>'+
+      '<div class="rubric-item"><input type="checkbox" id="rb-acc" checked><label for="rb-acc">Factual Accuracy</label><input type="number" class="rubric-weight" value="30" min="0" max="100" aria-label="Factual accuracy weight percentage">%</div>'+
+      '<div class="rubric-item"><input type="checkbox" id="rb-tone" checked><label for="rb-tone">Tone & Voice</label><input type="number" class="rubric-weight" value="20" min="0" max="100" aria-label="Tone and voice weight percentage">%</div>'+
+      '<div class="rubric-item"><input type="checkbox" id="rb-fmt"><label for="rb-fmt">Format Compliance</label><input type="number" class="rubric-weight" value="15" min="0" max="100" aria-label="Format compliance weight percentage">%</div>'+
+      '<div class="rubric-item"><input type="checkbox" id="rb-comp" checked><label for="rb-comp">Completeness</label><input type="number" class="rubric-weight" value="20" min="0" max="100" aria-label="Completeness weight percentage">%</div>'+
+      '<div class="rubric-item"><input type="checkbox" id="rb-src"><label for="rb-src">Source Attribution</label><input type="number" class="rubric-weight" value="15" min="0" max="100" aria-label="Source attribution weight percentage">%</div>'+
     '</div>'+
     '<div class="callout" style="margin-top:16px">Adjust the weights to match your content type. Technical documentation might weight accuracy at 40%+ while marketing copy might weight tone higher. The key is having a <em>consistent</em> rubric so every reviewer applies the same standards.</div>'+
   '</div>'+
@@ -1423,7 +1425,7 @@ function mod7Content(){
     '<div class="case-title">When an AI Usage Policy Saved a Company from a PR Crisis</div>'+
     '<dl class="case-body">'+
       '<dt>Situation</dt>'+
-      '<dd>A marketing team at a mid-size SaaS company used AI to generate a series of customer success stories for their website. The stories were polished, specific, and compelling. They included customer names, company names, specific metrics (\u201c47% increase in productivity\u201d), and direct quotes. The content was published without the standard editorial review because \u201cAI wrote it, and it looked perfect.\u201d</dd>'+
+      '<dd>A marketing team at a mid-size SaaS company used AI to generate a series of customer success stories for their website. The stories were polished, specific, and compelling. They included customer names, company names, specific metrics (for example, a claimed productivity lift), and direct quotes. The content was published without the standard editorial review because \u201cAI wrote it, and it looked perfect.\u201d</dd>'+
       '<dt>What Went Wrong</dt>'+
       '<dd>Three of the five \u201ccustomer success stories\u201d were entirely fabricated. The customer names were real companies found in the AI\u2019s training data, but those companies had never been customers. The metrics were plausible but invented. The \u201cdirect quotes\u201d were hallucinated. One of the named companies discovered the fake case study through a Google Alert and contacted the SaaS company\u2019s legal department.</dd>'+
       '<dt>Root Cause</dt>'+
@@ -1480,8 +1482,11 @@ function mod8Content(){
   var tier3 = [
     {t:'Stanford HAI',p:'Stanford University',time:'Ongoing',cost:'Check current access',url:'https://hai.stanford.edu/',why:'Interdisciplinary AI research, policy, education. Their public lectures and papers are useful for understanding AI\u2019s societal impact.'},
     {t:'Stanford AI Index',p:'Stanford HAI',time:'~2 hours',cost:'Check current access',url:'https://hai.stanford.edu/ai-index',why:'Widely cited annual AI landscape report. Essential for understanding where AI stands globally.'},
-    {t:'Anthropic Alignment Science Blog',p:'Anthropic',time:'Ongoing',cost:'Check current access',url:'https://alignment.anthropic.com/',why:'How AI models are made safe. Understand the \u201cwhy\u201d behind Claude\u2019s behavior and safety mechanisms.'},
-    {t:'Anthropic Research',p:'Anthropic',time:'Ongoing',cost:'Check current access',url:'https://www.anthropic.com/research',why:'Latest on AI capabilities and safety. Written for a broad audience despite covering deep technical topics.'},
+    {t:'NIST AI Risk Management Framework',p:'NIST',time:'~1 hour',cost:'Check current access',url:'https://www.nist.gov/itl/ai-risk-management-framework',why:'Practical governance vocabulary for mapping, measuring, managing, and governing AI risks.'},
+    {t:'ISO/IEC 42001 Overview',p:'ISO',time:'~30 min',cost:'Check current access',url:'https://www.iso.org/standard/81230.html',why:'International AI management-system standard. Useful for understanding organizational controls and accountability.'},
+    {t:'C2PA Content Credentials',p:'C2PA',time:'~30 min',cost:'Check current access',url:'https://c2pa.org/',why:'A practical provenance resource for understanding content credentials and metadata for AI-assisted media.'},
+    {t:'Anthropic Alignment Science Blog',p:'Anthropic',time:'Ongoing',cost:'Check current access',url:'https://alignment.anthropic.com/',why:'Research on approaches for making AI models safer and more aligned. Useful for understanding the principles behind assistant behavior and safety mechanisms.'},
+    {t:'Anthropic Research',p:'Anthropic',time:'Ongoing',cost:'Check current access',url:'https://www.anthropic.com/research',why:'AI capability and safety research updates. Written for a broad audience despite covering deep technical topics.'},
     {t:'MCP Documentation',p:'Model Context Protocol',time:'~1 hour',cost:'Check current access',url:'https://modelcontextprotocol.io/docs/getting-started/intro',why:'Official MCP introduction. Understand the protocol connecting AI tools to external systems.'},
     {t:'MCP GitHub',p:'Model Context Protocol',time:'Reference',cost:'Check current access',url:'https://github.com/modelcontextprotocol',why:'Source code and SDKs. Browse to understand the architecture and available integrations.'},
     {t:'MCP on Wikipedia',p:'Wikipedia',time:'~15 min',cost:'Check current access',url:'https://en.wikipedia.org/wiki/Model_Context_Protocol',why:'Protocol overview and adoption. Use official MCP documentation for source-of-truth details.'},
@@ -2244,7 +2249,7 @@ function buildSearchIndex(){
     {t:'NIST AI Risk Management Framework',d:'AI governance and risk framework'},
     {t:'ISO/IEC 42001 Overview',d:'AI management-system standard'},
     {t:'C2PA Content Credentials',d:'Content provenance and credentials'},
-    {t:'Anthropic Alignment Science Blog',d:'AI safety research'},
+    {t:'Anthropic Alignment Science Blog',d:'AI alignment and safety research'},
     {t:'Anthropic Research',d:'AI capability and safety research updates'},
     {t:'MCP Documentation',d:'Official Model Context Protocol intro'},
     {t:'MCP GitHub',d:'MCP source code and SDKs'},
