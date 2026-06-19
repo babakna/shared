@@ -47,7 +47,9 @@
       line-height: 1.55;
       color: var(--text);
       background:
-        radial-gradient(circle at 12% 0%, rgba(31, 79, 215, 0.18), transparent 30rem),
+        radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.18), transparent 30rem),
+        radial-gradient(circle at 88% 12%, rgba(236, 72, 153, 0.12), transparent 28rem),
+        radial-gradient(circle at 65% 80%, rgba(20, 184, 166, 0.10), transparent 26rem),
         linear-gradient(180deg, var(--panel-2), var(--bg) 36rem);
     }
 
@@ -83,7 +85,10 @@
       height: 68px;
       border: 1px solid var(--border);
       border-radius: 16px;
-      background: linear-gradient(135deg, var(--accent), var(--panel-2));
+      color: #2457d6;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(20, 184, 166, 0.22), transparent 35%),
+        linear-gradient(135deg, #dbeafe, #fce7f3 58%, #dcfce7);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
     }
 
@@ -99,7 +104,7 @@
       width: 14rem;
       height: 14rem;
       border-radius: 50%;
-      background: rgba(31, 79, 215, 0.10);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(236, 72, 153, 0.12));
       pointer-events: none;
     }
 
@@ -188,15 +193,21 @@
     }
 
     .card {
+      --card-soft: #eef4ff;
+      --card-mid: #dbeafe;
+      --card-strong: #2457d6;
+      --card-ink: #173f9f;
+      --card-border: rgba(36, 87, 214, 0.28);
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       min-height: 100%;
       padding: 0.9rem;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
       border-radius: 18px;
-      background: var(--panel);
-      box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--card-soft) 38%, var(--panel)), var(--panel) 42%);
+      box-shadow: 0 12px 30px color-mix(in srgb, var(--card-strong) 16%, transparent);
     }
 
     .visual {
@@ -207,9 +218,11 @@
       border: 1px solid var(--border);
       border-radius: 15px;
       background:
-        radial-gradient(circle at 18% 18%, rgba(31, 79, 215, 0.14), transparent 42%),
-        linear-gradient(135deg, var(--panel-2), var(--accent));
+        radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.74), transparent 26%),
+        radial-gradient(circle at 78% 26%, color-mix(in srgb, var(--card-strong) 26%, transparent), transparent 36%),
+        linear-gradient(135deg, var(--card-soft), var(--card-mid));
       overflow: hidden;
+      color: var(--card-ink);
     }
 
     .visual::after {
@@ -219,7 +232,7 @@
       width: 8rem;
       height: 8rem;
       border-radius: 50%;
-      background: rgba(31, 79, 215, 0.08);
+      background: color-mix(in srgb, var(--card-strong) 18%, transparent);
     }
 
     .visual svg {
@@ -227,11 +240,13 @@
       z-index: 1;
       width: min(170px, 76%);
       height: 70px;
+      filter: drop-shadow(0 8px 12px color-mix(in srgb, var(--card-strong) 24%, transparent));
     }
 
     .card.featured {
-      border-color: rgba(31, 79, 215, 0.42);
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border-color: color-mix(in srgb, var(--card-strong) 52%, var(--border));
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--card-soft) 58%, var(--panel)), var(--panel) 48%);
     }
 
     .card-top {
@@ -252,8 +267,8 @@
 
     .badge, .chip {
       border-radius: 999px;
-      background: var(--accent);
-      color: var(--accent-text);
+      background: var(--card-soft);
+      color: var(--card-ink);
       font-size: 0.7rem;
       font-weight: 850;
       white-space: nowrap;
@@ -264,6 +279,8 @@
       top: 0.55rem;
       right: 0.55rem;
       z-index: 2;
+      background: var(--card-strong);
+      color: #fff;
       padding: 0.16rem 0.46rem;
     }
 
@@ -309,12 +326,14 @@
     }
 
     .primary {
-      border-color: var(--primary);
-      background: var(--primary);
+      border-color: var(--card-strong);
+      background: var(--card-strong);
       color: #fff;
     }
 
-    .primary:hover { background: var(--primary-hover); }
+    .primary:hover {
+      background: color-mix(in srgb, var(--card-strong) 86%, #000);
+    }
 
     @media (prefers-color-scheme: dark) {
       .primary { color: #081120; }
@@ -413,6 +432,10 @@
         desc:"AI-synthesized weekly briefing connecting the biggest tech, telecom, and AI news with research trends.",
         subject:"Subscribe to Weekly News Roundup [#ROUNDUP]" },
 
+      { name:"Scholarly Briefing", emoji:"🎓", schedule:"Weekly · Tuesdays, 6 AM PT",
+        desc:"Academic research roundup — arXiv papers and Hugging Face daily papers across AI, ML, 6G, and networking.",
+        subject:"Subscribe to Scholarly Briefing [#SCHOLARLY]" },
+
       { name:"Telecom & 6G Briefing", emoji:"📡", schedule:"Daily · 7 AM PT",
         desc:"Standards bodies (3GPP, ETSI), operators, and vendors (Ericsson, Nokia, Samsung), plus 6G and AI-RAN research.",
         subject:"Subscribe to Telecom & 6G Briefing [#TELECOM]" },
@@ -420,10 +443,6 @@
       { name:"Financial Briefing", emoji:"💰", schedule:"Weekly · Wednesdays, 8 AM PT",
         desc:"Macro, markets, and economics from primary sources — NBER, IMF, the Fed blogs, Project Syndicate, and academic finance.",
         subject:"Subscribe to Financial Briefing [#FINANCE]" },
-
-      { name:"Scholarly Briefing", emoji:"🎓", schedule:"Weekly · Tuesdays, 6 AM PT",
-        desc:"Academic research roundup — arXiv papers and Hugging Face daily papers across AI, ML, 6G, and networking.",
-        subject:"Subscribe to Scholarly Briefing [#SCHOLARLY]" },
 
       { name:"News Briefing", emoji:"📰", schedule:"Every 3 days · 7 AM PT",
         desc:"Cross-topic headlines across tech, AI, telecom, finance, and US/World in one roundup.",
@@ -443,6 +462,28 @@
 
     function copyText(subject, body) {
       return `To: ${TO}\nSubject: ${subject}\nBody: ${body}`;
+    }
+
+    function digestTheme(name) {
+      const themes = {
+        "Weekly News Roundup": {
+          soft: "#fff1f2", mid: "#fed7aa", strong: "#ea580c", ink: "#9a3412", border: "rgba(234, 88, 12, 0.34)"
+        },
+        "Scholarly Briefing": {
+          soft: "#f5f3ff", mid: "#ddd6fe", strong: "#7c3aed", ink: "#5b21b6", border: "rgba(124, 58, 237, 0.34)"
+        },
+        "Telecom & 6G Briefing": {
+          soft: "#ecfeff", mid: "#a5f3fc", strong: "#0891b2", ink: "#155e75", border: "rgba(8, 145, 178, 0.34)"
+        },
+        "Financial Briefing": {
+          soft: "#ecfdf5", mid: "#bbf7d0", strong: "#16a34a", ink: "#166534", border: "rgba(22, 163, 74, 0.34)"
+        },
+        "News Briefing": {
+          soft: "#eff6ff", mid: "#bfdbfe", strong: "#2563eb", ink: "#1d4ed8", border: "rgba(37, 99, 235, 0.34)"
+        }
+      };
+
+      return themes[name] || themes["News Briefing"];
     }
 
     function digestArt(name) {
@@ -541,7 +582,13 @@
       const unsubSubject = unsubscribeSubject(digest.subject);
 
       const card = document.createElement("article");
+      const theme = digestTheme(digest.name);
       card.className = index === 0 ? "card featured" : "card";
+      card.style.setProperty("--card-soft", theme.soft);
+      card.style.setProperty("--card-mid", theme.mid);
+      card.style.setProperty("--card-strong", theme.strong);
+      card.style.setProperty("--card-ink", theme.ink);
+      card.style.setProperty("--card-border", theme.border);
       card.innerHTML = `
         <div class="visual">
           ${digestArt(digest.name)}
