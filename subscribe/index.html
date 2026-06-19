@@ -350,21 +350,35 @@
       gap: 0.42rem;
     }
 
-    @media (min-width: 430px) {
-      .actions { grid-template-columns: 1fr 1fr; }
+    .action-group {
+      display: grid;
+      gap: 0.36rem;
+    }
+
+    .action-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.02em;
+    }
+
+    .provider-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.36rem;
     }
 
     .button {
       display: inline-flex;
-      min-height: 2.12rem;
+      min-height: 2rem;
       align-items: center;
       justify-content: center;
       border: 1px solid var(--border);
       border-radius: 999px;
-      padding: 0.42rem 0.66rem;
+      padding: 0.38rem 0.5rem;
       color: var(--text);
       background: transparent;
-      font-size: 0.86rem;
+      font-size: 0.78rem;
       font-weight: 850;
       text-decoration: none;
       cursor: pointer;
@@ -384,6 +398,21 @@
 
     .primary:hover {
       background: color-mix(in srgb, var(--card-strong) 86%, #000);
+    }
+
+    .provider {
+      border-color: color-mix(in srgb, var(--card-strong) 22%, var(--border));
+      background: color-mix(in srgb, var(--card-soft) 52%, var(--panel));
+      color: var(--card-ink);
+    }
+
+    .provider.primary {
+      color: #fff;
+    }
+
+    .provider.mail {
+      background: transparent;
+      color: var(--muted);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -537,6 +566,28 @@
       return `mailto:${TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
 
+    function gmailCompose(subject, body) {
+      const params = new URLSearchParams({
+        view: "cm",
+        fs: "1",
+        to: TO,
+        su: subject,
+        body
+      });
+
+      return `https://mail.google.com/mail/?${params.toString()}`;
+    }
+
+    function outlookCompose(subject, body) {
+      const params = new URLSearchParams({
+        to: TO,
+        subject,
+        body
+      });
+
+      return `https://outlook.office.com/mail/deeplink/compose?${params.toString()}`;
+    }
+
     function copyText(subject, body) {
       return `To: ${TO}\nSubject: ${subject}\nBody: ${body}`;
     }
@@ -677,8 +728,22 @@
         <span class="chip">${digest.schedule}</span>
         <p class="desc">${digest.desc}</p>
         <div class="actions">
-          <a class="button primary" href="${mailto(digest.subject, subscribeBody)}">Subscribe</a>
-          <a class="button" href="${mailto(unsubSubject, unsubscribeBody)}">Unsubscribe</a>
+          <div class="action-group">
+            <span class="action-label">Subscribe with</span>
+            <div class="provider-row">
+              <a class="button provider primary" href="${gmailCompose(digest.subject, subscribeBody)}" target="_blank" rel="noopener">Gmail</a>
+              <a class="button provider" href="${outlookCompose(digest.subject, subscribeBody)}" target="_blank" rel="noopener">Outlook</a>
+              <a class="button provider mail" href="${mailto(digest.subject, subscribeBody)}">Mail App</a>
+            </div>
+          </div>
+          <div class="action-group">
+            <span class="action-label">Unsubscribe with</span>
+            <div class="provider-row">
+              <a class="button provider primary" href="${gmailCompose(unsubSubject, unsubscribeBody)}" target="_blank" rel="noopener">Gmail</a>
+              <a class="button provider" href="${outlookCompose(unsubSubject, unsubscribeBody)}" target="_blank" rel="noopener">Outlook</a>
+              <a class="button provider mail" href="${mailto(unsubSubject, unsubscribeBody)}">Mail App</a>
+            </div>
+          </div>
         </div>
       `;
 
