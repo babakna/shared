@@ -76,6 +76,22 @@
       position: relative;
     }
 
+    .hero-logo {
+      display: grid;
+      place-items: center;
+      width: 92px;
+      height: 68px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--panel-2));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .hero-logo svg {
+      width: 74px;
+      height: 50px;
+    }
+
     .hero::after {
       content: "";
       position: absolute;
@@ -183,6 +199,36 @@
       box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
     }
 
+    .visual {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: 88px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(31, 79, 215, 0.14), transparent 42%),
+        linear-gradient(135deg, var(--panel-2), var(--accent));
+      overflow: hidden;
+    }
+
+    .visual::after {
+      content: "";
+      position: absolute;
+      inset: auto -2rem -3.5rem auto;
+      width: 8rem;
+      height: 8rem;
+      border-radius: 50%;
+      background: rgba(31, 79, 215, 0.08);
+    }
+
+    .visual svg {
+      position: relative;
+      z-index: 1;
+      width: min(170px, 76%);
+      height: 70px;
+    }
+
     .card.featured {
       border-color: rgba(31, 79, 215, 0.42);
       background: linear-gradient(180deg, var(--panel), var(--panel-2));
@@ -204,17 +250,6 @@
       line-height: 1.25;
     }
 
-    .emoji {
-      display: grid;
-      flex: 0 0 2.05rem;
-      width: 2.05rem;
-      height: 2.05rem;
-      place-items: center;
-      border-radius: 13px;
-      background: var(--accent);
-      font-size: 1.12rem;
-    }
-
     .badge, .chip {
       border-radius: 999px;
       background: var(--accent);
@@ -224,7 +259,14 @@
       white-space: nowrap;
     }
 
-    .badge { padding: 0.16rem 0.46rem; }
+    .badge {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      z-index: 2;
+      padding: 0.16rem 0.46rem;
+    }
+
     .chip { align-self: flex-start; padding: 0.24rem 0.55rem; }
 
     .desc {
@@ -328,6 +370,14 @@
 <body>
   <main class="page">
     <header class="hero">
+      <div class="hero-logo" aria-hidden="true">
+        <svg viewBox="0 0 180 120" role="img">
+          <rect x="22" y="28" width="136" height="78" rx="18" fill="none" stroke="currentColor" stroke-width="8" opacity=".82"/>
+          <path d="M30 42l60 42 60-42" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity=".82"/>
+          <circle cx="138" cy="24" r="14" fill="currentColor" opacity=".22"/>
+          <path d="M128 24h20M138 14v20" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
       <p class="eyebrow">Email briefings by Babak</p>
       <h1>Babak's Digests</h1>
       <p class="intro">Pick the briefings you want. Each button opens a pre-filled email; just hit Send from the address you want subscribed.</p>
@@ -395,6 +445,49 @@
       return `To: ${TO}\nSubject: ${subject}\nBody: ${body}`;
     }
 
+    function digestArt(name) {
+      const art = {
+        "Weekly News Roundup": `
+          <svg viewBox="0 0 220 110" aria-hidden="true">
+            <rect x="42" y="24" width="116" height="68" rx="10" fill="none" stroke="currentColor" stroke-width="7"/>
+            <path d="M58 42h42M58 58h78M58 74h54" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <path d="M150 28c20 10 31 26 34 49M164 22c25 12 40 33 44 61" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity=".42"/>
+            <circle cx="166" cy="80" r="8" fill="currentColor"/>
+          </svg>`,
+        "Telecom & 6G Briefing": `
+          <svg viewBox="0 0 220 110" aria-hidden="true">
+            <path d="M110 82V38" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+            <path d="M78 88l32-50 32 50" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="110" cy="32" r="10" fill="currentColor"/>
+            <path d="M75 36c-13 13-13 34 0 47M145 36c13 13 13 34 0 47M55 24c-26 25-26 65 0 90M165 24c26 25 26 65 0 90" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity=".42"/>
+          </svg>`,
+        "Financial Briefing": `
+          <svg viewBox="0 0 220 110" aria-hidden="true">
+            <rect x="36" y="24" width="132" height="72" rx="12" fill="none" stroke="currentColor" stroke-width="7"/>
+            <path d="M56 78l28-24 22 16 38-38" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M134 32h26v26" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="174" cy="82" r="15" fill="currentColor" opacity=".26"/>
+            <path d="M174 72v20M166 78h13a6 6 0 010 12h-12" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          </svg>`,
+        "Scholarly Briefing": `
+          <svg viewBox="0 0 220 110" aria-hidden="true">
+            <path d="M40 42l70-26 70 26-70 26-70-26z" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round"/>
+            <path d="M70 56v24c22 12 58 12 80 0V56" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M180 42v34" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="180" cy="84" r="7" fill="currentColor"/>
+          </svg>`,
+        "News Briefing": `
+          <svg viewBox="0 0 220 110" aria-hidden="true">
+            <circle cx="82" cy="56" r="36" fill="none" stroke="currentColor" stroke-width="7"/>
+            <path d="M46 56h72M82 20c14 17 14 55 0 72M82 20c-14 17-14 55 0 72" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+            <rect x="122" y="30" width="56" height="56" rx="10" fill="none" stroke="currentColor" stroke-width="7"/>
+            <path d="M136 48h28M136 64h22" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+          </svg>`
+      };
+
+      return art[name] || art["News Briefing"];
+    }
+
     async function copyToClipboard(button, text) {
       const original = button.textContent;
 
@@ -450,9 +543,12 @@
       const card = document.createElement("article");
       card.className = index === 0 ? "card featured" : "card";
       card.innerHTML = `
-        <div class="card-top">
-          <h3 class="card-title"><span class="emoji" aria-hidden="true">${digest.emoji}</span><span>${digest.name}</span></h3>
+        <div class="visual">
+          ${digestArt(digest.name)}
           ${index === 0 ? '<span class="badge">Featured</span>' : ""}
+        </div>
+        <div class="card-top">
+          <h3 class="card-title">${digest.name}</h3>
         </div>
         <span class="chip">${digest.schedule}</span>
         <p class="desc">${digest.desc}</p>
