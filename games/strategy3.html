@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4X, Tactics & Sims Pack</title>
+<style>
+  :root{--bg:#eef2f8;--panel:#ffffff;--accent:#2487c9;--accent2:#d9772b;--text:#13203a;--dim:#56688c;--border:#d2dae8;}
+  html[data-theme="dark"]{--bg:#0a0f1c;--panel:#13203a;--accent:#7df;--accent2:#fb9;--text:#eaf2ff;--dim:#93a4c4;--border:#24335a;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  #host{max-width:100%;overflow-x:auto}.wrap{max-width:100%}
+  @media (max-width:560px){#app{padding:10px}h1{font-size:24px}.bar{gap:8px}}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  #app{max-width:880px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .card .ico{font-size:34px;display:block;margin-bottom:8px}
+  .card .name{font-weight:700}.card .hs{color:var(--dim);font-size:12px;margin-top:4px;min-height:14px}
+  .card .tag{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:var(--accent);color:#08131f;border:0;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer}
+  button.btn:hover{filter:brightness(1.1)}
+  button.btn:disabled{opacity:.4;cursor:default}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px;max-width:640px}
+  .big{font-size:18px;font-weight:700}
+  .toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .res{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 14px}
+  .res b{color:var(--accent)}
+  select{padding:7px;border-radius:8px;background:var(--panel);color:var(--text);border:1px solid var(--border)}
+  .log{font-size:12px;color:var(--dim);max-width:640px;text-align:center;min-height:18px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🌐 4X · TACTICS · SIMS</h1>
+    <div class="sub">Bigger strategy — simplified single-file takes inspired by the classics.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const GAMES=[
+  {id:'tribes',name:'Tribe Wars',ico:'⚔️',tag:'≈ Polytopia'},
+  {id:'mech',name:'Mech Tactics',ico:'🤖',tag:'≈ Into the Breach'},
+  {id:'dicewars',name:'Dice Wars',ico:'🎲',tag:'≈ Dice Wars'},
+  {id:'stars',name:'Star Conquest',ico:'🌌',tag:'≈ Neptune\'s Pride'},
+  {id:'city',name:'Micropolis',ico:'🏙️',tag:'≈ SimCity'},
+  {id:'orion',name:'Galactic Empire',ico:'🚀',tag:'≈ Master of Orion'},
+  {id:'idleciv',name:'Micro-Civilization',ico:'🏛️',tag:'idle / incremental'},
+];
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null;
+function wins(id){return +(localStorage.getItem('s3_'+id)||0)}
+function addWin(id){localStorage.setItem('s3_'+id,wins(id)+1);}
+function setHs(id,v){if(v>wins(id)){localStorage.setItem('s3_'+id,v);return true}return false}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+  d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><span class="tag">${gm.tag}</span><div class="hs">${wins(gm.id)?'Best: '+wins(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name+'  ('+gm.tag+')';setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+
+/* ============================================================
+   MICRO-CIVILIZATION (idle)
+   ============================================================ */
+function game_idleciv(gm){
+  setHint('Click to gather, build to automate, and research to advance through the Ages. Reach the Space Age to win!');
+  const AGES=['Stone Age','Bronze Age','Iron Age','Medieval Age','Renaissance','Industrial Age','Space Age'];
+  let S;
+  function reset(){S={food:0,wood:0,stone:0,sci:0,gold:0,pop:1,cap:3,age:0,
+    farm:0,lumber:0,quarry:0,hut:0,lib:0,market:0};}
+  reset();
+  const res=el('div',{className:'res'});
+  const ageEl=el('div',{className:'big'});
+  const gather=el('div',{className:'toolbar'});
+  const gFood=el('button',{className:'btn',textContent:'🍞 Gather Food'});
+  const gWood=el('button',{className:'btn',textContent:'🌲 Chop Wood'});
+  const gStone=el('button',{className:'btn',textContent:'⛏️ Mine Stone'});
+  gather.append(gFood,gWood,gStone);
+  const shop=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:560px'});
+  const researchBtn=el('button',{className:'btn',style:'max-width:560px;width:100%'});
+  host.append(ageEl,res,gather,shop,researchBtn);
+  gFood.onclick=()=>{S.food+=1*mult();draw();};
+  gWood.onclick=()=>{S.wood+=1*mult();draw();};
+  gStone.onclick=()=>{S.stone+=1*mult();draw();};
+  function mult(){return 1+S.age*0.5;}
+  const BUILDINGS=[
+    {k:'farm',name:'🌾 Farm',desc:'+food/s',cost:()=>({wood:10+S.farm*6})},
+    {k:'lumber',name:'🪵 Lumber Camp',desc:'+wood/s',cost:()=>({wood:8+S.lumber*6,stone:4+S.lumber*3})},
+    {k:'quarry',name:'🪨 Quarry',desc:'+stone/s',cost:()=>({wood:12+S.quarry*6})},
+    {k:'hut',name:'🛖 Hut',desc:'+pop cap',cost:()=>({wood:15+S.hut*10,stone:5+S.hut*6})},
+    {k:'lib',name:'📚 Library',desc:'+science/s',cost:()=>({wood:20+S.lib*12,stone:15+S.lib*10})},
+    {k:'market',name:'🏪 Market',desc:'+gold/s',cost:()=>({wood:18+S.market*10,stone:10+S.market*8})},
+  ];
+  function canAfford(c){return Object.entries(c).every(([k,v])=>S[k]>=v);}
+  function pay(c){Object.entries(c).forEach(([k,v])=>S[k]-=v);}
+  function buy(b){const c=b.cost();if(!canAfford(c))return;pay(c);S[b.k]++;if(b.k==='hut')S.cap+=2;draw();}
+  function researchCost(){return Math.floor(40*Math.pow(2.2,S.age));}
+  researchBtn.onclick=()=>{if(S.age>=AGES.length-1)return;if(S.sci>=researchCost()){S.sci-=researchCost();S.age++;if(S.age===AGES.length-1){addWin(gm.id);setStatus('🎉 You reached the Space Age!');}draw();}};
+  function draw(){
+    ageEl.textContent='🏛️ '+AGES[S.age]+'  —  Population '+Math.floor(S.pop)+'/'+S.cap;
+    res.innerHTML='';[['🍞 Food','food'],['🌲 Wood','wood'],['🪨 Stone','stone'],['🔬 Science','sci'],['🪙 Gold','gold']].forEach(([lbl,k])=>res.append(el('div',{},lbl+': ',el('b',{textContent:Math.floor(S[k])}))));
+    shop.innerHTML='';BUILDINGS.forEach(b=>{const c=b.cost();const aff=canAfford(c);
+      const costStr=Object.entries(c).map(([k,v])=>v+' '+k).join(', ');
+      const btn=el('button',{className:'btn '+(aff?'':'ghost'),disabled:!aff,style:'text-align:left;padding:8px 10px',
+        innerHTML:`<b>${b.name}</b> ×${S[b.k]} <span style="opacity:.7">(${b.desc})</span><br><small>Cost: ${costStr}</small>`});
+      btn.onclick=()=>buy(b);shop.append(btn);});
+    const rc=researchCost();const can=S.sci>=rc&&S.age<AGES.length-1;
+    researchBtn.disabled=!can;researchBtn.className='btn '+(can?'':'ghost');
+    researchBtn.textContent=S.age>=AGES.length-1?'🌟 Max Age reached!':'🔬 Advance to '+AGES[S.age+1]+'  (cost '+rc+' science)';
+    if(S.age<AGES.length-1)setStatus('Age '+(S.age+1)+'/'+AGES.length+'  •  Best Age: '+(wins(gm.id)+1<=AGES.length?wins(gm.id):AGES.length));
+  }
+  const timer=setInterval(()=>{const m=mult();
+    S.food+=S.farm*m; S.wood+=S.lumber*m*0.8; S.stone+=S.quarry*m*0.6; S.sci+=S.lib*m*0.5; S.gold+=S.market*m*0.4;
+    // population: eats food, grows on surplus
+    S.food-=S.pop*0.5;
+    if(S.food<0){S.food=0;if(S.pop>1)S.pop-=0.02;}
+    else if(S.pop<S.cap)S.pop+=0.05+S.farm*0.005;
+    setHs(gm.id,S.age);draw();
+  },1000);
+  draw();
+  return {stop:()=>clearInterval(timer)};
+}
+
+/* ============================================================
+   DICE WARS
+   ============================================================ */
+function game_dicewars(gm){
+  setHint('Click your territory, then an adjacent enemy to attack (both roll dice — higher sum wins). End turn for reinforcements. Conquer the map!');
+  const N=6,P=3;const COL=['#3a8fd0','#d04a4a','#4ab87a'];const NAME=['You','Red','Green'];
+  let owner,dice,sel,turn,over;
+  const info=el('div',{className:'big'});
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},58px);gap:3px`});
+  const endBtn=el('button',{className:'btn',textContent:'End Turn ▶'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,board,el('div',{style:'display:flex;gap:10px'},endBtn,newBtn));
+  function reset(){owner=[];dice=[];for(let i=0;i<N*N;i++){owner.push(Math.floor(Math.random()*P));dice.push(1+Math.floor(Math.random()*3));}sel=-1;turn=0;over=false;draw();}
+  function adj(i){const r=Math.floor(i/N),c=i%N;const out=[];if(r>0)out.push(i-N);if(r<N-1)out.push(i+N);if(c>0)out.push(i-1);if(c<N-1)out.push(i+1);return out;}
+  function rollSum(n){let s=0;for(let k=0;k<n;k++)s+=1+Math.floor(Math.random()*6);return s;}
+  function largestGroup(p){const seen=new Array(N*N).fill(false);let best=0;for(let i=0;i<N*N;i++){if(owner[i]!==p||seen[i])continue;let cnt=0;const st=[i];seen[i]=true;while(st.length){const x=st.pop();cnt++;adj(x).forEach(y=>{if(!seen[y]&&owner[y]===p){seen[y]=true;st.push(y);}});}best=Math.max(best,cnt);}return best;}
+  function counts(){const c=[0,0,0];owner.forEach(o=>c[o]++);return c;}
+  function draw(){board.innerHTML='';for(let i=0;i<N*N;i++){const d=el('div',{style:`width:58px;height:58px;border-radius:8px;background:${COL[owner[i]]};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#fff;cursor:pointer;${sel===i?'outline:3px solid #fd5;outline-offset:-3px':''}`,textContent:dice[i]});
+    d.onclick=()=>click(i);board.append(d);}
+    const c=counts();info.innerHTML=NAME.map((n,p)=>`<span style="color:${COL[p]}">${n}: ${c[p]}</span>`).join('  •  ');
+    setStatus((over?'':turn===0?'Your turn':NAME[turn]+' (AI)')+'  •  Wins: '+wins(gm.id));}
+  function click(i){if(over||turn!==0)return;
+    if(sel===-1){if(owner[i]===0&&dice[i]>1)sel=i,draw();return;}
+    if(i===sel){sel=-1;draw();return;}
+    if(owner[i]!==0&&adj(sel).includes(i)){attack(sel,i);sel=-1;draw();if(checkWin())return;}
+    else if(owner[i]===0&&dice[i]>1){sel=i;draw();}}
+  function attack(from,to){const a=rollSum(dice[from]),d=rollSum(dice[to]);
+    if(a>d){owner[to]=owner[from];dice[to]=dice[from]-1;dice[from]=1;}else{dice[from]=1;}}
+  function reinforce(p){let add=largestGroup(p);const mine=[];owner.forEach((o,i)=>{if(o===p&&dice[i]<8)mine.push(i);});
+    while(add>0&&mine.length){const idx=mine[Math.floor(Math.random()*mine.length)];dice[idx]++;if(dice[idx]>=8)mine.splice(mine.indexOf(idx),1);add--;}}
+  function checkWin(){const c=counts();if(c[0]===N*N){over=true;addWin(gm.id);setStatus('🎉 You conquered the map!');return true;}
+    if(c[0]===0){over=true;setStatus('💀 You were eliminated!');return true;}return false;}
+  endBtn.onclick=()=>{if(over||turn!==0)return;reinforce(0);turn=1;aiLoop();};
+  function aiLoop(){if(over)return;
+    if(turn===0){draw();return;}
+    // do a batch of attacks for current AI
+    let attacks=0;let acted=true;
+    while(acted&&attacks<8){acted=false;
+      for(let i=0;i<N*N;i++){if(owner[i]!==turn||dice[i]<2)continue;
+        const tgts=adj(i).filter(j=>owner[j]!==turn&&dice[i]>dice[j]);
+        if(tgts.length){const t=tgts[Math.floor(Math.random()*tgts.length)];attack(i,t);attacks++;acted=true;break;}}}
+    reinforce(turn);
+    turn=(turn+1)%P;draw();if(checkWin())return;
+    if(turn===0){setStatus('Your turn  •  Wins: '+wins(gm.id));draw();}
+    else setTimeout(aiLoop,500);}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ============================================================
+   STAR CONQUEST (Neptune's Pride lite)
+   ============================================================ */
+function game_stars(gm){
+  setHint('Click your star ⭐ then a connected star to send half your ships. Stars grow each turn. Take them all!');
+  const W=560,H=420;const COL=['#3a8fd0','#d04a4a','#888'];
+  let stars,edges,sel,over;
+  const wrapEl=el('div',{style:`position:relative;width:${W}px;height:${H}px;background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden`});
+  const endBtn=el('button',{className:'btn',textContent:'End Turn ▶'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(wrapEl,el('div',{style:'display:flex;gap:10px'},endBtn,newBtn));
+  function dist(a,b){return Math.hypot(stars[a].x-stars[b].x,stars[a].y-stars[b].y);}
+  function reset(){stars=[];const n=10;
+    for(let i=0;i<n;i++){let x,y,ok,tries=0;do{x=40+Math.random()*(W-80);y=40+Math.random()*(H-80);ok=stars.every(s=>Math.hypot(s.x-x,s.y-y)>90);tries++;}while(!ok&&tries<200);
+      stars.push({x,y,owner:2,ships:Math.floor(Math.random()*8)+3,prod:1+Math.floor(Math.random()*3)});}
+    stars[0].owner=0;stars[0].ships=20;
+    stars[n-1].owner=1;stars[n-1].ships=20;
+    edges=[];for(let i=0;i<n;i++){const near=[...Array(n).keys()].filter(j=>j!==i).sort((a,b)=>dist(i,a)-dist(i,b)).slice(0,3);near.forEach(j=>{if(!edges.some(e=>(e[0]===i&&e[1]===j)||(e[0]===j&&e[1]===i)))edges.push([i,j]);});}
+    sel=-1;over=false;draw();}
+  function connected(a,b){return edges.some(e=>(e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a));}
+  function draw(){wrapEl.innerHTML='';
+    let svg=`<svg width="${W}" height="${H}" style="position:absolute;left:0;top:0">`;
+    edges.forEach(([a,b])=>{svg+=`<line x1="${stars[a].x}" y1="${stars[a].y}" x2="${stars[b].x}" y2="${stars[b].y}" stroke="#8884" stroke-width="2"/>`;});
+    svg+='</svg>';wrapEl.innerHTML=svg;
+    stars.forEach((s,i)=>{const d=el('div',{style:`position:absolute;left:${s.x-22}px;top:${s.y-22}px;width:44px;height:44px;border-radius:50%;background:${COL[s.owner]};color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:800;font-size:14px;border:3px solid ${sel===i?'#fd5':'#fff3'};box-shadow:0 2px 6px #0005`});
+      d.innerHTML=`${s.ships}<span style="font-size:9px;opacity:.8">+${s.prod}</span>`;d.onclick=()=>click(i);wrapEl.append(d);});
+    const mine=stars.filter(s=>s.owner===0).length,en=stars.filter(s=>s.owner===1).length;
+    setStatus(`You: ${mine}  •  Enemy: ${en}  •  Neutral: ${stars.filter(s=>s.owner===2).length}  •  Wins: ${wins(gm.id)}`);}
+  function click(i){if(over)return;
+    if(sel===-1){if(stars[i].owner===0&&stars[i].ships>1)sel=i,draw();return;}
+    if(i===sel){sel=-1;draw();return;}
+    if(connected(sel,i)){send(sel,i,0);sel=-1;draw();checkEnd();}
+    else if(stars[i].owner===0){sel=i;draw();}}
+  function send(from,to,p){const fleet=Math.floor(stars[from].ships/2);if(fleet<1)return;stars[from].ships-=fleet;
+    if(stars[to].owner===p){stars[to].ships+=fleet;}
+    else{if(fleet>stars[to].ships){stars[to].owner=p;stars[to].ships=fleet-stars[to].ships;}else{stars[to].ships-=fleet;}}}
+  endBtn.onclick=()=>{if(over)return;stars.forEach(s=>{if(s.owner!==2)s.ships+=s.prod;});
+    aiTurn();stars.forEach(s=>{});draw();checkEnd();};
+  function aiTurn(){
+    // AI (owner 1): for each star, attack weakest connected non-AI if it can win, else reinforce
+    stars.forEach((s,i)=>{if(s.owner!==1||s.ships<3)return;
+      const nb=[...Array(stars.length).keys()].filter(j=>connected(i,j));
+      const targets=nb.filter(j=>stars[j].owner!==1).sort((a,b)=>stars[a].ships-stars[b].ships);
+      if(targets.length){const t=targets[0];if(Math.floor(s.ships/2)>stars[t].ships||stars[t].owner===2)send(i,t,1);}});}
+  function checkEnd(){const mine=stars.filter(s=>s.owner===0).length,en=stars.filter(s=>s.owner===1).length;
+    if(en===0){over=true;addWin(gm.id);setStatus('🎉 Galaxy conquered!');}else if(mine===0){over=true;setStatus('💀 Your empire fell.');}}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ============================================================
+   MECH TACTICS (Into the Breach lite)
+   ============================================================ */
+function game_mech(gm){
+  setHint('Move a mech (click it, then a tile), then click an adjacent enemy to PUNCH (damage + push). Kill or shove enemies before they strike your buildings. Survive 5 turns!');
+  const N=7;let grid,mechs,enemies,buildings,turnNo,phase,sel,over,won;
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},48px);gap:2px`});
+  const endBtn=el('button',{className:'btn',textContent:'End Turn ▶'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const info=el('div',{className:'big'});
+  host.append(info,board,el('div',{style:'display:flex;gap:10px'},endBtn,newBtn));
+  function key(r,c){return r*N+c;}
+  function reset(){buildings={};let placed=0;while(placed<5){const r=Math.floor(Math.random()*N),c=Math.floor(Math.random()*N);if(!buildings[key(r,c)]){buildings[key(r,c)]={hp:1};placed++;}}
+    mechs=[{type:'punch',r:N-1,c:1,used:false,moved:false},{type:'punch',r:N-1,c:N-2,used:false,moved:false}];
+    enemies=[];turnNo=1;over=false;won=false;sel=null;spawn(2);draw();}
+  function occupied(r,c){return mechs.some(m=>m.r===r&&m.c===c)||enemies.some(e=>e.r===r&&e.c===c)||buildings[key(r,c)];}
+  function spawn(n){for(let i=0;i<n;i++){let r,c,tries=0;do{r=Math.floor(Math.random()*3);c=Math.floor(Math.random()*N);tries++;}while(occupied(r,c)&&tries<50);
+    if(!occupied(r,c)){const e={r,c,hp:2};retarget(e);enemies.push(e);}}}
+  function retarget(e){// target nearest building, else nearest mech
+    let best=null,bd=1e9;const cands=Object.keys(buildings).map(k=>({r:Math.floor(k/N),c:k%N})).concat(mechs.map(m=>({r:m.r,c:m.c})));
+    cands.forEach(t=>{const d=Math.abs(t.r-e.r)+Math.abs(t.c-e.c);if(d<bd){bd=d;best=t;}});e.tr=best?best.r:e.r;e.tc=best?best.c:e.c;}
+  function inb(r,c){return r>=0&&r<N&&c>=0&&c<N;}
+  function draw(){board.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const b=buildings[key(r,c)];const m=mechs.find(x=>x.r===r&&x.c===c);const e=enemies.find(x=>x.r===r&&x.c===c);
+    const isMove=sel&&!sel.moved&&reach(sel).some(t=>t.r===r&&t.c===c);
+    const isHit=sel&&sel.moved&&!sel.used&&Math.abs(sel.r-r)+Math.abs(sel.c-c)===1&&e;
+    const telegraph=enemies.some(x=>x.tr===r&&x.tc===c);
+    let bg='var(--panel)';if(b)bg='#6a7';if(isMove)bg='#3a8fd055';if(isHit)bg='#d04a4055';
+    const d=el('div',{style:`width:48px;height:48px;border:1px solid var(--border);border-radius:6px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;position:relative`});
+    if(telegraph&&!m&&!e)d.append(el('div',{textContent:'⚠️',style:'font-size:16px;opacity:.8'}));
+    if(b)d.textContent='🏢';
+    if(m){d.textContent='🤖';if(sel===m)d.style.outline='3px solid #fd5';if(m.used)d.style.opacity='.6';}
+    if(e){d.textContent='👾';d.title='HP '+e.hp;d.append(el('div',{textContent:e.hp,style:'position:absolute;top:0;right:2px;font-size:10px;color:#d04a4a;font-weight:800'}));}
+    d.onclick=()=>click(r,c);board.append(d);}
+    info.textContent='Turn '+turnNo+'/5  •  Buildings: '+Object.keys(buildings).length+'  •  Enemies: '+enemies.length;
+    setStatus(over?(won?'🎉 You held the line!':'💥 City destroyed'):'Move & punch, then End Turn  •  Wins: '+wins(gm.id));}
+  function reach(m){const out=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++){const d=Math.abs(r-m.r)+Math.abs(c-m.c);if(d>=1&&d<=3&&!occupied(r,c))out.push({r,c});}return out;}
+  function click(r,c){if(over)return;const m=mechs.find(x=>x.r===r&&x.c===c);const e=enemies.find(x=>x.r===r&&x.c===c);
+    if(sel){
+      if(!sel.moved&&reach(sel).some(t=>t.r===r&&t.c===c)){sel.r=r;sel.c=c;sel.moved=true;draw();return;}
+      if(sel.moved&&!sel.used&&e&&Math.abs(sel.r-r)+Math.abs(sel.c-c)===1){punch(sel,r,c);sel.used=true;sel=null;draw();return;}
+      if(m&&m!==sel){sel=m;draw();return;}
+      sel=null;draw();return;}
+    if(m&&!m.used){sel=m;draw();}}
+  function punch(m,r,c){const e=enemies.find(x=>x.r===r&&x.c===c);if(!e)return;e.hp--;
+    const dr=r-m.r,dc=c-m.c;const nr=r+dr,nc=c+dc;
+    if(e.hp<=0){enemies=enemies.filter(x=>x!==e);}
+    else if(inb(nr,nc)&&!occupied(nr,nc)){e.r=nr;e.c=nc;}
+    else if(inb(nr,nc)&&occupied(nr,nc)){e.hp--;const o=enemies.find(x=>x.r===nr&&x.c===nc);if(o){o.hp--;if(o.hp<=0)enemies=enemies.filter(x=>x!==o);}if(e.hp<=0)enemies=enemies.filter(x=>x!==e);}
+    // pushing off the edge into wall: minor extra dmg already applied
+  }
+  endBtn.onclick=()=>{if(over)return;
+    // enemies strike their target tiles
+    enemies.forEach(e=>{const k=key(e.tr,e.tc);if(buildings[k]){buildings[k].hp--;if(buildings[k].hp<=0)delete buildings[k];}
+      const hitM=mechs.find(m=>m.r===e.tr&&m.c===e.tc);if(hitM){/* mech survives but does nothing extra in this lite version */}});
+    if(Object.keys(buildings).length===0){over=true;won=false;draw();return;}
+    turnNo++;
+    if(turnNo>5){over=true;won=true;addWin(gm.id);draw();return;}
+    mechs.forEach(m=>{m.used=false;m.moved=false;});
+    enemies.forEach(retarget);
+    spawn(Math.min(3,1+Math.floor(turnNo/2)));
+    enemies.forEach(retarget);
+    sel=null;draw();};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ============================================================
+   MICROPOLIS (SimCity lite)
+   ============================================================ */
+function game_city(gm){
+  setHint('Place roads, power, and R/C/I zones. Zones near power and roads grow. Collect taxes each month. Reach 200 population!');
+  const N=10;let g,money,month,pop,tool;
+  const TOOLS=[['road','🛣️ Road',10],['R','🏠 Residential',50],['C','🏢 Commercial',60],['I','🏭 Industrial',60],['power','⚡ Power Plant',300],['bull','⛏️ Bulldoze',5]];
+  const res=el('div',{className:'res'});
+  const toolbar=el('div',{className:'toolbar'});
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},40px);gap:1px;background:var(--border);padding:1px;border-radius:8px`});
+  const monthBtn=el('button',{className:'btn',textContent:'📅 Next Month'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New City'});
+  host.append(res,toolbar,board,el('div',{style:'display:flex;gap:10px'},monthBtn,newBtn));
+  TOOLS.forEach(([k,label,cost])=>{const b=el('button',{className:'btn ghost',textContent:label+' ($'+cost+')'});b.onclick=()=>{tool=k;drawTools();};toolbar.append(b);});
+  function drawTools(){[...toolbar.children].forEach((b,i)=>{b.className='btn '+(TOOLS[i][0]===tool?'':'ghost');});}
+  function reset(){g=Array.from({length:N*N},()=>({t:'',lvl:0}));money=2000;month=0;pop=0;tool='road';drawTools();draw();}
+  function costOf(k){return TOOLS.find(t=>t[0]===k)[2];}
+  function near(i,type,range){const r=Math.floor(i/N),c=i%N;for(let dr=-range;dr<=range;dr++)for(let dc=-range;dc<=range;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N&&Math.abs(dr)+Math.abs(dc)<=range&&g[nr*N+nc].t===type)return true;}return false;}
+  function adjRoad(i){const r=Math.floor(i/N),c=i%N;return [[1,0],[-1,0],[0,1],[0,-1]].some(([dr,dc])=>{const nr=r+dr,nc=c+dc;return nr>=0&&nr<N&&nc>=0&&nc<N&&g[nr*N+nc].t==='road';});}
+  function place(i){if(tool==='bull'){if(g[i].t){money-=costOf('bull');g[i]={t:'',lvl:0};}draw();return;}
+    if(g[i].t)return;const c=costOf(tool);if(money<c){setStatus('Not enough money!');return;}money-=c;g[i]={t:tool,lvl:tool==='R'||tool==='C'||tool==='I'?1:0};draw();}
+  function draw(){board.innerHTML='';g.forEach((cell,i)=>{let bg='#cfe3cf',txt='';
+    if(document.documentElement.dataset.theme==='dark')bg='#16291a';
+    if(cell.t==='road'){bg='#555';txt='';}
+    else if(cell.t==='power'){bg='#fc6';txt='⚡';}
+    else if(cell.t==='R'){bg=`hsl(120,50%,${65-cell.lvl*5}%)`;txt='🏠';}
+    else if(cell.t==='C'){bg=`hsl(210,55%,${65-cell.lvl*5}%)`;txt='🏢';}
+    else if(cell.t==='I'){bg=`hsl(40,55%,${60-cell.lvl*5}%)`;txt='🏭';}
+    const d=el('div',{style:`width:40px;height:40px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer`,textContent:txt});
+    d.onclick=()=>place(i);board.append(d);});
+    res.innerHTML='';[['💰 Money','$'+money],['📅 Month',month],['👥 Population',pop]].forEach(([l,v])=>res.append(el('div',{},l+': ',el('b',{textContent:v}))));
+    setStatus('Goal: 200 pop  •  Best pop: '+wins(gm.id));}
+  monthBtn.onclick=()=>{month++;let newPop=0;const hasC=g.some(c=>c.t==='C'),hasI=g.some(c=>c.t==='I');
+    g.forEach((cell,i)=>{if(['R','C','I'].includes(cell.t)){const powered=near(i,'power',6);const road=adjRoad(i);
+      if(powered&&road){const demand=cell.t==='R'?(hasC||hasI):true;if(demand&&cell.lvl<6&&Math.random()<0.6)cell.lvl++;}
+      else if(cell.lvl>1&&Math.random()<0.3)cell.lvl--;}});
+    g.forEach(cell=>{if(cell.t==='R')newPop+=cell.lvl*8;});pop=newPop;
+    const roads=g.filter(c=>c.t==='road').length,powers=g.filter(c=>c.t==='power').length;
+    const tax=Math.floor(pop*1.2)-roads*1-powers*40;money+=tax;
+    setHs(gm.id,pop);
+    if(pop>=200){setStatus('🎉 City reached 200 population! Tax this month: $'+tax);}else setStatus('Tax: $'+tax+'  •  Best pop: '+wins(gm.id));
+    draw();};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ============================================================
+   GALACTIC EMPIRE (Master of Orion lite)
+   ============================================================ */
+function game_orion(gm){
+  setHint('Manage planets: invest in Industry (ships), Research (tech), or Growth. Send fleets to conquer enemy & neutral worlds. Research boosts your fleets!');
+  let planets,tech,over,turnNo,selFrom;
+  const COL=['#3a8fd0','#d04a4a','#888'];const NAMES=['Sol','Vega','Rigel','Orion','Sirius','Deneb','Altair','Procyon','Antares','Mizar'];
+  const info=el('div',{className:'res'});
+  const table=el('div',{style:'display:flex;flex-direction:column;gap:6px;width:100%;max-width:660px'});
+  const endBtn=el('button',{className:'btn',textContent:'End Turn ▶'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const log=el('div',{className:'log'});
+  host.append(info,table,log,el('div',{style:'display:flex;gap:10px'},endBtn,newBtn));
+  function reset(){planets=[];const n=8;for(let i=0;i<n;i++)planets.push({name:NAMES[i],owner:2,pop:Math.floor(Math.random()*4)+2,ind:0,ships:Math.floor(Math.random()*5)+2,focus:'ind'});
+    planets[0].owner=0;planets[0].pop=6;planets[0].ships=10;
+    planets[n-1].owner=1;planets[n-1].pop=6;planets[n-1].ships=10;
+    tech={0:1,1:1};over=false;turnNo=1;selFrom=null;draw();}
+  function techMult(p){return 1+(tech[p]-1)*0.35;}
+  function draw(){
+    info.innerHTML='';info.append(el('div',{},'🔬 Weapon Tech: ',el('b',{textContent:'Lv '+tech[0].toFixed(0)})),el('div',{},'🛡️ Your planets: ',el('b',{textContent:planets.filter(p=>p.owner===0).length})),el('div',{},'Turn: ',el('b',{textContent:turnNo})));
+    table.innerHTML='';planets.forEach((p,i)=>{
+      const row=el('div',{style:`display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-left:5px solid ${COL[p.owner]};border-radius:8px;padding:6px 10px;flex-wrap:wrap`});
+      row.append(el('b',{textContent:p.name,style:'min-width:64px'}),el('span',{textContent:'👥'+p.pop+' 🚀'+p.ships,style:'color:var(--dim)'}));
+      if(p.owner===0){
+        const sel=el('select',{});[['ind','⚙️ Industry'],['res','🔬 Research'],['grow','🌱 Growth']].forEach(([v,t])=>{const o=el('option',{value:v,textContent:t});if(p.focus===v)o.selected=true;sel.append(o);});
+        sel.onchange=()=>p.focus=sel.value;row.append(sel);
+        const send=el('button',{className:'btn',textContent:selFrom===i?'Sending… pick target':'Send Fleet',style:'padding:5px 10px'});
+        send.onclick=()=>{selFrom=selFrom===i?null:i;draw();};row.append(send);
+      } else {
+        if(selFrom!=null){const atk=el('button',{className:'btn ghost',textContent:'⚔️ Attack',style:'padding:5px 10px'});atk.onclick=()=>sendFleet(selFrom,i);row.append(atk);}
+        else row.append(el('span',{textContent:p.owner===1?'(enemy)':'(neutral)',style:'color:var(--dim);font-size:12px'}));
+      }
+      if(selFrom!=null&&p.owner===0&&i!==selFrom){const mv=el('button',{className:'btn ghost',textContent:'➕ Reinforce',style:'padding:5px 10px'});mv.onclick=()=>sendFleet(selFrom,i);row.append(mv);}
+      table.append(row);});
+    setStatus(over?'':'Your turn  •  Wins: '+wins(gm.id));}
+  function sendFleet(from,to){if(from===to)return;const f=planets[from];const fleet=Math.floor(f.ships/2);if(fleet<1){log.textContent='Not enough ships.';selFrom=null;draw();return;}
+    f.ships-=fleet;const t=planets[to];
+    if(t.owner===0){t.ships+=fleet;log.textContent='Reinforced '+t.name+' with '+fleet+' ships.';}
+    else{const atk=fleet*techMult(0);if(atk>t.ships){t.owner=0;t.ships=Math.ceil(atk-t.ships);log.textContent='⚔️ Captured '+t.name+'!';}else{t.ships=Math.ceil(t.ships-atk);log.textContent='Attack on '+t.name+' repelled.';}}
+    selFrom=null;draw();checkEnd();}
+  endBtn.onclick=()=>{if(over)return;
+    // your production
+    planets.filter(p=>p.owner===0).forEach(p=>{if(p.focus==='ind')p.ships+=p.pop;else if(p.focus==='res')tech[0]+=p.pop*0.12;else if(p.focus==='grow'&&p.pop<10)p.pop++;});
+    // AI
+    planets.filter(p=>p.owner===1).forEach(p=>{p.ships+=p.pop;tech[1]+=p.pop*0.08;});
+    aiAttacks();
+    turnNo++;selFrom=null;draw();checkEnd();};
+  function aiAttacks(){planets.forEach((p,i)=>{if(p.owner!==1||p.ships<4)return;
+    const targets=planets.map((q,j)=>({q,j})).filter(o=>o.q.owner!==1).sort((a,b)=>a.q.ships-b.q.ships);
+    if(targets.length){const{q,j}=targets[0];const fleet=Math.floor(p.ships/2);const atk=fleet*(1+(tech[1]-1)*0.35);
+      if(atk>q.ships){p.ships-=fleet;q.owner=1;q.ships=Math.ceil(atk-q.ships);}}});}
+  function checkEnd(){const mine=planets.filter(p=>p.owner===0).length,en=planets.filter(p=>p.owner===1).length;
+    if(en===0){over=true;addWin(gm.id);setStatus('🎉 Galaxy united under your rule!');}else if(mine===0){over=true;setStatus('💀 Your empire has fallen.');}}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ============================================================
+   TRIBE WARS (Polytopia lite)
+   ============================================================ */
+function game_tribes(gm){
+  setHint('Move units (click unit → tile) and attack adjacent enemies. Capture villages 🏯 for income; train ⚔️ warriors at your cities (2★). Take the enemy capital to win!');
+  const N=8;let terr,units,villages,you,enemy,sel,over,stars,turnNo;
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},48px);gap:2px`});
+  const trainBtn=el('button',{className:'btn',textContent:'⚔️ Train Warrior (2★)'});
+  const endBtn=el('button',{className:'btn',textContent:'End Turn ▶'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const info=el('div',{className:'big'});
+  host.append(info,board,el('div',{style:'display:flex;gap:10px;flex-wrap:wrap'},trainBtn,endBtn,newBtn));
+  function key(r,c){return r*N+c;}
+  function reset(){units=[];villages={};over=false;sel=null;stars=3;turnNo=1;
+    // capitals
+    you={r:N-1,c:0};enemy={r:0,c:N-1};
+    villages[key(you.r,you.c)]={owner:0,capital:true};
+    villages[key(enemy.r,enemy.c)]={owner:1,capital:true};
+    // neutral villages
+    let placed=0;while(placed<4){const r=Math.floor(Math.random()*N),c=Math.floor(Math.random()*N);if(!villages[key(r,c)]){villages[key(r,c)]={owner:2};placed++;}}
+    units.push({r:you.r,c:you.c,owner:0,hp:10,used:false});
+    units.push({r:enemy.r,c:enemy.c,owner:1,hp:10,used:false});
+    draw();}
+  function unitAt(r,c){return units.find(u=>u.r===r&&u.c===c);}
+  function inb(r,c){return r>=0&&r<N&&c>=0&&c<N;}
+  function income(){return Object.values(villages).filter(v=>v.owner===0).length;}
+  function draw(){board.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=villages[key(r,c)];const u=unitAt(r,c);
+    const canMove=sel&&!sel.used&&moves(sel).some(t=>t.r===r&&t.c===c);
+    const canAtk=sel&&!sel.used&&u&&u.owner!==0&&Math.abs(sel.r-r)+Math.abs(sel.c-c)===1;
+    let bg='var(--panel)';if(v){bg=v.owner===0?'#3a8fd055':v.owner===1?'#d04a4055':'#8884';}
+    if(canMove)bg='#4ab87a66';if(canAtk)bg='#d04a4088';
+    const d=el('div',{style:`width:48px;height:48px;border:1px solid var(--border);border-radius:6px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;position:relative`});
+    if(v)d.append(el('div',{textContent:v.capital?'🏰':'🏯',style:'position:absolute;font-size:20px;opacity:.9'}));
+    if(u){const e=el('div',{textContent:u.owner===0?'🔵':'🔴',style:'position:relative;z-index:1'});d.append(e);
+      d.append(el('div',{textContent:u.hp,style:'position:absolute;bottom:0;right:2px;font-size:9px;font-weight:800;color:'+(u.owner===0?'#3a8fd0':'#d04a4a')}));
+      if(sel===u)d.style.outline='3px solid #fd5';if(u.used)d.style.opacity='.55';}
+    d.onclick=()=>click(r,c);board.append(d);}
+    info.innerHTML=`⭐ ${stars}  •  +${income()}/turn  •  Your towns: ${Object.values(villages).filter(v=>v.owner===0).length}`;
+    trainBtn.disabled=stars<2;
+    setStatus(over?'':'Turn '+turnNo+'  •  Wins: '+wins(gm.id));}
+  function moves(u){const out=[];[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{const nr=u.r+dr,nc=u.c+dc;if(inb(nr,nc)&&!unitAt(nr,nc))out.push({r:nr,c:nc});});return out;}
+  function click(r,c){if(over)return;const u=unitAt(r,c);
+    if(sel){
+      if(!sel.used&&u&&u.owner!==0&&Math.abs(sel.r-r)+Math.abs(sel.c-c)===1){attack(sel,u);sel=null;draw();checkEnd();return;}
+      if(!sel.used&&moves(sel).some(t=>t.r===r&&t.c===c)){sel.r=r;sel.c=c;capture(sel);sel.used=true;sel=null;draw();checkEnd();return;}
+      if(u&&u.owner===0&&!u.used){sel=u;draw();return;}
+      sel=null;draw();return;}
+    if(u&&u.owner===0&&!u.used){sel=u;draw();}}
+  function capture(u){const v=villages[key(u.r,u.c)];if(v&&v.owner!==u.owner){v.owner=u.owner;}}
+  function attack(a,d){d.hp-=5;if(d.hp<=0){units=units.filter(x=>x!==d);a.used=true;}else{a.hp-=3;a.used=true;if(a.hp<=0)units=units.filter(x=>x!==a);}}
+  trainBtn.onclick=()=>{if(stars<2)return;
+    // spawn at any owned village with empty tile
+    const spots=Object.keys(villages).filter(k=>villages[k].owner===0).map(k=>({r:Math.floor(k/N),c:k%N})).filter(s=>!unitAt(s.r,s.c));
+    if(!spots.length){setStatus('No free city tile to train on!');return;}
+    const s=spots[0];units.push({r:s.r,c:s.c,owner:0,hp:10,used:true});stars-=2;draw();};
+  endBtn.onclick=()=>{if(over)return;stars+=income();
+    // AI turn
+    aiTurn();
+    units.forEach(u=>{if(u.owner===0)u.used=false;});turnNo++;sel=null;draw();checkEnd();};
+  function aiTurn(){const ai=units.filter(u=>u.owner===1);
+    ai.forEach(u=>{
+      // attack adjacent player unit if possible
+      const adjEnemy=units.find(t=>t.owner===0&&Math.abs(t.r-u.r)+Math.abs(t.c-u.c)===1);
+      if(adjEnemy){attack(u,adjEnemy);return;}
+      // move toward player capital / nearest village
+      const targets=[you].concat(Object.keys(villages).filter(k=>villages[k].owner!==1).map(k=>({r:Math.floor(k/N),c:k%N})));
+      let best=null,bd=1e9;moves(u).forEach(m=>{const d=Math.min(...targets.map(t=>Math.abs(t.r-m.r)+Math.abs(t.c-m.c)));if(d<bd){bd=d;best=m;}});
+      if(best){u.r=best.r;u.c=best.c;const v=villages[key(u.r,u.c)];if(v&&v.owner!==1)v.owner=1;}});
+    // AI trains occasionally
+    if(turnNo%2===0){const spots=Object.keys(villages).filter(k=>villages[k].owner===1).map(k=>({r:Math.floor(k/N),c:k%N})).filter(s=>!unitAt(s.r,s.c));if(spots.length)units.push({r:spots[0].r,c:spots[0].c,owner:1,hp:10,used:false});}}
+  function checkEnd(){
+    if(villages[key(enemy.r,enemy.c)].owner===0){over=true;addWin(gm.id);setStatus('🎉 You captured the enemy capital!');return;}
+    if(villages[key(you.r,you.c)].owner===1){over=true;setStatus('💀 Your capital has fallen!');return;}}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+applyTheme(localStorage.getItem('theme')||'light');
+buildMenu();
+</script>
+</body>
+</html>

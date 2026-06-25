@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calm & Sensory Pack</title>
+<style>
+  :root{--bg:#eef7f4;--panel:#ffffff;--accent:#5bb3a0;--accent2:#9ab8e0;--text:#2a3a38;--dim:#7a9088;--border:#d6e8e2;}
+  html[data-theme="dark"]{--bg:#0f1a18;--panel:#172624;--accent:#7fd0bd;--accent2:#a9c4e8;--text:#e8f4f0;--dim:#9ab4ac;--border:#274038;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  #host{max-width:100%;overflow-x:auto}.wrap{max-width:100%}
+  @media (max-width:560px){#app{padding:10px}h1{font-size:24px}.bar{gap:8px}}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  #app{max-width:820px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 14px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .card .ico{font-size:38px;display:block;margin-bottom:8px}
+  .card .name{font-weight:700}.card .hs{color:var(--dim);font-size:12px;margin-top:4px;min-height:14px}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:var(--accent);color:#06302a;border:0;border-radius:12px;padding:9px 16px;font-weight:700;cursor:pointer}
+  button.btn:hover{filter:brightness(1.06)}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px;max-width:620px}
+  .big{font-size:18px;font-weight:700;text-align:center}
+  canvas{border-radius:16px;border:1px solid var(--border);touch-action:none;max-width:100%;height:auto}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🌿 CALM & SENSORY</h1>
+    <div class="sub">Gentle, relaxing activities — no timers, no losing, just play at your own pace. 💛</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const GAMES=[
+  {id:'bubblewrap',name:'Bubble Wrap',ico:'🫧'},
+  {id:'breathe',name:'Breathing Buddy',ico:'🌬️'},
+  {id:'zen',name:'Zen Garden',ico:'🏖️'},
+  {id:'pads',name:'Sound Pads',ico:'🎵'},
+  {id:'fidget',name:'Fidget Spinner',ico:'🌀'},
+  {id:'sort',name:'Color Sorting',ico:'🌈'},
+  {id:'shapes',name:'Shape Match',ico:'🔷'},
+  {id:'feelings',name:'Feelings Faces',ico:'😊'},
+  {id:'counting',name:'Counting Fun',ico:'🔢'},
+  {id:'calmmemory',name:'Gentle Memory',ico:'🧠'},
+];
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null;
+function getN(id){return +(localStorage.getItem('calm_'+id)||0)}
+function addN(id,v){localStorage.setItem('calm_'+id,(getN(id)+v));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+  d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">&nbsp;</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+function mkCanvas(w,h){const c=el('canvas',{width:w,height:h});host.append(c);return c;}
+let actx;function tone(freq,dur=0.4,type='sine',vol=0.18){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+dur);o.stop(actx.currentTime+dur);}catch(e){}}
+
+/* ---------------- BUBBLE WRAP ---------------- */
+function game_bubblewrap(gm){
+  setHint('Tap each bubble to pop it. Pop them all, then tap "Fresh Sheet" to do it again. So satisfying! 🫧');
+  const N=10;let popped;
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},minmax(28px,1fr));gap:6px;max-width:420px;width:100%`});
+  const reset=el('button',{className:'btn',textContent:'✨ Fresh Sheet'});
+  host.append(board,reset);
+  function draw(){board.innerHTML='';popped=0;
+    for(let i=0;i<N*N;i++){const b=el('div',{style:'aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 32% 30%,#bfeee4,#7fd0bd);cursor:pointer;transition:.1s'});
+      b.onclick=()=>{if(b._p)return;b._p=true;b.style.background='var(--border)';b.style.transform='scale(.8)';tone(300+Math.random()*500,0.08,'sine',0.12);popped++;addN(gm.id,1);
+        setStatus('Popped: '+popped+'/'+(N*N)+'  •  Total ever: '+getN(gm.id));if(popped===N*N)setStatus('🎉 All popped! Tap Fresh Sheet for more.');};
+      board.append(b);}
+    setStatus('Tap the bubbles!  •  Total ever popped: '+getN(gm.id));}
+  reset.onclick=draw;draw();
+  return {stop:()=>{}};
+}
+
+/* ---------------- BREATHING BUDDY ---------------- */
+function game_breathe(gm){
+  setHint('Follow the circle. Breathe in as it grows, hold, then breathe out as it shrinks. Relax. 🌬️');
+  const circle=el('div',{style:'width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--accent2),var(--accent));transition:transform 4s ease-in-out,background 1s;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px'});
+  const phase=el('div',{className:'big',style:'font-size:24px'});
+  const startBtn=el('button',{className:'btn',textContent:'Start'});
+  host.append(el('div',{style:'height:180px;display:flex;align-items:center;justify-content:center'},circle),phase,startBtn);
+  let timers=[],running=false;
+  const STEPS=[['Breathe in…',4,2.2],['Hold…',2,2.2],['Breathe out…',4,1],['Hold…',1,1]];
+  function cycle(){if(!running)return;let t=0;STEPS.forEach((s,i)=>{timers.push(setTimeout(()=>{if(!running)return;phase.textContent=s[0];circle.style.transitionDuration=s[1]+'s';circle.style.transform='scale('+s[2]+')';if(i===0)tone(330,0.5,'sine',0.1);if(i===2)tone(262,0.6,'sine',0.1);},t*1000));t+=s[1];});
+    timers.push(setTimeout(cycle,t*1000));}
+  startBtn.onclick=()=>{if(running){running=false;timers.forEach(clearTimeout);timers=[];startBtn.textContent='Start';phase.textContent='';circle.style.transform='scale(1)';return;}running=true;startBtn.textContent='Stop';cycle();};
+  setStatus('Take a calm moment 💛');phase.textContent='Press Start when ready';
+  return {stop:()=>{running=false;timers.forEach(clearTimeout);}};
+}
+
+/* ---------------- ZEN GARDEN ---------------- */
+function game_zen(gm){
+  setHint('Drag your finger or mouse to rake patterns in the sand. Calm and quiet. Tap "Smooth" to start fresh. 🏖️');
+  const W=540,H=380;const c=mkCanvas(W,H);const ctx=c.getContext('2d');let drawing=false,last=null;
+  function smooth(){ctx.fillStyle='#e8d8b8';ctx.fillRect(0,0,W,H);
+    // subtle base texture
+    ctx.strokeStyle='#dcc9a3';ctx.lineWidth=1;for(let y=10;y<H;y+=14){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+  function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*(W/r.width),y:(e.clientY-r.top)*(H/r.height)};}
+  function rake(p){ctx.strokeStyle='#c4a87a';ctx.lineWidth=2;for(let o=-9;o<=9;o+=4.5){ctx.beginPath();ctx.moveTo(last.x,last.y+o);ctx.lineTo(p.x,p.y+o);ctx.stroke();}
+    ctx.strokeStyle='#fff5e0';ctx.lineWidth=1;for(let o=-9;o<=9;o+=4.5){ctx.beginPath();ctx.moveTo(last.x,last.y+o-1.5),ctx.lineTo(p.x,p.y+o-1.5);ctx.stroke();}}
+  function start(e){drawing=true;last=pos(e);}
+  function move(e){if(!drawing)return;const p=pos(e);rake(p);last=p;}
+  c.addEventListener('mousedown',start);c.addEventListener('mousemove',move);window.addEventListener('mouseup',()=>drawing=false);
+  c.addEventListener('touchstart',e=>{e.preventDefault();start(e.touches[0]);});c.addEventListener('touchmove',e=>{e.preventDefault();move(e.touches[0]);});
+  const btn=el('button',{className:'btn',textContent:'🌊 Smooth the Sand'});btn.onclick=smooth;host.append(btn);
+  smooth();setStatus('Rake gentle patterns 🧘');
+  return {stop:()=>{}};
+}
+
+/* ---------------- SOUND PADS ---------------- */
+function game_pads(gm){
+  setHint('Tap the colorful pads to play soft notes. Make your own gentle music. No wrong notes here! 🎵');
+  const PADS=[['#e88aa0',262],['#f0b86e',294],['#f6e07a',330],['#8fd8a0',349],['#7fc8e0',392],['#9aa8e8',440],['#c89ae0',494],['#e8a0c8',523]];
+  const board=el('div',{style:'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:440px;width:100%'});
+  PADS.forEach(([col,freq])=>{const p=el('div',{style:`aspect-ratio:1;border-radius:18px;background:${col};cursor:pointer;transition:transform .08s,filter .08s`});
+    const hit=()=>{tone(freq,0.6,'sine',0.2);p.style.transform='scale(0.92)';p.style.filter='brightness(1.2)';setTimeout(()=>{p.style.transform='scale(1)';p.style.filter='none';},120);};
+    p.onmousedown=hit;p.ontouchstart=e=>{e.preventDefault();hit();};board.append(p);});
+  host.append(board);
+  const song=el('button',{className:'btn',textContent:'🎶 Play a Twinkle'});
+  song.onclick=()=>{const notes=[262,262,392,392,440,440,392,349,349,330,330,294,294,262];let i=0;const iv=setInterval(()=>{if(i>=notes.length){clearInterval(iv);return;}tone(notes[i],0.45,'sine',0.2);i++;},450);};
+  host.append(song);
+  setStatus('Make some music! 🎹');
+  return {stop:()=>{}};
+}
+
+/* ---------------- FIDGET SPINNER ---------------- */
+function game_fidget(gm){
+  setHint('Drag across the spinner to flick it, then watch it spin and slow down. Spin it again whenever you like! 🌀');
+  const W=320,H=320;const c=mkCanvas(W,H);const ctx=c.getContext('2d');
+  let angle=0,vel=0,dragging=false,lastA=0,lastT=0;
+  function ang(e){const r=c.getBoundingClientRect();const x=(e.clientX-r.left)*(W/r.width)-W/2,y=(e.clientY-r.top)*(H/r.height)-H/2;return Math.atan2(y,x);}
+  c.addEventListener('mousedown',e=>{dragging=true;lastA=ang(e);lastT=performance.now();});
+  c.addEventListener('mousemove',e=>{if(!dragging)return;const a=ang(e);let d=a-lastA;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;const now=performance.now();angle+=d;vel=d/((now-lastT)/16.67||1);lastA=a;lastT=now;});
+  window.addEventListener('mouseup',()=>dragging=false);
+  c.addEventListener('touchstart',e=>{e.preventDefault();dragging=true;lastA=ang(e.touches[0]);lastT=performance.now();});
+  c.addEventListener('touchmove',e=>{e.preventDefault();if(!dragging)return;const a=ang(e.touches[0]);let d=a-lastA;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;angle+=d;vel=d*2;lastA=a;});
+  c.addEventListener('touchend',()=>dragging=false);
+  const COLORS=['#e88aa0','#7fc8e0','#8fd8a0'];
+  let raf;function frame(){if(!dragging){angle+=vel;vel*=0.985;if(Math.abs(vel)<0.0005)vel=0;}
+    ctx.clearRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.rotate(angle);
+    ctx.fillStyle=document.documentElement.dataset.theme==='dark'?'#22322f':'#cfe8e0';ctx.beginPath();ctx.arc(0,0,30,0,7);ctx.fill();
+    for(let i=0;i<3;i++){ctx.save();ctx.rotate(i*2*Math.PI/3);ctx.fillStyle=COLORS[i];ctx.beginPath();ctx.arc(0,-90,40,0,7);ctx.fill();ctx.fillStyle='#fff6';ctx.beginPath();ctx.arc(0,-90,16,0,7);ctx.fill();ctx.restore();}
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,14,0,7);ctx.fill();ctx.restore();
+    setStatus('Spin speed: '+Math.abs(vel*60).toFixed(0));
+    raf=requestAnimationFrame(frame);}
+  frame();setStatus('Flick to spin! 🌀');
+  return {stop:()=>cancelAnimationFrame(raf)};
+}
+
+/* ---------------- COLOR SORTING ---------------- */
+function game_sort(gm){
+  setHint('Tap the basket that matches the color of the fruit. Take your time — every try is okay! 🌈');
+  const BINS=[['#e85a5a','🧺','red'],['#f0a030','🧺','orange'],['#f0d030','🧺','yellow'],['#5ab85a','🧺','green'],['#5a8ae8','🧺','blue'],['#a05ae8','🧺','purple']];
+  const FRUITS={red:'🍓',orange:'🍊',yellow:'🍋',green:'🍏',blue:'🫐',purple:'🍇'};
+  let current2,sorted;
+  const item=el('div',{style:'font-size:80px;height:110px;display:flex;align-items:center;justify-content:center'});
+  const bins=el('div',{style:'display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:420px;width:100%'});
+  host.append(item,bins);
+  function next(){const keys=Object.keys(FRUITS);current2=keys[Math.floor(Math.random()*keys.length)];item.textContent=FRUITS[current2];}
+  function draw(){bins.innerHTML='';BINS.forEach(([col,emo,name])=>{const b=el('div',{style:`background:${col};border-radius:16px;padding:14px;text-align:center;cursor:pointer;color:#fff;font-weight:700`});
+    b.innerHTML='🧺<br><small>'+name+'</small>';b.onclick=()=>pick(name);bins.append(b);});}
+  function pick(name){if(name===current2){sorted++;addN(gm.id,1);tone(523,0.3,'sine',0.18);setStatus('🎉 Great match! Sorted: '+sorted);next();}
+    else{tone(220,0.2,'sine',0.12);setStatus('That one is '+name+'. Try the '+current2+' basket! 💛');}}
+  sorted=0;next();draw();setStatus('Match the colors! 🌈');
+  return {stop:()=>{}};
+}
+
+/* ---------------- SHAPE MATCH ---------------- */
+function game_shapes(gm){
+  setHint('Look at the shape on top, then tap the same shape below. You can always try again! 🔷');
+  const SHAPES=['🔴','🔷','🔶','⭐','❤️','🟩','🔺','⬛'];
+  let target,done;
+  const top=el('div',{style:'font-size:80px'});
+  const opts=el('div',{style:'display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:420px;width:100%'});
+  host.append(top,opts);
+  function next(){target=SHAPES[Math.floor(Math.random()*SHAPES.length)];top.textContent=target;
+    const choices=[target];while(choices.length<4){const s=SHAPES[Math.floor(Math.random()*SHAPES.length)];if(!choices.includes(s))choices.push(s);}
+    choices.sort(()=>Math.random()-0.5);opts.innerHTML='';
+    choices.forEach(s=>{const b=el('div',{textContent:s,style:'font-size:54px;text-align:center;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:10px;cursor:pointer'});
+      b.onclick=()=>{if(s===target){done++;addN(gm.id,1);tone(523,0.3,'sine',0.18);setStatus('🎉 Yes! That matches! Matched: '+done);b.style.background='var(--accent)';setTimeout(next,700);}else{tone(220,0.2);setStatus('Not quite — look for the same shape. 💛');}};opts.append(b);});}
+  done=0;next();setStatus('Find the matching shape! 🔷');
+  return {stop:()=>{}};
+}
+
+/* ---------------- FEELINGS FACES ---------------- */
+function game_feelings(gm){
+  setHint('Learn about feelings! Look at the face and tap the word that matches how they feel. 😊');
+  const FEEL=[['😊','happy'],['😢','sad'],['😡','angry'],['😨','scared'],['😴','sleepy'],['🤩','excited'],['😌','calm'],['😮','surprised'],['😝','silly'],['🥰','loved']];
+  let cur,done;
+  const face=el('div',{style:'font-size:90px'});
+  const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;width:100%'});
+  host.append(face,opts);
+  function next(){cur=FEEL[Math.floor(Math.random()*FEEL.length)];face.textContent=cur[0];
+    const choices=[cur];while(choices.length<4){const f=FEEL[Math.floor(Math.random()*FEEL.length)];if(!choices.includes(f))choices.push(f);}
+    choices.sort(()=>Math.random()-0.5);opts.innerHTML='';
+    choices.forEach(f=>{const b=el('button',{className:'btn ghost',textContent:f[1],style:'padding:16px;font-size:18px;text-transform:capitalize'});
+      b.onclick=()=>{if(f[1]===cur[1]){done++;addN(gm.id,1);tone(523,0.3,'sine',0.18);b.style.background='var(--accent)';b.style.color='#fff';setStatus('🎉 Yes! This face feels '+cur[1]+'. Learned: '+done);setTimeout(next,800);}else{tone(220,0.2);setStatus('This face feels '+cur[1]+'. It\'s okay, try again! 💛');}};opts.append(b);});}
+  done=0;next();setStatus('How do they feel? 😊');
+  return {stop:()=>{}};
+}
+
+/* ---------------- COUNTING FUN ---------------- */
+function game_counting(gm){
+  setHint('Count the animals, then tap the right number. Count slowly — there is no rush! 🔢');
+  const ANIMALS=['🐶','🐱','🐰','🐸','🐥','🐢','🦋','🐠','🐝','🦄'];
+  let n,done;
+  const display=el('div',{style:'font-size:42px;line-height:1.4;max-width:420px;text-align:center;min-height:120px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap'});
+  const opts=el('div',{style:'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:360px;width:100%'});
+  host.append(display,opts);
+  function next(){n=2+Math.floor(Math.random()*7);const a=ANIMALS[Math.floor(Math.random()*ANIMALS.length)];display.textContent=a.repeat(n);
+    let choices=[n];while(choices.length<4){const x=2+Math.floor(Math.random()*8);if(!choices.includes(x))choices.push(x);}
+    choices.sort((a,b)=>a-b);opts.innerHTML='';
+    choices.forEach(x=>{const b=el('button',{className:'btn ghost',textContent:x,style:'padding:16px;font-size:24px;font-weight:800'});
+      b.onclick=()=>{if(x===n){done++;addN(gm.id,1);tone(523,0.3,'sine',0.18);b.style.background='var(--accent)';b.style.color='#fff';setStatus('🎉 Correct! There are '+n+'. Counted: '+done);setTimeout(next,800);}else{tone(220,0.2);setStatus('Let\'s count again together. 💛');}};opts.append(b);});}
+  done=0;next();setStatus('How many do you see? 🔢');
+  return {stop:()=>{}};
+}
+
+/* ---------------- GENTLE MEMORY ---------------- */
+function game_calmmemory(gm){
+  setHint('Find the matching pairs. Take all the time you need — flip cards until you match them all. 🧠');
+  const EMO=['🌸','🦋','🌟','🐢','🌈','🍀'];
+  let deck,flipped,matched,lock;
+  const board=el('div',{style:'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:360px;width:100%'});
+  const reset=el('button',{className:'btn',textContent:'🔄 New Cards'});
+  host.append(board,reset);
+  function start(){deck=[...EMO,...EMO].map((e,i)=>({e,id:i})).sort(()=>Math.random()-0.5);flipped=[];matched=new Set();lock=false;draw();setStatus('Flip two cards to find a pair 🧠');}
+  function draw(){board.innerHTML='';deck.forEach((card,i)=>{const up=flipped.includes(i)||matched.has(i);
+    const d=el('div',{style:`aspect-ratio:1;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;background:${up?'var(--panel)':'var(--accent)'};border:1px solid var(--border);transition:.2s`});
+    d.textContent=up?card.e:'';
+    d.onclick=()=>{if(lock||up)return;flipped.push(i);draw();
+      if(flipped.length===2){lock=true;const[a,b]=flipped;
+        if(deck[a].e===deck[b].e){matched.add(a);matched.add(b);flipped=[];lock=false;tone(523,0.25,'sine',0.16);draw();
+          if(matched.size===deck.length){addN(gm.id,1);setStatus('🎉 You found them all! Lovely work. 💛');}}
+        else setTimeout(()=>{flipped=[];lock=false;tone(330,0.15,'sine',0.1);draw();},900);}};
+    board.append(d);});}
+  reset.onclick=start;start();
+  return {stop:()=>{}};
+}
+
+applyTheme(localStorage.getItem('theme')||'light');
+buildMenu();
+</script>
+</body>
+</html>

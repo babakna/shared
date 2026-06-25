@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Pack</title>
+<style>
+  :root{--bg:#eef2f7;--panel:#ffffff;--accent:#12a89a;--accent2:#e0892b;--text:#13203a;--dim:#5a6a86;--border:#d2dae6;}
+  html[data-theme="dark"]{--bg:#101522;--panel:#192238;--accent:#5ed;--accent2:#fb7;--text:#eaf2ff;--dim:#8fa0c0;--border:#28324e;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  #host{max-width:100%;overflow-x:auto}.wrap{max-width:100%}
+  @media (max-width:560px){#app{padding:10px}h1{font-size:24px}.bar{gap:8px}}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  #app{max-width:760px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .card .ico{font-size:34px;display:block;margin-bottom:8px}
+  .card .name{font-weight:700}
+  .card .hs{color:var(--dim);font-size:12px;margin-top:4px;min-height:14px}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:var(--accent);color:#04201c;border:0;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer}
+  button.btn:hover{filter:brightness(1.1)}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px}
+  .big{font-size:20px;font-weight:700}
+  table{border-collapse:collapse}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🧩 PUZZLE PACK</h1>
+    <div class="sub">Brain teasers — click or use the keyboard.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const GAMES=[
+  {id:'g2048',name:'2048',ico:'🔢'},
+  {id:'mines',name:'Minesweeper',ico:'💣'},
+  {id:'sudoku',name:'Sudoku',ico:'9️⃣'},
+  {id:'memory',name:'Memory Match',ico:'🃏'},
+  {id:'mastermind',name:'Mastermind',ico:'🎨'},
+  {id:'lights',name:'Lights Out',ico:'💡'},
+  {id:'sokoban',name:'Sokoban',ico:'📦'},
+  {id:'hanoi',name:'Tower of Hanoi',ico:'🗼'},
+  {id:'simon',name:'Simon',ico:'🟩'},
+  {id:'nonogram',name:'Nonogram',ico:'⬛'},
+  {id:'fifteen',name:'15-Puzzle',ico:'🔀'},
+];
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null;
+function hs(id){return +(localStorage.getItem('puz_'+id)||0)}
+function setHs(id,v){if(v>hs(id)){localStorage.setItem('puz_'+id,v);return true}return false}
+function setBest(id,v){const cur=localStorage.getItem('puz_'+id);if(cur===null||v<+cur){localStorage.setItem('puz_'+id,v);return true}return false} // lower=better
+function getBest(id){return localStorage.getItem('puz_'+id)}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';
+  GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+    d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${hs(gm.id)?'Best: '+hs(gm.id):'&nbsp;'}</div>`;
+    d.onclick=()=>launch(gm);g.appendChild(d);});}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
+function keyHandler(map){const dn=e=>{if(map[e.key]){map[e.key](e);if(e.key.startsWith('Arrow')||e.key===' ')e.preventDefault();}};window.addEventListener('keydown',dn);return ()=>window.removeEventListener('keydown',dn);}
+
+/* ---------------- 2048 ---------------- */
+function game_g2048(gm){
+  setHint('Arrow keys / WASD to slide tiles. Reach 2048!');
+  const N=4;let grid,score,won,lost;
+  const wrap=el('div',{style:'display:flex;flex-direction:column;align-items:center;gap:10px'});
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},70px);gap:8px;background:#1f2840;padding:8px;border-radius:10px`});
+  wrap.append(board);host.append(wrap);
+  function colorFor(v){const m={2:'#3a4666',4:'#43507a',8:'#5b6fb5',16:'#6f8fd0',32:'#5ec6c0',64:'#4cd0a0',128:'#e0b84a',256:'#e6a93a',512:'#e88f3a',1024:'#e86a4a',2048:'#e84a8a'};return m[v]||'#e84a8a';}
+  function draw(){board.innerHTML='';for(let i=0;i<N*N;i++){const v=grid[i];const cell=el('div',{style:`width:70px;height:70px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:${v>=1000?22:26}px;background:${v?colorFor(v):'#141a2e'};color:${v<=4?'#9fb0d0':'#fff'}`});cell.textContent=v||'';board.append(cell);}}
+  function add(){const empty=[];grid.forEach((v,i)=>{if(!v)empty.push(i);});if(empty.length)grid[empty[Math.floor(Math.random()*empty.length)]]=Math.random()<0.9?2:4;}
+  function reset(){grid=Array(N*N).fill(0);score=0;won=false;lost=false;add();add();draw();setStatus('Score: 0  •  Best: '+hs(gm.id));}
+  function line(arr){let a=arr.filter(x=>x);for(let i=0;i<a.length-1;i++){if(a[i]===a[i+1]){a[i]*=2;score+=a[i];if(a[i]===2048)won=true;a.splice(i+1,1);}}while(a.length<N)a.push(0);return a;}
+  function move(dir){let moved=false;const g2=grid.slice();
+    for(let i=0;i<N;i++){let idx=[];for(let j=0;j<N;j++){if(dir==='L')idx.push(i*N+j);if(dir==='R')idx.push(i*N+(N-1-j));if(dir==='U')idx.push(j*N+i);if(dir==='D')idx.push((N-1-j)*N+i);}
+      let vals=idx.map(k=>grid[k]);let nv=line(vals);idx.forEach((k,j)=>grid[k]=nv[j]);}
+    moved=g2.some((v,i)=>v!==grid[i]);
+    if(moved){add();draw();setHs(gm.id,score);setStatus('Score: '+score+'  •  Best: '+hs(gm.id));
+      if(won){setStatus('🎉 2048! Score: '+score);}
+      if(!canMove()){setStatus('Game Over — Score: '+score+'  (Enter restarts)');}
+    }
+  }
+  function canMove(){if(grid.some(v=>!v))return true;for(let i=0;i<N;i++)for(let j=0;j<N;j++){const v=grid[i*N+j];if(j<N-1&&v===grid[i*N+j+1])return true;if(i<N-1&&v===grid[(i+1)*N+j])return true;}return false;}
+  reset();
+  const off=keyHandler({ArrowLeft:()=>move('L'),ArrowRight:()=>move('R'),ArrowUp:()=>move('U'),ArrowDown:()=>move('D'),
+    a:()=>move('L'),d:()=>move('R'),w:()=>move('U'),s:()=>move('D'),Enter:()=>reset()});
+  return {stop:off};
+}
+
+/* ---------------- MINESWEEPER ---------------- */
+function game_mines(gm){
+  const N=10,MINES=15;let cells,over,win,flags,started;
+  setHint('Left-click reveal • Right-click flag. Clear all safe cells.');
+  const ctrl=el('div',{style:'display:flex;gap:8px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});ctrl.append(newBtn);
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},32px);gap:2px`});
+  host.append(ctrl,board);
+  function idx(r,c){return r*N+c;}
+  function neighbors(r,c){const out=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N)out.push([nr,nc]);}return out;}
+  function reset(){cells=[];over=false;win=false;flags=0;started=false;
+    for(let i=0;i<N*N;i++)cells.push({mine:false,rev:false,flag:false,n:0});draw();setStatus('Mines: '+MINES);}
+  function placeMines(safe){let placed=0;while(placed<MINES){const i=Math.floor(Math.random()*N*N);if(cells[i].mine||i===safe)continue;cells[i].mine=true;placed++;}
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(cells[idx(r,c)].mine)continue;cells[idx(r,c)].n=neighbors(r,c).filter(([nr,nc])=>cells[idx(nr,nc)].mine).length;}}
+  function reveal(r,c){const cell=cells[idx(r,c)];if(cell.rev||cell.flag)return;cell.rev=true;if(cell.n===0&&!cell.mine)neighbors(r,c).forEach(([nr,nc])=>reveal(nr,nc));}
+  function checkWin(){if(cells.every(c=>c.rev||c.mine)){win=over=true;setStatus('🎉 Cleared! '+(setHs(gm.id,1),''));}}
+  function draw(){board.innerHTML='';const COL=['','#6cf','#6f9','#f88','#c6f','#fb7','#5dd','#fff','#aaa'];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){const cell=cells[idx(r,c)];
+      const d=el('div',{style:`width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:4px;cursor:pointer;user-select:none;background:${cell.rev?'#0e1426':'#28324e'};color:${COL[cell.n]||'#fff'}`});
+      if(cell.rev){if(cell.mine)d.textContent='💣';else if(cell.n)d.textContent=cell.n;}
+      else if(cell.flag)d.textContent='🚩';
+      d.onclick=()=>{if(over)return;if(!started){placeMines(idx(r,c));started=true;}if(cell.flag)return;reveal(r,c);if(cell.mine){over=true;cells.forEach(x=>{if(x.mine)x.rev=true;});setStatus('💥 Boom! Game over');}else checkWin();draw();};
+      d.oncontextmenu=e=>{e.preventDefault();if(over||cell.rev)return;cell.flag=!cell.flag;flags+=cell.flag?1:-1;setStatus('Mines: '+(MINES-flags));draw();};
+      board.append(d);}}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- SUDOKU ---------------- */
+function game_sudoku(gm){
+  setHint('Click a cell, type 1-9. Fill the grid. (Backspace clears)');
+  let puzzle,solution,given,sel;
+  const ctrl=el('div',{style:'display:flex;gap:8px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Puzzle'});
+  const checkBtn=el('button',{className:'btn ghost',textContent:'Check'});
+  ctrl.append(newBtn,checkBtn);
+  const board=el('div',{style:'display:grid;grid-template-columns:repeat(9,38px);grid-template-rows:repeat(9,38px);background:#5ed;gap:1px;padding:3px;border-radius:6px'});
+  host.append(ctrl,board);
+  function gen(){const base=Array.from({length:9},()=>Array(9).fill(0));
+    function ok(b,r,c,v){for(let i=0;i<9;i++)if(b[r][i]===v||b[i][c]===v)return false;const br=r-r%3,bc=c-c%3;for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(b[br+i][bc+j]===v)return false;return true;}
+    function solve(b){for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(!b[r][c]){const nums=[1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);for(const v of nums){if(ok(b,r,c,v)){b[r][c]=v;if(solve(b))return true;b[r][c]=0;}}return false;}return true;}
+    solve(base);solution=base.map(r=>r.slice());
+    puzzle=base.map(r=>r.slice());let removed=0;while(removed<48){const r=Math.floor(Math.random()*9),c=Math.floor(Math.random()*9);if(puzzle[r][c]){puzzle[r][c]=0;removed++;}}
+    given=puzzle.map(r=>r.map(v=>v!==0));}
+  function draw(){board.innerHTML='';for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    const v=puzzle[r][c];const isG=given[r][c];
+    const bord=`border-right:${c%3===2&&c<8?'2px solid #5ed':'none'};border-bottom:${r%3===2&&r<8?'2px solid #5ed':'none'}`;
+    const d=el('div',{style:`width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-weight:${isG?800:500};font-size:20px;background:${sel&&sel[0]===r&&sel[1]===c?'#243a55':'#121a2e'};color:${isG?'#5ed':'#fff'};cursor:pointer;${bord}`});
+    d.textContent=v||'';d.onclick=()=>{if(!isG){sel=[r,c];draw();}};board.append(d);}}
+  function reset(){gen();sel=null;draw();setStatus('New puzzle');}
+  newBtn.onclick=reset;
+  checkBtn.onclick=()=>{let full=true,correct=true;for(let r=0;r<9;r++)for(let c=0;c<9;c++){if(!puzzle[r][c])full=false;else if(puzzle[r][c]!==solution[r][c])correct=false;}
+    setStatus(!full?'Not finished yet':correct?'🎉 Solved correctly!':'❌ Some cells are wrong');if(full&&correct)setHs(gm.id,1);};
+  const off=keyHandler({_:0});
+  const dn=e=>{if(!sel)return;const[r,c]=sel;if(given[r][c])return;if(e.key>='1'&&e.key<='9'){puzzle[r][c]=+e.key;draw();}if(e.key==='Backspace'||e.key==='0'||e.key==='Delete'){puzzle[r][c]=0;draw();}};
+  window.addEventListener('keydown',dn);
+  reset();
+  return {stop:()=>{off();window.removeEventListener('keydown',dn);}};
+}
+
+/* ---------------- MEMORY MATCH ---------------- */
+function game_memory(gm){
+  setHint('Flip two cards to find matching pairs. Fewer moves = better.');
+  const EMO=['🍎','🚀','🐶','🌟','🎸','⚽','🍕','🎲'];
+  let deck,flipped,matched,moves,lock;
+  const info=el('div',{});
+  const board=el('div',{style:'display:grid;grid-template-columns:repeat(4,72px);gap:8px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(newBtn,board);
+  function reset(){deck=[...EMO,...EMO].map((e,i)=>({e,id:i})).sort(()=>Math.random()-0.5);flipped=[];matched=new Set();moves=0;lock=false;draw();setStatus('Moves: 0  •  Best: '+(hs(gm.id)||'—'));}
+  function draw(){board.innerHTML='';deck.forEach((card,i)=>{const up=flipped.includes(i)||matched.has(i);
+    const d=el('div',{style:`width:72px;height:72px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer;background:${up?'#243a55':'#5ed'};transition:background .2s`});
+    d.textContent=up?card.e:'';
+    d.onclick=()=>{if(lock||up)return;flipped.push(i);draw();
+      if(flipped.length===2){moves++;lock=true;const[a,b]=flipped;
+        if(deck[a].e===deck[b].e){matched.add(a);matched.add(b);flipped=[];lock=false;draw();
+          if(matched.size===deck.length){const best=hs(gm.id);if(!best||moves<best)localStorage.setItem('puz_'+gm.id,moves);setStatus('🎉 Done in '+moves+' moves!  Best: '+hs(gm.id));}
+          else setStatus('Moves: '+moves);}
+        else setTimeout(()=>{flipped=[];lock=false;draw();setStatus('Moves: '+moves);},700);}
+    };board.append(d);});}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- MASTERMIND ---------------- */
+function game_mastermind(gm){
+  setHint('Guess the 4-color code in 10 tries. ● right spot, ○ right color.');
+  const COLS=['#f55','#5f5','#56f','#fd5','#f5f','#5ff'];
+  let secret,rows,cur,done;
+  const palette=el('div',{style:'display:flex;gap:6px;margin-bottom:6px'});
+  const guessRow=el('div',{style:'display:flex;gap:6px;align-items:center'});
+  const history=el('div',{style:'display:flex;flex-direction:column;gap:5px'});
+  const submitBtn=el('button',{className:'btn',textContent:'Guess'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New'});
+  host.append(palette,el('div',{style:'display:flex;gap:8px'},guessRow,submitBtn,newBtn),history);
+  function dot(color,sz=30){return el('div',{style:`width:${sz}px;height:${sz}px;border-radius:50%;background:${color};border:1px solid #0006`});}
+  function reset(){secret=Array.from({length:4},()=>Math.floor(Math.random()*6));rows=[];cur=[];done=false;drawPalette();drawGuess();history.innerHTML='';setStatus('Tries left: 10');}
+  function drawPalette(){palette.innerHTML='';COLS.forEach((c,i)=>{const d=dot(c,34);d.style.cursor='pointer';d.onclick=()=>{if(done)return;if(cur.length<4){cur.push(i);drawGuess();}};palette.append(d);});}
+  function drawGuess(){guessRow.innerHTML='';for(let i=0;i<4;i++){const d=dot(cur[i]!=null?COLS[cur[i]]:'#222');d.style.cursor='pointer';d.onclick=()=>{if(done)return;cur.splice(i,1);drawGuess();};guessRow.append(d);}}
+  function score(g){let exact=0,color=0;const s=secret.slice(),gg=g.slice();
+    for(let i=0;i<4;i++)if(gg[i]===s[i]){exact++;s[i]=gg[i]=-1;}
+    for(let i=0;i<4;i++)if(gg[i]>=0){const j=s.indexOf(gg[i]);if(j>=0){color++;s[j]=-1;}}return{exact,color};}
+  submitBtn.onclick=()=>{if(done||cur.length<4)return;const{exact,color}=score(cur);
+    const row=el('div',{style:'display:flex;gap:6px;align-items:center;background:#192238;padding:5px 8px;border-radius:8px'});
+    cur.forEach(c=>row.append(dot(COLS[c],24)));
+    const peg=el('div',{style:'margin-left:8px;font-size:16px'});peg.textContent='●'.repeat(exact)+'○'.repeat(color)+'·'.repeat(4-exact-color);row.append(peg);
+    history.prepend(row);rows.push(cur.slice());
+    if(exact===4){done=true;setStatus('🎉 Cracked in '+rows.length+'! Best: '+(setHs(gm.id,11-rows.length),hs(gm.id)));}
+    else if(rows.length>=10){done=true;setStatus('Out of tries! Code was: '+secret.map(i=>'■').join('')+' (revealed below)');const rev=el('div',{style:'display:flex;gap:6px;margin-top:6px'});secret.forEach(c=>rev.append(dot(COLS[c],24)));history.prepend(rev);}
+    else setStatus('Tries left: '+(10-rows.length));
+    cur=[];drawGuess();};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- LIGHTS OUT ---------------- */
+function game_lights(gm){
+  setHint('Click a light to toggle it and its neighbors. Turn all OFF.');
+  const N=5;let grid,moves;
+  const newBtn=el('button',{className:'btn',textContent:'New Puzzle'});
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},60px);gap:6px`});
+  host.append(newBtn,board);
+  function reset(){grid=Array(N*N).fill(false);moves=0;for(let k=0;k<12;k++){const i=Math.floor(Math.random()*N*N);press(Math.floor(i/N),i%N,true);}moves=0;draw();setStatus('Moves: 0');}
+  function press(r,c,silent){[[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N)grid[nr*N+nc]=!grid[nr*N+nc];});if(!silent)moves++;}
+  function draw(){board.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<N;c++){const on=grid[r*N+c];
+    const d=el('div',{style:`width:60px;height:60px;border-radius:10px;cursor:pointer;background:${on?'#fd5':'#1a2238'};box-shadow:${on?'0 0 14px #fd5a':'none'};transition:.1s`});
+    d.onclick=()=>{press(r,c);draw();if(grid.every(v=>!v)){setStatus('🎉 Solved in '+moves+' moves! Best: '+(setHs(gm.id,100-moves),Math.max(0,100-(getBest(gm.id)?0:0)),moves));const b=getBest(gm.id);if(b===null||moves<+(localStorage.getItem('puz_best_'+gm.id)||1e9)){}localStorage.setItem('puz_'+gm.id,Math.max(hs(gm.id),1));setStatus('🎉 Solved in '+moves+' moves!');}else setStatus('Moves: '+moves);};
+    board.append(d);}}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- SOKOBAN ---------------- */
+function game_sokoban(gm){
+  setHint('Arrow keys to push boxes 📦 onto targets ⭐. R to reset level.');
+  const LEVELS=[
+   ["#######","#  .  #","#  $  #","#@ $ .#","#     #","#######"],
+   ["########","#   . .#","# $$   #","# @ ## #","#   .. #","# $$   #","########"],
+   ["#######","#. #  #","#  $  #","#.$@$.#","#  $  #","#  #. #","#######"]
+  ];
+  let lvl,map,px,py,moves;
+  const info=el('div',{style:'display:flex;gap:8px'});
+  const prevB=el('button',{className:'btn ghost',textContent:'◀ Prev'});
+  const nextB=el('button',{className:'btn ghost',textContent:'Next ▶'});
+  const resetB=el('button',{className:'btn',textContent:'Reset'});
+  info.append(prevB,resetB,nextB);
+  const board=el('div',{style:'font-family:monospace;font-size:30px;line-height:30px;letter-spacing:4px'});
+  host.append(info,board);
+  function load(){const L=LEVELS[lvl];map=L.map(r=>r.split(''));moves=0;
+    for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++){if(map[r][c]==='@'){px=c;py=r;map[r][c]=' ';}if(map[r][c]==='+'){px=c;py=r;map[r][c]='.';}}draw();}
+  function targets(){let t=[];for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++)if(map[r][c]==='.'||map[r][c]==='*')t.push([r,c]);return t;}
+  function draw(){board.innerHTML='';for(let r=0;r<map.length;r++){let line='';for(let c=0;c<map[r].length;c++){if(r===py&&c===px)line+='😀';else{const ch=map[r][c];line+=ch==='#'?'🟫':ch==='$'?'📦':ch==='*'?'✅':ch==='.'?'⭐':'　';}}
+    board.append(el('div',{textContent:line}));}
+    const t=targets();const done=t.every(([r,c])=>map[r][c]==='*');
+    setStatus('Level '+(lvl+1)+'/'+LEVELS.length+'  •  Moves: '+moves+(done?'  🎉 Solved!':''));
+    if(done)setHs(gm.id,lvl+1);}
+  function at(r,c){return (map[r]&&map[r][c])||'#';}
+  function move(dx,dy){const nx=px+dx,ny=py+dy;const dest=at(ny,nx);
+    if(dest==='#')return;
+    if(dest==='$'||dest==='*'){const bx=nx+dx,by=ny+dy;const bd=at(by,bx);if(bd==='#'||bd==='$'||bd==='*')return;
+      map[by][bx]=(bd==='.')?'*':'$';map[ny][nx]=(dest==='*')?'.':' ';}
+    px=nx;py=ny;moves++;draw();}
+  const off=keyHandler({ArrowUp:()=>move(0,-1),ArrowDown:()=>move(0,1),ArrowLeft:()=>move(-1,0),ArrowRight:()=>move(1,0),r:()=>load(),R:()=>load()});
+  prevB.onclick=()=>{lvl=(lvl-1+LEVELS.length)%LEVELS.length;load();};
+  nextB.onclick=()=>{lvl=(lvl+1)%LEVELS.length;load();};
+  resetB.onclick=()=>load();
+  lvl=0;load();
+  return {stop:off};
+}
+
+/* ---------------- TOWER OF HANOI ---------------- */
+function game_hanoi(gm){
+  setHint('Click a tower to pick up / drop the top disk. Move the stack to the right peg.');
+  let n=4,pegs,sel,moves;
+  const ctrl=el('div',{style:'display:flex;gap:8px;align-items:center'});
+  const sizeSel=el('select',{style:'padding:6px;border-radius:8px;background:#192238;color:#fff;border:1px solid #34406a'});
+  [3,4,5,6].forEach(v=>sizeSel.append(el('option',{value:v,textContent:v+' disks'})));sizeSel.value=4;
+  const newBtn=el('button',{className:'btn',textContent:'New'});
+  ctrl.append(sizeSel,newBtn);
+  const board=el('div',{style:'display:flex;gap:20px;justify-content:center;align-items:flex-end;height:220px;width:560px'});
+  host.append(ctrl,board);
+  const COLS=['#f55','#fa5','#fd5','#5f5','#5ff','#a5f'];
+  function reset(){n=+sizeSel.value;pegs=[[],[],[]];for(let i=n;i>=1;i--)pegs[0].push(i);sel=null;moves=0;draw();setStatus('Moves: 0  •  Min: '+((1<<n)-1));}
+  function draw(){board.innerHTML='';pegs.forEach((peg,pi)=>{
+    const col=el('div',{style:`position:relative;width:170px;height:200px;display:flex;flex-direction:column-reverse;align-items:center;cursor:pointer;border-bottom:6px solid #5ed;background:linear-gradient(#0000,#0000)`});
+    const rod=el('div',{style:'position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:8px;height:180px;background:#34406a;border-radius:4px'});col.append(rod);
+    peg.forEach(d=>{col.append(el('div',{style:`z-index:1;height:24px;width:${30+d*22}px;border-radius:6px;background:${COLS[d-1]};margin-bottom:3px;border:1px solid #0006;${sel===pi&&peg[peg.length-1]===d?'outline:3px solid #fff':''}`}));});
+    col.onclick=()=>{if(sel===null){if(peg.length)sel=pi;}else{if(sel!==pi){const from=pegs[sel],to=pegs[pi];if(!to.length||to[to.length-1]>from[from.length-1]){to.push(from.pop());moves++;}}sel=null;}
+      draw();if(pegs[2].length===n){setHs(gm.id,1);setStatus('🎉 Solved in '+moves+' moves! (min '+((1<<n)-1)+')');}else setStatus('Moves: '+moves+'  •  Min: '+((1<<n)-1));};
+    board.append(col);});}
+  newBtn.onclick=reset;sizeSel.onchange=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- SIMON ---------------- */
+function game_simon(gm){
+  setHint('Watch the sequence, then repeat it. It grows each round.');
+  const COLS=[{c:'#e44',a:'#f99',f:330},{c:'#4d4',a:'#9f9',f:392},{c:'#46f',a:'#9bf',f:262},{c:'#ed4',a:'#ff9',f:494}];
+  let seq,input,playing,round;
+  const board=el('div',{style:'display:grid;grid-template-columns:repeat(2,120px);gap:10px;border-radius:14px'});
+  const startBtn=el('button',{className:'btn',textContent:'Start'});
+  const pads=COLS.map((cc,i)=>{const p=el('div',{style:`width:120px;height:120px;border-radius:14px;background:${cc.c};opacity:.6;cursor:pointer`});board.append(p);return p;});
+  host.append(startBtn,board);
+  let actx;
+  function beep(f){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.value=0.2;o.start();setTimeout(()=>{o.stop();},250);}catch(e){}}
+  function flash(i){pads[i].style.opacity='1';beep(COLS[i].f);setTimeout(()=>pads[i].style.opacity='.6',300);}
+  function playSeq(){playing=true;let k=0;const iv=setInterval(()=>{flash(seq[k]);k++;if(k>=seq.length){clearInterval(iv);playing=false;input=[];}},650);}
+  function reset(){seq=[];round=0;next();}
+  function next(){round++;seq.push(Math.floor(Math.random()*4));setStatus('Round '+round+'  •  Best: '+hs(gm.id));setTimeout(playSeq,500);}
+  pads.forEach((p,i)=>p.onclick=()=>{if(playing||!seq.length)return;flash(i);input.push(i);
+    const k=input.length-1;if(input[k]!==seq[k]){setStatus('❌ Wrong! Reached round '+round+'. Best: '+(setHs(gm.id,round-1),hs(gm.id)));seq=[];return;}
+    if(input.length===seq.length){setHs(gm.id,round);next();}});
+  startBtn.onclick=reset;
+  setStatus('Press Start  •  Best: '+hs(gm.id));
+  return {stop:()=>{if(actx&&actx.close)actx.close();}};
+}
+
+/* ---------------- NONOGRAM ---------------- */
+function game_nonogram(gm){
+  setHint('Use the number clues to fill the right cells. Left-click fill, right-click mark X.');
+  const N=5;let sol,grid;
+  const newBtn=el('button',{className:'btn',textContent:'New Puzzle'});
+  const checkBtn=el('button',{className:'btn ghost',textContent:'Check'});
+  const cont=el('div',{});
+  host.append(el('div',{style:'display:flex;gap:8px'},newBtn,checkBtn),cont);
+  function clues(arr){const out=[];let cnt=0;arr.forEach(v=>{if(v){cnt++;}else{if(cnt)out.push(cnt);cnt=0;}});if(cnt)out.push(cnt);return out.length?out:[0];}
+  function reset(){sol=Array.from({length:N*N},()=>Math.random()<0.55?1:0);grid=Array(N*N).fill(0);draw();setStatus('Fill the grid');}
+  function draw(){cont.innerHTML='';
+    const rowClues=[],colClues=[];
+    for(let r=0;r<N;r++)rowClues.push(clues(sol.slice(r*N,r*N+N)));
+    for(let c=0;c<N;c++){const col=[];for(let r=0;r<N;r++)col.push(sol[r*N+c]);colClues.push(clues(col));}
+    const tbl=el('table',{});
+    const top=el('tr',{});top.append(el('td',{}));
+    colClues.forEach(cc=>{const td=el('td',{style:'vertical-align:bottom;text-align:center;color:#5ed;font-size:13px;font-weight:700;padding:2px'});td.innerHTML=cc.join('<br>');top.append(td);});
+    tbl.append(top);
+    for(let r=0;r<N;r++){const tr=el('tr',{});const lc=el('td',{style:'text-align:right;color:#5ed;font-size:13px;font-weight:700;padding-right:6px;white-space:nowrap'});lc.textContent=rowClues[r].join(' ');tr.append(lc);
+      for(let c=0;c<N;c++){const i=r*N+c;const v=grid[i];
+        const td=el('td',{style:'padding:0'});
+        const d=el('div',{style:`width:42px;height:42px;border:1px solid #34406a;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;background:${v===1?'#5ed':'#121a2e'};color:#f88`});
+        if(v===2)d.textContent='✕';
+        d.onclick=()=>{grid[i]=grid[i]===1?0:1;draw();};
+        d.oncontextmenu=e=>{e.preventDefault();grid[i]=grid[i]===2?0:2;draw();};
+        td.append(d);tr.append(td);}
+      tbl.append(tr);}
+    cont.append(tbl);}
+  checkBtn.onclick=()=>{const ok=sol.every((v,i)=>(v===1)===(grid[i]===1));setStatus(ok?'🎉 Correct!':'❌ Not solved yet');if(ok)setHs(gm.id,1);};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- 15 PUZZLE ---------------- */
+function game_fifteen(gm){
+  setHint('Click a tile next to the gap to slide it. Order 1-15.');
+  const N=4;let tiles,moves;
+  const newBtn=el('button',{className:'btn',textContent:'Shuffle'});
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},66px);gap:6px`});
+  host.append(newBtn,board);
+  function solved(){for(let i=0;i<15;i++)if(tiles[i]!==i+1)return false;return true;}
+  function reset(){tiles=[...Array(15).keys()].map(x=>x+1);tiles.push(0);
+    for(let k=0;k<300;k++){const z=tiles.indexOf(0);const opts=[];const r=Math.floor(z/N),c=z%N;if(r>0)opts.push(z-N);if(r<N-1)opts.push(z+N);if(c>0)opts.push(z-1);if(c<N-1)opts.push(z+1);const m=opts[Math.floor(Math.random()*opts.length)];[tiles[z],tiles[m]]=[tiles[m],tiles[z]];}
+    moves=0;draw();setStatus('Moves: 0  •  Best: '+(hs(gm.id)||'—'));}
+  function draw(){board.innerHTML='';tiles.forEach((v,i)=>{
+    const d=el('div',{style:`width:66px;height:66px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;cursor:pointer;background:${v?'#5ed':'transparent'};color:#04201c`});
+    d.textContent=v||'';d.onclick=()=>{const z=tiles.indexOf(0);const r=Math.floor(i/N),c=i%N,zr=Math.floor(z/N),zc=z%N;
+      if(Math.abs(r-zr)+Math.abs(c-zc)===1){[tiles[i],tiles[z]]=[tiles[z],tiles[i]];moves++;draw();
+        if(solved()){const b=hs(gm.id);if(!b||moves<b)localStorage.setItem('puz_'+gm.id,moves);setStatus('🎉 Solved in '+moves+' moves! Best: '+hs(gm.id));}
+        else setStatus('Moves: '+moves);}};
+    board.append(d);});}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+applyTheme(localStorage.getItem('theme')||'light');
+buildMenu();
+</script>
+</body>
+</html>

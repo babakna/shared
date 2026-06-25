@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids & Family Pack</title>
+<style>
+  :root{--bg:#fff0f6;--panel:#ffffff;--accent:#e85a9c;--accent2:#7b5ce0;--text:#3a1d33;--dim:#9a7a90;--border:#f3d6e4;}
+  html[data-theme="dark"]{--bg:#1d0f1a;--panel:#2c1726;--accent:#ff8ac0;--accent2:#b79cff;--text:#ffe8f4;--dim:#c89ab4;--border:#43283a;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  #host{max-width:100%;overflow-x:auto}.wrap{max-width:100%}
+  @media (max-width:560px){#app{padding:10px}h1{font-size:24px}.bar{gap:8px}}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  #app{max-width:820px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 14px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-3px) scale(1.02);border-color:var(--accent)}
+  .card .ico{font-size:38px;display:block;margin-bottom:8px}
+  .card .name{font-weight:700}.card .hs{color:var(--dim);font-size:12px;margin-top:4px;min-height:14px}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:9px 16px;font-weight:700;cursor:pointer}
+  button.btn:hover{filter:brightness(1.08)}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px;max-width:620px}
+  .big{font-size:18px;font-weight:700}
+  canvas{border-radius:14px;border:1px solid var(--border);background:#fff;touch-action:none;max-width:100%;height:auto}
+  input,select{padding:8px;border-radius:10px;background:var(--panel);color:var(--text);border:1px solid var(--border);font-size:15px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🌈 KIDS & FAMILY</h1>
+    <div class="sub">Colorful, friendly games — perfect for ages 8+ and the whole family.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const GAMES=[
+  {id:'pet',name:'Virtual Pet',ico:'🐱'},
+  {id:'match3',name:'Gem Crush',ico:'💎'},
+  {id:'dressup',name:'Dress-Up Studio',ico:'👗'},
+  {id:'paint',name:'Pixel Coloring',ico:'🎨'},
+  {id:'draw',name:'Drawing Pad',ico:'✏️'},
+  {id:'piano',name:'Piano',ico:'🎹'},
+  {id:'bubble',name:'Bubble Pop',ico:'🫧'},
+  {id:'catch',name:'Catch the Fruit',ico:'🍓'},
+  {id:'maze',name:'Maze Run',ico:'🌽'},
+  {id:'emoji',name:'Emoji Quiz',ico:'😀'},
+  {id:'madlibs',name:'Silly Stories',ico:'📖'},
+  {id:'eightball',name:'Magic 8-Ball',ico:'🔮'},
+];
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null;
+function hs(id){return +(localStorage.getItem('kid_'+id)||0)}
+function setHs(id,v){if(v>hs(id)){localStorage.setItem('kid_'+id,v);return true}return false}
+function getRaw(id){return localStorage.getItem('kid_'+id)}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+  d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${hs(gm.id)?'Best: '+hs(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+function mkCanvas(w,h){const c=el('canvas',{width:w,height:h});host.append(c);return c;}
+function loop(fn){let raf,last=performance.now(),live=true;function step(t){if(!live)return;const dt=Math.min(50,t-last)/16.667;last=t;fn(dt);raf=requestAnimationFrame(step);}raf=requestAnimationFrame(step);return ()=>{live=false;cancelAnimationFrame(raf);};}
+let audioCtx;function beep(freq,dur=0.3,type='sine',vol=0.2){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+dur);o.stop(audioCtx.currentTime+dur);}catch(e){}}
+
+/* ---------------- VIRTUAL PET ---------------- */
+function game_pet(gm){
+  setHint('Keep your pet happy! Feed, play, and let it rest. Watch the meters so none hit zero.');
+  let S,timer;
+  function reset(){S={hunger:80,happy:80,energy:80,age:0,alive:true,name:'Mochi'};}
+  reset();
+  const face=el('div',{style:'font-size:90px'});
+  const nameEl=el('div',{className:'big'});
+  const bars=el('div',{style:'display:flex;flex-direction:column;gap:8px;width:280px'});
+  const btns=el('div',{className:'row'});
+  const feed=el('button',{className:'btn',textContent:'🍖 Feed'});
+  const play=el('button',{className:'btn',textContent:'🎾 Play'});
+  const sleep=el('button',{className:'btn',textContent:'😴 Rest'});
+  const wash=el('button',{className:'btn',textContent:'🛁 Wash'});
+  btns.append(feed,play,sleep,wash);
+  host.append(nameEl,face,bars,btns);
+  function bar(label,val,color){const w=el('div',{});w.append(el('div',{textContent:label+' '+Math.round(val)+'%',style:'font-size:13px;margin-bottom:2px'}));
+    const outer=el('div',{style:'height:14px;background:var(--border);border-radius:7px;overflow:hidden'});
+    outer.append(el('div',{style:`height:100%;width:${Math.max(0,val)}%;background:${color};transition:.3s`}));w.append(outer);return w;}
+  function mood(){if(!S.alive)return'💀';const avg=(S.hunger+S.happy+S.energy)/3;if(avg>70)return'😸';if(avg>45)return'🐱';if(avg>20)return'😿';return'🙀';}
+  function draw(){nameEl.textContent=S.name+'  •  Age: '+Math.floor(S.age)+' days';face.textContent=mood();
+    bars.innerHTML='';bars.append(bar('🍖 Hunger',S.hunger,'#e85a9c'),bar('😊 Happy',S.happy,'#7b5ce0'),bar('⚡ Energy',S.energy,'#5ab8e8'));
+    setStatus(S.alive?'Take good care of '+S.name+'!  •  Best age: '+hs(gm.id):'😢 '+S.name+' needs a fresh start');
+    [feed,play,sleep,wash].forEach(b=>b.disabled=!S.alive);}
+  feed.onclick=()=>{S.hunger=Math.min(100,S.hunger+25);beep(660,0.15);draw();};
+  play.onclick=()=>{S.happy=Math.min(100,S.happy+25);S.energy=Math.max(0,S.energy-10);beep(880,0.15);draw();};
+  sleep.onclick=()=>{S.energy=Math.min(100,S.energy+30);beep(440,0.25);draw();};
+  wash.onclick=()=>{S.happy=Math.min(100,S.happy+12);beep(720,0.15);draw();};
+  timer=setInterval(()=>{if(!S.alive)return;S.hunger-=3;S.happy-=2;S.energy-=2;S.age+=0.2;setHs(gm.id,Math.floor(S.age));
+    if(S.hunger<=0||S.happy<=0||S.energy<=0){S.alive=false;face.textContent='💤';nameEl.textContent=S.name+' got too sad and ran away after '+Math.floor(S.age)+' days. Press Reset!';}
+    draw();},1500);
+  const resetBtn=el('button',{className:'btn ghost',textContent:'🔄 New Pet'});resetBtn.onclick=()=>{reset();draw();};host.append(resetBtn);
+  draw();
+  return {stop:()=>clearInterval(timer)};
+}
+
+/* ---------------- GEM CRUSH (match-3) ---------------- */
+function game_match3(gm){
+  setHint('Swap two touching gems to line up 3+ of the same. You have 20 swaps — score as high as you can!');
+  const N=8,GEMS=['💎','🍓','⭐','🍋','🫐','🍊'];let g,sel,score,movesLeft,busy;
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},44px);gap:3px;background:var(--panel);padding:6px;border-radius:12px`});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(board,newBtn);
+  function rnd(){return Math.floor(Math.random()*GEMS.length);}
+  function reset(){g=Array.from({length:N*N},rnd);while(findMatches().size)resolveOnce();score=0;movesLeft=20;sel=-1;busy=false;draw();}
+  function idx(r,c){return r*N+c;}
+  function findMatches(){const m=new Set();
+    for(let r=0;r<N;r++)for(let c=0;c<N-2;c++){const v=g[idx(r,c)];if(v!=null&&v===g[idx(r,c+1)]&&v===g[idx(r,c+2)]){m.add(idx(r,c));m.add(idx(r,c+1));m.add(idx(r,c+2));let cc=c+3;while(cc<N&&g[idx(r,cc)]===v){m.add(idx(r,cc));cc++;}}}
+    for(let c=0;c<N;c++)for(let r=0;r<N-2;r++){const v=g[idx(r,c)];if(v!=null&&v===g[idx(r+1,c)]&&v===g[idx(r+2,c)]){m.add(idx(r,c));m.add(idx(r+1,c));m.add(idx(r+2,c));let rr=r+3;while(rr<N&&g[idx(rr,c)]===v){m.add(idx(rr,c));rr++;}}}
+    return m;}
+  function resolveOnce(){const m=findMatches();if(!m.size)return 0;m.forEach(i=>g[i]=null);
+    // gravity
+    for(let c=0;c<N;c++){let col=[];for(let r=N-1;r>=0;r--)if(g[idx(r,c)]!=null)col.push(g[idx(r,c)]);
+      for(let r=N-1;r>=0;r--){g[idx(r,c)]=col.length?col.shift():rnd();}}
+    return m.size;}
+  function cascade(){let total=0,got;do{got=resolveOnce();total+=got;}while(got);if(total)score+=total*10;return total;}
+  function draw(){board.innerHTML='';g.forEach((v,i)=>{const d=el('div',{textContent:GEMS[v],style:`width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border-radius:10px;background:${sel===i?'var(--accent)':'transparent'};transition:.1s`});
+    d.onclick=()=>click(i);board.append(d);});
+    setStatus('Score: '+score+'  •  Swaps left: '+movesLeft+'  •  Best: '+hs(gm.id));}
+  function adjacent(a,b){const r1=Math.floor(a/N),c1=a%N,r2=Math.floor(b/N),c2=b%N;return Math.abs(r1-r2)+Math.abs(c1-c2)===1;}
+  function click(i){if(busy||movesLeft<=0)return;
+    if(sel===-1){sel=i;draw();return;}
+    if(i===sel){sel=-1;draw();return;}
+    if(adjacent(sel,i)){[g[sel],g[i]]=[g[i],g[sel]];
+      if(findMatches().size){movesLeft--;sel=-1;busy=true;draw();setTimeout(()=>{cascade();busy=false;draw();if(movesLeft<=0)finish();},180);}
+      else{[g[sel],g[i]]=[g[i],g[sel]];sel=-1;draw();}}
+    else{sel=i;draw();}}
+  function finish(){setHs(gm.id,score);setStatus('🎉 Out of swaps! Final score: '+score+'  •  Best: '+hs(gm.id));}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- DRESS-UP STUDIO ---------------- */
+function game_dressup(gm){
+  setHint('Mix and match to design a character! Pick a face, hair, outfit, accessory and background.');
+  const PARTS={
+    bg:['🌸','🌈','⭐','🌙','🏰','🌊'],
+    face:['😊','😄','😎','🥰','😺','🦄'],
+    hair:['👩‍🦰','👱‍♀️','👩‍🦱','👩','🧑‍🎤','👸'],
+    outfit:['👗','👚','🦺','🧥','👕','🥻'],
+    acc:['👑','🎀','🕶️','🎩','💎','🧣'],
+  };
+  let pick={bg:0,face:0,hair:0,outfit:0,acc:0};
+  const stage=el('div',{style:'position:relative;width:240px;height:240px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:120px;background:var(--panel);border:2px solid var(--border)'});
+  const bgEl=el('div',{style:'position:absolute;font-size:200px;opacity:.25'});
+  const charEl=el('div',{style:'position:relative;display:flex;flex-direction:column;align-items:center;line-height:.8'});
+  stage.append(bgEl,charEl);
+  const controls=el('div',{style:'display:flex;flex-direction:column;gap:8px'});
+  host.append(stage,controls);
+  function row(key,label){const r=el('div',{className:'row'});r.append(el('span',{textContent:label,style:'width:90px;text-align:right;color:var(--dim);font-size:13px'}));
+    const prev=el('button',{className:'btn ghost',textContent:'◀'});const show=el('div',{style:'font-size:30px;width:50px;text-align:center'});const next=el('button',{className:'btn ghost',textContent:'▶'});
+    prev.onclick=()=>{pick[key]=(pick[key]-1+PARTS[key].length)%PARTS[key].length;draw();};
+    next.onclick=()=>{pick[key]=(pick[key]+1)%PARTS[key].length;draw();};
+    r.append(prev,show,next);r._show=show;return r;}
+  const rows={bg:row('bg','Background'),acc:row('acc','Accessory'),hair:row('hair','Hair'),face:row('face','Face'),outfit:row('outfit','Outfit')};
+  Object.values(rows).forEach(r=>controls.append(r));
+  const randomBtn=el('button',{className:'btn',textContent:'🎲 Surprise Me!'});
+  controls.append(randomBtn);
+  randomBtn.onclick=()=>{Object.keys(pick).forEach(k=>pick[k]=Math.floor(Math.random()*PARTS[k].length));draw();};
+  function draw(){bgEl.textContent=PARTS.bg[pick.bg];
+    charEl.innerHTML='';charEl.append(el('div',{textContent:PARTS.acc[pick.acc],style:'font-size:30px'}),el('div',{textContent:PARTS.hair[pick.hair],style:'font-size:64px;margin:-10px 0'}),el('div',{textContent:PARTS.outfit[pick.outfit],style:'font-size:54px;margin-top:-12px'}));
+    Object.keys(rows).forEach(k=>rows[k]._show.textContent=PARTS[k][pick[k]]);
+    setStatus('Design your dream character! 💕');}
+  draw();
+  return {stop:()=>{}};
+}
+
+/* ---------------- PIXEL COLORING ---------------- */
+function game_paint(gm){
+  setHint('Pick a color and tap squares to color. Try making a flower, heart, or rainbow!');
+  const N=16,S=24;let color='#e85a9c',painting=false;
+  const COLORS=['#e85a9c','#ff7eb3','#ffd166','#ffe066','#06d6a0','#4cc9f0','#7b5ce0','#b56cff','#ff5252','#ff8a3d','#ffffff','#222222'];
+  const palette=el('div',{className:'row'});
+  COLORS.forEach(c=>{const sw=el('div',{style:`width:30px;height:30px;border-radius:8px;background:${c};cursor:pointer;border:2px solid var(--border)`});sw.onclick=()=>{color=c;updateSel();};sw._c=c;palette.append(sw);});
+  const c=mkCanvas(N*S,N*S);const ctx=c.getContext('2d');
+  const tools=el('div',{className:'row'});
+  const eraser=el('button',{className:'btn ghost',textContent:'🧽 Eraser'});
+  const clear=el('button',{className:'btn ghost',textContent:'🗑️ Clear'});
+  const save=el('button',{className:'btn',textContent:'💾 Save PNG'});
+  tools.append(eraser,clear,save);
+  host.append(palette,c,tools);
+  function updateSel(){[...palette.children].forEach(s=>s.style.outline=s._c===color?'3px solid var(--text)':'none');}
+  function grid(){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.strokeStyle='#eee';for(let i=0;i<=N;i++){ctx.beginPath();ctx.moveTo(i*S,0);ctx.lineTo(i*S,N*S);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*S);ctx.lineTo(N*S,i*S);ctx.stroke();}}
+  let cells=Array(N*N).fill('#fff');
+  function redraw(){grid();cells.forEach((col,i)=>{if(col!=='#fff'){ctx.fillStyle=col;ctx.fillRect((i%N)*S+1,Math.floor(i/N)*S+1,S-2,S-2);}});}
+  function paintAt(e){const r=c.getBoundingClientRect();const x=Math.floor((e.clientX-r.left)*(c.width/r.width)/S),y=Math.floor((e.clientY-r.top)*(c.height/r.height)/S);if(x<0||x>=N||y<0||y>=N)return;cells[y*N+x]=color;redraw();}
+  c.addEventListener('mousedown',e=>{painting=true;paintAt(e);});
+  c.addEventListener('mousemove',e=>{if(painting)paintAt(e);});
+  window.addEventListener('mouseup',()=>painting=false);
+  c.addEventListener('touchstart',e=>{e.preventDefault();paintAt(e.touches[0]);});
+  c.addEventListener('touchmove',e=>{e.preventDefault();paintAt(e.touches[0]);});
+  eraser.onclick=()=>{color='#fff';updateSel();};
+  clear.onclick=()=>{cells=Array(N*N).fill('#fff');redraw();};
+  save.onclick=()=>{const a=el('a',{href:c.toDataURL(),download:'my-art.png'});a.click();};
+  updateSel();redraw();setStatus('Have fun coloring! 🎨');
+  return {stop:()=>window.removeEventListener('mouseup',()=>{})};
+}
+
+/* ---------------- DRAWING PAD ---------------- */
+function game_draw(gm){
+  setHint('Draw anything you like! Choose a color and brush size. Save your masterpiece as a picture.');
+  let color='#7b5ce0',size=6,drawing=false,last=null;
+  const COLORS=['#222','#e85a9c','#ff7eb3','#ffd166','#06d6a0','#4cc9f0','#7b5ce0','#ff5252','#ff8a3d','#ffffff'];
+  const palette=el('div',{className:'row'});
+  COLORS.forEach(cc=>{const sw=el('div',{style:`width:28px;height:28px;border-radius:50%;background:${cc};cursor:pointer;border:2px solid var(--border)`});sw.onclick=()=>{color=cc;sel();};sw._c=cc;palette.append(sw);});
+  const c=mkCanvas(560,400);const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,560,400);ctx.lineCap='round';ctx.lineJoin='round';
+  const tools=el('div',{className:'row'});
+  const sizeSel=el('input',{type:'range',min:1,max:30,value:6});
+  const clear=el('button',{className:'btn ghost',textContent:'🗑️ Clear'});
+  const save=el('button',{className:'btn',textContent:'💾 Save'});
+  tools.append(el('span',{textContent:'Brush'}),sizeSel,clear,save);
+  host.append(palette,c,tools);
+  function sel(){[...palette.children].forEach(s=>s.style.outline=s._c===color?'3px solid var(--text)':'none');}
+  function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*(c.width/r.width),y:(e.clientY-r.top)*(c.height/r.height)};}
+  function start(e){drawing=true;last=pos(e);}
+  function move(e){if(!drawing)return;const p=pos(e);ctx.strokeStyle=color;ctx.lineWidth=size;ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;}
+  sizeSel.oninput=()=>size=+sizeSel.value;
+  c.addEventListener('mousedown',start);c.addEventListener('mousemove',move);window.addEventListener('mouseup',()=>drawing=false);
+  c.addEventListener('touchstart',e=>{e.preventDefault();start(e.touches[0]);});c.addEventListener('touchmove',e=>{e.preventDefault();move(e.touches[0]);});
+  clear.onclick=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,560,400);};
+  save.onclick=()=>{const a=el('a',{href:c.toDataURL(),download:'drawing.png'});a.click();};
+  sel();setStatus('Draw your masterpiece! ✏️');
+  return {stop:()=>{}};
+}
+
+/* ---------------- PIANO ---------------- */
+function game_piano(gm){
+  setHint('Click the keys or use your keyboard (A S D F G H J for white keys). Make some music! 🎵');
+  const WHITE=[['C',261.63,'a'],['D',293.66,'s'],['E',329.63,'d'],['F',349.23,'f'],['G',392.00,'g'],['A',440.00,'h'],['B',493.88,'j'],['C',523.25,'k'],['D',587.33,'l']];
+  const BLACK=[['C#',277.18,0],['D#',311.13,1],['',0,2],['F#',369.99,3],['G#',415.30,4],['A#',466.16,5],['',0,6],['C#',554.37,7]];
+  const piano=el('div',{style:'position:relative;display:flex;background:#222;padding:10px;border-radius:12px'});
+  const whiteEls={};
+  WHITE.forEach((w,i)=>{const k=el('div',{style:'width:48px;height:170px;background:#fff;border:1px solid #999;border-radius:0 0 6px 6px;margin:0 1px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;color:#999;cursor:pointer;user-select:none'});
+    k.textContent=w[2].toUpperCase();k.onmousedown=()=>hit(w[1],k);piano.append(k);whiteEls[w[2]]=()=>hit(w[1],k);});
+  // black keys overlay
+  BLACK.forEach((b,i)=>{if(!b[1])return;const k=el('div',{style:`position:absolute;top:10px;left:${10+34+i*50}px;width:30px;height:105px;background:#222;border:1px solid #000;border-radius:0 0 5px 5px;cursor:pointer;z-index:2`});k.onmousedown=()=>hit(b[1],k);piano.append(k);});
+  host.append(piano);
+  const songBtn=el('button',{className:'btn',textContent:'🎵 Play "Twinkle Twinkle"'});
+  host.append(songBtn);
+  function hit(freq,k){beep(freq,0.5,'triangle',0.25);const orig=k.style.background;k.style.background='#ffd166';setTimeout(()=>k.style.background=orig,150);}
+  const dn=e=>{const f=WHITE.find(w=>w[2]===e.key.toLowerCase());if(f){beep(f[1],0.5,'triangle',0.25);}};
+  window.addEventListener('keydown',dn);
+  songBtn.onclick=()=>{const notes=[261.63,261.63,392,392,440,440,392, 349.23,349.23,329.63,329.63,293.66,293.66,261.63];let i=0;const iv=setInterval(()=>{if(i>=notes.length){clearInterval(iv);return;}beep(notes[i],0.4,'triangle',0.25);i++;},400);};
+  setStatus('Tap the keys to play! 🎹');
+  return {stop:()=>window.removeEventListener('keydown',dn)};
+}
+
+/* ---------------- BUBBLE POP ---------------- */
+function game_bubble(gm){
+  setHint('Pop as many bubbles as you can in 30 seconds! Tap them before they float away.');
+  const W=460,H=480;const c=mkCanvas(W,H);const ctx=c.getContext('2d');
+  let bubbles,score,time,over,spawn;
+  const COLORS=['#e85a9c','#7b5ce0','#4cc9f0','#06d6a0','#ffd166','#ff8a3d'];
+  function reset(){bubbles=[];score=0;time=30;over=false;spawn=0;}
+  reset();
+  c.addEventListener('mousedown',e=>{if(over){reset();return;}const r=c.getBoundingClientRect();const x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+    for(let i=bubbles.length-1;i>=0;i--){if(Math.hypot(bubbles[i].x-x,bubbles[i].y-y)<bubbles[i].r){bubbles.splice(i,1);score++;beep(600+Math.random()*400,0.1,'sine',0.15);break;}}});
+  const stop=loop(dt=>{
+    if(!over){time-=dt/60;if(time<=0){time=0;over=true;setHs(gm.id,score);}
+      spawn-=dt;if(spawn<=0){spawn=18+Math.random()*16;bubbles.push({x:30+Math.random()*(W-60),y:H+20,r:20+Math.random()*18,sp:1+Math.random()*1.6,c:COLORS[Math.floor(Math.random()*COLORS.length)]});}
+      bubbles.forEach(b=>b.y-=b.sp*dt);bubbles=bubbles.filter(b=>b.y>-40);}
+    ctx.fillStyle=document.documentElement.dataset.theme==='dark'?'#1d0f1a':'#fff';ctx.fillRect(0,0,W,H);
+    bubbles.forEach(b=>{ctx.fillStyle=b.c;ctx.globalAlpha=.85;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#fff8';ctx.beginPath();ctx.arc(b.x-b.r*0.3,b.y-b.r*0.3,b.r*0.25,0,7);ctx.fill();});
+    setStatus('Score: '+score+'  •  Time: '+Math.ceil(time)+'s  •  Best: '+hs(gm.id));
+    if(over){ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 28px sans-serif';ctx.fillText('Time! You popped '+score+'!',W/2,H/2);ctx.font='15px sans-serif';ctx.fillText('Click to play again',W/2,H/2+30);}
+  });
+  return {stop};
+}
+
+/* ---------------- CATCH THE FRUIT ---------------- */
+function game_catch(gm){
+  setHint('Move the basket with your mouse or ← → keys. Catch fruit, dodge bombs! 3 misses and it\'s over.');
+  const W=460,H=480;const c=mkCanvas(W,H);const ctx=c.getContext('2d');
+  let basket,items,score,lives,over,spawn,left,right;
+  const FRUIT=['🍓','🍎','🍊','🍇','🍌','🍉','🍒'];
+  function reset(){basket=W/2;items=[];score=0;lives=3;over=false;spawn=0;left=right=false;}
+  reset();
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();basket=(e.clientX-r.left)*(W/r.width);});
+  c.addEventListener('mousedown',()=>{if(over)reset();});
+  const dn=e=>{if(e.key==='ArrowLeft')left=true;if(e.key==='ArrowRight')right=true;};
+  const up=e=>{if(e.key==='ArrowLeft')left=false;if(e.key==='ArrowRight')right=false;};
+  window.addEventListener('keydown',dn);window.addEventListener('keyup',up);
+  const stop=loop(dt=>{
+    if(!over){if(left)basket-=7*dt;if(right)basket+=7*dt;basket=Math.max(30,Math.min(W-30,basket));
+      spawn-=dt;if(spawn<=0){spawn=26+Math.random()*22;const bomb=Math.random()<0.18;items.push({x:30+Math.random()*(W-60),y:-20,sp:2+Math.random()*2+score*0.02,bomb,e:bomb?'💣':FRUIT[Math.floor(Math.random()*FRUIT.length)]});}
+      items.forEach(it=>it.y+=it.sp*dt);
+      items=items.filter(it=>{if(it.y>H-50&&Math.abs(it.x-basket)<38){if(it.bomb){lives=0;}else{score++;beep(700,0.08,'sine',0.12);}return false;}
+        if(it.y>H){if(!it.bomb){lives--;}return false;}return true;});
+      if(lives<=0){over=true;setHs(gm.id,score);}}
+    ctx.fillStyle=document.documentElement.dataset.theme==='dark'?'#1d0f1a':'#eaf6ff';ctx.fillRect(0,0,W,H);
+    ctx.font='32px sans-serif';ctx.textAlign='center';items.forEach(it=>ctx.fillText(it.e,it.x,it.y));
+    ctx.font='44px sans-serif';ctx.fillText('🧺',basket,H-14);
+    setStatus('Score: '+score+'  •  Lives: '+Math.max(0,lives)+'  •  Best: '+hs(gm.id));
+    if(over){ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='bold 26px sans-serif';ctx.fillText('Game Over — '+score+' caught!',W/2,H/2);ctx.font='15px sans-serif';ctx.fillText('Click to play again',W/2,H/2+30);}
+  });
+  return {stop:()=>{stop();window.removeEventListener('keydown',dn);window.removeEventListener('keyup',up);}};
+}
+
+/* ---------------- MAZE RUN ---------------- */
+function game_maze(gm){
+  setHint('Use arrow keys to guide 🐭 through the maze to the cheese 🧀!');
+  let N=11,S=34,maze,px,py,wins2;
+  const c=mkCanvas(N*S,N*S);const ctx=c.getContext('2d');
+  function gen(){maze=Array.from({length:N},()=>Array(N).fill(1));
+    function carve(r,col){maze[r][col]=0;const dirs=[[0,2],[0,-2],[2,0],[-2,0]].sort(()=>Math.random()-0.5);
+      for(const[dr,dc]of dirs){const nr=r+dr,nc=col+dc;if(nr>0&&nr<N-1&&nc>0&&nc<N-1&&maze[nr][nc]===1){maze[r+dr/2][col+dc/2]=0;carve(nr,nc);}}}
+    carve(1,1);maze[N-1][N-2]=0;maze[N-2][N-1]=0;px=1;py=1;}
+  function reset(){gen();draw();setStatus('Find the cheese! 🧀  •  Mazes solved: '+hs(gm.id));}
+  function draw(){ctx.fillStyle=document.documentElement.dataset.theme==='dark'?'#2c1726':'#fff';ctx.fillRect(0,0,c.width,c.height);
+    for(let r=0;r<N;r++)for(let col=0;col<N;col++){if(maze[r][col]===1){ctx.fillStyle='#7b5ce0';ctx.fillRect(col*S,r*S,S,S);}}
+    ctx.font='26px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧀',(N-1.5)*S,(N-1.5)*S);ctx.fillText('🐭',px*S+S/2,py*S+S/2);}
+  function move(dx,dy){const nx=px+dx,ny=py+dy;if(nx>=0&&nx<N&&ny>=0&&ny<N&&maze[ny][nx]===0){px=nx;py=ny;draw();
+    if(px>=N-2&&py>=N-2){beep(880,0.2);setHs(gm.id,hs(gm.id)+1);setStatus('🎉 You found the cheese! New maze…');setTimeout(reset,800);}}}
+  const dn=e=>{if(e.key==='ArrowUp'){move(0,-1);e.preventDefault();}if(e.key==='ArrowDown'){move(0,1);e.preventDefault();}if(e.key==='ArrowLeft'){move(-1,0);e.preventDefault();}if(e.key==='ArrowRight'){move(1,0);e.preventDefault();}};
+  window.addEventListener('keydown',dn);
+  const newBtn=el('button',{className:'btn',textContent:'🔄 New Maze'});newBtn.onclick=reset;host.append(newBtn);
+  reset();
+  return {stop:()=>window.removeEventListener('keydown',dn)};
+}
+
+/* ---------------- EMOJI QUIZ ---------------- */
+function game_emoji(gm){
+  setHint('Guess what the emojis mean! Pick the right answer.');
+  const QS=[
+    ['🦁👑',['The Lion King','Tarzan','Madagascar','Zootopia']],
+    ['❄️⛄',['Frozen','Moana','Tangled','Brave']],
+    ['🐠🔍',['Finding Nemo','Shark Tale','The Little Mermaid','Ponyo']],
+    ['🕷️🧒',['Spider-Man','Ant-Man','Batman','Superman']],
+    ['🧙‍♂️⚡',['Harry Potter','Lord of the Rings','Merlin','Narnia']],
+    ['🚗⚡',['Cars','Speed Racer','Turbo','Wreck-It Ralph']],
+    ['🐼🥋',['Kung Fu Panda','Po','Mulan','Karate Kid']],
+    ['👧🐺',['Little Red Riding Hood','Brave','Frozen','Tangled']],
+    ['🤖❤️',['WALL-E','Big Hero 6','Transformers','Robots']],
+    ['🐝🎬',['Bee Movie','Antz','A Bug\'s Life','Maya the Bee']],
+    ['👸🐸',['The Princess and the Frog','Shrek','Enchanted','Brave']],
+    ['🐭🏰',['Disney','Ratatouille','Cinderella','Stuart Little']],
+    ['🍫🏭',['Charlie & the Chocolate Factory','Wonka','Matilda','Coraline']],
+    ['🐉🏹',['How to Train Your Dragon','Mulan','Brave','Raya']],
+    ['🌊🛶',['Moana','Finding Dory','Lilo & Stitch','Luca']],
+  ];
+  let pool,qi,score;
+  const qBox=el('div',{style:'font-size:60px'});
+  const ans=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:500px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Quiz'});
+  host.append(qBox,ans,newBtn);
+  function reset(){pool=[...QS].sort(()=>Math.random()-0.5).slice(0,10);qi=0;score=0;show();}
+  function show(){const cur=pool[qi];qBox.textContent=cur[0];const opts=cur[1].map((t,i)=>[t,i===0]).sort(()=>Math.random()-0.5);ans.innerHTML='';
+    opts.forEach(([txt,ok])=>{const b=el('button',{className:'btn ghost',textContent:txt,style:'padding:14px;font-size:15px'});
+      b.onclick=()=>{[...ans.children].forEach(x=>x.disabled=true);b.style.background=ok?'#06d6a0':'#ff5252';b.style.color='#fff';if(ok){score++;beep(700,0.15);}else{[...ans.children].forEach(x=>{if(opts[[...ans.children].indexOf(x)][1])x.style.background='#06d6a0';});}
+        setTimeout(next,900);};ans.append(b);});
+    setStatus('Question '+(qi+1)+'/10  •  Score: '+score+'  •  Best: '+hs(gm.id));}
+  function next(){qi++;if(qi>=pool.length){setHs(gm.id,score);qBox.textContent='🎉';ans.innerHTML='';const m=el('div',{className:'big',style:'grid-column:1/3;text-align:center',textContent:'You scored '+score+'/10!'});ans.append(m);setStatus('Best: '+hs(gm.id));return;}show();}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- SILLY STORIES (Mad Libs) ---------------- */
+function game_madlibs(gm){
+  setHint('Fill in the blanks with silly words, then read your funny story out loud!');
+  const TEMPLATES=[
+    {blanks:['an animal','a silly word','a place','an adjective','a food','a number'],
+     story:a=>`One sunny day, a ${a[0]} named "${a[1]}" went to the ${a[2]}. It was feeling very ${a[3]}, so it ate ${a[5]} bowls of ${a[4]}! Everyone cheered, "Hooray for the ${a[3]} ${a[0]}!"`},
+    {blanks:['a name','an adjective','a job','a color','an animal','a verb'],
+     story:a=>`${a[0]} woke up and discovered they were a ${a[1]} ${a[2]}! Wearing ${a[3]} shoes, they decided to ${a[5]} all the way to school riding a giant ${a[4]}. What a day!`},
+    {blanks:['a place','a food','an adjective','an animal','a number','a silly word'],
+     story:a=>`Welcome to the ${a[2]} ${a[0]}! Here you can find ${a[4]} dancing ${a[3]}s and rivers made of ${a[1]}. The magic password is "${a[5]}". Don't tell anyone!`},
+  ];
+  let tpl,inputs;
+  const form=el('div',{style:'display:flex;flex-direction:column;gap:8px;width:100%;max-width:420px'});
+  const makeBtn=el('button',{className:'btn',textContent:'✨ Make My Story!'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'🔄 Different Story'});
+  const out=el('div',{style:'font-size:18px;line-height:1.6;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;max-width:560px;min-height:30px'});
+  host.append(form,el('div',{className:'row'},makeBtn,newBtn),out);
+  function reset(){tpl=TEMPLATES[Math.floor(Math.random()*TEMPLATES.length)];inputs=[];form.innerHTML='';out.textContent='';
+    tpl.blanks.forEach(b=>{const wrap=el('div',{className:'row',style:'justify-content:space-between'});
+      const inp=el('input',{placeholder:'Type '+b,style:'flex:1'});wrap.append(el('span',{textContent:b+':',style:'width:120px;color:var(--dim);font-size:13px'}),inp);inputs.push(inp);form.append(wrap);});
+    setStatus('Fill in the blanks! 📝');}
+  makeBtn.onclick=()=>{const vals=inputs.map((i,k)=>i.value.trim()||('['+tpl.blanks[k]+']'));out.textContent=tpl.story(vals);beep(660,0.2);setStatus('😂 Ta-da! Read it out loud!');};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- MAGIC 8-BALL ---------------- */
+function game_eightball(gm){
+  setHint('Think of a yes/no question, type it, and shake the magic 8-ball for an answer!');
+  const ANS=['It is certain! ✨','Without a doubt! 💯','Yes, definitely! 😄','You may rely on it.','Most likely! 🌟','Outlook good. 👍','Signs point to yes.','Reply hazy, try again. 🌫️','Ask again later. ⏳','Better not tell you now. 🤫','Cannot predict now. 🔮','Don\'t count on it. 🙅','My reply is no. ❌','Very doubtful. 😬','Outlook not so good.'];
+  const ball=el('div',{style:'width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#555,#000);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px #0006;transition:transform .1s'});
+  const inner=el('div',{style:'width:90px;height:90px;border-radius:50%;background:#3a1d6e;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;font-weight:700;padding:8px'});
+  inner.textContent='8';ball.append(inner);
+  const q=el('input',{placeholder:'Type your yes/no question…',style:'width:320px;max-width:90vw'});
+  const askBtn=el('button',{className:'btn',textContent:'🔮 Shake!'});
+  host.append(q,ball,askBtn);
+  function shake(){ball.style.transform='rotate(-8deg)';setTimeout(()=>ball.style.transform='rotate(8deg)',80);setTimeout(()=>ball.style.transform='rotate(0)',160);
+    inner.textContent='…';beep(330,0.2);setTimeout(()=>{inner.textContent=ANS[Math.floor(Math.random()*ANS.length)];beep(550,0.2);setStatus('The 8-ball has spoken! 🔮');},500);}
+  askBtn.onclick=shake;ball.onclick=shake;
+  setStatus('Ask the magic 8-ball anything! 🔮');
+  return {stop:()=>{}};
+}
+
+applyTheme(localStorage.getItem('theme')||'light');
+buildMenu();
+</script>
+</body>
+</html>

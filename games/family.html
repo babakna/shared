@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family & Party Pack</title>
+<style>
+  :root{--bg:#fbf6ee;--panel:#ffffff;--accent:#d99a1f;--accent2:#1f9dc9;--text:#2a1e10;--dim:#7a6a50;--border:#e6dcc8;}
+  html[data-theme="dark"]{--bg:#1a1208;--panel:#2a1e10;--accent:#fc6;--accent2:#6df;--text:#fff6e8;--dim:#c8b090;--border:#4a3418;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  #host{max-width:100%;overflow-x:auto}.wrap{max-width:100%}
+  @media (max-width:560px){#app{padding:10px}h1{font-size:24px}.bar{gap:8px}}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  #app{max-width:780px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .card .ico{font-size:34px;display:block;margin-bottom:8px}
+  .card .name{font-weight:700}.card .hs{color:var(--dim);font-size:12px;margin-top:4px;min-height:14px}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:var(--accent);color:#2a1e10;border:0;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer}
+  button.btn:hover{filter:brightness(1.1)}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px}
+  .big{font-size:20px;font-weight:700}
+  select{padding:7px;border-radius:8px;background:var(--panel);color:var(--text);border:1px solid var(--border)}
+  .die{width:54px;height:54px;border-radius:10px;background:#fff;color:#222;display:inline-flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;box-shadow:0 2px 5px #0008}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🎉 FAMILY & PARTY</h1>
+    <div class="sub">Games for the whole family — pass-and-play or vs. the computer.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const GAMES=[
+  {id:'snakes',name:'Snakes & Ladders',ico:'🪜'},
+  {id:'ludo',name:'Ludo',ico:'🎲'},
+  {id:'yahtzee',name:'Yahtzee',ico:'🎯'},
+  {id:'farkle',name:'Farkle',ico:'🎰'},
+  {id:'trivia',name:'Trivia Quiz',ico:'❓'},
+  {id:'bingo',name:'Bingo',ico:'🔢'},
+  {id:'gofish',name:'Go Fish',ico:'🐟'},
+  {id:'dominoes',name:'Dominoes',ico:'🁫'},
+  {id:'rps',name:'Rock Paper Scissors',ico:'✊'},
+  {id:'scramble',name:'Word Scramble',ico:'🔤'},
+  {id:'guessnum',name:'Guess the Number',ico:'🔢'},
+  {id:'dice',name:'Dice & Coin Roller',ico:'🎲'},
+];
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null;
+function hs(id){return +(localStorage.getItem('fam_'+id)||0)}
+function setHs(id,v){if(v>hs(id)){localStorage.setItem('fam_'+id,v);return true}return false}
+function getRaw(id){return localStorage.getItem('fam_'+id)}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+  d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${getRaw(gm.id)?'Best: '+getRaw(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
+const DICE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function roll(){return 1+Math.floor(Math.random()*6);}
+
+/* ---------------- SNAKES & LADDERS ---------------- */
+function game_snakes(gm){
+  const NP=2;let pos,turn,over,rolling;
+  const SNL={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78, 1:38,4:14,9:31,21:42,28:84,36:44,51:67,71:91,80:100};
+  const COLORS=['#f55','#5af'];
+  setHint('Players take turns. Ladders 🪜 climb up, snakes 🐍 slide down. First to 100 wins!');
+  const boardEl=el('div',{style:'position:relative;width:440px;height:440px;background:#2a1e10;border-radius:10px'});
+  const rollBtn=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const dieEl=el('div',{className:'die'});
+  host.append(boardEl,el('div',{style:'display:flex;gap:10px;align-items:center'},dieEl,rollBtn,newBtn));
+  function cellXY(n){n--;let row=Math.floor(n/10);let col=n%10;if(row%2===1)col=9-col;const x=col*44+4,y=(9-row)*44+4;return[x,y];}
+  function reset(){pos=[1,1];turn=0;over=false;rolling=false;draw();setStatus('Player 1 (red) to roll');}
+  function draw(){boardEl.innerHTML='';for(let n=1;n<=100;n++){const[x,y]=cellXY(n);const snl=SNL[n];
+    const d=el('div',{style:`position:absolute;left:${x}px;top:${y}px;width:42px;height:42px;border:1px solid #4a3418;display:flex;align-items:flex-start;justify-content:flex-start;font-size:10px;color:#c8b090;background:${snl?(snl>n?'#1d3a1d':'#3a1d1d'):'#241a0e'}`});
+    d.textContent=n+(snl?(snl>n?' 🪜':' 🐍'):'');boardEl.append(d);}
+    pos.forEach((p,i)=>{const[x,y]=cellXY(p);boardEl.append(el('div',{style:`position:absolute;left:${x+(i*14)+6}px;top:${y+16}px;width:16px;height:16px;border-radius:50%;background:${COLORS[i]};border:2px solid #fff;transition:.2s`}));});}
+  rollBtn.onclick=()=>{if(over||rolling)return;rolling=true;const r=roll();dieEl.textContent=DICE[r];
+    let np=pos[turn]+r;if(np>100)np=100;pos[turn]=np;draw();
+    setTimeout(()=>{if(SNL[pos[turn]]){pos[turn]=SNL[pos[turn]];draw();}
+      if(pos[turn]===100){over=true;setStatus('🎉 Player '+(turn+1)+' wins!');rolling=false;return;}
+      turn=(turn+1)%NP;rolling=false;setStatus('Player '+(turn+1)+(turn===0?' (red)':' (blue)')+' to roll  •  rolled '+r);},350);};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- LUDO (simplified, 2-player) ---------------- */
+function game_ludo(gm){
+  setHint('You (red) vs AI (blue). Roll a 6 to leave home. Land on a foe to send it back. Get all tokens home!');
+  // simplified single-track race of 40 with 4 tokens; exact-roll to finish at 45
+  let tokens,turn,over,lastRoll,awaiting;
+  const TRACK=45;
+  const dieEl=el('div',{className:'die'});
+  const rollBtn=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const view=el('div',{style:'display:flex;flex-direction:column;gap:14px;width:100%;max-width:560px'});
+  host.append(view,el('div',{style:'display:flex;gap:10px;align-items:center'},dieEl,rollBtn,newBtn));
+  function reset(){tokens={0:[0,0,0,0],1:[0,0,0,0]};turn=0;over=false;lastRoll=0;awaiting=false;draw();setStatus('Your turn (red) — roll!');}
+  function draw(){view.innerHTML='';[0,1].forEach(p=>{const row=el('div',{style:`background:${p===0?'#3a1d1d':'#1d2a3a'};border-radius:10px;padding:10px`});
+    row.append(el('div',{className:'big',textContent:(p===0?'🔴 You':'🔵 AI')+'  —  home: '+tokens[p].filter(t=>t>=TRACK).length+'/4'}));
+    const bar=el('div',{style:'display:flex;gap:6px;margin-top:6px;flex-wrap:wrap'});
+    tokens[p].forEach((t,i)=>{const done=t>=TRACK;bar.append(el('div',{textContent:done?'🏠':(t===0?'🚪':t),style:`min-width:42px;height:34px;padding:0 8px;border-radius:8px;background:${done?'#2a6':'#2a1e10'};display:flex;align-items:center;justify-content:center;font-weight:700;cursor:${p===0&&awaiting&&canMove(0,i)?'pointer':'default'};${p===0&&awaiting&&canMove(0,i)?'outline:2px solid #fc6':''}`,onclick:()=>{if(p===0&&awaiting&&canMove(0,i))moveToken(0,i);}}));});
+    row.append(bar);view.append(row);});}
+  function canMove(p,i){const t=tokens[p][i];if(t>=TRACK)return false;if(t===0)return lastRoll===6;return t+lastRoll<=TRACK;}
+  function anyMove(p){return tokens[p].some((t,i)=>canMove(p,i));}
+  function moveToken(p,i){let t=tokens[p][i];if(t===0&&lastRoll===6)tokens[p][i]=1;else tokens[p][i]=t+lastRoll;
+    // capture
+    const opp=1-p;const myPos=tokens[p][i];if(myPos<TRACK)tokens[opp].forEach((ot,oi)=>{if(ot>0&&ot<TRACK&&ot===myPos)tokens[opp][oi]=0;});
+    awaiting=false;draw();
+    if(tokens[p].every(t=>t>=TRACK)){over=true;setStatus(p===0?'🎉 You win!':'🤖 AI wins');if(p===0)setHs(gm.id,(hs(gm.id)+1));return;}
+    if(lastRoll===6){turn=p;nextPrompt();return;}
+    turn=1-p;nextPrompt();}
+  function nextPrompt(){if(over)return;if(turn===0)setStatus('Your turn (red) — roll!');else{setStatus('AI turn…');setTimeout(aiRoll,500);}}
+  rollBtn.onclick=()=>{if(over||turn!==0||awaiting)return;lastRoll=roll();dieEl.textContent=DICE[lastRoll];
+    if(!anyMove(0)){setStatus('Rolled '+lastRoll+' — no moves. AI turn');turn=1;setTimeout(aiRoll,600);return;}
+    awaiting=true;draw();setStatus('Rolled '+lastRoll+' — click a token to move');};
+  function aiRoll(){if(over)return;lastRoll=roll();dieEl.textContent=DICE[lastRoll];
+    if(!anyMove(1)){turn=0;nextPrompt();return;}
+    // choose: prefer capture, then furthest token
+    let choice=-1,best=-1;tokens[1].forEach((t,i)=>{if(!canMove(1,i))return;let np=t===0?1:t+lastRoll;let sc=np;if(tokens[0].some(ot=>ot>0&&ot<TRACK&&ot===np))sc+=100;if(sc>best){best=sc;choice=i;}});
+    moveToken(1,choice);}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- YAHTZEE ---------------- */
+function game_yahtzee(gm){
+  setHint('Roll up to 3×, hold dice between rolls, then pick a category to score. 13 rounds.');
+  let dice,held,rolls,scores,round;
+  const CATS=[['Ones','1s'],['Twos','2s'],['Threes','3s'],['Fours','4s'],['Fives','5s'],['Sixes','6s'],['3 of a Kind','3k'],['4 of a Kind','4k'],['Full House','fh'],['Sm Straight','ss'],['Lg Straight','ls'],['Yahtzee','yz'],['Chance','ch']];
+  const diceRow=el('div',{style:'display:flex;gap:8px'});
+  const rollBtn=el('button',{className:'btn'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const sheet=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;width:100%;max-width:460px'});
+  host.append(diceRow,el('div',{style:'display:flex;gap:10px'},rollBtn,newBtn),sheet);
+  function reset(){dice=[1,1,1,1,1];held=[false,false,false,false,false];rolls=0;round=0;scores={};draw();updateBtn();}
+  function updateBtn(){rollBtn.textContent=rolls===0?'🎲 Roll':'🎲 Roll ('+(3-rolls)+' left)';rollBtn.disabled=rolls>=3;}
+  function draw(){diceRow.innerHTML='';dice.forEach((d,i)=>{const die=el('div',{className:'die',textContent:DICE[d],style:`width:54px;height:54px;border-radius:10px;background:${held[i]?'#fc6':'#fff'};color:#222;display:inline-flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer`});
+    die.onclick=()=>{if(rolls>0){held[i]=!held[i];draw();}};diceRow.append(die);});
+    sheet.innerHTML='';let total=0;Object.values(scores).forEach(v=>total+=v);
+    CATS.forEach(([name,key])=>{const done=scores[key]!=null;const pot=rolls>0&&!done?potential(key):null;
+      const row=el('div',{style:`display:flex;justify-content:space-between;padding:6px 10px;border-radius:7px;background:${done?'#241a0e':'#2a1e10'};cursor:${done||rolls===0?'default':'pointer'};${!done&&rolls>0?'border:1px solid #5a4428':''}`});
+      row.append(el('span',{textContent:name}),el('span',{textContent:done?scores[key]:(pot!=null?pot:'—'),style:done?'font-weight:800':'color:#c8b090'}));
+      if(!done&&rolls>0)row.onclick=()=>pick(key);sheet.append(row);});
+    sheet.append(el('div',{style:'grid-column:1/3;text-align:center;font-weight:800;margin-top:6px',textContent:'Total: '+total}));
+    setStatus('Round '+(round+1)+'/13  •  Total: '+total+'  •  Best: '+hs(gm.id));}
+  function counts(){const c=[0,0,0,0,0,0,0];dice.forEach(d=>c[d]++);return c;}
+  function potential(key){const c=counts();const sum=dice.reduce((a,b)=>a+b,0);
+    if(['1s','2s','3s','4s','5s','6s'].includes(key)){const n=+key[0];return c[n]*n;}
+    if(key==='3k')return c.some(x=>x>=3)?sum:0;
+    if(key==='4k')return c.some(x=>x>=4)?sum:0;
+    if(key==='fh')return (c.includes(3)&&c.includes(2))||c.includes(5)?25:0;
+    if(key==='ss'){const s=[...new Set(dice)].sort();const str='123456';const has=[ '1234','2345','3456'].some(seq=>seq.split('').every(d=>dice.includes(+d)));return has?30:0;}
+    if(key==='ls'){const has=['12345','23456'].some(seq=>seq.split('').every(d=>dice.includes(+d)));return has?40:0;}
+    if(key==='yz')return c.some(x=>x===5)?50:0;
+    if(key==='ch')return sum;return 0;}
+  function pick(key){scores[key]=potential(key);rolls=0;held=[false,false,false,false,false];round++;
+    if(round>=13){let t=0;Object.values(scores).forEach(v=>t+=v);setHs(gm.id,t);draw();setStatus('🎉 Game over! Final: '+t+'  •  Best: '+hs(gm.id));rollBtn.disabled=true;return;}
+    draw();updateBtn();}
+  rollBtn.onclick=()=>{if(rolls>=3)return;dice=dice.map((d,i)=>held[i]?d:roll());rolls++;draw();updateBtn();};
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- FARKLE ---------------- */
+function game_farkle(gm){
+  setHint('Roll 6 dice. Keep scoring dice (1s, 5s, triples), bank or risk a re-roll. First to 4000! (vs AI)');
+  let dice,kept,turnScore,scores,turn,over,canRoll;
+  const TARGET=4000;
+  const diceRow=el('div',{style:'display:flex;gap:8px;flex-wrap:wrap'});
+  const rollBtn=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const bankBtn=el('button',{className:'btn ghost',textContent:'Bank'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  const info=el('div',{className:'big'});
+  host.append(info,diceRow,el('div',{style:'display:flex;gap:10px'},rollBtn,bankBtn,newBtn));
+  function reset(){scores=[0,0];turn=0;over=false;newTurn();}
+  function newTurn(){dice=[];kept=[];turnScore=0;canRoll=true;draw();info.textContent='You: '+scores[0]+'  •  AI: '+scores[1];
+    setStatus(turn===0?'Your turn — roll!':'AI turn…');if(turn===1&&!over)setTimeout(aiTurn,700);}
+  function scoreOf(ds){// returns [score, usedCount] for best scoring of a set, simple rules
+    const c=[0,0,0,0,0,0,0];ds.forEach(d=>c[d]++);let s=0,used=0;
+    for(let n=1;n<=6;n++){if(c[n]>=3){s+=(n===1?1000:n*100);used+=3;c[n]-=3;}}
+    s+=c[1]*100;used+=c[1];s+=c[5]*50;used+=c[5];return[s,used];}
+  function anyScore(ds){return scoreOf(ds)[0]>0;}
+  function draw(){diceRow.innerHTML='';dice.forEach((d,i)=>{const die=el('div',{className:'die',textContent:DICE[d],style:`background:${kept[i]?'#fc6':'#fff'};cursor:pointer`});
+    die.onclick=()=>{if(turn===0){kept[i]=!kept[i];draw();}};diceRow.append(die);});}
+  rollBtn.onclick=()=>{if(turn!==0||over||!canRoll)return;
+    // bank selected first
+    const sel=dice.filter((d,i)=>kept[i]);
+    if(dice.length&&sel.length){const[s]=scoreOf(sel);if(s===0){setStatus('Selected dice don\'t all score — adjust');return;}turnScore+=s;dice=dice.filter((d,i)=>!kept[i]);}
+    let n=dice.length===0?6:dice.length;if(turnScore>0&&dice.length===0&&kept.length)n=6;if(dice.length===0)n=6;
+    dice=Array.from({length:n},()=>roll());kept=Array(n).fill(false);
+    if(!anyScore(dice)){setStatus('💥 FARKLE! No scoring dice. Turn lost.');turnScore=0;canRoll=false;draw();turn=1;setTimeout(newTurn,1200);return;}
+    draw();setStatus('Turn score: '+turnScore+' — pick scoring dice & roll again, or Bank');};
+  bankBtn.onclick=()=>{if(turn!==0||over)return;const sel=dice.filter((d,i)=>kept[i]);let add=0;if(sel.length){const[s]=scoreOf(sel);if(s)add=s;}
+    scores[0]+=turnScore+add;info.textContent='You: '+scores[0]+'  •  AI: '+scores[1];
+    if(scores[0]>=TARGET){over=true;setHs(gm.id,scores[0]);setStatus('🎉 You win with '+scores[0]+'!');return;}
+    turn=1;setTimeout(newTurn,500);};
+  function aiTurn(){if(over)return;let ts=0,pool=6;
+    function go(){let d=Array.from({length:pool},()=>roll());const[s,used]=scoreOf(d);
+      if(s===0){setStatus('AI Farkled!');turn=0;setTimeout(newTurn,1000);return;}
+      ts+=s;pool-=used;if(pool===0)pool=6;
+      // AI banks if turn score >=300 or close to win
+      if(ts>=300||scores[1]+ts>=TARGET){scores[1]+=ts;info.textContent='You: '+scores[0]+'  •  AI: '+scores[1];
+        if(scores[1]>=TARGET){over=true;setStatus('🤖 AI wins with '+scores[1]);return;}turn=0;setTimeout(newTurn,800);}
+      else{setStatus('AI banking risk… score '+ts);setTimeout(go,700);}}
+    go();}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- TRIVIA QUIZ ---------------- */
+function game_trivia(gm){
+  setHint('Answer the multiple-choice questions. 10 per round.');
+  const QS=[
+    ['What planet is known as the Red Planet?',['Mars','Venus','Jupiter','Mercury'],0],
+    ['How many continents are there?',['7','5','6','8'],0],
+    ['What is the largest mammal?',['Blue whale','Elephant','Giraffe','Hippo'],0],
+    ['Who painted the Mona Lisa?',['Da Vinci','Picasso','Van Gogh','Monet'],0],
+    ['What is H2O commonly known as?',['Water','Salt','Oxygen','Hydrogen'],0],
+    ['How many sides does a hexagon have?',['6','5','7','8'],0],
+    ['Which ocean is the largest?',['Pacific','Atlantic','Indian','Arctic'],0],
+    ['What gas do plants absorb?',['Carbon dioxide','Oxygen','Nitrogen','Helium'],0],
+    ['Capital of Japan?',['Tokyo','Beijing','Seoul','Bangkok'],0],
+    ['How many legs does a spider have?',['8','6','10','4'],0],
+    ['What is the freezing point of water (°C)?',['0','32','100','-10'],0],
+    ['Which is a primary color?',['Red','Green','Orange','Purple'],0],
+    ['How many strings on a standard guitar?',['6','4','5','7'],0],
+    ['Largest planet in our solar system?',['Jupiter','Saturn','Earth','Neptune'],0],
+    ['What animal is "man\'s best friend"?',['Dog','Cat','Horse','Bird'],0],
+    ['Speed of light is approximately?',['300,000 km/s','3,000 km/s','30 km/s','3 million km/s'],0],
+    ['Who wrote Romeo and Juliet?',['Shakespeare','Dickens','Twain','Austen'],0],
+    ['How many minutes in an hour?',['60','100','30','90'],0],
+    ['What is the chemical symbol for gold?',['Au','Gd','Go','Ag'],0],
+    ['Which country has the Eiffel Tower?',['France','Italy','Spain','Germany'],0],
+  ];
+  let pool,qi,score;
+  const qBox=el('div',{className:'big',style:'text-align:center;max-width:520px'});
+  const ans=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:520px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Quiz'});
+  host.append(qBox,ans,newBtn);
+  function reset(){pool=[...QS].sort(()=>Math.random()-0.5).slice(0,10).map(q=>{const opts=q[1].map((t,i)=>[t,i===q[2]]).sort(()=>Math.random()-0.5);return{q:q[0],opts};});qi=0;score=0;show();}
+  function show(){const cur=pool[qi];qBox.textContent='Q'+(qi+1)+'. '+cur.q;ans.innerHTML='';
+    cur.opts.forEach(([txt,correct])=>{const b=el('button',{className:'btn ghost',textContent:txt,style:'padding:14px;font-size:16px'});
+      b.onclick=()=>{[...ans.children].forEach(c=>c.disabled=true);b.style.background=correct?'#2a6':'#a33';b.style.color='#fff';
+        if(correct)score++;else{[...ans.children].forEach(c=>{if(cur.opts[[...ans.children].indexOf(c)][1])c.style.background='#2a6';});}
+        setStatus('Score: '+score+'/'+pool.length);setTimeout(next,900);};ans.append(b);});
+    setStatus('Score: '+score+'  •  Best: '+hs(gm.id));}
+  function next(){qi++;if(qi>=pool.length){setHs(gm.id,score);qBox.textContent='🎉 Quiz complete! You scored '+score+'/'+pool.length;ans.innerHTML='';setStatus('Best: '+hs(gm.id));return;}show();}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- BINGO ---------------- */
+function game_bingo(gm){
+  setHint('Numbers are auto-called every 2.5s. Click matching numbers on your card. Get a line to win!');
+  let card,marked,called,pool,timer,won;
+  const callEl=el('div',{className:'big',style:'font-size:30px'});
+  const calledEl=el('div',{style:'color:#c8b090;font-size:13px;max-width:520px;text-align:center'});
+  const grid=el('div',{style:'display:grid;grid-template-columns:repeat(5,60px);gap:5px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Card'});
+  const pauseBtn=el('button',{className:'btn ghost',textContent:'Pause'});
+  host.append(callEl,grid,calledEl,el('div',{style:'display:flex;gap:10px'},newBtn,pauseBtn));
+  function colRange(c){return [c*15+1,c*15+15];}
+  function reset(){clearInterval(timer);card=[];marked=[];won=false;
+    for(let c=0;c<5;c++){const[lo,hi]=colRange(c);const nums=[];while(nums.length<5){const n=lo+Math.floor(Math.random()*15);if(!nums.includes(n))nums.push(n);}card.push(nums);}
+    for(let i=0;i<25;i++)marked.push(false);marked[12]=true;// free center
+    pool=[];for(let i=1;i<=75;i++)pool.push(i);pool.sort(()=>Math.random()-0.5);called=[];draw();callEl.textContent='Get ready…';
+    timer=setInterval(callNum,2500);setStatus('Best lines: '+hs(gm.id));}
+  function callNum(){if(won||!pool.length){clearInterval(timer);return;}const n=pool.pop();called.push(n);
+    const letter='BINGO'[Math.floor((n-1)/15)];callEl.textContent=letter+' '+n;calledEl.textContent='Called: '+called.join(', ');}
+  function draw(){grid.innerHTML='';['B','I','N','G','O'].forEach(L=>grid.append(el('div',{textContent:L,style:'text-align:center;font-weight:800;color:#fc6'})));
+    for(let r=0;r<5;r++)for(let c=0;c<5;c++){const idx=r*5+c;const free=idx===12;const n=free?'★':card[c][r];
+      const d=el('div',{textContent:n,style:`width:60px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:700;cursor:pointer;background:${marked[idx]?'#2a6':'#2a1e10'}`});
+      d.onclick=()=>{if(free)return;if(called.includes(card[c][r])){marked[idx]=!marked[idx];draw();check();}};grid.append(d);}}
+  function check(){const lines=[];for(let r=0;r<5;r++)lines.push([0,1,2,3,4].map(c=>r*5+c));for(let c=0;c<5;c++)lines.push([0,1,2,3,4].map(r=>r*5+c));
+    lines.push([0,6,12,18,24]);lines.push([4,8,12,16,20]);
+    const got=lines.filter(l=>l.every(i=>marked[i])).length;if(got>0){setHs(gm.id,got);}
+    if(got>0&&!won){won=true;clearInterval(timer);setStatus('🎉 BINGO! '+got+' line(s)!');}else setStatus('Lines: '+got+'  •  Best: '+hs(gm.id));}
+  newBtn.onclick=reset;pauseBtn.onclick=()=>{if(timer){clearInterval(timer);timer=null;pauseBtn.textContent='Resume';}else{timer=setInterval(callNum,2500);pauseBtn.textContent='Pause';}};
+  reset();
+  return {stop:()=>clearInterval(timer)};
+}
+
+/* ---------------- GO FISH ---------------- */
+function game_gofish(gm){
+  setHint('Ask the AI for a rank to collect 4-of-a-kind books. Most books wins!');
+  let deck,you,ai,books,turn,over,aiKnown;
+  const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  const handEl=el('div',{style:'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:560px'});
+  const log=el('div',{style:'color:#c8b090;font-size:14px;text-align:center;min-height:40px;max-width:520px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(el('div',{className:'big',textContent:'Ask for:'}),handEl,log,newBtn);
+  function reset(){deck=[];RANKS.forEach(r=>{for(let i=0;i<4;i++)deck.push(r);});deck.sort(()=>Math.random()-0.5);
+    you=[];ai=[];books={you:0,ai:0};aiKnown={};for(let i=0;i<7;i++){you.push(deck.pop());ai.push(deck.pop());}
+    turn='you';over=false;collectBooks('you');collectBooks('ai');draw();log.textContent='Your turn — click a card rank to ask the AI.';}
+  function count(hand,r){return hand.filter(c=>c===r).length;}
+  function collectBooks(who){const hand=who==='you'?you:ai;RANKS.forEach(r=>{if(count(hand,r)===4){for(let i=0;i<4;i++)hand.splice(hand.indexOf(r),1);books[who]++;}});}
+  function draw(){handEl.innerHTML='';const uniq=[...new Set(you)].sort((a,b)=>RANKS.indexOf(a)-RANKS.indexOf(b));
+    uniq.forEach(r=>{const n=count(you,r);const c=el('div',{style:'background:#fff;color:#222;border-radius:7px;padding:8px 12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center'});
+      c.append(el('div',{textContent:r}),el('div',{textContent:'×'+n,style:'font-size:11px;color:#666'}));c.onclick=()=>ask(r);handEl.append(c);});
+    setStatus('Your books: '+books.you+'  •  AI books: '+books.ai+'  •  Best: '+hs(gm.id));}
+  function ask(r){if(over||turn!=='you')return;if(!you.includes(r))return;aiKnown[r]=true;
+    const got=count(ai,r);if(got>0){for(let i=0;i<got;i++){ai.splice(ai.indexOf(r),1);you.push(r);}collectBooks('you');draw();log.textContent='AI had '+got+' '+r+'(s)! Go again.';
+      if(checkEnd())return;}
+    else{log.textContent='Go Fish! ';if(deck.length){const d=deck.pop();you.push(d);if(d===r)log.textContent+='You drew the '+r+' you asked for — go again!';else{turn='ai';}}else turn='ai';collectBooks('you');draw();
+      if(checkEnd())return;if(turn==='ai')setTimeout(aiTurn,900);}}
+  function aiTurn(){if(over)return;
+    const ranks=[...new Set(ai)];let r=Object.keys(aiKnown).find(k=>ai.includes(k))||ranks[Math.floor(Math.random()*ranks.length)];
+    const got=count(you,r);log.textContent='AI asks for '+r+'. ';
+    if(got>0){for(let i=0;i<got;i++){you.splice(you.indexOf(r),1);ai.push(r);}collectBooks('ai');draw();log.textContent+='You had '+got+'! AI goes again.';if(checkEnd())return;setTimeout(aiTurn,900);}
+    else{log.textContent+='Go Fish! ';if(deck.length){ai.push(deck.pop());}collectBooks('ai');turn='you';draw();if(checkEnd())return;log.textContent+='Your turn.';}}
+  function checkEnd(){if(books.you+books.ai>=13||(!you.length&&!ai.length&&!deck.length)){over=true;
+    const msg=books.you>books.ai?'🎉 You win '+books.you+'—'+books.ai+'!':books.ai>books.you?'🤖 AI wins '+books.you+'—'+books.ai:'Tie '+books.you+'—'+books.ai;
+    setHs(gm.id,books.you);setStatus(msg);log.textContent=msg;return true;}return false;}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- DOMINOES ---------------- */
+function game_dominoes(gm){
+  setHint('Match a domino end to an open end of the chain. Click your tile, then which end to play. First to empty hand wins.');
+  let stock,you,ai,chain,leftEnd,rightEnd,turn,over,sel;
+  const chainEl=el('div',{style:'display:flex;flex-wrap:wrap;gap:4px;justify-content:center;min-height:46px;max-width:600px;background:#241a0e;padding:8px;border-radius:8px'});
+  const handEl=el('div',{style:'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:600px'});
+  const ends=el('div',{style:'display:flex;gap:10px'});
+  const leftBtn=el('button',{className:'btn ghost',textContent:'◀ Play left'});
+  const rightBtn=el('button',{className:'btn ghost',textContent:'Play right ▶'});
+  const drawBtn=el('button',{className:'btn ghost',textContent:'Draw'});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  ends.append(leftBtn,rightBtn,drawBtn);
+  host.append(el('div',{className:'big',textContent:'Chain'}),chainEl,ends,el('div',{className:'big',textContent:'Your tiles'}),handEl,newBtn);
+  function reset(){stock=[];for(let a=0;a<=6;a++)for(let b=a;b<=6;b++)stock.push([a,b]);stock.sort(()=>Math.random()-0.5);
+    you=stock.splice(0,7);ai=stock.splice(0,7);chain=[];sel=null;over=false;
+    // first move: highest double or random
+    const first=you.splice(0,0); chain=[stock.splice(0,1)[0]];leftEnd=chain[0][0];rightEnd=chain[0][1];
+    turn='you';draw();setStatus('Your turn');}
+  function tileEl(t,clickable){const d=el('div',{style:`display:flex;background:#fff;color:#222;border-radius:6px;font-weight:800;cursor:${clickable?'pointer':'default'};${sel&&sel[0]===t[0]&&sel[1]===t[1]?'outline:3px solid #fc6':''}`});
+    [t[0],t[1]].forEach(v=>d.append(el('div',{textContent:v===0?'·':v,style:'width:26px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc'})));return d;}
+  function draw(){chainEl.innerHTML='';chain.forEach(t=>chainEl.append(tileEl(t,false)));
+    handEl.innerHTML='';you.forEach((t,i)=>{const e=tileEl(t,true);e.onclick=()=>{sel=t;draw();};handEl.append(e);});
+    setStatus('Open ends: '+leftEnd+' | '+rightEnd+'  •  AI tiles: '+ai.length+'  •  Best: '+hs(gm.id));}
+  function canPlay(t,end){return t[0]===end||t[1]===end;}
+  function place(t,side){const idx=you.indexOf(t);
+    if(side==='left'){const tile=t[1]===leftEnd?[t[0],t[1]]:[t[1],t[0]];chain.unshift(tile);leftEnd=tile[0];}
+    else{const tile=t[0]===rightEnd?[t[0],t[1]]:[t[1],t[0]];chain.push(tile);rightEnd=tile[1];}
+    you.splice(idx,1);sel=null;}
+  leftBtn.onclick=()=>{if(turn!=='you'||!sel)return;if(!canPlay(sel,leftEnd)){setStatus('That tile doesn\'t match the left end ('+leftEnd+')');return;}place(sel,'left');afterYou();};
+  rightBtn.onclick=()=>{if(turn!=='you'||!sel)return;if(!canPlay(sel,rightEnd)){setStatus('That tile doesn\'t match the right end ('+rightEnd+')');return;}place(sel,'right');afterYou();};
+  drawBtn.onclick=()=>{if(turn!=='you')return;if(stock.length){you.push(stock.pop());draw();}else{setStatus('Stock empty — you pass');turn='ai';setTimeout(aiTurn,600);}};
+  function afterYou(){draw();if(!you.length){over=true;setHs(gm.id,hs(gm.id)+1);setStatus('🎉 You win!');return;}turn='ai';setTimeout(aiTurn,600);}
+  function aiTurn(){if(over)return;let played=false;
+    for(const t of ai){if(canPlay(t,leftEnd)){const tile=t[1]===leftEnd?[t[0],t[1]]:[t[1],t[0]];chain.unshift(tile);leftEnd=tile[0];ai.splice(ai.indexOf(t),1);played=true;break;}
+      if(canPlay(t,rightEnd)){const tile=t[0]===rightEnd?[t[0],t[1]]:[t[1],t[0]];chain.push(tile);rightEnd=tile[1];ai.splice(ai.indexOf(t),1);played=true;break;}}
+    if(!played){if(stock.length){ai.push(stock.pop());setStatus('AI drew a tile');setTimeout(aiTurn,500);return;}else{setStatus('AI passes — your turn');turn='you';draw();return;}}
+    draw();if(!ai.length){over=true;setStatus('🤖 AI wins');return;}turn='you';setStatus('Your turn');}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- ROCK PAPER SCISSORS ---------------- */
+function game_rps(gm){
+  setHint('Best of 5. Pick your move!');
+  let ys,as,round;
+  const CH=[['✊','Rock'],['✋','Paper'],['✌️','Scissors']];
+  const display=el('div',{style:'display:flex;gap:40px;align-items:center;font-size:60px'});
+  const youD=el('div',{textContent:'❔'}),aiD=el('div',{textContent:'❔'});
+  display.append(youD,el('div',{style:'font-size:24px',textContent:'VS'}),aiD);
+  const msg=el('div',{className:'big'});
+  const btns=el('div',{style:'display:flex;gap:12px'});
+  CH.forEach(([emo,name],i)=>{const b=el('button',{className:'btn',textContent:emo+' '+name,style:'font-size:18px'});b.onclick=()=>play(i);btns.append(b);});
+  const newBtn=el('button',{className:'btn ghost',textContent:'Reset Match'});
+  host.append(display,msg,btns,newBtn);
+  function reset(){ys=0;as=0;round=0;youD.textContent=aiD.textContent='❔';msg.textContent='First to 3 wins!';setStatus('You 0 — 0 AI  •  Match wins: '+hs(gm.id));}
+  function play(y){if(ys>=3||as>=3)return;const a=Math.floor(Math.random()*3);youD.textContent=CH[y][0];aiD.textContent=CH[a][0];
+    let r;if(y===a)r='Tie!';else if((y===0&&a===2)||(y===1&&a===0)||(y===2&&a===1)){ys++;r='You win the round!';}else{as++;r='AI wins the round!';}
+    if(ys>=3){msg.textContent='🎉 You win the match '+ys+'—'+as+'!';setHs(gm.id,hs(gm.id)+1);}
+    else if(as>=3)msg.textContent='🤖 AI wins the match '+ys+'—'+as;
+    else msg.textContent=r;
+    setStatus('You '+ys+' — '+as+' AI  •  Match wins: '+hs(gm.id));}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- WORD SCRAMBLE ---------------- */
+function game_scramble(gm){
+  setHint('Unscramble the word and type your answer. Beat the clock!');
+  const WORDS=['planet','garden','window','rocket','puzzle','dragon','castle','guitar','pencil','jungle','rabbit','wizard','market','silver','orange','flower','bridge','candle','monkey','pirate','school','winter','summer','animal','friend'];
+  let word,scrambled,score,timeLeft,timer,streak;
+  const scrEl=el('div',{style:'font-size:44px;font-weight:900;letter-spacing:8px;color:#fc6'});
+  const input=el('input',{style:'font-size:22px;padding:10px;border-radius:10px;text-align:center;background:#2a1e10;color:#fff;border:1px solid #5a4428'});
+  const submit=el('button',{className:'btn',textContent:'Submit'});
+  const skip=el('button',{className:'btn ghost',textContent:'Skip'});
+  host.append(scrEl,input,el('div',{style:'display:flex;gap:10px'},submit,skip));
+  function scramble(w){let s;do{s=w.split('').sort(()=>Math.random()-0.5).join('');}while(s===w);return s;}
+  function next(){word=WORDS[Math.floor(Math.random()*WORDS.length)];scrambled=scramble(word);scrEl.textContent=scrambled.toUpperCase();input.value='';input.focus();}
+  function reset(){score=0;streak=0;timeLeft=60;next();clearInterval(timer);timer=setInterval(()=>{timeLeft--;if(timeLeft<=0){clearInterval(timer);setHs(gm.id,score);scrEl.textContent='⏰ Time!';setStatus('Final score: '+score+'  •  Best: '+hs(gm.id));input.disabled=submit.disabled=true;}else setStatus('Score: '+score+'  •  Time: '+timeLeft+'s  •  Best: '+hs(gm.id));},1000);input.disabled=submit.disabled=false;}
+  function check(){if(input.value.trim().toLowerCase()===word){streak++;score+=10+streak*2;next();}else{streak=0;scrEl.style.color='#f66';setTimeout(()=>scrEl.style.color='#fc6',300);}}
+  submit.onclick=check;skip.onclick=next;
+  input.onkeydown=e=>{if(e.key==='Enter')check();};
+  reset();
+  return {stop:()=>clearInterval(timer)};
+}
+
+/* ---------------- GUESS THE NUMBER ---------------- */
+function game_guessnum(gm){
+  setHint('I picked a number 1–100. Guess it in as few tries as possible (lower best = better).');
+  let target,tries,over;
+  const input=el('input',{type:'number',style:'font-size:22px;padding:10px;width:120px;border-radius:10px;text-align:center;background:#2a1e10;color:#fff;border:1px solid #5a4428'});
+  const go=el('button',{className:'btn',textContent:'Guess'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Number'});
+  const msg=el('div',{className:'big',style:'min-height:30px'});
+  host.append(msg,el('div',{style:'display:flex;gap:10px'},input,go,newBtn));
+  function reset(){target=1+Math.floor(Math.random()*100);tries=0;over=false;msg.textContent='Make a guess between 1 and 100';input.value='';input.disabled=go.disabled=false;input.focus();
+    const b=getRaw(gm.id);setStatus('Best: '+(b?b+' tries':'—'));}
+  function guess(){if(over)return;const g=+input.value;if(!g||g<1||g>100){msg.textContent='Enter 1–100';return;}tries++;
+    if(g===target){over=true;msg.textContent='🎉 Correct! '+target+' in '+tries+' tries';const b=getRaw(gm.id);if(b===null||tries<+b)localStorage.setItem('fam_'+gm.id,tries);setStatus('Best: '+getRaw(gm.id)+' tries');input.disabled=go.disabled=true;}
+    else{msg.textContent=g<target?'📈 Higher! ('+tries+' tries)':'📉 Lower! ('+tries+' tries)';input.value='';input.focus();}}
+  go.onclick=guess;input.onkeydown=e=>{if(e.key==='Enter')guess();};newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- DICE & COIN ROLLER ---------------- */
+function game_dice(gm){
+  setHint('A handy roller for board-game night. Pick dice count & sides, or flip a coin.');
+  let nDice=2,sides=6;
+  const ctrl=el('div',{style:'display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center'});
+  const nSel=el('select',{});for(let i=1;i<=6;i++)nSel.append(el('option',{value:i,textContent:i+' dice'}));nSel.value=2;
+  const sSel=el('select',{});[4,6,8,10,12,20].forEach(s=>sSel.append(el('option',{value:s,textContent:'d'+s})));sSel.value=6;
+  const rollBtn=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const coinBtn=el('button',{className:'btn ghost',textContent:'🪙 Flip Coin'});
+  ctrl.append(nSel,sSel,rollBtn,coinBtn);
+  const out=el('div',{style:'display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:40px;min-height:60px'});
+  const total=el('div',{className:'big'});
+  host.append(ctrl,out,total);
+  nSel.onchange=()=>nDice=+nSel.value;sSel.onchange=()=>sides=+sSel.value;
+  rollBtn.onclick=()=>{out.innerHTML='';let sum=0;for(let i=0;i<nDice;i++){const v=1+Math.floor(Math.random()*sides);sum+=v;
+    out.append(el('div',{className:'die',textContent:(sides===6?DICE[v]:v),style:'width:60px;height:60px;font-size:'+(sides===6?'34px':'26px')}));}
+    total.textContent='Total: '+sum;setStatus('Rolled '+nDice+'d'+sides+' = '+sum);};
+  coinBtn.onclick=()=>{out.innerHTML='';const h=Math.random()<0.5;out.append(el('div',{style:'font-size:70px',textContent:h?'🙂':'👑'}));total.textContent=h?'HEADS':'TAILS';setStatus('Coin flip: '+(h?'Heads':'Tails'));};
+  setStatus('Ready to roll');
+  return {stop:()=>{}};
+}
+
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+applyTheme(localStorage.getItem('theme')||'light');
+buildMenu();
+</script>
+</body>
+</html>
