@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atusa's Play Room</title>
+    <style>
+        :root {
+            --primary: #ffb6c1; 
+            --secondary: #e6e6fa; 
+            --accent: #98fb98; 
+            --text: #444;
+            --bg: #fff0f5; 
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        /* Top Bar for Window Controls */
+        #top-bar {
+            background-color: #ff99a8;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .sys-btn {
+            background-color: white; color: #ff99a8; border: 2px solid white; 
+            padding: 8px 15px; font-size: 1rem; border-radius: 15px; cursor: pointer; 
+            font-family: inherit; font-weight: bold; transition: 0.2s;
+        }
+
+        .sys-btn:hover { background-color: var(--bg); color: #ff6b81; }
+
+        header {
+            background-color: var(--primary);
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-bottom: 5px dashed white;
+        }
+
+        h1 { margin: 0; color: white; font-size: 2.2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+
+        /* Compact Grid Layout */
+        #home-view {
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 12px; 
+            justify-content: center; 
+            max-width: 1050px; 
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background-color: white; border-radius: 12px; padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08); cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; border: 2px solid var(--secondary);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 90px;
+        }
+
+        .game-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); background-color: var(--secondary); }
+        .game-icon { font-size: 2rem; margin-bottom: 5px; }
+        .game-title { font-size: 0.95rem; font-weight: bold; line-height: 1.1; }
+
+        /* Game View */
+        #game-view { display: none; padding: 20px; }
+
+        .back-btn {
+            background-color: var(--primary); color: white; border: none; padding: 10px 20px;
+            font-size: 1.2rem; border-radius: 20px; cursor: pointer; margin-bottom: 20px; font-family: inherit;
+        }
+        .back-btn:hover { background-color: #ff99a8; }
+
+        .game-container {
+            background: white; border-radius: 20px; padding: 25px; max-width: 650px;
+            margin: 0 auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); border: 4px solid var(--accent);
+            display: none; 
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            background: var(--bg); padding: 15px; border-radius: 15px; margin-bottom: 20px;
+            border: 2px dashed var(--primary); display: inline-block; text-align: left; font-size: 1.1rem;
+        }
+        .settings-panel label { margin-right: 15px; cursor: pointer; }
+        .settings-row { margin-bottom: 10px; }
+
+        button.action-btn {
+            background: var(--accent); border: none; padding: 10px 20px; font-size: 1.2rem;
+            border-radius: 10px; cursor: pointer; margin: 5px; font-family: inherit;
+        }
+        button.action-btn:hover { filter: brightness(0.9); }
+        input[type="number"], input[type="text"] {
+            padding: 10px; font-size: 1.2rem; border-radius: 10px; border: 2px solid var(--primary);
+            text-align: center; font-family: inherit; width: 150px; margin: 10px;
+        }
+
+        .question-text { font-size: 1.5rem; font-weight: bold; margin: 20px 0; color: var(--text); }
+        .feedback { font-size: 1.3rem; font-weight: bold; margin-top: 15px; color: #ff69b4; min-height: 30px;}
+        .choice-btn { background: var(--secondary); border: 2px solid var(--primary); padding: 10px 20px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; margin: 5px; display: inline-block; font-family: inherit;}
+        .choice-btn:hover { background: var(--primary); color: white; }
+
+        .reading-passage {
+            background: var(--bg); padding: 20px; border-radius: 15px; font-size: 1.2rem;
+            line-height: 1.6; border: 2px solid var(--secondary); margin-bottom: 20px; text-align: left;
+        }
+
+        /* Specific Layouts */
+        .tic-tac-toe-board { display: grid; grid-template-columns: repeat(3, 90px); gap: 5px; justify-content: center; margin-top: 20px; }
+        .ttt-cell { width: 90px; height: 90px; background: var(--secondary); font-size: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 10px; }
+        .memory-board { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; max-width: 450px; margin-left: auto; margin-right: auto;}
+        .memory-card { background: var(--primary); border-radius: 10px; cursor: pointer; font-size: 2rem; display: flex; align-items: center; justify-content: center; color: transparent; transition: background 0.3s; }
+        .memory-card.flipped { background: white; border: 2px solid var(--primary); color: black; }
+    
+        /* ── Load Modal ── */
+        #load-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 9999;
+            align-items: center; justify-content: center;
+        }
+        #load-modal-overlay.active { display: flex; }
+        #load-modal {
+            background: #fff0f5; border-radius: 20px; padding: 30px 35px;
+            border: 4px solid #ffb6c1; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            text-align: center; max-width: 420px; width: 90%;
+            font-family: 'Comic Sans MS', sans-serif;
+        }
+        #load-modal h2 { color: #ff6b81; margin: 0 0 10px; font-size: 1.4rem; }
+        #load-modal p  { color: #555; font-size: 1rem; margin-bottom: 22px; }
+        .modal-btn {
+            display: block; width: 100%; padding: 12px;
+            margin: 8px 0; font-size: 1.1rem; border-radius: 12px;
+            border: 2px solid transparent; cursor: pointer;
+            font-family: inherit; font-weight: bold; transition: 0.2s;
+        }
+        .modal-btn.replace { background:#ff6b81; color:white; border-color:#ff6b81; }
+        .modal-btn.replace:hover { background:#ff4757; }
+        .modal-btn.append  { background:#98fb98; color:#333; border-color:#7dda7d; }
+        .modal-btn.append:hover  { background:#7dda7d; }
+        .modal-btn.cancel  { background:#e6e6fa; color:#555; border-color:#c8c8f0; }
+        .modal-btn.cancel:hover  { background:#d0d0f0; }
+    </style>
+</head>
+<body>
+
+    <div id="top-bar">
+        <a class="sys-btn" href="index.html" style="text-decoration:none;display:inline-block">🏠 All Games</a>
+    </div>
+
+    <header>
+        <h1>🌸 Atusa's Play Room 🦄</h1>
+    </header>
+
+    <div id="home-view"></div>
+
+    <div id="game-view">
+        <button class="back-btn" onclick="goHome()">🔙 Back to Play Room</button>
+        <h2 id="active-game-title" style="font-size: 1.8rem; color: var(--text); margin-top: 0;">Game Title</h2>
+        
+        <div id="game-6" class="game-container">
+            <div class="question-text">Read the story, then answer the question! 📖</div>
+            <div id="reading-passage" class="reading-passage"></div>
+            <div id="reading-q" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 15px;"></div>
+            <div id="reading-options"></div>
+            <div id="reading-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initReading()" style="margin-top:20px;">Next Story</button>
+        </div>
+
+        <div id="game-1" class="game-container">
+            <div class="settings-panel">
+                <div class="settings-row">
+                    <strong>Players:</strong>
+                    <label><input type="radio" name="tttPlayers" value="1" checked onchange="initTicTacToe()"> 1 Player</label>
+                    <label><input type="radio" name="tttPlayers" value="2" onchange="initTicTacToe()"> 2 Players</label>
+                </div>
+                <div class="settings-row" id="ttt-diff-row">
+                    <strong>Difficulty:</strong>
+                    <label><input type="radio" name="tttDiff" value="easy" onchange="initTicTacToe()"> Easy</label>
+                    <label><input type="radio" name="tttDiff" value="medium" checked onchange="initTicTacToe()"> Medium</label>
+                    <label><input type="radio" name="tttDiff" value="hard" onchange="initTicTacToe()"> Hard</label>
+                </div>
+            </div>
+            <div id="ttt-status" class="question-text">Your turn (X)</div>
+            <div class="tic-tac-toe-board" id="ttt-board"></div>
+            <button class="action-btn" onclick="initTicTacToe()">Restart Game</button>
+        </div>
+
+        <div id="game-2" class="game-container">
+            <div class="settings-panel">
+                <strong>Difficulty:</strong>
+                <label><input type="radio" name="memDiff" value="easy" onchange="initMemory()"> Easy</label>
+                <label><input type="radio" name="memDiff" value="medium" checked onchange="initMemory()"> Medium</label>
+                <label><input type="radio" name="memDiff" value="hard" onchange="initMemory()"> Hard</label>
+            </div>
+            <div class="question-text">Match the pairs!</div>
+            <div class="memory-board" id="memory-board"></div>
+            <div id="mem-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initMemory()">Restart Game</button>
+        </div>
+
+        <div id="game-3" class="game-container">
+            <div class="settings-panel">
+                <strong>Difficulty:</strong>
+                <label><input type="radio" name="mathDiff" value="easy" onchange="initMath()"> Easy</label>
+                <label><input type="radio" name="mathDiff" value="medium" checked onchange="initMath()"> Medium</label>
+                <label><input type="radio" name="mathDiff" value="hard" onchange="initMath()"> Hard</label>
+            </div>
+            <div id="math-problem" class="question-text" style="font-size: 3rem;"></div>
+            <input type="number" id="math-answer" onkeypress="if(event.key==='Enter') checkMath()">
+            <button class="action-btn" onclick="checkMath()">Check Answer</button>
+            <div id="math-result" class="feedback"></div>
+        </div>
+
+        <div id="game-4" class="game-container">
+            <div class="settings-panel">
+                <strong>Difficulty:</strong>
+                <label><input type="radio" name="guessDiff" value="easy" onchange="initGuessGame()"> Easy</label>
+                <label><input type="radio" name="guessDiff" value="medium" checked onchange="initGuessGame()"> Medium</label>
+                <label><input type="radio" name="guessDiff" value="hard" onchange="initGuessGame()"> Hard</label>
+            </div>
+            <div id="guess-prompt" class="question-text"></div>
+            <input type="number" id="guess-input" onkeypress="if(event.key==='Enter') checkGuess()">
+            <button class="action-btn" onclick="checkGuess()">Guess</button>
+            <div id="guess-result" class="feedback"></div>
+            <button class="action-btn" onclick="initGuessGame()" style="display:none;" id="guess-restart">Play Again</button>
+        </div>
+
+        <div id="game-5" class="game-container">
+            <div class="settings-panel">
+                <strong>Difficulty:</strong>
+                <label><input type="radio" name="scrambleDiff" value="easy" onchange="initScramble()"> Easy</label>
+                <label><input type="radio" name="scrambleDiff" value="medium" checked onchange="initScramble()"> Medium</label>
+                <label><input type="radio" name="scrambleDiff" value="hard" onchange="initScramble()"> Hard</label>
+            </div>
+            <div class="question-text">Unscramble the word!</div>
+            <div id="scramble-word" style="font-size: 2.5rem; letter-spacing: 5px; margin: 15px; font-weight:bold; color:var(--primary);"></div>
+            <input type="text" id="scramble-input" onkeypress="if(event.key==='Enter') checkScramble()">
+            <button class="action-btn" onclick="checkScramble()">Check</button>
+            <div id="scramble-result" class="feedback"></div>
+            <button class="action-btn" onclick="initScramble()">Next Word</button>
+        </div>
+
+        <div id="game-7" class="game-container">
+            <div id="trivia-q" class="question-text"></div>
+            <div id="trivia-options"></div>
+            <div id="trivia-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initTrivia()" style="margin-top:20px;">Next Question</button>
+        </div>
+
+        <div id="game-8" class="game-container">
+            <div id="geo-q" class="question-text"></div>
+            <div id="geo-options"></div>
+            <div id="geo-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initGeography()" style="margin-top:20px;">Next State</button>
+        </div>
+
+        <div id="game-9" class="game-container">
+            <div class="question-text">Which planet is closest to the sun?</div>
+            <div id="planet-target" style="font-size: 1.5rem; margin-bottom: 20px;">Find: <strong>Mercury</strong></div>
+            <div id="planet-options" style="font-size: 2.5rem; cursor: pointer;"></div>
+            <div id="planet-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initPlanets()">Restart</button>
+        </div>
+
+        <div id="game-10" class="game-container">
+            <div class="question-text">Fill in the missing letter!</div>
+            <div id="spelling-word" style="font-size: 2.5rem; letter-spacing: 5px; margin: 20px; font-weight:bold;"></div>
+            <div id="spelling-options"></div>
+            <div id="spelling-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initSpelling()" style="margin-top:20px;">Next Word</button>
+        </div>
+
+        <div id="game-11" class="game-container">
+            <div class="question-text">What food group does this belong to?</div>
+            <div id="food-item" style="font-size: 4rem; margin: 20px;">🍎</div>
+            <div>
+                <button class="choice-btn" onclick="checkFood('Fruit')">Fruit</button>
+                <button class="choice-btn" onclick="checkFood('Vegetable')">Vegetable</button>
+                <button class="choice-btn" onclick="checkFood('Protein')">Protein</button>
+                <button class="choice-btn" onclick="checkFood('Dairy')">Dairy</button>
+            </div>
+            <div id="food-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initFood()" style="margin-top:20px;">Next Food</button>
+        </div>
+
+        <div id="game-12" class="game-container">
+            <div class="question-text">Where does this animal live?</div>
+            <div id="habitat-item" style="font-size: 4rem; margin: 20px;">🦈</div>
+            <div>
+                <button class="choice-btn" onclick="checkHabitat('Ocean')">🌊 Ocean</button>
+                <button class="choice-btn" onclick="checkHabitat('Forest')">🌲 Forest</button>
+                <button class="choice-btn" onclick="checkHabitat('Jungle')">🌴 Jungle</button>
+                <button class="choice-btn" onclick="checkHabitat('Farm')">🚜 Farm</button>
+            </div>
+            <div id="habitat-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initHabitat()" style="margin-top:20px;">Next Animal</button>
+        </div>
+
+        <div id="game-13" class="game-container">
+            <div class="question-text">Match the definition to the stage!</div>
+            <div id="water-def" style="font-size: 1.1rem; margin: 20px; min-height: 50px;"></div>
+            <div>
+                <button class="choice-btn" onclick="checkWater('Evaporation')">Evaporation ☀️</button>
+                <button class="choice-btn" onclick="checkWater('Condensation')">Condensation ☁️</button>
+                <button class="choice-btn" onclick="checkWater('Precipitation')">Precipitation 🌧️</button>
+                <button class="choice-btn" onclick="checkWater('Collection')">Collection 🌊</button>
+            </div>
+            <div id="water-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initWater()" style="margin-top:20px;">Next Stage</button>
+        </div>
+
+        <div id="game-14" class="game-container">
+            <div class="question-text">Time Math!</div>
+            <div id="time-q" style="font-size: 1.5rem; margin: 20px;"></div>
+            <div id="time-options"></div>
+            <div id="time-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initTime()" style="margin-top:20px;">Next Question</button>
+        </div>
+
+        <div id="game-15" class="game-container">
+            <div class="question-text">Help the robot reach the battery! 🤖🔋</div>
+            <div style="font-size: 1.1rem; margin-bottom: 20px;" id="code-q"></div>
+            <div id="code-options"></div>
+            <div id="code-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initCoding()" style="margin-top:20px;">Next Puzzle</button>
+        </div>
+
+        <div id="game-16" class="game-container">
+            <div class="question-text">Which word is spelled correctly?</div>
+            <div id="fixer-options" style="margin-top: 20px;"></div>
+            <div id="fixer-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initFixer()" style="margin-top:20px;">Next Word</button>
+        </div>
+
+        <div id="game-17" class="game-container">
+            <div class="question-text">Fraction Math!</div>
+            <div id="fraction-q" style="font-size: 1.5rem; margin: 20px;"></div>
+            <div id="fraction-options"></div>
+            <div id="fraction-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initFraction()" style="margin-top:20px;">Next Problem</button>
+        </div>
+
+        <div id="game-18" class="game-container">
+            <div class="question-text">Who invented this?</div>
+            <div id="inventor-item" style="font-size: 3.5rem; margin: 15px;"></div>
+            <div id="inventor-desc" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 20px;"></div>
+            <div id="inventor-options"></div>
+            <div id="inventor-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initInventor()" style="margin-top:20px;">Next Inventor</button>
+        </div>
+
+        <div id="game-19" class="game-container">
+            <div class="question-text">What is the OPPOSITE of...</div>
+            <div id="opposite-word" style="font-size: 2.2rem; font-weight: bold; color: var(--primary); margin: 20px;"></div>
+            <div id="opposite-options"></div>
+            <div id="opposite-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initOpposite()" style="margin-top:20px;">Next Word</button>
+        </div>
+
+        <div id="game-20" class="game-container">
+            <div class="question-text">Let's count our change! 💵</div>
+            <div id="money-q" style="font-size: 1.5rem; margin: 20px;"></div>
+            <div id="money-options"></div>
+            <div id="money-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initMoney()" style="margin-top:20px;">Next Scenario</button>
+        </div>
+
+        <div id="game-21" class="game-container">
+            <div class="question-text">Geography Explorer! 🌍</div>
+            <div id="continent-q" style="font-size: 1.3rem; margin: 20px;"></div>
+            <div id="continent-options"></div>
+            <div id="continent-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initContinent()" style="margin-top:20px;">Next Fact</button>
+        </div>
+
+        <div id="game-22" class="game-container">
+            <div class="question-text">What family does this instrument belong to? 🎻</div>
+            <div id="instrument-name" style="font-size: 2.5rem; font-weight: bold; margin: 20px;"></div>
+            <div>
+                <button class="choice-btn" onclick="checkInstrument('String')">String</button>
+                <button class="choice-btn" onclick="checkInstrument('Woodwind')">Woodwind</button>
+                <button class="choice-btn" onclick="checkInstrument('Brass')">Brass</button>
+                <button class="choice-btn" onclick="checkInstrument('Percussion')">Percussion</button>
+            </div>
+            <div id="instrument-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initInstrument()" style="margin-top:20px;">Next Instrument</button>
+        </div>
+
+        <div id="game-23" class="game-container">
+            <div class="question-text">Find the correct part of speech! 📚</div>
+            <div id="grammar-q" style="font-size: 1.5rem; margin: 20px; font-style: italic;"></div>
+            <div id="grammar-prompt" style="font-weight: bold; margin-bottom: 15px;"></div>
+            <div id="grammar-options"></div>
+            <div id="grammar-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initGrammar()" style="margin-top:20px;">Next Sentence</button>
+        </div>
+
+        <div id="game-24" class="game-container">
+            <div class="question-text">Geometry Detective! 🛑</div>
+            <div id="shape-q" style="font-size: 1.5rem; margin: 20px;"></div>
+            <div id="shape-options"></div>
+            <div id="shape-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initShape()" style="margin-top:20px;">Next Shape</button>
+        </div>
+
+        <div id="game-25" class="game-container">
+            <div class="question-text">What comes next in the pattern? 🧩</div>
+            <div id="pattern-q" style="font-size: 2.5rem; margin: 20px; letter-spacing: 2px;"></div>
+            <div id="pattern-options"></div>
+            <div id="pattern-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initPattern()" style="margin-top:20px;">Next Pattern</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SYSTEM API HOOKS (For Python to interact with) ---
+        function triggerExit() {
+            if (window.pywebview) { window.pywebview.api.exit_app(); } 
+            else { alert("This button works when running inside the desktop app!"); }
+        }
+
+        function triggerLoadGames() {
+            if (window.pywebview) { window.pywebview.api.load_new_curriculum(); } 
+            else { alert("This button works when running inside the desktop app!"); }
+        }
+// Replacement starts here
+        // =====================================================================
+        // FIX 1: Added showAlert parameter (default true) so startup injection
+        //         is silent while manual "Load New Games" still shows the alert.
+        // FIX 2: Removed the dead duplicate `else if (data.readingquest...)` block.
+        // FIX 3: Added user-visible error in the catch block.
+        // FIX 4: Added structure validation for scrambleWords.
+        // =====================================================================
+        function injectCurriculum(jsonData, showAlert = true) {
+            const trySet = (fn) => { try { fn(); } catch(e) { console.warn("Inject partial error:", e.message); } };
+            try {
+                const data = JSON.parse(jsonData);
+                trySet(() => { const d = data.readingquest    || data.reading_quest;    if (d && d.length > 0) readingPassages = d; });
+                trySet(() => { const d = data.wordfixer       || data.word_fixer;       if (d && d.length > 0) fixerQs        = d; });
+                trySet(() => { const d = data.grammarguru     || data.grammar_guru;     if (d && d.length > 0) gramQs          = d; });
+                trySet(() => { const d = data.fractionaction  || data.fraction_action;  if (d && d.length > 0) fractQs         = d; });
+                trySet(() => { const d = data.sciencetrivia   || data.science_trivia;   if (d && d.length > 0) triviaPool      = d; });
+                trySet(() => { const d = data.famousinventors || data.famous_inventors; if (d && d.length > 0) inventors       = d; });
+                trySet(() => { if (data.geoPool    && data.geoPool.length    > 0) geoPool    = data.geoPool; });
+                trySet(() => { if (data.oppQs      && data.oppQs.length      > 0) oppQs      = data.oppQs; });
+                trySet(() => { if (data.moneyQs    && data.moneyQs.length    > 0) moneyQs    = data.moneyQs; });
+                trySet(() => { if (data.timeQs     && data.timeQs.length     > 0) timeQs     = data.timeQs; });
+                trySet(() => { if (data.shapeQs    && data.shapeQs.length    > 0) shapeQs    = data.shapeQs; });
+                trySet(() => { if (data.patQs      && data.patQs.length      > 0) patQs      = data.patQs; });
+                trySet(() => { if (data.contQs     && data.contQs.length     > 0) contQs     = data.contQs; });
+                trySet(() => { if (data.foods      && data.foods.length      > 0) foods      = data.foods; });
+                trySet(() => { if (data.animals    && data.animals.length    > 0) animals    = data.animals; });
+                trySet(() => { if (data.insts      && data.insts.length      > 0) insts      = data.insts; });
+                trySet(() => { if (data.spellWords && data.spellWords.length > 0) spellWords = data.spellWords; });
+                trySet(() => { if (data.codes      && data.codes.length      > 0) codes      = data.codes; });
+                trySet(() => {
+                    if (data.scrambleWords && typeof data.scrambleWords === 'object' &&
+                        Array.isArray(data.scrambleWords.easy) &&
+                        Array.isArray(data.scrambleWords.medium) &&
+                        Array.isArray(data.scrambleWords.hard)) {
+                        scrambleWords = data.scrambleWords;
+                    }
+                });
+                if (showAlert) alert("Games successfully updated! \u{1F31F}");
+            } catch (e) {
+                console.error("Error loading curriculum: ", e);
+                alert("Failed to load games. JSON format error: " + e.message);
+            }
+        }
+        // Replacement Ends here
+
+
+        // --- Navigation & Setup ---
+        const games = [
+            { id: 1, title: "Tic Tac Toe", icon: "❌⭕" },
+            { id: 2, title: "Memory Match", icon: "🃏" },
+            { id: 3, title: "Math Fun", icon: "➕➖" },
+            { id: 4, title: "Guess the Number", icon: "🔢" },
+            { id: 5, title: "Word Scramble", icon: "🔤" },
+            { id: 6, title: "Reading Quest", icon: "📖" }, 
+            { id: 7, title: "Science Trivia", icon: "🔬" },
+            { id: 8, title: "Geography Capitals", icon: "🗺️" },
+            { id: 9, title: "Planet Order", icon: "🪐" },
+            { id: 10, title: "Missing Letters", icon: "A_C" },
+            { id: 11, title: "Food Groups", icon: "🥦" },
+            { id: 12, title: "Animal Habitats", icon: "🦁" },
+            { id: 13, title: "Water Cycle", icon: "🌧️" },
+            { id: 14, title: "Time Math", icon: "⌚" },
+            { id: 15, title: "Robot Coding", icon: "🤖" },
+            { id: 16, title: "Word Fixer", icon: "📝" },
+            { id: 17, title: "Fraction Action", icon: "🍕" },
+            { id: 18, title: "Famous Inventors", icon: "💡" },
+            { id: 19, title: "Opposites Attract", icon: "↔️" },
+            { id: 20, title: "Money Math", icon: "💵" },
+            { id: 21, title: "World Continents", icon: "🌍" },
+            { id: 22, title: "Instruments", icon: "🎻" },
+            { id: 23, title: "Grammar Guru", icon: "📚" },
+            { id: 24, title: "Shape Sorter", icon: "🛑" },
+            { id: 25, title: "Pattern Puzzle", icon: "🧩" }
+        ];
+
+        const homeView = document.getElementById('home-view');
+        games.forEach(game => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.onclick = () => openGame(game.id, game.title);
+            card.innerHTML = `<div class="game-icon">${game.icon}</div><div class="game-title">${game.title}</div>`;
+            homeView.appendChild(card);
+        });
+
+        function openGame(id, title) {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('game-view').style.display = 'block';
+            document.getElementById('active-game-title').innerText = title;
+            document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
+            document.getElementById('game-' + id).style.display = 'block';
+
+            document.querySelectorAll('.feedback').forEach(el => el.innerText = '');
+
+            const initFunctions = {
+                1: initTicTacToe, 2: initMemory, 3: initMath, 4: initGuessGame, 5: initScramble,
+                6: initReading, 7: initTrivia, 8: initGeography, 9: initPlanets, 10: initSpelling,
+                11: initFood, 12: initHabitat, 13: initWater, 14: initTime, 15: initCoding,
+                16: initFixer, 17: initFraction, 18: initInventor, 19: initOpposite, 20: initMoney,
+                21: initContinent, 22: initInstrument, 23: initGrammar, 24: initShape, 25: initPattern
+            };
+            if(initFunctions[id]) initFunctions[id]();
+        }
+
+        function goHome() {
+            document.getElementById('home-view').style.display = 'grid';
+            document.getElementById('game-view').style.display = 'none';
+        }
+
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+        function populateOptions(optsArray, containerId, feedbackId, correctAns, successMsg) {
+            let container = document.getElementById(containerId);
+            container.innerHTML = '';
+            shuffle(optsArray).forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'choice-btn'; btn.innerText = opt;
+                btn.onclick = () => {
+                    if(opt === correctAns) document.getElementById(feedbackId).innerText = successMsg;
+                    else document.getElementById(feedbackId).innerText = "Not quite! Try again.";
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // --- ANTI-REPEAT HELPER FUNCTION ---
+        const lastIndices = {};
+        function getRandomItem(array, key) {
+            if (!array || array.length === 0) return null;
+            if (array.length === 1) return array[0];
+            if (lastIndices[key] === undefined) lastIndices[key] = -1;
+            
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * array.length);
+            } while (idx === lastIndices[key]);
+            
+            lastIndices[key] = idx;
+            return array[idx];
+        }
+
+        /* ----- THE 50 READING QUESTS (Dynamic Data) ----- */
+        let readingPassages = [
+            { p: "Jack ate a shiny red apple for breakfast. After he finished, he grabbed his backpack and walked to school.", q: "Where did Jack go after breakfast?", a: "To school", wr: ["To the park", "To bed", "To the store"] },
+            { p: "Mia found a tiny, fluffy kitten hiding under the porch. She carefully gave it a bowl of warm milk and named it Whiskers.", q: "What did Mia name the kitten?", a: "Whiskers", wr: ["Fluffy", "Milk", "Porch"] },
+            { p: "The sun was shining brightly at the beach. Sam built a huge sandcastle with three tall towers and a moat.", q: "What did Sam build?", a: "A sandcastle", wr: ["A snowman", "A treehouse", "A boat"] },
+            { p: "Emma planted a small sunflower seed in a pot. She watered it every day until a bright yellow flower bloomed.", q: "What color was the flower?", a: "Yellow", wr: ["Red", "Blue", "Purple"] },
+            { p: "Leo and his dad went camping in the forest. At night, they roasted marshmallows over a crackling fire.", q: "What did they roast over the fire?", a: "Marshmallows", wr: ["Hot dogs", "Apples", "Fish"] },
+            { p: "Maya loves programming. She spent all afternoon building a simple website about her favorite band.", q: "What did Maya build a website about?", a: "Her favorite band", wr: ["A video game", "Her pet dog", "School math"] },
+            { p: "The school robotics team had a big competition on Saturday. They packed their robot, Sparky, into a padded box.", q: "What was the name of the robot?", a: "Sparky", wr: ["Bolts", "Gizmo", "Rover"] },
+            { p: "Samira decided to bake cookies for the neighborhood block party. She mixed chocolate chips, flour, and sugar.", q: "Where was Samira taking the cookies?", a: "The block party", wr: ["To school", "To her grandmother's", "To the park"] },
+            { p: "During the hike, Liam stopped suddenly. Resting on a low branch was a massive snowy owl.", q: "What kind of bird did Liam see?", a: "A snowy owl", wr: ["A bald eagle", "A blue jay", "A red robin"] },
+            { p: "Zoe found an old, dusty map in the attic. It showed a path leading to a big red X in the local park.", q: "Where did Zoe find the map?", a: "In the attic", wr: ["In the basement", "Under her bed", "At the library"] },
+            { p: "The science fair was packed with people. David proudly stood next to his project about volcanoes.", q: "Where was David?", a: "The science fair", wr: ["The grocery store", "The movie theater", "The park"] },
+            { p: "Nora was practicing the guitar for her upcoming talent show. She played the same song five times.", q: "Why was Nora practicing the guitar?", a: "For a talent show", wr: ["For a math test", "To join a band", "To teach her brother"] },
+            { p: "A loud thunderstorm woke Leo up. He quickly shut his window to stop the rain from soaking his rug.", q: "Why did Leo shut his window?", a: "To stop the rain", wr: ["To block the wind", "To keep out bugs", "Because it was cold"] },
+            { p: "The art teacher asked the class to paint a landscape. Sarah chose to paint a bright orange sunset.", q: "What did Sarah paint?", a: "A sunset", wr: ["A mountain range", "A busy city street", "A dark forest"] },
+            { p: "Marcus saved his allowance for two months to buy a new skateboard. He picked one with bright green wheels.", q: "What color were the wheels on the skateboard?", a: "Green", wr: ["Red", "Black", "Blue"] },
+            { p: "It was freezing outside. Chloe wrapped a thick woolen scarf around her neck before waiting for the bus.", q: "What did Chloe wrap around her neck?", a: "A scarf", wr: ["A jacket", "A necklace", "A tie"] },
+            { p: "The mystery novel was so exciting that Ben stayed up late. He had to know who stole the diamond necklace.", q: "What was stolen in the book?", a: "A diamond necklace", wr: ["A gold watch", "A secret map", "A famous painting"] },
+            { p: "Jasmine packed a healthy lunch for her field trip to the museum. She brought a turkey sandwich and an apple.", q: "Where was Jasmine going for her field trip?", a: "The museum", wr: ["The zoo", "The aquarium", "The state park"] },
+            { p: "Tyler's dog, Buster, loves to play fetch. Yesterday, Buster chased a tennis ball right into the muddy pond.", q: "Where did Buster chase the tennis ball?", a: "Into the pond", wr: ["Under the car", "Over the fence", "Into the house"] },
+            { p: "The gymnasium was decorated with streamers. Tonight was the middle school dance, and everyone was excited.", q: "How was the gymnasium decorated?", a: "With streamers", wr: ["With lights", "With posters", "With confetti"] },
+            { p: "Aria visited the animal shelter to adopt a pet. She fell in love with a quiet, floppy-eared rabbit.", q: "What kind of animal did Aria adopt?", a: "A rabbit", wr: ["A kitten", "A puppy", "A hamster"] },
+            { p: "The math puzzle was tricky. Carlos stared at the numbers for ten minutes before finding the pattern.", q: "How long did Carlos stare at the puzzle?", a: "Ten minutes", wr: ["Five minutes", "Twenty minutes", "An hour"] },
+            { p: "Emma helped her dad plant a vegetable garden. By August, they had grown lots of big red tomatoes.", q: "What did Emma and her dad grow?", a: "Tomatoes", wr: ["Carrots", "Peppers", "Corn"] },
+            { p: "Oliver loves taking photos. He spent an hour trying to get a picture of a butterfly landing on a flower.", q: "What was Oliver trying to photograph?", a: "A butterfly", wr: ["A flying bird", "A running dog", "A falling leaf"] },
+            { p: "The basketball game was tied. Jamal grabbed the ball and shot it through the hoop just before the buzzer.", q: "What did Jamal do right before the buzzer?", a: "Shot the ball", wr: ["Passed the ball", "Fell down", "Called a timeout"] },
+            { p: "Lily found a shiny silver coin on the sidewalk. She picked it up and put it safely in her pocket.", q: "What did Lily find?", a: "A silver coin", wr: ["A gold ring", "A lost key", "A smooth rock"] },
+            { p: "Max wanted to build a fort in the living room. He used three heavy blankets and four fluffy pillows.", q: "What did Max use to build his fort?", a: "Blankets and pillows", wr: ["Cardboard boxes", "Wooden blocks", "Chairs and string"] },
+            { p: "The school bus had a flat tire on the way to school. All the kids had to wait until a mechanic fixed it.", q: "Why was the school bus stopped?", a: "It had a flat tire", wr: ["It ran out of gas", "The driver was lost", "There was traffic"] },
+            { p: "Sophie's favorite subject in school is science. Today, they learned about how caterpillars turn into butterflies.", q: "What is Sophie's favorite subject?", a: "Science", wr: ["Math", "History", "Art"] },
+            { p: "Lucas went to the library to check out a book about space. He wanted to learn all about the rings of Saturn.", q: "What did Lucas want to learn about?", a: "Saturn's rings", wr: ["Black holes", "The moon", "Mars rovers"] },
+            { p: "For dinner, dad made spaghetti with homemade tomato sauce. It was so delicious that everyone asked for seconds.", q: "What did dad make for dinner?", a: "Spaghetti", wr: ["Pizza", "Tacos", "Chicken"] },
+            { p: "Ella's grandmother taught her how to knit. After practicing for a week, Ella finally made a small blue scarf.", q: "What did Ella knit?", a: "A blue scarf", wr: ["A warm hat", "A pair of socks", "A thick blanket"] },
+            { p: "The city park has a brand new playground. It features a tall twisty slide and a giant climbing web.", q: "What is new at the city park?", a: "A playground", wr: ["A swimming pool", "A basketball court", "A picnic area"] },
+            { p: "Noah was looking for his lost shoe. He finally found it hiding right underneath the living room sofa.", q: "Where was Noah's shoe?", a: "Under the sofa", wr: ["In the closet", "By the front door", "Under his bed"] },
+            { p: "The ice cream truck drove down the street playing a happy song. All the kids ran outside to buy a cold treat.", q: "What drove down the street?", a: "An ice cream truck", wr: ["A fire engine", "A mail truck", "A school bus"] },
+            { p: "Ava and her brother built a tall tower out of wooden blocks. It reached all the way up to the kitchen table.", q: "What did Ava build with her brother?", a: "A block tower", wr: ["A puzzle", "A train track", "A paper airplane"] },
+            { p: "It snowed five inches on Tuesday night. The school principal called the next morning to say there was a snow day.", q: "Why was school canceled?", a: "Because it snowed", wr: ["Because of a storm", "It was a holiday", "The school was broken"] },
+            { p: "Caleb loves collecting interesting rocks. He keeps his favorite shiny quartz crystals in a small glass jar on his desk.", q: "Where does Caleb keep his rocks?", a: "In a glass jar", wr: ["In a wooden box", "In a velvet bag", "In his drawer"] },
+            { p: "The history teacher told a fascinating story about ancient Egypt. The class learned how the great pyramids were built.", q: "What did the class learn about?", a: "Ancient Egypt", wr: ["Ancient Rome", "The Wild West", "The Middle Ages"] },
+            { p: "Isabella brought her jump rope to recess. She and her friends took turns seeing who could jump the most times without stopping.", q: "What did Isabella bring to recess?", a: "A jump rope", wr: ["A soccer ball", "A frisbee", "Chalk"] },
+            { p: "The squirrel ran quickly across the yard. It scrambled up the old oak tree holding a large acorn in its mouth.", q: "What was the squirrel holding?", a: "An acorn", wr: ["A leaf", "A twig", "A piece of bread"] },
+            { p: "During the family road trip, they played a game of 'I Spy'. They saw cows, tractors, and a big red barn out the window.", q: "What game did the family play?", a: "I Spy", wr: ["Bingo", "Tic Tac Toe", "Hide and Seek"] },
+            { p: "Elijah accidentally dropped his favorite mug. It shattered into three pieces, but his dad promised they could glue it back together.", q: "What did Elijah drop?", a: "His mug", wr: ["His phone", "His plate", "His toy"] },
+            { p: "The bakery on the corner always smells wonderful. Every Sunday morning, they make fresh, warm cinnamon rolls.", q: "What does the bakery make on Sunday mornings?", a: "Cinnamon rolls", wr: ["Chocolate chip cookies", "Blueberry muffins", "Apple pie"] },
+            { p: "Grace put on her yellow rain boots and grabbed her umbrella. She couldn't wait to jump in the big puddles on the sidewalk.", q: "What color were Grace's rain boots?", a: "Yellow", wr: ["Red", "Blue", "Green"] },
+            { p: "The music room has many instruments to choose from. Daniel decided he wanted to learn how to play the drums this year.", q: "What instrument does Daniel want to play?", a: "The drums", wr: ["The piano", "The flute", "The guitar"] },
+            { p: "A loud siren echoed through the neighborhood. A bright red fire truck rushed past on its way to an emergency.", q: "What rushed past the neighborhood?", a: "A fire truck", wr: ["A police car", "An ambulance", "A tow truck"] },
+            { p: "Chloe loves to read before going to sleep. She keeps a small reading light clipped right onto her book.", q: "When does Chloe love to read?", a: "Before going to sleep", wr: ["During breakfast", "On the bus", "At recess"] },
+            { p: "The farmer fed his animals early in the morning. The horses ate hay, and the chickens pecked at their seeds.", q: "What did the horses eat?", a: "Hay", wr: ["Seeds", "Apples", "Carrots"] },
+            { p: "Julian's phone battery was at one percent. He quickly plugged it into the charger just before the screen went completely black.", q: "Why did Julian plug in his phone?", a: "The battery was low", wr: ["To download a game", "To update it", "Because it was hot"] }
+        ];
+
+        function initReading() {
+            let rData = getRandomItem(readingPassages, 'reading');
+            document.getElementById('reading-passage').innerText = rData.p; 
+            document.getElementById('reading-q').innerText = rData.q;
+            document.getElementById('reading-feedback').innerText = '';
+            populateOptions([rData.a, ...rData.wr], 'reading-options', 'reading-feedback', rData.a, "Excellent reading! 🌟");
+        }
+
+        /* ----- ALL OTHER GAMES (1-5, 7-25) ----- */
+        let tttBoard = ['', '', '', '', '', '', '', '', '']; let currentPlayer = 'X'; let isGameActive = true;
+        function initTicTacToe() { tttBoard = ['', '', '', '', '', '', '', '', '']; currentPlayer = 'X'; isGameActive = true; document.getElementById('ttt-status').innerText = 'Your turn (X)'; let is1Player = document.querySelector('input[name="tttPlayers"]:checked').value === '1'; document.getElementById('ttt-diff-row').style.display = is1Player ? 'block' : 'none'; const board = document.getElementById('ttt-board'); board.innerHTML = ''; for(let i=0; i<9; i++) { let cell = document.createElement('div'); cell.className = 'ttt-cell'; cell.onclick = () => playTTT(i, cell); board.appendChild(cell); } }
+        function playTTT(index, cell) { if(tttBoard[index] !== '' || !isGameActive) return; tttBoard[index] = currentPlayer; cell.innerText = currentPlayer; if(checkTTTWin(currentPlayer)) { document.getElementById('ttt-status').innerText = currentPlayer + ' Wins! 🎉'; isGameActive = false; return; } if(!tttBoard.includes('')) { document.getElementById('ttt-status').innerText = 'Draw! 🤝'; isGameActive = false; return; } currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; document.getElementById('ttt-status').innerText = currentPlayer + "'s turn"; let is1Player = document.querySelector('input[name="tttPlayers"]:checked').value === '1'; if(is1Player && currentPlayer === 'O' && isGameActive) setTimeout(makeAIMove, 400); }
+        function makeAIMove() { let diff = document.querySelector('input[name="tttDiff"]:checked').value; let available = tttBoard.map((val, idx) => val === '' ? idx : null).filter(val => val !== null); let move = available[Math.floor(Math.random() * available.length)]; if (diff === 'hard' || (diff === 'medium' && Math.random() > 0.5)) { let w = findWinningMove('O') ?? findWinningMove('X'); move = w !== null ? w : (tttBoard[4] === '' ? 4 : move); } if(move !== null) playTTT(move, document.getElementById('ttt-board').children[move]); }
+        function findWinningMove(p) { const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(let c of wins) { if(tttBoard[c[0]]===p && tttBoard[c[1]]===p && tttBoard[c[2]]==='') return c[2]; if(tttBoard[c[0]]===p && tttBoard[c[2]]===p && tttBoard[c[1]]==='') return c[1]; if(tttBoard[c[1]]===p && tttBoard[c[2]]===p && tttBoard[c[0]]==='') return c[0]; } return null; }
+        function checkTTTWin(p) { const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return wins.some(c => tttBoard[c[0]] === p && tttBoard[c[1]] === p && tttBoard[c[2]] === p); }
+
+        let allEmojis = ['🦄','🌸','⭐','🎀','🐶','🦋','🐬','🍉']; let flippedCards = []; let matchedPairs = 0; let totalPairs = 0;
+        function initMemory() { let diff = document.querySelector('input[name="memDiff"]:checked').value; totalPairs = diff === 'easy' ? 4 : (diff === 'medium' ? 6 : 8); let selectedEmojis = allEmojis.slice(0, totalPairs); let deck = shuffle([...selectedEmojis, ...selectedEmojis]); matchedPairs = 0; flippedCards = []; document.getElementById('mem-feedback').innerText = ''; const board = document.getElementById('memory-board'); board.innerHTML = ''; let size = diff === 'hard' ? '60px' : '70px'; deck.forEach((emoji) => { let card = document.createElement('div'); card.className = 'memory-card'; card.style.width = size; card.style.height = size; card.dataset.emoji = emoji; card.onclick = () => flipCard(card); board.appendChild(card); }); }
+        function flipCard(card) { if(flippedCards.length < 2 && !card.classList.contains('flipped')) { card.classList.add('flipped'); card.innerText = card.dataset.emoji; flippedCards.push(card); if(flippedCards.length === 2) setTimeout(checkMemMatch, 800); } }
+        function checkMemMatch() { if(flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) { matchedPairs++; if(matchedPairs === totalPairs) document.getElementById('mem-feedback').innerText = "You found all the pairs! 🎉"; } else { flippedCards[0].classList.remove('flipped'); flippedCards[0].innerText = ''; flippedCards[1].classList.remove('flipped'); flippedCards[1].innerText = ''; } flippedCards = []; }
+
+        let expectedMathAnswer = 0;
+        function initMath() { let diff = document.querySelector('input[name="mathDiff"]:checked').value; let n1, n2, op; if(diff === 'easy') { n1 = Math.floor(Math.random() * 10) + 1; n2 = Math.floor(Math.random() * 10) + 1; op = Math.random() > 0.5 ? '+' : '-'; } else if(diff === 'medium') { n1 = Math.floor(Math.random() * 40) + 10; n2 = Math.floor(Math.random() * 40) + 10; op = Math.random() > 0.5 ? '+' : '-'; } else { n1 = Math.floor(Math.random() * 10) + 2; n2 = Math.floor(Math.random() * 10) + 2; op = 'x'; } if(op === '-' && n2 > n1) { let temp = n1; n1 = n2; n2 = temp; } expectedMathAnswer = op === '+' ? n1 + n2 : (op === '-' ? n1 - n2 : n1 * n2); document.getElementById('math-problem').innerText = `${n1} ${op} ${n2} = ?`; document.getElementById('math-answer').value = ''; document.getElementById('math-result').innerText = ''; }
+        function checkMath() { let ans = parseInt(document.getElementById('math-answer').value); let res = document.getElementById('math-result'); if(ans === expectedMathAnswer) { res.innerText = "Correct! Great job! ⭐"; setTimeout(initMath, 1500); } else { res.innerText = "Not quite, try again! 🤔"; } }
+
+        let secretNum;
+        function initGuessGame() { let max = document.querySelector('input[name="guessDiff"]:checked').value === 'easy' ? 20 : (document.querySelector('input[name="guessDiff"]:checked').value === 'medium' ? 50 : 100); secretNum = Math.floor(Math.random() * max) + 1; document.getElementById('guess-prompt').innerText = `I'm thinking of a number between 1 and ${max}!`; document.getElementById('guess-result').innerText = ''; document.getElementById('guess-input').value = ''; document.getElementById('guess-restart').style.display = 'none'; }
+        function checkGuess() { const g = parseInt(document.getElementById('guess-input').value); const res = document.getElementById('guess-result'); if(isNaN(g)) return; if(g === secretNum) { res.innerText = `You got it! It was ${secretNum}! 🎉`; document.getElementById('guess-restart').style.display = 'inline-block'; } else if(g < secretNum) res.innerText = "Higher! ⬆️"; else res.innerText = "Lower! ⬇️"; document.getElementById('guess-input').value = ''; }
+
+        let scrambleWords = { easy: ['RED', 'BLUE', 'PINK'], medium: ['PUPPY', 'KITTEN', 'HORSE'], hard: ['GRAVITY', 'PLANET', 'OXYGEN'] }; let curScramble = "";
+        function initScramble() { let diff = document.querySelector('input[name="scrambleDiff"]:checked').value; let list = scrambleWords[diff]; curScramble = getRandomItem(list, 'scramble_' + diff); let scrambled = curScramble.split('').sort(() => 0.5 - Math.random()).join(''); if(scrambled === curScramble && curScramble.length > 2) scrambled = curScramble[1] + curScramble[0] + curScramble.slice(2); document.getElementById('scramble-word').innerText = scrambled; document.getElementById('scramble-input').value = ''; document.getElementById('scramble-result').innerText = ''; }
+        function checkScramble() { if(document.getElementById('scramble-input').value.toUpperCase().trim() === curScramble) { document.getElementById('scramble-result').innerText = "Excellent! 🎉"; setTimeout(initScramble, 1500); } else { document.getElementById('scramble-result').innerText = "Try again!"; } }
+
+        let triviaPool = [{ q: "What do plants need to make their own food?", opts: ["Sunlight & Water", "Milk & Cookies", "Sand & Wind", "Electricity"], a: "Sunlight & Water" }, { q: "Which of these is a mammal?", opts: ["Shark", "Dolphin", "Penguin", "Frog"], a: "Dolphin" }];
+        function initTrivia() { let qData = getRandomItem(triviaPool, 'trivia'); document.getElementById('trivia-q').innerText = qData.q; document.getElementById('trivia-feedback').innerText = ''; populateOptions(qData.opts, 'trivia-options', 'trivia-feedback', qData.a, "Correct! You're a scientist! 🔬"); }
+
+        let geoPool = [{ state: "Washington", cap: "Olympia" }, { state: "California", cap: "Sacramento" }, { state: "Texas", cap: "Austin" }, { state: "New York", cap: "Albany" }];
+        function initGeography() { let qData = getRandomItem(geoPool, 'geo'); document.getElementById('geo-q').innerText = `What is the capital of ${qData.state}?`; document.getElementById('geo-feedback').innerText = ''; let options = [qData.cap]; while(options.length < 4) { let r = geoPool[Math.floor(Math.random() * geoPool.length)].cap; if(!options.includes(r)) options.push(r); } populateOptions(options, 'geo-options', 'geo-feedback', qData.cap, "Spot on! 🗺️"); }
+
+        const planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']; let targetPlanetIdx = 0;
+        function initPlanets() { targetPlanetIdx = 0; document.getElementById('planet-target').innerHTML = `Find the <strong>1st</strong> planet: <strong>Mercury</strong>`; document.getElementById('planet-feedback').innerText = ''; let container = document.getElementById('planet-options'); container.innerHTML = ''; let mixed = shuffle(planets.map((p, i) => ({name: p, em: ['🌕','🌔','🌍','🔴','🪐','🪐','🔵','🌑'][i], realIdx: i}))); mixed.forEach(pData => { let span = document.createElement('span'); span.innerText = pData.em; span.style.margin = "10px"; span.onclick = () => { if(pData.realIdx === targetPlanetIdx) { span.style.visibility = 'hidden'; targetPlanetIdx++; if(targetPlanetIdx === planets.length) document.getElementById('planet-feedback').innerText = "You sorted the solar system! 🚀"; else document.getElementById('planet-target').innerHTML = `Find the <strong>${targetPlanetIdx+1}</strong> planet: <strong>${planets[targetPlanetIdx]}</strong>`; } else document.getElementById('planet-feedback').innerText = "Nope! Look for " + planets[targetPlanetIdx]; }; container.appendChild(span); }); }
+
+        let spellWords = [{w:"BUTTERFLY", m:3, d:"A beautiful insect with colorful wings."}, {w:"ASTRONAUT", m:5, d:"Someone who travels to space."}];
+        function initSpelling() { let curSpell = getRandomItem(spellWords, 'spell'); let displayWord = curSpell.w.split(''); let missingChar = displayWord[curSpell.m]; displayWord[curSpell.m] = "_"; document.getElementById('spelling-word').innerText = displayWord.join(''); document.querySelector('#game-10 .question-text').innerText = curSpell.d; document.getElementById('spelling-feedback').innerText = ''; let opts = [missingChar]; while(opts.length < 4) { let r = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*26)]; if(!opts.includes(r)) opts.push(r); } let optsDiv = document.getElementById('spelling-options'); optsDiv.innerHTML = ''; shuffle(opts).forEach(letter => { let btn = document.createElement('button'); btn.className = 'choice-btn'; btn.innerText = letter; btn.onclick = () => { if(letter === missingChar) { document.getElementById('spelling-word').innerText = curSpell.w; document.getElementById('spelling-feedback').innerText = "Correct! 📖"; } else document.getElementById('spelling-feedback').innerText = "Try another letter!"; }; optsDiv.appendChild(btn); }); }
+
+        let foods = [ {e:"🍎", g:"Fruit"}, {e:"🥦", g:"Vegetable"}, {e:"🍗", g:"Protein"}, {e:"🧀", g:"Dairy"} ]; let curFood;
+        function initFood() { curFood = getRandomItem(foods, 'food'); document.getElementById('food-item').innerText = curFood.e; document.getElementById('food-feedback').innerText = ''; }
+        function checkFood(group) { document.getElementById('food-feedback').innerText = group === curFood.g ? "Yummy! That's correct! 🍽️" : "Not quite! Try again."; }
+
+        let animals = [{e:"🦈", h:"Ocean"}, {e:"🐻", h:"Forest"}, {e:"🐒", h:"Jungle"}, {e:"🐄", h:"Farm"}]; let curAnim;
+        function initHabitat() { curAnim = getRandomItem(animals, 'habitat'); document.getElementById('habitat-item').innerText = curAnim.e; document.getElementById('habitat-feedback').innerText = ''; }
+        function checkHabitat(hab) { document.getElementById('habitat-feedback').innerText = hab === curAnim.h ? "Right! They love it there! 🏡" : "They might get lost there! Try again."; }
+
+        const cycle = [{ stage: "Evaporation", def: "The sun heats up water and turns it into gas." }, { stage: "Condensation", def: "Water vapor cools down to make clouds." }, { stage: "Precipitation", def: "Water falls back down as rain or snow." }, { stage: "Collection", def: "Water gathers in oceans and lakes." }]; let curCycle;
+        function initWater() { curCycle = getRandomItem(cycle, 'water'); document.getElementById('water-def').innerText = curCycle.def; document.getElementById('water-feedback').innerText = ''; }
+        function checkWater(stage) { if(stage === curCycle.stage) { document.getElementById('water-feedback').innerText = "Excellent science! 🌧️"; setTimeout(initWater, 2000); } else document.getElementById('water-feedback').innerText = "Try again!"; }
+
+        let timeQs = [{ q: "How many minutes are in 1 hour?", a: "60", wr: ["30", "100", "24"] }, { q: "If it's 2:00 PM and a movie is 2 hours long, what time is it over?", a: "4:00 PM", wr: ["3:00 PM", "5:00 PM", "4:30 PM"] }];
+        function initTime() { let tData = getRandomItem(timeQs, 'time'); document.getElementById('time-q').innerText = tData.q; document.getElementById('time-feedback').innerText = ''; populateOptions([tData.a, ...tData.wr], 'time-options', 'time-feedback', tData.a, "Right on time! ⌚"); }
+
+        let codes = [{ q: "The robot faces North. Target is 1 step North, 1 step East.", a: "Move Forward, Turn Right, Move Forward", wr: ["Turn Left, Move Forward", "Move Forward, Turn Left"] }];
+        function initCoding() { let cData = getRandomItem(codes, 'code'); document.getElementById('code-q').innerText = cData.q; document.getElementById('code-feedback').innerText = ''; populateOptions([cData.a, ...cData.wr], 'code-options', 'code-feedback', cData.a, "Code accepted! 🤖"); document.querySelectorAll('#code-options button').forEach(b => {b.style.display="block"; b.style.width="90%"; b.style.margin="10px auto";}); }
+
+        let fixerQs = [{ c: "BEAUTIFUL", w: ["BEUTIFUL", "BEATIFUL", "BEEUTIFUL"] }, { c: "BECAUSE", w: ["BECUASE", "BECAUS", "BECUZ"] }, { c: "FRIEND", w: ["FREIND", "FRIND", "F फ्रेंड"] }];
+        function initFixer() { let fData = getRandomItem(fixerQs, 'fixer'); document.getElementById('fixer-feedback').innerText = ''; populateOptions([fData.c, ...fData.w.slice(0,2)], 'fixer-options', 'fixer-feedback', fData.c, "Great Spelling! 📝"); }
+
+        let fractQs = [{ q: "What is 1/2 of 10?", a: "5", wr: ["2", "10", "4"] }, { q: "Which fraction is the biggest?", a: "1/2", wr: ["1/4", "1/8", "1/10"] }, { q: "If you have 4 slices of an 8-slice pizza, how much is that?", a: "1/2", wr: ["1/4", "3/4", "Whole"] }];
+        function initFraction() { let fData = getRandomItem(fractQs, 'fraction'); document.getElementById('fraction-q').innerText = fData.q; document.getElementById('fraction-feedback').innerText = ''; populateOptions([fData.a, ...fData.wr], 'fraction-options', 'fraction-feedback', fData.a, "Perfect fraction math! 🍕"); }
+
+        let inventors = [{ i: "💡", d: "The Lightbulb", a: "Thomas Edison", wr: ["Alexander Graham Bell", "Wright Brothers"] }, { i: "☎️", d: "The Telephone", a: "Alexander Graham Bell", wr: ["Thomas Edison", "Benjamin Franklin"] }, { i: "✈️", d: "The Airplane", a: "Wright Brothers", wr: ["Albert Einstein", "Isaac Newton"] }];
+        function initInventor() { let iData = getRandomItem(inventors, 'inventor'); document.getElementById('inventor-item').innerText = iData.i; document.getElementById('inventor-desc').innerText = iData.d; document.getElementById('inventor-feedback').innerText = ''; populateOptions([iData.a, ...iData.wr], 'inventor-options', 'inventor-feedback', iData.a, "History Master! 🕰️"); }
+
+        let oppQs = [{ w: "GIGANTIC", a: "Tiny", wr: ["Huge", "Heavy", "Tall"] }, { w: "FREEZING", a: "Boiling", wr: ["Cold", "Windy", "Snowy"] }, { w: "ANCIENT", a: "Modern", wr: ["Old", "Dusty", "Broken"] }];
+        function initOpposite() { let oData = getRandomItem(oppQs, 'opposite'); document.getElementById('opposite-word').innerText = oData.w; document.getElementById('opposite-feedback').innerText = ''; populateOptions([oData.a, ...oData.wr], 'opposite-options', 'opposite-feedback', oData.a, "Exactly! ↔️"); }
+
+        let moneyQs = [{ q: "You have 2 quarters and 1 dime. How much money is that?", a: "60¢", wr: ["50¢", "35¢", "75¢"] }, { q: "An apple costs 50¢. You pay with $1.00. What is your change?", a: "50¢", wr: ["25¢", "10¢", "No change"] }, { q: "How many pennies are in $1.00?", a: "100", wr: ["10", "50", "1000"] }];
+        function initMoney() { let mData = getRandomItem(moneyQs, 'money'); document.getElementById('money-q').innerText = mData.q; document.getElementById('money-feedback').innerText = ''; populateOptions([mData.a, ...mData.wr], 'money-options', 'money-feedback', mData.a, "Cha-ching! 💵"); }
+
+        let contQs = [{ q: "Which continent is Egypt in?", a: "Africa", wr: ["Asia", "Europe", "South America"] }, { q: "Which continent is known for the Amazon Rainforest?", a: "South America", wr: ["North America", "Australia", "Africa"] }, { q: "Which continent is also a country?", a: "Australia", wr: ["Europe", "Asia", "Antarctica"] }];
+        function initContinent() { let cData = getRandomItem(contQs, 'continent'); document.getElementById('continent-q').innerText = cData.q; document.getElementById('continent-feedback').innerText = ''; populateOptions([cData.a, ...cData.wr], 'continent-options', 'continent-feedback', cData.a, "Great exploring! 🌍"); }
+
+        let insts = [{ n: "Flute", f: "Woodwind" }, { n: "Trumpet", f: "Brass" }, { n: "Drum", f: "Percussion" }, { n: "Guitar", f: "String" }, { n: "Violin", f: "String" }]; let curInst;
+        function initInstrument() { curInst = getRandomItem(insts, 'instrument'); document.getElementById('instrument-name').innerText = curInst.n; document.getElementById('instrument-feedback').innerText = ''; }
+        function checkInstrument(fam) { document.getElementById('instrument-feedback').innerText = fam === curInst.f ? "Perfect pitch! 🎶" : "Not quite! Try another family."; }
+
+        let gramQs = [{ s: "The happy dog jumped over the fence.", p: "Find the VERB (action word):", a: "jumped", wr: ["happy", "dog", "fence"] }, { s: "She wore a bright red jacket.", p: "Find the ADJECTIVE (describing word):", a: "red", wr: ["She", "wore", "jacket"] }];
+        function initGrammar() { let gData = getRandomItem(gramQs, 'grammar'); document.getElementById('grammar-q').innerText = '"' + gData.s + '"'; document.getElementById('grammar-prompt').innerText = gData.p; document.getElementById('grammar-feedback').innerText = ''; populateOptions([gData.a, ...gData.wr], 'grammar-options', 'grammar-feedback', gData.a, "Grammar genius! 📚"); }
+
+        let shapeQs = [{ q: "I have 3 sides and 3 angles. What am I?", a: "Triangle", wr: ["Square", "Circle", "Hexagon"] }, { q: "I have 8 sides, like a stop sign. What am I?", a: "Octagon", wr: ["Hexagon", "Pentagon", "Square"] }];
+        function initShape() { let sData = getRandomItem(shapeQs, 'shape'); document.getElementById('shape-q').innerText = sData.q; document.getElementById('shape-feedback').innerText = ''; populateOptions([sData.a, ...sData.wr], 'shape-options', 'shape-feedback', sData.a, "Shape matched! 🛑"); }
+
+        let patQs = [{ q: "2, 4, 6, 8, ?", a: "10", wr: ["9", "12", "14"] }, { q: "🔴, 🔵, 🔴, 🔵, ?", a: "🔴", wr: ["🔵", "🟡", "🟢"] }];
+        function initPattern() { let pData = getRandomItem(patQs, 'pattern'); document.getElementById('pattern-q').innerText = pData.q; document.getElementById('pattern-feedback').innerText = ''; populateOptions([pData.a, ...pData.wr], 'pattern-options', 'pattern-feedback', pData.a, "Pattern cracked! 🧩"); }
+
+    
+        function showReplaceModal() {
+            document.getElementById('load-modal-overlay').classList.add('active');
+        }
+        function hideReplaceModal() {
+            document.getElementById('load-modal-overlay').classList.remove('active');
+        }
+    </script>
+
+    <!-- ── Load Method Modal ── -->
+    <div id="load-modal-overlay">
+        <div id="load-modal">
+            <h2>&#128196; How to Load Games?</h2>
+            <p>Choose how to add the new content to your existing games.</p>
+            <button class="modal-btn replace" onclick="window.pywebview.api.execute_load('replace')">
+                &#9888; Replace &mdash; Overwrite existing games
+            </button>
+            <button class="modal-btn append" onclick="window.pywebview.api.execute_load('append')">
+                &#10133; Append &mdash; Add new items only
+            </button>
+            <button class="modal-btn cancel" onclick="window.pywebview.api.execute_load('cancel')">
+                &#10005; Cancel
+            </button>
+        </div>
+    </div>
+</body>
+</html>
