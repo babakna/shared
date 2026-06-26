@@ -70,6 +70,34 @@ const GAMES=[
   {id:'reaction',name:'Reaction Test',ico:'⚡'},
   {id:'clicker',name:'Clicker',ico:'👆'},
   {id:'slots',name:'Slot Machine',ico:'🎰'},
+  {id:'syn',name:'Synonyms',ico:'🟰'},
+  {id:'ant',name:'Antonyms',ico:'↔️'},
+  {id:'rhyme',name:'Rhyming Words',ico:'🎵'},
+  {id:'plural',name:'Plurals',ico:'📦'},
+  {id:'past',name:'Past Tense',ico:'⏪'},
+  {id:'homo',name:'Homophones',ico:'👂'},
+  {id:'compound',name:'Compound Words',ico:'🧩'},
+  {id:'prefix',name:'Prefixes',ico:'🔤'},
+  {id:'contraction',name:'Contractions',ico:'✂️'},
+  {id:'comparative',name:'Comparatives',ico:'📈'},
+  {id:'syll',name:'Syllables',ico:'👏'},
+  {id:'vowelcount',name:'Count Vowels',ico:'🅰️'},
+  {id:'conscount',name:'Count Consonants',ico:'🅱️'},
+  {id:'lettercount',name:'Count Letters',ico:'#️⃣'},
+  {id:'firstL',name:'First Letter',ico:'🔡'},
+  {id:'lastL',name:'Last Letter',ico:'🔚'},
+  {id:'midL',name:'Middle Letter',ico:'🔠'},
+  {id:'unscram',name:'Unscramble',ico:'🔀'},
+  {id:'missL',name:'Missing Letter',ico:'➖'},
+  {id:'abc1',name:'ABC Order',ico:'🔤'},
+  {id:'abcZ',name:'Last in ABC',ico:'🔚'},
+  {id:'longest',name:'Longest Word',ico:'📏'},
+  {id:'shortest',name:'Shortest Word',ico:'🐜'},
+  {id:'aan',name:'A or An',ico:'🅰️'},
+  {id:'startV',name:'Starts with Vowel?',ico:'🔎'},
+  {id:'endV',name:'Ends with Vowel?',ico:'🔚'},
+  {id:'dblL',name:'Double Letter?',ico:'🔁'},
+  {id:'sameLen',name:'Same Length',ico:'📐'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
@@ -268,6 +296,69 @@ function game_slots(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+/* ===== Quiz framework for word games (Easy/Med/Hard + help) ===== */
+let DIFFW=localStorage.getItem('l2diff')||'med';
+function Dw(e,m,h){return DIFFW==='easy'?e:DIFFW==='hard'?h:m;}
+function rW(n){return Math.floor(Math.random()*n);}
+function pkW(a){return a[rW(a.length)];}
+function shW(a){for(let i=a.length-1;i>0;i--){const j=rW(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function wfW(pool,ans,n){return shW(pool.filter(x=>x!==ans)).slice(0,n||4);}
+function vowW(s){return (s.match(/[aeiou]/gi)||[]).length;}
+function sylW(s){const m=s.toLowerCase().match(/[aeiouy]+/g);return m?Math.max(1,m.length):1;}
+function poolW(){return WL.filter(w=>DIFFW==='easy'?w.length<=4:DIFFW==='hard'?w.length>=6:(w.length>=4&&w.length<=7));}
+function mcqW(gm,hint,gen){setHint(hint);let score=0;
+  const dr=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap'});
+  function rd(){[...dr.children].forEach((c,i)=>c.className='btn'+(['easy','med','hard'][i]===DIFFW?'':' ghost'));}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,l])=>{const b=el('button',{className:'btn',textContent:l,style:'padding:7px 13px'});b.onclick=()=>{DIFFW=d;localStorage.setItem('l2diff',d);rd();score=0;round();};dr.append(b);});rd();
+  const q=el('div',{className:'big',style:'font-size:22px;min-height:42px;max-width:560px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(dr,q,opts,fb,nb);
+  function round(){const dt=gen();q.textContent=dt.q;fb.textContent='';const optN={easy:2,med:3,hard:4}[DIFFW];let arr=shW([dt.a].concat((dt.wr||[]).slice(0,optN))).map(String);const long=arr.some(o=>o.length>14);opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    arr.forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:13px;font-size:16px'});b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===String(dt.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+dt.a;}setHs(gm.id,score);setStatus('Score: '+score+' • '+DIFFW+' • Best: '+hs(gm.id));};opts.append(b);});
+    setStatus('Score: '+score+' • '+DIFFW+' • Best: '+hs(gm.id));}
+  nb.onclick=round;round();return{stop:()=>{}};}
+const WL=("apple table garden planet rocket dragon castle guitar jungle wizard market silver orange friend school winter summer animal bridge candle monkey pirate yellow purple basket cookie tunnel ticket bottle button carpet dolphin elephant giraffe penguin octopus rainbow treasure dinosaur sandwich morning evening picture teacher brother sister kitchen blanket diamond feather hammer island ladder needle pillow ribbon thunder village yogurt rabbit pencil window forest flower river ocean mountain valley desert meadow harbor anchor pickle puzzle saddle bottle camel lemon melon onion robin eagle otter zebra tiger panda koala llama snake whale shark trout perch cabin attic porch fence brick stone glass metal copper bronze marble crystal velvet cotton denim leather basket hamper kettle teapot saucer napkin spoon plate bowl mug jug vase clock lamp chair couch shelf drawer mirror carpet curtain pillow blanket pajama jacket sweater mitten scarf boot sandal sneaker helmet goggles compass lantern candle torch rope tent canoe paddle saddle stable barn tractor wagon shovel rake hoe seed sprout petal stem root bark leaf branch trunk acorn maple birch cedar willow beach cliff coast creek dune field grove hedge marsh plain pond ridge shore swamp brook canal gulf reef bay cave peak slope trail path road lane route plaza court yard patio attic cellar lobby studio office stairs hall closet pantry garage shed booth cabin lodge villa manor tower palace temple chapel museum gallery theater stadium arena circus zoo aquarium clinic bakery grocer butcher florist tailor jeweler cobbler potter weaver miner farmer sailor pilot driver baker singer dancer writer painter doctor nurse banker lawyer judge mayor captain admiral colonel sergeant scout ranger guard knight squire jester minstrel herald wizard witch fairy goblin troll giant ogre gnome elf dwarf phoenix griffin unicorn pegasus serpent falcon raven sparrow finch robin heron crane stork swan goose duck quail pheasant turkey peacock parrot toucan beetle cricket locust mantis weevil hornet wasp moth gnat midge aphid termite earwig spider scorpion lobster crayfish shrimp prawn clam oyster mussel scallop urchin starfish jellyfish coral sponge").split(/\s+/);
+const SYN=[["big","large"],["small","tiny"],["happy","glad"],["fast","quick"],["smart","clever"],["scared","afraid"],["angry","mad"],["pretty","lovely"],["begin","start"],["end","finish"],["shout","yell"],["rich","wealthy"],["cold","chilly"],["sick","ill"],["easy","simple"],["odd","strange"],["quiet","silent"],["story","tale"],["gift","present"],["jump","leap"],["smell","odor"],["cry","weep"],["fix","repair"],["hide","conceal"],["throw","toss"],["empty","vacant"],["help","aid"],["brave","bold"],["calm","peaceful"],["huge","enormous"]];
+const ANT=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","close"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["win","lose"],["true","false"],["rich","poor"],["near","far"],["clean","dirty"],["thick","thin"],["early","late"],["above","below"],["buy","sell"],["brave","afraid"],["sweet","sour"],["enter","exit"],["float","sink"]];
+const RHY=[["cat","hat","bat","rat"],["dog","log","fog","frog"],["car","star","jar","far"],["bee","tree","sea","key"],["light","night","kite","bright"],["cake","lake","snake","rake"],["run","sun","fun","bun"],["king","ring","sing","wing"],["ball","tall","wall","fall"],["blue","glue","true","shoe"],["moon","spoon","soon","noon"],["pig","wig","dig","big"]];
+const PLU=[["cat","cats"],["box","boxes"],["baby","babies"],["man","men"],["child","children"],["foot","feet"],["mouse","mice"],["leaf","leaves"],["bus","buses"],["fly","flies"],["tooth","teeth"],["goose","geese"],["knife","knives"],["city","cities"],["wolf","wolves"],["potato","potatoes"],["person","people"],["wish","wishes"],["half","halves"],["story","stories"]];
+const PAST=[["go","went"],["run","ran"],["eat","ate"],["see","saw"],["come","came"],["give","gave"],["take","took"],["make","made"],["sing","sang"],["swim","swam"],["fly","flew"],["draw","drew"],["write","wrote"],["ride","rode"],["buy","bought"],["bring","brought"],["catch","caught"],["teach","taught"],["sleep","slept"],["find","found"],["think","thought"],["drink","drank"],["begin","began"],["build","built"]];
+const HOMO=[["I ate ___ cookies.","two"],["I want to come ___!","too"],["Walk ___ school.","to"],["The cat licked ___ paw.","its"],["___ raining now.","It's"],["Put it over ___.","there"],["___ my best friends.","They're"],["That is ___ house.","their"],["I can ___ the music.","hear"],["Come ___ please.","here"],["She has long ___.","hair"],["The ___ hopped away.","hare"],["A ___ of bread.","piece"],["World ___ at last.","peace"],["Look at the ___.","sea"],["Can you ___ me?","see"],["A busy ___ buzzed.","bee"],["I want to ___ kind.","be"],["The ___ is bright.","sun"],["Her ___ is grown.","son"],["Turn ___ at the corner.","right"],["I will ___ a letter.","write"],["A ___ flew over.","plane"],["Keep it ___ and simple.","plain"],["The ___ growled.","bear"],["The shelf was ___.","bare"],["A ___ of socks.","pair"],["I ate a juicy ___.","pear"],["We have one ___ left.","hour"],["This is ___ house.","our"],["The sky is ___.","blue"],["The wind ___ hard.","blew"],["I ___ the answer.","knew"],["I bought a ___ toy.","new"],["A ___ of bread.","loaf"],["Please ___ the door.","close"],["Wear warm ___.","clothes"],["The ___ ran fast.","deer"],["You are very ___ to me.","dear"],["Send it by ___.","mail"],["A ___ lion is big.","male"],["The road was ___.","steep"],["I ___ all night.","sleep"]];
+const HPOOL=["two","too","to","its","it's","there","their","they're","hear","here","hair","hare","piece","peace","sea","see","bee","be","sun","son","right","write","plane","plain","bear","bare","pair","pear","hour","our","blue","blew","knew","new","loaf","close","clothes","deer","dear","mail","male","steep","sleep","week","weak","road","rode","one","won","made","maid","tail","tale","sail","sale","flour","flower"];
+const COMP=["rainbow","sunflower","football","cupcake","bedroom","starfish","butterfly","snowman","pancake","toothbrush","backpack","cowboy","popcorn","seashell","ladybug","firefly","raincoat","sandbox","doghouse","moonlight"];
+const NOTCOMP=["banana","pencil","window","purple","garden","dragon","planet","cookie","silver","monkey","tiger","orange","castle","jungle"];
+const PREFIX=[["un-","not / opposite"],["re-","again"],["pre-","before"],["dis-","not / away"],["mis-","wrongly"],["tri-","three"],["bi-","two"],["sub-","under"]];
+const PREMEAN=["not / opposite","again","before","not / away","wrongly","three","two","under","over","many"];
+const CONTR=[["do not","don't"],["can not","can't"],["I am","I'm"],["it is","it's"],["you are","you're"],["we are","we're"],["they are","they're"],["did not","didn't"],["is not","isn't"],["was not","wasn't"],["will not","won't"],["could not","couldn't"],["she is","she's"],["he is","he's"],["that is","that's"]];
+const ADJ=["tall","fast","slow","old","smart","kind","warm","cold","quick","clean","rich","near","high","deep","small","loud","soft","dark","strong","sweet","bright","proud","fresh","brave","short"];
+function game_syn(gm){return mcqW(gm,'Tap the word that means the SAME thing.',()=>{const p=pkW(SYN);return{q:'Same meaning as "'+p[0]+'"?',a:p[1],wr:wfW(SYN.map(x=>x[1]),p[1])};});}
+function game_ant(gm){return mcqW(gm,'Tap the OPPOSITE word.',()=>{const p=pkW(ANT);const f=Math.random()<0.5;const w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:wfW(ANT.flat(),a)};});}
+function game_rhyme(gm){return mcqW(gm,'Tap the word that RHYMES.',()=>{const g=pkW(RHY);const w=g[0],a=pkW(g.slice(1));return{q:'Which word rhymes with "'+w+'"?',a:a,wr:shW(RHY.filter(x=>x!==g)).slice(0,4).map(x=>x[0])};});}
+function game_plural(gm){return mcqW(gm,'Tap the correct plural (more than one).',()=>{const p=pkW(PLU);return{q:'Plural of "'+p[0]+'"?',a:p[1],wr:wfW(PLU.map(x=>x[1]),p[1])};});}
+function game_past(gm){return mcqW(gm,'Tap the past-tense form.',()=>{const p=pkW(PAST);return{q:'Past tense of "'+p[0]+'"?',a:p[1],wr:wfW(PAST.map(x=>x[1]),p[1])};});}
+function game_homo(gm){return mcqW(gm,'Tap the word that correctly fits the sentence.',()=>{const p=pkW(HOMO);return{q:p[0],a:p[1],wr:wfW(HPOOL,p[1])};});}
+function game_compound(gm){return mcqW(gm,'A compound word is two words joined. Tap it!',()=>{const a=pkW(COMP);return{q:'Which is a COMPOUND word?',a:a,wr:wfW(NOTCOMP,a)};});}
+function game_prefix(gm){return mcqW(gm,'Tap what the word-beginning means.',()=>{const p=pkW(PREFIX);return{q:'What does "'+p[0]+'" mean?',a:p[1],wr:wfW(PREMEAN,p[1])};});}
+function game_contraction(gm){return mcqW(gm,'Tap the contraction (short form).',()=>{const p=pkW(CONTR);return{q:'"'+p[0]+'" as a contraction?',a:p[1],wr:wfW(CONTR.map(x=>x[1]),p[1])};});}
+function game_comparative(gm){return mcqW(gm,'Tap the comparative ("more") form.',()=>{const adj=pkW(ADJ);const a=adj.endsWith('e')?adj+'r':adj+'er';return{q:'Comparative of "'+adj+'"?',a:a,wr:[adj+'est','more '+adj,adj+'ish']};});}
+function game_syll(gm){return mcqW(gm,'Count the syllables (beats) in the word.',()=>{const w=pkW(poolW());const c=sylW(w);return{q:'How many syllables in "'+w+'"?',a:c,wr:[1,2,3,4,5].filter(x=>x!==c)};});}
+function game_vowelcount(gm){return mcqW(gm,'Count the vowels (a, e, i, o, u).',()=>{const w=pkW(poolW());const c=vowW(w);return{q:'How many vowels in "'+w+'"?',a:c,wr:[c+1,c-1,c+2,c+3].filter(x=>x>=0&&x!==c)};});}
+function game_conscount(gm){return mcqW(gm,'Count the consonants (non-vowels).',()=>{const w=pkW(poolW());const c=w.length-vowW(w);return{q:'How many consonants in "'+w+'"?',a:c,wr:[c+1,c-1,c+2].filter(x=>x>=0&&x!==c)};});}
+function game_lettercount(gm){return mcqW(gm,'Count the letters in the word.',()=>{const w=pkW(poolW());return{q:'How many letters in "'+w+'"?',a:w.length,wr:[w.length+1,w.length-1,w.length+2].filter(x=>x>0)};});}
+function game_firstL(gm){return mcqW(gm,'Which letter does the word START with?',()=>{const w=pkW(poolW());const a=w[0].toUpperCase();return{q:'First letter of "'+w+'"?',a:a,wr:wfW("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_lastL(gm){return mcqW(gm,'Which letter does the word END with?',()=>{const w=pkW(poolW());const a=w[w.length-1].toUpperCase();return{q:'Last letter of "'+w+'"?',a:a,wr:wfW("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_midL(gm){return mcqW(gm,'Tap the MIDDLE letter of the word.',()=>{const pool=poolW().filter(w=>w.length%2===1);const w=pkW(pool.length?pool:['cat']);const a=w[(w.length-1)/2].toUpperCase();return{q:'Middle letter of "'+w+'"?',a:a,wr:wfW("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_unscram(gm){return mcqW(gm,'Unscramble the letters — pick the real word!',()=>{const w=pkW(poolW());let s;do{s=shW(w.split('')).join('');}while(s===w);return{q:'Unscramble: '+s.toUpperCase(),a:w,wr:shW(WL.filter(x=>x!==w&&x.length===w.length)).slice(0,4)};});}
+function game_missL(gm){return mcqW(gm,'Which letter is missing from the word?',()=>{const w=pkW(poolW()).toUpperCase();const i=rW(w.length);const miss=w[i];const d=w.split('');d[i]='_';return{q:'Fill the blank: '+d.join(''),a:miss,wr:wfW("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),miss)};});}
+function game_abc1(gm){return mcqW(gm,'Which word comes FIRST in the dictionary (A→Z)?',()=>{const s=new Set();while(s.size<Dw(2,3,4))s.add(pkW(WL));const a=[...s];const ans=a.slice().sort()[0];return{q:'First in ABC order?',a:ans,wr:a.filter(x=>x!==ans)};});}
+function game_abcZ(gm){return mcqW(gm,'Which word comes LAST in the dictionary (A→Z)?',()=>{const s=new Set();while(s.size<Dw(2,3,4))s.add(pkW(WL));const a=[...s];const ans=a.slice().sort()[a.length-1];return{q:'Last in ABC order?',a:ans,wr:a.filter(x=>x!==ans)};});}
+function game_longest(gm){return mcqW(gm,'Which word is the LONGEST?',()=>{const s=new Set();while(s.size<Dw(2,3,4))s.add(pkW(WL));const a=[...s];const ans=a.reduce((x,y)=>y.length>x.length?y:x);return{q:'Longest word?',a:ans,wr:a.filter(x=>x!==ans)};});}
+function game_shortest(gm){return mcqW(gm,'Which word is the SHORTEST?',()=>{const s=new Set();while(s.size<Dw(2,3,4))s.add(pkW(WL));const a=[...s];const ans=a.reduce((x,y)=>y.length<x.length?y:x);return{q:'Shortest word?',a:ans,wr:a.filter(x=>x!==ans)};});}
+function game_aan(gm){return mcqW(gm,'Use "an" before a vowel sound, "a" otherwise.',()=>{const w=pkW(WL);const a=/^[aeiou]/i.test(w)?'an':'a';return{q:'Choose:  ___ '+w,a:a,wr:[a==='a'?'an':'a']};});}
+function game_startV(gm){return mcqW(gm,'Does the word start with a vowel?',()=>{const w=pkW(WL);return /^[aeiou]/i.test(w)?{q:'Does "'+w+'" start with a vowel?',a:'Yes',wr:['No']}:{q:'Does "'+w+'" start with a vowel?',a:'No',wr:['Yes']};});}
+function game_endV(gm){return mcqW(gm,'Does the word end with a vowel?',()=>{const w=pkW(WL);return /[aeiou]$/i.test(w)?{q:'Does "'+w+'" end with a vowel?',a:'Yes',wr:['No']}:{q:'Does "'+w+'" end with a vowel?',a:'No',wr:['Yes']};});}
+function game_dblL(gm){return mcqW(gm,'Does the word have a double (repeated) letter?',()=>{const w=pkW(WL);return /(.)\1/.test(w)?{q:'Does "'+w+'" have a double letter?',a:'Yes',wr:['No']}:{q:'Does "'+w+'" have a double letter?',a:'No',wr:['Yes']};});}
+function game_sameLen(gm){return mcqW(gm,'Pick the word with the SAME number of letters.',()=>{const w=pkW(WL);const same=WL.filter(x=>x.length===w.length&&x!==w);const a=pkW(same.length?same:[w]);return{q:'Same length as "'+w+'"?',a:a,wr:shW(WL.filter(x=>x.length!==w.length)).slice(0,4)};});}
+
 applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
