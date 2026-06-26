@@ -86,6 +86,9 @@ const GAMES=[
   {id:'helicopter',name:'Helicopter',ico:'🚁'},
   {id:'stack',name:'Stack',ico:'🧱'},
   {id:'colorlines',name:'Color Lines',ico:'🟢'},
+  {id:'addto10',name:'Add to Ten',ico:'🔟'},
+  {id:'beggar',name:'Beggar My Neighbour',ico:'🤝'},
+  {id:'speedsort',name:'Speed Sort',ico:'⚡'},
 ];
 const HELP={
 scrabble:`Build words on the board for points. Tap a letter in your rack, then tap an empty square to place it; lay tiles in one straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL/TL = letter, DW/TW = word). Tap Submit to score (words are checked against the dictionary), Recall to take tiles back, 🔀 to reshuffle your rack.`,
@@ -534,7 +537,7 @@ function game_crossword(gm){
   function render(){board.innerHTML='';for(let r=0;r<5;r++)for(let c=0;c<5;c++){const sol=SOL[r][c];if(sol==='#'){board.append(el('div',{style:'width:46px;height:46px;background:#222;border-radius:4px'}));continue;}
     const inp=el('input',{maxLength:1,'data-rc':r+','+c,style:'width:46px;height:46px;text-align:center;font-size:22px;text-transform:uppercase;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text)'});board.append(inp);}
     setStatus('Solve the crossword! • Wins: '+hs(gm.id));}
-  checkB.onclick=()=>{let ok=true;board.querySelectorAll('input').forEach(inp=>{const[r,c]=inp.getAttribute('data-rc').split(',').map(Number);const want=SOL[r][c];const got=(inp.value||'').toUpperCase();inp.style.background=got===want?'#2ecc71':(got?'#e74c3c':'var(--panel)');if(got!==want)ok=false;});
+  checkB.onclick=()=>{let ok=true;board.querySelectorAll('input').forEach(inp=>{const[r,c]=inp['data-rc'].split(',').map(Number);const want=SOL[r][c];const got=(inp.value||'').toUpperCase();inp.style.background=got===want?'#2ecc71':(got?'#e74c3c':'var(--panel)');if(got!==want)ok=false;});
     setStatus(ok?'🎉 Solved!':'Keep trying!');if(ok)setHs(gm.id,1);};
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
@@ -562,7 +565,7 @@ function game_kakuro(gm){
       if(d2)div.append(el('div',{textContent:'▼'+d2,style:'position:absolute;bottom:2px;left:3px'}));if(r2)div.append(el('div',{textContent:r2+'▶',style:'position:absolute;top:2px;right:3px'}));board.append(div);continue;}
     const inp=el('input',{maxLength:1,'data-rc':r+','+c,style:'width:52px;height:52px;text-align:center;font-size:22px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text)'});board.append(inp);}
     setStatus('Fill the runs! • Wins: '+hs(gm.id));}
-  checkB.onclick=()=>{let ok=true;board.querySelectorAll('input').forEach(inp=>{const key=inp.getAttribute('data-rc');const want=ANS[key];const got=+inp.value;inp.style.background=got===want?'#2ecc71':(inp.value?'#e74c3c':'var(--panel)');if(got!==want)ok=false;});setStatus(ok?'🎉 Correct!':'Not yet — check the sums.');if(ok)setHs(gm.id,1);};
+  checkB.onclick=()=>{let ok=true;board.querySelectorAll('input').forEach(inp=>{const key=inp['data-rc'];const want=ANS[key];const got=+inp.value;inp.style.background=got===want?'#2ecc71':(inp.value?'#e74c3c':'var(--panel)');if(got!==want)ok=false;});setStatus(ok?'🎉 Correct!':'Not yet — check the sums.');if(ok)setHs(gm.id,1);};
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
 
@@ -585,7 +588,7 @@ function game_kenken(gm){
     const lab=LABEL[r+','+c];if(lab)wrap.append(el('div',{textContent:lab,style:'position:absolute;top:1px;left:3px;font-size:11px;color:var(--accent);font-weight:700'}));
     const inp=el('input',{maxLength:1,'data-rc':r+','+c,style:'width:56px;height:56px;text-align:center;font-size:24px;border:0;background:transparent;color:var(--text)'});wrap.append(inp);board.append(wrap);}
     setStatus('1-4 each row & column • Wins: '+hs(gm.id));}
-  checkB.onclick=()=>{let ok=true;board.querySelectorAll('input').forEach(inp=>{const[r,c]=inp.getAttribute('data-rc').split(',').map(Number);const want=SOL[r][c];const got=+inp.value;inp.parentElement.style.background=got===want?'#2ecc71':(inp.value?'#e74c3c':'var(--panel)');if(got!==want)ok=false;});setStatus(ok?'🎉 Solved!':'Not yet!');if(ok)setHs(gm.id,1);};
+  checkB.onclick=()=>{let ok=true;board.querySelectorAll('input').forEach(inp=>{const[r,c]=inp['data-rc'].split(',').map(Number);const want=SOL[r][c];const got=+inp.value;inp.parentElement.style.background=got===want?'#2ecc71':(inp.value?'#e74c3c':'var(--panel)');if(got!==want)ok=false;});setStatus(ok?'🎉 Solved!':'Not yet!');if(ok)setHs(gm.id,1);};
   newB.onclick=render;render();return{stop:()=>{}};
 }
 
@@ -815,6 +818,40 @@ function game_scrabble(gm){
     score+=gained;turns++;placed=[];while(rack.length<7&&bag.length)rack.push(bag.pop());setHs(gm.id,score);msg.textContent='✅ '+word.toUpperCase()+' +'+gained+' points!';render();};
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
+
+/* ---------------- ADD TO TEN ---------------- */
+function game_addto10(gm){setHint('Tap two cards that add up to 10 (Aces=1). Tens & face cards count as 10 — tap one alone to remove it. Clear them all!');
+  let deck,board,sel;const grid=el('div',{style:'display:grid;grid-template-columns:repeat(5,46px);gap:6px'});const nb=el('button',{className:'btn',textContent:'New Game'});const msg=el('div',{className:'big'});host.append(msg,grid,nb);
+  function val(c){return c.v>=10?10:c.v;}
+  function reset(){deck=shuffle(makeDeck());board=deck.splice(0,10);sel=-1;draw();}
+  function refill(){for(let k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+  function draw(){grid.innerHTML='';board.forEach((c,i)=>{if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}const f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);grid.append(f);});const left=board.filter(Boolean).length+deck.length;setStatus('Left: '+left+(left===0?' — 🎉 Cleared!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+  function click(i){if(!board[i])return;if(val(board[i])===10){board[i]=null;refill();sel=-1;draw();return;}if(sel===i){sel=-1;draw();return;}if(sel>=0){if(val(board[sel])+val(board[i])===10){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- BEGGAR MY NEIGHBOUR ---------------- */
+function game_beggar(gm){setHint('Tap Play. Face cards force the other player to pay penalty cards. Win the pile and collect all 52!');
+  let p1,p2,pile,turn,debt,over;const center=el('div',{style:'min-height:78px;display:flex;justify-content:center'});const msg=el('div',{className:'big'});const play=el('button',{className:'btn',textContent:'Play'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(center,msg,el('div',{style:'display:flex;gap:10px'},play,nb));
+  function reset(){const d=shuffle(makeDeck());p1=d.slice(0,26);p2=d.slice(26);pile=[];turn=0;debt=0;over=false;center.innerHTML='';msg.textContent='You vs AI. Tap Play.';upd();}
+  function upd(){setStatus('You: '+p1.length+' • AI: '+p2.length+' • Best: '+hs(gm.id));}
+  function pen(r){return r==='J'?1:r==='Q'?2:r==='K'?3:r==='A'?4:0;}
+  function check(){if(!p1.length){over=true;msg.textContent='😢 AI wins!';}else if(!p2.length){over=true;msg.textContent='🎉 You win!';setHs(gm.id,1);}}
+  play.onclick=()=>{if(over)return;const hand=turn===0?p1:p2;if(!hand.length){check();return;}const c=hand.shift();pile.push(c);center.innerHTML='';center.append(cardFace(c));
+    if(pen(c.r)>0){debt=pen(c.r);turn=1-turn;msg.textContent=(turn===0?'You':'AI')+' must pay '+debt+'.';upd();check();return;}
+    if(debt>0){debt--;if(debt===0){const w=1-turn;(w===0?p1:p2).push(...shuffle(pile));pile=[];msg.textContent=(w===0?'You':'AI')+' win the pile!';turn=w;upd();check();return;}upd();return;}
+    turn=1-turn;upd();check();};
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- SPEED SORT ---------------- */
+function game_speedsort(gm){setHint('A card appears — tap its SUIT as fast as you can! Score as high as possible in 30 seconds.');
+  let deck,score,time,timer,over,cur;const cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});const row=el('div',{style:'display:flex;gap:8px'});
+  SUITS.forEach(s=>{const b=el('button',{className:'btn',textContent:s,style:'font-size:22px'});b.onclick=()=>tap(s);row.append(b);});const nb=el('button',{className:'btn ghost',textContent:'New Game'});const msg=el('div',{className:'big'});
+  host.append(cardEl,row,nb,msg);
+  function reset(){deck=shuffle(makeDeck().concat(makeDeck()));score=0;time=30;over=false;clearInterval(timer);next();timer=setInterval(()=>{time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);msg.textContent='⏰ Time! Score '+score;}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);}
+  function next(){if(!deck.length)deck=shuffle(makeDeck());cur=deck.pop();cardEl.innerHTML='';cardEl.append(cardFace(cur));}
+  function tap(s){if(over)return;if(s===cur.s){score++;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();}
+  nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
 
 applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;

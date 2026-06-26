@@ -86,6 +86,11 @@ const GAMES=[
   {id:'garbage',name:'Garbage',ico:'🗑️'},
   {id:'sevens',name:'Sevens',ico:'7️⃣'},
   {id:'clock',name:'Clock Solitaire',ico:'🕐'},
+  {id:'monte',name:'Three-Card Monte',ico:'👑'},
+  {id:'guesssuit',name:'Guess the Suit',ico:'♣️'},
+  {id:'inbetween',name:'In Between',ico:'🃏'},
+  {id:'matchpairs',name:'Match Pairs',ico:'🔗'},
+  {id:'slapjack',name:'Slap Jack',ico:'✋'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
@@ -510,6 +515,53 @@ function game_clock(gm){setHint('A luck game. Tap "Play Card" to place cards on 
     if(c.r==='K'){kings++;msg.textContent='Drew a King ('+kings+'/4).';if(kings===4&&revealed<52){over=true;msg.textContent='💀 4th King too soon — you lose. ('+revealed+'/52)';draw();return;}}
     curPile=idx;draw();if(revealed===52){over=true;msg.textContent='🎉 Amazing — all 52 revealed! You win!';setHs(gm.id,1);}};
   nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- THREE-CARD MONTE ---------------- */
+function game_monte(gm){setHint('Watch where the Queen is, then pick her card. Build your streak!');
+  let pos,streak,over;const row=el('div',{style:'display:flex;gap:14px;justify-content:center;min-height:78px'});const msg=el('div',{className:'big'});const start=el('button',{className:'btn',textContent:'Deal'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(row,msg,el('div',{style:'display:flex;gap:10px'},start,nb));
+  function reset(){streak=0;over=false;row.innerHTML='';msg.textContent='Tap Deal to start.';setStatus('Streak: 0 • Best: '+hs(gm.id));}
+  function deal(){pos=rnd(3);over=false;row.innerHTML='';for(let i=0;i<3;i++)row.append(cardFace(i===pos?{s:'♥',r:'Q',v:12}:{s:'♠',r:(rnd(2)?'7':'9'),v:7},true));msg.textContent='Remember the Queen…';
+    setTimeout(()=>{row.innerHTML='';for(let i=0;i<3;i++){const f=cardFace({s:'♠',r:'?',v:0},false);f.style.cursor='pointer';f.onclick=()=>pick(i);row.append(f);}msg.textContent='Where is the Queen? 👑';},1200);}
+  function pick(i){const win=i===pos;row.innerHTML='';for(let j=0;j<3;j++)row.append(cardFace(j===pos?{s:'♥',r:'Q',v:12}:{s:'♠',r:'7',v:7},true));
+    if(win){streak++;setHs(gm.id,streak);msg.textContent='🎉 Found her! Streak '+streak+'. Tap Deal.';}else{msg.textContent='❌ Not there! Streak was '+streak+'. Tap Deal.';streak=0;}setStatus('Streak: '+streak+' • Best: '+hs(gm.id));}
+  start.onclick=deal;nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- GUESS THE SUIT ---------------- */
+function game_guesssuit(gm){setHint('Guess the SUIT of the next card. How long can your streak last?');
+  let deck,streak,over;const cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});const msg=el('div',{className:'big'});const row=el('div',{style:'display:flex;gap:8px'});
+  SUITS.forEach(s=>{const b=el('button',{className:'btn',textContent:s,style:'font-size:22px'});b.onclick=()=>guess(s);row.append(b);});const nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(cardEl,row,nb,msg);
+  function reset(){deck=shuffle(makeDeck());streak=0;over=false;cardEl.innerHTML='';cardEl.append(cardFace({s:'♠',r:'?',v:0},false));msg.textContent='Pick a suit!';setStatus('Streak: 0 • Best: '+hs(gm.id));}
+  function guess(s){if(over||!deck.length)return;const c=deck.pop();cardEl.innerHTML='';cardEl.append(cardFace(c));if(c.s===s){streak++;setHs(gm.id,streak);msg.textContent='✅ Yes! ('+c.r+c.s+')';setStatus('Streak: '+streak+' • Best: '+hs(gm.id));}else{msg.textContent='❌ It was '+c.s+'. Streak: '+streak+'. New Game?';over=true;}}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- IN BETWEEN ---------------- */
+function game_inbetween(gm){setHint('Two cards are shown. Will the next card rank fall BETWEEN them? Score points!');
+  let deck,a,b,score,over;const row=el('div',{style:'display:flex;gap:14px;justify-content:center;align-items:center;min-height:78px'});const msg=el('div',{className:'big'});const yes=el('button',{className:'btn',textContent:'⬇️ Between'}),no=el('button',{className:'btn',textContent:'⬆️ Outside'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(row,el('div',{style:'display:flex;gap:10px'},yes,no,nb),msg);
+  function reset(){deck=shuffle(makeDeck());score=0;over=false;deal();}
+  function deal(){if(deck.length<3)deck=shuffle(makeDeck());a=deck.pop();b=deck.pop();if(a.v>b.v){const t=a;a=b;b=t;}row.innerHTML='';row.append(cardFace(a),el('div',{className:'big',textContent:'?'}),cardFace(b));msg.textContent='Between '+a.r+' and '+b.r+'?';setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+  function guess(bet){if(over)return;const c=deck.pop();row.innerHTML='';row.append(cardFace(a),cardFace(c),cardFace(b));const between=c.v>a.v&&c.v<b.v;
+    if(bet===between){score++;setHs(gm.id,score);msg.textContent='✅ Right! ('+c.r+')';}else{score=Math.max(0,score-1);msg.textContent='❌ It was '+c.r+'.';}setStatus('Score: '+score+' • Best: '+hs(gm.id));setTimeout(deal,950);}
+  yes.onclick=()=>guess(true);no.onclick=()=>guess(false);nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- MATCH PAIRS ---------------- */
+function game_matchpairs(gm){setHint('Tap two cards of the SAME rank to remove them. Clear the whole deck!');
+  let deck,board,sel;const grid=el('div',{style:'display:grid;grid-template-columns:repeat(6,46px);gap:6px'});const nb=el('button',{className:'btn',textContent:'New Game'});const msg=el('div',{className:'big'});host.append(msg,grid,nb);
+  function reset(){deck=shuffle(makeDeck());board=deck.splice(0,12);sel=-1;draw();}
+  function refill(){for(let k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+  function draw(){grid.innerHTML='';board.forEach((c,i)=>{if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}const f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);grid.append(f);});const left=board.filter(Boolean).length+deck.length;setStatus('Cards left: '+left+(left===0?' — 🎉 Cleared!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+  function click(i){if(!board[i])return;if(sel===i){sel=-1;draw();return;}if(sel>=0){if(board[sel].r===board[i].r){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- SLAP JACK ---------------- */
+function game_slapjack(gm){setHint('Cards flip fast — SLAP the instant a Jack appears! 30 seconds.');
+  let deck,score,time,timer,over,isJack;const cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});const slap=el('button',{className:'btn',textContent:'✋ SLAP!',style:'font-size:22px;padding:16px 30px'});const nb=el('button',{className:'btn ghost',textContent:'New Game'});host.append(cardEl,slap,nb);
+  function reset(){deck=shuffle(makeDeck().concat(makeDeck()));score=0;time=30;over=false;isJack=false;clearInterval(timer);timer=setInterval(tick,650);setStatus('Score: 0 • Time: 30s • Best: '+hs(gm.id));}
+  function tick(){if(over)return;time-=0.65;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);cardEl.innerHTML='';cardEl.append(el('div',{className:'big',textContent:'Time! Score '+score}));return;}if(!deck.length)deck=shuffle(makeDeck().concat(makeDeck()));const c=deck.pop();cardEl.innerHTML='';cardEl.append(cardFace(c));isJack=c.r==='J';setStatus('Score: '+score+' • Time: '+Math.ceil(time)+'s • Best: '+hs(gm.id));}
+  slap.onclick=()=>{if(over){reset();return;}if(isJack){score++;isJack=false;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.ceil(time)+'s • Best: '+hs(gm.id));};
+  nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
 
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
