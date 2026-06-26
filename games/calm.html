@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calm & Sensory Pack</title>
+<title>Babak's Calm & Sensory Pack</title>
 <style>
   :root{--bg:#eef7f4;--panel:#ffffff;--accent:#5bb3a0;--accent2:#9ab8e0;--text:#2a3a38;--dim:#7a9088;--border:#d6e8e2;}
   html[data-theme="dark"]{--bg:#0f1a18;--panel:#172624;--accent:#7fd0bd;--accent2:#a9c4e8;--text:#e8f4f0;--dim:#9ab4ac;--border:#274038;}
@@ -38,7 +38,7 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>🌿 CALM & SENSORY</h1>
+    <h1>Babak's 🌿 CALM & SENSORY</h1>
     <div class="sub">Gentle, relaxing activities — no timers, no losing, just play at your own pace. 💛</div>
     <div class="grid" id="grid"></div>
   </div>
@@ -142,11 +142,20 @@ function game_pads(gm){
     const hit=()=>{tone(freq,0.6,'sine',0.2);p.style.transform='scale(0.92)';p.style.filter='brightness(1.2)';setTimeout(()=>{p.style.transform='scale(1)';p.style.filter='none';},120);};
     p.onmousedown=hit;p.ontouchstart=e=>{e.preventDefault();hit();};board.append(p);});
   host.append(board);
-  const song=el('button',{className:'btn',textContent:'🎶 Play a Twinkle'});
-  song.onclick=()=>{const notes=[262,262,392,392,440,440,392,349,349,330,330,294,294,262];let i=0;const iv=setInterval(()=>{if(i>=notes.length){clearInterval(iv);return;}tone(notes[i],0.45,'sine',0.2);i++;},450);};
-  host.append(song);
-  setStatus('Make some music! 🎹');
-  return {stop:()=>{}};
+  const songs={
+    'Twinkle':[262,262,392,392,440,440,392,0,349,349,330,330,294,294,262],
+    'Mary Lamb':[330,294,262,294,330,330,330,0,294,294,294,0,330,392,392],
+    'Ode to Joy':[330,330,349,392,392,349,330,294,262,262,294,330,330,294,294],
+    'Jingle Bells':[330,330,330,0,330,330,330,0,330,392,262,294,330],
+    'Happy Birthday':[262,262,294,262,349,330,0,262,262,294,262,392,349],
+    'Row Your Boat':[262,262,262,294,330,330,294,330,349,392]
+  };
+  const songRow=el('div',{className:'row'});
+  Object.keys(songs).forEach(name=>{const b=el('button',{className:'btn',textContent:'🎶 '+name});b.onclick=()=>playSong(songs[name]);songRow.append(b);});
+  host.append(songRow);
+  let songIv;function playSong(notes){clearInterval(songIv);let i=0;songIv=setInterval(()=>{if(i>=notes.length){clearInterval(songIv);return;}const n=notes[i];if(n)tone(n,0.42,'sine',0.2);i++;},430);}
+  setStatus('Tap the pads, or play a song! 🎹');
+  return {stop:()=>clearInterval(songIv)};
 }
 
 /* ---------------- FIDGET SPINNER ---------------- */
@@ -265,6 +274,14 @@ function game_calmmemory(gm){
 }
 
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Word & Casual Pack</title>
+<title>Babak's Word & Casual Pack</title>
 <style>
   :root{--bg:#f3eef9;--panel:#ffffff;--accent:#8a4fd0;--accent2:#e0892b;--text:#1d1430;--dim:#6a5a80;--border:#e0d6ec;}
   html[data-theme="dark"]{--bg:#13101c;--panel:#221a30;--accent:#b9f;--accent2:#fc8;--text:#f2eaff;--dim:#a99ac0;--border:#352a48;}
@@ -36,7 +36,7 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>✏️ WORD & CASUAL</h1>
+    <h1>Babak's ✏️ WORD & CASUAL</h1>
     <div class="sub">Word games and quick casual fun.</div>
     <div class="grid" id="grid"></div>
   </div>
@@ -79,7 +79,7 @@ const WORDSBIG=['javascript','keyboard','elephant','mountain','computer','rainbo
 
 /* ---------------- WORDLE ---------------- */
 function game_wordle(gm){
-  setHint('Guess the 5-letter word in 6 tries. Type and press Enter.');
+  setHint('Type a whole 5-letter word, then press ⏎ (the big key, or Enter) to check it. Tap the on-screen keys or use your keyboard. 🟩 right spot · 🟨 wrong spot · ⬛ not in word.');
   let answer,row,col,grid,done;
   const board=el('div',{style:'display:grid;grid-template-rows:repeat(6,52px);gap:6px'});
   const kb=el('div',{style:'display:flex;flex-direction:column;gap:6px;align-items:center;margin-top:10px'});
@@ -258,6 +258,14 @@ function game_slots(gm){
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>

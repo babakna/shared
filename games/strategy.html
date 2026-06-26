@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strategy Pack</title>
+<title>Babak's Strategy Pack</title>
 <style>
   :root{--bg:#eef1f6;--panel:#ffffff;--accent:#3a6fd0;--accent2:#d24a4a;--text:#141824;--dim:#5a6580;--border:#d3d9e6;}
   html[data-theme="dark"]{--bg:#0e1118;--panel:#171c28;--accent:#9bf;--accent2:#f99;--text:#eef2ff;--dim:#9aa6c0;--border:#283248;}
@@ -37,13 +37,14 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>♟️ STRATEGY PACK</h1>
+    <h1>Babak's ♟️ STRATEGY PACK</h1>
     <div class="sub">Think ahead — play the computer or a friend.</div>
     <div class="grid" id="grid"></div>
   </div>
   <div id="stage">
     <div class="bar">
       <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <button class="btn ghost" onclick="showRules()">❓ Rules</button>
       <span class="big" id="title"></span>
       <span class="score" id="status"></span>
     </div>
@@ -62,7 +63,22 @@ const GAMES=[
   {id:'chess',name:'Chess',ico:'♚'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
-let current=null;
+let current=null,currentGm=null;
+const HELP={
+ttt:`You are X. Take turns placing marks. Get three in a row across, down, or diagonally to win. The AI is perfect — a draw is a great result! The AI's last move is highlighted in blue.`,
+connect4:`You are 🔴. Click a column to drop a disc; it falls to the lowest open slot. Connect four of your colour in a row (horizontal, vertical, or diagonal) to win. The AI's last drop is highlighted in blue.`,
+checkers:`You are red, moving up the board. Click a piece, then a square to move diagonally. Jump over an enemy into an empty square to capture it (multi-jumps chain automatically). Reach the far row to make a King ♛ that moves both ways. Capture all enemy pieces to win. The AI's move is highlighted in blue.`,
+reversi:`You are black ⚫. Place a disc so it traps one or more white discs in a straight line between your new disc and another of yours — those flip to black. Every move must flip at least one disc (legal squares show a dot). When nobody can move, the most discs wins. The AI's move is highlighted in blue.`,
+dots:`Take turns drawing one line between two dots. Complete the 4th side of a box to claim it AND take another turn. When every line is drawn, whoever owns the most boxes wins.`,
+battleship:`Click squares on the enemy grid (left) to fire — 💥 means hit, • means miss. Sink all enemy ships before the enemy sinks your fleet (right). The enemy fires back after every shot.`,
+chess:`You are white, moving up the board. Click a piece to see its legal moves (dots), then click a square to move. Pawns promote to a Queen at the far end. Checkmate the enemy king to win. The AI's last move is highlighted in blue.`
+};
+function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
+  const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008;max-height:85vh;overflow:auto'});
+  box.append(el('div',{className:'big',style:'font-size:20px;margin-bottom:10px',textContent:(currentGm.ico||'❓')+' '+currentGm.name+' — How to Play'}));
+  box.append(el('div',{style:'line-height:1.6;white-space:pre-line',textContent:HELP[currentGm.id]||'Have fun!'}));
+  const close=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});close.onclick=()=>ov.remove();
+  box.append(close);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
 function wins(id){return +(localStorage.getItem('st_'+id)||0)}
 function addWin(id){localStorage.setItem('st_'+id,wins(id)+1);}
 function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
@@ -70,7 +86,7 @@ function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAME
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}
 function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
-function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function launch(gm){currentGm=gm;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
 function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
 
 /* ---------------- TIC-TAC-TOE ---------------- */
@@ -147,8 +163,8 @@ function game_checkers(gm){
   function apply(bd,m){bd[m.tr][m.tc]=bd[m.fr][m.fc];bd[m.fr][m.fc]=0;if(m.cr!=null)bd[m.cr][m.cc]=0;
     if(bd[m.tr][m.tc]===1&&m.tr===0)bd[m.tr][m.tc]=2;if(bd[m.tr][m.tc]===-1&&m.tr===N-1)bd[m.tr][m.tc]=-2;}
   function draw(){board.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<N;c++){const dark=(r+c)%2;
-    const d=el('div',{style:`width:54px;height:54px;display:flex;align-items:center;justify-content:center;background:${dark?'#3a2a1a':'#c8b890'};cursor:pointer;${sel&&sel.r===r&&sel.c===c?'outline:3px solid #fd5;outline-offset:-3px;':''}${lastAI&&((lastAI.from[0]===r&&lastAI.from[1]===c)||(lastAI.to[0]===r&&lastAI.to[1]===c))?'box-shadow:inset 0 0 0 4px #39f;':''}`});
-    const v=b[r][c];if(v){const piece=el('div',{style:`width:38px;height:38px;border-radius:50%;background:${v>0?'#e44':'#222'};border:3px solid ${v>0?'#a22':'#000'};display:flex;align-items:center;justify-content:center;color:#fd5;font-weight:800;font-size:20px`});if(Math.abs(v)===2)piece.textContent='♛';d.append(piece);}
+    const d=el('div',{style:`width:54px;height:54px;display:flex;align-items:center;justify-content:center;background:${dark?'#8a6a45':'#ecdcb8'};cursor:pointer;${sel&&sel.r===r&&sel.c===c?'outline:3px solid #fd5;outline-offset:-3px;':''}${lastAI&&((lastAI.from[0]===r&&lastAI.from[1]===c)||(lastAI.to[0]===r&&lastAI.to[1]===c))?'box-shadow:inset 0 0 0 4px #39f;':''}`});
+    const v=b[r][c];if(v){const piece=el('div',{style:`width:40px;height:40px;border-radius:50%;background:${v>0?'radial-gradient(circle at 35% 30%,#ff7a7a,#cc1f1f)':'radial-gradient(circle at 35% 30%,#5a6080,#1a1d2e)'};border:3px solid ${v>0?'#fff':'#cfd6ff'};box-shadow:0 2px 4px #0006;display:flex;align-items:center;justify-content:center;color:#ffd34d;font-weight:800;font-size:22px`});if(Math.abs(v)===2)piece.textContent='♛';d.append(piece);}
     d.onclick=()=>click(r,c);board.append(d);}}
   function click(r,c){if(over||turn!==1)return;const legal=moves(b,1);
     if(sel){const m=legal.find(x=>x.fr===sel.r&&x.fc===sel.c&&x.tr===r&&x.tc===c);
@@ -342,6 +358,14 @@ function game_chess(gm){
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>

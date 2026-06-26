@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Family & Party Pack</title>
+<title>Babak's Family & Party Pack</title>
 <style>
   :root{--bg:#fbf6ee;--panel:#ffffff;--accent:#d99a1f;--accent2:#1f9dc9;--text:#2a1e10;--dim:#7a6a50;--border:#e6dcc8;}
   html[data-theme="dark"]{--bg:#1a1208;--panel:#2a1e10;--accent:#fc6;--accent2:#6df;--text:#fff6e8;--dim:#c8b090;--border:#4a3418;}
@@ -38,7 +38,7 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>🎉 FAMILY & PARTY</h1>
+    <h1>Babak's 🎉 FAMILY & PARTY</h1>
     <div class="sub">Games for the whole family — pass-and-play or vs. the computer.</div>
     <div class="grid" id="grid"></div>
   </div>
@@ -468,6 +468,14 @@ function game_dice(gm){
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arcade Pack</title>
+<title>Babak's Arcade Pack</title>
 <style>
   :root{--bg:#eef1f8;--panel:#ffffff;--accent:#2b7fd4;--accent2:#d23a92;--text:#161a2e;--dim:#5a6488;--border:#d3d8ec;}
   html[data-theme="dark"]{--bg:#0f1020;--panel:#1a1c33;--accent:#6cf;--accent2:#f6c;--text:#e8eaff;--dim:#9aa0c8;--border:#2a2d50;}
@@ -40,7 +40,7 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>🕹️ ARCADE PACK</h1>
+    <h1>Babak's 🕹️ ARCADE PACK</h1>
     <div class="sub">Pick a game — use keyboard or touch. High scores save automatically.</div>
     <div class="grid" id="grid"></div>
   </div>
@@ -560,6 +560,27 @@ function game_whack(gm){
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
+(function(){var stage=document.getElementById('stage');if(!stage)return;
+ var pad=document.createElement('div');pad.style.cssText='display:flex;gap:16px;justify-content:center;align-items:center;margin-top:16px;flex-wrap:wrap';
+ function mk(label,key,w){var b=document.createElement('button');b.textContent=label;b.style.cssText='min-width:'+(w||54)+'px;height:54px;font-size:20px;border-radius:12px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-weight:800;touch-action:none;user-select:none;cursor:pointer';
+  function dn(e){e.preventDefault();window.dispatchEvent(new KeyboardEvent('keydown',{key:key}));}
+  function up(e){e.preventDefault();window.dispatchEvent(new KeyboardEvent('keyup',{key:key}));}
+  b.addEventListener('pointerdown',dn);b.addEventListener('pointerup',up);b.addEventListener('pointerleave',up);b.addEventListener('pointercancel',up);return b;}
+ function bl(){var d=document.createElement('div');d.style.cssText='width:54px;height:54px';return d;}
+ var dpad=document.createElement('div');dpad.style.cssText='display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,54px);gap:6px';
+ dpad.append(bl(),mk('↑','ArrowUp'),bl(),mk('←','ArrowLeft'),mk('↓','ArrowDown'),mk('→','ArrowRight'));
+ var act=document.createElement('div');act.style.cssText='display:flex;flex-direction:column;gap:6px';
+ act.append(mk('Space',' ',104),mk('⏎ Enter','Enter',104));
+ pad.append(dpad,act);stage.append(pad);
+ var tip=document.createElement('div');tip.className='hint';tip.style.marginTop='6px';tip.textContent='On-screen controls — use these on a phone/tablet.';stage.append(tip);})();
 buildMenu();
 </script>
 </body>

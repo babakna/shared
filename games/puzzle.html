@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puzzle Pack</title>
+<title>Babak's Puzzle Pack</title>
 <style>
   :root{--bg:#eef2f7;--panel:#ffffff;--accent:#12a89a;--accent2:#e0892b;--text:#13203a;--dim:#5a6a86;--border:#d2dae6;}
   html[data-theme="dark"]{--bg:#101522;--panel:#192238;--accent:#5ed;--accent2:#fb7;--text:#eaf2ff;--dim:#8fa0c0;--border:#28324e;}
@@ -38,7 +38,7 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>🧩 PUZZLE PACK</h1>
+    <h1>Babak's 🧩 PUZZLE PACK</h1>
     <div class="sub">Brain teasers — click or use the keyboard.</div>
     <div class="grid" id="grid"></div>
   </div>
@@ -386,6 +386,14 @@ function game_fifteen(gm){
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>

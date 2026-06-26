@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>4X, Tactics & Sims Pack</title>
+<title>Babak's 4X, Tactics & Sims Pack</title>
 <style>
   :root{--bg:#eef2f8;--panel:#ffffff;--accent:#2487c9;--accent2:#d9772b;--text:#13203a;--dim:#56688c;--border:#d2dae8;}
   html[data-theme="dark"]{--bg:#0a0f1c;--panel:#13203a;--accent:#7df;--accent2:#fb9;--text:#eaf2ff;--dim:#93a4c4;--border:#24335a;}
@@ -43,7 +43,7 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>🌐 4X · TACTICS · SIMS</h1>
+    <h1>Babak's 🌐 4X · TACTICS · SIMS</h1>
     <div class="sub">Bigger strategy — simplified single-file takes inspired by the classics.</div>
     <div class="grid" id="grid"></div>
   </div>
@@ -491,6 +491,14 @@ function game_tribes(gm){
 }
 
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>

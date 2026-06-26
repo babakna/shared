@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strategy II Pack</title>
+<title>Babak's Strategy II Pack</title>
 <style>
   :root{--bg:#eef2f8;--panel:#ffffff;--accent:#2487c9;--accent2:#d9772b;--text:#13203a;--dim:#56688c;--border:#d2dae8;}
   html[data-theme="dark"]{--bg:#0c1220;--panel:#15203a;--accent:#7df;--accent2:#fb9;--text:#eaf2ff;--dim:#93a4c4;--border:#25335a;}
@@ -37,13 +37,14 @@
 <button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 <div id="app">
   <div id="menu">
-    <h1>♜ STRATEGY II</h1>
+    <h1>Babak's ♜ STRATEGY II</h1>
     <div class="sub">More board & abstract strategy — vs. the computer or a friend.</div>
     <div class="grid" id="grid"></div>
   </div>
   <div id="stage">
     <div class="bar">
       <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <button class="btn ghost" onclick="showRules()">❓ Rules</button>
       <span class="big" id="title"></span>
       <span class="score" id="status"></span>
     </div>
@@ -61,9 +62,33 @@ const GAMES=[
   {id:'peg',name:'Peg Solitaire',ico:'🟤'},
   {id:'uttt',name:'Ultimate Tic-Tac-Toe',ico:'#️⃣'},
   {id:'orderchaos',name:'Order & Chaos',ico:'🔵'},
+  {id:'hex',name:'Hex',ico:'⬡'},
+  {id:'pentago',name:'Pentago',ico:'🌀'},
+  {id:'atarigo',name:'Capture Go',ico:'⚪'},
+  {id:'foxhounds',name:'Fox & Hounds',ico:'🦊'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
-let current=null;
+let current=null,currentGm=null;
+const HELP={
+gomoku:`You are ⚫. Take turns placing stones. The first to line up five in a row — horizontal, vertical, or diagonal — wins. The AI's last stone is highlighted in blue.`,
+morris:`Phase 1: take turns placing your 9 men on the points. Phase 2: slide a man along a line to an empty neighbour. Forming a 'mill' (three in a line) lets you remove one enemy man. Reduce the enemy to 2 men, or block all their moves, to win.`,
+mancala:`Click one of your pits (bottom) to scoop its stones and sow them one-by-one counter-clockwise. Last stone in your store (right) = extra turn. Last stone in an empty pit on your side captures the stones across from it. When one side empties, the most stones wins.`,
+nim:`On your turn take any number of coins (at least one) from a SINGLE row. Whoever takes the very last coin wins. The AI plays perfectly — find the trick!`,
+halma:`Move all your pieces (blue, bottom-left) into the opposite corner. Click a piece then a highlighted square to step or hop over a neighbour. First to fill the far corner wins.`,
+peg:`Jump a peg over an adjacent peg into an empty hole — the jumped peg is removed. Clear as many as you can; finishing with one peg is a perfect solve!`,
+uttt:`Nine small boards make one big board. Win a small board to claim it; claim three in a row to win. The cell you play in decides which small board the opponent must play in next (highlighted).`,
+orderchaos:`On a 6×6 grid you are 'Order': place EITHER an X or an O each turn, aiming for five of one symbol in a row. The AI is 'Chaos' and fills the board to stop you. Five in a row wins.`,
+hex:`You are blue — connect the LEFT and RIGHT edges with a chain of your stones. The AI (red) connects TOP and BOTTOM. Click any empty cell to place. Hexes touch six neighbours, so diagonals connect. First to link their two sides wins.`,
+pentago:`Each turn: (1) place one marble on any empty space, then (2) rotate ONE 3×3 quadrant using the rotate buttons. Get five of your marbles in a row — counting the position AFTER rotating — to win. You are blue.`,
+atarigo:`Take turns placing stones. A stone or connected group is captured the instant it has no empty space beside it (no 'liberties'). The FIRST player to capture any enemy stone WINS. You are black ⚫. You can't play a move that would capture yourself.`,
+foxhounds:`You control the 4 Hounds 🐕 (move diagonally DOWNWARD only). The AI is the Fox 🦊 (moves diagonally any direction). Trap the fox so it can't move to win. If the fox reaches the top row, it escapes and wins.`
+};
+function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
+  const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008;max-height:85vh;overflow:auto'});
+  box.append(el('div',{className:'big',style:'font-size:20px;margin-bottom:10px',textContent:(currentGm.ico||'❓')+' '+currentGm.name+' — How to Play'}));
+  box.append(el('div',{style:'line-height:1.6;white-space:pre-line',textContent:HELP[currentGm.id]||'Have fun!'}));
+  const close=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});close.onclick=()=>ov.remove();
+  box.append(close);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
 function wins(id){return +(localStorage.getItem('s2_'+id)||0)}
 function addWin(id){localStorage.setItem('s2_'+id,wins(id)+1);}
 function setBestLow(id,v){const c=localStorage.getItem('s2_'+id);if(c===null||v<+c){localStorage.setItem('s2_'+id,v);return true}return false}
@@ -74,7 +99,7 @@ function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAME
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}
 function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
-function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function launch(gm){currentGm=gm;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
 function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
 
 /* ---------------- GOMOKU ---------------- */
@@ -378,9 +403,158 @@ function game_orderchaos(gm){
   return {stop:()=>{}};
 }
 
+/* ---------------- HEX ---------------- */
+function game_hex(gm){
+  setHint('Connect the LEFT and RIGHT sides (blue). The AI connects top & bottom (red). Tap any cell.');
+  const N=7;let b,over;
+  const boardWrap=el('div',{style:'border-left:6px solid #3a8fd0;border-right:6px solid #3a8fd0;border-top:6px solid #d04a4a;border-bottom:6px solid #d04a4a;padding:6px;border-radius:10px;overflow-x:auto;max-width:100%'});
+  const board=el('div',{style:'display:flex;flex-direction:column;gap:3px'});boardWrap.append(board);
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(boardWrap,newBtn);
+  const NB=[[0,-1],[0,1],[-1,0],[-1,1],[1,-1],[1,0]];
+  function idx(r,c){return r*N+c;}
+  function nbrs(r,c){return NB.map(([dr,dc])=>[r+dr,c+dc]).filter(([nr,nc])=>nr>=0&&nr<N&&nc>=0&&nc<N);}
+  function reset(){b=Array(N*N).fill(0);over=false;draw();setStatus('Your move (blue). Wins: '+wins(gm.id));}
+  function win(p){const seen=Array(N*N).fill(false),st=[];
+    if(p===1){for(let r=0;r<N;r++)if(b[idx(r,0)]===1){st.push([r,0]);seen[idx(r,0)]=true;}}
+    else{for(let c=0;c<N;c++)if(b[idx(0,c)]===2){st.push([0,c]);seen[idx(0,c)]=true;}}
+    while(st.length){const [r,c]=st.pop();if(p===1&&c===N-1)return true;if(p===2&&r===N-1)return true;
+      nbrs(r,c).forEach(([nr,nc])=>{if(!seen[idx(nr,nc)]&&b[idx(nr,nc)]===p){seen[idx(nr,nc)]=true;st.push([nr,nc]);}});}return false;}
+  function draw(){board.innerHTML='';for(let r=0;r<N;r++){const row=el('div',{style:`display:flex;gap:3px;margin-left:${r*18}px`});
+    for(let c=0;c<N;c++){const v=b[idx(r,c)];const d=el('div',{style:`width:34px;height:34px;border-radius:6px;background:${v===1?'#3a8fd0':v===2?'#d04a4a':'var(--panel)'};border:1px solid var(--border);cursor:pointer`});
+      d.onclick=()=>play(r,c);row.append(d);}board.append(row);}
+    setStatus((over?'':'Your move (blue) — link left & right')+'  •  Wins: '+wins(gm.id));}
+  function play(r,c){if(over||b[idx(r,c)])return;b[idx(r,c)]=1;draw();
+    if(win(1)){over=true;addWin(gm.id);setStatus('🎉 You linked your sides — you win!');return;}
+    setTimeout(aiMove,200);}
+  function aiMove(){if(over)return;const empt=[];b.forEach((v,i)=>{if(!v)empt.push(i);});let mv=-1;
+    for(const i of empt){b[i]=2;if(win(2)){mv=i;b[i]=0;break;}b[i]=0;}
+    if(mv<0)for(const i of empt){b[i]=1;if(win(1)){mv=i;b[i]=0;break;}b[i]=0;}
+    if(mv<0){let best=-1,bs=-1;empt.forEach(i=>{const r=Math.floor(i/N),c=i%N;let s=4-Math.abs(c-N/2)+Math.random()*2;nbrs(r,c).forEach(([nr,nc])=>{if(b[idx(nr,nc)]===2)s+=2;});if(s>bs){bs=s;best=i;}});mv=best;}
+    if(mv<0)mv=empt[0];b[mv]=2;draw();
+    if(win(2)){over=true;setStatus('🤖 AI linked top & bottom — AI wins');return;}
+    setStatus('Your move (blue)');}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- PENTAGO ---------------- */
+function game_pentago(gm){
+  setHint('Place a marble, then rotate one 3×3 quadrant. Five in a row wins. You are blue.');
+  let b,phase,over;
+  const msg=el('div',{className:'big'});
+  const board=el('div',{style:'display:grid;grid-template-columns:repeat(6,44px);gap:3px;background:var(--border);padding:6px;border-radius:10px'});
+  const rotBox=el('div',{style:'display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:440px;width:100%;min-height:20px'});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(msg,board,rotBox,newBtn);
+  function reset(){b=Array(36).fill(0);phase='place';over=false;msg.textContent='Step 1: place a blue marble';draw();setStatus('Your turn. Wins: '+wins(gm.id));}
+  function qCells(q){const qr=Math.floor(q/2)*3,qc=(q%2)*3,cells=[];for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push((qr+r)*6+(qc+c));return cells;}
+  function rotateRaw(q,dir){const cells=qCells(q),vals=cells.map(i=>b[i]);const m=[[vals[0],vals[1],vals[2]],[vals[3],vals[4],vals[5]],[vals[6],vals[7],vals[8]]];const nm=[[0,0,0],[0,0,0],[0,0,0]];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++){if(dir===1)nm[c][2-r]=m[r][c];else nm[2-c][r]=m[r][c];}let k=0;for(let r=0;r<3;r++)for(let c=0;c<3;c++)b[cells[k++]]=nm[r][c];}
+  function win(p){const at=(r,c)=>(r>=0&&r<6&&c>=0&&c<6)?b[r*6+c]:0;
+    for(let r=0;r<6;r++)for(let c=0;c<6;c++){if(at(r,c)!==p)continue;for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]){let k=1;for(;k<5;k++)if(at(r+dr*k,c+dc*k)!==p)break;if(k===5)return true;}}return false;}
+  function draw(){board.innerHTML='';for(let i=0;i<36;i++){const v=b[i];const r=Math.floor(i/6),c=i%6;const q=(Math.floor(r/3))*2+Math.floor(c/3);
+    const d=el('div',{style:`width:44px;height:44px;border-radius:50%;background:${v===1?'#3a8fd0':v===2?'#d04a4a':(q%2?'var(--panel)':'#8881')};cursor:${phase==='place'&&!v&&!over?'pointer':'default'}`});
+    d.onclick=()=>place(i);board.append(d);}
+    rotBox.innerHTML='';if(phase==='rotate'&&!over){[['↖ TL',0],['↗ TR',1],['↙ BL',2],['↘ BR',3]].forEach(([name,q])=>{
+      const wrap=el('div',{style:'display:flex;flex-direction:column;gap:4px;align-items:center'});wrap.append(el('div',{textContent:name,style:'font-size:11px;color:var(--dim)'}));
+      const r=el('div',{className:'toolbar',style:'gap:4px'});
+      const ccw=el('button',{className:'btn',textContent:'↺',style:'padding:6px 9px'});ccw.onclick=()=>rotate(q,-1);
+      const cw=el('button',{className:'btn',textContent:'↻',style:'padding:6px 9px'});cw.onclick=()=>rotate(q,1);
+      r.append(ccw,cw);wrap.append(r);rotBox.append(wrap);});}}
+  function place(i){if(over||phase!=='place'||b[i])return;b[i]=1;phase='rotate';msg.textContent='Step 2: rotate a quadrant ↺ ↻';draw();}
+  function rotate(q,dir){if(over||phase!=='rotate')return;rotateRaw(q,dir);phase='place';
+    if(win(1)){over=true;addWin(gm.id);msg.textContent='🎉 Five in a row — you win!';draw();return;}
+    if(win(2)){over=true;msg.textContent='🤖 AI made five — AI wins';draw();return;}
+    if(b.every(v=>v)){over=true;msg.textContent='Board full — a draw!';draw();return;}
+    msg.textContent='🤔 AI is thinking…';draw();setTimeout(aiTurn,400);}
+  function aiTurn(){if(over)return;const empt=[];b.forEach((v,i)=>{if(!v)empt.push(i);});let move=null;
+    for(const i of empt){for(let q=0;q<4;q++){for(const dir of [1,-1]){const snap=b.slice();b[i]=2;rotateRaw(q,dir);if(win(2))move={i,q,dir};b=snap;if(move)break;}if(move)break;}if(move)break;}
+    if(!move){const i=empt[Math.floor(Math.random()*empt.length)];move={i,q:Math.floor(Math.random()*4),dir:Math.random()<.5?1:-1};}
+    b[move.i]=2;rotateRaw(move.q,move.dir);
+    if(win(2)){over=true;msg.textContent='🤖 AI made five — AI wins';draw();return;}
+    if(win(1)){over=true;addWin(gm.id);msg.textContent='🎉 Five in a row — you win!';draw();return;}
+    if(b.every(v=>v)){over=true;msg.textContent='Board full — a draw!';draw();return;}
+    phase='place';msg.textContent='Step 1: place a blue marble';draw();}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- CAPTURE GO (Atari Go) ---------------- */
+function game_atarigo(gm){
+  setHint('Place stones (black). Capture any enemy stone by removing its last empty neighbour to WIN.');
+  const N=7;let b,over;
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},40px);gap:0;background:#cba75e;padding:8px;border-radius:8px`});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(board,newBtn);
+  function idx(r,c){return r*N+c;}
+  function nbrs(i){const r=Math.floor(i/N),c=i%N,o=[];if(r>0)o.push(i-N);if(r<N-1)o.push(i+N);if(c>0)o.push(i-1);if(c<N-1)o.push(i+1);return o;}
+  function group(i){const col=b[i],st=[i],seen=new Set([i]);while(st.length){const x=st.pop();nbrs(x).forEach(y=>{if(!seen.has(y)&&b[y]===col){seen.add(y);st.push(y);}});}return [...seen];}
+  function libs(grp){const s=new Set();grp.forEach(i=>nbrs(i).forEach(y=>{if(b[y]===0)s.add(y);}));return s.size;}
+  function tryPlace(i,col){if(b[i])return false;b[i]=col;const opp=col===1?2:1;let captured=false;
+    nbrs(i).forEach(y=>{if(b[y]===opp){const g=group(y);if(libs(g)===0){g.forEach(z=>b[z]=0);captured=true;}}});
+    if(!captured&&libs(group(i))===0){b[i]=0;return false;}return {captured};}
+  function reset(){b=Array(N*N).fill(0);over=false;draw();setStatus('Your move (black). First capture wins! Wins: '+wins(gm.id));}
+  function draw(){board.innerHTML='';for(let i=0;i<N*N;i++){const v=b[i];
+    const d=el('div',{style:`width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #00000040;cursor:pointer`});
+    if(v)d.append(el('div',{style:`width:30px;height:30px;border-radius:50%;background:${v===1?'#111':'#fff'};box-shadow:0 1px 2px #0007`}));
+    d.onclick=()=>play(i);board.append(d);}
+    setStatus((over?'':'Your move (black)')+'  •  Wins: '+wins(gm.id));}
+  function play(i){if(over)return;const res=tryPlace(i,1);if(!res){setStatus('That move would capture your own stones — try elsewhere.');return;}
+    draw();if(res.captured){over=true;addWin(gm.id);setStatus('🎉 You captured — you win!');return;}setTimeout(aiMove,250);}
+  function aiMove(){if(over)return;
+    for(let i=0;i<N*N;i++){if(b[i])continue;const snap=b.slice();const res=tryPlace(i,2);if(res&&res.captured){draw();over=true;setStatus('🤖 AI captured — AI wins');return;}b=snap;}
+    let target=null,bestLib=99;for(let i=0;i<N*N;i++){if(b[i]===1){const l=libs(group(i));if(l<bestLib){bestLib=l;target=group(i);}}}
+    let move=-1;
+    if(target){const ls=new Set();target.forEach(i=>nbrs(i).forEach(y=>{if(b[y]===0)ls.add(y);}));for(const y of ls){const snap=b.slice();const r=tryPlace(y,2);b=snap;if(r){move=y;break;}}}
+    if(move<0){const empt=[];b.forEach((v,i)=>{if(!v)empt.push(i);});empt.sort(()=>Math.random()-0.5);for(const y of empt){const snap=b.slice();const r=tryPlace(y,2);b=snap;if(r){move=y;break;}}}
+    if(move>=0)tryPlace(move,2);draw();setStatus('Your move (black)');}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- FOX & HOUNDS ---------------- */
+function game_foxhounds(gm){
+  setHint('Move your Hounds 🐕 (diagonally DOWN only). Trap the Fox 🦊 so it can\'t move. Click a hound, then a square.');
+  const N=8;let hounds,fox,sel,over;
+  const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},44px);gap:0`});
+  const newBtn=el('button',{className:'btn',textContent:'New Game'});
+  host.append(board,newBtn);
+  function reset(){hounds=[[0,1],[0,3],[0,5],[0,7]];fox=[7,4];sel=null;over=false;draw();setStatus('Your move (hounds). Wins: '+wins(gm.id));}
+  function dark(r,c){return (r+c)%2===1;}
+  function eq(a,b){return a[0]===b[0]&&a[1]===b[1];}
+  function occ(r,c){return hounds.some(h=>h[0]===r&&h[1]===c)||eq(fox,[r,c]);}
+  function houndMoves(h){const o=[];[[1,-1],[1,1]].forEach(([dr,dc])=>{const nr=h[0]+dr,nc=h[1]+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N&&!occ(nr,nc))o.push([nr,nc]);});return o;}
+  function foxMoves(){const o=[];[[1,-1],[1,1],[-1,-1],[-1,1]].forEach(([dr,dc])=>{const nr=fox[0]+dr,nc=fox[1]+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N&&!occ(nr,nc))o.push([nr,nc]);});return o;}
+  function draw(){board.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<N;c++){const isDark=dark(r,c);
+    const canMove=sel&&houndMoves(sel).some(m=>m[0]===r&&m[1]===c);
+    const d=el('div',{style:`width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px;background:${canMove?'#6e9':isDark?'#7a5a3a':'#e8d8b8'};cursor:pointer`});
+    const h=hounds.find(x=>x[0]===r&&x[1]===c);if(h){d.textContent='🐕';if(sel&&eq(sel,[r,c])){d.style.outline='3px solid #fd5';d.style.outlineOffset='-3px';}}
+    if(eq(fox,[r,c]))d.textContent='🦊';
+    d.onclick=()=>click(r,c);board.append(d);}
+    setStatus((over?'':'Your move (hounds)')+'  •  Wins: '+wins(gm.id));}
+  function click(r,c){if(over)return;const h=hounds.find(x=>x[0]===r&&x[1]===c);
+    if(sel&&houndMoves(sel).some(m=>m[0]===r&&m[1]===c)){sel[0]=r;sel[1]=c;sel=null;afterHound();return;}
+    if(h){sel=h;draw();return;}sel=null;draw();}
+  function afterHound(){draw();if(foxMoves().length===0){over=true;addWin(gm.id);setStatus('🎉 The fox is trapped — you win!');return;}setTimeout(foxTurn,400);}
+  function foxTurn(){if(over)return;const mv=foxMoves();if(!mv.length){over=true;addWin(gm.id);setStatus('🎉 The fox is trapped — you win!');return;}
+    mv.sort((a,b)=>a[0]-b[0]||(Math.random()-0.5));fox=mv[0].slice();draw();
+    if(fox[0]===0){over=true;setStatus('🦊 The fox escaped to the top — fox wins!');return;}setStatus('Your move (hounds)');}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 applyTheme(localStorage.getItem('theme')||'light');
+(function(){var host=document.getElementById('host');if(!host)return;var pend=false;
+function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
+ host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ var avail=host.clientWidth,need=host.scrollWidth;
+ if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
+try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
+window.addEventListener('resize',sched);})();
 buildMenu();
 </script>
 </body>
