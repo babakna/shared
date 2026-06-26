@@ -284,6 +284,10 @@ function game_calmmemory(gm){
   return {stop:()=>{}};
 }
 
+(function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
+var _lastCeleb='';
+function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
+function setStatus(s){statusEl.textContent=s;if(/🎉/.test(s)){if(_lastCeleb!==s){_lastCeleb=s;celebrate(s.split('•')[0].trim(),true);}}else{_lastCeleb='';}}
 applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;

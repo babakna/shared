@@ -157,10 +157,12 @@ function game_connect4(gm){
 /* ---------------- CHECKERS ---------------- */
 function game_checkers(gm){
   setHint('You are red (bottom). Click a piece then a dark square. Captures when possible.');
-  const N=8;let b,sel,turn,over,lastAI;
+  const N=8;let b,sel,turn,over,lastAI;let CKDIFF=localStorage.getItem('st_diff')||'med';
+  const diffRow=el('div',{style:'display:flex;gap:6px;justify-content:center;margin-bottom:6px'});
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,l])=>{const bt=el('button',{className:'btn'+(CKDIFF===d?'':' ghost'),textContent:l,style:'padding:6px 13px'});bt.onclick=()=>{CKDIFF=d;localStorage.setItem('st_diff',d);[...diffRow.children].forEach((c,i)=>c.className='btn'+(['easy','med','hard'][i]===CKDIFF?'':' ghost'));};diffRow.append(bt);});
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},54px);gap:0;border:3px solid #5a4`});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(board,newBtn);
+  host.append(diffRow,board,newBtn);
   // b cell: 0 empty, 1 red man, 2 red king, -1 black man, -2 black king
   function reset(){b=Array.from({length:N},()=>Array(N).fill(0));over=false;turn=1;sel=null;lastAI=null;
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)if((r+c)%2){if(r<3)b[r][c]=-1;if(r>4)b[r][c]=1;}draw();setStatus('Your move (red)  •  Wins: '+wins(gm.id));}
@@ -188,7 +190,11 @@ function game_checkers(gm){
   function endTurn(){draw();if(checkEnd())return;turn=2;setStatus('🤔 AI is thinking…');setTimeout(aiMove,700);}
   function aiMove(){if(over)return;let legal=moves(b,-1);if(!legal.length){over=true;addWin(gm.id);setStatus('🎉 You win! AI has no moves');return;}
     // prefer captures, else random; greedy
-    let m=legal[Math.floor(Math.random()*legal.length)];const startSq=[m.fr,m.fc];let endSq=[m.tr,m.tc];apply(b,m);
+    let m;
+    if(CKDIFF==='med'){m=legal[Math.floor(Math.random()*legal.length)];}
+    else{const scored=legal.map(mv=>{const cp=b.map(r=>r.slice());let caps=mv.cr!=null?1:0;apply(cp,mv);let cur=mv,more=moves(cp,-1).filter(x=>x.fr===cur.tr&&x.fc===cur.tc&&x.cr!=null);while(more.length){apply(cp,more[0]);caps++;cur=more[0];more=moves(cp,-1).filter(x=>x.fr===cur.tr&&x.fc===cur.tc&&x.cr!=null);}const playerCaps=moves(cp,1).filter(x=>x.cr!=null).length;return{mv,score:playerCaps-caps*2};});
+      scored.sort((a,b2)=>a.score-b2.score);m=(CKDIFF==='hard'?scored[0]:scored[scored.length-1]).mv;}
+    const startSq=[m.fr,m.fc];let endSq=[m.tr,m.tc];apply(b,m);
     if(m.cr!=null){let more=moves(b,-1).filter(x=>x.fr===m.tr&&x.fc===m.tc&&x.cr!=null);while(more.length){const mm=more[0];apply(b,mm);endSq=[mm.tr,mm.tc];more=moves(b,-1).filter(x=>x.fr===mm.tr&&x.fc===mm.tc&&x.cr!=null);}}
     lastAI={from:startSq,to:endSq};draw();if(checkEnd())return;turn=1;setStatus('🔵 AI moved the piece highlighted in blue — your move (red)');}
   function checkEnd(){const red=b.flat().filter(v=>v>0).length,black=b.flat().filter(v=>v<0).length;
@@ -368,6 +374,10 @@ function game_chess(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+(function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
+var _lastCeleb='';
+function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
+function setStatus(s){statusEl.textContent=s;if(/🎉/.test(s)){if(_lastCeleb!==s){_lastCeleb=s;celebrate(s.split('•')[0].trim(),true);}}else if(/💀|😢|Game Over|Game over|AI wins|AI Wins|You lose|Defeated/.test(s)){if(_lastCeleb!==s){_lastCeleb=s;celebrate(s.split('•')[0].trim(),false);}}else{_lastCeleb='';}}
 applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
