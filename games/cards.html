@@ -96,6 +96,11 @@ const GAMES=[
   {id:'sumto21',name:'Twenty-One',ico:'2️⃣'},
   {id:'colorstreak',name:'Colour Streak',ico:'🟥'},
   {id:'lucky7',name:'Lucky Seven',ico:'🍀'},
+  {id:'pairs15',name:'Pairs of 15',ico:'➕'},
+  {id:'matchsuit',name:'Suit Match',ico:'♣️'},
+  {id:'pickhigher',name:'Pick Higher',ico:'⬆️'},
+  {id:'highcardduel',name:'High Card Duel',ico:'⚔️'},
+  {id:'cardladder',name:'Card Ladder',ico:'🪜'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
@@ -612,6 +617,53 @@ function game_lucky7(gm){setHint('Keep drawing to build points (card value). But
   function reset(){deck=shuffle(makeDeck());pot=0;over=false;cards.innerHTML='';msg.textContent='Draw or Bank?';setStatus('Pot: 0 • Best: '+hs(gm.id));}
   draw.onclick=()=>{if(over)return;if(!deck.length)deck=shuffle(makeDeck());const c=deck.pop();cards.append(cardFace(c));if(c.r==='7'){over=true;msg.textContent='💥 A 7! You lost '+pot+' points.';pot=0;setStatus('Pot: 0 • Best: '+hs(gm.id));return;}pot+=(c.v>10?10:c.v);msg.textContent='Pot: '+pot+' — keep going?';setStatus('Pot: '+pot+' • Best: '+hs(gm.id));};
   bank.onclick=()=>{if(over)return;over=true;setHs(gm.id,pot);msg.textContent='🏦 Banked '+pot+'! Best: '+hs(gm.id);};
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- PAIRS OF 15 ---------------- */
+function game_pairs15(gm){setHint('Tap two cards that add up to 15 (A=1 … K=13). Clear the whole deck!');
+  let deck,board,sel;const grid=el('div',{style:'display:grid;grid-template-columns:repeat(6,46px);gap:6px'});const nb=el('button',{className:'btn',textContent:'New Game'});const msg=el('div',{className:'big'});host.append(msg,grid,nb);
+  function reset(){deck=shuffle(makeDeck());board=deck.splice(0,12);sel=-1;draw();}
+  function refill(){for(let k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+  function draw(){grid.innerHTML='';board.forEach((c,i)=>{if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}const f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);grid.append(f);});const left=board.filter(Boolean).length+deck.length;setStatus('Left: '+left+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+  function click(i){if(!board[i])return;if(sel===i){sel=-1;draw();return;}if(sel>=0){if(board[sel].v+board[i].v===15){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- SUIT MATCH ---------------- */
+function game_matchsuit(gm){setHint('Tap two cards of the SAME SUIT to remove them. Clear the whole deck!');
+  let deck,board,sel;const grid=el('div',{style:'display:grid;grid-template-columns:repeat(6,46px);gap:6px'});const nb=el('button',{className:'btn',textContent:'New Game'});const msg=el('div',{className:'big'});host.append(msg,grid,nb);
+  function reset(){deck=shuffle(makeDeck());board=deck.splice(0,12);sel=-1;draw();}
+  function refill(){for(let k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+  function draw(){grid.innerHTML='';board.forEach((c,i)=>{if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}const f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);grid.append(f);});const left=board.filter(Boolean).length+deck.length;setStatus('Left: '+left+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+  function click(i){if(!board[i])return;if(sel===i){sel=-1;draw();return;}if(sel>=0){if(board[sel].s===board[i].s){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- PICK HIGHER ---------------- */
+function game_pickhigher(gm){setHint('Tap the HIGHER card as fast as you can! 30 seconds.');
+  let a,b,score,time,timer,over;const row=el('div',{style:'display:flex;gap:20px;justify-content:center;min-height:78px'});const msg=el('div',{className:'big'});const nb=el('button',{className:'btn ghost',textContent:'New Game'});host.append(row,msg,nb);
+  function reset(){score=0;time=30;over=false;clearInterval(timer);timer=setInterval(()=>{time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);msg.textContent='⏰ Time! Score '+score;row.innerHTML='';}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);deal();}
+  function deal(){const d=shuffle(makeDeck());a=d[0];b=d[1];if(a.v===b.v)b=d[2];row.innerHTML='';const fa=cardFace(a),fb=cardFace(b);fa.style.cursor='pointer';fb.style.cursor='pointer';fa.onclick=()=>pick(a);fb.onclick=()=>pick(b);row.append(fa,fb);}
+  function pick(c){if(over)return;const hi=a.v>b.v?a:b;score+=c===hi?1:-1;if(score<0)score=0;setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));deal();}
+  nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
+
+/* ---------------- HIGH CARD DUEL ---------------- */
+function game_highcardduel(gm){setHint('Pick one of three face-down cards. The higher card beats the AI. First to 5 wins!');
+  let deck,you,ai,over;const msg=el('div',{className:'big'});const row=el('div',{style:'display:flex;gap:12px;justify-content:center;min-height:78px'});const res=el('div',{style:'display:flex;gap:26px;justify-content:center;min-height:78px'});const nb=el('button',{className:'btn ghost',textContent:'New Game'});host.append(msg,row,res,nb);
+  function reset(){you=0;ai=0;over=false;deal();}
+  function deal(){if(over)return;deck=shuffle(makeDeck());res.innerHTML='';row.innerHTML='';for(let i=0;i<3;i++){const f=cardFace({s:'♠',r:'?',v:0},false);f.style.cursor='pointer';f.onclick=()=>play();row.append(f);}msg.textContent='Pick a card!  You '+you+' — '+ai+' AI';setStatus('You '+you+' — '+ai+' AI • Wins: '+hs(gm.id));}
+  function play(){const yc=deck.pop(),ac=deck.pop();res.innerHTML='';res.append(el('div',{},el('div',{className:'big',textContent:'You'}),cardFace(yc)),el('div',{},el('div',{className:'big',textContent:'AI'}),cardFace(ac)));
+    if(yc.v>ac.v){you++;msg.textContent='You win the round!';}else if(ac.v>yc.v){ai++;msg.textContent='AI wins the round.';}else msg.textContent='Tie!';
+    if(you>=5){over=true;msg.textContent='🎉 You win the match!';setHs(gm.id,hs(gm.id)+1);}else if(ai>=5){over=true;msg.textContent='😢 AI wins the match.';}
+    setStatus('You '+you+' — '+ai+' AI • Wins: '+hs(gm.id));if(!over)setTimeout(deal,1100);}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- CARD LADDER ---------------- */
+function game_cardladder(gm){setHint('Tap the cards in order from LOWEST to HIGHEST. Get the whole row right!');
+  let cards,idx,streak;const row=el('div',{style:'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:78px'});const msg=el('div',{className:'big'});const nb=el('button',{className:'btn ghost',textContent:'New Game'});host.append(msg,row,nb);
+  function reset(){streak=0;deal();}
+  function deal(){const d=shuffle(makeDeck()).slice(0,5);cards=d.map(c=>({c,done:false}));idx=0;draw();msg.textContent='Tap lowest to highest!';}
+  function order(){return cards.map((x,i)=>i).sort((a,b)=>cards[a].c.v-cards[b].c.v);}
+  function draw(){row.innerHTML='';cards.forEach((x,i)=>{const f=cardFace(x.c);if(x.done)f.style.opacity='.4';else{f.style.cursor='pointer';f.onclick=()=>pick(i);}row.append(f);});setStatus('Streak: '+streak+' • Best: '+hs(gm.id));}
+  function pick(i){const ord=order();if(i===ord[idx]){cards[i].done=true;idx++;draw();if(idx===5){streak++;setHs(gm.id,streak);msg.textContent='🎉 Perfect! Next…';setTimeout(deal,800);}}else{msg.textContent='❌ Out of order — try again.';streak=0;setTimeout(deal,900);}}
   nb.onclick=reset;reset();return{stop:()=>{}};}
 
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;

@@ -94,6 +94,11 @@ const GAMES=[
   {id:'quickmaths',name:'True or False',ico:'✅'},
   {id:'memorynum',name:'Number Memory',ico:'🧠'},
   {id:'biggernum',name:'Biggest Number',ico:'📈'},
+  {id:'roundgame',name:'Rounding',ico:'🔟'},
+  {id:'comparemath',name:'Compare Sums',ico:'⚖️'},
+  {id:'doublehalf',name:'Double or Half',ico:'✌️'},
+  {id:'oddeven',name:'Odd or Even',ico:'🔢'},
+  {id:'placeval',name:'Place Value',ico:'🏷️'},
 ];
 const HELP={
 scrabble:`Build words on the board for points. Tap a letter in your rack, then tap an empty square to place it; lay tiles in one straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL/TL = letter, DW/TW = word). Tap Submit to score (words are checked against the dictionary), Recall to take tiles back, 🔀 to reshuffle your rack.`,
@@ -823,6 +828,16 @@ function game_scrabble(gm){
     score+=gained;turns++;placed=[];while(rack.length<7&&bag.length)rack.push(bag.pop());setHs(gm.id,score);msg.textContent='✅ '+word.toUpperCase()+' +'+gained+' points!';render();};
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
+
+function nC(ans,sp){const s=new Set([ans]);let g=0;while(s.size<4&&g<99){g++;const v=ans+rnd(2*sp+1)-sp;if(v!==ans)s.add(v);}return [...s].filter(x=>x!==ans);}
+function mcq(gm,gen){let score=0;const q=el('div',{className:'big',style:'font-size:24px;min-height:42px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});host.append(q,opts,fb,nb);
+  function round(){const d=gen();q.textContent=d.q;fb.textContent='';opts.innerHTML='';shuffle([d.a,...d.wr]).map(String).forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:18px'});b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===String(d.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+d.a;}setHs(gm.id,score);setStatus('Score: '+score+' • Best: '+hs(gm.id));};opts.append(b);});setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+  nb.onclick=round;round();return{stop:()=>{}};}
+function game_roundgame(gm){setHint('Round the number to the nearest 10.');return mcq(gm,()=>{const n=rnd(889)+11;const a=Math.round(n/10)*10;return{q:'Round '+n+' to the nearest 10',a:a,wr:[a+10,a-10,a+20].filter(x=>x>=0&&x!==a)};});}
+function game_comparemath(gm){setHint('Which sum is BIGGER?');return mcq(gm,()=>{const a=rnd(50)+1,b=rnd(50)+1,c=rnd(50)+1,d=rnd(50)+1;const s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);const ans=(a+b)>=(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[(a+b)>=(c+d)?s2:s1]};});}
+function game_doublehalf(gm){setHint('Double it or halve it!');return mcq(gm,()=>{if(rnd(2)){const n=rnd(490)+10;return{q:'Double '+n+' = ?',a:n*2,wr:nC(n*2,12)};}const n=(rnd(245)+5)*2;return{q:'Half of '+n+' = ?',a:n/2,wr:nC(n/2,8)};});}
+function game_oddeven(gm){setHint('Is the number odd or even?');return mcq(gm,()=>{const n=rnd(9999)+1;return{q:'Is '+n+' odd or even?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};});}
+function game_placeval(gm){setHint('Which digit is in the named place?');return mcq(gm,()=>{const n=rnd(8999)+100;const s=String(n);const names=['ones','tens','hundreds','thousands'];const i=rnd(s.length);const dig=+s[s.length-1-i];return{q:'In '+n+', which digit is in the '+names[i]+' place?',a:dig,wr:nC(dig,4).filter(x=>x>=0&&x<=9)};});}
 
 /* ---------------- MATH DASH ---------------- */
 function game_mathdash(gm){setHint('Solve as many as you can in 30 seconds — tap the correct answer!');
