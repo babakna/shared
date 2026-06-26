@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Babak's Learning Room IV</title>
+<style>
+  :root{--bg:#eaf3fb;--panel:#ffffff;--accent:#1f8fc9;--accent2:#e0723a;--text:#13243a;--dim:#5a6f88;--border:#d2e2ee;}
+  html[data-theme="dark"]{--bg:#0a141f;--panel:#132231;--accent:#6cc8ff;--accent2:#ffb27d;--text:#e9f3ff;--dim:#9bb2c8;--border:#243a4e;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(900px 520px at 12% -8%,rgba(110,180,255,.18),transparent 60%),radial-gradient(900px 520px at 112% 2%,rgba(255,170,110,.16),transparent 55%),var(--bg);background-attachment:fixed;color:var(--text)}
+  #app{max-width:920px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card{position:relative;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(0,0,0,.05)),var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 12px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s,box-shadow .12s;box-shadow:0 6px 18px rgba(0,0,0,.14);animation:pop .4s ease both}
+  .card:hover{transform:translateY(-5px) scale(1.03);border-color:var(--accent);box-shadow:0 14px 30px rgba(0,0,0,.22)}
+  .card .ico{font-size:32px;display:block;margin-bottom:6px}
+  .card .name{font-weight:700;font-size:14px}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;border-radius:11px;padding:9px 15px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:transform .12s,filter .12s}
+  button.btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  button.btn:disabled{opacity:.6;cursor:default}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:100%}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px;max-width:620px}
+  .big{font-size:20px;font-weight:700;text-align:center}
+  #host{max-width:100%;overflow-x:auto}
+  @media(max-width:560px){#app{padding:10px}h1{font-size:24px}.opts{grid-template-columns:1fr !important}}
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>📚 LEARNING ROOM IV</h1>
+    <div class="sub">100+ more learning games — Easy / Medium / Hard, with 500+ variations each.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <button class="btn ghost" onclick="showRules()">❓ Rules</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null,currentGm=null,score=0;
+let DIFF=localStorage.getItem('l2diff')||'med';
+function D(e,m,h){return DIFF==='easy'?e:DIFF==='hard'?h:m;}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function el(tag,props={},...kids){const e=document.createElement(tag);for(const k in props){if(k==='style')e.style.cssText=props[k];else e[k]=props[k];}kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pk(a){return a[Math.floor(Math.random()*a.length)];}
+function wf(pool,ans,n){return shuffle(pool.filter(x=>x!==ans)).slice(0,n||4);}
+function nums(ans,spread,n){const s=new Set([ans]);let g=0;n=n||4;while(s.size<n+1&&g<300){g++;const v=ans+ri(-spread,spread);if(v!==ans)s.add(v);}return [...s].filter(x=>x!==ans).slice(0,n);}
+function yn(cond,q){return cond?{q:q,a:'Yes',wr:['No']}:{q:q,a:'No',wr:['Yes']};}
+const RN=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+function toRoman(n){let r='';for(const[v,s]of RN){while(n>=v){r+=s;n-=v;}}return r;}
+const ONES=['','one','two','three','four','five','six','seven','eight','nine'],TEENS=['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function toWords(n){if(n<10)return ONES[n]||'zero';if(n<20)return TEENS[n-10];if(n<100)return TENS[Math.floor(n/10)]+(n%10?'-'+ONES[n%10]:'');const h=Math.floor(n/100);return ONES[h]+' hundred'+(n%100?' '+toWords(n%100):'');}
+const vow=s=>(s.match(/[aeiou]/gi)||[]).length;
+const BW=("about above across active actor adult after again agent agree ahead alarm album alert alike alive allow alone along amaze among anger angle animal ankle apart apple apply arena argue arise armor arrow aside asset atlas attic audio avoid awake award aware bacon badge baker banana banker barber basket beacon beauty beaver before began begin being below bench berry beside better beyond birth black blade blame blank blast blaze bleed blend bless blind block blood bloom board boast bonus booth border bottle bottom bounce brain brake branch brave bread break breath breeze brick bride brief bright bring broad brook brown brush buddy budget buffalo build bunch bundle burst butter button cabin cable camel candle candy cannon canyon carbon cargo carpet carrot castle catch cattle cause cedar cellar center cereal chain chair chalk chance change chaos charm chart chase cheap check cheek cheer chess chest chief child choice choose chunk circle city civil claim clamp clash class clean clear clerk click cliff climb cloak clock close cloth cloud clown coach coast cobra cocoa color comet comic coral couch cough count court cover crack craft crane crash crater crawl crazy cream creek crisp cross crowd crown crumb crush crust daily dairy dance dandy dealt death debate decay decent decide deeds defeat defend degree delay delta dense depth desert design detail device diary digit dimple diner dinner dirty disco ditch dizzy dodge dolly donor doodle double dough dozen draft drama drank dread dream dress dried drift drill drink drive drone drove dryer eager eagle early earth easel eaten ebony elbow elder elect elite elope email emerge empty enact enemy energy enjoy enter entry equal error erupt event every exact exam excel exist expand extra fable fabric fairy faith false fancy farm fatal favor feast feather fence ferry fetch fever fiber field fierce fifty fight final finer first fixed flag flame flash fleet flesh flint float flock flood floor flour fluid flush flute foam focus foggy folks force forest forget forgot frame frank fresh friend frost frown fruit fudge funny gadget galaxy garden garlic gather gauge gecko gentle ghost giant giddy ginger giraffe given glad glance glass gleam glide globe gloom glory glove goal goat golden goose grab grace grade grain grand grape graph grasp grass grave gravy great greedy green greet grief grill grin grip groan group grunt guard guess guest guide guilt habit handy happy harbor hardy haste hatch haunt haven hazel heart heavy hedge helmet herb hero hinge hippo hobby hockey honey honor horse hotel hound house human humor hunt hurry ideal igloo image index inner input insect issue ivory jacket jaguar jelly jewel joker jolly joyful judge juice juicy jumbo jungle keen ketchup kettle kind kiosk kitten knee knife knight label labor ladder lady lake lamp lane large laser later laugh layer leader learn lease least leave ledge legal legend lemon lemur level light lilac limit linen lion liquid listen lively lizard llama local lodge logic lonely loose lovely lower loyal lucky lumber lunar lunch magic magnet major mango maple march marsh mask match meadow medal melon melt mercy merge metal meteor middle might mild miner mint mirror model modern money month moral mossy motel motor mound mount mouse mouth movie muddy muffin mural music nacho nature needle nerve nest never noble noise north notch novel nudge ocean offer often olive onion opera orbit order organ otter ought ounce outer owner oxygen palace panda panel paper parade party pasta patch patio pause peace peach pearl pedal penny perch petal photo piano picnic piece pilot pinch pixel pizza place plain plane plank plant plate plaza pluck point polar polite porch power prairie press price pride prime print prize proud prune public pulse pumpkin punch puppy purple puzzle quack quail quake quart queen query quest quick quiet quilt quote rabbit radar radio raft rainbow raise rally ranch range rapid raven reach react ready realm rebel recap relax relay remix repeat reply rescue resort return rhino rhythm ribbon ridge rigid rinse risky river roast robin robot rocket rotate rough round royal ruby rugby ruler rumor safari salad sample sandy sauce scale scarf scene scent scoop score scout scrap screen scrub seal sedan seize sense seven shade shadow shaft shake shape share shark sharp sheep sheet shelf shell shine shiny shore short shout shovel shrub sight signal silk silly silver simple siren skate sketch skill skirt skull slate sleek sleep slice slide slope sloth small smart smile smoke smooth snack snail snake sneak snow soap solar solid solve sonic sorry sound south space spare spark speak spear speed spell spend spice spider spike spine spiral splash spoke sport spray spring sprint sprout squad square squid stack staff stage stair stamp stand steam steel stern stick still sting stock stone stool storm story stove strap straw stray strip study sugar suite summer sunny super swamp swarm sweat sweet swift swing sword table talent tango taste teach tease tempo tender tennis thank theme thick thief thigh thing think third thorn thread three throw thumb tidy tiger tight title toast token tomato tooth topic torch total touch tough tower trace track trade trail train trap trash treat trend trial tribe trick trim troll truck truly trust truth tulip tunnel turbo twist ultra uncle under unit upper urban usual valet valley value vapor vault velvet venue verse video vigor villa vine vinyl violet vivid vocal voice vowel wagon waltz wander watch water weave weird whale wheat wheel where which while whisk white whole wider width windy winter wisdom witty wizard woman wonder wooden world worry worth woven wreck wrist write yacht yarn yeast yield young youth zebra zesty zigzag").split(/\s+/);
+const SYN=[["big","large"],["small","tiny"],["happy","glad"],["fast","quick"],["smart","clever"],["scared","afraid"],["angry","furious"],["pretty","lovely"],["begin","start"],["end","finish"],["shout","yell"],["rich","wealthy"],["cold","chilly"],["sick","ill"],["easy","simple"],["strange","odd"],["quiet","silent"],["story","tale"],["gift","present"],["jump","leap"],["smell","odor"],["cry","weep"],["look","gaze"],["fix","repair"],["hide","conceal"],["throw","toss"],["empty","vacant"],["help","aid"],["brave","bold"],["calm","peaceful"],["damp","moist"],["enormous","huge"],["fall","drop"],["glad","cheerful"],["hurry","rush"]];
+const ANT=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","close"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["win","lose"],["true","false"],["rich","poor"],["near","far"],["clean","dirty"],["thick","thin"],["early","late"],["above","below"],["begin","end"],["buy","sell"],["brave","afraid"],["smooth","rough"],["sweet","sour"],["wild","calm"],["expand","shrink"],["enter","exit"],["float","sink"],["accept","reject"],["future","past"],["polite","rude"]];
+const INGW=[["run","running"],["swim","swimming"],["sit","sitting"],["hop","hopping"],["make","making"],["bake","baking"],["ride","riding"],["write","writing"],["play","playing"],["jump","jumping"],["read","reading"],["cut","cutting"],["run","running"],["smile","smiling"],["dance","dancing"],["clap","clapping"],["dig","digging"],["hope","hoping"],["skate","skating"],["plan","planning"]];
+const ANIMR=["ant","bee","mouse","sparrow","frog","rat","squirrel","rabbit","cat","fox","dog","goat","wolf","sheep","pig","kangaroo","lion","horse","bear","cow","camel","giraffe","elephant","whale"];
+const SPEED=["snail","tortoise","worm","sloth","chicken","pig","squirrel","cat","dog","rabbit","fox","deer","horse","lion","cheetah","ostrich","kangaroo","wolf","zebra","hare","greyhound","gazelle","antelope","eagle"];
+
+function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
+  const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008'});
+  box.append(el('div',{className:'big',style:'font-size:20px;margin-bottom:10px',textContent:currentGm.ico+' '+currentGm.name}));
+  box.append(el('div',{style:'line-height:1.6',textContent:'Read the question and tap the correct answer. Use Easy / Medium / Hard to change the level, then tap Next.'}));
+  const c=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});c.onclick=()=>ov.remove();box.append(c);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=el('div',{className:'card'});d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){currentGm=gm;score=0;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=gm.fn();}
+function quiz(gen){
+  score=0;
+  const diffRow=el('div',{className:'row',style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center'});
+  function rd(){[...diffRow.children].forEach((c,i)=>c.className='btn'+(['easy','med','hard'][i]===DIFF?'':' ghost'));}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,lbl])=>{const b=el('button',{className:'btn',textContent:lbl,style:'padding:7px 14px'});b.onclick=()=>{DIFF=d;localStorage.setItem('l2diff',d);rd();score=0;round();};diffRow.append(b);});rd();
+  const qEl=el('div',{className:'big',style:'max-width:600px;min-height:46px;line-height:1.4'});
+  const opts=el('div',{className:'opts',style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:540px;width:100%'});
+  const fb=el('div',{className:'big',style:'min-height:26px'});const next=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(diffRow,qEl,opts,fb,next);
+  function round(){const d=gen(DIFF);qEl.innerHTML=d.q;fb.textContent='';
+    const optN={easy:2,med:3,hard:4}[DIFF];const all=shuffle([d.a,...(d.wr||[]).slice(0,optN)]).map(String);
+    const long=all.some(o=>o.length>14);opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    all.forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:16px'});
+      b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===String(d.a)){b.style.background='#2ecc71';b.style.color='#fff';score++;fb.textContent='✅ '+(d.ok||'Correct!');setStatus('Score: '+score+' • '+DIFF);}else{b.style.background='#e74c3c';b.style.color='#fff';[...opts.children].forEach(x=>{if(x.textContent===String(d.a)){x.style.background='#2ecc71';x.style.color='#fff';}});fb.textContent='Answer: '+d.a;}};
+      opts.append(b);});
+    setStatus('Score: '+score+' • '+DIFF);}
+  next.onclick=round;round();return{stop:()=>{}};
+}
+function cmpAnim(list,word){return ()=>{const i=ri(0,list.length-1);let j;do{j=ri(0,list.length-1);}while(j===i);const big=Math.random()<0.5;const A=list[i],B=list[j];const ans=big?(i>j?A:B):(i<j?A:B);return{q:'Which is '+(big?word[0]:word[1])+': a '+A+' or a '+B+'?',a:ans,wr:[ans===A?B:A]};};}
+
+const GAMES=[
+ {id:'add5',name:'Add Near Doubles',ico:'➕',fn:()=>quiz(()=>{const a=ri(2,D(20,99,600));return{q:a+' + '+(a+1)+' = ?',a:a+a+1,wr:nums(a+a+1,D(5,12,40))};})},
+ {id:'mul5',name:'Multiply by 5',ico:'5️⃣',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 5 = ?',a:n*5,wr:nums(n*5,D(10,30,120))};})},
+ {id:'mul9',name:'Multiply by 9',ico:'9️⃣',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 9 = ?',a:n*9,wr:nums(n*9,D(12,36,150))};})},
+ {id:'mul25',name:'Multiply by 25',ico:'🔢',fn:()=>quiz(()=>{const n=ri(2,D(12,60,400));return{q:n+' × 25 = ?',a:n*25,wr:nums(n*25,D(25,80,300))};})},
+ {id:'divis2',name:'Divisible by 2?',ico:'➗',fn:()=>quiz(()=>{const n=ri(1,D(60,700,9000));return yn(n%2===0,'Is '+n+' divisible by 2?');})},
+ {id:'divis3',name:'Divisible by 3?',ico:'➗',fn:()=>quiz(()=>{const n=ri(1,D(60,700,9000));return yn(n%3===0,'Is '+n+' divisible by 3?');})},
+ {id:'divis5',name:'Divisible by 5?',ico:'➗',fn:()=>quiz(()=>{const n=ri(1,D(60,700,9000));return yn(n%5===0,'Is '+n+' divisible by 5?');})},
+ {id:'divis10',name:'Divisible by 10?',ico:'🔟',fn:()=>quiz(()=>{const n=ri(1,D(60,700,9000));return yn(n%10===0,'Is '+n+' divisible by 10?');})},
+ {id:'divis4',name:'Divisible by 4?',ico:'4️⃣',fn:()=>quiz(()=>{const n=ri(1,D(60,700,9000));return yn(n%4===0,'Is '+n+' divisible by 4?');})},
+ {id:'round50',name:'Round to 50',ico:'🎯',fn:()=>quiz(()=>{const n=ri(20,D(480,2000,20000));const a=Math.round(n/50)*50;return{q:'Round '+n+' to the nearest 50',a:a,wr:[a+50,a-50,a+100,a-100].filter(x=>x>=0&&x!==a)};})},
+ {id:'digitvalue',name:'Value of a Digit',ico:'🏷️',fn:()=>quiz(()=>{const n=ri(100,D(999,9999,99999));const s=String(n);const i=ri(0,Math.min(s.length-1,D(2,3,4)));const place=Math.pow(10,s.length-1-i);const a=(+s[i])*place;return{q:'In '+n+', what is the VALUE of the digit '+s[i]+'?',a:a,wr:[(+s[i])*place*10,(+s[i])*(place/10||1),(+s[i])].filter((x,k,arr)=>x!==a&&arr.indexOf(x)===k)};})},
+ {id:'moneycmp',name:'Which Costs More',ico:'💵',fn:()=>quiz(()=>{const a=ri(1,D(99,500,5000)),b=ri(1,D(99,500,5000));const ans=Math.max(a,b)+'¢';return{q:'Which is more: '+a+'¢ or '+b+'¢?',a:ans,wr:[Math.min(a,b)+'¢']};})},
+ {id:'moneyadd2',name:'Add Money',ico:'💲',fn:()=>quiz(()=>{const a=ri(5,D(95,500,5000)),b=ri(5,D(95,500,5000));return{q:a+'¢ + '+b+'¢ = ?',a:(a+b)+'¢',wr:nums(a+b,D(15,40,120)).map(x=>x+'¢')};})},
+ {id:'change5',name:'Change from $5',ico:'🪙',fn:()=>quiz(()=>{const cost=ri(5,495);return{q:'You pay $5.00 (500¢) for a '+cost+'¢ item. Change?',a:(500-cost)+'¢',wr:nums(500-cost,D(20,60,150)).map(x=>x+'¢')};})},
+ {id:'mixedlen',name:'Metres & Centimetres',ico:'📏',fn:()=>quiz(()=>{const m=ri(1,D(5,9,40)),c=ri(1,99);return{q:m+' m '+c+' cm = ? cm',a:m*100+c,wr:nums(m*100+c,D(30,80,200))};})},
+ {id:'minhour',name:'Minutes to Hours',ico:'🕐',fn:()=>quiz(()=>{const h=ri(1,D(5,12,40));return{q:(h*60)+' minutes = ? hours',a:h,wr:nums(h,D(3,6,15))};})},
+ {id:'timediff',name:'Time Difference',ico:'⏱️',fn:()=>quiz(()=>{const m1=ri(0,59),m2=ri(0,59),h=ri(1,D(2,4,8));const total=h*60+(m2-m1);const tt=Math.abs(total);return{q:'How many minutes from '+h+' hours '+m1+' min to '+(h)+' hours '+m2+' min later... wait — how many minutes in '+h+' h '+m2+' min?',a:h*60+m2,wr:nums(h*60+m2,D(20,50,120))};})},
+ {id:'negcmp',name:'Negative Numbers',ico:'🥶',fn:()=>quiz(()=>{const a=-ri(1,D(20,99,999)),b=-ri(1,D(20,99,999));const ans=Math.max(a,b);return{q:'Which is GREATER: '+a+' or '+b+'?',a:ans,wr:[Math.min(a,b)]};})},
+ {id:'negadd',name:'Add Negatives',ico:'➖',fn:()=>quiz(()=>{const a=ri(1,D(15,40,200)),b=ri(a+1,D(30,90,500));return{q:a+' + ('+(-b)+') = ?',a:a-b,wr:nums(a-b,D(6,14,40))};})},
+ {id:'absval',name:'Absolute Value',ico:'🧱',fn:()=>quiz(()=>{const n=-ri(1,D(40,400,5000));return{q:'What is |'+n+'| (the absolute value)?',a:-n,wr:nums(-n,D(8,20,80))};})},
+ {id:'doublemoney',name:'Double the Money',ico:'💰',fn:()=>quiz(()=>{const n=ri(5,D(99,500,5000));return{q:'Double '+n+'¢ = ?',a:(n*2)+'¢',wr:nums(n*2,D(15,40,120)).map(x=>x+'¢')};})},
+ {id:'inverse',name:'Inverse Operations',ico:'🔁',fn:()=>quiz(()=>{const a=ri(2,D(20,99,500)),b=ri(2,D(20,99,500));return{q:'If '+a+' + '+b+' = '+(a+b)+', then '+(a+b)+' − '+b+' = ?',a:a,wr:nums(a,D(6,14,40))};})},
+ {id:'by10more',name:'10 / 100 More',ico:'↗️',fn:()=>quiz(()=>{const n=ri(10,D(200,900,9000)),d=pk([10,100,1000].slice(0,D(1,2,3)));return{q:'What is '+d+' more than '+n+'?',a:n+d,wr:nums(n+d,D(12,40,120))};})},
+ {id:'repeatadd',name:'Repeated Addition',ico:'➕✖️',fn:()=>quiz(()=>{const n=ri(2,D(5,9,12)),t=ri(2,D(4,6,9));return{q:Array(t).fill(n).join(' + ')+' = ? (as '+n+' × ?)',a:t,wr:nums(t,D(2,4,7))};})},
+ {id:'sharing',name:'Sharing Equally',ico:'🍪',fn:()=>quiz(()=>{const g=ri(2,D(4,6,10)),each=ri(2,D(6,10,20));return{q:(g*each)+' cookies shared by '+g+' kids. Each gets?',a:each,wr:nums(each,D(3,6,12))};})},
+ {id:'simplifyF',name:'Simplify Fractions',ico:'🍰',fn:()=>quiz(()=>{const k=ri(2,D(4,9,16));const a=ri(1,D(4,9,16)),b=ri(a+1,D(8,16,28));return{q:'Simplify '+(a*k)+'/'+(b*k),a:a+'/'+b,wr:[(a*k)+'/'+b,a+'/'+(b*k),(a+1)+'/'+b]};})},
+ {id:'mixedF',name:'Mixed to Improper',ico:'🔢',fn:()=>quiz(()=>{const w=ri(1,D(4,10,25)),n=ri(1,D(4,8,16)),d=ri(n+1,D(8,16,28));return{q:w+' and '+n+'/'+d+' as an improper fraction?',a:(w*d+n)+'/'+d,wr:[(w*d-n)+'/'+d,(w+n)+'/'+d,(w*d+n)+'/'+(d+1)]};})},
+ {id:'moneyDec',name:'Cents to Dollars',ico:'💵',fn:()=>quiz(()=>{const c=ri(D(100,100,100),D(999,9999,99999));return{q:c+'¢ written as dollars?',a:'$'+(c/100).toFixed(2),wr:['$'+(c/10).toFixed(2),'$'+(c*1).toFixed(2),'$'+(c/1000).toFixed(2)]};})},
+ {id:'addtens',name:'Add Tens',ico:'🔟',fn:()=>quiz(()=>{const a=ri(1,D(9,40,400))*10,b=ri(1,D(9,40,400))*10;return{q:a+' + '+b+' = ?',a:a+b,wr:nums(a+b,D(20,60,200))};})},
+ {id:'subtens',name:'Subtract Tens',ico:'🔟',fn:()=>quiz(()=>{const a=ri(2,D(9,40,400))*10,b=ri(1,Math.floor(a/10))*10;return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,D(20,60,200))};})},
+ {id:'multens',name:'Multiply Tens',ico:'✖️',fn:()=>quiz(()=>{const a=ri(2,D(9,30,90))*10,b=ri(2,D(5,9,12));return{q:a+' × '+b+' = ?',a:a*b,wr:nums(a*b,D(30,80,250))};})},
+ {id:'mulhund',name:'Multiply Hundreds',ico:'💯',fn:()=>quiz(()=>{const a=ri(2,D(9,20,90))*100,b=ri(2,D(5,9,12));return{q:a+' × '+b+' = ?',a:a*b,wr:nums(a*b,D(200,500,2000))};})},
+ {id:'longadd3',name:'Add Three Big',ico:'🧮',fn:()=>quiz(()=>{const h=D(50,300,3000);const a=ri(10,h),b=ri(10,h),c=ri(10,h);return{q:a+' + '+b+' + '+c+' = ?',a:a+b+c,wr:nums(a+b+c,D(20,60,200))};})},
+ {id:'estprod',name:'Estimate Products',ico:'🎯',fn:()=>quiz(()=>{const a=ri(11,D(49,99,499)),b=ri(2,D(5,9,9));const ra=Math.round(a/10)*10;return{q:'About how much is '+a+' × '+b+'?',a:ra*b,wr:nums(ra*b,D(30,80,300)).map(x=>Math.round(x/10)*10)};})},
+ {id:'percent2',name:'Percent of Number',ico:'％',fn:()=>quiz(()=>{const p=pk(D([10,50,100],[10,20,25,50],[5,15,20,40,60,80]));const base=ri(1,D(10,30,90))*10;return{q:p+'% of '+base+' = ?',a:base*p/100,wr:nums(base*p/100,D(6,15,40))};})},
+ {id:'saleprice',name:'Sale Price',ico:'🏷️',fn:()=>quiz(()=>{const base=ri(1,D(10,30,90))*10;const off=pk([10,25,50]);const a=base-base*off/100;return{q:'A $'+base+' toy is '+off+'% off. New price?',a:'$'+a,wr:nums(a,D(8,20,40)).map(x=>'$'+x)};})},
+ {id:'avg4',name:'Average of Four',ico:'📊',fn:()=>quiz(()=>{const m=ri(D(5,15,40),D(15,40,90));const arr=[m+ri(-3,3),m+ri(-3,3),m+ri(-3,3),m+ri(-3,3)];let sum=arr.reduce((x,y)=>x+y,0);while(sum%4){arr[0]++;sum++;}return{q:'Average of '+arr.join(', ')+'?',a:sum/4,wr:nums(sum/4,D(3,6,12))};})},
+ {id:'rangeMM',name:'Range (Max−Min)',ico:'📐',fn:()=>quiz(()=>{const s=new Set();while(s.size<4)s.add(ri(1,D(50,300,3000)));const a=[...s];const ans=Math.max(...a)-Math.min(...a);return{q:'Range of '+a.join(', ')+'?  (biggest − smallest)',a:ans,wr:nums(ans,D(8,20,80))};})},
+ {id:'median3',name:'Median of Three',ico:'🎚️',fn:()=>quiz(()=>{const s=new Set();while(s.size<3)s.add(ri(1,D(50,300,3000)));const a=[...s].sort((x,y)=>x-y);return{q:'Middle number (median) of '+[...s].join(', ')+'?',a:a[1],wr:[a[0],a[2]]};})},
+ {id:'oddsum',name:'Odd or Even Sum',ico:'🔢',fn:()=>quiz(()=>{const a=ri(1,D(40,400,4000)),b=ri(1,D(40,400,4000));return yn((a+b)%2===0,'Is '+a+' + '+b+' an EVEN number?');})},
+ {id:'romanRev',name:'Roman to Number',ico:'🏛️',fn:()=>quiz(()=>{const n=ri(1,D(40,600,2000));return{q:'What number is '+toRoman(n)+'?',a:n,wr:nums(n,D(4,10,40))};})},
+ {id:'nextmult',name:'Next Multiple',ico:'🔁',fn:()=>quiz(()=>{const m=ri(2,D(6,9,12));const k=ri(2,D(8,20,60));return{q:'What is the next multiple of '+m+' after '+(m*k)+'?',a:m*(k+1),wr:nums(m*(k+1),D(5,12,40))};})},
+ {id:'compNumFrac',name:'Compare Fractions',ico:'🍕',fn:()=>quiz(()=>{const n=ri(1,D(2,4,6));let d1,d2;do{d1=ri(n+1,D(9,16,30));d2=ri(n+1,D(9,16,30));}while(d1===d2);const a=n+'/'+Math.min(d1,d2);return{q:'Which is BIGGER: '+n+'/'+d1+' or '+n+'/'+d2+'?',a:a,wr:[n+'/'+Math.max(d1,d2)]};})},
+ {id:'sqarea2',name:'Area of a Square',ico:'⬛',fn:()=>quiz(()=>{const s=ri(2,D(12,25,90));return{q:'A square has side '+s+'. Area = ?',a:s*s,wr:nums(s*s,D(10,30,120))};})},
+ {id:'placeExp',name:'What Number?',ico:'🧩',fn:()=>quiz(()=>{const h=ri(1,9),t=ri(0,9),o=ri(0,9);const n=h*100+t*10+o;return{q:h+' hundreds, '+t+' tens, '+o+' ones = ?',a:n,wr:nums(n,D(40,90,200)).filter(x=>x>=0)};})},
+ {id:'subAcross',name:'Subtract Across Zeros',ico:'➖',fn:()=>quiz(()=>{const a=ri(1,D(5,20,90))*100,b=ri(1,a-1);return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,D(20,50,150))};})},
+ {id:'tripleAdd',name:'Triple a Number',ico:'3️⃣',fn:()=>quiz(()=>{const n=ri(1,D(20,99,999));return{q:'Triple '+n+' (×3) = ?',a:n*3,wr:nums(n*3,D(8,20,80))};})},
+ {id:'ratio2',name:'Scale a Ratio',ico:'🧬',fn:()=>quiz(()=>{const a=ri(1,5),b=ri(1,5),k=ri(2,D(4,8,15));return{q:'Ratio '+a+':'+b+'. If first = '+(a*k)+', second = ?',a:b*k,wr:nums(b*k,D(3,8,20))};})},
+ {id:'perimSq',name:'Perimeter of Square',ico:'🔲',fn:()=>quiz(()=>{const s=ri(2,D(15,40,200));return{q:'Square side '+s+'. Perimeter = ?',a:s*4,wr:nums(s*4,D(6,16,60))};})},
+ {id:'countbyBig',name:'Count Back By',ico:'🔙',fn:()=>quiz(()=>{const st=pk([2,5,10,25,50]);const s=ri(D(10,30,90),D(40,120,900))*1;const start=s*st;const seq=[start,start-st,start-2*st,start-3*st];return{q:seq.join(', ')+', ?',a:start-4*st,wr:nums(start-4*st,st+3)};})},
+ {id:'multipleof2',name:'Multiple Check',ico:'✳️',fn:()=>quiz(()=>{const m=ri(2,D(6,9,12));const k=ri(2,D(12,30,90));const yes=Math.random()<0.5;const n=yes?m*k:m*k+ri(1,m-1);return yn(yes,'Is '+n+' a multiple of '+m+'?');})},
+ {id:'cubeUp',name:'Cube Numbers',ico:'🧊',fn:()=>quiz(()=>{const n=ri(2,D(5,8,15));return{q:n+'³ = '+n+'×'+n+'×'+n+' = ?',a:n*n*n,wr:nums(n*n*n,D(12,30,120))};})},
+ {id:'squareUp',name:'Square Numbers',ico:'⬛',fn:()=>quiz(()=>{const n=ri(2,D(12,25,60));return{q:n+'² = ?',a:n*n,wr:nums(n*n,D(10,30,120))};})},
+ {id:'plus1000',name:'Add 1000s',ico:'🔢',fn:()=>quiz(()=>{const a=ri(1,D(9,40,400))*100,b=ri(1,D(9,40,400))*100;return{q:a+' + '+b+' = ?',a:a+b,wr:nums(a+b,D(100,300,1500))};})},
+ {id:'minus100',name:'Subtract 100s',ico:'💯',fn:()=>quiz(()=>{const a=ri(2,D(9,40,400))*100,b=ri(1,Math.floor(a/100))*100;return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,D(100,300,1500))};})},
+ {id:'fracDec2',name:'Fraction to Decimal',ico:'🔘',fn:()=>quiz(()=>{const opt=[['1/2','0.5'],['1/4','0.25'],['3/4','0.75'],['1/10','0.1'],['1/5','0.2'],['2/5','0.4'],['3/5','0.6'],['1/100','0.01'],['7/10','0.7'],['9/10','0.9'],['1/20','0.05']];const p=pk(opt);return{q:p[0]+' as a decimal?',a:p[1],wr:wf(opt.map(x=>x[1]),p[1])};})},
+ {id:'prob',name:'Simple Probability',ico:'🎲',fn:()=>quiz(()=>{const tot=ri(D(4,8,20),D(8,16,40));const fav=ri(1,tot-1);return{q:'A bag has '+tot+' balls, '+fav+' are red. How many are NOT red?',a:tot-fav,wr:nums(tot-fav,D(2,4,8)).filter(x=>x>=0)};})},
+ {id:'doubledouble',name:'Double, Double',ico:'✌️',fn:()=>quiz(()=>{const n=ri(1,D(20,99,900));return{q:'Double '+n+', then double again = ?',a:n*4,wr:nums(n*4,D(10,25,90))};})},
+ {id:'multiStep2',name:'Two-Step',ico:'🪜',fn:()=>quiz(()=>{const a=ri(2,D(6,9,12)),b=ri(2,D(6,9,12)),c=ri(1,D(15,30,90));return{q:a+' × '+b+' − '+c+' = ?',a:a*b-c,wr:nums(a*b-c,D(8,18,40))};})},
+ {id:'syn2',name:'Synonyms',ico:'🟰',fn:()=>quiz(()=>{const p=pk(SYN);return{q:'Same meaning as "'+p[0]+'"?',a:p[1],wr:wf(SYN.map(x=>x[1]),p[1])};})},
+ {id:'ant2',name:'Antonyms',ico:'↔️',fn:()=>quiz(()=>{const p=pk(ANT);const f=Math.random()<0.5;const w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:wf(ANT.flat(),a)};})},
+ {id:'ing',name:'Add -ing',ico:'🏃',fn:()=>quiz(()=>{const p=pk(INGW);return{q:'"'+p[0]+'" + ing = ?',a:p[1],wr:wf(INGW.map(x=>x[1]),p[1]).concat([p[0]+'ing',p[0]+'eing']).slice(0,4)};})},
+ {id:'mul15',name:'Multiply by 15',ico:'🔢',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 15 = ?',a:n*15,wr:nums(n*15,D(20,60,200))};})},
+ {id:'mul20',name:'Multiply by 20',ico:'🔢',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 20 = ?',a:n*20,wr:nums(n*20,D(25,70,250))};})},
+ {id:'div4g',name:'Divide by 4',ico:'➗',fn:()=>quiz(()=>{const n=ri(2,D(20,120,999));return{q:(n*4)+' ÷ 4 = ?',a:n,wr:nums(n,D(6,15,60))};})},
+ {id:'div3g',name:'Divide by 3',ico:'➗',fn:()=>quiz(()=>{const n=ri(2,D(20,120,999));return{q:(n*3)+' ÷ 3 = ?',a:n,wr:nums(n,D(6,15,60))};})},
+ {id:'lastAlpha',name:'Last in ABC Order',ico:'🔠',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(2,3,4))s.add(pk(BW));const a=[...s];const ans=a.slice().sort()[a.length-1];return{q:'Which word comes LAST in ABC order?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'wordfamily',name:'Word Families',ico:'👨‍👩‍👧',fn:()=>quiz(()=>{const fam=[['-at',['cat','hat','bat','mat']],['-an',['can','man','pan','fan']],['-ig',['pig','wig','dig','big']],['-op',['top','hop','mop','pop']],['-ed',['bed','red','fed','led']],['-un',['sun','run','fun','bun']],['-it',['sit','hit','bit','fit']],['-ot',['hot','pot','dot','lot']]];const f=pk(fam);const a=pk(f[1]);const wrong=[];while(wrong.length<3){const o=pk(fam.filter(x=>x!==f));const w=pk(o[1]);if(!wrong.includes(w))wrong.push(w);}return{q:'Which word is in the "'+f[0]+'" family?',a:a,wr:wrong};})},
+ {id:'thirds',name:'One Third Of',ico:'🍀',fn:()=>quiz(()=>{const n=ri(1,D(8,40,400))*3;return{q:'1/3 of '+n+' = ?',a:n/3,wr:nums(n/3,D(4,10,40))};})},
+ {id:'fifths',name:'One Fifth Of',ico:'🖐️',fn:()=>quiz(()=>{const n=ri(1,D(8,40,400))*5;return{q:'1/5 of '+n+' = ?',a:n/5,wr:nums(n/5,D(4,10,40))};})},
+ {id:'addFourBig',name:'Add Four Numbers',ico:'➕',fn:()=>quiz(()=>{const h=D(20,60,300);const a=ri(5,h),b=ri(5,h),c=ri(5,h),d=ri(5,h);return{q:a+' + '+b+' + '+c+' + '+d+' = ?',a:a+b+c+d,wr:nums(a+b+c+d,D(12,30,90))};})},
+ {id:'subThree',name:'Subtract Two',ico:'➖',fn:()=>quiz(()=>{const a=ri(D(40,150,2000),D(80,400,5000)),b=ri(1,Math.floor(a/3)),c=ri(1,Math.floor(a/3));return{q:a+' − '+b+' − '+c+' = ?',a:a-b-c,wr:nums(a-b-c,D(10,30,120))};})},
+ {id:'abbrev',name:'Abbreviations',ico:'✂️',fn:()=>quiz(()=>{const A=[["Mr.","Mister"],["Dr.","Doctor"],["St.","Street"],["Ave.","Avenue"],["Mt.","Mount"],["etc.","et cetera"],["Jan.","January"],["Dec.","December"],["min.","minute"],["kg","kilogram"],["cm","centimetre"],["Mrs.","Missus"]];const p=pk(A);return{q:'What does "'+p[0]+'" stand for?',a:p[1],wr:wf(A.map(x=>x[1]),p[1])};})},
+ {id:'doubleLetter',name:'Has a Double Letter?',ico:'🔁',fn:()=>quiz(()=>{const w=pk(BW);return yn(/(.)\1/.test(w),'Does "'+w+'" have a double (repeated) letter?');})},
+ {id:'sameLen',name:'Same Length Words',ico:'📐',fn:()=>quiz(()=>{const w=pk(BW);const same=BW.filter(x=>x.length===w.length&&x!==w);const a=pk(same);const wrong=BW.filter(x=>x.length!==w.length);return{q:'Which word has the SAME number of letters as "'+w+'"?',a:a,wr:shuffle(wrong).slice(0,3)};})},
+ {id:'productPlus',name:'Multiply then Add',ico:'🧮',fn:()=>quiz(()=>{const a=ri(2,D(6,9,15)),b=ri(2,D(6,9,15)),c=ri(1,D(20,50,200));return{q:a+' × '+b+' + '+c+' = ?',a:a*b+c,wr:nums(a*b+c,D(10,25,90))};})},
+ {id:'mul13',name:'Multiply by 13',ico:'🔢',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 13 = ?',a:n*13,wr:nums(n*13,D(20,60,200))};})},
+ {id:'biggerAnimal',name:'Bigger Animal',ico:'🐘',fn:()=>quiz(cmpAnim(ANIMR,['BIGGER','SMALLER']))},
+ {id:'fasterAnimal',name:'Faster Animal',ico:'🐆',fn:()=>quiz(cmpAnim(SPEED,['FASTER','SLOWER']))},
+ {id:'heavierAnimal',name:'Heavier Animal',ico:'⚖️',fn:()=>quiz(cmpAnim(ANIMR,['HEAVIER','LIGHTER']))},
+ {id:'tallerAnimal',name:'Taller Animal',ico:'🦒',fn:()=>quiz(cmpAnim(ANIMR,['TALLER','SHORTER']))},
+ {id:'beforeAfter10',name:'10 Before / After',ico:'↕️',fn:()=>quiz(()=>{const n=ri(20,D(200,900,9000));const before=Math.random()<0.5;return{q:'What is 10 '+(before?'before':'after')+' '+n+'?',a:before?n-10:n+10,wr:nums(before?n-10:n+10,D(8,20,60))};})},
+ {id:'factPairs',name:'Fact Family',ico:'👪',fn:()=>quiz(()=>{const a=ri(2,D(9,30,90)),b=ri(2,D(9,30,90));const s=a+b;return{q:'If '+a+' + '+b+' = '+s+', which is also true?',a:s+' − '+a+' = '+b,wr:[s+' + '+a+' = '+b,a+' − '+b+' = '+s,s+' − '+a+' = '+(b+1)]};})},
+ {id:'orderNums',name:'Put in Order',ico:'🔢',fn:()=>quiz(()=>{const s=new Set();while(s.size<3)s.add(ri(1,D(50,500,9000)));const a=[...s];const ans=a.slice().sort((x,y)=>x-y).join(', ');return{q:'Smallest to biggest: '+a.join(', ')+' → ?',a:ans,wr:[a.slice().sort((x,y)=>y-x).join(', '),a.join(', ')]};})},
+ {id:'mul12b',name:'Times 12',ico:'🕛',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 12 = ?',a:n*12,wr:nums(n*12,D(20,60,200))};})},
+ {id:'mul6',name:'Multiply by 6',ico:'6️⃣',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 6 = ?',a:n*6,wr:nums(n*6,D(12,30,120))};})},
+ {id:'mul7',name:'Multiply by 7',ico:'7️⃣',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 7 = ?',a:n*7,wr:nums(n*7,D(12,30,120))};})},
+ {id:'mul8',name:'Multiply by 8',ico:'8️⃣',fn:()=>quiz(()=>{const n=ri(2,D(20,120,2000));return{q:n+' × 8 = ?',a:n*8,wr:nums(n*8,D(12,30,120))};})},
+ {id:'div2',name:'Divide by Many',ico:'➗',fn:()=>quiz(()=>{const b=ri(2,D(6,12,20)),ans=ri(2,D(20,60,300));return{q:(b*ans)+' ÷ '+b+' = ?',a:ans,wr:nums(ans,D(6,15,60))};})},
+ {id:'remzero',name:'Divides Evenly?',ico:'🟰',fn:()=>quiz(()=>{const b=ri(2,D(6,9,12));const n=ri(2,D(50,400,4000));return yn(n%b===0,'Does '+b+' divide '+n+' evenly (no remainder)?');})},
+ {id:'addMixed',name:'Add 2 & 3 Digit',ico:'➕',fn:()=>quiz(()=>{const a=ri(10,D(99,400,900)),b=ri(100,D(400,900,4000));return{q:a+' + '+b+' = ?',a:a+b,wr:nums(a+b,D(20,60,200))};})},
+ {id:'half2',name:'Half of It',ico:'🌗',fn:()=>quiz(()=>{const n=ri(1,D(40,300,3000))*2;return{q:'Half of '+n+' = ?',a:n/2,wr:nums(n/2,D(8,20,80))};})},
+ {id:'quarterOf',name:'Quarter of It',ico:'🍀',fn:()=>quiz(()=>{const n=ri(1,D(12,60,600))*4;return{q:'A quarter (1/4) of '+n+' = ?',a:n/4,wr:nums(n/4,D(5,12,40))};})},
+ {id:'tenths',name:'Tenths',ico:'🔟',fn:()=>quiz(()=>{const n=ri(1,D(12,60,600))*10;return{q:'One tenth (1/10) of '+n+' = ?',a:n/10,wr:nums(n/10,D(4,10,40))};})},
+ {id:'addDecimals2',name:'Add Decimals',ico:'🔘',fn:()=>quiz(()=>{const a=ri(1,D(50,200,990))/10,b=ri(1,D(50,200,990))/10;const ans=Math.round((a+b)*10)/10;return{q:a.toFixed(1)+' + '+b.toFixed(1)+' = ?',a:ans.toFixed(1),wr:[(ans+0.1).toFixed(1),(ans-0.1).toFixed(1),(ans+1).toFixed(1)]};})},
+ {id:'subDecimals',name:'Subtract Decimals',ico:'🔻',fn:()=>quiz(()=>{const a=ri(20,D(99,300,990))/10,b=ri(1,Math.floor(a*10))/10;const ans=Math.round((a-b)*10)/10;return{q:a.toFixed(1)+' − '+b.toFixed(1)+' = ?',a:ans.toFixed(1),wr:[(ans+0.1).toFixed(1),(ans-0.1).toFixed(1),(ans+1).toFixed(1)]};})},
+ {id:'wordProblem',name:'Word Problems',ico:'📖',fn:()=>quiz(()=>{const a=ri(2,D(9,30,99)),b=ri(2,D(9,30,99));const names=['Mia','Leo','Ava','Sam','Zoe','Kai','Noah','Lily'];const items=['apples','marbles','stickers','coins','books','pencils','cookies','shells'];const n=pk(names),it=pk(items);return{q:n+' had '+a+' '+it+' and got '+b+' more. How many now?',a:a+b,wr:nums(a+b,D(6,15,40))};})},
+ {id:'wordProblem2',name:'Take-Away Problems',ico:'📕',fn:()=>quiz(()=>{const a=ri(10,D(40,99,500)),b=ri(2,a-1);const names=['Mia','Leo','Ava','Sam','Zoe','Kai','Noah','Lily'];const items=['apples','marbles','stickers','coins','grapes','candies'];const n=pk(names),it=pk(items);return{q:n+' had '+a+' '+it+' and gave away '+b+'. How many left?',a:a-b,wr:nums(a-b,D(6,15,40))};})},
+ {id:'mulWord',name:'Groups Of',ico:'🧺',fn:()=>quiz(()=>{const g=ri(2,D(6,9,12)),each=ri(2,D(6,9,12));return{q:g+' baskets with '+each+' eggs each. Total eggs?',a:g*each,wr:nums(g*each,D(8,18,50))};})},
+ {id:'compNeg',name:'Number Line',ico:'➖',fn:()=>quiz(()=>{const a=ri(-D(20,99,999),D(20,99,999)),b=ri(-D(20,99,999),D(20,99,999));const ans=a<b?a:b;return{q:'Which is SMALLER: '+a+' or '+b+'?',a:ans,wr:[a<b?b:a]};})},
+ {id:'evenList',name:'Find the Even',ico:'2️⃣',fn:()=>quiz(()=>{const ev=ri(1,D(20,200,2000))*2;const arr=[ri(0,D(20,200,2000))*2+1,ri(0,D(20,200,2000))*2+1,ri(0,D(20,200,2000))*2+1,ev];return{q:'Which number is EVEN?',a:ev,wr:arr.filter(x=>x!==ev)};})},
+ {id:'oddList',name:'Find the Odd',ico:'1️⃣',fn:()=>quiz(()=>{const od=ri(0,D(20,200,2000))*2+1;const arr=[ri(1,D(20,200,2000))*2,ri(1,D(20,200,2000))*2,ri(1,D(20,200,2000))*2,od];return{q:'Which number is ODD?',a:od,wr:arr.filter(x=>x!==od)};})},
+ {id:'roundBoth',name:'Round to 10',ico:'🔟',fn:()=>quiz(()=>{const n=ri(11,D(89,899,8999));const a=Math.round(n/10)*10;return{q:'Round '+n+' to the nearest 10',a:a,wr:[a+10,a-10,a+20].filter(x=>x>=0&&x!==a)};})},
+];
+applyTheme(localStorage.getItem('theme')||'light');
+(function(){var h=document.getElementById('host');if(!h)return;var p=false;function fit(){p=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;h.style.transformOrigin='top center';h.style.transform='';h.style.height='';var a=h.clientWidth,n=h.scrollWidth;if(n>a+2){var s=a/n;h.style.transform='scale('+s+')';h.style.height=(h.scrollHeight*s)+'px';}}function sc(){if(p)return;p=true;requestAnimationFrame(fit);}try{new MutationObserver(sc).observe(h,{childList:true,subtree:true});}catch(e){}window.addEventListener('resize',sc);})();
+buildMenu();
+</script>
+</body>
+</html>
