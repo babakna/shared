@@ -66,6 +66,7 @@ const GAMES=[
   {id:'pentago',name:'Pentago',ico:'🌀'},
   {id:'atarigo',name:'Capture Go',ico:'⚪'},
   {id:'foxhounds',name:'Fox & Hounds',ico:'🦊'},
+  {id:'go',name:'Go (9×9)',ico:'⛩️'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null,currentGm=null;
@@ -81,7 +82,8 @@ orderchaos:`On a 6×6 grid you are 'Order': place EITHER an X or an O each turn,
 hex:`You are blue — connect the LEFT and RIGHT edges with a chain of your stones. The AI (red) connects TOP and BOTTOM. Click any empty cell to place. Hexes touch six neighbours, so diagonals connect. First to link their two sides wins.`,
 pentago:`Each turn: (1) place one marble on any empty space, then (2) rotate ONE 3×3 quadrant using the rotate buttons. Get five of your marbles in a row — counting the position AFTER rotating — to win. You are blue.`,
 atarigo:`Take turns placing stones. A stone or connected group is captured the instant it has no empty space beside it (no 'liberties'). The FIRST player to capture any enemy stone WINS. You are black ⚫. You can't play a move that would capture yourself.`,
-foxhounds:`You control the 4 Hounds 🐕 (move diagonally DOWNWARD only). The AI is the Fox 🦊 (moves diagonally any direction). Trap the fox so it can't move to win. If the fox reaches the top row, it escapes and wins.`
+foxhounds:`You control the 4 Hounds 🐕 (move diagonally DOWNWARD only). The AI is the Fox 🦊 (moves diagonally any direction). Trap the fox so it can't move to win. If the fox reaches the top row, it escapes and wins.`,
+go:`Place stones on the line crossings. Surround empty area to make territory, and capture enemy stones by taking their last empty point (liberty). Click 'Pass' when you're done; two passes in a row ends the game. Score = your territory + captures (White gets 6.5 komi). You are black ⚫.`
 };
 function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
   const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008;max-height:85vh;overflow:auto'});
@@ -540,6 +542,58 @@ function game_foxhounds(gm){
   function foxTurn(){if(over)return;const mv=foxMoves();if(!mv.length){over=true;addWin(gm.id);setStatus('🎉 The fox is trapped — you win!');return;}
     mv.sort((a,b)=>a[0]-b[0]||(Math.random()-0.5));fox=mv[0].slice();draw();
     if(fox[0]===0){over=true;setStatus('🦊 The fox escaped to the top — fox wins!');return;}setStatus('Your move (hounds)');}
+  newBtn.onclick=reset;reset();
+  return {stop:()=>{}};
+}
+
+/* ---------------- GO (9×9) ---------------- */
+function game_go(gm){
+  setHint('Surround territory and capture stones. Two passes end the game. You are black ⚫.');
+  const N=9,CELL=40,M=30,SZ=M*2+(N-1)*CELL;
+  let b,prev,over,passes,lastMove,blackCaps,whiteCaps;
+  const c=el('canvas',{width:SZ,height:SZ,style:'border-radius:10px;max-width:100%;height:auto;touch-action:none;box-shadow:0 4px 16px #0006'});
+  const ctx=c.getContext('2d');
+  const bar=el('div',{className:'big'});
+  const passBtn=el('button',{className:'btn',textContent:'Pass'});
+  const newBtn=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(bar,c,el('div',{style:'display:flex;gap:10px'},passBtn,newBtn));
+  function idx(r,col){return r*N+col;}
+  function nbrs(i){const r=Math.floor(i/N),col=i%N,o=[];if(r>0)o.push(i-N);if(r<N-1)o.push(i+N);if(col>0)o.push(i-1);if(col<N-1)o.push(i+1);return o;}
+  function group(arr,i){const col=arr[i],st=[i],seen=new Set([i]);while(st.length){const x=st.pop();nbrs(x).forEach(y=>{if(!seen.has(y)&&arr[y]===col){seen.add(y);st.push(y);}});}return [...seen];}
+  function libs(arr,grp){const s=new Set();grp.forEach(i=>nbrs(i).forEach(y=>{if(arr[y]===0)s.add(y);}));return s.size;}
+  function tryMove(arr,i,col){if(arr[i])return null;const nb=arr.slice();nb[i]=col;const opp=col===1?2:1;let caps=0;
+    nbrs(i).forEach(y=>{if(nb[y]===opp){const g=group(nb,y);if(libs(nb,g)===0){g.forEach(z=>nb[z]=0);caps+=g.length;}}});
+    if(libs(nb,group(nb,i))===0)return null;
+    if(prev&&col===1&&nb.join('')===prev)return null;
+    return {board:nb,caps};}
+  function reset(){b=Array(N*N).fill(0);prev=null;over=false;passes=0;lastMove=-1;blackCaps=0;whiteCaps=0;draw();info();setStatus('Your move (black). Two passes to score.');}
+  function draw(){const g=ctx.createLinearGradient(0,0,SZ,SZ);g.addColorStop(0,'#e8b962');g.addColorStop(1,'#cf9a47');ctx.fillStyle=g;ctx.fillRect(0,0,SZ,SZ);
+    ctx.strokeStyle='#5a3a18';ctx.lineWidth=1.4;for(let i=0;i<N;i++){ctx.beginPath();ctx.moveTo(M,M+i*CELL);ctx.lineTo(SZ-M,M+i*CELL);ctx.stroke();ctx.beginPath();ctx.moveTo(M+i*CELL,M);ctx.lineTo(M+i*CELL,SZ-M);ctx.stroke();}
+    ctx.fillStyle='#5a3a18';[[2,2],[2,6],[6,2],[6,6],[4,4]].forEach(([r,cc])=>{ctx.beginPath();ctx.arc(M+cc*CELL,M+r*CELL,3.5,0,7);ctx.fill();});
+    for(let i=0;i<N*N;i++){if(!b[i])continue;const r=Math.floor(i/N),col=i%N,x=M+col*CELL,y=M+r*CELL;
+      ctx.beginPath();ctx.arc(x+1,y+2,CELL*0.42,0,7);ctx.fillStyle='rgba(0,0,0,.25)';ctx.fill();
+      const rg=ctx.createRadialGradient(x-5,y-6,2,x,y,CELL*0.45);if(b[i]===1){rg.addColorStop(0,'#6a6a6a');rg.addColorStop(1,'#080808');}else{rg.addColorStop(0,'#ffffff');rg.addColorStop(1,'#c6cad2');}
+      ctx.beginPath();ctx.arc(x,y,CELL*0.42,0,7);ctx.fillStyle=rg;ctx.fill();
+      if(i===lastMove){ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.strokeStyle=b[i]===1?'#fff':'#000';ctx.lineWidth=2;ctx.stroke();}}}
+  function info(){bar.textContent='⚫ You captured '+blackCaps+'   •   ⚪ AI captured '+whiteCaps+(over?'':(passes===1?'   • (1 pass)':''));}
+  c.addEventListener('pointerdown',e=>{if(over)return;const rect=c.getBoundingClientRect();const x=(e.clientX-rect.left)*(SZ/rect.width),y=(e.clientY-rect.top)*(SZ/rect.height);
+    const col=Math.round((x-M)/CELL),row=Math.round((y-M)/CELL);if(row<0||row>=N||col<0||col>=N)return;const i=idx(row,col);
+    const mv=tryMove(b,i,1);if(!mv)return;prev=b.join('');b=mv.board;blackCaps+=mv.caps;lastMove=i;passes=0;draw();info();setStatus('🤔 AI is thinking…');setTimeout(aiMove,350);});
+  function aiMove(){if(over)return;const legal=[];for(let i=0;i<N*N;i++){if(b[i])continue;const mv=tryMove(b,i,2);if(mv)legal.push({i,mv});}
+    if(!legal.length){doPass(2);return;}legal.sort((a,d)=>d.mv.caps-a.mv.caps);let pick;
+    if(legal[0].mv.caps>0)pick=legal[0];else{let best=null,bs=-1;legal.forEach(o=>{const r=Math.floor(o.i/N),cc=o.i%N;let s=(4-Math.abs(r-4))+(4-Math.abs(cc-4));
+      nbrs(o.i).forEach(y=>{if(b[y]===1){s+=(libs(b,group(b,y))===1?8:2);}else if(b[y]===2)s+=1;});s+=Math.random()*2;if(s>bs){bs=s;best=o;}});pick=best;}
+    prev=b.join('');b=pick.mv.board;whiteCaps+=pick.mv.caps;lastMove=pick.i;passes=0;draw();info();setStatus('Your move (black).');}
+  function doPass(who){passes++;if(passes>=2){finish();return;}info();if(who===1){setStatus('You passed — AI to move');setTimeout(aiMove,300);}else setStatus('AI passed — your move. Pass again to score.');}
+  passBtn.onclick=()=>{if(over)return;doPass(1);};
+  function finish(){over=true;const owner=b.slice(),seen=new Array(N*N).fill(false);
+    for(let i=0;i<N*N;i++){if(b[i]||seen[i])continue;const reg=[],st=[i];seen[i]=true;const borders=new Set();
+      while(st.length){const x=st.pop();reg.push(x);nbrs(x).forEach(y=>{if(b[y]===0&&!seen[y]){seen[y]=true;st.push(y);}else if(b[y])borders.add(b[y]);});}
+      if(borders.size===1){const o=[...borders][0];reg.forEach(z=>owner[z]=o);}}
+    let black=blackCaps,white=whiteCaps+6.5;owner.forEach(v=>{if(v===1)black++;else if(v===2)white++;});
+    const won=black>white;if(won)addWin(gm.id);
+    setStatus((won?'🎉 You win! ':'🤖 AI wins. ')+'Black '+black+' — White '+white.toFixed(1));
+    bar.textContent='Final score — ⚫ '+black+'  vs  ⚪ '+white.toFixed(1)+'  (White +6.5 komi)';}
   newBtn.onclick=reset;reset();
   return {stop:()=>{}};
 }
