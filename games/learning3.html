@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Babak's Learning Room III</title>
+<style>
+  :root{--bg:#f0eef9;--panel:#ffffff;--accent:#7a5cd0;--accent2:#d98a2b;--text:#1d1633;--dim:#6a5f88;--border:#e0d8ee;}
+  html[data-theme="dark"]{--bg:#100c1d;--panel:#1b1530;--accent:#b79cff;--accent2:#ffc27d;--text:#efe9ff;--dim:#a99cc4;--border:#2e2547;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(900px 520px at 12% -8%,rgba(150,110,255,.18),transparent 60%),radial-gradient(900px 520px at 112% 2%,rgba(255,180,110,.16),transparent 55%),var(--bg);background-attachment:fixed;color:var(--text)}
+  #app{max-width:920px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card{position:relative;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(0,0,0,.05)),var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 12px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s,box-shadow .12s;box-shadow:0 6px 18px rgba(0,0,0,.14);animation:pop .4s ease both}
+  .card:hover{transform:translateY(-5px) scale(1.03);border-color:var(--accent);box-shadow:0 14px 30px rgba(0,0,0,.22)}
+  .card .ico{font-size:32px;display:block;margin-bottom:6px}
+  .card .name{font-weight:700;font-size:14px}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;border-radius:11px;padding:9px 15px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:transform .12s,filter .12s}
+  button.btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  button.btn:disabled{opacity:.6;cursor:default}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:100%}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px;max-width:620px}
+  .big{font-size:20px;font-weight:700;text-align:center}
+  #host{max-width:100%;overflow-x:auto}
+  @media(max-width:560px){#app{padding:10px}h1{font-size:24px}.opts{grid-template-columns:1fr !important}}
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🧠 LEARNING ROOM III</h1>
+    <div class="sub">100 more learning games — Easy / Medium / Hard, with 500+ variations each.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <button class="btn ghost" onclick="showRules()">❓ Rules</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null,currentGm=null,score=0;
+let DIFF=localStorage.getItem('l2diff')||'med';
+function D(e,m,h){return DIFF==='easy'?e:DIFF==='hard'?h:m;}
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function el(tag,props={},...kids){const e=document.createElement(tag);for(const k in props){if(k==='style')e.style.cssText=props[k];else e[k]=props[k];}kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pk(a){return a[Math.floor(Math.random()*a.length)];}
+function wf(pool,ans,n){return shuffle(pool.filter(x=>x!==ans)).slice(0,n||4);}
+function nums(ans,spread,n){const s=new Set([ans]);let g=0;n=n||4;while(s.size<n+1&&g<300){g++;const v=ans+ri(-spread,spread);if(v!==ans)s.add(v);}return [...s].filter(x=>x!==ans).slice(0,n);}
+function yn(cond,q){return cond?{q:q,a:'Yes',wr:['No']}:{q:q,a:'No',wr:['Yes']};}
+const RN=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+function toRoman(n){let r='';for(const[v,s]of RN){while(n>=v){r+=s;n-=v;}}return r;}
+const ONES=['','one','two','three','four','five','six','seven','eight','nine'],TEENS=['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function toWords(n){if(n<10)return ONES[n]||'zero';if(n<20)return TEENS[n-10];if(n<100){return TENS[Math.floor(n/10)]+(n%10?'-'+ONES[n%10]:'');}const h=Math.floor(n/100);return ONES[h]+' hundred'+(n%100?' '+toWords(n%100):'');}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=el('div',{className:'card'});d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){currentGm=gm;score=0;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint(HELP[gm.id]||'');host.innerHTML='';current=gm.fn();}
+function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
+  const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008'});
+  box.append(el('div',{className:'big',style:'font-size:20px;margin-bottom:10px',textContent:currentGm.ico+' '+currentGm.name}));
+  box.append(el('div',{style:'line-height:1.6',textContent:(HELP[currentGm.id]||'Read the question and tap the correct answer.')+'  Use Easy / Medium / Hard to change the level.'}));
+  const c=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});c.onclick=()=>ov.remove();box.append(c);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
+function quiz(gen){
+  score=0;
+  const diffRow=el('div',{className:'row',style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center'});
+  function rd(){[...diffRow.children].forEach((c,i)=>c.className='btn'+(['easy','med','hard'][i]===DIFF?'':' ghost'));}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,lbl])=>{const b=el('button',{className:'btn',textContent:lbl,style:'padding:7px 14px'});b.onclick=()=>{DIFF=d;localStorage.setItem('l2diff',d);rd();score=0;round();};diffRow.append(b);});rd();
+  const qEl=el('div',{className:'big',style:'max-width:600px;min-height:46px;line-height:1.4'});
+  const opts=el('div',{className:'opts',style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:540px;width:100%'});
+  const fb=el('div',{className:'big',style:'min-height:26px'});const next=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(diffRow,qEl,opts,fb,next);
+  function round(){const d=gen(DIFF);qEl.innerHTML=d.q;fb.textContent='';
+    const optN={easy:2,med:3,hard:4}[DIFF];const all=shuffle([d.a,...(d.wr||[]).slice(0,optN)]).map(String);
+    const long=all.some(o=>o.length>14);opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    all.forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:16px'});
+      b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===String(d.a)){b.style.background='#2ecc71';b.style.color='#fff';score++;fb.textContent='✅ '+(d.ok||'Correct!');setStatus('Score: '+score+' • '+DIFF);}else{b.style.background='#e74c3c';b.style.color='#fff';[...opts.children].forEach(x=>{if(x.textContent===String(d.a)){x.style.background='#2ecc71';x.style.color='#fff';}});fb.textContent='Answer: '+d.a;}};
+      opts.append(b);});
+    setStatus('Score: '+score+' • '+DIFF);}
+  next.onclick=round;round();return{stop:()=>{}};
+}
+
+/* ===== DATA ===== */
+const BW=("about above across action active actor adult after again agent agree ahead alarm album alert alike alive allow alone along aloud amaze among angel anger angle animal ankle apart apple apply april arena argue arise armor arrow aside asked aspect asset atlas attic audio avoid awake award aware awful bacon badge baker balloon banana banker barber basket beacon beauty beaver became become before began begin being below bench berry beside better beyond bigger birth black blade blame blank blast blaze bleed blend bless blind block blood bloom board boast bonus booth border bottle bottom bought bounce brain brake branch brave bread break breath breeze brick bride brief bright bring broad broke brook brown brush buddy budget buffalo build built bunch bundle burst butter button cabin cable camel candle candy cannon canyon carbon cargo carpet carrot castle catch cattle caught cause cedar cellar center cereal chain chair chalk chance change chaos charm chart chase cheap check cheek cheer chess chest chew chief child china choice choose chord chorus chosen chunk circle city civil claim clamp clash class clean clear clerk click cliff climb cloak clock close cloth cloud clown clubs clump coach coast cobra cocoa coins color comet comic coral couch cough could count court cover crack craft crane crash crater crawl crazy cream creek crew crisp cross crowd crown crumb crush crust cabin daily dairy dance dandy dared dealt death debate debris decay decent decide deck deeds defeat defend degree delay delta dense depth desert design desk detail device dial diary dice diet digit dimple diner dinner dirt dirty disco ditch dizzy dodge doing dolly donor doodle double dough dozen draft drag drama drank dread dream dress dried drift drill drink drive drone drop drove drum dryer eager eagle early earth easel easy eaten ebony edge eight elbow elder elect elite elope email emerge empty enact enemy energy enjoy enter entry equal error erupt event every exact exam excel exist exit expand extra fable fabric face fact fairy faith false fancy fang farm fatal favor feast feather fence ferry fetch fever fiber field fierce fifty fight final find finer fire first fish fixed flag flame flash fleet flesh flint float flock flood floor flour flow fluid flush flute foam focus foggy folks food force forest forget forgot fork form forth forty found frame frank fresh friend frog front frost frown fruit fudge funny gadget galaxy game garden garlic gather gauge gaze gear gecko gentle ghost giant giddy gift ginger giraffe given glad glance glass gleam glide globe gloom glory glove glow goal goat going golden goods goose grab grace grade grain grand grape graph grasp grass grave gravy great greedy green greet grid grief grill grim grin grip groan group grow grunt guard guess guest guide guilt habit handy happy harbor hardy haste hatch haunt haven hazel heart heavy hedge hello helmet herb hero hill hinge hippo hobby hockey honey honor horse hotel hound house human humor hunt hurry ideal igloo image index inner input insect issue ivory jacket jaguar jelly jewel join joker jolly joyful judge juice juicy jumbo jungle keen kept ketchup kettle kind king kiosk kitten knee knife knight knock label labor lace ladder lady lake lamp land lane large laser later laugh layer leader leaf learn lease least leave ledge legal legend lemon lemur level light lilac lily limit linen lion liquid list listen lively lizard llama loaf local lodge logic lonely loop loose loud lovely lower loyal lucky lumber lunar lunch magic magnet major mango maple march mark marsh mask match maze meadow meal mean medal melon melt mercy merge metal meteor middle might mild milk mind miner mint mirror modal model modern money month moral mossy motel motor mound mount mouse mouth movie muddy muffin mural music nacho nature near neat needle nerve nest never newly noble noise north notch novel nudge ocean offer often olive onion opera orbit order organ otter ought ounce outer owner oxygen pace pack paddle page pail paint pair palace panda panel paper parade park party pasta patch path patio pause peace peach pearl pedal penny perch petal photo piano picnic piece pilot pinch pixel pizza place plain plane plank plant plate plaza pluck plumb point polar polite porch power prairie press price pride prime print prize proud prune public pull pulse pumpkin punch puppy purple puzzle quack quail quake quart queen query quest quick quiet quilt quote rabbit radar radio raft rainbow raise rally ranch range rapid raven reach react ready realm rebel recap reach relax relay remix repeat reply rescue resort return rhino rhythm ribbon ridge rigid rinse risky river roast robin robot rocket roost rotate rough round royal ruby rugby ruler rumor sadly safari salad salt sample sandy sauce scale scarf scene scent scoop score scout scrap screen scrub seal seat sedan seize sense seven shade shadow shaft shake shape share shark sharp sheep sheet shelf shell shine shiny shore short shout shovel shrub sigh sight signal silk silly silver simple siren skate sketch skill skirt skull slate sled sleek sleep slice slide slope sloth small smart smile smoke smooth snack snail snake sneak snow soap solar solid solve sonic sorry sound south space spare spark speak spear speed spell spend spice spider spike spine spiral splash spoke sport spray spring sprint sprout squad square squid stack staff stage stair stamp stand star steam steel stem step stern stick still sting stock stone stool storm story stove strap straw stray strip study stuff sturn sugar suite summer sunny super swamp swan swarm sweat sweet swift swing sword table taco talent tango taste teach tease tempo tender tennis tent thank theme thick thief thigh thing think third thorn thread three throw thumb tidy tiger tight title toast token tomato tooth topic torch total touch tough tower trace track trade trail train trap trash treat tree trend trial tribe trick trim troll truck truly trust truth tulip tunnel turbo twist ultra uncle under unit upper urban usual valet valley value vapor vault velvet venue verb verse video vigor villa vine vinyl violet vivid vocal voice vowel wagon waltz wander watch water wave weave weird whale wheat wheel where which while whisk white whole wider width windy winter wisdom witty wizard woman wonder wooden world worry worth woven wreck wrist write wrong yacht yarn yeast yield young youth zebra zero zesty zigzag zinc zone").split(/\s+/);
+const ANIMc=[["Dog","Mammal"],["Cat","Mammal"],["Whale","Mammal"],["Bat","Mammal"],["Horse","Mammal"],["Eagle","Bird"],["Penguin","Bird"],["Owl","Bird"],["Parrot","Bird"],["Duck","Bird"],["Shark","Fish"],["Salmon","Fish"],["Tuna","Fish"],["Snake","Reptile"],["Lizard","Reptile"],["Turtle","Reptile"],["Crocodile","Reptile"],["Frog","Amphibian"],["Toad","Amphibian"],["Bee","Insect"],["Ant","Insect"],["Butterfly","Insect"],["Beetle","Insect"],["Spider","Arachnid"]];
+const ACLASS=["Mammal","Bird","Fish","Reptile","Amphibian","Insect","Arachnid"];
+const BABY=[["Cow","Calf"],["Dog","Puppy"],["Cat","Kitten"],["Horse","Foal"],["Sheep","Lamb"],["Goat","Kid"],["Hen","Chick"],["Frog","Tadpole"],["Bear","Cub"],["Lion","Cub"],["Kangaroo","Joey"],["Deer","Fawn"],["Duck","Duckling"],["Goose","Gosling"],["Pig","Piglet"],["Bee","Larva"]];
+const SOUND=[["Dog","Bark"],["Cat","Meow"],["Cow","Moo"],["Duck","Quack"],["Lion","Roar"],["Horse","Neigh"],["Sheep","Baa"],["Pig","Oink"],["Bee","Buzz"],["Snake","Hiss"],["Owl","Hoot"],["Frog","Ribbit"],["Bird","Tweet"],["Wolf","Howl"]];
+const MATTER=[["Ice","Solid"],["Rock","Solid"],["Wood","Solid"],["Water","Liquid"],["Milk","Liquid"],["Juice","Liquid"],["Steam","Gas"],["Air","Gas"],["Oxygen","Gas"],["Brick","Solid"],["Honey","Liquid"],["Helium","Gas"]];
+const FOODG=[["Apple","Fruit"],["Banana","Fruit"],["Grapes","Fruit"],["Carrot","Vegetable"],["Broccoli","Vegetable"],["Potato","Vegetable"],["Chicken","Protein"],["Egg","Protein"],["Beans","Protein"],["Cheese","Dairy"],["Milk","Dairy"],["Yogurt","Dairy"]];
+const MAG=[["Iron nail","Yes"],["Steel clip","Yes"],["Tin can","Yes"],["Plastic toy","No"],["Wooden spoon","No"],["Glass cup","No"],["Rubber band","No"],["Paper","No"],["Nickel coin","Yes"]];
+const SYN=[["big","large"],["small","tiny"],["happy","glad"],["fast","quick"],["smart","clever"],["scared","afraid"],["angry","mad"],["pretty","beautiful"],["begin","start"],["end","finish"],["shout","yell"],["rich","wealthy"],["cold","chilly"],["sick","ill"],["easy","simple"],["strange","weird"],["quiet","silent"],["story","tale"],["gift","present"],["jump","leap"]];
+const ANT=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","close"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["win","lose"],["true","false"],["rich","poor"],["near","far"],["clean","dirty"]];
+const CONTR=[["do not","don't"],["can not","can't"],["I am","I'm"],["it is","it's"],["you are","you're"],["we are","we're"],["they are","they're"],["did not","didn't"],["is not","isn't"],["was not","wasn't"],["will not","won't"],["could not","couldn't"],["she is","she's"],["he is","he's"],["that is","that's"]];
+const CO=[["France","Paris","Europe"],["Germany","Berlin","Europe"],["Italy","Rome","Europe"],["Spain","Madrid","Europe"],["Portugal","Lisbon","Europe"],["Greece","Athens","Europe"],["Norway","Oslo","Europe"],["Sweden","Stockholm","Europe"],["Poland","Warsaw","Europe"],["Russia","Moscow","Europe"],["Ireland","Dublin","Europe"],["Austria","Vienna","Europe"],["Switzerland","Bern","Europe"],["Netherlands","Amsterdam","Europe"],["Belgium","Brussels","Europe"],["Japan","Tokyo","Asia"],["China","Beijing","Asia"],["India","New Delhi","Asia"],["Thailand","Bangkok","Asia"],["Vietnam","Hanoi","Asia"],["Indonesia","Jakarta","Asia"],["Turkey","Ankara","Asia"],["Iran","Tehran","Asia"],["Iraq","Baghdad","Asia"],["Nepal","Kathmandu","Asia"],["Egypt","Cairo","Africa"],["Kenya","Nairobi","Africa"],["Nigeria","Abuja","Africa"],["Morocco","Rabat","Africa"],["Ghana","Accra","Africa"],["Ethiopia","Addis Ababa","Africa"],["Algeria","Algiers","Africa"],["Tunisia","Tunis","Africa"],["United States","Washington","North America"],["Canada","Ottawa","North America"],["Mexico","Mexico City","North America"],["Cuba","Havana","North America"],["Panama","Panama City","North America"],["Brazil","Brasilia","South America"],["Argentina","Buenos Aires","South America"],["Chile","Santiago","South America"],["Peru","Lima","South America"],["Colombia","Bogota","South America"],["Australia","Canberra","Australia"],["New Zealand","Wellington","Australia"],["Czechia","Prague","Europe"],["Hungary","Budapest","Europe"],["Romania","Bucharest","Europe"],["Ukraine","Kyiv","Europe"],["Finland","Helsinki","Europe"],["Denmark","Copenhagen","Europe"],["Croatia","Zagreb","Europe"],["South Korea","Seoul","Asia"],["Malaysia","Kuala Lumpur","Asia"],["Philippines","Manila","Asia"],["Pakistan","Islamabad","Asia"],["Saudi Arabia","Riyadh","Asia"],["Israel","Jerusalem","Asia"],["Jordan","Amman","Asia"],["Lebanon","Beirut","Asia"],["South Africa","Pretoria","Africa"],["Tanzania","Dodoma","Africa"],["Uganda","Kampala","Africa"],["Senegal","Dakar","Africa"],["Cameroon","Yaounde","Africa"],["Guatemala","Guatemala City","North America"],["Costa Rica","San Jose","North America"],["Jamaica","Kingston","North America"],["Ecuador","Quito","South America"],["Bolivia","La Paz","South America"],["Uruguay","Montevideo","South America"],["Paraguay","Asuncion","South America"],["Venezuela","Caracas","South America"]];
+const CONTS=["Europe","Asia","Africa","North America","South America","Australia"];
+const CAPS=CO.map(x=>x[1]),CTRY=CO.map(x=>x[0]);
+const COLORMIX=[["Red","Blue","Purple"],["Blue","Yellow","Green"],["Red","Yellow","Orange"],["Black","White","Gray"],["Red","White","Pink"],["Blue","White","Light Blue"],["Yellow","Red","Orange"]];
+const COLORS=["Purple","Green","Orange","Gray","Pink","Brown","Light Blue"];
+const vow=s=>(s.match(/[aeiou]/gi)||[]).length;
+const syl=s=>{const m=s.toLowerCase().match(/[aeiouy]+/g);return m?Math.max(1,m.length):1;};
+
+/* ===== 100 GAMES ===== */
+const GAMES=[
+ {id:'add2',name:'Add 2-Digit',ico:'➕',fn:()=>quiz(()=>{const h=D(20,99,500);const a=ri(2,h),b=ri(2,h);return{q:a+' + '+b+' = ?',a:a+b,wr:nums(a+b,D(6,12,40))};})},
+ {id:'add3',name:'Add 3-Digit',ico:'🧮',fn:()=>quiz(()=>{const h=D(150,500,2000);const a=ri(20,h),b=ri(20,h);return{q:a+' + '+b+' = ?',a:a+b,wr:nums(a+b,D(20,60,150))};})},
+ {id:'sub2',name:'Subtract',ico:'➖',fn:()=>quiz(()=>{const h=D(30,99,800);const a=ri(10,h),b=ri(1,a);return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,D(6,12,40))};})},
+ {id:'mul1',name:'Times Tables',ico:'✖️',fn:()=>quiz(()=>{const h=D(6,12,12);const a=ri(2,h),b=ri(2,12);return{q:a+' × '+b+' = ?',a:a*b,wr:nums(a*b,D(6,12,20))};})},
+ {id:'mul2',name:'Multiply 2-Digit',ico:'🔢',fn:()=>quiz(()=>{const a=ri(D(2,11,21),D(9,30,99)),b=ri(2,D(5,9,12));return{q:a+' × '+b+' = ?',a:a*b,wr:nums(a*b,D(15,40,120))};})},
+ {id:'div1',name:'Division',ico:'➗',fn:()=>quiz(()=>{const h=D(6,12,20);const b=ri(2,h),ans=ri(2,h);return{q:(b*ans)+' ÷ '+b+' = ?',a:ans,wr:nums(ans,D(3,6,10))};})},
+ {id:'divr',name:'Division + Remainder',ico:'🪟',fn:()=>quiz(()=>{const b=ri(2,D(5,9,12)),q1=ri(2,D(6,12,20)),r=ri(1,b-1);const n=b*q1+r;return{q:'Remainder of '+n+' ÷ '+b+' = ?',a:r,wr:nums(r,b-1).filter(x=>x>=0&&x<b)};})},
+ {id:'missadd',name:'Missing Addend',ico:'❔',fn:()=>quiz(()=>{const h=D(20,60,300);const a=ri(2,h),s=a+ri(2,h);return{q:a+' + ? = '+s,a:s-a,wr:nums(s-a,D(6,12,40))};})},
+ {id:'missfac',name:'Missing Factor',ico:'✳️',fn:()=>quiz(()=>{const a=ri(2,D(6,9,12)),b=ri(2,D(6,9,12));return{q:a+' × ? = '+(a*b),a:b,wr:nums(b,D(3,5,8))};})},
+ {id:'square',name:'Square Numbers',ico:'⬛',fn:()=>quiz(()=>{const n=ri(2,D(8,12,25));return{q:n+'² (means '+n+'×'+n+') = ?',a:n*n,wr:nums(n*n,D(6,14,40))};})},
+ {id:'oop',name:'Order of Operations',ico:'🧷',fn:()=>quiz(()=>{const a=ri(2,9),b=ri(2,9),c=ri(2,9);const ans=a+b*c;return{q:a+' + '+b+' × '+c+' = ?',a:ans,wr:nums(ans,D(8,14,30)).concat([(a+b)*c]).slice(0,4)};})},
+ {id:'neg',name:'Negative Numbers',ico:'🥶',fn:()=>quiz(()=>{const a=ri(1,D(10,20,50)),b=ri(a+1,D(20,40,90));return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,D(5,10,20))};})},
+ {id:'round100',name:'Round to 100',ico:'💯',fn:()=>quiz(()=>{const n=ri(120,D(900,2000,9000));const ans=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:ans,wr:[ans+100,ans-100,ans+200,ans-200].filter(x=>x>=0&&x!==ans)};})},
+ {id:'estimate',name:'Estimation',ico:'🎯',fn:()=>quiz(()=>{const a=ri(11,D(49,99,499)),b=ri(11,D(49,99,499));const ra=Math.round(a/10)*10,rb=Math.round(b/10)*10;return{q:'About how much is '+a+' + '+b+'?  (estimate)',a:ra+rb,wr:nums(ra+rb,D(20,40,120)).map(x=>Math.round(x/10)*10)};})},
+ {id:'cmp3',name:'Compare 3-Digit',ico:'⚖️',fn:()=>quiz(()=>{const h=D(99,999,99999);const a=ri(10,h),b=ri(10,h);const ans=a>b?'>':a<b?'<':'=';return{q:a+'  ?  '+b,a:ans,wr:['>','<','='].filter(x=>x!==ans)};})},
+ {id:'placeH',name:'Place Value',ico:'🏷️',fn:()=>quiz(()=>{const n=ri(100,D(999,9999,99999));const digs=String(n).split('').reverse();const names=['ones','tens','hundreds','thousands','ten-thousands'];const i=ri(0,Math.min(digs.length-1,D(2,3,4)));return{q:'In '+n+', what digit is in the '+names[i]+' place?',a:+digs[i],wr:nums(+digs[i],4).filter(x=>x>=0&&x<=9)};})},
+ {id:'expanded',name:'Expanded Form',ico:'📤',fn:()=>quiz(()=>{const n=ri(D(11,100,1000),D(99,999,9999));const parts=String(n).split('').map((d,i,a)=>+d*Math.pow(10,a.length-1-i)).filter(x=>x);return{q:'Expanded form of '+n+'?',a:parts.join(' + '),wr:[parts.slice().reverse().join(' + '),parts.map(x=>x+1).join(' + '),String(n)]};})},
+ {id:'evenL',name:'Even or Odd',ico:'🔢',fn:()=>quiz(()=>{const n=ri(1,D(80,900,99999));return{q:'Is '+n+' even or odd?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};})},
+ {id:'skipB',name:'Skip Counting',ico:'⏭️',fn:()=>quiz(()=>{const st=pk(D([2,5,10],[2,3,5,10,25],[6,7,8,9,25,50,100]));const s=ri(1,D(8,15,40))*st;const seq=[s,s+st,s+2*st,s+3*st];return{q:seq.join(', ')+', ?',a:s+4*st,wr:nums(s+4*st,st+2)};})},
+ {id:'half',name:'Halving',ico:'🌗',fn:()=>quiz(()=>{const n=ri(1,D(20,50,200))*2;return{q:'Half of '+n+' = ?',a:n/2,wr:nums(n/2,D(4,8,20))};})},
+ {id:'factors',name:'Factors',ico:'🧩',fn:()=>quiz(()=>{const n=pk([12,16,18,20,24,30,36,40]);const f=[];for(let i=1;i<=n;i++)if(n%i===0)f.push(i);const ans=pk(f.slice(1,-1));const non=[];while(non.length<4){const x=ri(2,n-1);if(n%x!==0&&!non.includes(x))non.push(x);}return{q:'Which number is a FACTOR of '+n+'?',a:ans,wr:non};})},
+ {id:'prime2',name:'Prime or Composite',ico:'🥇',fn:()=>quiz(()=>{const n=ri(2,D(80,700,4000));const isP=x=>{if(x<2)return false;for(let i=2;i*i<=x;i++)if(x%i===0)return false;return true;};return{q:'Is '+n+' prime or composite?',a:isP(n)?'Prime':'Composite',wr:[isP(n)?'Composite':'Prime']};})},
+ {id:'fracOf',name:'Fraction of a Number',ico:'🍕',fn:()=>quiz(()=>{const B=ri(2,D(5,8,10));const A=ri(1,B-1);const m=ri(2,D(6,10,20));return{q:'What is '+A+'/'+B+' of '+(B*m)+'?',a:A*m,wr:nums(A*m,D(4,8,15))};})},
+ {id:'equivF',name:'Equivalent Fractions',ico:'🟰',fn:()=>quiz(()=>{const a=ri(1,D(4,9,14)),b=ri(a+1,D(8,18,26)),k=ri(2,D(6,14,22));return{q:'Which is equal to '+a+'/'+b+'?',a:(a*k)+'/'+(b*k),wr:[(a*k+1)+'/'+(b*k),(a*k)+'/'+(b*k+1),(a+k)+'/'+(b+k)]};})},
+ {id:'addF',name:'Add Fractions',ico:'➕🍰',fn:()=>quiz(()=>{const b=ri(3,D(9,18,30));const a1=ri(1,b-2),a2=ri(1,b-a1-1);return{q:a1+'/'+b+' + '+a2+'/'+b+' = ?',a:(a1+a2)+'/'+b,wr:[(a1+a2)+'/'+(b*2),(a1+a2+1)+'/'+b,Math.max(1,a1*a2)+'/'+b]};})},
+ {id:'decAdd',name:'Add Decimals',ico:'🔘',fn:()=>quiz(()=>{const a=(ri(1,D(50,90,990))/10),b=(ri(1,D(50,90,990))/10);const ans=Math.round((a+b)*10)/10;return{q:a.toFixed(1)+' + '+b.toFixed(1)+' = ?',a:ans.toFixed(1),wr:[ (ans+0.1).toFixed(1),(ans-0.1).toFixed(1),(ans+1).toFixed(1)]};})},
+ {id:'decCmp',name:'Compare Decimals',ico:'⚖️',fn:()=>quiz(()=>{const a=(ri(1,999)/10),b=(ri(1,999)/10);const ans=a>b?'>':a<b?'<':'=';return{q:a.toFixed(1)+'  ?  '+b.toFixed(1),a:ans,wr:['>','<','='].filter(x=>x!==ans)};})},
+ {id:'percent',name:'Percent of Number',ico:'％',fn:()=>quiz(()=>{const p=pk(D([10,50,100],[10,25,50,75,100],[5,10,20,25,40,60,80]));const base=ri(1,D(10,20,50))*10;const ans=base*p/100;return{q:'What is '+p+'% of '+base+'?',a:ans,wr:nums(ans,D(5,10,25))};})},
+ {id:'ratio',name:'Simple Ratios',ico:'🧬',fn:()=>quiz(()=>{const a=ri(1,6),b=ri(1,6),k=ri(2,D(3,5,9));return{q:'If the ratio is '+a+':'+b+', and there are '+(a*k)+' of the first, how many of the second?',a:b*k,wr:nums(b*k,D(3,6,12))};})},
+ {id:'mean',name:'Average (Mean)',ico:'📊',fn:()=>quiz(()=>{const n=D(2,3,4);const arr=[];let sum=0;const m=ri(2,12);for(let i=0;i<n;i++){const v=m;}for(let i=0;i<n;i++){const v=ri(2,20);arr.push(v);sum+=v;}let avg=sum/n;while(!Number.isInteger(avg)){arr[0]+=1;sum+=1;avg=sum/n;}return{q:'What is the average of '+arr.join(', ')+'?',a:avg,wr:nums(avg,D(3,5,8))};})},
+ {id:'times10',name:'Times 10 & 100',ico:'🔟',fn:()=>quiz(()=>{const n=ri(2,D(20,99,999)),k=pk([10,100]);return{q:n+' × '+k+' = ?',a:n*k,wr:nums(n*k,D(20,60,200))};})},
+ {id:'unitLen',name:'Length Units',ico:'📏',fn:()=>quiz(()=>{const n=ri(1,D(5,9,20));const t=ri(0,1);return t?{q:n+' m = ? cm',a:n*100,wr:nums(n*100,D(50,90,200))}:{q:n+' cm = ? mm',a:n*10,wr:nums(n*10,8)};})},
+ {id:'unitMass',name:'Mass Units',ico:'⚖️',fn:()=>quiz(()=>{const n=ri(1,D(5,9,20));return{q:n+' kg = ? grams',a:n*1000,wr:nums(n*1000,400)};})},
+ {id:'unitTime',name:'Time Units',ico:'🕰️',fn:()=>quiz(()=>{const n=ri(1,D(5,10,30));const t=ri(0,2);if(t===0)return{q:n+' hours = ? minutes',a:n*60,wr:nums(n*60,40)};if(t===1)return{q:n+' minutes = ? seconds',a:n*60,wr:nums(n*60,40)};return{q:n+' weeks = ? days',a:n*7,wr:nums(n*7,9)};})},
+ {id:'perim2',name:'Perimeter',ico:'🔲',fn:()=>quiz(()=>{const h=D(8,15,40);const l=ri(2,h),w=ri(2,h);return{q:'Rectangle '+l+'×'+w+'. Perimeter?',a:2*(l+w),wr:nums(2*(l+w),D(6,12,25))};})},
+ {id:'areaR',name:'Area Rectangle',ico:'⬛',fn:()=>quiz(()=>{const h=D(8,15,40);const l=ri(2,h),w=ri(2,h);return{q:'Rectangle '+l+'×'+w+'. Area?',a:l*w,wr:nums(l*w,D(8,15,40))};})},
+ {id:'areaT',name:'Area Triangle',ico:'🔺',fn:()=>quiz(()=>{const b=ri(2,D(8,12,20))*2,hh=ri(2,D(8,12,20));return{q:'Triangle base '+b+', height '+hh+'. Area = (b×h)÷2 = ?',a:b*hh/2,wr:nums(b*hh/2,D(8,15,30))};})},
+ {id:'volume',name:'Volume of a Box',ico:'📦',fn:()=>quiz(()=>{const a=ri(2,D(5,8,12)),b=ri(2,D(5,8,12)),c=ri(2,D(5,8,12));return{q:'Box '+a+'×'+b+'×'+c+'. Volume?',a:a*b*c,wr:nums(a*b*c,D(15,40,120))};})},
+ {id:'div10',name:'Divide by 10 & 100',ico:'🔻',fn:()=>quiz(()=>{const k=pk([10,100]),ans=ri(2,D(20,99,999));return{q:(ans*k)+' ÷ '+k+' = ?',a:ans,wr:nums(ans,D(8,20,80))};})},
+ {id:'roman2',name:'Roman Numerals',ico:'🏛️',fn:()=>quiz(()=>{const n=ri(1,D(50,700,2000));return{q:n+' in Roman numerals?',a:toRoman(n),wr:[...new Set([toRoman(n+1),toRoman(n+ri(2,5)),toRoman(Math.max(1,n-1)),toRoman(n+10)])].filter(x=>x!==toRoman(n))};})},
+ {id:'numwords',name:'Number Words',ico:'🔤',fn:()=>quiz(()=>{const n=ri(D(1,30,100),D(40,650,999));return{q:'How do you write '+n+' in words?',a:toWords(n),wr:[toWords(n+1),toWords(n+ri(2,9)),toWords(Math.max(0,n-1))].filter(x=>x!==toWords(n))};})},
+ {id:'wordsnum',name:'Words to Number',ico:'🔢',fn:()=>quiz(()=>{const n=ri(D(1,30,100),D(40,650,999));return{q:'Which number is "'+toWords(n)+'"?',a:n,wr:nums(n,D(5,12,40))};})},
+ {id:'doublD',name:'Doubling',ico:'✌️',fn:()=>quiz(()=>{const n=ri(1,D(12,30,150));return{q:'Double '+n+' = ?',a:n*2,wr:nums(n*2,D(4,8,20))};})},
+ {id:'tripl',name:'Tripling',ico:'3️⃣',fn:()=>quiz(()=>{const n=ri(1,D(10,20,60));return{q:'Triple '+n+' = ?',a:n*3,wr:nums(n*3,D(5,10,25))};})},
+ {id:'cube',name:'Cube Numbers',ico:'🧊',fn:()=>quiz(()=>{const n=ri(2,D(4,6,10));return{q:n+'³ (means '+n+'×'+n+'×'+n+') = ?',a:n*n*n,wr:nums(n*n*n,D(10,25,80))};})},
+ {id:'countup',name:'What Comes Next',ico:'🔜',fn:()=>quiz(()=>{const n=ri(1,D(80,900,9000));return{q:'What number comes right after '+n+'?',a:n+1,wr:[n-1,n+2,n+10]};})},
+ {id:'countback',name:'What Comes Before',ico:'🔙',fn:()=>quiz(()=>{const n=ri(2,D(80,900,9000));return{q:'What number comes right before '+n+'?',a:n-1,wr:[n+1,n-2,n-10]};})},
+ {id:'tens',name:'Tens & Ones',ico:'🔟',fn:()=>quiz(()=>{const t=ri(1,9),o=ri(0,9);const n=t*10+o;return{q:t+' tens and '+o+' ones make...',a:n,wr:nums(n,D(5,9,20)).filter(x=>x>=0)};})},
+ {id:'biggest3',name:'Biggest of Many',ico:'📈',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(3,4,5))s.add(ri(1,D(99,999,99999)));const a=[...s];const ans=Math.max(...a);return{q:'Which is BIGGEST?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'smallest',name:'Smallest of Many',ico:'📉',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(3,4,5))s.add(ri(1,D(99,999,99999)));const a=[...s];const ans=Math.min(...a);return{q:'Which is SMALLEST?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'change',name:'Making Change',ico:'💵',fn:()=>quiz(()=>{const pay=D(100,500,2000);const cost=ri(5,pay-5);return{q:'You pay '+pay+'¢ for a '+cost+'¢ item. Change?',a:pay-cost,wr:nums(pay-cost,D(15,40,120))};})},
+ {id:'coins',name:'Count Coins',ico:'🪙',fn:()=>quiz(()=>{const q=ri(0,D(2,4,8)),d=ri(0,D(3,5,9)),n=ri(0,D(3,5,9));const c=q*25+d*10+n*5;return{q:q+' quarters, '+d+' dimes, '+n+' nickels = ? ¢',a:c,wr:nums(c,D(10,20,40))};})},
+ {id:'spellMiss',name:'Missing Letter',ico:'🔠',fn:()=>quiz(()=>{const w=pk(BW).toUpperCase();const i=ri(0,w.length-1);const miss=w[i];const disp=w.split('');disp[i]='_';return{q:'Fill the blank:  '+disp.join(''),a:miss,wr:wf("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),miss,4)};})},
+ {id:'firstL',name:'First Letter',ico:'🔡',fn:()=>quiz(()=>{const w=pk(BW);const a=w[0].toUpperCase();return{q:'What letter does "'+w+'" start with?',a:a,wr:wf("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a,4)};})},
+ {id:'lastL',name:'Last Letter',ico:'🔚',fn:()=>quiz(()=>{const w=pk(BW);const a=w[w.length-1].toUpperCase();return{q:'What letter does "'+w+'" end with?',a:a,wr:wf("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a,4)};})},
+ {id:'vowelN',name:'Count Vowels',ico:'🅰️',fn:()=>quiz(()=>{const w=pk(BW);const c=vow(w);return{q:'How many vowels in "'+w+'"?',a:c,wr:[c+1,c-1,c+2,c+3].filter(x=>x>=0&&x!==c)};})},
+ {id:'consN',name:'Count Consonants',ico:'🅱️',fn:()=>quiz(()=>{const w=pk(BW);const c=w.length-vow(w);return{q:'How many consonants in "'+w+'"?',a:c,wr:[c+1,c-1,c+2].filter(x=>x>=0&&x!==c)};})},
+ {id:'lettersN',name:'Count Letters',ico:'#️⃣',fn:()=>quiz(()=>{const w=pk(BW);return{q:'How many letters in "'+w+'"?',a:w.length,wr:[w.length+1,w.length-1,w.length+2].filter(x=>x>0)};})},
+ {id:'syllN',name:'Count Syllables',ico:'👏',fn:()=>quiz(()=>{const w=pk(BW);const c=syl(w);return{q:'How many syllables in "'+w+'"?',a:c,wr:[1,2,3,4].filter(x=>x!==c)};})},
+ {id:'scramb',name:'Word Scramble',ico:'🔀',fn:()=>quiz(()=>{const w=pk(BW);let s;do{s=shuffle(w.split('')).join('');}while(s===w);const wrong=[];while(wrong.length<3){const o=pk(BW);if(o!==w&&!wrong.includes(o))wrong.push(o);}return{q:'Unscramble:  '+s.toUpperCase(),a:w,wr:wrong};})},
+ {id:'longer',name:'Longer Word',ico:'📏',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(2,3,4))s.add(pk(BW));const a=[...s];const ans=a.reduce((x,y)=>y.length>x.length?y:x);return{q:'Which word is LONGEST?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'alpha',name:'ABC Order',ico:'🔤',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(3,4,5))s.add(pk(BW));const a=[...s];const ans=a.slice().sort()[0];return{q:'Which comes FIRST in ABC order?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'aan',name:'A or An',ico:'🅰️',fn:()=>quiz(()=>{const w=pk(BW);const a=/^[aeiou]/i.test(w)?'an':'a';return{q:'Choose:  ___ '+w,a:a,wr:[a==='a'?'an':'a']};})},
+ {id:'startV',name:'Starts with Vowel?',ico:'🔎',fn:()=>quiz(()=>{const w=pk(BW);return yn(/^[aeiou]/i.test(w),'Does "'+w+'" start with a vowel?');})},
+ {id:'reverse',name:'Reversed Word',ico:'↩️',fn:()=>quiz(()=>{const w=pk(BW);const rv=w.split('').reverse().join('');const wrong=[];while(wrong.length<3){const o=pk(BW);const orr=o.split('').reverse().join('');if(orr!==rv&&!wrong.includes(orr))wrong.push(orr);}return{q:'Spell "'+w+'" BACKWARDS:',a:rv,wr:wrong};})},
+ {id:'syn3',name:'Synonyms',ico:'🟰',fn:()=>quiz(()=>{const p=pk(SYN);return{q:'Same meaning as "'+p[0]+'"?',a:p[1],wr:wf(SYN.map(x=>x[1]),p[1])};})},
+ {id:'ant3',name:'Antonyms',ico:'↔️',fn:()=>quiz(()=>{const p=pk(ANT);const f=Math.random()<0.5;const w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:wf(ANT.flat(),a)};})},
+ {id:'contr',name:'Contractions',ico:'✂️',fn:()=>quiz(()=>{const p=pk(CONTR);return{q:'"'+p[0]+'" written as a contraction is...',a:p[1],wr:wf(CONTR.map(x=>x[1]),p[1])};})},
+ {id:'contr2',name:'Contraction Meaning',ico:'🔄',fn:()=>quiz(()=>{const p=pk(CONTR);return{q:'What does "'+p[1]+'" mean?',a:p[0],wr:wf(CONTR.map(x=>x[0]),p[0])};})},
+ {id:'complement100',name:'Make the Total',ico:'💯',fn:()=>quiz(()=>{const T=D(100,1000,10000),a=ri(1,T-1);return{q:a+' + ? = '+T,a:T-a,wr:nums(T-a,D(15,40,150))};})},
+ {id:'tenmore',name:'Ten More / Less',ico:'↕️',fn:()=>quiz(()=>{const n=ri(20,D(200,900,9000)),d=pk([10,100,1000].slice(0,D(1,2,3))),more=Math.random()<0.5;return{q:'What is '+d+' '+(more?'more':'less')+' than '+n+'?',a:more?n+d:n-d,wr:nums(more?n+d:n-d,D(12,40,120))};})},
+ {id:'digitsum',name:'Digit Sum',ico:'➕',fn:()=>quiz(()=>{const n=ri(10,D(99,999,99999));const a=String(n).split('').reduce((x,y)=>x+ +y,0);return{q:'Add up the digits of '+n+'. Total = ?',a:a,wr:nums(a,D(4,7,12)).filter(x=>x>=0)};})},
+ {id:'nearest5',name:'Round to 5',ico:'🖐️',fn:()=>quiz(()=>{const n=ri(1,D(120,800,4998));const a=Math.round(n/5)*5;return{q:'Round '+n+' to the nearest 5',a:a,wr:[a+5,a-5,a+10,a-10].filter(x=>x>=0&&x!==a)};})},
+ {id:'missingop',name:'Which Sign?',ico:'➗',fn:()=>quiz(()=>{const a=ri(2,D(20,99,500)),b=ri(1,a);const plus=Math.random()<0.5;return{q:a+' ? '+b+' = '+(plus?a+b:a-b),a:plus?'+':'−',wr:[plus?'−':'+']};})},
+ {id:'iomachine',name:'Number Machine',ico:'⚙️',fn:()=>quiz(()=>{const m=ri(2,D(5,9,12)),c=ri(1,D(10,30,99)),x=ri(2,D(12,40,200));return{q:'Machine rule: ×'+m+' then + '+c+'.  Input '+x+' → ?',a:x*m+c,wr:nums(x*m+c,D(10,25,80))};})},
+ {id:'balance',name:'Balance It',ico:'⚖️',fn:()=>quiz(()=>{const T=ri(D(20,100,1000),D(60,500,5000)),a=ri(1,T-1);return{q:'? + '+a+' = '+T,a:T-a,wr:nums(T-a,D(12,40,120))};})},
+ {id:'addFour',name:'Add Four Numbers',ico:'➕',fn:()=>quiz(()=>{const h=D(9,30,99);const a=ri(1,h),b=ri(1,h),c=ri(1,h),d=ri(1,h);return{q:a+' + '+b+' + '+c+' + '+d+' = ?',a:a+b+c+d,wr:nums(a+b+c+d,D(8,16,40))};})},
+ {id:'mul11',name:'Times 11',ico:'🅵',fn:()=>quiz(()=>{const n=ri(2,D(40,600,2000));return{q:n+' × 11 = ?',a:n*11,wr:nums(n*11,D(20,60,200))};})},
+ {id:'halfBig',name:'Halving',ico:'🌗',fn:()=>quiz(()=>{const n=ri(1,D(50,500,5000))*2;return{q:'Half of '+n+' = ?',a:n/2,wr:nums(n/2,D(8,20,80))};})},
+ {id:'round1000',name:'Round to 1000',ico:'🔢',fn:()=>quiz(()=>{const n=ri(500,D(6000,30000,300000));const a=Math.round(n/1000)*1000;return{q:'Round '+n+' to the nearest 1000',a:a,wr:[a+1000,a-1000,a+2000,a-2000].filter(x=>x>=0&&x!==a)};})},
+ {id:'doubleplus',name:'Double Plus One',ico:'✌️',fn:()=>quiz(()=>{const n=ri(1,D(50,500,5000));return{q:'Double '+n+', then add 1 = ?',a:n*2+1,wr:nums(n*2+1,D(8,20,80))};})},
+ {id:'middleL',name:'Middle Letter',ico:'🔡',fn:()=>quiz(()=>{const w=pk(BW.filter(x=>x.length%2===1));const a=w[(w.length-1)/2].toUpperCase();return{q:'Middle letter of "'+w+'"?',a:a,wr:wf("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a,4)};})},
+ {id:'endV',name:'Ends in a Vowel?',ico:'🔚',fn:()=>quiz(()=>{const w=pk(BW);return yn(/[aeiou]$/i.test(w),'Does "'+w+'" end with a vowel?');})},
+ {id:'vowelMost',name:'Most Vowels',ico:'🅰️',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(2,3,4))s.add(pk(BW));const a=[...s];const ans=a.reduce((x,y)=>vow(y)>vow(x)?y:x);return{q:'Which word has the MOST vowels?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'capMC',name:'World Capitals',ico:'🏙️',fn:()=>quiz(()=>{const p=pk(CO);return{q:'What is the capital of '+p[0]+'?',a:p[1],wr:wf(CAPS,p[1])};})},
+ {id:'capYN',name:'Capital Check',ico:'✅',fn:()=>quiz(()=>{const p=pk(CO);if(Math.random()<0.5)return yn(true,'Is '+p[1]+' the capital of '+p[0]+'?');const w=pk(CO.filter(x=>x[1]!==p[1]));return yn(false,'Is '+w[1]+' the capital of '+p[0]+'?');})},
+ {id:'capRev',name:'Capital to Country',ico:'🌆',fn:()=>quiz(()=>{const p=pk(CO);return{q:p[1]+' is the capital of which country?',a:p[0],wr:wf(CTRY,p[0])};})},
+ {id:'contMC',name:'Which Continent',ico:'🌍',fn:()=>quiz(()=>{const p=pk(CO);return{q:'Which continent is '+p[0]+' in?',a:p[2],wr:wf(CONTS,p[2])};})},
+ {id:'shorter',name:'Shortest Word',ico:'🐜',fn:()=>quiz(()=>{const s=new Set();while(s.size<D(2,3,4))s.add(pk(BW));const a=[...s];const ans=a.reduce((x,y)=>y.length<x.length?y:x);return{q:'Which word is SHORTEST?',a:ans,wr:a.filter(x=>x!==ans)};})},
+ {id:'stateMC',name:'US State Capitals',ico:'🇺🇸',fn:()=>quiz(()=>{const ST=[["California","Sacramento"],["Texas","Austin"],["Florida","Tallahassee"],["New York","Albany"],["Ohio","Columbus"],["Washington","Olympia"],["Arizona","Phoenix"],["Colorado","Denver"],["Oregon","Salem"],["Nevada","Carson City"],["Georgia","Atlanta"],["Hawaii","Honolulu"],["Illinois","Springfield"],["Maine","Augusta"],["Utah","Salt Lake City"],["Virginia","Richmond"],["Kansas","Topeka"],["Idaho","Boise"],["Iowa","Des Moines"],["Alaska","Juneau"]];const p=pk(ST);return{q:'Capital of '+p[0]+'?',a:p[1],wr:wf(ST.map(x=>x[1]),p[1])};})},
+ {id:'wordstart',name:'Starts With...',ico:'🔤',fn:()=>quiz(()=>{const w=pk(BW);const L=w[0].toUpperCase();const wrong=[];let g=0;while(wrong.length<3&&g<99){g++;const o=pk(BW);if(o[0].toUpperCase()!==L&&!wrong.includes(o))wrong.push(o);}return{q:'Which word starts with "'+L+'"?',a:w,wr:wrong};})},
+ {id:'mul12',name:'Times 12',ico:'🅶',fn:()=>quiz(()=>{const n=ri(2,D(40,600,2000));return{q:n+' × 12 = ?',a:n*12,wr:nums(n*12,D(20,60,200))};})},
+ {id:'oddNum',name:'Odd Number Out',ico:'🕵️',fn:()=>quiz(()=>{const ev=ri(1,20)*2;const arr=[ev,ri(1,20)*2,ri(1,20)*2];const odd=ri(0,19)*2+1;arr.push(odd);return{q:'Which is the ODD number?',a:odd,wr:arr.filter(x=>x!==odd)};})},
+ {id:'evenOddMix',name:'Even Number Out',ico:'🔍',fn:()=>quiz(()=>{const ev=ri(1,20)*2;const arr=[ri(0,19)*2+1,ri(0,19)*2+1,ri(0,19)*2+1,ev];return{q:'Which is the EVEN number?',a:ev,wr:arr.filter(x=>x!==ev)};})},
+ {id:'greater',name:'Greater Than',ico:'▶️',fn:()=>quiz(()=>{const a=ri(1,D(50,500,9000)),b=ri(1,D(50,500,9000));const ans=Math.max(a,b);return{q:'Which is GREATER: '+a+' or '+b+'?',a:ans,wr:[Math.min(a,b)]};})},
+ {id:'between',name:'Number Between',ico:'↔️',fn:()=>quiz(()=>{const a=ri(1,D(40,400,4000));const c=a+ri(2,D(8,20,40));const ans=ri(a+1,c-1);return{q:'Which number is BETWEEN '+a+' and '+c+'?',a:ans,wr:[a-ri(1,5),c+ri(1,5),a-ri(6,10)]};})},
+ {id:'mul3',name:'Multiply Three',ico:'✖️',fn:()=>quiz(()=>{const a=ri(2,D(4,6,9)),b=ri(2,D(4,6,9)),c=ri(2,D(3,5,9));return{q:a+' × '+b+' × '+c+' = ?',a:a*b*c,wr:nums(a*b*c,D(10,25,80))};})},
+ {id:'moneyAdd',name:'Add Money',ico:'💲',fn:()=>quiz(()=>{const a=ri(1,D(50,300,900)),b=ri(1,D(50,300,900));return{q:a+'¢ + '+b+'¢ = ?',a:a+b,wr:nums(a+b,D(15,40,120))};})},
+ {id:'dozen',name:'Dozens',ico:'🥚',fn:()=>quiz(()=>{const n=ri(1,D(3,6,12));return{q:n+' dozen = ? (1 dozen = 12)',a:n*12,wr:nums(n*12,D(6,12,30))};})},
+ {id:'pairs',name:'Counting Pairs',ico:'🧦',fn:()=>quiz(()=>{const n=ri(2,D(8,15,40));return{q:n+' pairs of socks = ? socks',a:n*2,wr:nums(n*2,D(4,8,15))};})},
+ {id:'cmp2',name:'More or Less',ico:'⚖️',fn:()=>quiz(()=>{const a=ri(1,D(20,99,999)),d=ri(1,D(10,30,90));const more=Math.random()<0.5;return{q:'What is '+d+' '+(more?'more':'less')+' than '+a+'?',a:more?a+d:a-d,wr:nums(more?a+d:a-d,D(6,12,25))};})},
+ {id:'subzero',name:'Subtract Big',ico:'➖',fn:()=>quiz(()=>{const a=ri(D(40,300,3000),D(99,999,9999)),b=ri(1,a);return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,D(10,30,120))};})},
+ {id:'addgap',name:'Fill the Gap',ico:'❔',fn:()=>quiz(()=>{const a=ri(1,D(40,400,4000)),s=a+ri(2,D(40,400,4000));return{q:a+' + ? = '+s,a:s-a,wr:nums(s-a,D(12,40,150))};})},
+ {id:'ordinal',name:'Ordinal Numbers',ico:'🥇',fn:()=>quiz(()=>{const n=ri(1,D(5,10,20));const suf=(x)=>{const s=["th","st","nd","rd"],v=x%100;return x+(s[(v-20)%10]||s[v]||s[0]);};return{q:'Which is the word for "'+suf(n)+'"?',a:["zeroth","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth"][n]||(suf(n)),wr:wf(["first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth"],["zeroth","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth"][n]||suf(n))};})},
+ {id:'addThree',name:'Add Three Numbers',ico:'➕',fn:()=>quiz(()=>{const h=D(10,30,99);const a=ri(1,h),b=ri(1,h),c=ri(1,h);return{q:a+' + '+b+' + '+c+' = ?',a:a+b+c,wr:nums(a+b+c,D(6,14,40))};})},
+ {id:'multStep',name:'Two-Step Problem',ico:'🪜',fn:()=>quiz(()=>{const a=ri(2,D(5,9,12)),b=ri(2,D(5,9,12)),c=ri(1,D(10,20,40));const ans=a*b+c;return{q:a+' × '+b+' + '+c+' = ?',a:ans,wr:nums(ans,D(8,15,30))};})},
+ {id:'patternNum',name:'Number Pattern',ico:'🔢',fn:()=>quiz(()=>{const s=ri(1,D(9,20,50)),st=ri(2,D(5,9,15));const seq=[s,s+st,s+2*st,s+3*st];return{q:seq.join(', ')+', ?',a:s+4*st,wr:nums(s+4*st,st+2)};})},
+];
+const HELP={};
+applyTheme(localStorage.getItem('theme')||'light');
+(function(){var h=document.getElementById('host');if(!h)return;var p=false;function fit(){p=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;h.style.transformOrigin='top center';h.style.transform='';h.style.height='';var a=h.clientWidth,n=h.scrollWidth;if(n>a+2){var s=a/n;h.style.transform='scale('+s+')';h.style.height=(h.scrollHeight*s)+'px';}}function sc(){if(p)return;p=true;requestAnimationFrame(fit);}try{new MutationObserver(sc).observe(h,{childList:true,subtree:true});}catch(e){}window.addEventListener('resize',sc);})();
+buildMenu();
+</script>
+</body>
+</html>
