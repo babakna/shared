@@ -293,7 +293,7 @@ applyTheme(localStorage.getItem('theme')||'light');
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
  var avail=host.clientWidth,need=host.scrollWidth;
- if(need>avail+2){var s=avail/need;host.style.transform='scale('+s+')';host.style.height=(host.scrollHeight*s)+'px';}}
+ var availH=window.innerHeight-host.getBoundingClientRect().top-6,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);if(sc<0.995){host.style.transform='scale('+sc+')';host.style.height=(needH*sc)+'px';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
 window.addEventListener('resize',sched);})();
