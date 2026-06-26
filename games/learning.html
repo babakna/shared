@@ -177,6 +177,15 @@
             <button class="action-btn" onclick="initReading()" style="margin-top:20px;">Next Story</button>
         </div>
 
+        <div id="game-26" class="game-container">
+            <div class="question-text">Read carefully, then answer! 📚</div>
+            <div id="comp-passage" class="reading-passage"></div>
+            <div id="comp-q" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 15px;"></div>
+            <div id="comp-options"></div>
+            <div id="comp-feedback" class="feedback"></div>
+            <button class="action-btn" onclick="initComprehension()" style="margin-top:20px;">Next Passage</button>
+        </div>
+
         <div id="game-1" class="game-container">
             <div class="settings-panel">
                 <div class="settings-row">
@@ -508,7 +517,8 @@
             { id: 22, title: "Instruments", icon: "🎻" },
             { id: 23, title: "Grammar Guru", icon: "📚" },
             { id: 24, title: "Shape Sorter", icon: "🛑" },
-            { id: 25, title: "Pattern Puzzle", icon: "🧩" }
+            { id: 25, title: "Pattern Puzzle", icon: "🧩" },
+            { id: 26, title: "Reading Comprehension", icon: "📚" }
         ];
 
         const homeView = document.getElementById('home-view');
@@ -534,7 +544,8 @@
                 6: initReading, 7: initTrivia, 8: initGeography, 9: initPlanets, 10: initSpelling,
                 11: initFood, 12: initHabitat, 13: initWater, 14: initTime, 15: initCoding,
                 16: initFixer, 17: initFraction, 18: initInventor, 19: initOpposite, 20: initMoney,
-                21: initContinent, 22: initInstrument, 23: initGrammar, 24: initShape, 25: initPattern
+                21: initContinent, 22: initInstrument, 23: initGrammar, 24: initShape, 25: initPattern,
+                26: initComprehension
             };
             if(initFunctions[id]) initFunctions[id]();
         }
@@ -635,6 +646,34 @@
             document.getElementById('reading-q').innerText = rData.q;
             document.getElementById('reading-feedback').innerText = '';
             populateOptions([rData.a, ...rData.wr], 'reading-options', 'reading-feedback', rData.a, "Excellent reading! 🌟");
+        }
+
+        /* ----- READING COMPREHENSION (procedurally generated: millions of unique passages) ----- */
+        const C_NAMES=["Maya","Liam","Sofia","Noah","Aria","Ethan","Zoe","Lucas","Mia","Kai","Ava","Leo","Nora","Ravi","Emma","Omar","Lily","Jonah","Priya","Diego","Hana","Sam","Ivy","Theo","Luna","Max","Ada","Finn","Yuki","Cleo","Jack","Rosa","Owen","Tara","Beck"];
+        const C_PLACE=["park","library","beach","museum","zoo","market","garden","forest","lake","farm","bakery","aquarium","playground","mountain","harbor","castle"];
+        const C_COLOR=["red","blue","green","yellow","purple","orange","pink","silver","golden","teal"];
+        const C_OBJ=["kite","book","ball","basket","telescope","camera","backpack","umbrella","drum","puzzle","map","lantern","whistle"];
+        const C_ANIMAL=["puppy","kitten","rabbit","parrot","turtle","hamster","pony","duckling","squirrel","fox","goat","owl"];
+        const C_FOOD=["apple","sandwich","cookie","muffin","orange","pretzel","banana","peach","cupcake","plum"];
+        const C_TIME=["sunny morning","rainy afternoon","snowy day","breezy evening","warm Saturday","quiet Sunday","foggy dawn","starry night"];
+        const C_FEEL=["happy","excited","proud","curious","cheerful","calm","brave","grateful"];
+        function comp3(pool,ans){return shuffle(pool.filter(x=>x!==ans)).slice(0,3);}
+        function initComprehension(){
+            const name=getRandomItem(C_NAMES,'cn'),place=getRandomItem(C_PLACE,'cp'),color=getRandomItem(C_COLOR,'cc'),obj=getRandomItem(C_OBJ,'co'),animal=getRandomItem(C_ANIMAL,'ca'),food=getRandomItem(C_FOOD,'cf'),time=getRandomItem(C_TIME,'ct'),feel=getRandomItem(C_FEEL,'ce');
+            const passage="It was a "+time+". "+name+" set off for the "+place+", carrying a "+color+" "+obj+". At the "+place+", "+name+" met a friendly "+animal+" and shared a tasty "+food+" with a good friend. By the end of the day, "+name+" felt very "+feel+".";
+            const qs=[
+                {q:"Where did "+name+" go?",a:place,wr:comp3(C_PLACE,place)},
+                {q:"What color was the "+obj+"?",a:color,wr:comp3(C_COLOR,color)},
+                {q:"What animal did "+name+" meet?",a:animal,wr:comp3(C_ANIMAL,animal)},
+                {q:"What food did "+name+" share?",a:food,wr:comp3(C_FOOD,food)},
+                {q:"How did "+name+" feel at the end?",a:feel,wr:comp3(C_FEEL,feel)},
+                {q:"What did "+name+" carry?",a:obj,wr:comp3(C_OBJ,obj)}
+            ];
+            const pickQ=getRandomItem(qs,'cq');
+            document.getElementById('comp-passage').innerText=passage;
+            document.getElementById('comp-q').innerText=pickQ.q;
+            document.getElementById('comp-feedback').innerText='';
+            populateOptions([pickQ.a,...pickQ.wr],'comp-options','comp-feedback',pickQ.a,"Great comprehension! 🌟");
         }
 
         /* ----- ALL OTHER GAMES (1-5, 7-25) ----- */
