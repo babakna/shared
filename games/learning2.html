@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Babak's Learning Room II</title>
+<style>
+  :root{--bg:#eef6f0;--panel:#ffffff;--accent:#2aa775;--accent2:#d98a2b;--text:#13261d;--dim:#5a7568;--border:#d2e6da;}
+  html[data-theme="dark"]{--bg:#0c1814;--panel:#142420;--accent:#6fe0b0;--accent2:#ffc27d;--text:#e9f6ef;--dim:#9bbcaf;--border:#274038;}
+  #themeToggle{position:fixed;top:12px;right:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 8px #0002}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(900px 520px at 12% -8%,rgba(110,200,150,.18),transparent 60%),radial-gradient(900px 520px at 112% 2%,rgba(255,180,110,.16),transparent 55%),var(--bg);background-attachment:fixed;color:var(--text)}
+  #app{max-width:900px;margin:0 auto;padding:16px}
+  h1{font-weight:800;text-align:center;margin:8px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;color:var(--dim);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .card{position:relative;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(0,0,0,.05)),var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 12px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s,box-shadow .12s;box-shadow:0 6px 18px rgba(0,0,0,.14);animation:pop .4s ease both}
+  .card:hover{transform:translateY(-5px) scale(1.03);border-color:var(--accent);box-shadow:0 14px 30px rgba(0,0,0,.22)}
+  .card .ico{font-size:32px;display:block;margin-bottom:6px}
+  .card .name{font-weight:700;font-size:14px}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  #stage{display:none}
+  .bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  button.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;border-radius:11px;padding:9px 15px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:transform .12s,filter .12s}
+  button.btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  button.btn:disabled{opacity:.6;cursor:default}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+  .score{margin-left:auto;color:var(--dim)}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:100%}
+  .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:8px;max-width:620px}
+  .big{font-size:20px;font-weight:700;text-align:center}
+  #host{max-width:100%;overflow-x:auto}
+  @media(max-width:560px){#app{padding:10px}h1{font-size:24px}.opts{grid-template-columns:1fr !important}}
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
+<button id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div id="app">
+  <div id="menu">
+    <h1>🎓 LEARNING ROOM II</h1>
+    <div class="sub">50 more learning games — math, language, science & geography. Tap ❓ Rules in any game.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="stage">
+    <div class="bar">
+      <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+      <button class="btn ghost" onclick="showRules()">❓ Rules</button>
+      <span class="big" id="title"></span>
+      <span class="score" id="status"></span>
+    </div>
+    <div class="wrap" id="host"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<script>
+const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
+let current=null,currentGm=null,score=0;
+function setStatus(s){statusEl.textContent=s}
+function setHint(s){hintEl.textContent=s}
+function el(tag,props={},...kids){const e=document.createElement(tag);for(const k in props){if(k==='style')e.style.cssText=props[k];else e[k]=props[k];}kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
+function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pickItem(a){return a[Math.floor(Math.random()*a.length)];}
+function wf(pool,ans,n){return shuffle(pool.filter(x=>x!==ans)).slice(0,n);}
+function nums(ans,n,spread){const s=new Set([ans]);let g=0;while(s.size<n+1&&g<150){g++;const v=ans+ri(-spread,spread);if(v>=0&&v!==ans)s.add(v);}return [...s].filter(x=>x!==ans).slice(0,n);}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=el('div',{className:'card'});d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){currentGm=gm;score=0;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint(HELP[gm.id]||'');host.innerHTML='';current=gm.fn();}
+function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
+  const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008'});
+  box.append(el('div',{className:'big',style:'font-size:20px;margin-bottom:10px',textContent:currentGm.ico+' '+currentGm.name}));
+  box.append(el('div',{style:'line-height:1.6',textContent:HELP[currentGm.id]||'Read the question and tap the correct answer. Tap Next for a new one!'}));
+  const c=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});c.onclick=()=>ov.remove();box.append(c);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
+
+/* generic multiple-choice game from a generator returning {q,a,wr,ok} */
+function quiz(gen){
+  score=0;
+  const qEl=el('div',{className:'big',style:'max-width:580px;min-height:46px;line-height:1.4'});
+  const opts=el('div',{className:'opts',style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:540px;width:100%'});
+  const fb=el('div',{className:'big',style:'min-height:26px'});
+  const next=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(qEl,opts,fb,next);
+  function round(){const d=gen();qEl.innerHTML=d.q;fb.textContent='';
+    const all=shuffle([d.a,...d.wr]).map(String);const long=all.some(o=>o.length>14);
+    opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    all.forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:16px'});
+      b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);
+        if(o===String(d.a)){b.style.background='#2ecc71';b.style.color='#fff';score++;fb.textContent='✅ '+(d.ok||'Correct!');setStatus('Score: '+score);}
+        else{b.style.background='#e74c3c';b.style.color='#fff';[...opts.children].forEach(x=>{if(x.textContent===String(d.a)){x.style.background='#2ecc71';x.style.color='#fff';}});fb.textContent='Answer: '+d.a;}};
+      opts.append(b);});
+    setStatus('Score: '+score);}
+  next.onclick=round;round();
+  return {stop:()=>{}};
+}
+
+/* ============ DATA ============ */
+const SYN=[["big","large"],["small","tiny"],["happy","glad"],["sad","unhappy"],["fast","quick"],["smart","clever"],["begin","start"],["end","finish"],["jump","leap"],["shout","yell"],["scared","afraid"],["pretty","beautiful"],["angry","mad"],["cold","chilly"],["hot","warm"],["rich","wealthy"],["funny","silly"],["smell","odor"],["gift","present"],["help","assist"],["story","tale"],["close","shut"],["tired","sleepy"],["sick","ill"],["easy","simple"],["hard","difficult"],["strange","weird"],["brave","bold"],["quiet","silent"],["near","close"]];
+const RHY=[["cat","hat","bat","rat","mat"],["dog","log","fog","frog"],["car","star","jar","far"],["bee","tree","sea","key"],["light","night","kite","bright"],["cake","lake","snake","rake"],["run","sun","fun","bun"],["king","ring","sing","wing"],["ball","tall","wall","fall"],["blue","glue","true","shoe"],["pig","wig","dig","big"],["moon","spoon","soon","noon"]];
+const PLU=[["cat","cats"],["dog","dogs"],["box","boxes"],["baby","babies"],["man","men"],["child","children"],["foot","feet"],["mouse","mice"],["leaf","leaves"],["bus","buses"],["fly","flies"],["tooth","teeth"],["goose","geese"],["knife","knives"],["city","cities"],["wolf","wolves"],["potato","potatoes"],["church","churches"],["fish","fish"],["sheep","sheep"],["person","people"],["wish","wishes"],["story","stories"],["half","halves"]];
+const PAST=[["go","went"],["run","ran"],["eat","ate"],["see","saw"],["come","came"],["give","gave"],["take","took"],["make","made"],["sing","sang"],["swim","swam"],["fly","flew"],["draw","drew"],["write","wrote"],["ride","rode"],["buy","bought"],["bring","brought"],["catch","caught"],["teach","taught"],["sleep","slept"],["build","built"],["find","found"],["think","thought"],["drink","drank"],["begin","began"]];
+const ANIMc=[["Dog","Mammal"],["Cat","Mammal"],["Whale","Mammal"],["Bat","Mammal"],["Eagle","Bird"],["Penguin","Bird"],["Owl","Bird"],["Parrot","Bird"],["Shark","Fish"],["Salmon","Fish"],["Goldfish","Fish"],["Snake","Reptile"],["Lizard","Reptile"],["Turtle","Reptile"],["Crocodile","Reptile"],["Frog","Amphibian"],["Toad","Amphibian"],["Bee","Insect"],["Ant","Insect"],["Butterfly","Insect"],["Beetle","Insect"],["Spider","Arachnid"],["Scorpion","Arachnid"]];
+const ACLASS=["Mammal","Bird","Fish","Reptile","Amphibian","Insect","Arachnid"];
+const MATTER=[["Ice","Solid"],["Rock","Solid"],["Wood","Solid"],["Chair","Solid"],["Water","Liquid"],["Milk","Liquid"],["Juice","Liquid"],["Oil","Liquid"],["Steam","Gas"],["Air","Gas"],["Oxygen","Gas"],["Helium","Gas"],["Brick","Solid"],["Honey","Liquid"]];
+const ORGAN=[["pump blood","Heart"],["help you breathe","Lungs"],["think and remember","Brain"],["digest food","Stomach"],["clean your blood","Kidneys"],["help you see","Eyes"],["help you hear","Ears"],["cover your body","Skin"],["hold you up","Bones"],["taste food","Tongue"]];
+const ORGANS=["Heart","Lungs","Brain","Stomach","Kidneys","Eyes","Ears","Skin","Bones","Tongue","Liver"];
+const PLANT=[["take in water","Roots"],["carry water up","Stem"],["make food from sunlight","Leaves"],["attract bees","Flower"],["grow into a new plant","Seed"]];
+const PLANTS=["Roots","Stem","Leaves","Flower","Seed","Petal"];
+const SENSE=[["a flower","Smell"],["a song","Hearing"],["a rainbow","Sight"],["ice cream","Taste"],["a soft pillow","Touch"],["thunder","Hearing"],["a pizza","Taste"],["sandpaper","Touch"]];
+const SENSES=["Sight","Hearing","Smell","Taste","Touch"];
+const MAT=[["Wood","Natural"],["Cotton","Natural"],["Gold","Natural"],["Wool","Natural"],["Plastic","Man-made"],["Glass","Man-made"],["Paper","Man-made"],["Rubber tire","Man-made"],["Stone","Natural"],["Brick","Man-made"],["Leather","Natural"],["Nylon","Man-made"]];
+const MAG=[["Iron nail","Yes"],["Steel paperclip","Yes"],["Fridge magnet","Yes"],["Plastic toy","No"],["Wooden spoon","No"],["Glass cup","No"],["Rubber band","No"],["Tin can","Yes"],["Paper","No"],["Nickel coin","Yes"]];
+const FLAGS=[["🇺🇸","United States"],["🇬🇧","United Kingdom"],["🇫🇷","France"],["🇩🇪","Germany"],["🇮🇹","Italy"],["🇪🇸","Spain"],["🇯🇵","Japan"],["🇨🇳","China"],["🇮🇳","India"],["🇧🇷","Brazil"],["🇨🇦","Canada"],["🇲🇽","Mexico"],["🇦🇺","Australia"],["🇷🇺","Russia"],["🇪🇬","Egypt"],["🇰🇷","South Korea"],["🇬🇷","Greece"],["🇵🇹","Portugal"],["🇳🇱","Netherlands"],["🇸🇪","Sweden"],["🇳🇴","Norway"],["🇮🇪","Ireland"],["🇨🇭","Switzerland"],["🇦🇷","Argentina"],["🇿🇦","South Africa"],["🇯🇵","Japan"],["🇹🇷","Turkey"],["🇬🇷","Greece"]];
+const STATES=[["Alabama","Montgomery"],["Alaska","Juneau"],["Arizona","Phoenix"],["Arkansas","Little Rock"],["California","Sacramento"],["Colorado","Denver"],["Connecticut","Hartford"],["Delaware","Dover"],["Florida","Tallahassee"],["Georgia","Atlanta"],["Hawaii","Honolulu"],["Idaho","Boise"],["Illinois","Springfield"],["Indiana","Indianapolis"],["Iowa","Des Moines"],["Kansas","Topeka"],["Kentucky","Frankfort"],["Louisiana","Baton Rouge"],["Maine","Augusta"],["Maryland","Annapolis"],["Massachusetts","Boston"],["Michigan","Lansing"],["Minnesota","Saint Paul"],["Mississippi","Jackson"],["Missouri","Jefferson City"],["Montana","Helena"],["Nebraska","Lincoln"],["Nevada","Carson City"],["New Hampshire","Concord"],["New Jersey","Trenton"],["New Mexico","Santa Fe"],["New York","Albany"],["North Carolina","Raleigh"],["North Dakota","Bismarck"],["Ohio","Columbus"],["Oklahoma","Oklahoma City"],["Oregon","Salem"],["Pennsylvania","Harrisburg"],["Rhode Island","Providence"],["South Carolina","Columbia"],["South Dakota","Pierre"],["Tennessee","Nashville"],["Texas","Austin"],["Utah","Salt Lake City"],["Vermont","Montpelier"],["Virginia","Richmond"],["Washington","Olympia"],["West Virginia","Charleston"],["Wisconsin","Madison"],["Wyoming","Cheyenne"]];
+const STATECAPS=STATES.map(s=>s[1]);
+const LANDMARK=[["Eiffel Tower","France"],["Statue of Liberty","United States"],["Big Ben","United Kingdom"],["Colosseum","Italy"],["Great Pyramids","Egypt"],["Great Wall","China"],["Taj Mahal","India"],["Sydney Opera House","Australia"],["Christ the Redeemer","Brazil"],["Leaning Tower of Pisa","Italy"],["Mount Fuji","Japan"],["Statue of Christ","Brazil"],["Acropolis","Greece"],["Machu Picchu","Peru"],["CN Tower","Canada"]];
+const LANDFORM=[["A very tall landform with a peak","Mountain"],["A low area between mountains","Valley"],["Land surrounded by water","Island"],["A dry, sandy region","Desert"],["A large body of salt water","Ocean"],["A flowing body of fresh water","River"],["Flat grassy land","Plain"],["A small raised landform","Hill"],["Water falling from a height","Waterfall"],["A frozen river of ice","Glacier"]];
+const LANDFORMS=["Mountain","Valley","Island","Desert","Ocean","River","Plain","Hill","Waterfall","Glacier","Lake","Forest"];
+const HOMO=[["I have ___ apples.","two",["to","too"]],["Are you coming ___?","too",["two","to"]],["Let's go ___ the park.","to",["two","too"]],["___ going to be fun.","It's",["Its"]],["The dog wagged ___ tail.","its",["it's"]],["Put it over ___.","there",["their","they're"]],["___ my best friends.","They're",["Their","There"]],["That is ___ house.","their",["there","they're"]],["I can ___ the music.","hear",["here"]],["Come ___ please.","here",["hear"]],["She ___ a red hat.","wore",["war"]],["The knight won the ___.","war",["wore"]]];
+const COMPOUND=["rainbow","sunflower","football","cupcake","bedroom","starfish","butterfly","snowman","pancake","toothbrush","backpack","cowboy","popcorn","seashell","ladybug","firefly","raincoat","sandbox"];
+const NOTCOMP=["banana","pencil","window","purple","garden","dragon","planet","cookie","silver","monkey"];
+const SENT=[["What is your name?","Question"],["I love pizza.","Statement"],["Watch out!","Exclamation"],["Please sit down.","Command"],["The sky is blue.","Statement"],["Where are you going?","Question"],["That is amazing!","Exclamation"],["Close the door.","Command"],["Do you like dogs?","Question"],["We had fun today.","Statement"]];
+const SENTT=["Statement","Question","Exclamation","Command"];
+const ROMANS=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX"];
+const VWORDS=["apple","orange","umbrella","elephant","igloo","octopus","ant","egg","ice","owl","uncle","insect","olive","author","engine"];
+const CWORDS=["banana","dog","cat","table","pizza","robot","garden","yellow","tiger","mango","rabbit","sun","kite","lion","nest"];
+const SYLL=[["cat",1],["apple",2],["banana",3],["elephant",3],["dog",1],["pizza",2],["butterfly",3],["computer",3],["sun",1],["rabbit",2],["dinosaur",3],["table",2],["watermelon",4],["pencil",2],["caterpillar",4]];
+const ODD=[["Apple","Banana","Orange","Carrot","Carrot"],["Dog","Cat","Rose","Cow","Rose"],["Red","Blue","Green","Table","Table"],["Car","Bus","Train","Apple","Apple"],["One","Two","Dog","Three","Dog"],["Sun","Moon","Star","Shoe","Shoe"],["Lion","Tiger","Bear","Chair","Chair"],["Pizza","Burger","Taco","Pencil","Pencil"]];
+const PREFIX=[["un-","not / opposite"],["re-","again"],["pre-","before"],["dis-","not / away"],["mis-","wrongly"],["tri-","three"],["bi-","two"],["sub-","under"]];
+const PREMEAN=["not / opposite","again","before","not / away","wrongly","three","two","under","over","many"];
+const LIFE=[["Egg → ? → Butterfly","Caterpillar",["Tadpole","Chick","Seed"]],["Seed → Sprout → ?","Plant",["Egg","Cocoon","Rock"]],["Egg → Tadpole → ?","Frog",["Fish","Lizard","Bird"]],["Egg → Chick → ?","Hen",["Duck","Cow","Fish"]],["Caterpillar → ? → Butterfly","Cocoon",["Egg","Frog","Seed"]]];
+const WEATHER=[["It is raining. What do you take?","Umbrella",["Sunglasses","Sled","Fan"]],["It is snowing. What do you wear?","Coat",["Swimsuit","Sandals","Shorts"]],["It is very sunny. What do you wear?","Sunglasses",["Mittens","Raincoat","Scarf"]],["Water falls from clouds as...","Rain",["Sand","Smoke","Light"]],["Frozen rain is called...","Snow",["Steam","Fog","Dew"]],["A big storm with lightning is a...","Thunderstorm",["Rainbow","Breeze","Sunset"]]];
+
+/* ============ GAME LIST ============ */
+const GAMES=[
+ {id:'add',name:'Addition',ico:'➕',fn:()=>quiz(()=>{const a=ri(2,50),b=ri(2,50);return{q:a+' + '+b+' = ?',a:a+b,wr:nums(a+b,3,8),ok:'Great adding!'};})},
+ {id:'sub',name:'Subtraction',ico:'➖',fn:()=>quiz(()=>{const a=ri(10,60),b=ri(1,a);return{q:a+' − '+b+' = ?',a:a-b,wr:nums(a-b,3,8)};})},
+ {id:'mul',name:'Multiplication',ico:'✖️',fn:()=>quiz(()=>{const a=ri(2,12),b=ri(2,12);return{q:a+' × '+b+' = ?',a:a*b,wr:nums(a*b,3,10)};})},
+ {id:'div',name:'Division',ico:'➗',fn:()=>quiz(()=>{const b=ri(2,12),ans=ri(2,12);return{q:(b*ans)+' ÷ '+b+' = ?',a:ans,wr:nums(ans,3,5)};})},
+ {id:'compare',name:'Compare Numbers',ico:'⚖️',fn:()=>quiz(()=>{const a=ri(1,99),b=ri(1,99);const ans=a>b?'>':a<b?'<':'=';return{q:a+'  ?  '+b,a:ans,wr:['>','<','='].filter(x=>x!==ans)};})},
+ {id:'rounding',name:'Rounding',ico:'🔟',fn:()=>quiz(()=>{const n=ri(11,89);const ans=Math.round(n/10)*10;return{q:'Round '+n+' to the nearest 10',a:ans,wr:nums(ans,3,20).filter(x=>x%10===0).concat([ans+10,ans-10]).slice(0,3)};})},
+ {id:'place',name:'Place Value',ico:'🏷️',fn:()=>quiz(()=>{const n=ri(10,99),t=Math.floor(n/10);return{q:'In '+n+', how many TENS?',a:t,wr:nums(t,3,4)};})},
+ {id:'evenodd',name:'Even or Odd',ico:'🔢',fn:()=>quiz(()=>{const n=ri(1,99);return{q:'Is '+n+' even or odd?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};})},
+ {id:'skip',name:'Skip Counting',ico:'⏭️',fn:()=>quiz(()=>{const s=ri(1,8),st=pickItem([2,3,5,10]);const seq=[s,s+st,s+2*st,s+3*st];return{q:seq.join(', ')+', ?',a:s+4*st,wr:nums(s+4*st,3,st+2)};})},
+ {id:'bonds',name:'Number Bonds',ico:'🔗',fn:()=>quiz(()=>{const t=pickItem([10,20]),a=ri(1,t-1);return{q:a+' + ? = '+t,a:t-a,wr:nums(t-a,3,4)};})},
+ {id:'doubles',name:'Double It',ico:'✌️',fn:()=>quiz(()=>{const n=ri(1,25);return{q:'Double of '+n+' = ?',a:n*2,wr:nums(n*2,3,5)};})},
+ {id:'roman',name:'Roman Numerals',ico:'🏛️',fn:()=>quiz(()=>{const n=ri(1,30);return{q:'What is '+n+' in Roman numerals?',a:ROMANS[n-1],wr:wf(ROMANS,ROMANS[n-1],3)};})},
+ {id:'mentalmix',name:'Mental Math',ico:'🧠',fn:()=>quiz(()=>{const op=pickItem(['+','−','×']);let a,b,ans;if(op==='×'){a=ri(2,9);b=ri(2,9);ans=a*b;}else{a=ri(5,40);b=ri(1,op==='−'?a:40);ans=op==='+'?a+b:a-b;}return{q:a+' '+op+' '+b+' = ?',a:ans,wr:nums(ans,3,7)};})},
+ {id:'ordering',name:'Biggest Number',ico:'📈',fn:()=>quiz(()=>{const s=new Set();while(s.size<4)s.add(ri(1,99));const arr=[...s];const ans=Math.max(...arr);return{q:'Which is the BIGGEST?',a:ans,wr:arr.filter(x=>x!==ans)};})},
+ {id:'measure',name:'Measurement',ico:'📏',fn:()=>quiz(()=>{const t=ri(0,2);if(t===0){const n=ri(1,9);return{q:'How many cm are in '+n+' metre'+(n>1?'s':'')+'?',a:n*100,wr:nums(n*100,3,40)};}if(t===1){const n=ri(1,9);return{q:'How many mm are in '+n+' cm?',a:n*10,wr:nums(n*10,3,8)};}const n=ri(1,9);return{q:'How many grams are in '+n+' kg?',a:n*1000,wr:nums(n*1000,3,300)};})},
+ {id:'area',name:'Rectangle Area',ico:'⬛',fn:()=>quiz(()=>{const l=ri(2,12),w=ri(2,12);return{q:'A rectangle is '+l+' by '+w+'. AREA = ?',a:l*w,wr:nums(l*w,3,10)};})},
+ {id:'perimeter',name:'Perimeter',ico:'🔲',fn:()=>quiz(()=>{const l=ri(2,12),w=ri(2,12);return{q:'A rectangle is '+l+' by '+w+'. PERIMETER = ?',a:2*(l+w),wr:nums(2*(l+w),3,8)};})},
+ {id:'prime',name:'Prime Numbers',ico:'🥇',fn:()=>quiz(()=>{const n=ri(2,40);const isP=(x)=>{if(x<2)return false;for(let i=2;i*i<=x;i++)if(x%i===0)return false;return true;};return{q:'Is '+n+' a PRIME number?',a:isP(n)?'Prime':'Not prime',wr:[isP(n)?'Not prime':'Prime']};})},
+ {id:'multiples',name:'Multiples',ico:'🔁',fn:()=>quiz(()=>{const N=ri(2,9);const m=ri(2,9);const ans=N*m;const set=new Set([ans]);while(set.size<4){const x=ri(2,90);if(x%N!==0)set.add(x);}return{q:'Which number is a multiple of '+N+'?',a:ans,wr:[...set].filter(x=>x!==ans).slice(0,3)};})},
+ {id:'fraccmp',name:'Compare Fractions',ico:'🍕',fn:()=>quiz(()=>{const ds=shuffle([2,3,4,5,6,8]).slice(0,2);const big='1/'+Math.min(...ds);return{q:'Which fraction is BIGGER?',a:big,wr:['1/'+Math.max(...ds)]};})},
+ {id:'synonyms',name:'Synonyms',ico:'🟰',fn:()=>quiz(()=>{const p=pickItem(SYN);return{q:'Which word means the SAME as "'+p[0]+'"?',a:p[1],wr:wf(SYN.map(x=>x[1]),p[1],3)};})},
+ {id:'rhyme',name:'Rhyming Words',ico:'🎵',fn:()=>quiz(()=>{const g=pickItem(RHY);const w=g[0],a=pickItem(g.slice(1));const other=shuffle(RHY.filter(x=>x!==g)).slice(0,3).map(x=>x[0]);return{q:'Which word RHYMES with "'+w+'"?',a:a,wr:other};})},
+ {id:'plural',name:'Plurals',ico:'➕📦',fn:()=>quiz(()=>{const p=pickItem(PLU);return{q:'What is the plural of "'+p[0]+'"?',a:p[1],wr:wf(PLU.map(x=>x[1]),p[1],3)};})},
+ {id:'pasttense',name:'Past Tense',ico:'⏪',fn:()=>quiz(()=>{const p=pickItem(PAST);return{q:'Past tense of "'+p[0]+'" is...',a:p[1],wr:wf(PAST.map(x=>x[1]),p[1],3)};})},
+ {id:'homophone',name:'Homophones',ico:'👂',fn:()=>quiz(()=>{const p=pickItem(HOMO);return{q:p[0],a:p[1],wr:p[2]};})},
+ {id:'compound',name:'Compound Words',ico:'🧩',fn:()=>quiz(()=>{const a=pickItem(COMPOUND);return{q:'Which is a COMPOUND word?',a:a,wr:wf(NOTCOMP,a,3)};})},
+ {id:'prefix',name:'Prefixes',ico:'🔤',fn:()=>quiz(()=>{const p=pickItem(PREFIX);return{q:'What does the prefix "'+p[0]+'" mean?',a:p[1],wr:wf(PREMEAN,p[1],3)};})},
+ {id:'sentencetype',name:'Sentence Types',ico:'❓',fn:()=>quiz(()=>{const p=pickItem(SENT);return{q:'What kind of sentence?\n"'+p[0]+'"',a:p[1],wr:wf(SENTT,p[1],3)};})},
+ {id:'articles',name:'A or An',ico:'🅰️',fn:()=>quiz(()=>{const isV=Math.random()<0.5;const w=pickItem(isV?VWORDS:CWORDS);const a=/^[aeiou]/.test(w)?'an':'a';return{q:'Choose: ___ '+w,a:a,wr:[a==='a'?'an':'a']};})},
+ {id:'vowels',name:'Count Vowels',ico:'🔡',fn:()=>quiz(()=>{const w=pickItem(CWORDS.concat(VWORDS));const c=(w.match(/[aeiou]/g)||[]).length;return{q:'How many vowels in "'+w+'"?',a:c,wr:nums(c,3,2).filter(x=>x>=0)};})},
+ {id:'syllables',name:'Syllables',ico:'👏',fn:()=>quiz(()=>{const p=pickItem(SYLL);return{q:'How many syllables in "'+p[0]+'"?',a:p[1],wr:[1,2,3,4].filter(x=>x!==p[1]).slice(0,3)};})},
+ {id:'alphabet',name:'Alphabetical Order',ico:'🔠',fn:()=>quiz(()=>{const ws=shuffle(CWORDS.concat(SYN.map(x=>x[0]))).slice(0,3);const ans=ws.slice().sort()[0];return{q:'Which word comes FIRST in the dictionary?',a:ans,wr:ws.filter(x=>x!==ans)};})},
+ {id:'oddword',name:'Odd One Out',ico:'🕵️',fn:()=>quiz(()=>{const g=pickItem(ODD);return{q:'Which one does NOT belong?',a:g[4],wr:g.slice(0,3)};})},
+ {id:'animalclass',name:'Animal Groups',ico:'🦓',fn:()=>quiz(()=>{const p=pickItem(ANIMc);return{q:'What group is a '+p[0]+'?',a:p[1],wr:wf(ACLASS,p[1],3)};})},
+ {id:'matter',name:'States of Matter',ico:'🧊',fn:()=>quiz(()=>{const p=pickItem(MATTER);return{q:'Is "'+p[0]+'" a solid, liquid or gas?',a:p[1],wr:['Solid','Liquid','Gas'].filter(x=>x!==p[1])};})},
+ {id:'body',name:'Human Body',ico:'🫀',fn:()=>quiz(()=>{const p=pickItem(ORGAN);return{q:'Which body part helps you '+p[0]+'?',a:p[1],wr:wf(ORGANS,p[1],3)};})},
+ {id:'plantpart',name:'Parts of a Plant',ico:'🌱',fn:()=>quiz(()=>{const p=pickItem(PLANT);return{q:'Which plant part helps it '+p[0]+'?',a:p[1],wr:wf(PLANTS,p[1],3)};})},
+ {id:'senses',name:'Five Senses',ico:'👃',fn:()=>quiz(()=>{const p=pickItem(SENSE);return{q:'Which sense do you use for '+p[0]+'?',a:p[1],wr:wf(SENSES,p[1],3)};})},
+ {id:'weather',name:'Weather',ico:'🌦️',fn:()=>quiz(()=>{const p=pickItem(WEATHER);return{q:p[0],a:p[1],wr:p[2]};})},
+ {id:'lifecycle',name:'Life Cycles',ico:'🐛',fn:()=>quiz(()=>{const p=pickItem(LIFE);return{q:p[0],a:p[1],wr:p[2]};})},
+ {id:'materials',name:'Natural or Man-made',ico:'🪵',fn:()=>quiz(()=>{const p=pickItem(MAT);return{q:'Is "'+p[0]+'" natural or man-made?',a:p[1],wr:[p[1]==='Natural'?'Man-made':'Natural']};})},
+ {id:'magnet',name:'Magnetic?',ico:'🧲',fn:()=>quiz(()=>{const p=pickItem(MAG);return{q:'Is a "'+p[0]+'" magnetic?',a:p[1],wr:[p[1]==='Yes'?'No':'Yes']};})},
+ {id:'flags',name:'World Flags',ico:'🚩',fn:()=>quiz(()=>{const p=pickItem(FLAGS);return{q:'Which country has this flag?  '+p[0],a:p[1],wr:wf([...new Set(FLAGS.map(x=>x[1]))],p[1],3)};})},
+ {id:'statecap',name:'US State Capitals',ico:'🇺🇸',fn:()=>quiz(()=>{const p=pickItem(STATES);return{q:'What is the capital of '+p[0]+'?',a:p[1],wr:wf(STATECAPS,p[1],3)};})},
+ {id:'landmarks',name:'World Landmarks',ico:'🗽',fn:()=>quiz(()=>{const p=pickItem(LANDMARK);return{q:'Which country has the '+p[0]+'?',a:p[1],wr:wf([...new Set(LANDMARK.map(x=>x[1]))],p[1],3)};})},
+ {id:'landforms',name:'Landforms',ico:'🏔️',fn:()=>quiz(()=>{const p=pickItem(LANDFORM);return{q:p[0]+'. What is it?',a:p[1],wr:wf(LANDFORMS,p[1],3)};})},
+ {id:'oceans',name:'Oceans & Earth',ico:'🌊',fn:()=>quiz(()=>{const facts=[["Which is the LARGEST ocean?","Pacific",["Atlantic","Indian","Arctic"]],["Which is the SMALLEST ocean?","Arctic",["Pacific","Atlantic","Indian"]],["How many oceans are there?","5",["3","7","4"]],["Most of Earth is covered by...","Water",["Land","Ice","Sand"]],["The ocean water tastes...","Salty",["Sweet","Sour","Bitter"]],["Which ocean is by Antarctica?","Southern",["Arctic","Indian","Atlantic"]]];const p=pickItem(facts);return{q:p[0],a:p[1],wr:p[2]};})},
+ {id:'money2',name:'Money Smart',ico:'💰',fn:()=>quiz(()=>{const t=ri(0,1);if(t===0){const q5=ri(0,4),q10=ri(0,4),q25=ri(0,3);const c=q5*5+q10*10+q25*25;return{q:'You have '+q25+' quarters, '+q10+' dimes, '+q5+' nickels. How many cents?',a:c,wr:nums(c,3,15)};}const items=ri(2,5),cost=ri(2,9);return{q:'You buy '+items+' pencils at '+cost+'¢ each. Total?',a:items*cost,wr:nums(items*cost,3,8)};})},
+ {id:'clock',name:'Telling Time',ico:'🕐',fn:()=>quiz(()=>{const h=ri(1,12),m=pickItem([0,15,30,45]);const mm=(m<10?'0':'')+m;const ans=h+':'+mm;const wr=new Set();while(wr.size<3){const h2=ri(1,12),m2=pickItem([0,15,30,45]);const s=h2+':'+((m2<10?'0':'')+m2);if(s!==ans)wr.add(s);}const word=m===0?(h+" o'clock"):m===15?("quarter past "+h):m===30?("half past "+h):("quarter to "+((h%12)+1));return{q:'What time is "'+word+'"?',a:ans,wr:[...wr]};})},
+ {id:'counting',name:'Count the Emojis',ico:'🍓',fn:()=>quiz(()=>{const e=pickItem(['🍓','🐶','⭐','🍎','🐠','🌸','🚗','🎈']);const n=ri(3,12);return{q:e.repeat(n),a:n,wr:nums(n,3,3).filter(x=>x>0)};})},
+];
+const HELP={
+ add:"Add the two numbers and tap the correct total.",sub:"Subtract the second number from the first.",mul:"Multiply the two numbers.",div:"Divide and pick the answer.",compare:"Pick >, < or = to compare the numbers.",rounding:"Round to the nearest ten.",place:"How many tens are in the number?",evenodd:"Even numbers end in 0,2,4,6,8; odd end in 1,3,5,7,9.",skip:"Find the next number in the counting pattern.",bonds:"What adds on to make the total?",doubles:"Double means add the number to itself.",roman:"Match the number to its Roman numerals.",mentalmix:"Solve the mixed math problem.",ordering:"Pick the biggest of the four numbers.",measure:"Convert the units (100 cm = 1 m, etc.).",area:"Area of a rectangle = length × width.",perimeter:"Perimeter = all four sides added (2×(l+w)).",prime:"A prime number only divides by 1 and itself.",multiples:"Pick the number that divides evenly by the given number.",fraccmp:"A smaller bottom number means a bigger fraction.",
+ synonyms:"Pick the word with the same meaning.",rhyme:"Pick the word that rhymes.",plural:"Choose the correct plural (more than one).",pasttense:"Pick the past-tense form of the verb.",homophone:"Choose the word that fits the sentence.",compound:"A compound word is two words joined (e.g., rain+bow).",prefix:"Choose what the word-beginning means.",sentencetype:"Is it a statement, question, exclamation or command?",articles:"Use 'an' before a vowel sound, 'a' before others.",vowels:"Count the a, e, i, o, u letters.",syllables:"Count the beats (claps) in the word.",alphabet:"Pick the word that comes first A→Z.",oddword:"Pick the word that doesn't fit the group.",
+ animalclass:"Choose the animal's group.",matter:"Solid, liquid or gas?",body:"Pick the body part that does the job.",plantpart:"Choose the plant part with that job.",senses:"Which of the five senses do you use?",weather:"Answer the weather question.",lifecycle:"Pick the missing life-cycle stage.",materials:"Natural comes from nature; man-made is built by people.",magnet:"Magnets stick to iron and steel, not plastic/wood.",
+ flags:"Match the flag to its country.",statecap:"Pick the capital city of the US state.",landmarks:"Which country has this famous landmark?",landforms:"Name the landform from its description.",oceans:"Answer the question about oceans and Earth.",money2:"Add up the coins or the cost.",clock:"Match the time in words to the clock time.",counting:"Count how many emojis you see.",
+};
+applyTheme(localStorage.getItem('theme')||'light');
+(function(){var h=document.getElementById('host');if(!h)return;var p=false;function fit(){p=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;h.style.transformOrigin='top center';h.style.transform='';h.style.height='';var a=h.clientWidth,n=h.scrollWidth;if(n>a+2){var s=a/n;h.style.transform='scale('+s+')';h.style.height=(h.scrollHeight*s)+'px';}}function sc(){if(p)return;p=true;requestAnimationFrame(fit);}try{new MutationObserver(sc).observe(h,{childList:true,subtree:true});}catch(e){}window.addEventListener('resize',sc);})();
+buildMenu();
+</script>
+</body>
+</html>
