@@ -91,6 +91,11 @@ const GAMES=[
   {id:'inbetween',name:'In Between',ico:'🃏'},
   {id:'matchpairs',name:'Match Pairs',ico:'🔗'},
   {id:'slapjack',name:'Slap Jack',ico:'✋'},
+  {id:'wish',name:'Wish',ico:'⭐'},
+  {id:'thirteens',name:'Thirteens',ico:'🔺'},
+  {id:'sumto21',name:'Twenty-One',ico:'2️⃣'},
+  {id:'colorstreak',name:'Colour Streak',ico:'🟥'},
+  {id:'lucky7',name:'Lucky Seven',ico:'🍀'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
@@ -562,6 +567,52 @@ function game_slapjack(gm){setHint('Cards flip fast — SLAP the instant a Jack 
   function tick(){if(over)return;time-=0.65;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);cardEl.innerHTML='';cardEl.append(el('div',{className:'big',textContent:'Time! Score '+score}));return;}if(!deck.length)deck=shuffle(makeDeck().concat(makeDeck()));const c=deck.pop();cardEl.innerHTML='';cardEl.append(cardFace(c));isJack=c.r==='J';setStatus('Score: '+score+' • Time: '+Math.ceil(time)+'s • Best: '+hs(gm.id));}
   slap.onclick=()=>{if(over){reset();return;}if(isJack){score++;isJack=false;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.ceil(time)+'s • Best: '+hs(gm.id));};
   nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
+
+/* ---------------- WISH ---------------- */
+function game_wish(gm){setHint('Eight piles. Tap two top cards of the SAME rank to remove the pair. Clear all 32 cards to win!');
+  let piles,sel;const board=el('div',{style:'display:flex;gap:8px;justify-content:center;flex-wrap:wrap'});const cE=[];for(let i=0;i<8;i++){const c=el('div',{style:'position:relative;width:46px;min-height:64px'});cE.push(c);board.append(c);}const nb=el('button',{className:'btn',textContent:'New Game'});const msg=el('div',{className:'big'});host.append(msg,board,nb);
+  function reset(){const d=shuffle(makeDeck()).slice(0,32);piles=[[],[],[],[],[],[],[],[]];d.forEach((c,i)=>piles[i%8].push(c));sel=null;draw();}
+  function draw(){cE.forEach((ce,i)=>{ce.innerHTML='';piles[i].forEach((c,j)=>{const last=j===piles[i].length-1;const f=cardFace(c,last);f.style.position='absolute';f.style.top=(j*16)+'px';if(last){f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);}ce.append(f);});ce.style.height=(piles[i].length*16+64)+'px';});const left=piles.reduce((a,p)=>a+p.length,0);setStatus('Left: '+left+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+  function click(i){if(!piles[i].length)return;if(sel!==null&&sel!==i){if(piles[sel][piles[sel].length-1].r===piles[i][piles[i].length-1].r){piles[sel].pop();piles[i].pop();sel=null;draw();return;}sel=i;draw();return;}sel=sel===i?null:i;draw();}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- THIRTEENS ---------------- */
+function game_thirteens(gm){setHint('Tap a King (13) to remove it, or tap two cards that add up to 13 (A=1…Q=12). Clear the deck!');
+  let deck,board,sel;const grid=el('div',{style:'display:grid;grid-template-columns:repeat(5,46px);gap:6px'});const nb=el('button',{className:'btn',textContent:'New Game'});const msg=el('div',{className:'big'});host.append(msg,grid,nb);
+  function reset(){deck=shuffle(makeDeck());board=deck.splice(0,10);sel=-1;draw();}
+  function refill(){for(let k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+  function draw(){grid.innerHTML='';board.forEach((c,i)=>{if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}const f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);grid.append(f);});const left=board.filter(Boolean).length+deck.length;setStatus('Left: '+left+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+  function click(i){if(!board[i])return;if(board[i].v===13){board[i]=null;refill();sel=-1;draw();return;}if(sel===i){sel=-1;draw();return;}if(sel>=0){if(board[sel].v+board[i].v===13){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- TWENTY-ONE (solo) ---------------- */
+function game_sumto21(gm){setHint('Draw cards to get as close to 21 as you can (Ace=11 or 1, faces=10). Stop before you bust!');
+  let deck,hand,total,over;const cards=el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:74px'});const msg=el('div',{className:'big'});const hit=el('button',{className:'btn',textContent:'Hit'}),stop=el('button',{className:'btn',textContent:'Stop'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(cards,msg,el('div',{style:'display:flex;gap:10px'},hit,stop,nb));
+  function val(){let t=0,a=0;hand.forEach(c=>{if(c.r==='A'){a++;t+=11;}else if(c.v>10)t+=10;else t+=c.v;});while(t>21&&a){t-=10;a--;}return t;}
+  function reset(){deck=shuffle(makeDeck());hand=[deck.pop()];over=false;draw();}
+  function draw(){cards.innerHTML='';hand.forEach(c=>cards.append(cardFace(c)));total=val();msg.textContent='Total: '+total+(total>21?' — BUST! 😢':total===21?' — 21! 🎉':'');setStatus('Total: '+total+' • Best: '+hs(gm.id));if(total>=21){over=true;if(total===21)setHs(gm.id,21);}}
+  hit.onclick=()=>{if(over)return;hand.push(deck.pop());draw();};
+  stop.onclick=()=>{if(over)return;over=true;if(total<=21)setHs(gm.id,total);msg.textContent='You stopped at '+total+'. Best: '+hs(gm.id);};
+  nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- COLOUR STREAK ---------------- */
+function game_colorstreak(gm){setHint('Will the next card be the SAME colour as this one? Build the longest streak you can!');
+  let deck,cur,streak,over;const cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});const msg=el('div',{className:'big'});const same=el('button',{className:'btn',textContent:'Same colour'}),diff=el('button',{className:'btn',textContent:'Different'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(cardEl,el('div',{style:'display:flex;gap:10px'},same,diff,nb),msg);
+  function reset(){deck=shuffle(makeDeck());cur=deck.pop();streak=0;over=false;draw();msg.textContent='Same or different colour next?';}
+  function draw(){cardEl.innerHTML='';cardEl.append(cardFace(cur));setStatus('Streak: '+streak+' • Best: '+hs(gm.id));}
+  function g(s){if(over||!deck.length)return;const c=deck.pop();const sameC=isRed(c.s)===isRed(cur.s);cur=c;if(sameC===s){streak++;setHs(gm.id,streak);msg.textContent='✅ Correct!';}else{over=true;msg.textContent='❌ Streak: '+streak+'. New Game?';}draw();}
+  same.onclick=()=>g(true);diff.onclick=()=>g(false);nb.onclick=reset;reset();return{stop:()=>{}};}
+
+/* ---------------- LUCKY SEVEN ---------------- */
+function game_lucky7(gm){setHint('Keep drawing to build points (card value). But draw a 7 and you lose it all! Bank your score to keep it.');
+  let deck,pot,over;const cards=el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:74px'});const msg=el('div',{className:'big'});const draw=el('button',{className:'btn',textContent:'Draw'}),bank=el('button',{className:'btn',textContent:'Bank'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(cards,msg,el('div',{style:'display:flex;gap:10px'},draw,bank,nb));
+  function reset(){deck=shuffle(makeDeck());pot=0;over=false;cards.innerHTML='';msg.textContent='Draw or Bank?';setStatus('Pot: 0 • Best: '+hs(gm.id));}
+  draw.onclick=()=>{if(over)return;if(!deck.length)deck=shuffle(makeDeck());const c=deck.pop();cards.append(cardFace(c));if(c.r==='7'){over=true;msg.textContent='💥 A 7! You lost '+pot+' points.';pot=0;setStatus('Pot: 0 • Best: '+hs(gm.id));return;}pot+=(c.v>10?10:c.v);msg.textContent='Pot: '+pot+' — keep going?';setStatus('Pot: '+pot+' • Best: '+hs(gm.id));};
+  bank.onclick=()=>{if(over)return;over=true;setHs(gm.id,pot);msg.textContent='🏦 Banked '+pot+'! Best: '+hs(gm.id);};
+  nb.onclick=reset;reset();return{stop:()=>{}};}
 
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;

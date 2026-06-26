@@ -89,6 +89,11 @@ const GAMES=[
   {id:'addto10',name:'Add to Ten',ico:'🔟'},
   {id:'beggar',name:'Beggar My Neighbour',ico:'🤝'},
   {id:'speedsort',name:'Speed Sort',ico:'⚡'},
+  {id:'mathdash',name:'Math Dash',ico:'🏃'},
+  {id:'numberseq',name:'Number Sequence',ico:'🔢'},
+  {id:'quickmaths',name:'True or False',ico:'✅'},
+  {id:'memorynum',name:'Number Memory',ico:'🧠'},
+  {id:'biggernum',name:'Biggest Number',ico:'📈'},
 ];
 const HELP={
 scrabble:`Build words on the board for points. Tap a letter in your rack, then tap an empty square to place it; lay tiles in one straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL/TL = letter, DW/TW = word). Tap Submit to score (words are checked against the dictionary), Recall to take tiles back, 🔀 to reshuffle your rack.`,
@@ -818,6 +823,40 @@ function game_scrabble(gm){
     score+=gained;turns++;placed=[];while(rack.length<7&&bag.length)rack.push(bag.pop());setHs(gm.id,score);msg.textContent='✅ '+word.toUpperCase()+' +'+gained+' points!';render();};
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
+
+/* ---------------- MATH DASH ---------------- */
+function game_mathdash(gm){setHint('Solve as many as you can in 30 seconds — tap the correct answer!');
+  let score,time,timer,over,ans;const q=el('div',{className:'big',style:'font-size:28px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px;width:100%'});const nb=el('button',{className:'btn',textContent:'New Game'});host.append(q,opts,nb);
+  function reset(){score=0;time=30;over=false;clearInterval(timer);timer=setInterval(()=>{time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);q.textContent='⏰ Time! Score '+score;opts.innerHTML='';}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);next();}
+  function next(){const op=['+','−','×'][rnd(3)];let a,b;if(op==='×'){a=rnd(11)+2;b=rnd(11)+2;ans=a*b;}else{a=rnd(40)+5;b=rnd(40)+1;if(op==='−'&&b>a){const t=a;a=b;b=t;}ans=op==='+'?a+b:a-b;}q.textContent=a+' '+op+' '+b+' = ?';const set=new Set([ans]);while(set.size<4){const v=ans+rnd(13)-6;if(v!==ans)set.add(v);}opts.innerHTML='';[...set].sort(()=>Math.random()-0.5).forEach(v=>{const b2=el('button',{className:'btn ghost',textContent:v,style:'padding:14px;font-size:18px'});b2.onclick=()=>{if(over)return;score+=v===ans?1:-1;if(score<0)score=0;setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();};opts.append(b2);});}
+  nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
+
+/* ---------------- NUMBER SEQUENCE ---------------- */
+function game_numberseq(gm){setHint('What number comes next in the pattern?');
+  const q=el('div',{className:'big',style:'font-size:24px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});host.append(q,opts,fb,nb);let score=0;
+  function round(){const s=rnd(20)+1,st=rnd(9)+1;const ans=s+4*st;q.textContent=[s,s+st,s+2*st,s+3*st].join(', ')+', ?';fb.textContent='';const set=new Set([ans]);while(set.size<4){const v=ans+rnd(2*st+4)-(st+2);if(v!==ans)set.add(v);}opts.innerHTML='';[...set].sort(()=>Math.random()-0.5).forEach(v=>{const b=el('button',{className:'btn ghost',textContent:v,style:'padding:14px;font-size:18px'});b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(v===ans){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+ans;}setHs(gm.id,score);setStatus('Score: '+score+' • Best: '+hs(gm.id));};opts.append(b);});setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+  nb.onclick=round;round();return{stop:()=>{}};}
+
+/* ---------------- TRUE OR FALSE ---------------- */
+function game_quickmaths(gm){setHint('Is the equation TRUE or FALSE? Decide fast!');
+  const q=el('div',{className:'big',style:'font-size:26px'});const fb=el('div',{className:'big'});const tb=el('button',{className:'btn',textContent:'✅ True'}),fbtn=el('button',{className:'btn',textContent:'❌ False'}),nb=el('button',{className:'btn ghost',textContent:'Next ▶'});host.append(q,el('div',{style:'display:flex;gap:10px'},tb,fbtn),fb,nb);let score=0,truth;
+  function round(){const a=rnd(20)+1,b=rnd(20)+1,op=['+','−','×'][rnd(3)];const real=op==='+'?a+b:op==='−'?a-b:a*b;truth=Math.random()<0.5;const shown=truth?real:real+((rnd(2)?1:-1)*(rnd(5)+1));q.textContent=a+' '+op+' '+b+' = '+shown;fb.textContent='';setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+  function ans(g){if(g===truth){score++;fb.textContent='✅';}else{score=Math.max(0,score-1);fb.textContent='❌ It was '+(truth?'True':'False');}setHs(gm.id,score);setStatus('Score: '+score+' • Best: '+hs(gm.id));setTimeout(round,600);}
+  tb.onclick=()=>ans(true);fbtn.onclick=()=>ans(false);nb.onclick=round;round();return{stop:()=>{}};}
+
+/* ---------------- NUMBER MEMORY ---------------- */
+function game_memorynum(gm){setHint('Memorise the number, then pick it from the choices. It grows as you go!');
+  const disp=el('div',{className:'big',style:'font-size:36px;letter-spacing:4px;min-height:50px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});host.append(disp,opts,fb,nb);let score=0,level=3;
+  function round(){const len=Math.min(9,level);let n='';for(let i=0;i<len;i++)n+=rnd(10);disp.textContent=n;opts.innerHTML='';fb.textContent='Remember it…';
+    setTimeout(()=>{disp.textContent='🤔';const set=new Set([n]);while(set.size<4){let w='';for(let i=0;i<len;i++)w+=rnd(10);set.add(w);}fb.textContent='Which number was it?';[...set].sort(()=>Math.random()-0.5).forEach(v=>{const b=el('button',{className:'btn ghost',textContent:v,style:'padding:14px;font-size:18px'});b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(v===n){score++;level++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{level=Math.max(3,level-1);b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='It was '+n;}setHs(gm.id,score);setStatus('Score: '+score+' • Best: '+hs(gm.id));};opts.append(b);});},1400);
+    setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+  nb.onclick=round;round();return{stop:()=>{}};}
+
+/* ---------------- BIGGEST NUMBER ---------------- */
+function game_biggernum(gm){setHint('Tap the BIGGEST number as fast as you can!');
+  const q=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:320px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});host.append(q,fb,nb);let score=0;
+  function round(){const set=new Set();while(set.size<4)set.add(rnd(9999)+1);const arr=[...set];const ans=Math.max(...arr);fb.textContent='';q.innerHTML='';arr.sort(()=>Math.random()-0.5).forEach(v=>{const b=el('button',{className:'btn ghost',textContent:v,style:'padding:16px;font-size:20px'});b.onclick=()=>{[...q.children].forEach(x=>x.disabled=true);if(v===ans){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Biggest was '+ans;}setHs(gm.id,score);setStatus('Score: '+score+' • Best: '+hs(gm.id));};q.append(b);});setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+  nb.onclick=round;round();return{stop:()=>{}};}
 
 /* ---------------- ADD TO TEN ---------------- */
 function game_addto10(gm){setHint('Tap two cards that add up to 10 (Aces=1). Tens & face cards count as 10 — tap one alone to remove it. Clear them all!');
