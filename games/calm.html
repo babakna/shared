@@ -75,6 +75,31 @@ const GAMES=[
   {id:'feelings',name:'Feelings Faces',ico:'😊'},
   {id:'counting',name:'Counting Fun',ico:'🔢'},
   {id:'calmmemory',name:'Gentle Memory',ico:'🧠'},
+  {id:'ccount',name:'Count Along',ico:'🔢'},
+  {id:'cadd',name:'Gentle Adding',ico:'➕'},
+  {id:'csub',name:'Gentle Take-Away',ico:'➖'},
+  {id:'cbigger',name:'Which is Bigger',ico:'📈'},
+  {id:'csmaller',name:'Which is Smaller',ico:'📉'},
+  {id:'cmore',name:'More or Less',ico:'⚖️'},
+  {id:'cbefore',name:'Comes Before',ico:'⬅️'},
+  {id:'cafter',name:'Comes After',ico:'➡️'},
+  {id:'cdouble',name:'Double It',ico:'✌️'},
+  {id:'chalf',name:'Half It',ico:'🍰'},
+  {id:'csequence',name:'Number Sequence',ico:'🪜'},
+  {id:'cpattern',name:'What Comes Next',ico:'🔁'},
+  {id:'crhyme',name:'Rhyme Time',ico:'🎵'},
+  {id:'copp',name:'Opposites',ico:'↔️'},
+  {id:'cfirst',name:'First Letter',ico:'🔡'},
+  {id:'clast',name:'Last Letter',ico:'🔚'},
+  {id:'ccountl',name:'Count Letters',ico:'#️⃣'},
+  {id:'cvowel',name:'Count Vowels',ico:'🅰️'},
+  {id:'cspell',name:'Spelling',ico:'🔤'},
+  {id:'cmiss',name:'Missing Number',ico:'❓'},
+  {id:'ctenmore',name:'Ten More',ico:'🔟'},
+  {id:'ctenless',name:'Ten Less',ico:'🔽'},
+  {id:'ccompare',name:'Compare Sums',ico:'🟰'},
+  {id:'cfraction',name:'Simple Fractions',ico:'🥧'},
+  {id:'ceven',name:'Odd or Even',ico:'🎚️'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
@@ -283,6 +308,57 @@ function game_calmmemory(gm){
   reset.onclick=start;start();
   return {stop:()=>{}};
 }
+
+/* ===== Calm quiz framework (Easy/Med/Hard + help, 500+ variations, no pressure) ===== */
+var DIFFC=localStorage.getItem('l2diff')||'med';
+function DfC(e,m,h){return DIFFC==='easy'?e:DIFFC==='hard'?h:m;}
+function rC(n){return Math.floor(Math.random()*n);}
+function pkC(a){return a[rC(a.length)];}
+function shC(a){for(var i=a.length-1;i>0;i--){var j=rC(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function wfC(pool,ans,n){return shC(pool.filter(function(x){return x!==ans;})).slice(0,n||4);}
+function nC2(ans,sp){var s=new Set([ans]),g=0;while(s.size<5&&g<60){g++;var v=ans+rC(2*sp+1)-sp;if(v!==ans&&v>=0)s.add(v);}return [...s].filter(function(x){return x!==ans;});}
+function hsC(id){return +(localStorage.getItem('calm_'+id)||0)}
+function setHsC(id,v){if(v>hsC(id))localStorage.setItem('calm_'+id,v);}
+function mcqC(gm,hint,gen){setHint(hint);var score=0;
+  var dr=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap'});
+  function rd(){[...dr.children].forEach(function(c,i){c.className='btn'+(['easy','med','hard'][i]===DIFFC?'':' ghost');});}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(function(d){var b=el('button',{className:'btn',textContent:d[1],style:'padding:7px 13px'});b.onclick=function(){DIFFC=d[0];localStorage.setItem('l2diff',d[0]);rd();score=0;round();};dr.append(b);});rd();
+  var q=el('div',{className:'big',style:'font-size:23px;min-height:44px;max-width:560px'});var opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;width:100%'});var fb=el('div',{className:'big'});var nb=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(dr,q,opts,fb,nb);
+  function round(){var dt=gen();q.textContent=dt.q;fb.textContent='';var optN={easy:2,med:3,hard:4}[DIFFC];var arr=shC([dt.a].concat((dt.wr||[]).slice(0,optN))).map(String);var long=arr.some(function(o){return o.length>14;});opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    arr.forEach(function(o){var b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:17px'});b.onclick=function(){[...opts.children].forEach(function(x){x.disabled=true;});if(o===String(dt.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Lovely!';}else{b.style.background='#f0b37e';b.style.color='#fff';fb.textContent='It was '+dt.a+' — try the next one 💛';}setHsC(gm.id,score);statusEl.textContent='Score: '+score+' • '+DIFFC+' • Best: '+hsC(gm.id);};opts.append(b);});
+    statusEl.textContent='Score: '+score+' • '+DIFFC+' • Best: '+hsC(gm.id);}
+  nb.onclick=round;round();return{stop:function(){}};}
+var EMC=['🍎','🐶','⭐','🌸','🐟','🚗','🎈','🍌','🐱','🦋','🌳','🍓','🌼','🐢','🍀'];
+var WLC="apple table garden planet rocket dragon castle tiger jungle orange friend school winter summer animal bridge candle monkey yellow purple basket cookie tunnel bottle button carpet dolphin penguin rainbow morning picture teacher kitchen blanket feather hammer island ladder needle pillow ribbon village rabbit pencil window forest flower river ocean mountain valley desert lemon melon onion eagle otter zebra panda koala snake whale shark".split(/\s+/);
+var OPPC=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","shut"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["clean","dirty"],["near","far"],["sweet","sour"],["young","old"],["good","bad"],["tall","short"]];
+var RHYC=[["cat","hat","bat","rat"],["dog","log","fog","frog"],["car","star","jar","far"],["bee","tree","sea","key"],["cake","lake","snake","rake"],["run","sun","fun","bun"],["king","ring","sing","wing"],["ball","tall","wall","fall"],["moon","spoon","soon","noon"],["pig","wig","dig","big"],["bug","rug","hug","mug"],["red","bed","fed","led"]];
+function msC(w){var c=w.split('');var t=rC(3);if(t===0&&c.length>3){var i=rC(c.length-1);var x=c[i];c[i]=c[i+1];c[i+1]=x;}else if(t===1){var i2=rC(c.length);c.splice(i2,0,c[i2]||'e');}else{var i3=rC(c.length);c.splice(i3,1);}var r=c.join('');return r===w?w+'e':r;}
+function game_ccount(gm){return mcqC(gm,'Take your time and count how many you see.',function(){var n=rC(DfC(8,16,22))+2;var e=pkC(EMC);return{q:e.repeat(n),a:n,wr:nC2(n,DfC(2,4,6))};});}
+function game_cadd(gm){return mcqC(gm,'Add the two numbers together.',function(){var a=rC(DfC(10,20,50))+1,b=rC(DfC(10,20,50))+1;return{q:a+' + '+b+' = ?',a:a+b,wr:nC2(a+b,DfC(4,8,14))};});}
+function game_csub(gm){return mcqC(gm,'Gently take the small number away.',function(){var a=rC(DfC(12,30,90))+2,b=rC(a-1)+1;return{q:a+' − '+b+' = ?',a:a-b,wr:nC2(a-b,DfC(4,8,14))};});}
+function game_cbigger(gm){return mcqC(gm,'Tap the bigger number.',function(){var s=new Set();while(s.size<DfC(2,3,4))s.add(rC(DfC(20,99,999))+1);var a=[...s];var ans=Math.max.apply(null,a);return{q:'Which is bigger?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
+function game_csmaller(gm){return mcqC(gm,'Tap the smaller number.',function(){var s=new Set();while(s.size<DfC(2,3,4))s.add(rC(DfC(20,99,999))+1);var a=[...s];var ans=Math.min.apply(null,a);return{q:'Which is smaller?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
+function game_cmore(gm){return mcqC(gm,'Which group has more?',function(){var e=pkC(EMC);var x=rC(DfC(6,12,18))+2,y=rC(DfC(6,12,18))+2;while(y===x)y=rC(DfC(6,12,18))+2;return{q:'Which has more?  A: '+e.repeat(x)+'   B: '+e.repeat(y),a:x>y?'A':'B',wr:[x>y?'B':'A']};});}
+function game_cbefore(gm){return mcqC(gm,'Which number comes just before?',function(){var n=rC(DfC(20,99,999))+2;return{q:'What comes just before '+n+'?',a:n-1,wr:nC2(n-1,DfC(2,4,7))};});}
+function game_cafter(gm){return mcqC(gm,'Which number comes just after?',function(){var n=rC(DfC(20,99,998))+1;return{q:'What comes just after '+n+'?',a:n+1,wr:nC2(n+1,DfC(2,4,7))};});}
+function game_cdouble(gm){return mcqC(gm,'Double the number.',function(){var n=rC(DfC(10,25,99))+1;return{q:'Double '+n+' = ?',a:n*2,wr:nC2(n*2,DfC(4,8,14))};});}
+function game_chalf(gm){return mcqC(gm,'Find half of the number.',function(){var n=(rC(DfC(10,25,99))+1)*2;return{q:'Half of '+n+' = ?',a:n/2,wr:nC2(n/2,DfC(3,6,12))};});}
+function game_csequence(gm){return mcqC(gm,'What number comes next?',function(){var s=rC(20)+1,st=rC(DfC(5,9,12))+1;var ans=s+4*st;return{q:[s,s+st,s+2*st,s+3*st].join(', ')+', ?',a:ans,wr:nC2(ans,st+3)};});}
+function game_cpattern(gm){return mcqC(gm,'What comes next in the pattern?',function(){var a=pkC(EMC),b=pkC(EMC);while(b===a)b=pkC(EMC);return{q:[a,b,a,b,a].join(' ')+' ?',a:b,wr:wfC(EMC,b,3)};});}
+function game_crhyme(gm){return mcqC(gm,'Tap the word that rhymes.',function(){var g=pkC(RHYC);var w=g[0],a=pkC(g.slice(1));return{q:'Which rhymes with "'+w+'"?',a:a,wr:shC(RHYC.filter(function(x){return x!==g;})).slice(0,4).map(function(x){return x[0];})};});}
+function game_copp(gm){return mcqC(gm,'Tap the opposite word.',function(){var p=pkC(OPPC);var f=Math.random()<0.5;var w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:wfC([].concat.apply([],OPPC),a)};});}
+function game_cfirst(gm){return mcqC(gm,'Which letter does the word start with?',function(){var w=pkC(WLC);var a=w[0].toUpperCase();return{q:'First letter of "'+w+'"?',a:a,wr:wfC("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_clast(gm){return mcqC(gm,'Which letter does the word end with?',function(){var w=pkC(WLC);var a=w[w.length-1].toUpperCase();return{q:'Last letter of "'+w+'"?',a:a,wr:wfC("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_ccountl(gm){return mcqC(gm,'Count the letters in the word.',function(){var w=pkC(WLC);return{q:'How many letters in "'+w+'"?',a:w.length,wr:nC2(w.length,3).filter(function(x){return x>0;})};});}
+function game_cvowel(gm){return mcqC(gm,'Count the vowels (a, e, i, o, u).',function(){var w=pkC(WLC);var c=(w.match(/[aeiou]/g)||[]).length;return{q:'How many vowels in "'+w+'"?',a:c,wr:nC2(c,3).filter(function(x){return x>=0;})};});}
+function game_cspell(gm){return mcqC(gm,'Tap the word spelled correctly.',function(){var w=pkC(WLC);var wr=[];while(wr.length<4){var m=msC(w);if(m!==w&&wr.indexOf(m)<0)wr.push(m);}return{q:'Which is spelled right?',a:w,wr:wr};});}
+function game_cmiss(gm){return mcqC(gm,'Find the missing number.',function(){var s=rC(DfC(10,40,200))+1,st=DfC(1,2,5);var seq=[s,s+st,s+2*st,s+3*st];var hide=rC(4);var miss=seq[hide];seq[hide]='?';return{q:seq.join(', '),a:miss,wr:nC2(miss,st+2)};});}
+function game_ctenmore(gm){return mcqC(gm,'Add ten to the number.',function(){var n=rC(DfC(50,500,5000))+1;return{q:'10 more than '+n+'?',a:n+10,wr:nC2(n+10,DfC(5,9,15))};});}
+function game_ctenless(gm){return mcqC(gm,'Take ten away.',function(){var n=rC(DfC(50,500,5000))+11;return{q:'10 less than '+n+'?',a:n-10,wr:nC2(n-10,DfC(5,9,15))};});}
+function game_ccompare(gm){return mcqC(gm,'Which sum is bigger?',function(){var a=rC(50)+1,b=rC(50)+1,c=rC(50)+1,d=rC(50)+1;var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);var ans=(a+b)>=(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[(a+b)>=(c+d)?s2:s1]};});}
+function game_cfraction(gm){return mcqC(gm,'Find the fraction of the number.',function(){var den=[2,3,4,5][rC(DfC(2,3,4))];var mult=rC(8)+2;var whole=den*mult;return{q:'What is 1/'+den+' of '+whole+'?',a:mult,wr:nC2(mult,DfC(4,7,10))};});}
+function game_ceven(gm){return mcqC(gm,'Is the number odd or even?',function(){var n=rC(DfC(200,2000,20000))+1;return{q:'Is '+n+' odd or even?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};});}
 
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
