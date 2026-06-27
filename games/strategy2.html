@@ -78,6 +78,28 @@ const GAMES=[
   {id:'atarigo',name:'Capture Go',ico:'⚪'},
   {id:'foxhounds',name:'Fox & Hounds',ico:'🦊'},
   {id:'go',name:'Go (9×9)',ico:'⛩️'},
+  {id:'2lseq',name:'Number Sequence',ico:'🔢'},
+  {id:'2lpattern',name:'Pattern Next',ico:'🔁'},
+  {id:'2lmiss',name:'Missing Number',ico:'❓'},
+  {id:'2lodd',name:'Odd One Out',ico:'🚫'},
+  {id:'2lbiggest',name:'Biggest Number',ico:'📈'},
+  {id:'2lcompare',name:'Compare Sums',ico:'⚖️'},
+  {id:'2lmultiple',name:'Next Multiple',ico:'🔗'},
+  {id:'2lround',name:'Rounding',ico:'🔟'},
+  {id:'2lplace',name:'Place Value',ico:'🏷️'},
+  {id:'2ldouble',name:'Double or Half',ico:'✌️'},
+  {id:'2lroman',name:'Roman Numerals',ico:'🏛️'},
+  {id:'2leven',name:'Odd or Even',ico:'🎚️'},
+  {id:'2ldiv',name:'Divisible By?',ico:'➗'},
+  {id:'2lop',name:'Missing Sign',ico:'➕'},
+  {id:'2lavg',name:'Find the Average',ico:'📊'},
+  {id:'2lrange',name:'Find the Range',ico:'📏'},
+  {id:'2ldigit',name:'Digit Sum',ico:'#️⃣'},
+  {id:'2lcomp100',name:'Make 100',ico:'💯'},
+  {id:'2lfactor',name:'Is it a Factor?',ico:'🧮'},
+  {id:'2lnth',name:'Nth Term',ico:'📐'},
+  {id:'2lpair',name:'Which Pair Sums',ico:'🔢'},
+  {id:'2lhalf',name:'Half Of',ico:'🍰'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null,currentGm=null;
@@ -611,6 +633,63 @@ function game_go(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+var q2DIFF=localStorage.getItem('l2diff')||'med';
+function q2df(e,m,h){return q2DIFF==='easy'?e:q2DIFF==='hard'?h:m;}
+function q2r(n){return Math.floor(Math.random()*n);}
+function q2pk(a){return a[q2r(a.length)];}
+function q2sh(a){for(var i=a.length-1;i>0;i--){var j=q2r(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function q2wf(pool,ans,n){return q2sh(pool.filter(function(x){return x!==ans;})).slice(0,n||4);}
+function q2n(ans,sp){var s=new Set([ans]),g=0;while(s.size<5&&g<60){g++;var v=ans+q2r(2*sp+1)-sp;if(v!==ans&&v>=0)s.add(v);}return [...s].filter(function(x){return x!==ans;});}
+function q2setHs(id,v){if(v>wins(id))localStorage.setItem('s2_'+id,v);}
+var q2rn=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+function q2roman(n){var r='';for(var i=0;i<q2rn.length;i++){while(n>=q2rn[i][0]){r+=q2rn[i][1];n-=q2rn[i][0];}}return r;}
+function q2mcq(gm,hint,gen){setHint(hint);var score=0;
+  var dr=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap'});
+  function rd(){[...dr.children].forEach(function(c,i){c.className='btn'+(['easy','med','hard'][i]===q2DIFF?'':' ghost');});}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(function(d){var b=el('button',{className:'btn',textContent:d[1],style:'padding:7px 13px'});b.onclick=function(){q2DIFF=d[0];localStorage.setItem('l2diff',d[0]);rd();score=0;round();};dr.append(b);});rd();
+  var q=el('div',{className:'big',style:'font-size:23px;min-height:44px;max-width:560px'});var opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;width:100%'});var fb=el('div',{className:'big'});var nb=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(dr,q,opts,fb,nb);
+  function round(){var dt=gen();q.textContent=dt.q;fb.textContent='';var optN={easy:2,med:3,hard:4}[q2DIFF];var arr=q2sh([dt.a].concat((dt.wr||[]).slice(0,optN))).map(String);var long=arr.some(function(o){return o.length>14;});opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    arr.forEach(function(o){var b=el('button',{className:'btn ghost',textContent:o,style:'padding:13px;font-size:16px'});b.onclick=function(){[...opts.children].forEach(function(x){x.disabled=true;});if(o===String(dt.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+dt.a;}q2setHs(gm.id,score);statusEl.textContent='Score: '+score+' • '+q2DIFF+' • Best: '+wins(gm.id);};opts.append(b);});
+    statusEl.textContent='Score: '+score+' • '+q2DIFF+' • Best: '+wins(gm.id);}
+  nb.onclick=round;round();return{stop:function(){}};}
+var q2wl="apple table garden planet rocket dragon castle tiger jungle orange friend school winter summer animal bridge candle monkey yellow purple basket cookie tunnel bottle button carpet dolphin penguin rainbow morning picture teacher kitchen blanket feather hammer island ladder needle pillow ribbon village rabbit pencil window forest flower river ocean valley desert lemon melon onion eagle otter zebra panda koala snake whale shark".split(/\s+/);
+var q2cap=[["France","Paris"],["Japan","Tokyo"],["Italy","Rome"],["Spain","Madrid"],["Egypt","Cairo"],["Canada","Ottawa"],["Brazil","Brasília"],["China","Beijing"],["India","New Delhi"],["Russia","Moscow"],["Germany","Berlin"],["Greece","Athens"],["Kenya","Nairobi"],["Peru","Lima"],["Cuba","Havana"],["Chile","Santiago"],["Norway","Oslo"],["Sweden","Stockholm"],["Poland","Warsaw"],["Portugal","Lisbon"],["Austria","Vienna"],["Ireland","Dublin"],["Turkey","Ankara"],["Thailand","Bangkok"],["Vietnam","Hanoi"],["Argentina","Buenos Aires"],["Colombia","Bogotá"],["Nigeria","Abuja"],["Ghana","Accra"],["Morocco","Rabat"],["Iran","Tehran"],["Iceland","Reykjavik"],["Finland","Helsinki"],["Denmark","Copenhagen"],["Hungary","Budapest"],["Switzerland","Bern"],["Belgium","Brussels"],["Netherlands","Amsterdam"],["Australia","Canberra"],["South Korea","Seoul"],["Indonesia","Jakarta"],["Israel","Jerusalem"],["Ukraine","Kyiv"],["Romania","Bucharest"]];
+var q2contS=[["France","Europe"],["Japan","Asia"],["Egypt","Africa"],["Brazil","South America"],["Canada","North America"],["Australia","Oceania"],["China","Asia"],["Kenya","Africa"],["Peru","South America"],["Germany","Europe"],["India","Asia"],["Nigeria","Africa"],["Chile","South America"],["Mexico","North America"],["Italy","Europe"],["Thailand","Asia"],["Morocco","Africa"],["Argentina","South America"],["Spain","Europe"],["Vietnam","Asia"],["Ghana","Africa"],["Colombia","South America"],["Norway","Europe"],["Indonesia","Asia"],["Greece","Europe"]];
+var q2contL=["Europe","Asia","Africa","North America","South America","Oceania"];
+var q2syn=[["big","large"],["small","tiny"],["happy","glad"],["fast","quick"],["smart","clever"],["scared","afraid"],["angry","mad"],["begin","start"],["end","finish"],["shout","yell"],["rich","wealthy"],["cold","chilly"],["sick","ill"],["easy","simple"],["quiet","silent"],["gift","present"],["jump","leap"],["fix","repair"],["hide","conceal"],["throw","toss"],["empty","vacant"],["help","aid"],["brave","bold"],["calm","peaceful"],["huge","enormous"],["tired","sleepy"],["funny","silly"],["clean","spotless"]];
+var q2ant=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","close"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["win","lose"],["true","false"],["rich","poor"],["near","far"],["clean","dirty"],["thick","thin"],["early","late"],["above","below"],["buy","sell"],["sweet","sour"],["enter","exit"],["float","sink"],["begin","end"]];
+function game_2lseq(gm){return q2mcq(gm,'What number comes next in the sequence?',function(){var s=q2r(20)+1,st=q2r(q2df(5,9,13))+1;var ans=s+4*st;return{q:[s,s+st,s+2*st,s+3*st].join(', ')+', ?',a:ans,wr:q2n(ans,st+3)};});}
+function game_2lpattern(gm){return q2mcq(gm,'What comes next in the pattern?',function(){var E=['🔴','🔵','🟢','🟡','🟣','⭐'];var a=q2pk(E),b=q2pk(E);while(b===a)b=q2pk(E);return{q:[a,b,a,b,a].join(' ')+' ?',a:b,wr:q2wf(E,b,3)};});}
+function game_2lmiss(gm){return q2mcq(gm,'Find the missing number.',function(){var s=q2r(q2df(10,40,200))+1,st=q2df(2,3,7);var seq=[s,s+st,s+2*st,s+3*st];var hide=q2r(4);var miss=seq[hide];seq[hide]='?';return{q:seq.join(', '),a:miss,wr:q2n(miss,st+2)};});}
+function game_2lodd(gm){return q2mcq(gm,'Three share a multiple — tap the odd one out.',function(){var k=q2r(q2df(4,7,11))+2;var arr=[];for(var i=0;i<3;i++)arr.push(k*(q2r(9)+1));var odd=k*(q2r(9)+1)+(q2r(2)?1:-1);while(odd%k===0||arr.indexOf(odd)>=0)odd++;arr.push(odd);return{q:'Which is NOT a multiple of '+k+'?',a:odd,wr:arr.filter(function(x){return x!==odd;})};});}
+function game_2lbiggest(gm){return q2mcq(gm,'Tap the biggest number.',function(){var s=new Set();while(s.size<q2df(2,3,4))s.add(q2r(q2df(99,999,99999))+1);var a=[...s];var ans=Math.max.apply(null,a);return{q:'Which is biggest?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
+function game_2lcompare(gm){return q2mcq(gm,'Which sum is bigger?',function(){var a=q2r(60)+1,b=q2r(60)+1,c=q2r(60)+1,d=q2r(60)+1;var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);var ans=(a+b)>=(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[(a+b)>=(c+d)?s2:s1]};});}
+function game_2lmultiple(gm){return q2mcq(gm,'Find the next multiple.',function(){var k=q2r(q2df(5,9,12))+2;var n=q2r(60)+5;var ans=(Math.floor(n/k)+1)*k;return{q:'Next multiple of '+k+' after '+n+'?',a:ans,wr:q2n(ans,k+2)};});}
+function game_2lround(gm){return q2mcq(gm,'Round to the nearest 10.',function(){var n=q2r(q2df(180,890,9000))+11;var a=Math.round(n/10)*10;return{q:'Round '+n+' to nearest 10',a:a,wr:[a+10,a-10,a+20,a-20].filter(function(x){return x>=0&&x!==a;})};});}
+function game_2lplace(gm){return q2mcq(gm,'Which digit is in the named place?',function(){var n=q2r(q2df(900,9000,90000))+100;var s=String(n);var names=['ones','tens','hundreds','thousands','ten-thousands'];var i=q2r(s.length);var dig=+s[s.length-1-i];return{q:'In '+n+', which digit is in the '+names[i]+' place?',a:dig,wr:q2n(dig,4).filter(function(x){return x>=0&&x<=9;})};});}
+function game_2ldouble(gm){return q2mcq(gm,'Double it or halve it.',function(){if(q2r(2)){var n=q2r(q2df(50,490,990))+10;return{q:'Double '+n+' = ?',a:n*2,wr:q2n(n*2,q2df(8,12,20))};}var n2=(q2r(q2df(25,245,495))+5)*2;return{q:'Half of '+n2+' = ?',a:n2/2,wr:q2n(n2/2,q2df(6,10,16))};});}
+function game_2lroman(gm){return q2mcq(gm,'What is the Roman numeral?',function(){var n=q2r(q2df(20,200,2000))+1;var a=q2roman(n);var wr=[];while(wr.length<4){var m=q2roman(n+(q2r(11)-5||1));if(m!==a&&wr.indexOf(m)<0)wr.push(m);}return{q:'Roman numeral for '+n+'?',a:a,wr:wr};});}
+function game_2leven(gm){return q2mcq(gm,'Is the number odd or even?',function(){var n=q2r(q2df(200,2000,20000))+1;return{q:'Is '+n+' odd or even?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};});}
+function game_2ldiv(gm){return q2mcq(gm,'Can it be divided evenly?',function(){var k=[2,3,4,5,10][q2r(q2df(2,4,5))];var n=q2r(q2df(99,499,4999))+1;return{q:'Is '+n+' divisible by '+k+'?',a:n%k===0?'Yes':'No',wr:[n%k===0?'No':'Yes']};});}
+function game_2lop(gm){return q2mcq(gm,'Which sign makes it true?',function(){var a=q2r(q2df(8,15,30))+2,b=q2r(q2df(6,12,20))+1;var ops=[['+',a+b],['−',a-b],['×',a*b]];var pick=ops[q2r(3)];return{q:a+' ?  '+b+' = '+pick[1],a:pick[0],wr:['+','−','×','÷'].filter(function(x){return x!==pick[0];})};});}
+function game_2lavg(gm){return q2mcq(gm,'Find the average (mean).',function(){var k=q2df(2,2,3);var arr=[];for(var i=0;i<k;i++)arr.push(q2r(q2df(20,50,99))+1);var sum=arr.reduce(function(x,y){return x+y;},0);while(sum%k!==0){arr[0]++;sum++;}var ans=sum/k;return{q:'Average of '+arr.join(', ')+'?',a:ans,wr:q2n(ans,q2df(5,9,15))};});}
+function game_2lrange(gm){return q2mcq(gm,'Range = biggest − smallest.',function(){var s=new Set();while(s.size<q2df(3,4,5))s.add(q2r(q2df(50,200,999))+1);var a=[...s];var ans=Math.max.apply(null,a)-Math.min.apply(null,a);return{q:'Range of '+a.join(', ')+'?',a:ans,wr:q2n(ans,q2df(6,12,20))};});}
+function game_2ldigit(gm){return q2mcq(gm,'Add up all the digits.',function(){var n=q2r(q2df(90,900,9000))+10;var ds=String(n).split('').reduce(function(x,y){return x+ +y;},0);return{q:'Sum of digits of '+n+'?',a:ds,wr:q2n(ds,q2df(3,5,8))};});}
+function game_2lcomp100(gm){return q2mcq(gm,'What is added to make 100?',function(){var n=q2r(98)+1;return{q:n+' + ? = 100',a:100-n,wr:q2n(100-n,q2df(5,10,18))};});}
+function game_2lfactor(gm){return q2mcq(gm,'A factor divides a number evenly.',function(){var n=q2r(q2df(40,99,500))+10;var k=q2r(11)+2;return{q:'Is '+k+' a factor of '+n+'?',a:n%k===0?'Yes':'No',wr:[n%k===0?'No':'Yes']};});}
+function game_2lnth(gm){return q2mcq(gm,'Find the Nth number in the pattern.',function(){var st=q2r(q2df(4,8,12))+2;var start=q2r(9)+1;var nth=q2r(q2df(4,6,9))+3;var ans=start+(nth-1)*st;return{q:'Counting '+start+', '+(start+st)+', '+(start+2*st)+'…  number '+nth+'?',a:ans,wr:q2n(ans,st+3)};});}
+function game_2lpair(gm){return q2mcq(gm,'Which pair adds up to the target?',function(){var t=q2r(q2df(15,30,60))+6;var a=q2r(t-2)+1,b=t-a;var ans=a+' + '+b;var wr=[];while(wr.length<4){var x=q2r(t+10)+1,y=q2r(t+10)+1;if(x+y!==t&&wr.indexOf(x+' + '+y)<0)wr.push(x+' + '+y);}return{q:'Which pair adds to '+t+'?',a:ans,wr:wr};});}
+function game_2lhalf(gm){return q2mcq(gm,'Find half of the number.',function(){var n=(q2r(q2df(20,100,500))+2)*2;return{q:'What is half of '+n+'?',a:n/2,wr:q2n(n/2,q2df(5,10,18))};});}
+function game_2lmirror(gm){return q2mcq(gm,'Read the word backwards — pick it.',function(){var w=q2pk(q2wl);var rev=w.split('').reverse().join('');var wr=[];while(wr.length<4){var o=q2pk(q2wl);var ro=o.split('').reverse().join('');if(ro!==rev&&wr.indexOf(ro)<0)wr.push(ro);}return{q:'"'+w+'" spelled backwards?',a:rev,wr:wr};});}
+function game_2lcountup(gm){return q2mcq(gm,'Keep counting up — what comes next?',function(){var s=q2r(q2df(20,200,2000))+1;return{q:s+', '+(s+1)+', '+(s+2)+', ?',a:s+3,wr:q2n(s+3,q2df(2,4,7))};});}
+function game_2lcap(gm){return q2mcq(gm,'Tap the capital city.',function(){var p=q2pk(q2cap);return{q:'Capital of '+p[0]+'?',a:p[1],wr:q2wf(q2cap.map(function(x){return x[1];}),p[1])};});}
+function game_2lcont(gm){return q2mcq(gm,'Which continent is it in?',function(){var p=q2pk(q2contS);return{q:'Which continent is '+p[0]+' in?',a:p[1],wr:q2wf(q2contL,p[1])};});}
+function game_2lsyn(gm){return q2mcq(gm,'Tap the word with the SAME meaning.',function(){var p=q2pk(q2syn);return{q:'Same meaning as "'+p[0]+'"?',a:p[1],wr:q2wf(q2syn.map(function(x){return x[1];}),p[1])};});}
+function game_2lant(gm){return q2mcq(gm,'Tap the OPPOSITE word.',function(){var p=q2pk(q2ant);var f=Math.random()<0.5;var w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:q2wf([].concat.apply([],q2ant),a)};});}
+
+
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
