@@ -78,6 +78,29 @@ const GAMES=[
   {id:'emoji',name:'Emoji Quiz',ico:'😀'},
   {id:'madlibs',name:'Silly Stories',ico:'📖'},
   {id:'eightball',name:'Magic 8-Ball',ico:'🔮'},
+  {id:'kcount',name:'Count the Things',ico:'🔢'},
+  {id:'kadd',name:'Adding Fun',ico:'➕'},
+  {id:'ksub',name:'Taking Away',ico:'➖'},
+  {id:'kbigger',name:'Which is Bigger',ico:'📈'},
+  {id:'ksmaller',name:'Which is Smaller',ico:'📉'},
+  {id:'kmore',name:'More or Less',ico:'⚖️'},
+  {id:'kbefore',name:'Number Before',ico:'⬅️'},
+  {id:'kafter',name:'Number After',ico:'➡️'},
+  {id:'kfirst',name:'First Letter',ico:'🔡'},
+  {id:'klast',name:'Last Letter',ico:'🔚'},
+  {id:'kcountl',name:'Count Letters',ico:'#️⃣'},
+  {id:'krhyme',name:'Rhyme Time',ico:'🎵'},
+  {id:'kopp',name:'Opposites',ico:'↔️'},
+  {id:'kspell',name:'Spelling',ico:'🔤'},
+  {id:'kmiss',name:'Missing Number',ico:'❓'},
+  {id:'keven',name:'Odd or Even',ico:'🎚️'},
+  {id:'kdouble',name:'Double It',ico:'✌️'},
+  {id:'khalf',name:'Half It',ico:'🍰'},
+  {id:'kvowel',name:'Count Vowels',ico:'🅰️'},
+  {id:'kcountup',name:'Count Up',ico:'🆙'},
+  {id:'kpattern',name:'What Comes Next',ico:'🔁'},
+  {id:'ktenmore',name:'Ten More',ico:'🔟'},
+  {id:'ktenless',name:'Ten Less',ico:'🔽'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
@@ -436,6 +459,54 @@ function game_eightball(gm){
   return {stop:()=>{}};
 }
 
+/* ===== Kids quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+var DIFFK=localStorage.getItem('l2diff')||'med';
+function DfK(e,m,h){return DIFFK==='easy'?e:DIFFK==='hard'?h:m;}
+function rK(n){return Math.floor(Math.random()*n);}
+function pkK(a){return a[rK(a.length)];}
+function shK(a){for(var i=a.length-1;i>0;i--){var j=rK(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function wfK(pool,ans,n){return shK(pool.filter(function(x){return x!==ans;})).slice(0,n||4);}
+function nK(ans,sp){var s=new Set([ans]),g=0;while(s.size<5&&g<60){g++;var v=ans+rK(2*sp+1)-sp;if(v!==ans&&v>=0)s.add(v);}return [...s].filter(function(x){return x!==ans;});}
+function setHsK(id,v){if(v>hs(id))localStorage.setItem('kid_'+id,v);}
+function mcqK(gm,hint,gen){setHint(hint);var score=0;
+  var dr=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap'});
+  function rd(){[...dr.children].forEach(function(c,i){c.className='btn'+(['easy','med','hard'][i]===DIFFK?'':' ghost');});}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(function(d){var b=el('button',{className:'btn',textContent:d[1],style:'padding:7px 13px'});b.onclick=function(){DIFFK=d[0];localStorage.setItem('l2diff',d[0]);rd();score=0;round();};dr.append(b);});rd();
+  var q=el('div',{className:'big',style:'font-size:24px;min-height:46px;max-width:560px'});var opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;width:100%'});var fb=el('div',{className:'big'});var nb=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(dr,q,opts,fb,nb);
+  function round(){var dt=gen();q.textContent=dt.q;fb.textContent='';var optN={easy:2,med:3,hard:4}[DIFFK];var arr=shK([dt.a].concat((dt.wr||[]).slice(0,optN))).map(String);var long=arr.some(function(o){return o.length>14;});opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    arr.forEach(function(o){var b=el('button',{className:'btn ghost',textContent:o,style:'padding:15px;font-size:18px'});b.onclick=function(){[...opts.children].forEach(function(x){x.disabled=true;});if(o===String(dt.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Yes!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='It was '+dt.a;}setHsK(gm.id,score);statusEl.textContent='Score: '+score+' • '+DIFFK+' • Best: '+hs(gm.id);};opts.append(b);});
+    statusEl.textContent='Score: '+score+' • '+DIFFK+' • Best: '+hs(gm.id);}
+  nb.onclick=round;round();return{stop:function(){}};}
+var EMK=['🍎','🐶','⭐','🌸','🐟','🚗','🎈','🍌','🐱','🦋','🌳','🍓','🐢','🍕','🎩'];
+var WLK="apple table garden planet rocket dragon castle tiger jungle wizard orange friend school winter summer animal bridge candle monkey pirate yellow purple basket cookie tunnel ticket bottle button carpet dolphin penguin rainbow morning picture teacher brother kitchen blanket feather hammer island ladder needle pillow ribbon village rabbit pencil window forest flower river ocean mountain valley desert lemon melon onion eagle otter zebra panda koala snake whale shark".split(/\s+/);
+var OPPK=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","shut"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["clean","dirty"],["near","far"],["sweet","sour"],["young","old"],["good","bad"],["soft","hard"],["tall","short"]];
+var RHYK=[["cat","hat","bat","rat"],["dog","log","fog","frog"],["car","star","jar","far"],["bee","tree","sea","key"],["cake","lake","snake","rake"],["run","sun","fun","bun"],["king","ring","sing","wing"],["ball","tall","wall","fall"],["moon","spoon","soon","noon"],["pig","wig","dig","big"],["bug","rug","hug","mug"],["red","bed","fed","led"]];
+function msK(w){var c=w.split('');var t=rK(3);if(t===0&&c.length>3){var i=rK(c.length-1);var x=c[i];c[i]=c[i+1];c[i+1]=x;}else if(t===1){var i2=rK(c.length);c.splice(i2,0,c[i2]||'e');}else{var i3=rK(c.length);c.splice(i3,1);}var r=c.join('');return r===w?w+'e':r;}
+function game_kcount(gm){return mcqK(gm,'Count how many you see, then tap the number.',function(){var n=rK(DfK(8,16,22))+2;var e=pkK(EMK);return{q:e.repeat(n),a:n,wr:nK(n,DfK(2,4,6))};});}
+function game_kadd(gm){return mcqK(gm,'Add the two numbers together.',function(){var a=rK(DfK(10,20,50))+1,b=rK(DfK(10,20,50))+1;return{q:a+' + '+b+' = ?',a:a+b,wr:nK(a+b,DfK(4,8,14))};});}
+function game_ksub(gm){return mcqK(gm,'Take the small number away.',function(){var a=rK(DfK(12,30,90))+2,b=rK(a-1)+1;return{q:a+' − '+b+' = ?',a:a-b,wr:nK(a-b,DfK(4,8,14))};});}
+function game_kbigger(gm){return mcqK(gm,'Tap the BIGGER number.',function(){var s=new Set();while(s.size<DfK(2,3,4))s.add(rK(DfK(20,99,999))+1);var a=[...s];var ans=Math.max.apply(null,a);return{q:'Which is bigger?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
+function game_ksmaller(gm){return mcqK(gm,'Tap the SMALLER number.',function(){var s=new Set();while(s.size<DfK(2,3,4))s.add(rK(DfK(20,99,999))+1);var a=[...s];var ans=Math.min.apply(null,a);return{q:'Which is smaller?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
+function game_kmore(gm){return mcqK(gm,'Which group has MORE?',function(){var e=pkK(EMK);var x=rK(DfK(6,12,18))+2,y=rK(DfK(6,12,18))+2;while(y===x)y=rK(DfK(6,12,18))+2;return{q:'Which has more?  A: '+e.repeat(x)+'   B: '+e.repeat(y),a:x>y?'A':'B',wr:[x>y?'B':'A']};});}
+function game_kbefore(gm){return mcqK(gm,'What number comes BEFORE?',function(){var n=rK(DfK(20,99,999))+2;return{q:'What comes just before '+n+'?',a:n-1,wr:nK(n-1,DfK(2,4,7))};});}
+function game_kafter(gm){return mcqK(gm,'What number comes AFTER?',function(){var n=rK(DfK(20,99,998))+1;return{q:'What comes just after '+n+'?',a:n+1,wr:nK(n+1,DfK(2,4,7))};});}
+function game_kfirst(gm){return mcqK(gm,'Which letter does the word START with?',function(){var w=pkK(WLK);var a=w[0].toUpperCase();return{q:'First letter of "'+w+'"?',a:a,wr:wfK("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_klast(gm){return mcqK(gm,'Which letter does the word END with?',function(){var w=pkK(WLK);var a=w[w.length-1].toUpperCase();return{q:'Last letter of "'+w+'"?',a:a,wr:wfK("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''),a)};});}
+function game_kcountl(gm){return mcqK(gm,'Count the letters in the word.',function(){var w=pkK(WLK);return{q:'How many letters in "'+w+'"?',a:w.length,wr:nK(w.length,3).filter(function(x){return x>0;})};});}
+function game_krhyme(gm){return mcqK(gm,'Tap the word that RHYMES.',function(){var g=pkK(RHYK);var w=g[0],a=pkK(g.slice(1));return{q:'Which rhymes with "'+w+'"?',a:a,wr:shK(RHYK.filter(function(x){return x!==g;})).slice(0,4).map(function(x){return x[0];})};});}
+function game_kopp(gm){return mcqK(gm,'Tap the OPPOSITE word.',function(){var p=pkK(OPPK);var f=Math.random()<0.5;var w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:wfK([].concat.apply([],OPPK),a)};});}
+function game_kspell(gm){return mcqK(gm,'Tap the word spelled correctly.',function(){var w=pkK(WLK);var wr=[];while(wr.length<4){var m=msK(w);if(m!==w&&wr.indexOf(m)<0)wr.push(m);}return{q:'Which is spelled right?',a:w,wr:wr};});}
+function game_kmiss(gm){return mcqK(gm,'Find the missing number in the count.',function(){var s=rK(DfK(10,40,200))+1,st=DfK(1,2,5);var seq=[s,s+st,s+2*st,s+3*st];var hide=rK(4);var miss=seq[hide];seq[hide]='?';return{q:seq.join(', '),a:miss,wr:nK(miss,st+2)};});}
+function game_keven(gm){return mcqK(gm,'Is it odd or even?',function(){var n=rK(DfK(200,2000,20000))+1;return{q:'Is '+n+' odd or even?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};});}
+function game_kdouble(gm){return mcqK(gm,'Double the number (add it to itself).',function(){var n=rK(DfK(10,25,99))+1;return{q:'Double '+n+' = ?',a:n*2,wr:nK(n*2,DfK(4,8,14))};});}
+function game_khalf(gm){return mcqK(gm,'Find half of the number.',function(){var n=(rK(DfK(10,25,99))+1)*2;return{q:'Half of '+n+' = ?',a:n/2,wr:nK(n/2,DfK(3,6,12))};});}
+function game_kvowel(gm){return mcqK(gm,'Count the vowels (a, e, i, o, u).',function(){var w=pkK(WLK);var c=(w.match(/[aeiou]/g)||[]).length;return{q:'How many vowels in "'+w+'"?',a:c,wr:nK(c,3).filter(function(x){return x>=0;})};});}
+function game_kcountup(gm){return mcqK(gm,'Keep counting up — what comes next?',function(){var s=rK(DfK(20,200,2000))+1;return{q:s+', '+(s+1)+', '+(s+2)+', ?',a:s+3,wr:nK(s+3,DfK(2,4,7))};});}
+function game_kpattern(gm){return mcqK(gm,'What comes next in the pattern?',function(){var a=pkK(EMK),b=pkK(EMK);while(b===a)b=pkK(EMK);var seq=[a,b,a,b,a];return{q:seq.join(' ')+' ?',a:b,wr:wfK(EMK,b,3)};});}
+function game_ktenmore(gm){return mcqK(gm,'Add ten to the number.',function(){var n=rK(DfK(50,500,5000))+1;return{q:'10 more than '+n+'?',a:n+10,wr:nK(n+10,DfK(5,9,15))};});}
+function game_ktenless(gm){return mcqK(gm,'Take ten away from the number.',function(){var n=rK(DfK(50,500,5000))+11;return{q:'10 less than '+n+'?',a:n-10,wr:nK(n-10,DfK(5,9,15))};});}
+
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
@@ -443,12 +514,12 @@ function setStatus(s){statusEl.textContent=s;if(/🎉/.test(s)){if(_lastCeleb!==
 applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
- host.style.transformOrigin='top center';host.style.transform='';host.style.height='';
+ host.style.transformOrigin='top center';
  var avail=host.clientWidth,need=host.scrollWidth;
- var availH=window.innerHeight-host.getBoundingClientRect().top-6,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);if(sc<0.995){host.style.transform='scale('+sc+')';host.style.height=(needH*sc)+'px';}}
+ var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);if(sc<0.995){host.style.transform='scale('+sc+')';host.style.height=(needH*sc)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
-window.addEventListener('resize',sched);})();
+window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,800);})();
 buildMenu();
 </script>
 </body>
