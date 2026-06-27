@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>Babak's Learning Room III</title>
 <style>
   :root{--bg:#f0eef9;--panel:#ffffff;--accent:#7a5cd0;--accent2:#d98a2b;--text:#1d1633;--dim:#6a5f88;--border:#e0d8ee;}
@@ -233,8 +233,17 @@ const GAMES=[
 ];
 const HELP={};
 applyTheme(localStorage.getItem('theme')||'light');
-(function(){var h=document.getElementById('host');if(!h)return;var p=false;function fit(){p=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;h.style.transformOrigin='top center';var a=h.clientWidth,n=h.scrollWidth;var ah=window.innerHeight-h.getBoundingClientRect().top-52,nh=h.scrollHeight,sc=Math.min(a/n,ah/nh,1);if(sc<0.995){h.style.transform='scale('+sc+')';h.style.height=(nh*sc)+'px';}else{h.style.transform='';h.style.height='';}}function sc(){if(p)return;p=true;requestAnimationFrame(fit);}try{new MutationObserver(sc).observe(h,{childList:true,subtree:true});}catch(e){}window.addEventListener('resize',sc);window.addEventListener('orientationchange',sc);setInterval(sc,800);})();
+(function(){var h=document.getElementById('host');if(!h)return;var p=false;function fit(){p=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;h.style.transformOrigin='top center';var a=h.clientWidth,n=h.scrollWidth;var ah=window.innerHeight-h.getBoundingClientRect().top-52,nh=h.scrollHeight,sc=Math.min(a/n,ah/nh,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){h.style.transform='scale('+fin+')';h.style.height=(nh*fin)+'px';}else{h.style.transform='';h.style.height='';}}function sc(){if(p)return;p=true;requestAnimationFrame(fit);}try{new MutationObserver(sc).observe(h,{childList:true,subtree:true});}catch(e){}window.addEventListener('resize',sc);window.addEventListener('orientationchange',sc);setInterval(sc,800);})();
 buildMenu();
 </script>
+<script>(function(){var uz=parseFloat(localStorage.getItem('gzoom')||'1');if(isNaN(uz))uz=1;window.__uz=uz;
+var bar=document.createElement('div');bar.style.cssText='position:fixed;bottom:10px;right:10px;z-index:350;display:flex;gap:5px;align-items:center;background:rgba(0,0,0,.6);border-radius:22px;padding:5px 9px;box-shadow:0 3px 10px rgba(0,0,0,.4)';
+function mk(t){var b=document.createElement('button');b.textContent=t;b.style.cssText='border:0;background:#fff;color:#222;border-radius:50%;width:32px;height:32px;font-size:18px;font-weight:800;cursor:pointer;line-height:1';return b;}
+var minus=mk('−'),plus=mk('+'),lbl=document.createElement('span');lbl.style.cssText='color:#fff;font-size:12px;min-width:40px;text-align:center;font-weight:700;cursor:pointer';lbl.title='Tap to reset zoom';
+function upd(){lbl.textContent='🔍 '+Math.round(window.__uz*100)+'%';localStorage.setItem('gzoom',window.__uz);try{window.dispatchEvent(new Event('resize'));}catch(e){}}
+minus.onclick=function(){window.__uz=Math.max(0.4,Math.round((window.__uz-0.1)*10)/10);upd();};
+plus.onclick=function(){window.__uz=Math.min(2,Math.round((window.__uz+0.1)*10)/10);upd();};
+lbl.onclick=function(){window.__uz=1;upd();};
+bar.appendChild(minus);bar.appendChild(lbl);bar.appendChild(plus);document.body.appendChild(bar);upd();})();</script>
 </body>
 </html>

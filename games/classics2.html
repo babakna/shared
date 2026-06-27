@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>Babak's Classics II Pack</title>
 <style>
   :root{--bg:#eef2f8;--panel:#ffffff;--accent:#3a7fd0;--accent2:#d0743a;--text:#16203a;--dim:#5a6488;--border:#d3d8ec;}
@@ -103,7 +103,16 @@ const GAMES=[
   {id:'c2triple',name:'Triple It',ico:'3️⃣'},
   {id:'c2sign',name:'Greater or Less',ico:'⚖️'},
   {id:'c2countback',name:'Count Back',ico:'🔽'},
-  {id:'c2square',name:'Square Numbers',ico:'⏹️'},];
+  {id:'c2square',name:'Square Numbers',ico:'⏹️'},  {id:'c2quarter',name:'Quarter Of',ico:'¼'},
+  {id:'c2mult10',name:'Multiply by 10',ico:'✖️'},
+  {id:'c2near100',name:'Nearest 100',ico:'💯'},
+  {id:'c2skip',name:'Skip Counting',ico:'👣'},
+  {id:'c2change',name:'Make Change',ico:'💵'},
+  {id:'c2timeadd',name:'Time Later',ico:'⏰'},
+  {id:'c2divby',name:'Division',ico:'➗'},
+  {id:'c2numword',name:'Number Words',ico:'🔤'},
+  {id:'c2expand',name:'Expanded Form',ico:'📋'},
+  {id:'c2ordinal',name:'Which Position',ico:'🥇'},];
 const HELP={
 scrabble:`Build words on the board for points. Tap a letter in your rack, then tap an empty square to place it; lay tiles in one straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL/TL = letter, DW/TW = word). Tap Submit to score (words are checked against the dictionary), Recall to take tiles back, 🔀 to reshuffle your rack.`,
 wordladder:`Change the START word into the END word one letter at a time — every step must be a real word the same length. Tap a slot then type a letter, or use the suggestions. Fewer steps is better!`,
@@ -916,6 +925,16 @@ function game_c2triple(gm){setHint('Triple the number (multiply by 3).');return 
 function game_c2sign(gm){setHint('Greater than, less than, or equal?');return mcq(gm,function(){var a=rnd(999)+1,b=rnd(999)+1;var ans=a<b?'<':(a>b?'>':'=');return{q:a+'   ?   '+b,a:ans,wr:['<','>','='].filter(function(x){return x!==ans;})};});}
 function game_c2countback(gm){setHint('Count backwards — what comes next?');return mcq(gm,function(){var st=rnd(8)+2;var s=rnd(60)+40;var ans=s-3*st;return{q:s+', '+(s-st)+', '+(s-2*st)+', ?',a:ans,wr:nC(ans,st+3)};});}
 function game_c2square(gm){setHint('A square number is n times itself.');return mcq(gm,function(){var n=rnd(20)+2;var ans=n*n;return{q:n+' squared = ? ('+n+' × '+n+')',a:ans,wr:nC(ans,n*2)};});}
+function game_c2quarter(gm){setHint('Find one quarter (1/4) of the number.');return mcq(gm,function(){var k=rnd(20)+2;var n=k*4;return{q:'1/4 of '+n+' = ?',a:k,wr:nC(k,8)};});}
+function game_c2mult10(gm){setHint('Multiply by 10.');return mcq(gm,function(){var n=rnd(99)+1;return{q:n+' × 10 = ?',a:n*10,wr:nC(n*10,90)};});}
+function game_c2near100(gm){setHint('Round to the nearest 100.');return mcq(gm,function(){var n=rnd(4900)+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
+function game_c2skip(gm){setHint('Skip counting — what comes next?');return mcq(gm,function(){var step=[2,5,10,3,4][rnd(5)];var s=step*(rnd(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nC(s+3*step,step+3)};});}
+function game_c2change(gm){setHint('How much change from 100¢?');return mcq(gm,function(){var spent=rnd(98)+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nC(100-spent,12).map(function(x){return x+'¢';})};});}
+function game_c2timeadd(gm){setHint('What time will it be later?');return mcq(gm,function(){var h=rnd(12)+1;var add=rnd(6)+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rnd(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_c2divby(gm){setHint('Divide evenly.');return mcq(gm,function(){var d=[5,10,2,4][rnd(4)];var qq=rnd(15)+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nC(qq,7)};});}
+function game_c2numword(gm){setHint('Which number matches the words?');return mcq(gm,function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rnd(99)+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nC(n,12)};});}
+function game_c2expand(gm){setHint('Add the expanded form.');return mcq(gm,function(){var h=rnd(9)+1,t=rnd(9)+1,o=rnd(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nC(ans,80)};});}
+function game_c2ordinal(gm){setHint('Which one is in the named position?');return mcq(gm,function(){var EM=['🍎','⭐','🐶','🌸','🚗','🎈','🐱','🍌'];var sh=EM.slice().sort(function(){return Math.random()-0.5;});var row=sh.slice(0,5);var pos=rnd(5);var names=['1st','2nd','3rd','4th','5th'];return{q:'In   '+row.join('  ')+'   which is the '+names[pos]+'?',a:row[pos],wr:row.filter(function(x,i){return i!==pos;})};});}
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
@@ -924,11 +943,20 @@ applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';
- var avail=host.clientWidth,need=host.scrollWidth;var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);if(sc<0.995){host.style.transform='scale('+sc+')';host.style.height=(needH*sc)+'px';}else{host.style.transform='';host.style.height='';}}
+ var avail=host.clientWidth,need=host.scrollWidth;var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
 window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,800);})();
 buildMenu();
 </script>
+<script>(function(){var uz=parseFloat(localStorage.getItem('gzoom')||'1');if(isNaN(uz))uz=1;window.__uz=uz;
+var bar=document.createElement('div');bar.style.cssText='position:fixed;bottom:10px;right:10px;z-index:350;display:flex;gap:5px;align-items:center;background:rgba(0,0,0,.6);border-radius:22px;padding:5px 9px;box-shadow:0 3px 10px rgba(0,0,0,.4)';
+function mk(t){var b=document.createElement('button');b.textContent=t;b.style.cssText='border:0;background:#fff;color:#222;border-radius:50%;width:32px;height:32px;font-size:18px;font-weight:800;cursor:pointer;line-height:1';return b;}
+var minus=mk('−'),plus=mk('+'),lbl=document.createElement('span');lbl.style.cssText='color:#fff;font-size:12px;min-width:40px;text-align:center;font-weight:700;cursor:pointer';lbl.title='Tap to reset zoom';
+function upd(){lbl.textContent='🔍 '+Math.round(window.__uz*100)+'%';localStorage.setItem('gzoom',window.__uz);try{window.dispatchEvent(new Event('resize'));}catch(e){}}
+minus.onclick=function(){window.__uz=Math.max(0.4,Math.round((window.__uz-0.1)*10)/10);upd();};
+plus.onclick=function(){window.__uz=Math.min(2,Math.round((window.__uz+0.1)*10)/10);upd();};
+lbl.onclick=function(){window.__uz=1;upd();};
+bar.appendChild(minus);bar.appendChild(lbl);bar.appendChild(plus);document.body.appendChild(bar);upd();})();</script>
 </body>
 </html>

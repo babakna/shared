@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>Babak's Word & Casual Pack</title>
 <style>
   :root{--bg:#f3eef9;--panel:#ffffff;--accent:#8a4fd0;--accent2:#e0892b;--text:#1d1430;--dim:#6a5a80;--border:#e0d6ec;}
@@ -102,7 +102,16 @@ const GAMES=[
   {id:'wtriple',name:'Triple It',ico:'3️⃣'},
   {id:'wsign',name:'Greater or Less',ico:'⚖️'},
   {id:'wcountback',name:'Count Back',ico:'🔽'},
-  {id:'wsquare',name:'Square Numbers',ico:'⏹️'},];
+  {id:'wsquare',name:'Square Numbers',ico:'⏹️'},  {id:'wquarter',name:'Quarter Of',ico:'¼'},
+  {id:'wmult10',name:'Multiply by 10',ico:'✖️'},
+  {id:'wnear100',name:'Nearest 100',ico:'💯'},
+  {id:'wskip',name:'Skip Counting',ico:'👣'},
+  {id:'wchange',name:'Make Change',ico:'💵'},
+  {id:'wtimeadd',name:'Time Later',ico:'⏰'},
+  {id:'wdivby',name:'Division',ico:'➗'},
+  {id:'wnumword',name:'Number Words',ico:'🔤'},
+  {id:'wexpand',name:'Expanded Form',ico:'📋'},
+  {id:'wordinal',name:'Which Position',ico:'🥇'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('wc_'+id)||0)}
@@ -369,6 +378,16 @@ function game_wtriple(gm){return mcqW(gm,'Triple the number (multiply by 3).',fu
 function game_wsign(gm){return mcqW(gm,'Greater than, less than, or equal?',function(){var a=rW(Dw(20,99,999))+1,b=rW(Dw(20,99,999))+1;var ans=a<b?'<':(a>b?'>':'=');return{q:a+'   ?   '+b,a:ans,wr:['<','>','='].filter(function(x){return x!==ans;})};});}
 function game_wcountback(gm){return mcqW(gm,'Count backwards — what comes next?',function(){var st=rW(Dw(2,3,9))+1;var s=rW(60)+40;var ans=s-3*st;return{q:s+', '+(s-st)+', '+(s-2*st)+', ?',a:ans,wr:nWn(ans,st+3)};});}
 function game_wsquare(gm){return mcqW(gm,'A square number is n times itself.',function(){var n=rW(Dw(10,22,30))+2;var ans=n*n;return{q:n+' squared = ? ('+n+' × '+n+')',a:ans,wr:nWn(ans,Dw(n+4,n*2,n*3))};});}
+function game_wquarter(gm){return mcqW(gm,'Find one quarter (1/4) of the number.',function(){var k=rW(Dw(8,20,50))+2;var n=k*4;return{q:'1/4 of '+n+' = ?',a:k,wr:nWn(k,Dw(4,7,12))};});}
+function game_wmult10(gm){return mcqW(gm,'Multiply the number by 10.',function(){var n=rW(Dw(20,99,999))+1;return{q:n+' × 10 = ?',a:n*10,wr:nWn(n*10,Dw(20,90,300))};});}
+function game_wnear100(gm){return mcqW(gm,'Round to the nearest 100.',function(){var n=rW(Dw(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
+function game_wskip(gm){return mcqW(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][rW(Dw(3,4,5))];var s=step*(rW(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nWn(s+3*step,step+3)};});}
+function game_wchange(gm){return mcqW(gm,'How much change from one dollar (100¢)?',function(){var spent=rW(Dw(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nWn(100-spent,Dw(6,12,20)).map(function(x){return x+'¢';})};});}
+function game_wtimeadd(gm){return mcqW(gm,'What time will it be later?',function(){var h=rW(12)+1;var add=rW(Dw(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rW(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_wdivby(gm){return mcqW(gm,'Divide evenly.',function(){var d=[5,10,2,4][rW(Dw(2,3,4))];var qq=rW(Dw(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nWn(qq,Dw(4,7,10))};});}
+function game_wnumword(gm){return mcqW(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rW(Dw(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nWn(n,Dw(5,12,20))};});}
+function game_wexpand(gm){return mcqW(gm,'Add the expanded form.',function(){var h=rW(9)+1,t=rW(9)+1,o=rW(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nWn(ans,Dw(20,80,200))};});}
+function game_wordinal(gm){return mcqW(gm,'Which one is in the named position?',function(){var EM=['🍎','⭐','🐶','🌸','🚗','🎈','🐱','🍌'];var sh=EM.slice().sort(function(){return Math.random()-0.5;});var k=Dw(4,5,6);var row=sh.slice(0,k);var pos=rW(k);var names=['1st','2nd','3rd','4th','5th','6th'];return{q:'In   '+row.join('  ')+'   which is the '+names[pos]+'?',a:row[pos],wr:row.filter(function(x,i){return i!==pos;})};});}
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
@@ -378,11 +397,20 @@ applyTheme(localStorage.getItem('theme')||'light');
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';
  var avail=host.clientWidth,need=host.scrollWidth;
- var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);if(sc<0.995){host.style.transform='scale('+sc+')';host.style.height=(needH*sc)+'px';}else{host.style.transform='';host.style.height='';}}
+ var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
 window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,800);})();
 buildMenu();
 </script>
+<script>(function(){var uz=parseFloat(localStorage.getItem('gzoom')||'1');if(isNaN(uz))uz=1;window.__uz=uz;
+var bar=document.createElement('div');bar.style.cssText='position:fixed;bottom:10px;right:10px;z-index:350;display:flex;gap:5px;align-items:center;background:rgba(0,0,0,.6);border-radius:22px;padding:5px 9px;box-shadow:0 3px 10px rgba(0,0,0,.4)';
+function mk(t){var b=document.createElement('button');b.textContent=t;b.style.cssText='border:0;background:#fff;color:#222;border-radius:50%;width:32px;height:32px;font-size:18px;font-weight:800;cursor:pointer;line-height:1';return b;}
+var minus=mk('−'),plus=mk('+'),lbl=document.createElement('span');lbl.style.cssText='color:#fff;font-size:12px;min-width:40px;text-align:center;font-weight:700;cursor:pointer';lbl.title='Tap to reset zoom';
+function upd(){lbl.textContent='🔍 '+Math.round(window.__uz*100)+'%';localStorage.setItem('gzoom',window.__uz);try{window.dispatchEvent(new Event('resize'));}catch(e){}}
+minus.onclick=function(){window.__uz=Math.max(0.4,Math.round((window.__uz-0.1)*10)/10);upd();};
+plus.onclick=function(){window.__uz=Math.min(2,Math.round((window.__uz+0.1)*10)/10);upd();};
+lbl.onclick=function(){window.__uz=1;upd();};
+bar.appendChild(minus);bar.appendChild(lbl);bar.appendChild(plus);document.body.appendChild(bar);upd();})();</script>
 </body>
 </html>
