@@ -72,6 +72,34 @@ const GAMES=[
   {id:'dots',name:'Dots & Boxes',ico:'⬜'},
   {id:'battleship',name:'Battleship',ico:'🚢'},
   {id:'chess',name:'Chess',ico:'♚'},
+  {id:'slseq',name:'Number Sequence',ico:'🔢'},
+  {id:'slpattern',name:'Pattern Next',ico:'🔁'},
+  {id:'slmiss',name:'Missing Number',ico:'❓'},
+  {id:'slodd',name:'Odd One Out',ico:'🚫'},
+  {id:'slbiggest',name:'Biggest Number',ico:'📈'},
+  {id:'slcompare',name:'Compare Sums',ico:'⚖️'},
+  {id:'slmultiple',name:'Next Multiple',ico:'🔗'},
+  {id:'slround',name:'Rounding',ico:'🔟'},
+  {id:'slplace',name:'Place Value',ico:'🏷️'},
+  {id:'sldouble',name:'Double or Half',ico:'✌️'},
+  {id:'slroman',name:'Roman Numerals',ico:'🏛️'},
+  {id:'sleven',name:'Odd or Even',ico:'🎚️'},
+  {id:'sldiv',name:'Divisible By?',ico:'➗'},
+  {id:'slop',name:'Missing Sign',ico:'➕'},
+  {id:'slavg',name:'Find the Average',ico:'📊'},
+  {id:'slrange',name:'Find the Range',ico:'📏'},
+  {id:'sldigit',name:'Digit Sum',ico:'#️⃣'},
+  {id:'slcomp100',name:'Make 100',ico:'💯'},
+  {id:'slfactor',name:'Is it a Factor?',ico:'🧮'},
+  {id:'slnth',name:'Nth Term',ico:'📐'},
+  {id:'slpair',name:'Which Pair Sums',ico:'🔢'},
+  {id:'slhalf',name:'Half Of',ico:'🍰'},
+  {id:'slmirror',name:'Word Backwards',ico:'🪞'},
+  {id:'slcountup',name:'Count Up',ico:'🆙'},
+  {id:'slcap',name:'World Capitals',ico:'🌍'},
+  {id:'slcont',name:'Continents',ico:'🗺️'},
+  {id:'slsyn',name:'Synonyms',ico:'🟰'},
+  {id:'slant',name:'Antonyms',ico:'↔️'},
 ];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null,currentGm=null;
@@ -374,6 +402,62 @@ function game_chess(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+var DIFFS=localStorage.getItem('l2diff')||'med';
+function DfS(e,m,h){return DIFFS==='easy'?e:DIFFS==='hard'?h:m;}
+function rS(n){return Math.floor(Math.random()*n);}
+function pkS(a){return a[rS(a.length)];}
+function shS(a){for(var i=a.length-1;i>0;i--){var j=rS(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function wfS(pool,ans,n){return shS(pool.filter(function(x){return x!==ans;})).slice(0,n||4);}
+function nS(ans,sp){var s=new Set([ans]),g=0;while(s.size<5&&g<60){g++;var v=ans+rS(2*sp+1)-sp;if(v!==ans&&v>=0)s.add(v);}return [...s].filter(function(x){return x!==ans;});}
+function setHsS(id,v){if(v>wins(id))localStorage.setItem('st_'+id,v);}
+var RNS=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+function toRomanS(n){var r='';for(var i=0;i<RNS.length;i++){while(n>=RNS[i][0]){r+=RNS[i][1];n-=RNS[i][0];}}return r;}
+function mcqS(gm,hint,gen){setHint(hint);var score=0;
+  var dr=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap'});
+  function rd(){[...dr.children].forEach(function(c,i){c.className='btn'+(['easy','med','hard'][i]===DIFFS?'':' ghost');});}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(function(d){var b=el('button',{className:'btn',textContent:d[1],style:'padding:7px 13px'});b.onclick=function(){DIFFS=d[0];localStorage.setItem('l2diff',d[0]);rd();score=0;round();};dr.append(b);});rd();
+  var q=el('div',{className:'big',style:'font-size:23px;min-height:44px;max-width:560px'});var opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;width:100%'});var fb=el('div',{className:'big'});var nb=el('button',{className:'btn',textContent:'Next ▶'});
+  host.append(dr,q,opts,fb,nb);
+  function round(){var dt=gen();q.textContent=dt.q;fb.textContent='';var optN={easy:2,med:3,hard:4}[DIFFS];var arr=shS([dt.a].concat((dt.wr||[]).slice(0,optN))).map(String);var long=arr.some(function(o){return o.length>14;});opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
+    arr.forEach(function(o){var b=el('button',{className:'btn ghost',textContent:o,style:'padding:13px;font-size:16px'});b.onclick=function(){[...opts.children].forEach(function(x){x.disabled=true;});if(o===String(dt.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+dt.a;}setHsS(gm.id,score);statusEl.textContent='Score: '+score+' • '+DIFFS+' • Best: '+wins(gm.id);};opts.append(b);});
+    statusEl.textContent='Score: '+score+' • '+DIFFS+' • Best: '+wins(gm.id);}
+  nb.onclick=round;round();return{stop:function(){}};}
+var WLS="apple table garden planet rocket dragon castle tiger jungle orange friend school winter summer animal bridge candle monkey yellow purple basket cookie tunnel bottle button carpet dolphin penguin rainbow morning picture teacher kitchen blanket feather hammer island ladder needle pillow ribbon village rabbit pencil window forest flower river ocean valley desert lemon melon onion eagle otter zebra panda koala snake whale shark".split(/\s+/);
+var CAPS=[["France","Paris"],["Japan","Tokyo"],["Italy","Rome"],["Spain","Madrid"],["Egypt","Cairo"],["Canada","Ottawa"],["Brazil","Brasília"],["China","Beijing"],["India","New Delhi"],["Russia","Moscow"],["Germany","Berlin"],["Greece","Athens"],["Kenya","Nairobi"],["Peru","Lima"],["Cuba","Havana"],["Chile","Santiago"],["Norway","Oslo"],["Sweden","Stockholm"],["Poland","Warsaw"],["Portugal","Lisbon"],["Austria","Vienna"],["Ireland","Dublin"],["Turkey","Ankara"],["Thailand","Bangkok"],["Vietnam","Hanoi"],["Argentina","Buenos Aires"],["Colombia","Bogotá"],["Nigeria","Abuja"],["Ghana","Accra"],["Morocco","Rabat"],["Iran","Tehran"],["Iceland","Reykjavik"],["Finland","Helsinki"],["Denmark","Copenhagen"],["Hungary","Budapest"],["Switzerland","Bern"],["Belgium","Brussels"],["Netherlands","Amsterdam"],["Australia","Canberra"],["South Korea","Seoul"],["Indonesia","Jakarta"],["Israel","Jerusalem"],["Ukraine","Kyiv"],["Romania","Bucharest"]];
+var CONTSS=[["France","Europe"],["Japan","Asia"],["Egypt","Africa"],["Brazil","South America"],["Canada","North America"],["Australia","Oceania"],["China","Asia"],["Kenya","Africa"],["Peru","South America"],["Germany","Europe"],["India","Asia"],["Nigeria","Africa"],["Chile","South America"],["Mexico","North America"],["Italy","Europe"],["Thailand","Asia"],["Morocco","Africa"],["Argentina","South America"],["Spain","Europe"],["Vietnam","Asia"],["Ghana","Africa"],["Colombia","South America"],["Norway","Europe"],["Indonesia","Asia"],["Greece","Europe"]];
+var CONTL=["Europe","Asia","Africa","North America","South America","Oceania"];
+var SYNS=[["big","large"],["small","tiny"],["happy","glad"],["fast","quick"],["smart","clever"],["scared","afraid"],["angry","mad"],["begin","start"],["end","finish"],["shout","yell"],["rich","wealthy"],["cold","chilly"],["sick","ill"],["easy","simple"],["quiet","silent"],["gift","present"],["jump","leap"],["fix","repair"],["hide","conceal"],["throw","toss"],["empty","vacant"],["help","aid"],["brave","bold"],["calm","peaceful"],["huge","enormous"],["tired","sleepy"],["funny","silly"],["clean","spotless"]];
+var ANTS=[["big","small"],["hot","cold"],["up","down"],["happy","sad"],["fast","slow"],["day","night"],["open","close"],["new","old"],["light","dark"],["wet","dry"],["hard","soft"],["loud","quiet"],["full","empty"],["high","low"],["push","pull"],["win","lose"],["true","false"],["rich","poor"],["near","far"],["clean","dirty"],["thick","thin"],["early","late"],["above","below"],["buy","sell"],["sweet","sour"],["enter","exit"],["float","sink"],["begin","end"]];
+function game_slseq(gm){return mcqS(gm,'What number comes next in the sequence?',function(){var s=rS(20)+1,st=rS(DfS(5,9,13))+1;var ans=s+4*st;return{q:[s,s+st,s+2*st,s+3*st].join(', ')+', ?',a:ans,wr:nS(ans,st+3)};});}
+function game_slpattern(gm){return mcqS(gm,'What comes next in the pattern?',function(){var E=['🔴','🔵','🟢','🟡','🟣','⭐'];var a=pkS(E),b=pkS(E);while(b===a)b=pkS(E);return{q:[a,b,a,b,a].join(' ')+' ?',a:b,wr:wfS(E,b,3)};});}
+function game_slmiss(gm){return mcqS(gm,'Find the missing number.',function(){var s=rS(DfS(10,40,200))+1,st=DfS(2,3,7);var seq=[s,s+st,s+2*st,s+3*st];var hide=rS(4);var miss=seq[hide];seq[hide]='?';return{q:seq.join(', '),a:miss,wr:nS(miss,st+2)};});}
+function game_slodd(gm){return mcqS(gm,'Three share a multiple — tap the odd one out.',function(){var k=rS(DfS(4,7,11))+2;var arr=[];for(var i=0;i<3;i++)arr.push(k*(rS(9)+1));var odd=k*(rS(9)+1)+(rS(2)?1:-1);while(odd%k===0||arr.indexOf(odd)>=0)odd++;arr.push(odd);return{q:'Which is NOT a multiple of '+k+'?',a:odd,wr:arr.filter(function(x){return x!==odd;})};});}
+function game_slbiggest(gm){return mcqS(gm,'Tap the biggest number.',function(){var s=new Set();while(s.size<DfS(2,3,4))s.add(rS(DfS(99,999,99999))+1);var a=[...s];var ans=Math.max.apply(null,a);return{q:'Which is biggest?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
+function game_slcompare(gm){return mcqS(gm,'Which sum is bigger?',function(){var a=rS(60)+1,b=rS(60)+1,c=rS(60)+1,d=rS(60)+1;var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);var ans=(a+b)>=(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[(a+b)>=(c+d)?s2:s1]};});}
+function game_slmultiple(gm){return mcqS(gm,'Find the next multiple.',function(){var k=rS(DfS(5,9,12))+2;var n=rS(60)+5;var ans=(Math.floor(n/k)+1)*k;return{q:'Next multiple of '+k+' after '+n+'?',a:ans,wr:nS(ans,k+2)};});}
+function game_slround(gm){return mcqS(gm,'Round to the nearest 10.',function(){var n=rS(DfS(180,890,9000))+11;var a=Math.round(n/10)*10;return{q:'Round '+n+' to nearest 10',a:a,wr:[a+10,a-10,a+20,a-20].filter(function(x){return x>=0&&x!==a;})};});}
+function game_slplace(gm){return mcqS(gm,'Which digit is in the named place?',function(){var n=rS(DfS(900,9000,90000))+100;var s=String(n);var names=['ones','tens','hundreds','thousands','ten-thousands'];var i=rS(s.length);var dig=+s[s.length-1-i];return{q:'In '+n+', which digit is in the '+names[i]+' place?',a:dig,wr:nS(dig,4).filter(function(x){return x>=0&&x<=9;})};});}
+function game_sldouble(gm){return mcqS(gm,'Double it or halve it.',function(){if(rS(2)){var n=rS(DfS(50,490,990))+10;return{q:'Double '+n+' = ?',a:n*2,wr:nS(n*2,DfS(8,12,20))};}var n2=(rS(DfS(25,245,495))+5)*2;return{q:'Half of '+n2+' = ?',a:n2/2,wr:nS(n2/2,DfS(6,10,16))};});}
+function game_slroman(gm){return mcqS(gm,'What is the Roman numeral?',function(){var n=rS(DfS(20,200,2000))+1;var a=toRomanS(n);var wr=[];while(wr.length<4){var m=toRomanS(n+(rS(11)-5||1));if(m!==a&&wr.indexOf(m)<0)wr.push(m);}return{q:'Roman numeral for '+n+'?',a:a,wr:wr};});}
+function game_sleven(gm){return mcqS(gm,'Is the number odd or even?',function(){var n=rS(DfS(200,2000,20000))+1;return{q:'Is '+n+' odd or even?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};});}
+function game_sldiv(gm){return mcqS(gm,'Can it be divided evenly?',function(){var k=[2,3,4,5,10][rS(DfS(2,4,5))];var n=rS(DfS(99,499,4999))+1;return{q:'Is '+n+' divisible by '+k+'?',a:n%k===0?'Yes':'No',wr:[n%k===0?'No':'Yes']};});}
+function game_slop(gm){return mcqS(gm,'Which sign makes it true?',function(){var a=rS(DfS(8,15,30))+2,b=rS(DfS(6,12,20))+1;var ops=[['+',a+b],['−',a-b],['×',a*b]];var pick=ops[rS(3)];return{q:a+' ?  '+b+' = '+pick[1],a:pick[0],wr:['+','−','×','÷'].filter(function(x){return x!==pick[0];})};});}
+function game_slavg(gm){return mcqS(gm,'Find the average (mean).',function(){var k=DfS(2,2,3);var arr=[];for(var i=0;i<k;i++)arr.push(rS(DfS(20,50,99))+1);var sum=arr.reduce(function(x,y){return x+y;},0);while(sum%k!==0){arr[0]++;sum++;}var ans=sum/k;return{q:'Average of '+arr.join(', ')+'?',a:ans,wr:nS(ans,DfS(5,9,15))};});}
+function game_slrange(gm){return mcqS(gm,'Range = biggest − smallest.',function(){var s=new Set();while(s.size<DfS(3,4,5))s.add(rS(DfS(50,200,999))+1);var a=[...s];var ans=Math.max.apply(null,a)-Math.min.apply(null,a);return{q:'Range of '+a.join(', ')+'?',a:ans,wr:nS(ans,DfS(6,12,20))};});}
+function game_sldigit(gm){return mcqS(gm,'Add up all the digits.',function(){var n=rS(DfS(90,900,9000))+10;var ds=String(n).split('').reduce(function(x,y){return x+ +y;},0);return{q:'Sum of digits of '+n+'?',a:ds,wr:nS(ds,DfS(3,5,8))};});}
+function game_slcomp100(gm){return mcqS(gm,'What is added to make 100?',function(){var n=rS(98)+1;return{q:n+' + ? = 100',a:100-n,wr:nS(100-n,DfS(5,10,18))};});}
+function game_slfactor(gm){return mcqS(gm,'A factor divides a number evenly.',function(){var n=rS(DfS(40,99,500))+10;var k=rS(11)+2;return{q:'Is '+k+' a factor of '+n+'?',a:n%k===0?'Yes':'No',wr:[n%k===0?'No':'Yes']};});}
+function game_slnth(gm){return mcqS(gm,'Find the Nth number in the pattern.',function(){var st=rS(DfS(4,8,12))+2;var start=rS(9)+1;var nth=rS(DfS(4,6,9))+3;var ans=start+(nth-1)*st;return{q:'Counting '+start+', '+(start+st)+', '+(start+2*st)+'…  number '+nth+'?',a:ans,wr:nS(ans,st+3)};});}
+function game_slpair(gm){return mcqS(gm,'Which pair adds up to the target?',function(){var t=rS(DfS(15,30,60))+6;var a=rS(t-2)+1,b=t-a;var ans=a+' + '+b;var wr=[];while(wr.length<4){var x=rS(t+10)+1,y=rS(t+10)+1;if(x+y!==t&&wr.indexOf(x+' + '+y)<0)wr.push(x+' + '+y);}return{q:'Which pair adds to '+t+'?',a:ans,wr:wr};});}
+function game_slhalf(gm){return mcqS(gm,'Find half of the number.',function(){var n=(rS(DfS(20,100,500))+2)*2;return{q:'What is half of '+n+'?',a:n/2,wr:nS(n/2,DfS(5,10,18))};});}
+function game_slmirror(gm){return mcqS(gm,'Read the word backwards — pick it.',function(){var w=pkS(WLS);var rev=w.split('').reverse().join('');var wr=[];while(wr.length<4){var o=pkS(WLS);var ro=o.split('').reverse().join('');if(ro!==rev&&wr.indexOf(ro)<0)wr.push(ro);}return{q:'"'+w+'" spelled backwards?',a:rev,wr:wr};});}
+function game_slcountup(gm){return mcqS(gm,'Keep counting up — what comes next?',function(){var s=rS(DfS(20,200,2000))+1;return{q:s+', '+(s+1)+', '+(s+2)+', ?',a:s+3,wr:nS(s+3,DfS(2,4,7))};});}
+function game_slcap(gm){return mcqS(gm,'Tap the capital city.',function(){var p=pkS(CAPS);return{q:'Capital of '+p[0]+'?',a:p[1],wr:wfS(CAPS.map(function(x){return x[1];}),p[1])};});}
+function game_slcont(gm){return mcqS(gm,'Which continent is it in?',function(){var p=pkS(CONTSS);return{q:'Which continent is '+p[0]+' in?',a:p[1],wr:wfS(CONTL,p[1])};});}
+function game_slsyn(gm){return mcqS(gm,'Tap the word with the SAME meaning.',function(){var p=pkS(SYNS);return{q:'Same meaning as "'+p[0]+'"?',a:p[1],wr:wfS(SYNS.map(function(x){return x[1];}),p[1])};});}
+function game_slant(gm){return mcqS(gm,'Tap the OPPOSITE word.',function(){var p=pkS(ANTS);var f=Math.random()<0.5;var w=f?p[0]:p[1],a=f?p[1]:p[0];return{q:'Opposite of "'+w+'"?',a:a,wr:wfS([].concat.apply([],ANTS),a)};});}
+
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
