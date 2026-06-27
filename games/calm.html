@@ -100,7 +100,11 @@ const GAMES=[
   {id:'ccompare',name:'Compare Sums',ico:'🟰'},
   {id:'cfraction',name:'Simple Fractions',ico:'🥧'},
   {id:'ceven',name:'Odd or Even',ico:'🎚️'},
-];
+  {id:'cpercent',name:'Percent Of',ico:'％'},
+  {id:'ctriple',name:'Triple It',ico:'3️⃣'},
+  {id:'csign',name:'Greater or Less',ico:'⚖️'},
+  {id:'ccountback',name:'Count Back',ico:'🔽'},
+  {id:'csquare',name:'Square Numbers',ico:'⏹️'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function getN(id){return +(localStorage.getItem('calm_'+id)||0)}
@@ -360,6 +364,11 @@ function game_ccompare(gm){return mcqC(gm,'Which sum is bigger?',function(){var 
 function game_cfraction(gm){return mcqC(gm,'Find the fraction of the number.',function(){var den=[2,3,4,5][rC(DfC(2,3,4))];var mult=rC(8)+2;var whole=den*mult;return{q:'What is 1/'+den+' of '+whole+'?',a:mult,wr:nC2(mult,DfC(4,7,10))};});}
 function game_ceven(gm){return mcqC(gm,'Is the number odd or even?',function(){var n=rC(DfC(200,2000,20000))+1;return{q:'Is '+n+' odd or even?',a:n%2?'Odd':'Even',wr:[n%2?'Even':'Odd']};});}
 
+function game_cpercent(gm){return mcqC(gm,'Find the percent of the number.',function(){var pcts=[10,25,50];var pct=pcts[rC(3)];var mult=rC(DfC(6,15,40))+2;var base=mult*(100/pct);return{q:pct+'% of '+base+' = ?',a:mult,wr:nC2(mult,DfC(4,8,14))};});}
+function game_ctriple(gm){return mcqC(gm,'Triple the number (multiply by 3).',function(){var n=rC(DfC(12,30,99))+2;return{q:'Triple '+n+' = ?',a:n*3,wr:nC2(n*3,DfC(6,10,18))};});}
+function game_csign(gm){return mcqC(gm,'Greater than, less than, or equal?',function(){var a=rC(DfC(20,99,999))+1,b=rC(DfC(20,99,999))+1;var ans=a<b?'<':(a>b?'>':'=');return{q:a+'   ?   '+b,a:ans,wr:['<','>','='].filter(function(x){return x!==ans;})};});}
+function game_ccountback(gm){return mcqC(gm,'Count backwards — what comes next?',function(){var st=rC(DfC(2,3,9))+1;var s=rC(60)+40;var ans=s-3*st;return{q:s+', '+(s-st)+', '+(s-2*st)+', ?',a:ans,wr:nC2(ans,st+3)};});}
+function game_csquare(gm){return mcqC(gm,'A square number is n times itself.',function(){var n=rC(DfC(10,22,30))+2;var ans=n*n;return{q:n+' squared = ? ('+n+' × '+n+')',a:ans,wr:nC2(ans,DfC(n+4,n*2,n*3))};});}
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}

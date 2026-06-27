@@ -100,7 +100,11 @@ const GAMES=[
   {id:'frhyme',name:'Rhyming Words',ico:'🎵'},
   {id:'fcapital',name:'World Capitals',ico:'🌍'},
   {id:'fcontinent',name:'Continents',ico:'🗺️'},
-];
+  {id:'fpercent',name:'Percent Of',ico:'％'},
+  {id:'ftriple',name:'Triple It',ico:'3️⃣'},
+  {id:'fsign',name:'Greater or Less',ico:'⚖️'},
+  {id:'fcountback',name:'Count Back',ico:'🔽'},
+  {id:'fsquare',name:'Square Numbers',ico:'⏹️'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('fam_'+id)||0)}
@@ -552,6 +556,11 @@ function game_frhyme(gm){return mcqF(gm,'Tap the word that RHYMES.',function(){v
 function game_fcapital(gm){return mcqF(gm,'Tap the capital city.',function(){var p=pkF(CAPF);return{q:'Capital of '+p[0]+'?',a:p[1],wr:wfF(CAPF.map(function(x){return x[1];}),p[1])};});}
 function game_fcontinent(gm){return mcqF(gm,'Which continent is it in?',function(){var p=pkF(CONTF);return{q:'Which continent is '+p[0]+' in?',a:p[1],wr:wfF(CONTS,p[1])};});}
 
+function game_fpercent(gm){return mcqF(gm,'Find the percent of the number.',function(){var pcts=[10,25,50];var pct=pcts[rF(3)];var mult=rF(DfF(6,15,40))+2;var base=mult*(100/pct);return{q:pct+'% of '+base+' = ?',a:mult,wr:nF(mult,DfF(4,8,14))};});}
+function game_ftriple(gm){return mcqF(gm,'Triple the number (multiply by 3).',function(){var n=rF(DfF(12,30,99))+2;return{q:'Triple '+n+' = ?',a:n*3,wr:nF(n*3,DfF(6,10,18))};});}
+function game_fsign(gm){return mcqF(gm,'Greater than, less than, or equal?',function(){var a=rF(DfF(20,99,999))+1,b=rF(DfF(20,99,999))+1;var ans=a<b?'<':(a>b?'>':'=');return{q:a+'   ?   '+b,a:ans,wr:['<','>','='].filter(function(x){return x!==ans;})};});}
+function game_fcountback(gm){return mcqF(gm,'Count backwards — what comes next?',function(){var st=rF(DfF(2,3,9))+1;var s=rF(60)+40;var ans=s-3*st;return{q:s+', '+(s-st)+', '+(s-2*st)+', ?',a:ans,wr:nF(ans,st+3)};});}
+function game_fsquare(gm){return mcqF(gm,'A square number is n times itself.',function(){var n=rF(DfF(10,22,30))+2;var ans=n*n;return{q:n+' squared = ? ('+n+' × '+n+')',a:ans,wr:nF(ans,DfF(n+4,n*2,n*3))};});}
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}

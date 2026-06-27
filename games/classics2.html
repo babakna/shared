@@ -99,7 +99,11 @@ const GAMES=[
   {id:'doublehalf',name:'Double or Half',ico:'✌️'},
   {id:'oddeven',name:'Odd or Even',ico:'🔢'},
   {id:'placeval',name:'Place Value',ico:'🏷️'},
-];
+  {id:'c2percent',name:'Percent Of',ico:'％'},
+  {id:'c2triple',name:'Triple It',ico:'3️⃣'},
+  {id:'c2sign',name:'Greater or Less',ico:'⚖️'},
+  {id:'c2countback',name:'Count Back',ico:'🔽'},
+  {id:'c2square',name:'Square Numbers',ico:'⏹️'},];
 const HELP={
 scrabble:`Build words on the board for points. Tap a letter in your rack, then tap an empty square to place it; lay tiles in one straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL/TL = letter, DW/TW = word). Tap Submit to score (words are checked against the dictionary), Recall to take tiles back, 🔀 to reshuffle your rack.`,
 wordladder:`Change the START word into the END word one letter at a time — every step must be a real word the same length. Tap a slot then type a letter, or use the suggestions. Fewer steps is better!`,
@@ -907,6 +911,11 @@ function game_speedsort(gm){setHint('A card appears — tap its SUIT as fast as 
   function tap(s){if(over)return;if(s===cur.s){score++;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();}
   nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
 
+function game_c2percent(gm){setHint('Find the percent of the number.');return mcq(gm,function(){var p=[10,25,50][rnd(3)];var mult=rnd(20)+2;var base=mult*(100/p);return{q:p+'% of '+base+' = ?',a:mult,wr:nC(mult,10)};});}
+function game_c2triple(gm){setHint('Triple the number (multiply by 3).');return mcq(gm,function(){var n=rnd(40)+2;return{q:'Triple '+n+' = ?',a:n*3,wr:nC(n*3,10)};});}
+function game_c2sign(gm){setHint('Greater than, less than, or equal?');return mcq(gm,function(){var a=rnd(999)+1,b=rnd(999)+1;var ans=a<b?'<':(a>b?'>':'=');return{q:a+'   ?   '+b,a:ans,wr:['<','>','='].filter(function(x){return x!==ans;})};});}
+function game_c2countback(gm){setHint('Count backwards — what comes next?');return mcq(gm,function(){var st=rnd(8)+2;var s=rnd(60)+40;var ans=s-3*st;return{q:s+', '+(s-st)+', '+(s-2*st)+', ?',a:ans,wr:nC(ans,st+3)};});}
+function game_c2square(gm){setHint('A square number is n times itself.');return mcq(gm,function(){var n=rnd(20)+2;var ans=n*n;return{q:n+' squared = ? ('+n+' × '+n+')',a:ans,wr:nC(ans,n*2)};});}
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}

@@ -101,7 +101,11 @@ const GAMES=[
   {id:'pickhigher',name:'Pick Higher',ico:'⬆️'},
   {id:'highcardduel',name:'High Card Duel',ico:'⚔️'},
   {id:'cardladder',name:'Card Ladder',ico:'🪜'},
-];
+  {id:'ridethebus',name:'Ride the Bus',ico:'🚌'},
+  {id:'nines',name:'Nines',ico:'9️⃣'},
+  {id:'elevens',name:'Elevens',ico:'🔢'},
+  {id:'pontoon',name:'Pontoon',ico:'🂡'},
+  {id:'speedmatch',name:'Speed Snap',ico:'⚡'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('cd_'+id)||0)}
@@ -244,6 +248,47 @@ function game_solitaire(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
+function game_ridethebus(gm){setHint('Ride the Bus! 4 rounds: (1) Red or Black? (2) Higher or Lower? (3) Inside or Outside the first two? (4) Guess the Suit. Get all 4 to win!');
+ var deck,stage,cards;var row=el('div',{style:'display:flex;gap:10px;justify-content:center;min-height:78px;flex-wrap:wrap'});var btns=el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;justify-content:center'});var msg=el('div',{className:'big'});var nb=el('button',{className:'btn ghost',textContent:'New Game'});host.append(row,btns,msg,nb);
+ function draw(){row.innerHTML='';cards.forEach(function(c){row.append(cardFace(c));});for(var i=cards.length;i<4;i++)row.append(cardFace({s:'♠',r:'?',v:0},false));}
+ function setB(arr,fn){btns.innerHTML='';arr.forEach(function(t){var b=el('button',{className:'btn',textContent:t});b.onclick=function(){fn(t);};btns.append(b);});}
+ function ask(){if(stage===0){msg.textContent='Round 1: Red or Black?';setB(['Red','Black'],function(g){go(function(c){return (g==='Red')===isRed(c.s);});});}
+  else if(stage===1){msg.textContent='Round 2: Higher or Lower than '+cards[0].r+'?';setB(['Higher','Lower'],function(g){go(function(c){return g==='Higher'?c.v>cards[0].v:c.v<cards[0].v;});});}
+  else if(stage===2){var lo=Math.min(cards[0].v,cards[1].v),hi=Math.max(cards[0].v,cards[1].v);msg.textContent='Round 3: Inside or Outside '+cards[0].r+' & '+cards[1].r+'?';setB(['Inside','Outside'],function(g){go(function(c){return g==='Inside'?(c.v>lo&&c.v<hi):(c.v<lo||c.v>hi);});});}
+  else{msg.textContent='Round 4: Guess the Suit!';setB(SUITS,function(g){go(function(c){return c.s===g;});});}}
+ function go(test){var c=deck.pop();cards.push(c);draw();var ok=test(c);if(ok){stage++;setHs(gm.id,stage);if(stage===4){msg.textContent='You rode the bus!';btns.innerHTML='';setStatus('🎉 Win! Best: '+hs(gm.id));return;}setStatus('Stage '+stage+'/4 • Best: '+hs(gm.id));setTimeout(ask,650);}else{msg.textContent='Wrong! You reached round '+stage+'. New Game?';btns.innerHTML='';setStatus('Reached '+stage+' • Best: '+hs(gm.id));}}
+ function reset(){deck=shuffle(makeDeck());stage=0;cards=[];draw();ask();}
+ nb.onclick=reset;reset();return{stop:function(){}};}
+function game_nines(gm){setHint('Tap a 9 to remove it, or tap two cards that add up to 9 (A=1). Clear the whole deck!');
+ var deck,board,sel;var grid=el('div',{style:'display:grid;grid-template-columns:repeat(5,46px);gap:6px'});var nb=el('button',{className:'btn',textContent:'New Game'});var msg=el('div',{className:'big'});host.append(msg,grid,nb);
+ function refill(){for(var k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+ function draw(){grid.innerHTML='';board.forEach(function(c,i){if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}var f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=function(){click(i);};grid.append(f);});var left=board.filter(Boolean).length+deck.length;setStatus('Left: '+left+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+ function click(i){if(!board[i])return;if(board[i].v===9){board[i]=null;refill();sel=-1;draw();return;}if(sel===i){sel=-1;draw();return;}if(sel>=0){if(board[sel].v+board[i].v===9){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+ function reset(){deck=shuffle(makeDeck());board=deck.splice(0,10);sel=-1;draw();}
+ nb.onclick=reset;reset();return{stop:function(){}};}
+function game_elevens(gm){setHint('Tap two number cards that add up to 11 (A=1…10), or tap any face card (J, Q, K) to remove it. Clear the deck!');
+ var deck,board,sel;var grid=el('div',{style:'display:grid;grid-template-columns:repeat(6,46px);gap:6px'});var nb=el('button',{className:'btn',textContent:'New Game'});var msg=el('div',{className:'big'});host.append(msg,grid,nb);
+ function refill(){for(var k=0;k<board.length;k++)if(!board[k]&&deck.length)board[k]=deck.pop();}
+ function draw(){grid.innerHTML='';board.forEach(function(c,i){if(!c){grid.append(el('div',{style:'width:46px;height:64px'}));return;}var f=cardFace(c);f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=function(){click(i);};grid.append(f);});var left=board.filter(Boolean).length+deck.length;setStatus('Left: '+left+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0)setHs(gm.id,1);}
+ function click(i){if(!board[i])return;if(board[i].v>=11){board[i]=null;refill();sel=-1;draw();return;}if(sel===i){sel=-1;draw();return;}if(sel>=0){if(board[sel].v<11&&board[sel].v+board[i].v===11){board[sel]=null;board[i]=null;refill();sel=-1;draw();return;}sel=i;draw();return;}sel=i;draw();}
+ function reset(){deck=shuffle(makeDeck());board=deck.splice(0,12);sel=-1;draw();}
+ nb.onclick=reset;reset();return{stop:function(){}};}
+function game_pontoon(gm){setHint('Pontoon: beat the dealer! Get as close to 21 as you can without busting. Dealer draws to 17. Aces count as 11 or 1.');
+ var deck,you,dealer,over;var yrow=el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:74px'});var drow=el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:74px'});var msg=el('div',{className:'big'});var hit=el('button',{className:'btn',textContent:'Hit'}),stick=el('button',{className:'btn',textContent:'Stick'}),nb=el('button',{className:'btn ghost',textContent:'New Game'});
+ host.append(el('div',{className:'big',textContent:'Dealer'}),drow,el('div',{className:'big',textContent:'You'}),yrow,msg,el('div',{style:'display:flex;gap:10px'},hit,stick,nb));
+ function val(h){var t=0,a=0;h.forEach(function(c){if(c.r==='A'){a++;t+=11;}else if(c.v>10)t+=10;else t+=c.v;});while(t>21&&a){t-=10;a--;}return t;}
+ function drawY(){yrow.innerHTML='';you.forEach(function(c){yrow.append(cardFace(c));});}
+ function drawD(hideFirst){drow.innerHTML='';dealer.forEach(function(c,i){drow.append(cardFace(c,!(hideFirst&&i===0)));});}
+ function reset(){deck=shuffle(makeDeck());you=[deck.pop(),deck.pop()];dealer=[deck.pop(),deck.pop()];over=false;drawY();drawD(true);msg.textContent='Hit or Stick? You have '+val(you);setStatus('Best wins: '+hs(gm.id));}
+ hit.onclick=function(){if(over)return;you.push(deck.pop());drawY();var v=val(you);if(v>21){over=true;drawD(false);msg.textContent='💥 Bust at '+v+'! Dealer wins.';}else msg.textContent='You have '+v+'. Hit or Stick?';};
+ stick.onclick=function(){if(over)return;over=true;while(val(dealer)<17)dealer.push(deck.pop());drawD(false);var yv=val(you),dv=val(dealer);var win=yv<=21&&(dv>21||yv>dv);var tie=yv===dv&&yv<=21;msg.textContent='You '+yv+' • Dealer '+dv+' — '+(win?'🎉 You win!':tie?'Push (tie).':'Dealer wins.');if(win){setHs(gm.id,hs(gm.id)+1);setStatus('🎉 Win! Total wins: '+hs(gm.id));}};
+ nb.onclick=reset;reset();return{stop:function(){}};}
+function game_speedmatch(gm){setHint('Cards flip one by one. Tap SNAP! when a card matches the one before it by RANK or SUIT. You have 30 seconds!');
+ var deck,prev,score,time,timer,over,canSnap;var cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});var snap=el('button',{className:'btn',textContent:'SNAP!',style:'font-size:22px;padding:16px 30px'});var nb=el('button',{className:'btn ghost',textContent:'New Game'});var msg=el('div',{className:'big'});host.append(cardEl,snap,nb,msg);
+ function reset(){deck=shuffle(makeDeck().concat(makeDeck()));prev=null;score=0;time=30;over=false;canSnap=false;clearInterval(timer);timer=setInterval(tick,800);setStatus('Score: 0 • Time: 30s • Best: '+hs(gm.id));}
+ function tick(){if(over)return;time-=0.8;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);cardEl.innerHTML='';cardEl.append(el('div',{className:'big',textContent:'⏰ Time! Score '+score}));return;}if(!deck.length)deck=shuffle(makeDeck().concat(makeDeck()));var c=deck.pop();canSnap=prev&&(c.r===prev.r||c.s===prev.s);prev=c;cardEl.innerHTML='';cardEl.append(cardFace(c));setStatus('Score: '+score+' • Time: '+Math.ceil(time)+'s • Best: '+hs(gm.id));}
+ snap.onclick=function(){if(over){reset();return;}if(canSnap){score++;canSnap=false;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.ceil(time)+'s • Best: '+hs(gm.id));};
+ nb.onclick=reset;reset();return{stop:function(){clearInterval(timer);}};}
 (function(){if(!document.getElementById('celcss')){var st=document.createElement('style');st.id='celcss';st.textContent='@keyframes cel{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(380deg);opacity:.6}}';document.head.appendChild(st);}})();
 var _lastCeleb='';
 function celebrate(msg,win){var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none';var box=document.createElement('div');box.style.cssText='font-size:40px;font-weight:900;text-align:center;padding:22px 34px;border-radius:20px;color:#fff;max-width:90vw;background:'+(win?'linear-gradient(135deg,#2ecc71,#1f8f4e)':'linear-gradient(135deg,#e74c3c,#a93226)')+';box-shadow:0 14px 50px rgba(0,0,0,.55);animation:cel .5s ease';box.textContent=msg;o.appendChild(box);document.body.appendChild(o);if(win){for(var i=0;i<26;i++){(function(k){var c=document.createElement('div');c.textContent=['🎉','✨','🎊','⭐','🥳','🎈'][k%6];c.style.cssText='position:fixed;left:'+(Math.random()*100)+'vw;top:-40px;font-size:'+(18+Math.random()*22)+'px;z-index:401;pointer-events:none;animation:fall '+(1.4+Math.random()*1.2)+'s linear forwards';document.body.appendChild(c);setTimeout(function(){c.remove();},2900);})(i);}}setTimeout(function(){box.style.transition='opacity .5s';box.style.opacity='0';setTimeout(function(){o.remove();},500);},2000);}
