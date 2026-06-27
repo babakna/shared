@@ -33,7 +33,7 @@
   .big{font-size:18px;font-weight:700;text-align:center}
   canvas{border-radius:12px;border:1px solid var(--border);background:#0a1020;max-width:100%;height:auto;touch-action:none;box-shadow:0 8px 26px rgba(0,0,0,.3)}
   .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
-  #host{max-width:100%;overflow-x:auto}
+  #host{max-width:100%;overflow:visible}
   @media(max-width:560px){#app{padding:10px}h1{font-size:24px}}
   ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
   .pcard{background:#fff;color:#111;border-radius:7px;width:46px;height:64px;display:inline-flex;flex-direction:column;justify-content:space-between;padding:3px 5px;font-weight:800;box-shadow:0 2px 5px #0006;font-size:15px}
@@ -943,10 +943,10 @@ applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';
- var avail=host.clientWidth,need=host.scrollWidth;var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
+ host.style.transform='';host.style.height='';var avail=host.clientWidth,need=host.scrollWidth;var hr0=host.getBoundingClientRect(),L0=hr0.left,R0=hr0.right,ch=host.getElementsByTagName("*");for(var ci=0;ci<ch.length;ci++){var rr=ch[ci].getBoundingClientRect();if(rr.width>0&&rr.height>0){if(rr.left<L0)L0=rr.left;if(rr.right>R0)R0=rr.right;}}var cx0=(hr0.left+hr0.right)/2,he0=Math.max(R0-cx0,cx0-L0);if(2*he0>need)need=2*he0;var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
-window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,800);})();
+window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,140);setTimeout(sched,50);setTimeout(sched,150);setTimeout(sched,350);})();
 buildMenu();
 </script>
 <script>(function(){var uz=parseFloat(localStorage.getItem('gzoom')||'1');if(isNaN(uz))uz=1;window.__uz=uz;
