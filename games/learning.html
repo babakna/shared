@@ -186,6 +186,16 @@
             <button class="action-btn" onclick="initComprehension()" style="margin-top:20px;">Next Passage</button>
         </div>
 
+        <div id="game-27" class="game-container"><div class="question-text">Multiplication Master! ✖️</div><div id="m27-q" style="font-size:1.6rem;margin:20px;"></div><div id="m27-options"></div><div id="m27-feedback" class="feedback"></div><button class="action-btn" onclick="initMul27()" style="margin-top:20px;">Next</button></div>
+        <div id="game-28" class="game-container"><div class="question-text">What comes next? 🔢</div><div id="m28-q" style="font-size:1.5rem;margin:20px;"></div><div id="m28-options"></div><div id="m28-feedback" class="feedback"></div><button class="action-btn" onclick="initSeq28()" style="margin-top:20px;">Next</button></div>
+        <div id="game-29" class="game-container"><div class="question-text">Rounding Race! 🔟</div><div id="m29-q" style="font-size:1.5rem;margin:20px;"></div><div id="m29-options"></div><div id="m29-feedback" class="feedback"></div><button class="action-btn" onclick="initRound29()" style="margin-top:20px;">Next</button></div>
+        <div id="game-30" class="game-container"><div class="question-text">Roman Numerals 🏛️</div><div id="m30-q" style="font-size:1.5rem;margin:20px;"></div><div id="m30-options"></div><div id="m30-feedback" class="feedback"></div><button class="action-btn" onclick="initRoman30()" style="margin-top:20px;">Next</button></div>
+        <div id="game-31" class="game-container"><div class="question-text">Synonym Match 🟰</div><div id="m31-q" style="font-size:1.5rem;margin:20px;"></div><div id="m31-options"></div><div id="m31-feedback" class="feedback"></div><button class="action-btn" onclick="initSyn31()" style="margin-top:20px;">Next</button></div>
+        <div id="game-32" class="game-container"><div class="question-text">Capital Quest 🌍</div><div id="m32-q" style="font-size:1.5rem;margin:20px;"></div><div id="m32-options"></div><div id="m32-feedback" class="feedback"></div><button class="action-btn" onclick="initCap32()" style="margin-top:20px;">Next</button></div>
+        <div id="game-33" class="game-container"><div class="question-text">Digit Detective #️⃣</div><div id="m33-q" style="font-size:1.5rem;margin:20px;"></div><div id="m33-options"></div><div id="m33-feedback" class="feedback"></div><button class="action-btn" onclick="initDigit33()" style="margin-top:20px;">Next</button></div>
+        <div id="game-34" class="game-container"><div class="question-text">Doubling Dojo ✌️</div><div id="m34-q" style="font-size:1.6rem;margin:20px;"></div><div id="m34-options"></div><div id="m34-feedback" class="feedback"></div><button class="action-btn" onclick="initDouble34()" style="margin-top:20px;">Next</button></div>
+        <div id="game-35" class="game-container"><div class="question-text">Telling Time 🕐</div><div id="m35-q" style="font-size:1.5rem;margin:20px;"></div><div id="m35-options"></div><div id="m35-feedback" class="feedback"></div><button class="action-btn" onclick="initTime35()" style="margin-top:20px;">Next</button></div>
+
         <div id="game-1" class="game-container">
             <div class="settings-panel">
                 <div class="settings-row">
@@ -518,7 +528,16 @@
             { id: 23, title: "Grammar Guru", icon: "📚" },
             { id: 24, title: "Shape Sorter", icon: "🛑" },
             { id: 25, title: "Pattern Puzzle", icon: "🧩" },
-            { id: 26, title: "Reading Comprehension", icon: "📚" }
+            { id: 26, title: "Reading Comprehension", icon: "📚" },
+            { id: 27, title: "Multiplication Master", icon: "✖️" },
+            { id: 28, title: "Number Patterns", icon: "🔢" },
+            { id: 29, title: "Rounding Race", icon: "🔟" },
+            { id: 30, title: "Roman Numerals", icon: "🏛️" },
+            { id: 31, title: "Synonym Match", icon: "🟰" },
+            { id: 32, title: "Capital Quest", icon: "🌍" },
+            { id: 33, title: "Digit Detective", icon: "#️⃣" },
+            { id: 34, title: "Doubling Dojo", icon: "✌️" },
+            { id: 35, title: "Telling Time", icon: "🕐" }
         ];
 
         const homeView = document.getElementById('home-view');
@@ -545,7 +564,9 @@
                 11: initFood, 12: initHabitat, 13: initWater, 14: initTime, 15: initCoding,
                 16: initFixer, 17: initFraction, 18: initInventor, 19: initOpposite, 20: initMoney,
                 21: initContinent, 22: initInstrument, 23: initGrammar, 24: initShape, 25: initPattern,
-                26: initComprehension
+                26: initComprehension,
+                27: initMul27, 28: initSeq28, 29: initRound29, 30: initRoman30, 31: initSyn31,
+                32: initCap32, 33: initDigit33, 34: initDouble34, 35: initTime35
             };
             if(initFunctions[id]) initFunctions[id]();
         }
@@ -556,6 +577,23 @@
         }
 
         function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+        /* ----- GAMES 27-35 (procedural, 500+ variations each) ----- */
+        function riA(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+        function nA(ans,sp){var s=new Set([String(ans)]);var g=0;while(s.size<4&&g<60){g++;var v=ans+riA(-sp,sp);if(v>=0)s.add(String(v));}return [...s].filter(function(x){return x!==String(ans);}).slice(0,3);}
+        var RNA=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+        function toRomanA(n){var r='';for(var i=0;i<RNA.length;i++){while(n>=RNA[i][0]){r+=RNA[i][1];n-=RNA[i][0];}}return r;}
+        var SYNA=[["big","large"],["small","tiny"],["happy","glad"],["fast","quick"],["smart","clever"],["scared","afraid"],["angry","mad"],["begin","start"],["shout","yell"],["rich","wealthy"],["cold","chilly"],["easy","simple"],["quiet","silent"],["gift","present"],["jump","leap"],["fix","repair"],["hide","conceal"],["throw","toss"],["help","aid"],["brave","bold"],["calm","peaceful"],["huge","enormous"],["tired","sleepy"],["funny","silly"]];
+        var CAPA=[["France","Paris"],["Japan","Tokyo"],["Italy","Rome"],["Spain","Madrid"],["Egypt","Cairo"],["Canada","Ottawa"],["Brazil","Brasília"],["China","Beijing"],["India","New Delhi"],["Germany","Berlin"],["Greece","Athens"],["Kenya","Nairobi"],["Peru","Lima"],["Norway","Oslo"],["Sweden","Stockholm"],["Poland","Warsaw"],["Portugal","Lisbon"],["Austria","Vienna"],["Ireland","Dublin"],["Turkey","Ankara"],["Thailand","Bangkok"],["Argentina","Buenos Aires"],["Nigeria","Abuja"],["Morocco","Rabat"],["Mexico","Mexico City"],["Australia","Canberra"]];
+        function initMul27(){var a=riA(2,12),b=riA(2,12),ans=a*b;document.getElementById('m27-q').innerText=a+' × '+b+' = ?';document.getElementById('m27-feedback').innerText='';populateOptions([String(ans)].concat(nA(ans,10)),'m27-options','m27-feedback',String(ans),"Brilliant! ✖️");}
+        function initSeq28(){var s=riA(1,20),st=riA(2,9),ans=s+4*st;document.getElementById('m28-q').innerText=[s,s+st,s+2*st,s+3*st].join(', ')+', ?';document.getElementById('m28-feedback').innerText='';populateOptions([String(ans)].concat(nA(ans,st+3)),'m28-options','m28-feedback',String(ans),"Pattern pro! 🔢");}
+        function initRound29(){var n=riA(11,989),ans=Math.round(n/10)*10;document.getElementById('m29-q').innerText='Round '+n+' to the nearest 10';document.getElementById('m29-feedback').innerText='';populateOptions([String(ans),String(ans+10),String(ans-10),String(ans+20)],'m29-options','m29-feedback',String(ans),"Rounded right! 🔟");}
+        function initRoman30(){var n=riA(1,300),ans=toRomanA(n);var opts=[ans];var g=0;while(opts.length<4&&g<40){g++;var m=toRomanA(n+(riA(-6,6)||1));if(opts.indexOf(m)<0)opts.push(m);}document.getElementById('m30-q').innerText='Roman numeral for '+n+'?';document.getElementById('m30-feedback').innerText='';populateOptions(opts,'m30-options','m30-feedback',ans,"Caesar approves! 🏛️");}
+        function initSyn31(){var p=SYNA[riA(0,SYNA.length-1)];var opts=[p[1]];var g=0;while(opts.length<4&&g<40){g++;var w=SYNA[riA(0,SYNA.length-1)][1];if(opts.indexOf(w)<0)opts.push(w);}document.getElementById('m31-q').innerText='Which word means the same as "'+p[0]+'"?';document.getElementById('m31-feedback').innerText='';populateOptions(opts,'m31-options','m31-feedback',p[1],"Word wizard! 🟰");}
+        function initCap32(){var p=CAPA[riA(0,CAPA.length-1)];var opts=[p[1]];var g=0;while(opts.length<4&&g<40){g++;var c=CAPA[riA(0,CAPA.length-1)][1];if(opts.indexOf(c)<0)opts.push(c);}document.getElementById('m32-q').innerText='What is the capital of '+p[0]+'?';document.getElementById('m32-feedback').innerText='';populateOptions(opts,'m32-options','m32-feedback',p[1],"Globe-trotter! 🌍");}
+        function initDigit33(){var n=riA(10,999),ans=String(n).split('').reduce(function(x,y){return x+ +y;},0);document.getElementById('m33-q').innerText='What is the sum of the digits of '+n+'?';document.getElementById('m33-feedback').innerText='';populateOptions([String(ans)].concat(nA(ans,4)),'m33-options','m33-feedback',String(ans),"Sharp eyes! #️⃣");}
+        function initDouble34(){var n=riA(2,99),ans=n*2;document.getElementById('m34-q').innerText='Double '+n+' = ?';document.getElementById('m34-feedback').innerText='';populateOptions([String(ans)].concat(nA(ans,8)),'m34-options','m34-feedback',String(ans),"Doubled it! ✌️");}
+        function initTime35(){var h=riA(1,12),mm=[0,15,30,45][riA(0,3)];var ans=h+':'+(mm<10?'0'+mm:mm);var opts=[ans];var g=0;while(opts.length<4&&g<40){g++;var h2=riA(1,12),m2=[0,15,30,45][riA(0,3)];var v=h2+':'+(m2<10?'0'+m2:m2);if(opts.indexOf(v)<0)opts.push(v);}document.getElementById('m35-q').innerText='The clock reads '+h+" o'clock and "+mm+' minutes. What time is it?';document.getElementById('m35-feedback').innerText='';populateOptions(opts,'m35-options','m35-feedback',ans,"Right on time! 🕐");}
+
         function populateOptions(optsArray, containerId, feedbackId, correctAns, successMsg) {
             let container = document.getElementById(containerId);
             container.innerHTML = '';
