@@ -188,7 +188,7 @@ function game_hangman(gm){
 
 /* ---------------- WORD SEARCH ---------------- */
 function game_wordsearch(gm){
-  setHint('Click & drag across letters to find the listed words.');
+  setHint('Click or touch-drag across letters to find the listed words.');
   const N=10;let grid,words,found,start;
   const list=el('div',{style:'display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:6px'});
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},34px);gap:2px;user-select:none;touch-action:none`});
@@ -206,7 +206,7 @@ function game_wordsearch(gm){
     words.forEach(w=>list.append(el('span',{textContent:w,style:`padding:3px 8px;border-radius:6px;background:#221a30;${found.has(w)?'text-decoration:line-through;color:#5a9':''}`})));
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){const d=el('div',{textContent:grid[r][c],
       style:`width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:5px;background:#2a2138;cursor:pointer`});
-      d.onmousedown=()=>{start=[r,c];};d.onmouseup=()=>finish(r,c);
+      d.onmousedown=()=>{start=[r,c];};d.onmouseup=()=>finish(r,c);d.onpointerdown=e=>{start=[r,c];if(e.pointerType==='touch')e.preventDefault();};d.onpointerup=e=>{if(e.pointerType==='touch')e.preventDefault();finish(r,c);};
       board.append(d);}}
   function finish(r,c){if(!start)return;const[sr,sc]=start;start=null;
     const dr=Math.sign(r-sr),dc=Math.sign(c-sc);const len=Math.max(Math.abs(r-sr),Math.abs(c-sc))+1;
@@ -223,7 +223,7 @@ function game_wordsearch(gm){
 
 /* ---------------- TYPING TEST ---------------- */
 function game_typing(gm){
-  setHint('Type the sentence as fast & accurately as you can. Timer starts on first key.');
+  setHint('Keyboard typing practice: type the sentence as fast and accurately as you can. Timer starts on first key.');
   const SENT=['the quick brown fox jumps over the lazy dog','practice makes perfect every single day','coding is fun when the games actually work','a journey of a thousand miles begins with one step','keep calm and keep on typing faster now'];
   let target,started,t0;
   const text=el('div',{style:'font-size:20px;line-height:1.6;background:#221a30;padding:14px;border-radius:10px;max-width:560px'});
@@ -343,11 +343,11 @@ function game_ant(gm){return mcqW(gm,'Tap the OPPOSITE word.',()=>{const p=pkW(A
 function game_rhyme(gm){return mcqW(gm,'Tap the word that RHYMES.',()=>{const g=pkW(RHY);const w=g[0],a=pkW(g.slice(1));return{q:'Which word rhymes with "'+w+'"?',a:a,wr:shW(RHY.filter(x=>x!==g)).slice(0,4).map(x=>x[0])};});}
 function game_plural(gm){return mcqW(gm,'Tap the correct plural (more than one).',()=>{const p=pkW(PLU);return{q:'Plural of "'+p[0]+'"?',a:p[1],wr:wfW(PLU.map(x=>x[1]),p[1])};});}
 function game_past(gm){return mcqW(gm,'Tap the past-tense form.',()=>{const p=pkW(PAST);return{q:'Past tense of "'+p[0]+'"?',a:p[1],wr:wfW(PAST.map(x=>x[1]),p[1])};});}
-function game_homo(gm){return mcqW(gm,'Tap the word that correctly fits the sentence.',()=>{const p=pkW(HOMO);return{q:p[0],a:p[1],wr:wfW(HPOOL,p[1])};});}
+function game_homo(gm){return mcqW(gm,'Tap the word that correctly fits the sentence.',()=>{const p=pkW(HOMO);const pairs=HPOOL.filter(w=>w!==p[1]&&w.toLowerCase()[0]===p[1].toLowerCase()[0]);return{q:p[0],a:p[1],wr:wfW((pairs.length>=3?pairs:HPOOL),p[1])};});}
 function game_compound(gm){return mcqW(gm,'A compound word is two words joined. Tap it!',()=>{const a=pkW(COMP);return{q:'Which is a COMPOUND word?',a:a,wr:wfW(NOTCOMP,a)};});}
 function game_prefix(gm){return mcqW(gm,'Tap what the word-beginning means.',()=>{const p=pkW(PREFIX);return{q:'What does "'+p[0]+'" mean?',a:p[1],wr:wfW(PREMEAN,p[1])};});}
 function game_contraction(gm){return mcqW(gm,'Tap the contraction (short form).',()=>{const p=pkW(CONTR);return{q:'"'+p[0]+'" as a contraction?',a:p[1],wr:wfW(CONTR.map(x=>x[1]),p[1])};});}
-function game_comparative(gm){return mcqW(gm,'Tap the comparative ("more") form.',()=>{const adj=pkW(ADJ);const a=adj.endsWith('e')?adj+'r':adj+'er';return{q:'Comparative of "'+adj+'"?',a:a,wr:[adj+'est','more '+adj,adj+'ish']};});}
+function game_comparative(gm){return mcqW(gm,'Tap the comparative ("more") form.',()=>{const MAP={hot:'hotter',big:'bigger',sad:'sadder',thin:'thinner',wet:'wetter',fast:'faster',slow:'slower',old:'older',smart:'smarter',kind:'kinder',warm:'warmer',cold:'colder',quick:'quicker',clean:'cleaner',rich:'richer',near:'nearer',high:'higher',deep:'deeper',small:'smaller',loud:'louder',soft:'softer',dark:'darker',strong:'stronger',sweet:'sweeter',bright:'brighter',proud:'prouder',fresh:'fresher',brave:'braver',short:'shorter'};const adj=pkW(Object.keys(MAP));const a=MAP[adj];return{q:'Comparative of "'+adj+'"?',a:a,wr:[adj+'est','more '+adj,adj+'ish'].filter(x=>x!==a)};});}
 function game_syll(gm){return mcqW(gm,'Count the syllables (beats) in the word.',()=>{const w=pkW(poolW());const c=sylW(w);return{q:'How many syllables in "'+w+'"?',a:c,wr:[1,2,3,4,5].filter(x=>x!==c)};});}
 function game_vowelcount(gm){return mcqW(gm,'Count the vowels (a, e, i, o, u).',()=>{const w=pkW(poolW());const c=vowW(w);return{q:'How many vowels in "'+w+'"?',a:c,wr:[c+1,c-1,c+2,c+3].filter(x=>x>=0&&x!==c)};});}
 function game_conscount(gm){return mcqW(gm,'Count the consonants (non-vowels).',()=>{const w=pkW(poolW());const c=w.length-vowW(w);return{q:'How many consonants in "'+w+'"?',a:c,wr:[c+1,c-1,c+2].filter(x=>x>=0&&x!==c)};});}
@@ -378,7 +378,7 @@ function game_wmult10(gm){return mcqW(gm,'Multiply the number by 10.',function()
 function game_wnear100(gm){return mcqW(gm,'Round to the nearest 100.',function(){var n=rW(Dw(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_wskip(gm){return mcqW(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][rW(Dw(3,4,5))];var s=step*(rW(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nWn(s+3*step,step+3)};});}
 function game_wchange(gm){return mcqW(gm,'How much change from one dollar (100¢)?',function(){var spent=rW(Dw(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nWn(100-spent,Dw(6,12,20)).map(function(x){return x+'¢';})};});}
-function game_wtimeadd(gm){return mcqW(gm,'What time will it be later?',function(){var h=rW(12)+1;var add=rW(Dw(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rW(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_wtimeadd(gm){return mcqW(gm,'What time will it be later on a 12-hour clock?',function(){var h=rW(12)+1;var add=rW(Dw(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rW(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_wdivby(gm){return mcqW(gm,'Divide evenly.',function(){var d=[5,10,2,4][rW(Dw(2,3,4))];var qq=rW(Dw(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nWn(qq,Dw(4,7,10))};});}
 function game_wnumword(gm){return mcqW(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rW(Dw(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nWn(n,Dw(5,12,20))};});}
 function game_wexpand(gm){return mcqW(gm,'Add the expanded form.',function(){var h=rW(9)+1,t=rW(9)+1,o=rW(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nWn(ans,Dw(20,80,200))};});}

@@ -319,9 +319,9 @@ function game_piano(gm){
   const piano=el('div',{style:'position:relative;display:flex;background:#222;padding:10px;border-radius:12px'});
   const whiteEls={};
   WHITE.forEach((w,i)=>{const k=el('div',{style:'width:48px;height:170px;background:#fff;border:1px solid #999;border-radius:0 0 6px 6px;margin:0 1px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;color:#999;cursor:pointer;user-select:none'});
-    k.textContent=w[2].toUpperCase();k.onmousedown=()=>hit(w[1],k);piano.append(k);whiteEls[w[2]]=()=>hit(w[1],k);});
+    k.textContent=w[2].toUpperCase();k.onmousedown=()=>hit(w[1],k);k.onpointerdown=()=>hit(w[1],k);piano.append(k);whiteEls[w[2]]=()=>hit(w[1],k);});
   // black keys overlay
-  BLACK.forEach((b,i)=>{if(!b[1])return;const k=el('div',{style:`position:absolute;top:10px;left:${10+34+i*50}px;width:30px;height:105px;background:#222;border:1px solid #000;border-radius:0 0 5px 5px;cursor:pointer;z-index:2`});k.onmousedown=()=>hit(b[1],k);piano.append(k);});
+  BLACK.forEach((b,i)=>{if(!b[1])return;const k=el('div',{style:`position:absolute;top:10px;left:${10+34+i*50}px;width:30px;height:105px;background:#222;border:1px solid #000;border-radius:0 0 5px 5px;cursor:pointer;z-index:2`});k.onmousedown=()=>hit(b[1],k);k.onpointerdown=()=>hit(b[1],k);piano.append(k);});
   host.append(piano);
   const songBtn=el('button',{className:'btn',textContent:'🎵 Play "Twinkle Twinkle"'});
   host.append(songBtn);
@@ -422,12 +422,12 @@ function game_emoji(gm){
     ['🕷️🧒',['Spider-Man','Ant-Man','Batman','Superman']],
     ['🧙‍♂️⚡',['Harry Potter','Lord of the Rings','Merlin','Narnia']],
     ['🚗⚡',['Cars','Speed Racer','Turbo','Wreck-It Ralph']],
-    ['🐼🥋',['Kung Fu Panda','Po','Mulan','Karate Kid']],
+    ['🐼🥋',['Kung Fu Panda','Mulan','Karate Kid','Puss in Boots']],
     ['👧🐺',['Little Red Riding Hood','Brave','Frozen','Tangled']],
     ['🤖❤️',['WALL-E','Big Hero 6','Transformers','Robots']],
     ['🐝🎬',['Bee Movie','Antz','A Bug\'s Life','Maya the Bee']],
     ['👸🐸',['The Princess and the Frog','Shrek','Enchanted','Brave']],
-    ['🐭🏰',['Disney','Ratatouille','Cinderella','Stuart Little']],
+    ['🐭🏰',['Mickey at Disney World','Ratatouille','Cinderella','Stuart Little']],
     ['🍫🏭',['Charlie & the Chocolate Factory','Wonka','Matilda','Coraline']],
     ['🐉🏹',['How to Train Your Dragon','Mulan','Brave','Raya']],
     ['🌊🛶',['Moana','Finding Dory','Lilo & Stitch','Luca']],
@@ -467,7 +467,7 @@ function game_madlibs(gm){
   host.append(form,el('div',{className:'row'},makeBtn,newBtn),out);
   function reset(){tpl=TEMPLATES[Math.floor(Math.random()*TEMPLATES.length)];inputs=[];form.innerHTML='';out.textContent='';
     tpl.blanks.forEach(b=>{const wrap=el('div',{className:'row',style:'justify-content:space-between'});
-      const inp=el('input',{placeholder:'Type '+b,style:'flex:1'});wrap.append(el('span',{textContent:b+':',style:'width:120px;color:var(--dim);font-size:13px'}),inp);inputs.push(inp);form.append(wrap);});
+      const inp=el('input',{placeholder:'Type '+b,style:'flex:1'});const chips=el('div',{className:'kid-choice-row',style:'margin-top:4px'});['dragon','pizza','moon','sparkly','seven','banana','robot','castle'].forEach(w=>{const chip=el('button',{className:'btn ghost',textContent:w,style:'padding:5px 8px;font-size:12px'});chip.onclick=()=>{inp.value=w;};chips.append(chip);});wrap.append(el('span',{textContent:b+':',style:'width:120px;color:var(--dim);font-size:13px'}),inp);const outer=el('div',{});outer.append(wrap,chips);inputs.push(inp);form.append(outer);});
     setStatus('Fill in the blanks! 📝');}
   makeBtn.onclick=()=>{const vals=inputs.map((i,k)=>i.value.trim()||('['+tpl.blanks[k]+']'));out.textContent=tpl.story(vals);beep(660,0.2);setStatus('😂 Ta-da! Read it out loud!');};
   newBtn.onclick=reset;reset();
@@ -491,7 +491,7 @@ function game_eightball(gm){
   return {stop:()=>{}};
 }
 
-/* ===== Kids quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+/* ===== Kids quiz framework (Easy/Med/Hard + help, varied practice) ===== */
 var DIFFK=localStorage.getItem('l2diff')||'med';
 function DfK(e,m,h){return DIFFK==='easy'?e:DIFFK==='hard'?h:m;}
 function rK(n){return Math.floor(Math.random()*n);}
@@ -549,7 +549,7 @@ function game_kmult10(gm){return mcqK(gm,'Multiply the number by 10.',function()
 function game_knear100(gm){return mcqK(gm,'Round to the nearest 100.',function(){var n=rK(DfK(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_kskip(gm){return mcqK(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][rK(DfK(3,4,5))];var s=step*(rK(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nK(s+3*step,step+3)};});}
 function game_kchange(gm){return mcqK(gm,'How much change from one dollar (100¢)?',function(){var spent=rK(DfK(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nK(100-spent,DfK(6,12,20)).map(function(x){return x+'¢';})};});}
-function game_ktimeadd(gm){return mcqK(gm,'What time will it be later?',function(){var h=rK(12)+1;var add=rK(DfK(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rK(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_ktimeadd(gm){return mcqK(gm,'What time will it be later on a 12-hour clock?',function(){var h=rK(12)+1;var add=rK(DfK(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rK(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_kdivby(gm){return mcqK(gm,'Divide evenly.',function(){var d=[5,10,2,4][rK(DfK(2,3,4))];var qq=rK(DfK(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nK(qq,DfK(4,7,10))};});}
 function game_knumword(gm){return mcqK(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rK(DfK(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nK(n,DfK(5,12,20))};});}
 function game_kexpand(gm){return mcqK(gm,'Add the expanded form.',function(){var h=rK(9)+1,t=rK(9)+1,o=rK(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nK(ans,DfK(20,80,200))};});}

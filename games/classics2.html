@@ -127,20 +127,20 @@ const GAMES=[
   {id:'c2expand',name:'Expanded Form',ico:'📋'},
   {id:'c2ordinal',name:'Which Position',ico:'🥇'},];
 const HELP={
-scrabble:`Build words on the board for points. Tap a letter in your rack, then tap an empty square to place it; lay tiles in one straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL/TL = letter, DW/TW = word). Tap Submit to score (words are checked against the dictionary), Recall to take tiles back, 🔀 to reshuffle your rack.`,
+scrabble:`Solo Word Tiles practice: build one main dictionary word in a straight line. Your first word must cross the ⭐ centre; later words must touch existing tiles. Coloured squares multiply scores (DL = letter, DW/TW = word). Cross-words are not separately checked in this lite version.`,
 wordladder:`Change the START word into the END word one letter at a time — every step must be a real word the same length. Tap a slot then type a letter, or use the suggestions. Fewer steps is better!`,
 boggle:`Find words by tapping connected letters (touching sides or corners), each letter once per word. Words must be 3+ letters and in the dictionary. Score more for longer words. Beat the clock!`,
 anagram:`Make as many words as you can from the 6 letters before time runs out. Longer words score more. Tap letters to spell, Enter to submit.`,
 crossword:`Fill the white squares so the across and down clues are answered. Tap a square then type letters. Tap Check to see how you did.`,
-kakuro:`Like a crossword with numbers. Fill 1-9 so each run adds up to the clue (number above = the column sum below it, number left = the row sum to its right). No digit repeats within a run.`,
+kakuro:`Fixed mini Kakuro practice: fill the four open cells so the visible row and column clues work. The checker validates this mini puzzle's answers.`,
 kenken:`Fill the grid so every row and column has each number once (1-4). Each outlined "cage" must reach its target using the shown operation (+ − × ÷) on its cells.`,
 spider:`One-suit Spider. Build descending runs (K,Q,J…A) in the columns. Move a card (and the ordered run on it) onto a card one higher. Complete a full K-to-A run to clear it. Tap the stock to deal a new row (every column must be non-empty first). Clear all 8 runs to win.`,
 freecell:`Move all cards to the four foundations (top-right) by suit, Ace to King. Build columns downward in alternating colours. The four free cells (top-left) each hold one card. Tap a card then a destination. Plan ahead — almost every deal is winnable!`,
-hearts:`Avoid taking hearts (1 point each) and the Queen of Spades (13). Follow the led suit if you can. Hearts can't be led until "broken". Lowest score when someone hits 50 wins. Tip: take ALL the points ("shoot the moon") to give everyone else 26!`,
+hearts:`Simplified Hearts: no passing. The 2♣ holder opens with 2♣, follow suit if you can, avoid hearts and Q♠. Hearts cannot be led until broken. Lowest score wins.`,
 crazy8:`Match the top discard by suit or rank. Eights are wild — play one and choose the next suit. Can't play? Draw a card. First to empty their hand wins.`,
 war:`The classic luck game. Tap Flip — higher card wins both. Equal cards mean WAR: three cards down, then flip again. Collect all 52 cards to win.`,
-backgammon:`Roll the dice and move your checkers toward your home (bottom-right), then bear them off. Land on a point with one enemy checker to send it to the bar. You re-enter from the bar first. First to bear off all 15 wins.`,
-cribbage:`Make 31-friendly hands. Each round: keep 4 cards, send 2 to the crib. A card is cut, then hands are scored — 15s (=2), pairs (=2), runs, and flushes. First to 121 points wins.`,
+backgammon:`Backgammon Lite: a simplified race/checker game with dice, hits, bar re-entry, and bearing off. Some full tournament die-order edge cases are intentionally simplified.`,
+cribbage:`Cribbage Hand Practice: keep 4 cards, send 2 away, cut a card, and compare hand scores for 15s, pairs, runs, and flushes. No pegging or full match flow.`,
 mahjong:`Match pairs of identical tiles to remove them. A tile is "free" only if it has no tile on top and at least one open side (left or right). Clear the whole board to win.`,
 bubbleshooter:`Aim with your mouse/finger and tap to shoot a bubble. Make a group of 3+ same-colour bubbles to pop them. Clear them all — don't let them reach the bottom!`,
 towerdef:`Enemies walk the path. Tap a buildable tile to place a tower (costs gold); towers auto-shoot enemies in range. Each kill earns gold. Survive all the waves without letting too many leak through.`,
@@ -198,11 +198,9 @@ function game_war(gm){
   host.append(area,msg,el('div',{className:'row'},flip,newB));
   function reset(){const d=shuffle(makeDeck());p1=d.slice(0,26);p2=d.slice(26);pile=[];over=false;youP.innerHTML='';aiP.innerHTML='';msg.textContent='';upd();}
   function upd(){setStatus('You: '+p1.length+' cards   •   AI: '+p2.length+'   •   Best: '+hs(gm.id));}
-  function doFlip(){if(over)return;if(!p1.length||!p2.length){return;}const a=p1.shift(),b=p2.shift();youP.innerHTML='';aiP.innerHTML='';youP.append(cardFace(a));aiP.append(cardFace(b));pile.push(a,b);
-    if(a.v===b.v){msg.textContent='WAR! 3 cards down…';for(let k=0;k<3;k++){if(p1.length)pile.push(p1.shift());if(p2.length)pile.push(p2.shift());}}
-    else if(a.v>b.v){p1.push(...shuffle(pile));pile=[];msg.textContent='You win the pile!';}
-    else{p2.push(...shuffle(pile));pile=[];msg.textContent='AI wins the pile.';}
-    if(!p1.length){over=true;msg.textContent='😢 AI wins the game.';}if(!p2.length){over=true;msg.textContent='🎉 You win the game!';setHs(gm.id,1);}upd();}
+  function award(who,text){who.push(...shuffle(pile));pile=[];msg.textContent=text;}
+  function battle(){if(!p1.length||!p2.length)return;const a=p1.shift(),b=p2.shift();youP.innerHTML='';aiP.innerHTML='';youP.append(cardFace(a));aiP.append(cardFace(b));pile.push(a,b);if(a.v===b.v){msg.textContent='WAR! 3 cards down, then compare…';for(let k=0;k<3;k++){if(p1.length)pile.push(p1.shift());if(p2.length)pile.push(p2.shift());}if(p1.length&&p2.length)battle();else if(p1.length)award(p1,'You win the war pile!');else award(p2,'AI wins the war pile.');}else if(a.v>b.v)award(p1,'You win the pile!');else award(p2,'AI wins the pile.');}
+  function doFlip(){if(over)return;if(!p1.length||!p2.length){return;}battle();if(!p1.length){over=true;msg.textContent='😢 AI wins the game.';}if(!p2.length){over=true;msg.textContent='🎉 You win the game!';setHs(gm.id,1);}upd();}
   flip.onclick=doFlip;newB.onclick=reset;reset();return{stop:()=>{}};
 }
 
@@ -240,7 +238,7 @@ function game_crazy8(gm){
 
 /* ---------------- HEARTS (simplified, no passing) ---------------- */
 function game_hearts(gm){
-  setHint('Follow suit. Avoid hearts (1 pt) and Q♠ (13). Lowest score wins. Hearts must be broken before led.');
+  setHint('Simplified Hearts: no passing. The 2♣ holder must open with 2♣; avoid hearts and Q♠.');
   let hands,scores,trick,lead,turn,broken,over;
   const table=el('div',{style:'display:flex;gap:10px;justify-content:center;min-height:80px'});
   const handEl=el('div',{className:'row'});
@@ -253,7 +251,7 @@ function game_hearts(gm){
   function reset(){const d=shuffle(makeDeck());hands=[d.slice(0,13),d.slice(13,26),d.slice(26,39),d.slice(39,52)];scores=[0,0,0,0];broken=false;over=false;
     // player 0 with 2♣ leads
     lead=0;for(let i=0;i<4;i++)if(hands[i].some(c=>c.s==='♣'&&c.r==='2'))lead=i;turn=lead;trick=[];msg.textContent='';play();}
-  function legal(i){const h=hands[i];if(trick.length===0){if(!broken)return h.filter(c=>c.s!=='♥'||h.every(x=>x.s==='♥'));return h;}
+  function legal(i){const h=hands[i];if(trick.length===0&&scores.every(x=>x===0)&&hands.reduce((n,x)=>n+x.length,0)===52)return h.filter(c=>c.s==='♣'&&c.r==='2');if(trick.length===0){if(!broken)return h.filter(c=>c.s!=='♥'||h.every(x=>x.s==='♥'));return h;}
     const ls=trick[0].c.s;const fs=h.filter(c=>c.s===ls);return fs.length?fs:h;}
   function play(){draw();if(turn===0){msg.textContent=trick.length?'Your turn — follow '+trick[0].c.s:'Your turn — lead a card';return;}setTimeout(aiPlay,500);}
   function aiPlay(){if(over)return;const lg=legal(turn);lg.sort((a,b)=>val(a)-val(b));let c;
@@ -581,7 +579,7 @@ function game_crossword(gm){
 
 /* ---------------- KAKURO (fixed puzzle) ---------------- */
 function game_kakuro(gm){
-  setHint('Fill 1-9 so each run sums to its clue (▲ number = column below, ◀ number = row right). No repeats in a run.');
+  setHint('Fixed mini Kakuro practice: fill the four cells to satisfy the visible row and column clues.');
   // 5x5 with clue cells. Encoded: 'B'=block, [down,right] clue, or '.'=fill, with known solution
   const SOL=[[0,0,3,4,0],[0,16,9,7,0],[0,0,0,0,0]];
   // Use a compact known 4x4-ish puzzle:
@@ -639,8 +637,9 @@ function game_bubbleshooter(gm){
   reset();
   function px(r,q){return q*2*R+R+(r%2?R:0)+6;}
   function py(r){return r*2*R*0.87+R+6;}
-  c.addEventListener('mousemove',e=>{const rc=c.getBoundingClientRect();const mx=(e.clientX-rc.left)*(W/rc.width),my=(e.clientY-rc.top)*(H/rc.height);angle=Math.atan2(my-shooter.y,mx-shooter.x);if(angle>-0.15)angle=-0.15;if(angle<-Math.PI+0.15)angle=-Math.PI+0.15;});
-  c.addEventListener('mousedown',()=>{if(over){reset();return;}shoot();});
+  function aim(clientX,clientY){const rc=c.getBoundingClientRect();const mx=(clientX-rc.left)*(W/rc.width),my=(clientY-rc.top)*(H/rc.height);angle=Math.atan2(my-shooter.y,mx-shooter.x);if(angle>-0.15)angle=-0.15;if(angle<-Math.PI+0.15)angle=-Math.PI+0.15;}
+  c.addEventListener('mousemove',e=>aim(e.clientX,e.clientY));c.addEventListener('pointermove',e=>aim(e.clientX,e.clientY));
+  c.addEventListener('mousedown',()=>{if(over){reset();return;}shoot();});c.addEventListener('pointerdown',e=>{aim(e.clientX,e.clientY);if(over){reset();return;}shoot();});
   let fly=null;
   function shoot(){if(fly)return;fly={x:shooter.x,y:shooter.y,dx:Math.cos(angle)*9,dy:Math.sin(angle)*9,col:cur};}
   function nearestCell(x,y){let best=null,bd=1e9;for(let r=0;r<14;r++)for(let q=0;q<COLS;q++){if(grid[r]&&grid[r][q]>=0)continue;const cx=px(r,q),cy=py(r);const d=Math.hypot(cx-x,cy-y);if(d<bd){bd=d;best={r,q};}}return best;}
@@ -804,7 +803,7 @@ function game_stack(gm){
 
 /* ---------------- SCRABBLE (solo score-attack) ---------------- */
 function game_scrabble(gm){
-  setHint('Place tiles in a line, crossing the ⭐ first. Tap Submit to score. Real words only.');
+  setHint('Solo Word Tiles: score the main word you place. Cross-words are not checked in this lite version.');
   const N=11;const VAL={A:1,E:1,I:1,O:1,U:1,L:1,N:1,S:1,T:1,R:1,D:2,G:2,B:3,C:3,M:3,P:3,F:4,H:4,V:4,W:4,Y:4,K:5,J:8,X:8,Q:10,Z:10};
   const BAG=("AAAAAAAAAEEEEEEEEEEEEIIIIIIIIIOOOOOOOOUUUUNNNNNNRRRRRRTTTTTTLLLLSSSSDDDDGGGBBCCMMPPFFHHVVWWYYKJXQZ").split('');
   const PREM={};function setP(r,c,t){PREM[r+','+c]=t;}
@@ -944,7 +943,7 @@ function game_c2mult10(gm){setHint('Multiply by 10.');return mcq(gm,function(){v
 function game_c2near100(gm){setHint('Round to the nearest 100.');return mcq(gm,function(){var n=rnd(4900)+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_c2skip(gm){setHint('Skip counting — what comes next?');return mcq(gm,function(){var step=[2,5,10,3,4][rnd(5)];var s=step*(rnd(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nC(s+3*step,step+3)};});}
 function game_c2change(gm){setHint('How much change from 100¢?');return mcq(gm,function(){var spent=rnd(98)+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nC(100-spent,12).map(function(x){return x+'¢';})};});}
-function game_c2timeadd(gm){setHint('What time will it be later?');return mcq(gm,function(){var h=rnd(12)+1;var add=rnd(6)+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rnd(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_c2timeadd(gm){setHint('What time will it be later on a 12-hour clock?');return mcq(gm,function(){var h=rnd(12)+1;var add=rnd(6)+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rnd(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_c2divby(gm){setHint('Divide evenly.');return mcq(gm,function(){var d=[5,10,2,4][rnd(4)];var qq=rnd(15)+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nC(qq,7)};});}
 function game_c2numword(gm){setHint('Which number matches the words?');return mcq(gm,function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rnd(99)+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nC(n,12)};});}
 function game_c2expand(gm){setHint('Add the expanded form.');return mcq(gm,function(){var h=rnd(9)+1,t=rnd(9)+1,o=rnd(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nC(ans,80)};});}

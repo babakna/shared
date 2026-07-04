@@ -215,7 +215,7 @@ function game_connect4(gm){
 /* ---------------- CHECKERS ---------------- */
 function game_checkers(gm){
   setHint('You are red (bottom). Click a piece then a dark square. Captures when possible.');
-  const N=8;let b,sel,turn,over,lastAI;let CKDIFF=localStorage.getItem('st_diff')||'med';
+  const N=8;let b,sel,turn,over,lastAI,forcedJumper;let CKDIFF=localStorage.getItem('st_diff')||'med';
   const diffRow=el('div',{style:'display:flex;gap:6px;justify-content:center;margin-bottom:6px'});
   [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,l])=>{const bt=el('button',{className:'btn'+(CKDIFF===d?'':' ghost'),textContent:l,style:'padding:6px 13px'});bt.onclick=()=>{CKDIFF=d;localStorage.setItem('st_diff',d);[...diffRow.children].forEach((c,i)=>c.className='btn'+(['easy','med','hard'][i]===CKDIFF?'':' ghost'));};diffRow.append(bt);});
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},54px);gap:0;border:3px solid #5a4`});
@@ -223,7 +223,7 @@ function game_checkers(gm){
   const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
   host.append(diffRow,board,el('div',{className:'kid-choice-row'},newBtn,hintBtn));
   // b cell: 0 empty, 1 red man, 2 red king, -1 black man, -2 black king
-  function reset(){b=Array.from({length:N},()=>Array(N).fill(0));over=false;turn=1;sel=null;lastAI=null;
+  function reset(){b=Array.from({length:N},()=>Array(N).fill(0));over=false;turn=1;sel=null;lastAI=null;forcedJumper=null;
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)if((r+c)%2){if(r<3)b[r][c]=-1;if(r>4)b[r][c]=1;}draw();setStatus('Your move (red)  •  Wins: '+wins(gm.id));}
   function moves(bd,player){const list=[];const caps=[];
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=bd[r][c];if(!v||Math.sign(v)!==player)continue;const king=Math.abs(v)===2;
@@ -239,13 +239,13 @@ function game_checkers(gm){
     const v=b[r][c];if(v){const piece=el('div',{style:`width:40px;height:40px;border-radius:50%;background:${v>0?'radial-gradient(circle at 35% 30%,#ff7a7a,#cc1f1f)':'radial-gradient(circle at 35% 30%,#5a6080,#1a1d2e)'};border:3px solid ${v>0?'#fff':'#cfd6ff'};box-shadow:0 2px 4px #0006;display:flex;align-items:center;justify-content:center;color:#ffd34d;font-weight:800;font-size:22px`});if(Math.abs(v)===2)piece.textContent='♛';d.append(piece);}
     d.onclick=()=>click(r,c);board.append(d);}}
   function showHint(){if(over||turn!==1)return;const legal=moves(b,1);if(!legal.length){setStatus('No legal moves.');return;}const m=legal.find(x=>x.cr!=null)||legal[0];sel={r:m.fr,c:m.fc};draw();setStatus('💡 Move the highlighted red piece to row '+(m.tr+1)+', column '+(m.tc+1)+(m.cr!=null?' to capture.':'.'));}
-  function click(r,c){if(over||turn!==1)return;const legal=moves(b,1);
+  function click(r,c){if(over||turn!==1)return;let legal=moves(b,1);if(forcedJumper)legal=legal.filter(x=>x.fr===forcedJumper.r&&x.fc===forcedJumper.c);
     if(sel){const m=legal.find(x=>x.fr===sel.r&&x.fc===sel.c&&x.tr===r&&x.tc===c);
       if(m){apply(b,m);sel=null;
         // multi-capture
-        if(m.cr!=null){const more=moves(b,1).filter(x=>x.fr===m.tr&&x.fc===m.tc&&x.cr!=null);if(more.length){sel={r:m.tr,c:m.tc};draw();return;}}
-        endTurn();return;}
-      sel=null;draw();return;}
+        if(m.cr!=null){const more=moves(b,1).filter(x=>x.fr===m.tr&&x.fc===m.tc&&x.cr!=null);if(more.length){forcedJumper={r:m.tr,c:m.tc};sel={r:m.tr,c:m.tc};draw();setStatus('Keep jumping with the highlighted piece.');return;}}
+        forcedJumper=null;endTurn();return;}
+      if(forcedJumper){sel={r:forcedJumper.r,c:forcedJumper.c};draw();setStatus('You must continue the jump with the highlighted piece.');return;}sel=null;draw();return;}
     if(b[r][c]>0&&legal.some(x=>x.fr===r&&x.fc===c)){sel={r,c};draw();}}
   function endTurn(){draw();if(checkEnd())return;turn=2;setStatus('🤔 AI is thinking…');setTimeout(aiMove,700);}
   function aiMove(){if(over)return;let legal=moves(b,-1);if(!legal.length){over=true;addWin(gm.id);setStatus('🎉 You win! AI has no moves');return;}
@@ -441,7 +441,8 @@ function game_chess(gm){
     // Hard also tries not to walk into an easy capture on the next move.
     if(side==='b'&&CHDIFF==='hard')ranked=ranked.map(x=>{const nb=b.map(row=>row.slice());doMove(nb,x.m);const reply=genMoves(nb,'w',true).reduce((mx,m)=>Math.max(mx,nb[m.tr][m.tc]?pieceVal(nb[m.tr][m.tc]):0),0);return{x:x.m,score:x.score-reply*3};}).sort((a,b)=>b.score-a.score).map(x=>({m:x.x,score:x.score}));
     return ranked[0].m;}
-  function showHint(){if(over||turn!=='w'){setStatus('Hint is available on your turn.');return;}const m=chooseMove('w');if(!m){setStatus('No legal hint available.');return;}sel=[m.fr,m.fc];draw();setStatus('💡 Try '+coord(m.fr,m.fc)+' to '+coord(m.tr,m.tc)+'. Highlighted dots show the move.');}
+  function hintMove(side){const saved=CHDIFF;CHDIFF='hard';const m=chooseMove(side);CHDIFF=saved;return m;}
+  function showHint(){if(over||turn!=='w'){setStatus('Hint is available on your turn.');return;}const m=hintMove('w');if(!m){setStatus('No legal hint available.');return;}sel=[m.fr,m.fc];draw();setStatus('💡 Try '+coord(m.fr,m.fc)+' to '+coord(m.tr,m.tc)+'. Highlighted dots show the move.');}
   function coord(r,c){return FILES[c]+(8-r);}
   function aiMove(){if(over)return;const best=chooseMove('b');if(!best){endCheck('b');return;}doMove(b,best);if(b[best.tr][best.tc]==='p'&&best.tr===7)b[best.tr][best.tc]='q';lastAI={from:[best.fr,best.fc],to:[best.tr,best.tc]};draw();if(endCheck('b'))return;turn='w';setStatus('🔵 AI moved the piece highlighted in blue — your move (white)');}
   function endCheck(justMoved){const opp=justMoved==='w'?'b':'w';const oppMoves=genMoves(b,opp,true);
@@ -453,7 +454,7 @@ function game_chess(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
-/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, varied practice) ===== */
 var DIFFS=localStorage.getItem('l2diff')||'med';
 function DfS(e,m,h){return DIFFS==='easy'?e:DIFFS==='hard'?h:m;}
 function rS(n){return Math.floor(Math.random()*n);}
@@ -485,7 +486,7 @@ function game_slpattern(gm){return mcqS(gm,'What comes next in the pattern?',fun
 function game_slmiss(gm){return mcqS(gm,'Find the missing number.',function(){var s=rS(DfS(10,40,200))+1,st=DfS(2,3,7);var seq=[s,s+st,s+2*st,s+3*st];var hide=rS(4);var miss=seq[hide];seq[hide]='?';return{q:seq.join(', '),a:miss,wr:nS(miss,st+2)};});}
 function game_slodd(gm){return mcqS(gm,'Three share a multiple — tap the odd one out.',function(){var k=rS(DfS(4,7,11))+2;var arr=[];for(var i=0;i<3;i++)arr.push(k*(rS(9)+1));var odd=k*(rS(9)+1)+(rS(2)?1:-1);while(odd%k===0||arr.indexOf(odd)>=0)odd++;arr.push(odd);return{q:'Which is NOT a multiple of '+k+'?',a:odd,wr:arr.filter(function(x){return x!==odd;})};});}
 function game_slbiggest(gm){return mcqS(gm,'Tap the biggest number.',function(){var s=new Set();while(s.size<DfS(2,3,4))s.add(rS(DfS(99,999,99999))+1);var a=[...s];var ans=Math.max.apply(null,a);return{q:'Which is biggest?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
-function game_slcompare(gm){return mcqS(gm,'Which sum is bigger?',function(){var a,b,c,d;do{a=rS(60)+1;b=rS(60)+1;c=rS(60)+1;d=rS(60)+1;}while(a+b===c+d);var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);var ans=(a+b)>(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[ans===s1?s2:s1]};});}
+function game_slcompare(gm){return mcqS(gm,'Which sum is bigger?',function(){var a=rS(60)+1,b=rS(60)+1,c=rS(60)+1,d=rS(60)+1;var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);if(a+b===c+d)return{q:'Which is bigger?',a:'They are equal',wr:[s1,s2]};var ans=(a+b)>(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[ans===s1?s2:s1]};});}
 function game_slmultiple(gm){return mcqS(gm,'Find the next multiple.',function(){var k=rS(DfS(5,9,12))+2;var n=rS(60)+5;var ans=(Math.floor(n/k)+1)*k;return{q:'Next multiple of '+k+' after '+n+'?',a:ans,wr:nS(ans,k+2)};});}
 function game_slround(gm){return mcqS(gm,'Round to the nearest 10.',function(){var n=rS(DfS(180,890,9000))+11;var a=Math.round(n/10)*10;return{q:'Round '+n+' to nearest 10',a:a,wr:[a+10,a-10,a+20,a-20].filter(function(x){return x>=0&&x!==a;})};});}
 function game_slplace(gm){return mcqS(gm,'Which digit is in the named place?',function(){var n=rS(DfS(900,9000,90000))+100;var s=String(n);var names=['ones','tens','hundreds','thousands','ten-thousands'];var i=rS(s.length);var dig=+s[s.length-1-i];return{q:'In '+n+', which digit is in the '+names[i]+' place?',a:dig,wr:nS(dig,4).filter(function(x){return x>=0&&x<=9;})};});}
@@ -519,7 +520,7 @@ function game_slmult10(gm){return mcqS(gm,'Multiply the number by 10.',function(
 function game_slnear100(gm){return mcqS(gm,'Round to the nearest 100.',function(){var n=rS(DfS(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_slskip(gm){return mcqS(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][rS(DfS(3,4,5))];var s=step*(rS(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nS(s+3*step,step+3)};});}
 function game_slchange(gm){return mcqS(gm,'How much change from one dollar (100¢)?',function(){var spent=rS(DfS(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nS(100-spent,DfS(6,12,20)).map(function(x){return x+'¢';})};});}
-function game_sltimeadd(gm){return mcqS(gm,'What time will it be later?',function(){var h=rS(12)+1;var add=rS(DfS(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rS(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_sltimeadd(gm){return mcqS(gm,'What time will it be later on a 12-hour clock?',function(){var h=rS(12)+1;var add=rS(DfS(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rS(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_sldivby(gm){return mcqS(gm,'Divide evenly.',function(){var d=[5,10,2,4][rS(DfS(2,3,4))];var qq=rS(DfS(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nS(qq,DfS(4,7,10))};});}
 function game_slnumword(gm){return mcqS(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rS(DfS(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nS(n,DfS(5,12,20))};});}
 function game_slexpand(gm){return mcqS(gm,'Add the expanded form.',function(){var h=rS(9)+1,t=rS(9)+1,o=rS(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nS(ans,DfS(20,80,200))};});}

@@ -555,7 +555,7 @@ function game_tribes(gm){
   return {stop:()=>{}};
 }
 
-/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, varied practice) ===== */
 var q3DIFF=localStorage.getItem('l2diff')||'med';
 function q3df(e,m,h){return q3DIFF==='easy'?e:q3DIFF==='hard'?h:m;}
 function q3r(n){return Math.floor(Math.random()*n);}
@@ -622,7 +622,7 @@ function game_3lmult10(gm){return q3mcq(gm,'Multiply the number by 10.',function
 function game_3lnear100(gm){return q3mcq(gm,'Round to the nearest 100.',function(){var n=q3r(q3df(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_3lskip(gm){return q3mcq(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][q3r(q3df(3,4,5))];var s=step*(q3r(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:q3n(s+3*step,step+3)};});}
 function game_3lchange(gm){return q3mcq(gm,'How much change from one dollar (100¢)?',function(){var spent=q3r(q3df(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:q3n(100-spent,q3df(6,12,20)).map(function(x){return x+'¢';})};});}
-function game_3ltimeadd(gm){return q3mcq(gm,'What time will it be later?',function(){var h=q3r(12)+1;var add=q3r(q3df(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=q3r(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_3ltimeadd(gm){return q3mcq(gm,'What time will it be later on a 12-hour clock?',function(){var h=q3r(12)+1;var add=q3r(q3df(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=q3r(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_3ldivby(gm){return q3mcq(gm,'Divide evenly.',function(){var d=[5,10,2,4][q3r(q3df(2,3,4))];var qq=q3r(q3df(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:q3n(qq,q3df(4,7,10))};});}
 function game_3lnumword(gm){return q3mcq(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=q3r(q3df(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:q3n(n,q3df(5,12,20))};});}
 function game_3lexpand(gm){return q3mcq(gm,'Add the expanded form.',function(){var h=q3r(9)+1,t=q3r(9)+1,o=q3r(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:q3n(ans,q3df(20,80,200))};});}

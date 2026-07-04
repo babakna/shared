@@ -619,7 +619,7 @@ function game_whack(gm){
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
 function el(tag,props={},...kids){var e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(function(k){e.append(typeof k==='string'?document.createTextNode(k):k);});return e;}
-/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+/* ===== Brain & Logic quiz framework (Easy/Med/Hard + help, varied practice) ===== */
 var qADIFF=localStorage.getItem('l2diff')||'med';
 function qAdf(e,m,h){return qADIFF==='easy'?e:qADIFF==='hard'?h:m;}
 function qAr(n){return Math.floor(Math.random()*n);}
@@ -686,7 +686,7 @@ function game_Almult10(gm){return qAmcq(gm,'Multiply the number by 10.',function
 function game_Alnear100(gm){return qAmcq(gm,'Round to the nearest 100.',function(){var n=qAr(qAdf(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_Alskip(gm){return qAmcq(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][qAr(qAdf(3,4,5))];var s=step*(qAr(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:qAn(s+3*step,step+3)};});}
 function game_Alchange(gm){return qAmcq(gm,'How much change from one dollar (100¢)?',function(){var spent=qAr(qAdf(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:qAn(100-spent,qAdf(6,12,20)).map(function(x){return x+'¢';})};});}
-function game_Altimeadd(gm){return qAmcq(gm,'What time will it be later?',function(){var h=qAr(12)+1;var add=qAr(qAdf(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=qAr(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_Altimeadd(gm){return qAmcq(gm,'What time will it be later on a 12-hour clock?',function(){var h=qAr(12)+1;var add=qAr(qAdf(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=qAr(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_Aldivby(gm){return qAmcq(gm,'Divide evenly.',function(){var d=[5,10,2,4][qAr(qAdf(2,3,4))];var qq=qAr(qAdf(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:qAn(qq,qAdf(4,7,10))};});}
 function game_Alnumword(gm){return qAmcq(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=qAr(qAdf(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:qAn(n,qAdf(5,12,20))};});}
 function game_Alexpand(gm){return qAmcq(gm,'Add the expanded form.',function(){var h=qAr(9)+1,t=qAr(9)+1,o=qAr(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:qAn(ans,qAdf(20,80,200))};});}

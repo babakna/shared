@@ -105,7 +105,7 @@ function quiz(gen){
   const fb=el('div',{className:'big',style:'min-height:26px'});
   const next=el('button',{className:'btn',textContent:'Next ▶'});
   host.append(diffRow,qEl,opts,fb,next);
-  function round(){const d=gen(DIFF);qEl.innerHTML=d.q;fb.textContent='';
+  function round(){const d=gen(DIFF);qEl.textContent=d.q;fb.textContent='';
     const optN={easy:2,med:3,hard:4}[DIFF];
     const all=shuffle([d.a,...(d.wr||[]).slice(0,optN)]).map(String);
     const long=all.some(o=>o.length>14);opts.style.gridTemplateColumns=long?'1fr':'1fr 1fr';opts.innerHTML='';
@@ -141,7 +141,7 @@ const STATECAPS=STATES.map(s=>s[1]);
 const LANDMARK=[["Eiffel Tower","France"],["Statue of Liberty","United States"],["Big Ben","United Kingdom"],["Colosseum","Italy"],["Great Pyramids","Egypt"],["Great Wall","China"],["Taj Mahal","India"],["Sydney Opera House","Australia"],["Christ the Redeemer","Brazil"],["Leaning Tower of Pisa","Italy"],["Mount Fuji","Japan"],["Acropolis","Greece"],["Machu Picchu","Peru"],["CN Tower","Canada"]];
 const LANDFORM=[["A very tall landform with a peak","Mountain"],["A low area between mountains","Valley"],["Land surrounded by water","Island"],["A dry, sandy region","Desert"],["A large body of salt water","Ocean"],["A flowing body of fresh water","River"],["Flat grassy land","Plain"],["A small raised landform","Hill"],["Water falling from a height","Waterfall"],["A frozen river of ice","Glacier"]];
 const LANDFORMS=["Mountain","Valley","Island","Desert","Ocean","River","Plain","Hill","Waterfall","Glacier","Lake","Forest"];
-const HOMO=[["I have ___ apples.","two",["to","too","tow"]],["Are you coming ___?","too",["two","to","tu"]],["Let's go ___ the park.","to",["two","too","too"]],["The dog wagged ___ tail.","its",["it's","its'"]],["Put it over ___.","there",["their","they're"]],["___ my best friends.","They're",["Their","There"]],["That is ___ house.","their",["there","they're"]],["I can ___ the music.","hear",["here","heir"]],["Come ___ please.","here",["hear","heer"]],["She ___ a red hat.","wore",["war","ware"]]];
+const HOMO=[["I have ___ apples.","two",["to","too","tow"]],["Are you coming ___?","too",["two","to","tu"]],["Let's go ___ the park.","to",["two","too","toward"]],["The dog wagged ___ tail.","its",["it's","its'"]],["Put it over ___.","there",["their","they're"]],["___ my best friends.","They're",["Their","There"]],["That is ___ house.","their",["there","they're"]],["I can ___ the music.","hear",["here","heir"]],["Come ___ please.","here",["hear","heer"]],["She ___ a red hat.","wore",["war","ware"]]];
 const COMPOUND=["rainbow","sunflower","football","cupcake","bedroom","starfish","butterfly","snowman","pancake","toothbrush","backpack","cowboy","popcorn","seashell","ladybug","firefly","raincoat","sandbox"];
 const NOTCOMP=["banana","pencil","window","purple","garden","dragon","planet","cookie","silver","monkey","tiger","orange"];
 const SENT=[["What is your name?","Question"],["I love pizza.","Statement"],["Watch out!","Exclamation"],["Please sit down.","Command"],["The sky is blue.","Statement"],["Where are you going?","Question"],["That is amazing!","Exclamation"],["Close the door.","Command"],["Do you like dogs?","Question"],["We had fun today.","Statement"]];
@@ -176,7 +176,7 @@ const GAMES=[
  {id:'perimeter',name:'Perimeter',ico:'🔲',fn:()=>quiz(()=>{const hi=D(6,12,20);const l=ri(2,hi),w=ri(2,hi);return{q:'A rectangle is '+l+' by '+w+'. PERIMETER = ?',a:2*(l+w),wr:nums(2*(l+w),D(6,10,18))};})},
  {id:'prime',name:'Prime Numbers',ico:'🥇',fn:()=>quiz(()=>{const n=ri(2,D(20,40,100));const isP=x=>{if(x<2)return false;for(let i=2;i*i<=x;i++)if(x%i===0)return false;return true;};return{q:'Is '+n+' a PRIME number?',a:isP(n)?'Prime':'Not prime',wr:[isP(n)?'Not prime':'Prime']};})},
  {id:'multiples',name:'Multiples',ico:'🔁',fn:()=>quiz(()=>{const N=ri(2,D(5,9,12));const m=ri(2,9);const ans=N*m;const set=new Set([ans]);while(set.size<5){const x=ri(2,D(40,90,150));if(x%N!==0)set.add(x);}return{q:'Which number is a multiple of '+N+'?',a:ans,wr:[...set].filter(x=>x!==ans)};})},
- {id:'fraccmp',name:'Compare Fractions',ico:'🍕',fn:()=>quiz(()=>{const pool=D([2,3,4],[2,3,4,5,6,8],[3,5,6,7,8,9,10,12]);const ds=shuffle(pool.slice()).slice(0,D(2,3,4));const big='1/'+Math.min(...ds);return{q:'Which fraction is BIGGER?',a:big,wr:ds.filter(x=>x!==Math.min(...ds)).map(x=>'1/'+x)};})},
+ {id:'fraccmp',name:'Compare Fractions',ico:'🍕',fn:()=>quiz(()=>{const pool=[...new Set(D([2,3,4],[2,3,4,5,6,8],[3,5,6,7,8,9,10,12]))];const ds=shuffle(pool.slice()).slice(0,D(2,3,4));const minD=Math.min(...ds),big='1/'+minD;return{q:'Which fraction is BIGGER?',a:big,wr:[...new Set(ds.filter(x=>x!==minD).map(x=>'1/'+x))]};})},
  {id:'synonyms',name:'Synonyms',ico:'🟰',fn:()=>quiz(()=>{const p=pickItem(SYN);return{q:'Which word means the SAME as "'+p[0]+'"?',a:p[1],wr:wf(SYN.map(x=>x[1]),p[1])};})},
  {id:'rhyme',name:'Rhyming Words',ico:'🎵',fn:()=>quiz(()=>{const g=pickItem(RHY);const w=g[0],a=pickItem(g.slice(1));return{q:'Which word RHYMES with "'+w+'"?',a:a,wr:shuffle(RHY.filter(x=>x!==g)).slice(0,4).map(x=>x[0])};})},
  {id:'plural',name:'Plurals',ico:'📦',fn:()=>quiz(()=>{const p=pickItem(PLU);return{q:'What is the plural of "'+p[0]+'"?',a:p[1],wr:wf(PLU.map(x=>x[1]),p[1])};})},

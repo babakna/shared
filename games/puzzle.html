@@ -232,8 +232,9 @@ function game_sudoku(gm){
   const clearBt=el('button',{className:'btn ghost',textContent:'Clear'});clearBt.onclick=()=>put(0);keypad.append(clearBt);
   function reset(){gen();sel=null;draw();setStatus('New puzzle — tap a cell, then tap a number.');}
   newBtn.onclick=reset;
-  checkBtn.onclick=()=>{let full=true,correct=true;for(let r=0;r<9;r++)for(let c=0;c<9;c++){if(!puzzle[r][c])full=false;else if(puzzle[r][c]!==solution[r][c])correct=false;}
-    setStatus(!full?'Not finished yet':correct?'🎉 Solved correctly!':'❌ Some cells are wrong');if(full&&correct)setHs(gm.id,1);};
+  function validGrid(){for(let i=0;i<9;i++){const row=new Set(),col=new Set();for(let j=0;j<9;j++){row.add(puzzle[i][j]);col.add(puzzle[j][i]);}if(row.size!==9||col.size!==9||row.has(0)||col.has(0))return false;}for(let br=0;br<9;br+=3)for(let bc=0;bc<9;bc+=3){const box=new Set();for(let r=0;r<3;r++)for(let c=0;c<3;c++)box.add(puzzle[br+r][bc+c]);if(box.size!==9||box.has(0))return false;}return true;}
+  checkBtn.onclick=()=>{let full=true;for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(!puzzle[r][c])full=false;const correct=full&&validGrid();
+    setStatus(!full?'Not finished yet':correct?'🎉 Solved correctly!':'❌ Some cells are wrong');if(correct)setHs(gm.id,1);};
   const off=keyHandler({_:0});
   const dn=e=>{if(!sel)return;const[r,c]=sel;if(given[r][c])return;if(e.key>='1'&&e.key<='9'){puzzle[r][c]=+e.key;draw();}if(e.key==='Backspace'||e.key==='0'||e.key==='Delete'){puzzle[r][c]=0;draw();}};
   window.addEventListener('keydown',dn);
@@ -315,7 +316,7 @@ function game_lights(gm){
 
 /* ---------------- SOKOBAN ---------------- */
 function game_sokoban(gm){
-  setHint('Arrow keys to push boxes 📦 onto targets ⭐. R to reset level.');
+  setHint('Use arrow keys or the on-screen arrows to push boxes 📦 onto targets ⭐. R resets.');
   const LEVELS=[
    ["#######","#  .  #","#  $  #","#@ $ .#","#     #","#######"],
    ["########","#   . .#","# $$   #","# @ ## #","#   .. #","# $$   #","########"],
@@ -328,7 +329,7 @@ function game_sokoban(gm){
   const resetB=el('button',{className:'btn',textContent:'Reset'});
   info.append(prevB,resetB,nextB);
   const board=el('div',{style:'font-family:monospace;font-size:30px;line-height:30px;letter-spacing:4px'});
-  host.append(info,board);
+  const pad=el('div',{className:'kid-choice-row'});[['⬅️',-1,0],['⬆️',0,-1],['⬇️',0,1],['➡️',1,0]].forEach(([label,dx,dy])=>{const bt=el('button',{className:'btn ghost',textContent:label});bt.onclick=()=>move(dx,dy);pad.append(bt);});host.append(info,board,pad);
   function load(){const L=LEVELS[lvl];map=L.map(r=>r.split(''));moves=0;
     for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++){if(map[r][c]==='@'){px=c;py=r;map[r][c]=' ';}if(map[r][c]==='+'){px=c;py=r;map[r][c]='.';}}draw();}
   function targets(){let t=[];for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++)if(map[r][c]==='.'||map[r][c]==='*')t.push([r,c]);return t;}
@@ -400,14 +401,16 @@ function game_simon(gm){
 
 /* ---------------- NONOGRAM ---------------- */
 function game_nonogram(gm){
-  setHint('Use the number clues to fill the right cells. Left-click fill, right-click mark X.');
+  setHint('Mini Nonogram practice: use the clues to match the hidden picture. This pack uses small generated puzzles.');
   const N=5;let sol,grid;
   const newBtn=el('button',{className:'btn',textContent:'New Puzzle'});
   const checkBtn=el('button',{className:'btn ghost',textContent:'Check'});
+  let markMode=false;const modeBtn=el('button',{className:'btn ghost',textContent:'Mode: Fill'});modeBtn.onclick=()=>{markMode=!markMode;modeBtn.textContent=markMode?'Mode: Mark X':'Mode: Fill';};
   const cont=el('div',{});
-  host.append(el('div',{style:'display:flex;gap:8px'},newBtn,checkBtn),cont);
+  host.append(el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;justify-content:center'},newBtn,checkBtn,modeBtn),cont);
   function clues(arr){const out=[];let cnt=0;arr.forEach(v=>{if(v){cnt++;}else{if(cnt)out.push(cnt);cnt=0;}});if(cnt)out.push(cnt);return out.length?out:[0];}
-  function reset(){sol=Array.from({length:N*N},()=>Math.random()<0.55?1:0);grid=Array(N*N).fill(0);draw();setStatus('Fill the grid');}
+  const PUZZLES=[[1,0,1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,0,1,0,1],[0,1,1,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,0,0,0,1],[1,1,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,0,0,1,1,1,0,1,1]];
+  function reset(){sol=PUZZLES[Math.floor(Math.random()*PUZZLES.length)].slice();grid=Array(N*N).fill(0);draw();setStatus('Fill the grid');}
   function draw(){cont.innerHTML='';
     const rowClues=[],colClues=[];
     for(let r=0;r<N;r++)rowClues.push(clues(sol.slice(r*N,r*N+N)));
@@ -421,7 +424,7 @@ function game_nonogram(gm){
         const td=el('td',{style:'padding:0'});
         const d=el('div',{style:`width:42px;height:42px;border:1px solid #34406a;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;background:${v===1?'#5ed':'#121a2e'};color:#f88`});
         if(v===2)d.textContent='✕';
-        d.onclick=()=>{grid[i]=grid[i]===1?0:1;draw();};
+        d.onclick=()=>{if(markMode)grid[i]=grid[i]===2?0:2;else grid[i]=grid[i]===1?0:1;draw();};
         d.oncontextmenu=e=>{e.preventDefault();grid[i]=grid[i]===2?0:2;draw();};
         td.append(d);tr.append(td);}
       tbl.append(tr);}
@@ -455,7 +458,7 @@ function game_fifteen(gm){
 
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}
-/* ===== Puzzle quiz framework (Easy/Med/Hard + help, 500+ variations) ===== */
+/* ===== Puzzle quiz framework (Easy/Med/Hard + help, varied practice) ===== */
 var DIFFP=localStorage.getItem('l2diff')||'med';
 function DfP(e,m,h){return DIFFP==='easy'?e:DIFFP==='hard'?h:m;}
 function rP(n){return Math.floor(Math.random()*n);}
@@ -511,7 +514,7 @@ function game_pmult10(gm){return mcqP(gm,'Multiply the number by 10.',function()
 function game_pnear100(gm){return mcqP(gm,'Round to the nearest 100.',function(){var n=rP(DfP(900,4900,49000))+50;var a=Math.round(n/100)*100;return{q:'Round '+n+' to the nearest 100',a:a,wr:[a+100,a-100,a+200,a-200].filter(function(x){return x>=0&&x!==a;})};});}
 function game_pskip(gm){return mcqP(gm,'Skip counting — what comes next?',function(){var step=[2,5,10,3,4][rP(DfP(3,4,5))];var s=step*(rP(8)+1);return{q:s+', '+(s+step)+', '+(s+2*step)+', ?',a:s+3*step,wr:nP(s+3*step,step+3)};});}
 function game_pchange(gm){return mcqP(gm,'How much change from one dollar (100¢)?',function(){var spent=rP(DfP(90,98,98))+1;return{q:'You spend '+spent+'¢. Change from 100¢?',a:(100-spent)+'¢',wr:nP(100-spent,DfP(6,12,20)).map(function(x){return x+'¢';})};});}
-function game_ptimeadd(gm){return mcqP(gm,'What time will it be later?',function(){var h=rP(12)+1;var add=rP(DfP(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rP(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock is?",a:ans+":00",wr:wr};});}
+function game_ptimeadd(gm){return mcqP(gm,'What time will it be later on a 12-hour clock?',function(){var h=rP(12)+1;var add=rP(DfP(3,6,9))+1;var ans=((h+add-1)%12)+1;var wr=[];while(wr.length<4){var v=rP(12)+1;if(v!==ans&&wr.indexOf(v+":00")<0)wr.push(v+":00");}return{q:add+' hours after '+h+" o'clock on a 12-hour clock is?",a:ans+":00",wr:wr};});}
 function game_pdivby(gm){return mcqP(gm,'Divide evenly.',function(){var d=[5,10,2,4][rP(DfP(2,3,4))];var qq=rP(DfP(8,15,30))+2;var n=d*qq;return{q:n+' ÷ '+d+' = ?',a:qq,wr:nP(qq,DfP(4,7,10))};});}
 function game_pnumword(gm){return mcqP(gm,'Which number matches the words?',function(){function tw(n){var o=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];var t=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];if(n<20)return o[n];return t[Math.floor(n/10)]+(n%10?'-'+o[n%10]:'');}var n=rP(DfP(20,99,99))+1;return{q:'Which number is "'+tw(n)+'"?',a:n,wr:nP(n,DfP(5,12,20))};});}
 function game_pexpand(gm){return mcqP(gm,'Add the expanded form.',function(){var h=rP(9)+1,t=rP(9)+1,o=rP(9)+1;var ans=h*100+t*10+o;return{q:(h*100)+' + '+(t*10)+' + '+o+' = ?',a:ans,wr:nP(ans,DfP(20,80,200))};});}

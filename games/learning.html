@@ -264,8 +264,8 @@
                 <label><input type="radio" name="mathDiff" value="hard" onchange="initMath()"> Hard</label>
             </div>
             <div id="math-problem" class="question-text" style="font-size: 3rem;"></div>
-            <input type="number" id="math-answer" onkeypress="if(event.key==='Enter') checkMath()">
-            <button class="action-btn" onclick="checkMath()">Check Answer</button>
+            <input type="number" id="math-answer" onkeypress="if(event.key==='Enter') checkMath()" style="display:none">
+            <button class="action-btn" onclick="checkMath()" style="display:none">Check Answer</button>
             <div id="math-result" class="feedback"></div>
         </div>
 
@@ -292,8 +292,8 @@
             </div>
             <div class="question-text">Unscramble the word!</div>
             <div id="scramble-word" style="font-size: 2.5rem; letter-spacing: 5px; margin: 15px; font-weight:bold; color:var(--primary);"></div>
-            <input type="text" id="scramble-input" onkeypress="if(event.key==='Enter') checkScramble()">
-            <button class="action-btn" onclick="checkScramble()">Check</button>
+            <input type="text" id="scramble-input" onkeypress="if(event.key==='Enter') checkScramble()" style="display:none">
+            <button class="action-btn" onclick="checkScramble()" style="display:none">Check</button>
             <div id="scramble-result" class="feedback"></div>
             <button class="action-btn" onclick="initScramble()">Next Word</button>
         </div>
@@ -623,7 +623,7 @@
         }
 
         function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
-        /* ----- GAMES 27-35 (procedural, 500+ variations each) ----- */
+        /* ----- GAMES 27-35 (procedural, varied practice questions) ----- */
         function riA(a,b){return a+Math.floor(Math.random()*(b-a+1));}
         function nA(ans,sp){var s=new Set([String(ans)]);var g=0;while(s.size<4&&g<60){g++;var v=ans+riA(-sp,sp);if(v>=0)s.add(String(v));}return [...s].filter(function(x){return x!==String(ans);}).slice(0,3);}
         var RNA=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
@@ -851,7 +851,7 @@
         let codes = [{ q: "The robot faces North. Target is 1 step North, 1 step East.", a: "Move Forward, Turn Right, Move Forward", wr: ["Turn Left, Move Forward", "Move Forward, Turn Left"] }];
         function initCoding() { let cData = getRandomItem(codes, 'code'); document.getElementById('code-q').innerText = cData.q; document.getElementById('code-feedback').innerText = ''; populateOptions([cData.a, ...cData.wr], 'code-options', 'code-feedback', cData.a, "Code accepted! 🤖"); document.querySelectorAll('#code-options button').forEach(b => {b.style.display="block"; b.style.width="90%"; b.style.margin="10px auto";}); }
 
-        let fixerQs = [{ c: "BEAUTIFUL", w: ["BEUTIFUL", "BEATIFUL", "BEEUTIFUL"] }, { c: "BECAUSE", w: ["BECUASE", "BECAUS", "BECUZ"] }, { c: "FRIEND", w: ["FREIND", "FRIND", "FRIEND"] }];
+        let fixerQs = [{ c: "BEAUTIFUL", w: ["BEUTIFUL", "BEATIFUL", "BEEUTIFUL"] }, { c: "BECAUSE", w: ["BECUASE", "BECAUS", "BECUZ"] }, { c: "FRIEND", w: ["FREIND", "FRIND", "FREND"] }];
         function initFixer() { let fData = getRandomItem(fixerQs, 'fixer'); document.getElementById('fixer-feedback').innerText = ''; populateOptions([fData.c, ...fData.w.slice(0,2)], 'fixer-options', 'fixer-feedback', fData.c, "Great Spelling! 📝"); }
 
         let fractQs = [{ q: "What is 1/2 of 10?", a: "5", wr: ["2", "10", "4"] }, { q: "Which fraction is the biggest?", a: "1/2", wr: ["1/4", "1/8", "1/10"] }, { q: "If you have 4 slices of an 8-slice pizza, how much is that?", a: "1/2", wr: ["1/4", "3/4", "Whole"] }];
@@ -940,7 +940,7 @@
     function initScramble(){let diff='medium';const r=document.querySelector('input[name="scrambleDiff"]:checked');if(r)diff=r.value;
       const pool=SPELL_WORDS.filter(w=>diff==='easy'?w.length<=4:diff==='hard'?w.length>=7:(w.length>=5&&w.length<=6));const src=pool.length?pool:SPELL_WORDS;
       curScramble=src[Math.floor(Math.random()*src.length)].toLowerCase();let sc=curScramble.split('').sort(()=>0.5-Math.random()).join('');if(sc===curScramble&&curScramble.length>2)sc=curScramble[1]+curScramble[0]+curScramble.slice(2);
-      document.getElementById('scramble-word').innerText=sc.toUpperCase();document.getElementById('scramble-input').value='';document.getElementById('scramble-result').innerText='';}
+      document.getElementById('scramble-word').innerText=sc.toUpperCase();document.getElementById('scramble-input').value='';document.getElementById('scramble-result').innerText='';const distractors=src.filter(w=>w!==curScramble).slice(0,12).map(w=>w.toUpperCase());populateQuickChoices([curScramble.toUpperCase()].concat(shuffle(distractors).slice(0,3)),'scramble-choices',curScramble.toUpperCase(),()=>{document.getElementById('scramble-result').innerText='Excellent! 🎉';setTimeout(initScramble,1500);},()=>{document.getElementById('scramble-result').innerText='Try again!';});}
 
     // ---- GRAMMAR (endless) ----
     const G_ART=["The","A","My","Our","That"],G_ADJ=["happy","tall","brave","funny","tiny","old","clever","quick","gentle","sleepy","shiny","grumpy","curious","silly","kind"],G_NOUN=["dog","boy","sister","knight","clown","ant","teacher","wizard","cat","robot","girl","farmer","dragon","puppy","bird"],G_VERB=["jumped","ran","sang","danced","smiled","climbed","painted","waved","laughed","slept","hopped","giggled","marched","whistled","yawned"];
@@ -952,19 +952,19 @@
 
     // ---- GEOGRAPHY + CONTINENTS (300+ via 80 countries × question types) ----
     const COUNTRIES=[
-     {c:"France",cap:"Paris",k:"Europe"},{c:"Germany",cap:"Berlin",k:"Europe"},{c:"Italy",cap:"Rome",k:"Europe"},{c:"Spain",cap:"Madrid",k:"Europe"},{c:"Portugal",cap:"Lisbon",k:"Europe"},{c:"Greece",cap:"Athens",k:"Europe"},{c:"England",cap:"London",k:"Europe"},{c:"Ireland",cap:"Dublin",k:"Europe"},{c:"Norway",cap:"Oslo",k:"Europe"},{c:"Sweden",cap:"Stockholm",k:"Europe"},{c:"Finland",cap:"Helsinki",k:"Europe"},{c:"Denmark",cap:"Copenhagen",k:"Europe"},{c:"Poland",cap:"Warsaw",k:"Europe"},{c:"Austria",cap:"Vienna",k:"Europe"},{c:"Switzerland",cap:"Bern",k:"Europe"},{c:"Netherlands",cap:"Amsterdam",k:"Europe"},{c:"Belgium",cap:"Brussels",k:"Europe"},{c:"Russia",cap:"Moscow",k:"Europe"},{c:"Hungary",cap:"Budapest",k:"Europe"},{c:"Iceland",cap:"Reykjavik",k:"Europe"},
+     {c:"France",cap:"Paris",k:"Europe"},{c:"Germany",cap:"Berlin",k:"Europe"},{c:"Italy",cap:"Rome",k:"Europe"},{c:"Spain",cap:"Madrid",k:"Europe"},{c:"Portugal",cap:"Lisbon",k:"Europe"},{c:"Greece",cap:"Athens",k:"Europe"},{c:"United Kingdom",cap:"London",k:"Europe"},{c:"Ireland",cap:"Dublin",k:"Europe"},{c:"Norway",cap:"Oslo",k:"Europe"},{c:"Sweden",cap:"Stockholm",k:"Europe"},{c:"Finland",cap:"Helsinki",k:"Europe"},{c:"Denmark",cap:"Copenhagen",k:"Europe"},{c:"Poland",cap:"Warsaw",k:"Europe"},{c:"Austria",cap:"Vienna",k:"Europe"},{c:"Switzerland",cap:"Bern",k:"Europe"},{c:"Netherlands",cap:"Amsterdam",k:"Europe"},{c:"Belgium",cap:"Brussels",k:"Europe"},{c:"Russia",cap:"Moscow",k:"Europe"},{c:"Hungary",cap:"Budapest",k:"Europe"},{c:"Iceland",cap:"Reykjavik",k:"Europe"},
      {c:"China",cap:"Beijing",k:"Asia"},{c:"Japan",cap:"Tokyo",k:"Asia"},{c:"India",cap:"New Delhi",k:"Asia"},{c:"South Korea",cap:"Seoul",k:"Asia"},{c:"Thailand",cap:"Bangkok",k:"Asia"},{c:"Vietnam",cap:"Hanoi",k:"Asia"},{c:"Indonesia",cap:"Jakarta",k:"Asia"},{c:"Philippines",cap:"Manila",k:"Asia"},{c:"Malaysia",cap:"Kuala Lumpur",k:"Asia"},{c:"Iran",cap:"Tehran",k:"Asia"},{c:"Iraq",cap:"Baghdad",k:"Asia"},{c:"Turkey",cap:"Ankara",k:"Asia"},{c:"Israel",cap:"Jerusalem",k:"Asia"},{c:"Pakistan",cap:"Islamabad",k:"Asia"},{c:"Nepal",cap:"Kathmandu",k:"Asia"},{c:"Saudi Arabia",cap:"Riyadh",k:"Asia"},{c:"Mongolia",cap:"Ulaanbaatar",k:"Asia"},{c:"Sri Lanka",cap:"Colombo",k:"Asia"},
      {c:"Egypt",cap:"Cairo",k:"Africa"},{c:"Kenya",cap:"Nairobi",k:"Africa"},{c:"Nigeria",cap:"Abuja",k:"Africa"},{c:"South Africa",cap:"Pretoria",k:"Africa"},{c:"Morocco",cap:"Rabat",k:"Africa"},{c:"Ghana",cap:"Accra",k:"Africa"},{c:"Ethiopia",cap:"Addis Ababa",k:"Africa"},{c:"Tanzania",cap:"Dodoma",k:"Africa"},{c:"Algeria",cap:"Algiers",k:"Africa"},{c:"Tunisia",cap:"Tunis",k:"Africa"},{c:"Uganda",cap:"Kampala",k:"Africa"},{c:"Senegal",cap:"Dakar",k:"Africa"},{c:"Zimbabwe",cap:"Harare",k:"Africa"},{c:"Libya",cap:"Tripoli",k:"Africa"},
      {c:"United States",cap:"Washington, D.C.",k:"North America"},{c:"Canada",cap:"Ottawa",k:"North America"},{c:"Mexico",cap:"Mexico City",k:"North America"},{c:"Cuba",cap:"Havana",k:"North America"},{c:"Jamaica",cap:"Kingston",k:"North America"},{c:"Panama",cap:"Panama City",k:"North America"},{c:"Guatemala",cap:"Guatemala City",k:"North America"},{c:"Costa Rica",cap:"San Jose",k:"North America"},{c:"Honduras",cap:"Tegucigalpa",k:"North America"},
      {c:"Brazil",cap:"Brasilia",k:"South America"},{c:"Argentina",cap:"Buenos Aires",k:"South America"},{c:"Chile",cap:"Santiago",k:"South America"},{c:"Peru",cap:"Lima",k:"South America"},{c:"Colombia",cap:"Bogota",k:"South America"},{c:"Venezuela",cap:"Caracas",k:"South America"},{c:"Ecuador",cap:"Quito",k:"South America"},{c:"Bolivia",cap:"La Paz",k:"South America"},{c:"Uruguay",cap:"Montevideo",k:"South America"},{c:"Paraguay",cap:"Asuncion",k:"South America"},
-     {c:"Australia",cap:"Canberra",k:"Australia"},{c:"New Zealand",cap:"Wellington",k:"Australia"},{c:"Fiji",cap:"Suva",k:"Australia"},
+     {c:"Australia",cap:"Canberra",k:"Australia"},{c:"New Zealand",cap:"Wellington",k:"Oceania"},{c:"Fiji",cap:"Suva",k:"Oceania"},
      {c:"Czechia",cap:"Prague",k:"Europe"},{c:"Romania",cap:"Bucharest",k:"Europe"},{c:"Ukraine",cap:"Kyiv",k:"Europe"},{c:"Croatia",cap:"Zagreb",k:"Europe"},{c:"Serbia",cap:"Belgrade",k:"Europe"},{c:"Bulgaria",cap:"Sofia",k:"Europe"},{c:"Scotland",cap:"Edinburgh",k:"Europe"},{c:"Slovakia",cap:"Bratislava",k:"Europe"},{c:"Lithuania",cap:"Vilnius",k:"Europe"},{c:"Latvia",cap:"Riga",k:"Europe"},
      {c:"Bangladesh",cap:"Dhaka",k:"Asia"},{c:"Cambodia",cap:"Phnom Penh",k:"Asia"},{c:"Myanmar",cap:"Naypyidaw",k:"Asia"},{c:"Jordan",cap:"Amman",k:"Asia"},{c:"Lebanon",cap:"Beirut",k:"Asia"},{c:"Qatar",cap:"Doha",k:"Asia"},{c:"Kazakhstan",cap:"Astana",k:"Asia"},{c:"Afghanistan",cap:"Kabul",k:"Asia"},{c:"Syria",cap:"Damascus",k:"Asia"},{c:"Singapore",cap:"Singapore",k:"Asia"},
      {c:"Cameroon",cap:"Yaounde",k:"Africa"},{c:"Angola",cap:"Luanda",k:"Africa"},{c:"Mozambique",cap:"Maputo",k:"Africa"},{c:"Zambia",cap:"Lusaka",k:"Africa"},{c:"Botswana",cap:"Gaborone",k:"Africa"},{c:"Mali",cap:"Bamako",k:"Africa"},{c:"Madagascar",cap:"Antananarivo",k:"Africa"},{c:"Rwanda",cap:"Kigali",k:"Africa"},
      {c:"Nicaragua",cap:"Managua",k:"North America"},{c:"El Salvador",cap:"San Salvador",k:"North America"},{c:"Dominican Republic",cap:"Santo Domingo",k:"North America"},{c:"Haiti",cap:"Port-au-Prince",k:"North America"},{c:"Belize",cap:"Belmopan",k:"North America"},
      {c:"Guyana",cap:"Georgetown",k:"South America"},{c:"Suriname",cap:"Paramaribo",k:"South America"}
     ];
-    const CONTS=["Europe","Asia","Africa","North America","South America","Australia","Antarctica"];
+    const CONTS=["Europe","Asia","Africa","North America","South America","Oceania","Antarctica"];
     const ALLCAPS=COUNTRIES.map(x=>x.cap),ALLCTRY=COUNTRIES.map(x=>x.c);
     function geoQuestion(){const o=COUNTRIES[Math.floor(Math.random()*COUNTRIES.length)];const t=Math.floor(Math.random()*4);
       if(t===0)return{q:"What is the capital of "+o.c+"?",a:o.cap,wr:pickN(ALLCAPS,o.cap,3)};
