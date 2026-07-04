@@ -42,6 +42,19 @@
   canvas{box-shadow:0 8px 26px rgba(0,0,0,.3)}
   ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
 </style>
+<style id="shared-game-polish">
+  body{overflow-x:hidden;padding-top:48px}
+  a[href="index.html"]:not(.pack),#themeToggle{min-height:34px;display:inline-flex!important;align-items:center;justify-content:center;white-space:nowrap;line-height:1.1;backdrop-filter:blur(10px)}
+  a[href="index.html"]:not(.pack){max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}
+  .bar{width:100%;display:grid!important;grid-template-columns:auto auto auto minmax(0,1fr);align-items:center;gap:8px!important;margin:0 0 12px!important;padding:8px;border:1px solid var(--border,#d3d8ec);border-radius:16px;background:color-mix(in srgb,var(--panel,#fff) 86%,transparent);box-shadow:0 8px 26px rgba(0,0,0,.12);position:sticky;top:48px;z-index:180;backdrop-filter:blur(12px)}
+  .bar .big{min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar .score{grid-column:1/-1;margin-left:0!important;width:100%;text-align:center;font-size:13px;line-height:1.35}
+  #gameZoomBar{left:50%!important;right:auto!important;bottom:max(10px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:330!important;padding:6px 10px!important;border:1px solid rgba(255,255,255,.2)!important;backdrop-filter:blur(10px)}
+  #gameZoomBar button{width:38px!important;height:38px!important;font-size:20px!important}#gameZoomBar span{font-size:13px!important;min-width:48px!important;color:#fff!important}
+  .kid-choice-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}.kid-choice-row .btn,.kid-choice-row button{min-width:58px}.kid-win-overlay{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.32),rgba(0,0,0,.18) 55%,rgba(0,0,0,.35));animation:kidFadeIn .18s ease-out}.kid-win-card{max-width:min(92vw,520px);padding:24px 28px;border-radius:28px;color:#fff;text-align:center;background:linear-gradient(135deg,#ff7ac8,#7c5cff 48%,#19c37d);box-shadow:0 24px 80px rgba(0,0,0,.42),inset 0 0 0 3px rgba(255,255,255,.32);transform:scale(.9);animation:kidPop .42s cubic-bezier(.2,1.4,.3,1) forwards}.kid-win-title{font-size:clamp(34px,9vw,62px);font-weight:1000;line-height:.95;text-shadow:0 4px 12px rgba(0,0,0,.28)}.kid-win-msg{font-size:clamp(18px,4.8vw,26px);font-weight:900;margin-top:10px}.kid-win-stars{font-size:clamp(24px,7vw,42px);margin-bottom:8px;letter-spacing:6px}.kid-confetti{position:fixed;top:-42px;z-index:901;pointer-events:none;animation:kidFall linear forwards}
+  @keyframes kidPop{to{transform:scale(1)}}@keyframes kidFadeIn{from{opacity:0}to{opacity:1}}@keyframes kidFall{to{transform:translateY(115vh) rotate(540deg);opacity:.75}}
+  @media(max-width:560px){body{padding-top:58px}#app{padding:8px 8px 92px!important}a[href="index.html"]:not(.pack),#themeToggle{top:8px!important;padding:6px 9px!important;font-size:12px!important;min-height:32px!important;border-radius:18px!important}a[href="index.html"]:not(.pack){left:8px!important;max-width:44vw}#themeToggle{right:8px!important;max-width:44vw;overflow:hidden;text-overflow:ellipsis}.bar{top:46px;grid-template-columns:1fr 1fr 1fr;padding:7px;margin-bottom:10px!important}.bar .big{grid-column:1/-1;grid-row:2;text-align:center;font-size:18px;white-space:normal}.bar .score{grid-row:3;font-size:12px}.bar button.btn{width:100%;padding:8px 8px!important;font-size:12px!important}.grid{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))!important;gap:10px!important}.card{padding:14px 10px!important}.card .ico{font-size:30px!important}#gameZoomBar{bottom:max(8px,env(safe-area-inset-bottom))!important}.kid-win-card{padding:22px 20px;border-radius:24px}}
+</style>
 </head>
 <body>
 <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:200;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 2px 8px #0002">🏠 All Games</a>
@@ -70,8 +83,8 @@ const GAMES=[
   {id:'checkers',name:'Checkers',ico:'⚫'},
   {id:'reversi',name:'Reversi',ico:'🔵'},
   {id:'dots',name:'Dots & Boxes',ico:'⬜'},
-  {id:'battleship',name:'Battleship',ico:'🚢'},
-  {id:'chess',name:'Chess',ico:'♚'},
+  {id:'battleship',name:'Battleship Lite',ico:'🚢'},
+  {id:'chess',name:'Chess Basic',ico:'♚'},
   {id:'slseq',name:'Number Sequence',ico:'🔢'},
   {id:'slpattern',name:'Pattern Next',ico:'🔁'},
   {id:'slmiss',name:'Missing Number',ico:'❓'},
@@ -122,8 +135,8 @@ connect4:`You are 🔴. Click a column to drop a disc; it falls to the lowest op
 checkers:`You are red, moving up the board. Click a piece, then a square to move diagonally. Jump over an enemy into an empty square to capture it (multi-jumps chain automatically). Reach the far row to make a King ♛ that moves both ways. Capture all enemy pieces to win. The AI's move is highlighted in blue.`,
 reversi:`You are black ⚫. Place a disc so it traps one or more white discs in a straight line between your new disc and another of yours — those flip to black. Every move must flip at least one disc (legal squares show a dot). When nobody can move, the most discs wins. The AI's move is highlighted in blue.`,
 dots:`Take turns drawing one line between two dots. Complete the 4th side of a box to claim it AND take another turn. When every line is drawn, whoever owns the most boxes wins.`,
-battleship:`Click squares on the enemy grid (left) to fire — 💥 means hit, • means miss. Sink all enemy ships before the enemy sinks your fleet (right). The enemy fires back after every shot.`,
-chess:`You are white, moving up the board. Click a piece to see its legal moves (dots), then click a square to move. Pawns promote to a Queen at the far end. Checkmate the enemy king to win. The AI's last move is highlighted in blue.`
+battleship:`Lite version: fleets are auto-placed. Click squares on the enemy grid (left) to fire — 💥 means hit, • means miss. Sink all enemy ships before the enemy sinks your fleet (right). The enemy fires back after every shot.`,
+chess:`Basic chess: no castling or en passant. You are white, moving up the board. Click a piece to see its legal moves (dots), then click a square to move. Pawns promote to a Queen at the far end. Checkmate the enemy king to win. The AI's last move is highlighted in blue.`
 };
 function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px'});
   const box=el('div',{style:'background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px #0008;max-height:85vh;overflow:auto'});
@@ -147,7 +160,8 @@ function game_ttt(gm){
   let b,over,lastAI;
   const board=el('div',{style:'display:grid;grid-template-columns:repeat(3,90px);gap:6px'});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(board,newBtn);
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
+  host.append(board,el('div',{className:'kid-choice-row'},newBtn,hintBtn));
   const LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   function winner(bd){for(const[a,c,d]of LINES)if(bd[a]&&bd[a]===bd[c]&&bd[a]===bd[d])return bd[a];if(bd.every(x=>x))return'draw';return null;}
   function minimax(bd,player){const w=winner(bd);if(w==='O')return{score:10};if(w==='X')return{score:-10};if(w==='draw')return{score:0};
@@ -155,6 +169,7 @@ function game_ttt(gm){
     bd.forEach((v,i)=>{if(!v){bd[i]=player;const r=minimax(bd,player==='O'?'X':'O');bd[i]='';
       if(player==='O'&&r.score>best.score)best={score:r.score,move:i};
       if(player==='X'&&r.score<best.score)best={score:r.score,move:i};}});return best;}
+  function showHint(){if(over)return;const m=minimax(b.slice(),'X').move;if(m!=null)setStatus('💡 Try square '+(m+1)+'.');}
   function reset(){b=Array(9).fill('');over=false;lastAI=null;draw();setStatus('Your move (X)  •  Wins: '+wins(gm.id));}
   function draw(){board.innerHTML='';b.forEach((v,i)=>{const d=el('div',{textContent:v,style:`width:90px;height:90px;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:800;border-radius:12px;background:${lastAI===i?'#2a3a5e':'#171c28'};cursor:pointer;color:${v==='X'?'#9bf':'#f99'}${lastAI===i?';box-shadow:inset 0 0 0 4px #39f':''}`});
     d.onclick=()=>{if(over||v)return;b[i]='X';lastAI=null;check();draw();if(!over){setStatus('🤔 AI is thinking…');setTimeout(()=>{const m=minimax(b.slice(),'O').move;if(m!=null){b[m]='O';lastAI=m;}check();draw();if(!over)setStatus('🔵 AI played the blue square — your move (X)');},500);}};board.append(d);});}
@@ -169,7 +184,8 @@ function game_connect4(gm){
   const R=6,C=7;let b,over,turn,lastAI;
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${C},56px);gap:5px;background:#1a3a8a;padding:8px;border-radius:12px`});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(board,newBtn);
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
+  host.append(board,el('div',{className:'kid-choice-row'},newBtn,hintBtn));
   function reset(){b=Array.from({length:R},()=>Array(C).fill(0));over=false;turn=1;lastAI=null;draw();setStatus('Your turn 🔴  •  Wins: '+wins(gm.id));}
   function draw(){board.innerHTML='';for(let r=0;r<R;r++)for(let c=0;c<C;c++){const v=b[r][c];
     const d=el('div',{style:`width:56px;height:56px;border-radius:50%;cursor:pointer;background:${v===1?'#e44':v===2?'#fd5':'#0e1118'}${lastAI&&lastAI.r===r&&lastAI.c===c?';box-shadow:0 0 0 4px #39f,0 0 14px #39f':''}`});
@@ -181,6 +197,7 @@ function game_connect4(gm){
     if(win(b,1)){over=true;addWin(gm.id);setStatus('🎉 You win!');return;}
     if(b[0].every(x=>x)){over=true;setStatus('Draw!');return;}
     setStatus('🤔 AI is thinking…');setTimeout(aiMove,600);}
+  function showHint(){if(over||turn!==1)return;const valid=[];for(let c=0;c<C;c++)if(!b[0][c])valid.push(c);let best=valid[0];for(const c of valid){const t=b.map(r=>r.slice());drop(t,c,1);if(win(t,1)){best=c;break;}}if(best===valid[0])for(const c of valid){const t=b.map(r=>r.slice());drop(t,c,2);if(win(t,2)){best=c;break;}}if(best==null)best=valid.sort((a,b)=>Math.abs(a-3)-Math.abs(b-3))[0];setStatus('💡 Try column '+(best+1)+'.');}
   function aiMove(){if(over)return;
     let best=-1,bestScore=-1e9;const valid=[];for(let c=0;c<C;c++)if(!b[0][c])valid.push(c);
     // win or block
@@ -203,7 +220,8 @@ function game_checkers(gm){
   [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,l])=>{const bt=el('button',{className:'btn'+(CKDIFF===d?'':' ghost'),textContent:l,style:'padding:6px 13px'});bt.onclick=()=>{CKDIFF=d;localStorage.setItem('st_diff',d);[...diffRow.children].forEach((c,i)=>c.className='btn'+(['easy','med','hard'][i]===CKDIFF?'':' ghost'));};diffRow.append(bt);});
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},54px);gap:0;border:3px solid #5a4`});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(diffRow,board,newBtn);
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
+  host.append(diffRow,board,el('div',{className:'kid-choice-row'},newBtn,hintBtn));
   // b cell: 0 empty, 1 red man, 2 red king, -1 black man, -2 black king
   function reset(){b=Array.from({length:N},()=>Array(N).fill(0));over=false;turn=1;sel=null;lastAI=null;
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)if((r+c)%2){if(r<3)b[r][c]=-1;if(r>4)b[r][c]=1;}draw();setStatus('Your move (red)  •  Wins: '+wins(gm.id));}
@@ -220,6 +238,7 @@ function game_checkers(gm){
     const d=el('div',{style:`width:54px;height:54px;display:flex;align-items:center;justify-content:center;background:${dark?'#8a6a45':'#ecdcb8'};cursor:pointer;${sel&&sel.r===r&&sel.c===c?'outline:3px solid #fd5;outline-offset:-3px;':''}${lastAI&&((lastAI.from[0]===r&&lastAI.from[1]===c)||(lastAI.to[0]===r&&lastAI.to[1]===c))?'box-shadow:inset 0 0 0 4px #39f;':''}`});
     const v=b[r][c];if(v){const piece=el('div',{style:`width:40px;height:40px;border-radius:50%;background:${v>0?'radial-gradient(circle at 35% 30%,#ff7a7a,#cc1f1f)':'radial-gradient(circle at 35% 30%,#5a6080,#1a1d2e)'};border:3px solid ${v>0?'#fff':'#cfd6ff'};box-shadow:0 2px 4px #0006;display:flex;align-items:center;justify-content:center;color:#ffd34d;font-weight:800;font-size:22px`});if(Math.abs(v)===2)piece.textContent='♛';d.append(piece);}
     d.onclick=()=>click(r,c);board.append(d);}}
+  function showHint(){if(over||turn!==1)return;const legal=moves(b,1);if(!legal.length){setStatus('No legal moves.');return;}const m=legal.find(x=>x.cr!=null)||legal[0];sel={r:m.fr,c:m.fc};draw();setStatus('💡 Move the highlighted red piece to row '+(m.tr+1)+', column '+(m.tc+1)+(m.cr!=null?' to capture.':'.'));}
   function click(r,c){if(over||turn!==1)return;const legal=moves(b,1);
     if(sel){const m=legal.find(x=>x.fr===sel.r&&x.fc===sel.c&&x.tr===r&&x.tc===c);
       if(m){apply(b,m);sel=null;
@@ -237,7 +256,7 @@ function game_checkers(gm){
       scored.sort((a,b2)=>a.score-b2.score);m=(CKDIFF==='hard'?scored[0]:scored[scored.length-1]).mv;}
     const startSq=[m.fr,m.fc];let endSq=[m.tr,m.tc];apply(b,m);
     if(m.cr!=null){let more=moves(b,-1).filter(x=>x.fr===m.tr&&x.fc===m.tc&&x.cr!=null);while(more.length){const mm=more[0];apply(b,mm);endSq=[mm.tr,mm.tc];more=moves(b,-1).filter(x=>x.fr===mm.tr&&x.fc===mm.tc&&x.cr!=null);}}
-    lastAI={from:startSq,to:endSq};draw();if(checkEnd())return;turn=1;setStatus('🔵 AI moved the piece highlighted in blue — your move (red)');}
+    lastAI={from:startSq,to:endSq};draw();turn=1;if(checkEnd())return;setStatus('🔵 AI moved the piece highlighted in blue — your move (red)');}
   function checkEnd(){const red=b.flat().filter(v=>v>0).length,black=b.flat().filter(v=>v<0).length;
     if(black===0){over=true;addWin(gm.id);setStatus('🎉 You win!');return true;}
     if(red===0){over=true;setStatus('🤖 AI wins');return true;}
@@ -253,7 +272,8 @@ function game_reversi(gm){
   const N=8;let b,over,lastAI;
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},48px);gap:2px;background:#0a5;padding:6px;border-radius:10px`});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(board,newBtn);
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
+  host.append(board,el('div',{className:'kid-choice-row'},newBtn,hintBtn));
   const DIRS=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
   function reset(){b=Array.from({length:N},()=>Array(N).fill(0));b[3][3]=b[4][4]=2;b[3][4]=b[4][3]=1;over=false;lastAI=null;draw();turnInfo();}
   function flips(bd,r,c,p){if(bd[r][c])return[];let all=[];for(const[dr,dc]of DIRS){let line=[],nr=r+dr,nc=c+dc;
@@ -273,6 +293,7 @@ function game_reversi(gm){
     else if(hint)d.append(el('div',{style:'width:12px;height:12px;border-radius:50%;background:#0f06'}));
     d.onclick=()=>play(r,c);board.append(d);}}
   function turnInfo(){const[bk,a]=counts();setStatus('⚫ '+bk+' — ⚪ '+a+'  •  Wins: '+wins(gm.id));}
+  function showHint(){const m=legal(b,1).map(([r,c])=>({r,c,n:flips(b,r,c,1).length})).sort((a,b)=>b.n-a.n)[0];if(!m){setStatus('No legal moves for you.');return;}setStatus('💡 Try row '+(m.r+1)+', column '+(m.c+1)+' to flip '+m.n+' disc(s).');}
   function play(r,c){if(over)return;if(!legal(b,1).some(([lr,lc])=>lr===r&&lc===c))return;place(r,c,1);lastAI=null;draw();turnInfo();setStatus('🤔 AI is thinking…');setTimeout(aiTurn,600);}
   function aiTurn(){if(over)return;let m=legal(b,2);
     if(m.length){// greedy: max flips
@@ -290,7 +311,8 @@ function game_dots(gm){
   const N=3;let h,v,boxes,turn,over,sH,sA;
   const size=70;const board=el('div',{style:`position:relative;width:${N*size+20}px;height:${N*size+20}px`});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(board,newBtn);
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
+  host.append(board,el('div',{className:'kid-choice-row'},newBtn,hintBtn));
   function reset(){h=Array.from({length:N+1},()=>Array(N).fill(0));v=Array.from({length:N},()=>Array(N+1).fill(0));boxes=Array.from({length:N},()=>Array(N).fill(0));turn=1;over=false;sH=sA=0;draw();info();}
   function info(){setStatus('You '+sH+' — '+sA+' AI  •  '+(turn===1?'Your turn':'AI turn')+'  •  Wins: '+wins(gm.id));}
   function draw(){board.innerHTML='';const off=10;
@@ -302,6 +324,8 @@ function game_dots(gm){
   function setEdge(t,r,c,p){let made=false;if(t==='h')h[r][c]=1;else v[r][c]=1;
     for(let br=0;br<N;br++)for(let bc=0;bc<N;bc++)if(!boxes[br][bc]&&boxDone(br,bc)){boxes[br][bc]=p;made=true;}return made;}
   function full(){return h.flat().every(x=>x)&&v.flat().every(x=>x);}
+  function hintCompletes(t,r,c){if(t==='h')h[r][c]=1;else v[r][c]=1;let any=false;for(let br=0;br<N;br++)for(let bc=0;bc<N;bc++)if(!boxes[br][bc]&&boxDone(br,bc))any=true;if(t==='h')h[r][c]=0;else v[r][c]=0;return any;}
+  function showHint(){const edges=[];for(let r=0;r<=N;r++)for(let c=0;c<N;c++)if(!h[r][c])edges.push(['h',r,c]);for(let r=0;r<N;r++)for(let c=0;c<=N;c++)if(!v[r][c])edges.push(['v',r,c]);const winEdge=edges.find(([t,r,c])=>hintCompletes(t,r,c));const m=winEdge||edges[0];if(m)setStatus('💡 Try a '+(m[0]==='h'?'horizontal':'vertical')+' line near row '+(m[1]+1)+', column '+(m[2]+1)+'.');}
   function play(t,r,c){if(over||turn!==1)return;if(t==='h'&&h[r][c])return;if(t==='v'&&v[r][c])return;
     const made=setEdge(t,r,c,1);if(made){sH=boxes.flat().filter(x=>x===1).length;}draw();
     if(full()){finish();return;}if(!made){turn=2;info();setTimeout(aiTurn,350);}else info();}
@@ -330,7 +354,8 @@ function game_battleship(gm){
   const enemyBox=el('div',{});const youBox=el('div',{});
   wrapRow.append(el('div',{},el('div',{className:'big',textContent:'Enemy waters'}),enemyBox),el('div',{},el('div',{className:'big',textContent:'Your fleet'}),youBox));
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(newBtn,wrapRow);
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint'});hintBtn.onclick=showHint;
+  host.append(el('div',{className:'kid-choice-row'},newBtn,hintBtn),wrapRow);
   function emptyGrid(){return Array.from({length:N},()=>Array(N).fill(0));} // 0 water,1 ship,2 miss,3 hit
   function placeFleet(){const g=emptyGrid();SHIPS.forEach(len=>{let ok=false;while(!ok){const horiz=Math.random()<0.5;const r=Math.floor(Math.random()*N),c=Math.floor(Math.random()*N);
     if(horiz&&c+len>N)continue;if(!horiz&&r+len>N)continue;let clear=true;for(let i=0;i<len;i++){const rr=r+(horiz?0:i),cc=c+(horiz?i:0);if(g[rr][cc])clear=false;}
@@ -345,6 +370,7 @@ function game_battleship(gm){
     youBox.innerHTML='';const yg=el('div',{style:`display:grid;grid-template-columns:repeat(${N},34px);gap:2px`});
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=you[r][c];const bg=v===3?'#a33':v===2?'#234':v===1?'#2a6':'#1a3a6a';
       yg.append(el('div',{textContent:v===3?'💥':v===2?'•':'',style:`width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:${bg}`}));}youBox.append(yg);}
+  function showHint(){const hits=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(enemy[r][c]===3)hits.push([r,c]);for(const [r,c] of hits){for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N&&(enemy[nr][nc]===0||enemy[nr][nc]===1)){setStatus('💡 Try near a hit: row '+(nr+1)+', column '+(nc+1)+'.');return;}}}setStatus('💡 Try the center or checkerboard pattern to find ships.');}
   function fire(r,c){if(over)return;const v=enemy[r][c];if(v===2||v===3)return;enemy[r][c]=v===1?3:2;draw();
     if(shipsLeft(enemy)===0){over=true;addWin(gm.id);setStatus('🎉 You sank the enemy fleet!');return;}
     aiFire();
@@ -357,19 +383,26 @@ function game_battleship(gm){
 
 /* ---------------- CHESS ---------------- */
 function game_chess(gm){
-  setHint('You are white. Click a piece then destination. Legal moves shown. (Simple AI)');
+  setHint('You are white. Pick Easy, Medium or Hard, click a piece, then a highlighted square. Use Hint if you get stuck.');
   let b,sel,turn,over,legalCache,lastAI;
+  let CHDIFF=localStorage.getItem('st_chess_diff')||'med';
+  const controls=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap;align-items:center'});
+  function refreshDiff(){[...controls.querySelectorAll('button[data-diff]')].forEach(bt=>bt.className='btn'+(bt.dataset.diff===CHDIFF?'':' ghost'));}
+  [['easy','😊 Easy'],['med','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,l])=>{const bt=el('button',{className:'btn'+(CHDIFF===d?'':' ghost'),textContent:l,style:'padding:7px 12px'});bt.dataset.diff=d;bt.onclick=()=>{CHDIFF=d;localStorage.setItem('st_chess_diff',d);refreshDiff();setStatus('Chess difficulty: '+l.replace(/^.. /,''));};controls.append(bt);});
+  const hintBtn=el('button',{className:'btn ghost',textContent:'💡 Hint',style:'padding:7px 12px'});
+  hintBtn.onclick=showHint;controls.append(hintBtn);
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(8,56px);border:3px solid #34405a`});
   const newBtn=el('button',{className:'btn',textContent:'New Game'});
-  host.append(board,newBtn);
+  host.append(controls,board,newBtn);
   const G={p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};
+  const FILES='abcdefgh';
   function reset(){b=[
     ['r','n','b','q','k','b','n','r'],
     ['p','p','p','p','p','p','p','p'],
     ['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],
     ['P','P','P','P','P','P','P','P'],
     ['R','N','B','Q','K','B','N','R']];
-    turn='w';over=false;sel=null;lastAI=null;draw();setStatus('Your move (white)  •  Wins: '+wins(gm.id));}
+    turn='w';over=false;sel=null;lastAI=null;refreshDiff();draw();setStatus('Your move (white)  •  Wins: '+wins(gm.id));}
   function isW(p){return p&&p===p.toUpperCase();}
   function color(p){return p?(isW(p)?'w':'b'):null;}
   function inb(r,c){return r>=0&&r<8&&c>=0&&c<8;}
@@ -383,7 +416,7 @@ function game_chess(gm){
       else if(t==='k'){[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));}
       else{const dirs=t==='r'?[[1,0],[-1,0],[0,1],[0,-1]]:t==='b'?[[1,1],[1,-1],[-1,1],[-1,-1]]:[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
         dirs.forEach(([dr,dc])=>{let nr=r+dr,nc=c+dc;while(add(nr,nc)){nr+=dr;nc+=dc;}});}}
-    if(checkKing)mv=mv.filter(m=>{const nb=bd.map(row=>row.slice());nb[m.tr][m.tc]=nb[m.fr][m.fc];nb[m.fr][m.fc]='';return !inCheck(nb,side);});
+    if(checkKing)mv=mv.filter(m=>{const nb=bd.map(row=>row.slice());doMove(nb,m);return !inCheck(nb,side);});
     return mv;}
   function findKing(bd,side){const k=side==='w'?'K':'k';for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(bd[r][c]===k)return[r,c];return null;}
   function inCheck(bd,side){const k=findKing(bd,side);if(!k)return true;const opp=side==='w'?'b':'w';return genMoves(bd,opp,false).some(m=>m.tr===k[0]&&m.tc===k[1]);}
@@ -399,13 +432,18 @@ function game_chess(gm){
   function doMove(bd,m){bd[m.tr][m.tc]=bd[m.fr][m.fc];bd[m.fr][m.fc]='';}
   function afterHuman(){draw();if(endCheck('w'))return;turn='b';setStatus('🤔 AI is thinking…');setTimeout(aiMove,700);}
   function pieceVal(p){return {p:1,n:3,b:3,r:5,q:9,k:100}[p.toLowerCase()]||0;}
-  function aiMove(){if(over)return;const moves=genMoves(b,'b',true);if(!moves.length){endCheck('b');return;}
-    // greedy: maximize captured value, with slight randomness
-    let best=moves[0],bestScore=-1e9;moves.forEach(m=>{let s=b[m.tr][m.tc]?pieceVal(b[m.tr][m.tc]):0;
-      const nb=b.map(row=>row.slice());doMove(nb,m);if(nb[m.tr][m.tc]==='p'&&m.tr===7)s+=8;
-      if(inCheck(nb,'w'))s+=0.5;s+=Math.random()*0.3;if(s>bestScore){bestScore=s;best=m;}});
-    doMove(b,best);if(b[best.tr][best.tc]==='p'&&best.tr===7)b[best.tr][best.tc]='q';lastAI={from:[best.fr,best.fc],to:[best.tr,best.tc]};draw();
-    if(endCheck('b'))return;turn='w';setStatus('🔵 AI moved the piece highlighted in blue — your move (white)');}
+  function boardScore(bd){let s=0;bd.flat().forEach(p=>{if(!p)return;const v=pieceVal(p);s+=isW(p)?-v:v;});return s;}
+  function moveScore(m,side){const nb=b.map(row=>row.slice());let s=b[m.tr][m.tc]?pieceVal(b[m.tr][m.tc])*10:0;doMove(nb,m);if(nb[m.tr][m.tc].toLowerCase()==='p'&&(m.tr===0||m.tr===7))s+=8;if(inCheck(nb,side==='w'?'b':'w'))s+=3;s+=boardScore(nb)*(side==='b'?1:-1);return s;}
+  function chooseMove(side){const moves=genMoves(b,side,true);if(!moves.length)return null;
+    if((side==='b'&&CHDIFF==='easy')||(side==='w'&&CHDIFF==='easy'))return moves[Math.floor(Math.random()*moves.length)];
+    let ranked=moves.map(m=>({m,score:moveScore(m,side)+Math.random()*0.25})).sort((a,b)=>b.score-a.score);
+    if((side==='b'&&CHDIFF==='med')||(side==='w'&&CHDIFF==='med'))return ranked.slice(0,Math.min(4,ranked.length))[Math.floor(Math.random()*Math.min(4,ranked.length))].m;
+    // Hard also tries not to walk into an easy capture on the next move.
+    if(side==='b'&&CHDIFF==='hard')ranked=ranked.map(x=>{const nb=b.map(row=>row.slice());doMove(nb,x.m);const reply=genMoves(nb,'w',true).reduce((mx,m)=>Math.max(mx,nb[m.tr][m.tc]?pieceVal(nb[m.tr][m.tc]):0),0);return{x:x.m,score:x.score-reply*3};}).sort((a,b)=>b.score-a.score).map(x=>({m:x.x,score:x.score}));
+    return ranked[0].m;}
+  function showHint(){if(over||turn!=='w'){setStatus('Hint is available on your turn.');return;}const m=chooseMove('w');if(!m){setStatus('No legal hint available.');return;}sel=[m.fr,m.fc];draw();setStatus('💡 Try '+coord(m.fr,m.fc)+' to '+coord(m.tr,m.tc)+'. Highlighted dots show the move.');}
+  function coord(r,c){return FILES[c]+(8-r);}
+  function aiMove(){if(over)return;const best=chooseMove('b');if(!best){endCheck('b');return;}doMove(b,best);if(b[best.tr][best.tc]==='p'&&best.tr===7)b[best.tr][best.tc]='q';lastAI={from:[best.fr,best.fc],to:[best.tr,best.tc]};draw();if(endCheck('b'))return;turn='w';setStatus('🔵 AI moved the piece highlighted in blue — your move (white)');}
   function endCheck(justMoved){const opp=justMoved==='w'?'b':'w';const oppMoves=genMoves(b,opp,true);
     if(oppMoves.length===0){over=true;if(inCheck(b,opp)){if(opp==='b'){addWin(gm.id);setStatus('🎉 Checkmate — you win!');}else setStatus('🤖 Checkmate — AI wins');}else setStatus('Stalemate — draw');return true;}
     if(inCheck(b,opp))setStatus((opp==='w'?'You are':'AI is')+' in check!');return false;}
@@ -447,7 +485,7 @@ function game_slpattern(gm){return mcqS(gm,'What comes next in the pattern?',fun
 function game_slmiss(gm){return mcqS(gm,'Find the missing number.',function(){var s=rS(DfS(10,40,200))+1,st=DfS(2,3,7);var seq=[s,s+st,s+2*st,s+3*st];var hide=rS(4);var miss=seq[hide];seq[hide]='?';return{q:seq.join(', '),a:miss,wr:nS(miss,st+2)};});}
 function game_slodd(gm){return mcqS(gm,'Three share a multiple — tap the odd one out.',function(){var k=rS(DfS(4,7,11))+2;var arr=[];for(var i=0;i<3;i++)arr.push(k*(rS(9)+1));var odd=k*(rS(9)+1)+(rS(2)?1:-1);while(odd%k===0||arr.indexOf(odd)>=0)odd++;arr.push(odd);return{q:'Which is NOT a multiple of '+k+'?',a:odd,wr:arr.filter(function(x){return x!==odd;})};});}
 function game_slbiggest(gm){return mcqS(gm,'Tap the biggest number.',function(){var s=new Set();while(s.size<DfS(2,3,4))s.add(rS(DfS(99,999,99999))+1);var a=[...s];var ans=Math.max.apply(null,a);return{q:'Which is biggest?',a:ans,wr:a.filter(function(x){return x!==ans;})};});}
-function game_slcompare(gm){return mcqS(gm,'Which sum is bigger?',function(){var a=rS(60)+1,b=rS(60)+1,c=rS(60)+1,d=rS(60)+1;var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);var ans=(a+b)>=(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[(a+b)>=(c+d)?s2:s1]};});}
+function game_slcompare(gm){return mcqS(gm,'Which sum is bigger?',function(){var a,b,c,d;do{a=rS(60)+1;b=rS(60)+1;c=rS(60)+1;d=rS(60)+1;}while(a+b===c+d);var s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);var ans=(a+b)>(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[ans===s1?s2:s1]};});}
 function game_slmultiple(gm){return mcqS(gm,'Find the next multiple.',function(){var k=rS(DfS(5,9,12))+2;var n=rS(60)+5;var ans=(Math.floor(n/k)+1)*k;return{q:'Next multiple of '+k+' after '+n+'?',a:ans,wr:nS(ans,k+2)};});}
 function game_slround(gm){return mcqS(gm,'Round to the nearest 10.',function(){var n=rS(DfS(180,890,9000))+11;var a=Math.round(n/10)*10;return{q:'Round '+n+' to nearest 10',a:a,wr:[a+10,a-10,a+20,a-20].filter(function(x){return x>=0&&x!==a;})};});}
 function game_slplace(gm){return mcqS(gm,'Which digit is in the named place?',function(){var n=rS(DfS(900,9000,90000))+100;var s=String(n);var names=['ones','tens','hundreds','thousands','ten-thousands'];var i=rS(s.length);var dig=+s[s.length-1-i];return{q:'In '+n+', which digit is in the '+names[i]+' place?',a:dig,wr:nS(dig,4).filter(function(x){return x>=0&&x<=9;})};});}
@@ -510,5 +548,23 @@ minus.onclick=function(){window.__uz=Math.max(0.4,Math.round((window.__uz-0.1)*1
 plus.onclick=function(){window.__uz=Math.min(2,Math.round((window.__uz+0.1)*10)/10);upd();};
 lbl.onclick=function(){window.__uz=1;upd();};
 bar.appendChild(minus);bar.appendChild(lbl);bar.appendChild(plus);document.body.appendChild(bar);upd();})();</script>
+<script id="shared-game-polish-script">
+(function(){
+  if(window.__sharedGamePolish)return;window.__sharedGamePolish=true;
+  function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn);else fn();}
+  function txt(el){return (el&&el.textContent||'').trim();}
+  function installTheme(){if(document.getElementById('themeToggle'))return;var btn=document.createElement('button');btn.id='themeToggle';btn.textContent='🌙 Dark';btn.onclick=function(){var cur=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=cur;localStorage.setItem('theme',cur);btn.textContent=cur==='dark'?'☀️ Light':'🌙 Dark';};document.body.appendChild(btn);var saved=localStorage.getItem('theme')||'light';document.documentElement.dataset.theme=saved;btn.textContent=saved==='dark'?'☀️ Light':'🌙 Dark';}
+  function rulesText(){var title=txt(document.getElementById('title'))||txt(document.getElementById('active-game-title'))||'This game';var hint=txt(document.getElementById('hint'))||'Play the game, watch the instructions, and have fun.';return {title:title,body:hint};}
+  function showDefaultRules(){var r=rulesText();var ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:760;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px';var box=document.createElement('div');box.style.cssText='max-width:460px;width:100%;max-height:84vh;overflow:auto;border-radius:20px;padding:22px;background:var(--panel,#fff);color:var(--text,#222);border:1px solid var(--border,#ddd);box-shadow:0 18px 60px rgba(0,0,0,.45);line-height:1.55';box.innerHTML='<div style="font-size:22px;font-weight:900;margin-bottom:10px">❓ '+r.title+'</div><div>'+r.body+'</div>';var b=document.createElement('button');b.className='btn';b.textContent='Got it!';b.style.marginTop='16px';b.onclick=function(){ov.remove();};box.appendChild(b);ov.appendChild(box);ov.onclick=function(e){if(e.target===ov)ov.remove();};document.body.appendChild(ov);}
+  function installRules(){document.querySelectorAll('.bar').forEach(function(bar){var has=[].some.call(bar.querySelectorAll('button'),function(b){return /Rules/i.test(b.textContent||'');});if(has)return;var first=bar.querySelector('button');if(!first)return;var btn=document.createElement('button');btn.className='btn ghost';btn.textContent='❓ Rules';btn.onclick=function(){if(typeof window.showRules==='function')window.showRules();else showDefaultRules();};first.insertAdjacentElement('afterend',btn);});}
+  function applyFallbackZoom(){var z=window.__uz||1;var target=document.getElementById('host')||document.getElementById('game-view');if(!target)return;if(document.getElementById('host')&&document.getElementById('stage'))return;target.style.transformOrigin='top center';target.style.transform=Math.abs(z-1)>0.005?'scale('+z+')':'';target.style.minHeight=Math.abs(z-1)>0.005?(target.scrollHeight*z)+'px':'';}
+  function installZoomBar(){var existing=document.getElementById('gameZoomBar');if(existing)return;var uz=parseFloat(localStorage.getItem('gzoom')||'1');if(isNaN(uz))uz=1;window.__uz=uz;var bar=document.createElement('div');bar.id='gameZoomBar';bar.style.cssText='position:fixed;bottom:10px;right:10px;display:flex;gap:5px;align-items:center;background:rgba(0,0,0,.62);border-radius:22px;padding:5px 9px;box-shadow:0 3px 10px rgba(0,0,0,.4)';function mk(t){var b=document.createElement('button');b.textContent=t;b.style.cssText='border:0;background:#fff;color:#222;border-radius:50%;width:32px;height:32px;font-size:18px;font-weight:800;cursor:pointer;line-height:1';return b;}var minus=mk('−'),plus=mk('+'),lbl=document.createElement('span');lbl.style.cssText='color:#fff;font-size:12px;min-width:40px;text-align:center;font-weight:700;cursor:pointer';function upd(){lbl.textContent='🔍 '+Math.round(window.__uz*100)+'%';localStorage.setItem('gzoom',window.__uz);applyFallbackZoom();try{window.dispatchEvent(new Event('resize'));}catch(e){}}minus.onclick=function(){window.__uz=Math.max(0.4,Math.round((window.__uz-0.1)*10)/10);upd();};plus.onclick=function(){window.__uz=Math.min(2,Math.round((window.__uz+0.1)*10)/10);upd();};lbl.onclick=function(){window.__uz=1;upd();};bar.appendChild(minus);bar.appendChild(lbl);bar.appendChild(plus);document.body.appendChild(bar);upd();}
+  function polishZoom(){[].forEach.call(document.body.children,function(el){if(el.id==='gameZoomBar')return;var s=String(el.getAttribute('style')||'').toLowerCase();if(el.tagName==='DIV'&&s.indexOf('position:fixed')>=0&&s.indexOf('bottom:')>=0&&el.textContent.indexOf('🔍')>=0){el.id='gameZoomBar';el.setAttribute('aria-label','Game zoom controls');}});if(!document.getElementById('gameZoomBar')&&(document.getElementById('host')||document.getElementById('game-view')))installZoomBar();}
+  var lastCelebration='';
+  function celebrate(raw,win){var clean=String(raw||'').replace(/\s+/g,' ').replace(/•.*$/,'').trim();if(!clean)return;if(clean===lastCelebration)return;lastCelebration=clean;document.querySelectorAll('.kid-win-overlay,.kid-confetti').forEach(function(n){n.remove();});var ov=document.createElement('div');ov.className='kid-win-overlay';var card=document.createElement('div');card.className='kid-win-card';card.innerHTML='<div class="kid-win-stars">🌟 🎉 🌟</div><div class="kid-win-title">'+(win?'You Did It!':'Good Try!')+'</div><div class="kid-win-msg">'+clean+'</div>';ov.appendChild(card);document.body.appendChild(ov);var icons=win?['🎉','⭐','✨','🎊','🏆','🌈','🥳']:['⭐','💪','✨','🙂'];for(var i=0;i<(win?42:18);i++){(function(k){var c=document.createElement('div');c.className='kid-confetti';c.textContent=icons[k%icons.length];c.style.left=(Math.random()*100)+'vw';c.style.fontSize=(20+Math.random()*26)+'px';c.style.animationDuration=(1.8+Math.random()*1.6)+'s';document.body.appendChild(c);setTimeout(function(){c.remove();},3800);})(i);}setTimeout(function(){ov.style.transition='opacity .45s ease';ov.style.opacity='0';setTimeout(function(){ov.remove();},500);},win?2600:1700);}
+  function watchText(){var win=/🎉|you win|you won|cleared|solved|conquered|victory|great job|all popped|winner|correct!/i;var lose=/ai wins|game over|you lose|defeated|your fleet is destroyed|good try|😢|💀/i;var check=function(s){s=String(s||'');if(win.test(s))celebrate(s,true);else if(lose.test(s))celebrate(s,false);};var old=window.setStatus;if(typeof old==='function'&&!old.__kidWrapped){var wrapped=function(s){old.call(this,s);check(s);};wrapped.__kidWrapped=true;window.setStatus=wrapped;}try{new MutationObserver(function(ms){ms.forEach(function(m){if(m.target&&m.target.nodeType===1)check(m.target.textContent);});}).observe(document.body,{childList:true,subtree:true,characterData:true});}catch(e){} }
+  ready(function(){installTheme();installRules();polishZoom();watchText();setTimeout(polishZoom,100);setTimeout(polishZoom,500);});
+})();
+</script>
 </body>
 </html>
