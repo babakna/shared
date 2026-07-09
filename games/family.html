@@ -132,7 +132,9 @@ let current=null;
 function hs(id){return +(localStorage.getItem('fam_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('fam_'+id,v);return true}return false}
 function getRaw(id){return localStorage.getItem('fam_'+id)}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+const HIDDEN_SCHOOL_DRILLS=new Set(['fmultiply','fadd','fsubtract','fdivide','fsequence','frounding','foddeven','fplaceval','fbigger','fdoublehalf','fcompare','fhalfof','ftime','fmoney','ffraction','fmultipleof','fmissing','fpercent','ftriple','fsign','fcountback','fsquare','fquarter','fmult10','fnear100','fskip','fchange','ftimeadd','fdivby','fnumword','fexpand','fordinal']);
+function visibleGames(){return GAMES.filter(gm=>!HIDDEN_SCHOOL_DRILLS.has(gm.id));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${getRaw(gm.id)?'Best: '+getRaw(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}

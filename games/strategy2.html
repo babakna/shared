@@ -154,7 +154,8 @@ function wins(id){return +(localStorage.getItem('s2_'+id)||0)}
 function addWin(id){localStorage.setItem('s2_'+id,wins(id)+1);}
 function setBestLow(id,v){const c=localStorage.getItem('s2_'+id);if(c===null||v<+c){localStorage.setItem('s2_'+id,v);return true}return false}
 function getRaw(id){return localStorage.getItem('s2_'+id)}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+function visibleGames(){return GAMES.filter(gm=>!String(gm.id).startsWith('2l'));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   const label=gm.id==='peg'?(getRaw(gm.id)?'Best: '+getRaw(gm.id)+' left':''):(wins(gm.id)?'Wins: '+wins(gm.id):'');
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${label||'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}

@@ -146,7 +146,8 @@ function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fix
   box.append(close);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
 function wins(id){return +(localStorage.getItem('st_'+id)||0)}
 function addWin(id){localStorage.setItem('st_'+id,wins(id)+1);}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+function visibleGames(){return GAMES.filter(gm=>!String(gm.id).startsWith('sl'));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${wins(gm.id)?'Wins: '+wins(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}

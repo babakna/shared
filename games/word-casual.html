@@ -131,7 +131,9 @@ function hs(id){return +(localStorage.getItem('wc_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('wc_'+id,v);return true}return false}
 function lowerBest(id,v){const c=localStorage.getItem('wc_'+id);if(c===null||v<+c){localStorage.setItem('wc_'+id,v);return true}return false}
 function getRaw(id){return localStorage.getItem('wc_'+id)}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+const HIDDEN_MATH_IDS=new Set(['wpercent','wtriple','wsign','wcountback','wsquare','wquarter','wmult10','wnear100','wskip','wchange','wtimeadd','wdivby','wexpand','wordinal']);
+function visibleGames(){return GAMES.filter(gm=>!HIDDEN_MATH_IDS.has(gm.id));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${getRaw(gm.id)?'Best: '+getRaw(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}

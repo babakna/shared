@@ -133,7 +133,9 @@ let current=null;
 function hs(id){return +(localStorage.getItem('kid_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('kid_'+id,v);return true}return false}
 function getRaw(id){return localStorage.getItem('kid_'+id)}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+const HIDDEN_ADVANCED_DRILLS=new Set(['kpercent','ktriple','ksign','kcountback','ksquare','kquarter','kmult10','knear100','kskip','kchange','ktimeadd','kdivby','knumword','kexpand','kordinal']);
+function visibleGames(){return GAMES.filter(gm=>!HIDDEN_ADVANCED_DRILLS.has(gm.id));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${hs(gm.id)?'Best: '+hs(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}

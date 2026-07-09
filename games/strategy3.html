@@ -137,12 +137,16 @@ let current=null;
 function wins(id){return +(localStorage.getItem('s3_'+id)||0)}
 function addWin(id){localStorage.setItem('s3_'+id,wins(id)+1);}
 function setHs(id,v){if(v>wins(id)){localStorage.setItem('s3_'+id,v);return true}return false}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
-  d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><span class="tag">${gm.tag}</span><div class="hs">${wins(gm.id)?'Best: '+wins(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
+function visibleGames(){return GAMES.filter(gm=>!String(gm.id).startsWith('3l'));}
+function gameTag(gm){return gm.tag ? String(gm.tag) : '';}
+function gameTitle(gm){const tag=gameTag(gm);return gm.name+(tag?'  ('+tag+')':'');}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
+  const tag=gameTag(gm);
+  d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div>${tag?`<span class="tag">${tag}</span>`:''}<div class="hs">${wins(gm.id)?'Best: '+wins(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}
 function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
-function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name+'  ('+gm.tag+')';setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
+function launch(gm){document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gameTitle(gm);setStatus('');setHint('');host.innerHTML='';current=window['game_'+gm.id](gm);}
 function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(typeof k==='string'?document.createTextNode(k):k));return e;}
 function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);var b=document.getElementById('themeToggle');if(b)b.textContent=t==='dark'?'☀️ Light':'🌙 Dark';}
 function toggleTheme(){applyTheme((localStorage.getItem('theme')||'light')==='light'?'dark':'light');}

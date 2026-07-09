@@ -156,7 +156,9 @@ function hs(id){return +(localStorage.getItem('c2_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('c2_'+id,v);return true}return false}
 function lowBest(id,v){const c=localStorage.getItem('c2_'+id);if(c===null||v<+c){localStorage.setItem('c2_'+id,v);return true}return false}
 function getRaw(id){return localStorage.getItem('c2_'+id)}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+const HIDDEN_PRACTICE_IDS=new Set(['numberseq','quickmaths','memorynum','biggernum','roundgame','comparemath','doublehalf','oddeven','placeval','c2percent','c2triple','c2sign','c2countback','c2square','c2quarter','c2mult10','c2near100','c2skip','c2change','c2timeadd','c2divby','c2numword','c2expand','c2ordinal']);
+function visibleGames(){return GAMES.filter(gm=>!HIDDEN_PRACTICE_IDS.has(gm.id));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${getRaw(gm.id)?'Best: '+getRaw(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}

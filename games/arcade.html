@@ -136,9 +136,10 @@ const hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('arc_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('arc_'+id,v);return true}return false}
+function visibleGames(){return GAMES.filter(gm=>!String(gm.id).startsWith('Al'));}
 function buildMenu(){
   const g=document.getElementById('grid');g.innerHTML='';
-  GAMES.forEach(gm=>{
+  visibleGames().forEach(gm=>{
     const d=document.createElement('div');d.className='card';
     d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${hs(gm.id)?'Best: '+hs(gm.id):'&nbsp;'}</div>`;
     d.onclick=()=>launch(gm);g.appendChild(d);

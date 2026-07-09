@@ -131,7 +131,9 @@ const host=document.getElementById('host'),statusEl=document.getElementById('sta
 let current=null;
 function getN(id){return +(localStorage.getItem('calm_'+id)||0)}
 function addN(id,v){localStorage.setItem('calm_'+id,(getN(id)+v));}
-function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=document.createElement('div');d.className='card';
+const HIDDEN_ADVANCED_DRILLS=new Set(['cpercent','ctriple','csign','ccountback','csquare','cquarter','cmult10','cnear100','cskip','cchange','ctimeadd','cdivby','cnumword','cexpand','cordinal']);
+function visibleGames(){return GAMES.filter(gm=>!HIDDEN_ADVANCED_DRILLS.has(gm.id));}
+function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">&nbsp;</div>`;d.onclick=()=>launch(gm);g.append(d);});}
 function setStatus(s){statusEl.textContent=s}
 function setHint(s){hintEl.textContent=s}
