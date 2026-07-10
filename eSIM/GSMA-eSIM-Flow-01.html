@@ -270,7 +270,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.1</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.2</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -382,7 +382,7 @@ var DECISION_TREE={
     {label:'Enable failed',next:'en_fail'},
     {label:'Disable failed',next:'dis_fail'}
   ]},
-  'en_fail':{result:true,title:'ROOT CAUSE: Profile state or PPR restriction',desc:'Enable may fail if the profile is not in a disabled state, or PPR flags prevent the operation. Check ES10b.GetProfilesInfo for profile state and PPR flags.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'},{label:'Profile State Machine',tab:'tools-dbg'}]},
+  'en_fail':{result:true,title:'ROOT CAUSE: Profile state or PPR restriction',desc:'Enable may fail if the profile is not in a disabled state, or PPR flags prevent the operation. Check ES10c.GetProfilesInfo for profile state and PPR flags.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'},{label:'Profile State Machine',tab:'tools-dbg'}]},
   'dis_fail':{result:true,title:'ROOT CAUSE: PPR disableNotAllowed flag set',desc:'The profile\u2019s Policy Rules include pprDisableNotAllowed (bit 0). This can only be changed by the Operator via ES2+.UpdatePolicyRules.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'}]},
   'del':{result:true,title:'ROOT CAUSE: Profile state or PPR restriction',desc:'Delete requires the profile to be disabled first. Also check if pprDeleteNotAllowed (bit 1) is set. If the profile is enabled, disable it first.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'},{label:'Profile State Machine',tab:'tools-dbg'}]},
   'disc':{result:true,title:'ROOT CAUSE: SM-DS connectivity or event registration issue',desc:'The LPA cannot discover pending events. Verify SM-DS FQDN is reachable, the SM-DP+ successfully registered an event (ES12.RegisterEvent), and the eUICC\u2019s Root SM-DS address is configured correctly.',links:[{label:'Consumer DS flow',tab:'consumer',flow:'consumer-ds',step:1}]},
@@ -428,9 +428,9 @@ function ec(n){return EC[n]||'#888'}
 const SPEC={
 m2m:{badge:'SGP.01 '+SPEC_VERSIONS['SGP.01']+' / SGP.02 '+SPEC_VERSIONS['SGP.02'],title:'M2M Remote Provisioning Architecture',
 whatsNew:'v4.x added SM-SR swap (ES6), profile interoperability across SM-SR platforms, and MNO-SD support for operator-controlled security domains.',
-overview:['SGP.01 and SGP.02 define the original GSMA architecture for Machine-to-Machine (M2M) Remote SIM Provisioning (RSP). This architecture was designed for devices where there is no end-user interaction \u2014 connected cars, smart meters, industrial IoT modules, and vending machines. The key principle is that an Operator or M2M Service Provider (M2M-SP) remotely manages profiles on an eUICC through backend platform-to-platform communication.','The architecture introduces two critical backend entities: the Subscription Manager \u2013 Data Preparation (SM-DP), which securely prepares and encrypts profile packages, and the Subscription Manager \u2013 Secure Routing (SM-SR), which manages the secure transport channel to the eUICC and handles the lifecycle of profiles on it. The SM-SR maintains a secure remote channel to each eUICC using SCP03t or SCP80/SCP81, and acts as a gatekeeper \u2014 no entity other than the SM-SR communicates directly with the eUICC.','A key design decision in the M2M architecture is the \u201cpush\u201d model: the SM-SR pushes commands to the eUICC via the remote channel, which is why no Local Profile Assistant (LPA) or end-user UI is required. Profile operations (download, enable, disable, delete) are all initiated from the network side. This makes M2M RSP suitable for unattended devices but introduces dependencies on the SM-SR having continuous connectivity to the eUICC.','The SM-DP and SM-SR can be operated by the same entity or different entities. In many deployments, the eUICC manufacturer (EUM) provides the initial SM-SR, and Operators can request SM-SR changes (\u201cSM-SR swap\u201d) to move eUICC management to their preferred platform. Inter-SM-SR handover is defined in the spec but is complex and not universally deployed.','<b>Operational Realities:</b> Many M2M deployments use Binary SMS through the MNO\u2019s SMS-C (Short Message Service Center) for the remote channel, while others use IP-based secure channels. Operational complexity depends on bearer choice, SM-SR topology, key management, and deployment contracts. Compared with Consumer and IoT RSP architectures, SGP.02 deployments can involve more backend coordination, especially for SM-SR onboarding, key exchange, EIS updates, and multi-operator integration.','<b>Deployment Examples (illustrative):</b> Connected vehicles, smart meters, vending machines, industrial modules, and asset trackers. SM-SR operating models vary by EUM, platform vendor, operator, and service-provider contract. Treat vendor and product associations as deployment-specific and source-verification-needed.','<b>ES4 vs No-ES4 Flows:</b> Flows below are grouped by whether the Operator uses the ES4 interface to interact with the SM-SR. <b>No-ES4 flows</b> represent deployments where profiles are preloaded on the eUICC (e.g., at the factory or by the EUM), and the SM-SR manages lifecycle operations without direct Operator commands via ES4. <b>ES4 flows</b> represent the full architecture where the Operator triggers profile operations through ES4 commands to the SM-SR.'],
+overview:['SGP.01 and SGP.02 define the original GSMA architecture for Machine-to-Machine (M2M) Remote SIM Provisioning (RSP). This architecture was designed for devices where there is no end-user interaction \u2014 connected cars, smart meters, industrial IoT modules, and vending machines. The key principle is that an Operator or M2M Service Provider (M2M-SP) remotely manages profiles on an eUICC through backend platform-to-platform communication.','The architecture introduces two critical backend entities: the Subscription Manager \u2013 Data Preparation (SM-DP), which securely prepares and encrypts profile packages, and the Subscription Manager \u2013 Secure Routing (SM-SR), which manages the secure transport channel to the eUICC and handles the lifecycle of profiles on it. The SM-SR maintains a secure remote channel to each eUICC using SCP03t or SCP80/SCP81, and acts as a gatekeeper \u2014 no entity other than the SM-SR communicates directly with the eUICC.','A key design decision in the M2M architecture is the \u201cpush\u201d model: the SM-SR pushes commands to the eUICC via the remote channel, which is why no Local Profile Assistant (LPA) or end-user UI is required. Profile operations (download, enable, disable, delete) are all initiated from the network side. This makes M2M RSP suitable for unattended devices but introduces dependencies on the SM-SR having continuous connectivity to the eUICC.','The SM-DP and SM-SR can be operated by the same entity or different entities. In many deployments, the eUICC manufacturer (EUM) provides the initial SM-SR, and Operators can request SM-SR changes (\u201cSM-SR swap\u201d) to move eUICC management to their preferred platform. Inter-SM-SR handover is defined in the spec but is complex and not universally deployed.','<b>Operational Realities:</b> Many M2M deployments use Binary SMS through the MNO\u2019s SMS-C (Short Message Service Center) for the remote channel, while others use IP-based secure channels. Operational complexity depends on bearer choice, SM-SR topology, key management, and deployment contracts. Compared with Consumer and IoT RSP architectures, SGP.02 deployments can involve more backend coordination, especially for SM-SR onboarding, key exchange, EIS updates, and multi-operator integration.','<b>Deployment Examples (illustrative):</b> Connected vehicles, smart meters, vending machines, industrial modules, and asset trackers. SM-SR operating models vary by EUM, platform vendor, operator, and service-provider contract. Treat vendor and product associations as deployment-specific and source-verification-needed.','<b>Interface note:</b> M2M download starts with the Operator ordering download from the SM-DP; the SM-DP then coordinates with the SM-SR to create the ISD-P, retrieve EIS data, establish the end-to-end secure profile channel, and install the encrypted profile through the SM-SR remote transport. ES4 is the Operator-to-SM-SR path for remote profile management commands such as enable, disable, delete, and EIS queries. The no-ES4 variants below represent deployments where the Operator uses an SM-DP/vendor management path instead of direct Operator-to-SM-SR operations.'],
 entities:['Operator (M2M-SP)','SM-DP','SM-SR','eUICC'],
-flows:{'m2m-download':'Download & Install (ES4)','m2m-enable':'Profile Enable (ES4)','m2m-disable':'Profile Disable (ES4)','m2m-delete':'Profile Delete (ES4)','m2m-download-noes4':'Download (No ES4 \u2014 Preloaded Profiles)','m2m-enable-noes4':'Enable (No ES4)','m2m-disable-noes4':'Disable (No ES4)','m2m-delete-noes4':'Delete (No ES4)'}},
+flows:{'m2m-download':'Download & Install (Full M2M)','m2m-enable':'Profile Enable (ES4)','m2m-disable':'Profile Disable (ES4)','m2m-delete':'Profile Delete (ES4)','m2m-download-noes4':'Download (SM-DP Managed)','m2m-enable-noes4':'Enable (SM-DP Managed)','m2m-disable-noes4':'Disable (SM-DP Managed)','m2m-delete-noes4':'Delete (SM-DP Managed)'}},
 
 consumer:{badge:'SGP.21 '+SPEC_VERSIONS['SGP.21']+' / SGP.22 '+SPEC_VERSIONS['SGP.22'],title:'Consumer RSP Architecture',
 whatsNew:'v3.x introduced MEP (Multiple Enabled Profiles) \u2014 multiple profiles active simultaneously on different eSIM ports. Added ES10d interface for MEP port management. Enhanced profile metadata. Improved notification handling.',
@@ -454,26 +454,26 @@ flows:{'ifpp-prep':'Profile Preparation for Factory','ifpp-install':'Factory Ins
 const FL={
 /* ── M2M Flows ── */
 'm2m-download':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-DP|Data Preparation','SM-SR|Secure Routing','eUICC|Embedded SIM'],steps:[
-{f:1,t:1,n:'Profile Ready (Preloaded)',a:[['Profile Package','Encrypted profile data (APDU scripts)'],['EID','Target eUICC'],['Key Establishment','ES3 keys via SM-SR tunnel']],d:'Profile data (IMSI, Ki, OPc, file system) is preloaded in the SM-DP via the Operator\u2019s provisioning process (out of scope). The profile is NOT yet encrypted at this stage \u2014 encryption occurs during the download sequence when the SM-SR triggers ES2/ES3 key establishment between the SM-DP and the target eUICC. The ES3 key exchange (tunneled through ES2\u2192SM-SR\u2192ES1\u2192eUICC) uses ECKA to establish session keys for profile binding.'},
-{f:0,t:2,n:'ES4: DownloadProfile Request',a:[['EID','Target eUICC'],['SM-DP Address','Where to fetch the profile'],['Profile-ID','Which profile to download']],d:'Operator instructs SM-SR to initiate profile download to the target eUICC.'},
-{f:2,t:1,n:'ES2: GetProfile',a:[['EID','Target eUICC identifier'],['SM-SR ID','Requesting SM-SR identity'],['Profile-ID','Requested profile reference']],d:'SM-SR requests the encrypted profile package from SM-DP.'},
-{f:1,t:2,n:'ES2: GetProfile Response',a:[['Encrypted Profile Package','Protected profile data'],['Profile Metadata','Size, type, operator info']],d:'SM-DP delivers the encrypted profile package to SM-SR for onward delivery.'},
-{f:2,t:3,n:'ES1: ProfileInstallation (SM-SR Push)',a:[['Encrypted Profile Package','Profile APDU commands'],['SCP03t / SCP80 / SCP81','Secure channel protocol'],['INSTALL [for install]','GlobalPlatform command']],d:'SM-SR pushes the profile to the eUICC via the secure remote channel. The eUICC decrypts and installs it.'},
-{f:3,t:2,n:'ES1: InstallResult',a:[['Result Code','Success / failure'],['ICCID','Installed profile ICCID confirmation']],d:'eUICC reports installation result back to SM-SR.'},
-{f:2,t:0,n:'ES4: Notification',a:[['EID','Target eUICC'],['Status','Profile installed successfully / failed'],['ICCID','Installed profile ID']],d:'SM-SR notifies the Operator of the installation result.'}
+{f:1,t:1,n:'Profile Order Ready',a:[['Profile Data','IMSI, Ki, OPc, file system'],['Profile-ID / ICCID','Profile reference'],['State','Not yet bound to eUICC']],d:'The Operator has provisioned profile content into the SM-DP. At this point the profile is staged, not yet encrypted for a target eUICC. Binding and encryption occur during the download procedure after EIS retrieval, ISD-P creation, and secure channel establishment.'},
+{f:0,t:1,n:'Operator \u2192 SM-DP: Profile Download Request',a:[['EID','Target eUICC'],['SM-SR ID','Target secure-routing platform'],['Profile-ID / ICCID','Which profile to download'],['Enable after download','Optional policy flag']],d:'The Operator requests the SM-DP to download and install the profile for the target eUICC. In the SGP.01 M2M download procedure, the SM-DP is the entity that coordinates profile preparation and delivery; ES4 is not the profile-download trigger.'},
+{f:1,t:2,n:'SM-DP \u2192 SM-SR: Retrieve EIS / Prepare ISD-P',a:[['EID','Target eUICC'],['Requested profile','ICCID / profile reference'],['EIS request','Capabilities and current eUICC state']],d:'SM-DP identifies the associated SM-SR, authenticates with it, requests the eUICC Information Set (EIS), and asks the SM-SR to create or prepare the target ISD-P container on the eUICC.'},
+{f:2,t:1,n:'SM-SR \u2192 SM-DP: EIS + ISD-P Ready',a:[['EIS','eUICC capabilities and profile state'],['ISD-P AID','Prepared profile security domain'],['Transport ready','Remote channel available']],d:'SM-SR retrieves eUICC information, prepares the ISD-P through the remote channel, updates its EIS view, and returns the details the SM-DP needs to bind the profile.'},
+{f:1,t:3,n:'SM-DP \u2192 eUICC via SM-SR: EncP Install',a:[['EncP','Encrypted profile package'],['End-to-end protection','SM-DP to ISD-P'],['Transport','SM-SR remote channel via ISD-R']],d:'SM-DP establishes the profile-protection keyset with the ISD-P and sends the encrypted profile package. The SM-SR provides transport to the eUICC; it does not decrypt or own the profile payload.'},
+{f:3,t:1,n:'eUICC \u2192 SM-DP: Install Result',a:[['Result Code','Success / failure'],['ICCID','Installed profile'],['ISD-P state','Created / installed']],d:'The eUICC decrypts, verifies, and installs the profile, then returns the installation result to the SM-DP through the SM-SR transport path.'},
+{f:1,t:2,n:'SM-DP \u2192 SM-SR: Result / EIS Update',a:[['Install status','Final result'],['ICCID','Installed profile ID'],['EIS update','Profile state and metadata']],d:'SM-DP sends the final result to the SM-SR so the SM-SR can update the EIS record and maintain an accurate remote-management view of the eUICC.'},
+{f:1,t:0,n:'SM-DP \u2192 Operator: Download Result',a:[['EID','Target eUICC'],['Status','Profile installed successfully / failed'],['ICCID','Installed profile ID']],d:'SM-DP confirms the profile download and installation outcome back to the Operator or M2M service platform.'}
 ]},
 
 'm2m-download-noes4':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-DP|Data Preparation','SM-SR (3rd Party)|Secure Routing','eUICC|Embedded SIM'],steps:[
-{f:1,t:2,n:'ES2: Key Establishment Request',a:[['EID','Target eUICC'],['SM-DP Certificate','For mutual auth']],d:'With profiles preloaded, the SM-DP initiates key establishment with the target eUICC via the SM-SR. The Operator has no direct interface (no ES4 or ES5) \u2014 the SM-DP drives the entire flow.'},
-{f:2,t:3,n:'ES1\u2192ES3: Key Exchange (SM-SR Relay)',a:[['SM-DP Certificate','For eUICC to verify'],['Key Agreement Data','ECKA parameters']],d:'SM-SR relays the key establishment to the eUICC via the remote channel. The eUICC verifies the SM-DP certificate and participates in key agreement. This is the ES3 logical interface tunneled through ES1.'},
-{f:3,t:2,n:'ES1\u2192ES3: Key Exchange Response',a:[['eUICC Certificate','For SM-DP to verify'],['Key Agreement Response','eUICC\u2019s contribution']],d:'eUICC responds with its certificate and key material. SM-SR relays this back to the SM-DP.'},
-{f:2,t:1,n:'ES2: Key Establishment Response',a:[['eUICC Certificate','Verified by SM-DP'],['Session Keys','Now established']],d:'SM-DP and eUICC now share session keys for profile encryption. The SM-SR facilitated this but does NOT have access to the keys.'},
-{f:1,t:1,n:'Profile Encryption (Internal)',a:[['Profile Package','Encrypted with session keys'],['Bound to EID','Specific eUICC only']],d:'SM-DP encrypts the preloaded profile using the established session keys. Only the target eUICC can decrypt it.'},
-{f:1,t:2,n:'ES2: ProfileDelivery',a:[['Encrypted Profile Package','For delivery to eUICC'],['EID','Target'],['Profile Metadata','Size, type']],d:'SM-DP sends the encrypted profile to the SM-SR for onward delivery via the remote channel.'},
-{f:2,t:3,n:'ES1: ProfileInstallation (SM-SR Push)',a:[['Encrypted Profile Package','APDU commands'],['SCP03t / SCP80','Secure channel'],['INSTALL','GP command']],d:'SM-SR pushes the profile to the eUICC via the remote channel. The eUICC decrypts with the session keys and installs.'},
-{f:3,t:2,n:'ES1: InstallResult',a:[['Result Code','Success / failure'],['ICCID','Installed profile']],d:'eUICC confirms installation to SM-SR.'},
-{f:2,t:1,n:'ES2: InstallResult Relay',a:[['Result Code','Success / failure'],['ICCID','Installed'],['EID','Target']],d:'SM-SR relays the result back to SM-DP (since the Operator has no ES4 to the SM-SR).'},
-{f:1,t:0,n:'Notification (out-of-band)',a:[['Status','Profile installed'],['EID / ICCID','Identifiers']],d:'SM-DP notifies the Operator. The notification mechanism depends on the SM-DP vendor implementation (API callback, portal, email) \u2014 there is no ES5 in this deployment model.'}
+{f:0,t:1,n:'Download Request (SM-DP Managed)',a:[['EID','Target eUICC'],['Profile-ID / ICCID','Profile to install'],['SM-SR reference','Known from platform inventory']],d:'Operator or M2M service platform uses an SM-DP/vendor management interface rather than a direct Operator-to-SM-SR command path. The SM-DP still coordinates the standard M2M download sequence with the SM-SR.'},
+{f:1,t:2,n:'SM-DP \u2192 SM-SR: Retrieve EIS / Create ISD-P',a:[['EID','Target eUICC'],['Profile reference','ICCID / profile ID'],['SM-DP certificate','For profile-protection setup']],d:'SM-DP requests current EIS data and has the SM-SR create or prepare the ISD-P on the eUICC.'},
+{f:2,t:3,n:'SM-SR \u2192 eUICC: ISD-P Preparation',a:[['Remote channel','SCP03t / SCP80 / SCP81'],['ISD-P creation','Profile container setup']],d:'SM-SR uses its secure remote channel to prepare the eUICC for the incoming profile package.'},
+{f:3,t:1,n:'eUICC \u2192 SM-DP: Key Establishment Data',a:[['eUICC certificate','For SM-DP verification'],['Key agreement response','ISD-P contribution']],d:'The eUICC participates in the SM-DP-to-ISD-P key establishment. SM-SR relays the exchange but does not gain access to profile-protection keys.'},
+{f:1,t:1,n:'SM-DP: Bind and Encrypt Profile',a:[['EncP','Profile encrypted for target ISD-P'],['Bound to EID','Specific eUICC only']],d:'SM-DP encrypts and signs the profile for the target eUICC/ISD-P after key establishment succeeds.'},
+{f:1,t:3,n:'SM-DP \u2192 eUICC via SM-SR: EncP Install',a:[['EncP','Encrypted profile package'],['Transport','SM-SR remote channel']],d:'SM-DP sends the encrypted profile to the eUICC using SM-SR as the secure transport path.'},
+{f:3,t:1,n:'eUICC \u2192 SM-DP: Install Result',a:[['Result Code','Success / failure'],['ICCID','Installed profile']],d:'eUICC confirms installation back to the SM-DP through the relay path.'},
+{f:1,t:2,n:'SM-DP \u2192 SM-SR: Result / EIS Update',a:[['Result Code','Success / failure'],['ICCID','Installed'],['EID','Target']],d:'SM-DP updates the SM-SR with the final result so the EIS reflects the installed profile.'},
+{f:1,t:0,n:'Notification (SM-DP/vendor path)',a:[['Status','Profile installed'],['EID / ICCID','Identifiers']],d:'SM-DP notifies the Operator through the deployment-specific management interface.'}
 ]},
 
 'm2m-enable':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-SR|Secure Routing','eUICC|Embedded SIM'],steps:[
@@ -556,7 +556,7 @@ const FL={
 {f:1,t:2,n:'ES9+.GetBoundProfilePackage Response',a:[['boundProfilePackage','Encrypted profile bound to eUICC']],d:'SM-DP+ returns the BPP \u2014 encrypted and bound to this specific eUICC.'},
 {f:2,t:3,n:'ES10b.LoadBoundProfilePackage',a:[['boundProfilePackage','Encrypted BPP segments'],['Segmented delivery','Large profiles sent in chunks']],d:'LPA sends the BPP to the eUICC for decryption and installation.'},
 {f:3,t:2,n:'ES10b.LoadBPP Result',a:[['profileInstallResult','Success / failure code'],['ICCID','Installed profile ICCID']],d:'eUICC decrypts, verifies integrity, and installs the profile.'},
-{f:2,t:1,n:'ES9+.HandleNotification',a:[['notificationType','install / enable / delete'],['ICCID','Profile ICCID'],['resultCode','Success / failure']],d:'LPA sends installation notification to SM-DP+, forwarded to Operator via ES2+.HandleNotification.'}
+{f:2,t:1,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['notificationType','install / enable / delete'],['ICCID','Profile ICCID'],['resultCode','Success / failure'],['seqNumber','Notification sequence number']],d:'After installation, the LPA retrieves the pending eUICC notification, sends it to the SM-DP+ using ES9+.HandleNotification, and removes it from the eUICC notification list after successful delivery. The SM-DP+ can then forward the result to the Operator via ES2+.HandleNotification.'}
 ]},
 
 'consumer-ds':{nodes:['SM-DP+|Data Preparation+','SM-DS|Discovery Server','LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM'],steps:[
@@ -573,22 +573,22 @@ const FL={
 ]},
 
 'consumer-enable':{nodes:['LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','SM-DP+|Data Preparation+'],steps:[
-{f:0,t:1,n:'ES10b.EnableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends enable command. The currently active profile will be automatically disabled.'},
+{f:0,t:1,n:'ES10c.EnableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends the ES10c enable command. On pre-MEP eUICCs, enabling one profile normally disables the currently enabled profile.'},
 {f:1,t:1,n:'Profile Switch (Internal)',a:[['Disable current','Active profile set to disabled'],['Enable target','Requested profile set to enabled'],['REFRESH','Proactive command to modem']],d:'eUICC performs the switch. Only one profile active at a time (pre-MEP). REFRESH notifies baseband.'},
-{f:1,t:0,n:'ES10b.EnableProfile Result',a:[['resultCode','Success / error code']],d:'eUICC reports the result. Device re-attaches to network with the new profile.'},
-{f:0,t:2,n:'ES9+.HandleNotification (enable)',a:[['Enable Notification','Sent to SM-DP+ of enabled profile'],['Disable Notification','Sent to SM-DP+ of previously active profile']],d:'LPA retrieves pending notifications (ES10b.RetrieveNotification) and sends them to the respective SM-DP+ servers. SM-DP+ forwards to Operators via ES2+.HandleNotification. Note: The symmetric Disable operation follows the same pattern in reverse \u2014 the LPA sends ES10b.DisableProfile, the eUICC switches profiles, and notifications are generated for both the disabled and newly enabled profiles.'}
+{f:1,t:0,n:'ES10c.EnableProfile Result',a:[['resultCode','Success / error code']],d:'eUICC reports the result. Device re-attaches to network with the new profile.'},
+{f:0,t:2,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['Enable Notification','Sent to SM-DP+ of enabled profile'],['Disable Notification','Sent to SM-DP+ of previously active profile']],d:'LPA retrieves pending notifications from the eUICC, sends them to the respective SM-DP+ servers with ES9+.HandleNotification, and removes delivered notifications from the eUICC list. The SM-DP+ forwards them to Operators via ES2+.HandleNotification. The symmetric Disable operation follows the same pattern with ES10c.DisableProfile.'}
 ]},
 'consumer-disable':{nodes:['LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','SM-DP+|Data Preparation+'],steps:[
-{f:0,t:1,n:'ES10b.DisableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends disable command for the currently enabled profile. If the profile\u2019s PPR includes pprDisableNotAllowed (bit 0), this operation will be rejected by the eUICC.'},
+{f:0,t:1,n:'ES10c.DisableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends the ES10c disable command for the currently enabled profile. If the profile\u2019s PPR includes pprDisableNotAllowed (bit 0), this operation will be rejected by the eUICC.'},
 {f:1,t:1,n:'PPR Check & Profile Switch (Internal)',a:[['PPR validation','Check pprDisableNotAllowed flag'],['Disable target','Profile set to disabled state'],['REFRESH','Proactive command to modem']],d:'eUICC checks Profile Policy Rules. If pprDisableNotAllowed is set, the operation fails with an error. Otherwise, the profile is disabled and REFRESH notifies the baseband. The device loses network connectivity from this profile.'},
-{f:1,t:0,n:'ES10b.DisableProfile Result',a:[['resultCode','Success / error code']],d:'eUICC reports the result. On success, the profile is now in the disabled state. On failure, check for PPR restrictions (subjectCode=8.8, reasonCode=3.4).'},
-{f:0,t:2,n:'ES9+.HandleNotification (disable)',a:[['Disable Notification','Sent to SM-DP+ of disabled profile'],['seqNumber','Notification sequence number']],d:'LPA retrieves pending notifications and sends the disable notification to the SM-DP+. The SM-DP+ forwards to the Operator via ES2+.HandleNotification. The Operator can use ES2+.UpdatePolicyRules to change PPR flags if needed.'}
+{f:1,t:0,n:'ES10c.DisableProfile Result',a:[['resultCode','Success / error code']],d:'eUICC reports the result. On success, the profile is now in the disabled state. On failure, check for PPR restrictions (subjectCode=8.8, reasonCode=3.4).'},
+{f:0,t:2,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['Disable Notification','Sent to SM-DP+ of disabled profile'],['seqNumber','Notification sequence number']],d:'LPA retrieves the pending disable notification, sends it to the originating SM-DP+, and removes it from the eUICC list after successful delivery. The SM-DP+ forwards to the Operator via ES2+.HandleNotification. The Operator can use ES2+.UpdatePolicyRules to change PPR flags if needed.'}
 ]},
 'consumer-delete':{nodes:['LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','SM-DP+|Data Preparation+'],steps:[
-{f:0,t:1,n:'ES10b.DeleteProfile',a:[['ICCID or ISD-P AID','Target profile to delete']],d:'LPA sends delete command. Profile must be disabled. Irreversible.'},
+{f:0,t:1,n:'ES10c.DeleteProfile',a:[['ICCID or ISD-P AID','Target profile to delete']],d:'LPA sends the ES10c delete command. Profile must be disabled. Deletion is irreversible.'},
 {f:1,t:1,n:'Profile Deletion (Internal)',a:[['ISD-P removed','Security domain and apps deleted'],['Memory freed','eUICC memory reclaimed'],['Keys wiped','All profile keys erased']],d:'eUICC permanently removes the profile, ISD-P, all applications, and keys.'},
-{f:1,t:0,n:'ES10b.DeleteProfile Result',a:[['resultCode','Success / error code']],d:'eUICC confirms deletion.'},
-{f:0,t:2,n:'ES9+.HandleNotification (delete)',a:[['notificationType','delete'],['ICCID','Deleted profile ICCID'],['seqNumber','Notification sequence number']],d:'LPA sends delete notification to originating SM-DP+. Operator can recycle ICCID/IMSI.'}
+{f:1,t:0,n:'ES10c.DeleteProfile Result',a:[['resultCode','Success / error code']],d:'eUICC confirms deletion.'},
+{f:0,t:2,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['notificationType','delete'],['ICCID','Deleted profile ICCID'],['seqNumber','Notification sequence number']],d:'LPA retrieves and sends the delete notification to the originating SM-DP+, then removes the delivered notification from the eUICC list. Operator can recycle ICCID/IMSI.'}
 ]},
 
 /* ── Consumer MEP Flow ── */
@@ -605,10 +605,10 @@ const FL={
 /* ── IoT Flows ── */
 'iot-direct-download':{nodes:['Operator|MNO / MVNO','SM-DP+|Data Preparation+','eIM|IoT Remote Manager','IPAd|IPA in Device','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
 {f:0,t:1,n:'ES2+.DownloadOrder',a:[['EID','Target eUICC'],['Profile Data','Subscription credentials'],['Service Config','APN, QoS, network slice']],d:'Operator orders a profile from the SM-DP+ for the target eUICC, providing the EID and subscription data.'},
-{f:1,t:1,n:'BPP Generation (Internal)',a:[['boundProfilePackage','Encrypted BPP bound to target EID'],['Profile Metadata','Operator, profile class']],d:'SM-DP+ generates the Bound Profile Package (BPP), cryptographically bound to the target eUICC using the same mutual authentication and binding process as in Consumer RSP. The BPP can only be decrypted by the target eUICC.'},
+{f:1,t:1,n:'BPP / eUICC Package Preparation',a:[['boundProfilePackage','Encrypted package for target EID'],['Profile Metadata','Operator, profile class']],d:'SM-DP+ prepares profile material protected for the target eUICC. In IoT RSP, delivery may be direct through the eIM or indirect through the IPA contacting SM-DP+; exact package wrapping depends on IPAd/IPAe mode and SGP.32 deployment choices.'},
 {f:1,t:2,n:'BPP Delivery to eIM',a:[['Profile Package','Pre-encrypted BPP for target eUICC'],['EID','Target eUICC identifier'],['eIM Session Context','Delivery tracking']],d:'SM-DP+ delivers the pre-encrypted BPP to the eIM. The eIM\u2019s role is orchestration and secure delivery, not profile creation or encryption.'},
-{f:2,t:3,n:'ESeim: DownloadProfile Command',a:[['Encrypted Profile Package','Bound to target eUICC'],['profileMetadata','Profile type, operator info'],['eimTransactionId','Session tracking']],d:'eIM sends the encrypted profile to IPA via ESeim (IP, CoAP, MQTT, or SMS).'},
-{f:3,t:4,n:'Load Profile',a:[['Encrypted Profile Package','Forwarded to eUICC'],['INSTALL command','GlobalPlatform APDU']],d:'IPA forwards the encrypted profile to eUICC for installation.'},
+{f:2,t:3,n:'ESeim: Download Package Delivery',a:[['Encrypted Profile Package','Bound to target eUICC'],['profileMetadata','Profile type, operator info'],['eimTransactionId','Session tracking']],d:'eIM sends the protected profile/eUICC package to IPA via the supported transport profile (IP, CoAP, MQTT, SMS, or deployment-specific bearer).'},
+{f:3,t:4,n:'ES10b.LoadEuiccPackage',a:[['eUICC Package','Download/install package'],['Signed command set','Verified by eUICC'],['Replay counter','Anti-replay protection']],d:'IPA forwards the eUICC package to the eUICC for verification and execution. The eUICC validates authorization, EID binding, and replay protection before installing the profile.'},
 {f:4,t:3,n:'Install Result',a:[['resultCode','Success / failure'],['ICCID','Installed profile']],d:'eUICC decrypts, verifies, installs, and reports the result.'},
 {f:3,t:2,n:'ESeim: DownloadProfile Result',a:[['resultCode','Installation result'],['eimTransactionId','Matching transaction']],d:'IPA reports the installation result back to the eIM.'},
 {f:2,t:0,n:'Notification (out-of-band)',a:[['Status','Profile installed successfully'],['EID / ICCID','Identifiers']],d:'eIM notifies the Operator that the profile is installed.'}
@@ -625,22 +625,24 @@ const FL={
 {f:3,t:2,n:'ESeim: Result Notification',a:[['resultCode','Installation status']],d:'IPAe reports back to the eIM, which can then notify the Operator.'}
 ]},
 'iot-enable':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
-{f:0,t:1,n:'ESeim: EnableProfile',a:[['ICCID','Profile to enable'],['eimTransactionId','Transaction tracking']],d:'eIM sends an enable command to IPA. No end-user interaction needed.'},
-{f:1,t:2,n:'EnableProfile APDU',a:[['ICCID','Target profile'],['refreshFlag','Trigger modem refresh']],d:'IPA forwards the enable command to the eUICC.'},
-{f:2,t:1,n:'EnableResult',a:[['resultCode','Success / failure']],d:'eUICC enables the profile (disabling the current one) and reports the result.'},
+{f:0,t:1,n:'ESeim: Enable Package Request',a:[['ICCID','Profile to enable'],['eimTransactionId','Transaction tracking'],['Replay counter','Fresh command instance']],d:'eIM sends an enable operation to the IPA. No end-user interaction is required, but the operation is still packaged and authorized for the target eUICC.'},
+{f:1,t:2,n:'ES10b.LoadEuiccPackage (Enable)',a:[['Enable command','Contained in eUICC Package'],['EID','Target eUICC binding'],['eIM signature','Authorization proof']],d:'IPA forwards the signed eUICC Package to the eUICC. SGP.32 lifecycle operations are executed from package commands loaded through ES10b.LoadEuiccPackage, not as an unconstrained local APDU.'},
+{f:2,t:2,n:'Verify and Enable (Internal)',a:[['Signature','Authorized eIM verified'],['EID / replay counter','Checked by eUICC'],['Profile state','Target set enabled']],d:'eUICC verifies the package signature, EID, and replay counter, then enables the profile and performs any required refresh behavior.'},
+{f:2,t:1,n:'EnableResult',a:[['resultCode','Success / failure']],d:'eUICC reports the package execution result to the IPA.'},
 {f:1,t:0,n:'ESeim: EnableProfile Result',a:[['resultCode','Result status'],['eimTransactionId','Matching transaction']],d:'IPA confirms the operation to the eIM.'}
 ]},
 'iot-disable':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
-{f:0,t:1,n:'ESeim: DisableProfile',a:[['ICCID','Profile to disable'],['eimTransactionId','Transaction tracking']],d:'eIM sends a disable command to IPA. If the profile\u2019s PPR includes pprDisableNotAllowed (bit 0), the eUICC will reject the operation.'},
-{f:1,t:2,n:'DisableProfile APDU',a:[['ICCID','Target profile'],['refreshFlag','Trigger modem refresh']],d:'IPA forwards the disable command to the eUICC.'},
-{f:2,t:2,n:'PPR Check & Disable (Internal)',a:[['PPR validation','Check pprDisableNotAllowed flag'],['Profile state','Set to disabled if allowed']],d:'eUICC checks Profile Policy Rules. If pprDisableNotAllowed is set, the operation fails. Otherwise, the profile is disabled and the device loses network connectivity from this profile.'},
+{f:0,t:1,n:'ESeim: Disable Package Request',a:[['ICCID','Profile to disable'],['eimTransactionId','Transaction tracking'],['Companion enable','Recommended replacement profile']],d:'eIM sends a disable operation to IPA. If the profile\u2019s PPR includes pprDisableNotAllowed, the eUICC rejects it. For field devices, a disable should normally be paired with an enable command for another profile in the same package so connectivity is not lost.'},
+{f:1,t:2,n:'ES10b.LoadEuiccPackage (Disable)',a:[['Disable command','Contained in eUICC Package'],['EID','Target eUICC binding'],['eIM signature','Authorization proof']],d:'IPA forwards the signed package to the eUICC for verification and execution.'},
+{f:2,t:2,n:'Verify, PPR Check & Disable (Internal)',a:[['Signature / replay','Validated'],['PPR validation','Check pprDisableNotAllowed flag'],['Profile state','Set to disabled if allowed']],d:'eUICC verifies authorization and replay protection, checks Profile Policy Rules, and disables the profile if allowed. If there is no companion enable command, the device may lose connectivity from this profile.'},
 {f:2,t:1,n:'DisableResult',a:[['resultCode','Success / failure']],d:'eUICC reports the disable result. Failure may indicate a PPR restriction.'},
 {f:1,t:0,n:'ESeim: DisableProfile Result',a:[['resultCode','Result status'],['eimTransactionId','Matching transaction']],d:'IPA confirms the operation to the eIM. The eIM can then notify the Operator. If the operation failed due to PPR, the Operator must update the PPR via ES2+.UpdatePolicyRules before retrying.'}
 ]},
 'iot-delete':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
-{f:0,t:1,n:'ESeim: DeleteProfile',a:[['ICCID','Profile to delete'],['eimTransactionId','Transaction tracking']],d:'eIM commands profile deletion. Profile must be disabled first.'},
-{f:1,t:2,n:'DeleteProfile APDU',a:[['ICCID','Target profile']],d:'IPA forwards the delete command.'},
-{f:2,t:1,n:'DeleteResult',a:[['resultCode','Success / failure']],d:'eUICC permanently removes the profile and reclaims memory.'},
+{f:0,t:1,n:'ESeim: Delete Package Request',a:[['ICCID','Profile to delete'],['eimTransactionId','Transaction tracking'],['Replay counter','Fresh command instance']],d:'eIM commands profile deletion. The profile must be disabled first and the command must be authorized for the target eUICC.'},
+{f:1,t:2,n:'ES10b.LoadEuiccPackage (Delete)',a:[['Delete command','Contained in eUICC Package'],['EID','Target eUICC binding'],['eIM signature','Authorization proof']],d:'IPA forwards the signed delete package to the eUICC.'},
+{f:2,t:2,n:'Verify and Delete (Internal)',a:[['Signature / replay','Validated'],['Profile state','Must be disabled'],['Memory reclaim','Profile removed']],d:'eUICC verifies authorization, confirms the profile can be deleted, permanently removes it, and reclaims memory.'},
+{f:2,t:1,n:'DeleteResult',a:[['resultCode','Success / failure']],d:'eUICC reports the package execution result.'},
 {f:1,t:0,n:'ESeim: DeleteProfile Result',a:[['resultCode','Result status']],d:'IPA confirms deletion to the eIM.'}
 ]},
 
@@ -686,10 +688,10 @@ checks:['Compare euiccCiPKIdListForVerification from eUICC with SM-DP+ certifica
 logs:['grep for: "certificate verification failed" in LPA log','Look for: euiccCiPKIdListForVerification in ES10a response \u2014 compare with SM-DP+ cert chain','SM-DP+ log: "unknown CI" or "eUICC cert rejected"','Check: is the SM-DP+ using test CI but eUICC has production CI?']},
 {symptom:'Profile enable fails \u2014 device won\u2019t switch profiles',
 causes:['Profile in wrong state (must be disabled to enable a different one, or installed but not yet enabled)','Profile Policy Rules (PPR) block the enable \u2014 some profiles have pprNotAllowed flags','eUICC REFRESH not reaching modem \u2014 baseband doesn\u2019t pick up the switch','MEP slot conflict on v3.x devices'],
-flowStep:'Consumer Enable flow, Step 1 (ES10b.EnableProfile)',
+flowStep:'Consumer Enable flow, Step 1 (ES10c.EnableProfile)',
 jumpTarget:{tab:'consumer',flow:'consumer-enable',step:1},
-checks:['Check profile state via ES10b.ListProfiles','Review PPR flags on the profile','Verify device baseband supports profile switching','Check if device is MEP-capable and if there\u2019s a slot conflict'],
-logs:['APDU trace: SW=6985 on EnableProfile command','Check ES10b.GetProfilesInfo \u2014 is the profile in "disabled" state?','Look for PPR flags in profile metadata \u2014 pprDisableNotAllowed / pprDeleteNotAllowed','Modem log: check if REFRESH was received after enable']},
+checks:['Check profile state via ES10c.GetProfilesInfo','Review PPR flags on the profile','Verify device baseband supports profile switching','Check if device is MEP-capable and if there\u2019s a slot conflict'],
+logs:['APDU trace: SW=6985 on EnableProfile command','Check ES10c.GetProfilesInfo \u2014 is the profile in "disabled" state?','Look for PPR flags in profile metadata \u2014 pprDisableNotAllowed / pprDeleteNotAllowed','Modem log: check if REFRESH was received after enable']},
 {symptom:'Profile install succeeds but device can\u2019t register on network',
 causes:['Profile credentials (Ki/OPc) mismatch with HLR/HSS provisioning','IMSI not provisioned in network','APN configuration missing or incorrect in profile','Device band/RAT mismatch with operator network','Profile enabled but REFRESH not processed by baseband'],
 flowStep:'Post-install \u2014 this is a network registration problem, not a flow failure',
@@ -698,7 +700,7 @@ checks:['Verify IMSI/Ki were correctly provided in ES2+.ConfirmOrder','Check HLR
 logs:['Modem log: ATTACH REJECT with cause code (e.g., #11 PLMN not allowed, #3 illegal MS)','grep for: AUTHENTICATE response \u2014 compare with expected result','HLR/HSS query: is the IMSI provisioned? Is the Ki correct?','Check: OPc vs OP \u2014 are both sides using the same derivation?']},
 {symptom:'M2M remote push fails \u2014 profile not reaching eUICC',
 causes:['Device not connected to network (no data/SMS bearer)','SM-SR remote channel keys (SCP80/SCP81/SCP03t) out of sync with eUICC','eUICC ISD-R key mismatch after EUM manufacturing error','SMS-C delivery failure (for Binary SMS transport)','APN/connectivity not configured for remote bearer'],
-flowStep:'M2M Download flow, Step 5 (ES1: ProfileInstallation)',
+flowStep:'M2M Download flow, Step 5 (SM-DP \u2192 eUICC via SM-SR: EncP Install)',
 jumpTarget:{tab:'m2m',flow:'m2m-download',step:5},
 checks:['Verify device has active data/SMS connectivity','Check SM-SR remote channel key alignment with eUICC EIS data','Test SMS delivery to device MSISDN','Check SM-SR logs for delivery attempts and error codes'],
 logs:['SM-SR log: "remote delivery failed" or "SCP03t session error"','SMS-C delivery report: was the SMS-PP delivered?','Check: SCP80 key version on SM-SR vs eUICC ISD-R','EIS query: verify ISD-R key info matches SM-SR records']},
@@ -730,8 +732,8 @@ logs:['ATTACH REJECT cause #2 (IMSI unknown in HLR) or #3 (illegal MS)','AUTHENT
 causes:['eUICC has too many installed profiles consuming memory','Profile being downloaded is larger than available free space','eUICC has limited memory (especially constrained IoT eUICCs)','Fragmented memory after repeated install/delete cycles','Profile template includes unnecessary large data objects'],
 flowStep:'Consumer AC flow, Step 15 (ES10b.LoadBoundProfilePackage)',
 jumpTarget:{tab:'consumer',flow:'consumer-ac',step:15},
-checks:['Check available memory via ES10b.GetEUICCInfo2 \u2192 extCardResource field','List installed profiles via ES10b.GetProfilesInfo \u2014 identify any that can be deleted','Delete unused disabled profiles to free memory (ES10b.DeleteProfile)','Check with the profile template owner if the profile can be optimized (smaller file system, fewer applets)'],
-logs:['ES10b.GetEUICCInfo2 \u2192 check extCardResource field for available memory','LoadBoundProfilePackage response: SW=6A84 (not enough memory)','Count installed profiles: ES10b.GetProfilesInfo']},
+checks:['Check available memory via ES10b.GetEUICCInfo2 \u2192 extCardResource field','List installed profiles via ES10c.GetProfilesInfo \u2014 identify any that can be deleted','Delete unused disabled profiles to free memory (ES10c.DeleteProfile)','Check with the profile template owner if the profile can be optimized (smaller file system, fewer applets)'],
+logs:['ES10b.GetEUICCInfo2 \u2192 check extCardResource field for available memory','LoadBoundProfilePackage response: SW=6A84 (not enough memory)','Count installed profiles: ES10c.GetProfilesInfo']},
 {symptom:'M2M remote commands fail \u2014 SM-SR cannot establish secure channel to eUICC',
 causes:['Remote channel keys (SCP03t/SCP80/SCP81) on SM-SR do not match keys on eUICC ISD-R','Keys were rotated on one side but not the other','EUM manufacturing error \u2014 ISD-R keys were not correctly loaded','SM-SR was swapped (ES6) but new SM-SR was not provided correct key material','Key version number mismatch between SM-SR and eUICC'],
 flowStep:'M2M flows \u2014 fails at ES1 (any remote push command)',
@@ -742,8 +744,8 @@ logs:['SM-SR log: "secure channel establishment failed" or "MAC verification err
 causes:['No bootstrap profile was loaded during manufacturing','Bootstrap profile subscription expired or was deactivated by the operator','Bootstrap APN is not provisioned or has been changed','Device is in a region where the bootstrap operator has no coverage','Bootstrap profile was deleted accidentally','eUICC was reset (factory reset) and bootstrap profile was lost'],
 flowStep:'Pre-flow \u2014 this prevents any RSP operation from starting because the device has no network connectivity',
 jumpTarget:null,
-checks:['Check if a bootstrap profile exists: ES10b.GetProfilesInfo (if device has any local interface)','Verify the bootstrap operator has coverage in the device deployment region','Check if the bootstrap subscription is active with the operator','If bootstrap is missing, use IFPP or direct local provisioning to load one','For IoT: check if eIM can reach the device via alternative transport (SMS, MQTT) that does not require the bootstrap profile','Contact the EUM to verify what was loaded at manufacturing'],
-logs:['Check if any profile exists: ES10b.GetProfilesInfo returns empty list','Modem log: "no SIM" or "SIM not ready"','Bootstrap APN connectivity test: can the device reach the SM-DP+ FQDN?','DNS resolution: can the device resolve the SM-DP+ address?']},
+checks:['Check if a bootstrap profile exists: ES10c.GetProfilesInfo (if device has any local interface)','Verify the bootstrap operator has coverage in the device deployment region','Check if the bootstrap subscription is active with the operator','If bootstrap is missing, use IFPP or direct local provisioning to load one','For IoT: check if eIM can reach the device via alternative transport (SMS, MQTT) that does not require the bootstrap profile','Contact the EUM to verify what was loaded at manufacturing'],
+logs:['Check if any profile exists: ES10c.GetProfilesInfo returns empty list','Modem log: "no SIM" or "SIM not ready"','Bootstrap APN connectivity test: can the device reach the SM-DP+ FQDN?','DNS resolution: can the device resolve the SM-DP+ address?']},
 {symptom:'Notifications pending on eUICC \u2014 SM-DP+ not receiving install/enable/delete confirmations',
 causes:['SM-DP+ server unreachable (DNS, firewall, server down)','Notification queue on eUICC is full (max varies by eUICC, typically 10-20)','LPA crashed or was closed before notifications could be sent','Network connectivity lost between profile operation and notification send','SM-DP+ TLS certificate changed and LPA cannot establish HTTPS connection'],
 flowStep:'Consumer AC flow, Step 17 (ES9+.HandleNotification)',
@@ -758,10 +760,10 @@ checks:['Extract the euiccCiPKIdListForVerification from ES10a.GetEUICCInfo1 \u2
 logs:['ES10a.GetEUICCInfo1 \u2192 euiccCiPKIdListForVerification (list of trusted CIs)','SM-DP+ cert: extract CI PKID using Certificate Viewer tool','Compare: is the SM-DP+ CI PKID in the eUICC trusted list?','OpenSSL: openssl x509 -in smdp_cert.pem -text -noout']},
 {symptom:'Profile operation blocked \u2014 Profile Policy Rules prevent enable/disable/delete',
 causes:['pprUpdateControl set \u2014 Operator consent required before changes','pprDisableNotAllowed flag set \u2014 profile cannot be disabled','pprDeleteNotAllowed flag set \u2014 profile cannot be deleted','Profile is the designated \u201cOperational Profile\u201d with enterprise lock','PPR set by Operator during profile creation and cannot be overridden locally'],
-flowStep:'Consumer Enable/Disable/Delete flows \u2014 ES10b operation returns error code 3.4 (PPR not allowed)',
+flowStep:'Consumer Enable/Disable/Delete flows \u2014 ES10c operation returns error code 3.4 (PPR not allowed)',
 jumpTarget:{tab:'consumer',flow:'consumer-enable',step:1},
-checks:['Check profile PPR flags via ES10b.GetProfilesInfo \u2014 look at the profilePolicyRules field','Common PPR flags: bit 0 = disable not allowed, bit 1 = delete not allowed, bit 2 = delete on disable','If PPR blocks the operation, the Operator must update the profile\u2019s PPR via ES2+.UpdatePolicyRules (if supported)','Some PPRs are \u201cone-way\u201d \u2014 once set, they cannot be removed without deleting and re-downloading the profile','Refer to the Profile Policy Rules section of SGP.22 for the complete PPR flag definitions','Use the SGP.22 Error Code Decoder tool with subject 8.8, reason 3.4 for additional context'],
-logs:['ES10b.GetProfilesInfo \u2192 profilePolicyRules field','Error code: subjectCode=8.8, reasonCode=3.4','Check PPR bit flags: bit 0=disable-not-allowed, bit 1=delete-not-allowed, bit 2=delete-on-disable']}
+checks:['Check profile PPR flags via ES10c.GetProfilesInfo \u2014 look at the profilePolicyRules field','Common PPR flags: bit 0 = disable not allowed, bit 1 = delete not allowed, bit 2 = delete on disable','If PPR blocks the operation, the Operator must update the profile\u2019s PPR via ES2+.UpdatePolicyRules (if supported)','Some PPRs are \u201cone-way\u201d \u2014 once set, they cannot be removed without deleting and re-downloading the profile','Refer to the Profile Policy Rules section of SGP.22 for the complete PPR flag definitions','Use the SGP.22 Error Code Decoder tool with subject 8.8, reason 3.4 for additional context'],
+logs:['ES10c.GetProfilesInfo \u2192 profilePolicyRules field','Error code: subjectCode=8.8, reasonCode=3.4','Check PPR bit flags: bit 0=disable-not-allowed, bit 1=delete-not-allowed, bit 2=delete-on-disable']}
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -1928,7 +1930,7 @@ function appxHTML(){
   /* Key Interfaces */
   h+='<div class="asec"><h2>Key Interfaces</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Interface</th><th>Between</th><th>Spec</th><th>Purpose</th></tr></thead><tbody>';
   [['ES1','SM-SR \u2194 eUICC','SGP.02','Secure remote channel for M2M profile management'],
-  ['ES2','SM-DP \u2194 SM-SR','SGP.02','Profile package transfer from SM-DP to SM-SR'],
+  ['ES2','SM-DP \u2194 SM-SR','SGP.02','M2M coordination: EIS retrieval, ISD-P preparation, profile-delivery status, and related SM-DP/SM-SR procedures'],
   ['ES3','SM-DP \u2194 eUICC (logical, via SM-SR)','SGP.02','End-to-end key establishment for profile encryption (tunneled through ES2 + ES1)'],
   ['ES4','Operator \u2194 SM-SR','SGP.02','Operator-initiated lifecycle management requests'],
   ['ES5','Operator \u2194 SM-DP','SGP.02','Profile order / data preparation (not used in preloaded-profile deployments)'],
@@ -1938,8 +1940,8 @@ function appxHTML(){
   ['ES8+','SM-DP+ \u2194 eUICC (logical, via LPA)','SGP.22','Logical secure channel for profile binding, tunneled through ES9+ and ES10b'],
   ['ES9+','LPA \u2194 SM-DP+','SGP.22','Profile download: authentication, BPP delivery'],
   ['ES10a','LPA \u2194 eUICC','SGP.22','eUICC info retrieval, challenge generation'],
-  ['ES10b','LPA \u2194 eUICC','SGP.22','Profile operations (load, enable, disable, delete)'],
-  ['ES10c','LPA \u2194 eUICC','SGP.22','eUICC memory reset, audit, notifications'],
+  ['ES10b','LPA \u2194 eUICC','SGP.22','Bound profile package loading, download preparation, detailed eUICC info, and notification list handling'],
+  ['ES10c','LPA \u2194 eUICC','SGP.22','Local profile management: enable, disable, delete, profile info, EID, and memory reset operations'],
   ['ES10d','LPA \u2194 eUICC','SGP.22 v3.x','MEP port management (GetSIMSlotMapping, SetSIMSlotMapping)'],
   ['ES11','LPA \u2194 SM-DS','SGP.22','Event discovery / retrieval'],
   ['ES12','SM-DP+ \u2194 SM-DS','SGP.22','Event registration'],
@@ -1958,9 +1960,9 @@ function appxHTML(){
   ['ES9+.AuthenticateClient','ES9+','LPA \u2192 SM-DP+','Client auth; sends signed euiccInfo2'],
   ['ES9+.GetBoundProfilePackage','ES9+','LPA \u2192 SM-DP+','Retrieve the BPP for installation'],
   ['ES10b.LoadBoundProfilePackage','ES10b','LPA \u2192 eUICC','Install the BPP into the eUICC'],
-  ['ES10b.EnableProfile','ES10b','LPA \u2192 eUICC','Enable an installed profile'],
-  ['ES10b.DisableProfile','ES10b','LPA \u2192 eUICC','Disable an active profile'],
-  ['ES10b.DeleteProfile','ES10b','LPA \u2192 eUICC','Delete a profile from the eUICC'],
+  ['ES10c.EnableProfile','ES10c','LPA \u2192 eUICC','Enable an installed profile'],
+  ['ES10c.DisableProfile','ES10c','LPA \u2192 eUICC','Disable an active profile'],
+  ['ES10c.DeleteProfile','ES10c','LPA \u2192 eUICC','Delete a profile from the eUICC'],
   ['ES11.HandleEvent','ES11','LPA \u2192 SM-DS','Check for pending events at SM-DS'],
   ['ES12.RegisterEvent','ES12','SM-DP+ \u2192 SM-DS','Register a pending download event'],
   ['ES9+.AuthenticateServer (in InitiateAuth Response)','ES9+','SM-DP+ \u2192 LPA','Server authentication data (serverSigned1, signature, certificate)'],
@@ -1969,7 +1971,7 @@ function appxHTML(){
   ['ES10b.ListNotification','ES10b','LPA \u2192 eUICC','Retrieve list of pending notifications from eUICC'],
   ['ES10b.RetrieveNotification','ES10b','LPA \u2192 eUICC','Retrieve a specific notification for sending'],
   ['ES10b.RemoveNotificationFromList','ES10b','LPA \u2192 eUICC','Remove a sent notification from the eUICC list'],
-  ['ES10b.GetProfilesInfo','ES10b','LPA \u2192 eUICC','Retrieve list of installed profiles with state, ICCID, PPR flags, and metadata'],
+  ['ES10c.GetProfilesInfo','ES10c','LPA \u2192 eUICC','Retrieve list of installed profiles with state, ICCID, PPR flags, and metadata'],
   ['ES10a.GetEUICCInfo1','ES10a','LPA \u2192 eUICC','Retrieve basic eUICC capabilities (svn, CI PKIDs) before authentication'],
   ['ES10b.GetEUICCInfo2','ES10b','LPA \u2192 eUICC','Retrieve detailed eUICC info during authentication (free memory, firmware version, PPR support)'],
   ['ES10c.GetEUICCChallenge','ES10c','LPA \u2192 eUICC','Generate a cryptographic challenge for initiating authentication'],
@@ -1981,31 +1983,31 @@ function appxHTML(){
 
   /* M2M Messages */
   h+='<div class="asec"><h2>Key Messages \u2014 M2M RSP (SGP.02)</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Message</th><th>Interface</th><th>Direction</th><th>Purpose</th></tr></thead><tbody>';
-  [['ES5.ProfileOrder','ES5','Operator \u2192 SM-DP','Order a new profile for a target eUICC'],
-  ['ES5.ProfileOrder Response','ES5','SM-DP \u2192 Operator','Acknowledge order, return Profile-ID'],
-  ['ES2.GetProfile','ES2','SM-SR \u2192 SM-DP','Request encrypted profile package for delivery'],
-  ['ES2.GetProfile Response','ES2','SM-DP \u2192 SM-SR','Deliver encrypted profile package'],
-  ['ES2.KeyEstablishment','ES2/ES3','SM-DP \u2194 eUICC (via SM-SR)','Establish session keys between SM-DP and eUICC'],
-  ['ES4.DownloadProfile','ES4','Operator \u2192 SM-SR','Instruct SM-SR to download profile to eUICC'],
+  [['Operator-SM-DP Profile Order','Operator-SM-DP','Operator \u2192 SM-DP','Order or stage a new profile for a target eUICC'],
+  ['Operator-SM-DP Download Request','Operator-SM-DP','Operator \u2192 SM-DP','Request profile download and installation'],
+  ['ES2.RetrieveEIS / PrepareISDP','ES2','SM-DP \u2192 SM-SR','Retrieve EIS data and prepare the target ISD-P'],
+  ['ES2.EIS / ISD-P Ready','ES2','SM-SR \u2192 SM-DP','Return eUICC information and prepared ISD-P details'],
+  ['ES3 Key Establishment','ES3 logical','SM-DP \u2194 eUICC (via SM-SR)','Establish end-to-end profile-protection keys between SM-DP and ISD-P'],
   ['ES4.EnableProfile','ES4','Operator \u2192 SM-SR','Request profile enable on eUICC'],
   ['ES4.DisableProfile','ES4','Operator \u2192 SM-SR','Request profile disable on eUICC'],
   ['ES4.DeleteProfile','ES4','Operator \u2192 SM-SR','Request profile deletion from eUICC'],
-  ['ES1.ProfileInstallation','ES1','SM-SR \u2192 eUICC (remote)','Push profile package to eUICC via secure remote channel'],
+  ['EncP Installation','ES3 logical over ES2/ES1','SM-DP \u2192 eUICC (via SM-SR)','Deliver encrypted profile package to the ISD-P; SM-SR transports but does not decrypt profile payload'],
   ['ES1.EnableProfile','ES1','SM-SR \u2192 eUICC (remote)','Remote enable command'],
   ['ES1.DisableProfile','ES1','SM-SR \u2192 eUICC (remote)','Remote disable command'],
   ['ES1.DeleteProfile','ES1','SM-SR \u2192 eUICC (remote)','Remote delete command'],
   ['ES1.CreateISDP','ES1','SM-SR \u2192 eUICC (remote)','Create a new ISD-P on the eUICC before profile installation'],
   ['ES4.GetEIS','ES4','Operator \u2192 SM-SR','Retrieve the eUICC Information Set'],
-  ['ES2.ProfileDelivery','ES2','SM-DP \u2192 SM-SR','Deliver encrypted profile package to SM-SR for remote push']
+  ['ES2.Result / EIS Update','ES2','SM-DP \u2192 SM-SR','Report final install result and update SM-SR EIS state']
   ].forEach(function(r){h+='<tr><td><code>'+r[0]+'</code></td><td><code>'+r[1]+'</code></td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>'});
   h+='</tbody></table></div></div>';
 
   /* IoT Messages */
   h+='<div class="asec"><h2>Key Messages \u2014 IoT RSP (SGP.32)</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Message</th><th>Interface</th><th>Direction</th><th>Purpose</th></tr></thead><tbody>';
-  [['ESeim.DownloadProfile','ESeim','eIM \u2192 IPAd/IPAe','Direct mode: send encrypted profile to device'],
-  ['ESeim.EnableProfile','ESeim','eIM \u2192 IPAd/IPAe','Enable a profile on the eUICC'],
-  ['ESeim.DisableProfile','ESeim','eIM \u2192 IPAd/IPAe','Disable a profile on the eUICC'],
-  ['ESeim.DeleteProfile','ESeim','eIM \u2192 IPAd/IPAe','Delete a profile from the eUICC'],
+  [['ESeim.DownloadProfile','ESeim','eIM \u2192 IPAd/IPAe','Direct mode: deliver protected profile/eUICC package to device'],
+  ['ESeim.EnableProfile','ESeim','eIM \u2192 IPAd/IPAe','Request enable package delivery to the eUICC'],
+  ['ESeim.DisableProfile','ESeim','eIM \u2192 IPAd/IPAe','Request disable package delivery to the eUICC'],
+  ['ESeim.DeleteProfile','ESeim','eIM \u2192 IPAd/IPAe','Request delete package delivery to the eUICC'],
+  ['ES10b.LoadEuiccPackage','ES10b','IPA \u2192 eUICC','Load signed eUICC Package commands for download, enable, disable, or delete execution'],
   ['ESeim.ConfigureEim','ESeim','eIM \u2192 eUICC','Register/update eIM configuration on eUICC'],
   ['ESipa.InitiateAuthentication','ESipa','IPA \u2192 SM-DP+','Indirect mode: begin mutual authentication'],
   ['ESipa.AuthenticateClient','ESipa','IPA \u2192 SM-DP+','Indirect mode: send eUICC credentials for verification'],
@@ -2021,10 +2023,10 @@ function appxHTML(){
     ['Start authentication','ES9+.InitiateAuthentication','ES9+ (LPA\u2192SM-DP+)','ESipa.InitiateAuthentication','ESipa (IPA\u2192SM-DP+)','Same protocol, different initiator'],
     ['Client auth','ES9+.AuthenticateClient','ES9+','ESipa.AuthenticateClient','ESipa','IoT uses IPA instead of LPA'],
     ['Get profile package','ES9+.GetBoundProfilePackage','ES9+','ESipa.GetBoundProfilePackage','ESipa','Identical BPP format'],
-    ['Load profile','ES10b.LoadBoundProfilePackage','ES10b (LPA\u2192eUICC)','IPA\u2192eUICC (local)','Local','IoT may use non-APDU transport'],
-    ['Enable profile','ES10b.EnableProfile','ES10b','ESeim.EnableProfile','ESeim (eIM\u2192IPA)','IoT: eIM initiates, not user'],
-    ['Disable profile','ES10b.DisableProfile','ES10b','ESeim.DisableProfile','ESeim','Same'],
-    ['Delete profile','ES10b.DeleteProfile','ES10b','ESeim.DeleteProfile','ESeim','Same'],
+    ['Load profile','ES10b.LoadBoundProfilePackage','ES10b (LPA\u2192eUICC)','ES10b.LoadEuiccPackage','ES10b (IPA\u2192eUICC)','IoT executes signed eUICC Packages delivered by IPA'],
+    ['Enable profile','ES10c.EnableProfile','ES10c','ESeim.EnableProfile + ES10b.LoadEuiccPackage','ESeim then ES10b','IoT: eIM initiates; eUICC executes signed package command'],
+    ['Disable profile','ES10c.DisableProfile','ES10c','ESeim.DisableProfile + ES10b.LoadEuiccPackage','ESeim then ES10b','IoT should pair disable with enable where needed to preserve connectivity'],
+    ['Delete profile','ES10c.DeleteProfile','ES10c','ESeim.DeleteProfile + ES10b.LoadEuiccPackage','ESeim then ES10b','IoT delete is still packaged and signed by eIM'],
     ['Discover events','ES11 (LPA\u2192SM-DS)','ES11','N/A (eIM manages)','ESop/ESeim','IoT: eIM knows SM-DP+ directly'],
     ['Direct profile push','N/A','\u2014','ESeim.DownloadProfile','ESeim','IoT Direct Mode only \u2014 no Consumer equivalent'],
     ['Order profile','ES2+.DownloadOrder','ES2+','ES2+.DownloadOrder','ES2+','Identical \u2014 same SM-DP+ interface'],
