@@ -270,7 +270,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated June 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.1</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -310,17 +310,17 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
    All spec-dependent data lives here.
    To update: modify entries in this section ONLY.
    Rendering logic below reads from these objects.
-   Updated June 2026
+   Updated July 2026
    ═══════════════════════════════════════════════════════════ */
 
 // ── 1. Spec Versions ──
 // Format: 'SGP.XX': 'vX.X' or 'vX.X (qualifier)'
 const SPEC_VERSIONS = {
-  'SGP.01':'v1.1','SGP.02':'v4.2','SGP.08':'v1.0','SGP.11':'v3.1',
-  'SGP.16':'v2.1','SGP.21':'v3.1','SGP.22':'v3.1','SGP.22_v2':'v2.6.1',
-  'SGP.23':'v3.1','SGP.24':'v2.2','SGP.25':'v1.0','SGP.26':'v1.0',
-  'SGP.29':'v2.1','SGP.31':'v1.2','SGP.32':'v1.2','SGP.33':'v1.0',
-  'SGP.41':'v1.0 (public listing; verify current revision)','SGP.42':'source-verification needed','FS.18':'\u2014'
+  'SGP.01':'v4.3','SGP.02':'v4.3','SGP.08':'v1.4','SGP.11':'v4.2.2',
+  'SGP.16':'v1.5','SGP.21':'v3.1','SGP.22':'v3.1','SGP.22_v2':'v2.7',
+  'SGP.23':'v3.1','SGP.24':'v2.6.1 / v3.2.1','SGP.25':'v1.0','SGP.26':'v3.0.2',
+  'SGP.29':'v1.1','SGP.31':'v1.3','SGP.32':'v1.3','SGP.33':'v1.2',
+  'SGP.41':'v1.0 (verify current GSMA resource)','SGP.42':'source-verification needed','FS.18':'\u2014'
 };
 
 // ── 2. Entity Colors ──
@@ -439,13 +439,13 @@ entities:['Operator','SM-DP+','SM-DS','LPA (Device)','eUICC'],
 flows:{'consumer-prep':'Profile Preparation (ES2+)','consumer-ac':'Download \u2014 Activation Code','consumer-ds':'Download \u2014 Discovery Server','consumer-enable':'Enable','consumer-disable':'Disable','consumer-delete':'Profile Delete','consumer-mep':'MEP \u2014 Multi-Port Enable (v3.x)'}},
 
 iot:{badge:'SGP.31 '+SPEC_VERSIONS['SGP.31']+' / SGP.32 '+SPEC_VERSIONS['SGP.32'],title:'IoT eSIM Architecture',
-whatsNew:'SGP.32 v1.2 is the published IoT technical baseline used by this page. SGP.32 v1.3 is pending/source-verification-needed and should be checked against current GSMA releases before implementation planning.',
+whatsNew:'GSMA public listings now show SGP.31 v1.3 and SGP.32 v1.3 active, published 22 May 2026. Use those listings for implementation planning and verify detailed technical behavior against the current GSMA documents.',
 overview:['SGP.31 and SGP.32 define the IoT RSP architecture for eSIM profile management across a broad range of IoT device categories, from capable connected vehicles to constrained sensors. This architecture is designed to address many operational challenges seen in M2M deployments, including bearer constraints, SM-SR complexity, and multi-hop latency, while supporting a wider IoT deployment spectrum.','The architecture introduces the <b>eIM (eSIM IoT Remote Manager)</b> \u2014 a management platform that acts on behalf of the device owner or IoT service provider. The eIM orchestrates profile lifecycle operations (download, enable, disable, delete) without requiring an LPA on the device. The device runs an <b>IPA (IoT Profile Assistant)</b> that handles local eUICC interaction. Two IPA variants exist: <b>IPAd</b> (IPA in Device) runs as software on the IoT device itself, and <b>IPAe</b> (IPA embedded in eUICC) is a software component within the eUICC that performs IPA functions internally for constrained devices.','<b>Direct Mode:</b> The eIM delivers pre-encrypted profiles directly to the IPA on the device via the ESeim interface. The SM-DP+ generates and encrypts the BPP bound to the target eUICC, then delivers it to the eIM. The eIM stores and delivers it to the IPA when the device is reachable. This mode is suitable for capable devices where the eIM has direct connectivity.','<b>Indirect Mode:</b> Originally introduced to handle constrained devices, but now broadly favored for practical reasons. The IPA connects to the SM-DP+ (similar to the Consumer model) with the eIM orchestrating the operation. The eIM triggers the IPA to download from the SM-DP+, and the IPA performs the authentication and BPP retrieval directly with the SM-DP+. IPAe (embedded IPA in the eUICC) implementations typically use Indirect Mode, allowing the eUICC itself to handle the download without requiring device-side software complexity.','The architecture supports both IP and non-IP transport, and operations can be performed over protocols like CoAP, MQTT, or SMS. This flexibility allows SGP.32 to serve devices across the connectivity spectrum \u2014 from NB-IoT modules to LTE-M gateways to Wi-Fi connected industrial equipment.','<b>Prerequisite \u2014 eIM Configuration:</b> Before any eIM-based flow works, the eUICC must be configured to trust the eIM. This is done via <code>ESeim.ConfigureEim</code>, typically during eUICC manufacturing or via an initial bootstrap process. The eUICC stores a list of authorized eIM identifiers and will reject commands from unrecognized eIMs. This trust bootstrap is a critical deployment step \u2014 without it, neither Direct nor Indirect mode operations will succeed.','<b>Deployment Examples (illustrative):</b> Candidate use cases include connected vehicles, smart meters and utilities, industrial equipment, asset trackers, smart agriculture, consumer IoT devices, and constrained sensors. The choice between Direct and Indirect mode depends on deployment requirements, device capabilities, certification status, and connectivity patterns rather than device \u201cconstrainedness\u201d alone.'],
 entities:['Operator','SM-DP+','SM-DS','eIM','IPAd','IPAe','eUICC (IoT)'],
 flows:{'iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
 
 ifpp:{badge:'SGP.41 '+SPEC_VERSIONS['SGP.41']+' / SGP.42 '+SPEC_VERSIONS['SGP.42'],title:'In-Factory Profile Provisioning (IFPP)',
-whatsNew:'SGP.41 architecture/requirements are public; SGP.42 technical details are source-verification-needed for this page.',
+whatsNew:'SGP.41 architecture/requirements are public but may require direct GSMA resource access; SGP.42 technical details remain source-verification-needed for this page.',
 overview:['SGP.41 and SGP.42 define the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 covers architecture and requirements; the SGP.42 technical specification status, version, and implementation details should be verified against current GSMA source pages before relying on this page for implementation planning.','IFPP addresses a manufacturing provisioning use case in the eSIM ecosystem. With online SGP.22 and SGP.32 provisioning flows, profile download commonly requires a connection to the SM-DP+ and multiple round-trip exchanges, which can introduce delays and complexity on factory floors where production speed is important. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The intended security model keeps a pre-generated BPP cryptographically bound to a specific eUICC; exact controls and assurance claims should be verified against current SGP.41/SGP.42 text and vendor implementation guidance.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Because SGP.42 technical details are source-verification-needed for this page, the flows below are conceptual and based on the SGP.41 architectural framework. Update them against the current technical specification before using as an implementation checklist.','<b>Deployment Examples (illustrative):</b> Consumer bootstrap-profile installation, smart meters, automotive modules, and global IoT devices are example IFPP use cases. Treat these as illustrative, not claims about specific vendor, operator, or production deployment. Late Binding examples are conceptual until verified against current SGP.42 text and implementation guidance.'],
 entities:['Operator','SM-DP+ (Profile Provider)','Factory System','eUICC'],
 flows:{'ifpp-prep':'Profile Preparation for Factory','ifpp-install':'Factory Installation','ifpp-late-binding':'Late Binding \u2014 Configuration-Time Provisioning'}}
@@ -1330,7 +1330,7 @@ function esim101HTML(){
   h+='<tr><td style="font-weight:700">Provisioning model</td><td>Push (network-initiated via SM-SR)</td><td>Pull (device-initiated via LPA)</td><td>Both (Direct = push, Indirect = pull)</td><td>Local (factory wired interface)</td></tr>';
   h+='<tr><td style="font-weight:700">Key backend entity</td><td>SM-DP + SM-SR</td><td>SM-DP+</td><td>SM-DP+ + eIM</td><td>SM-DP+ + Factory System</td></tr>';
   h+='<tr><td style="font-weight:700">Connectivity at install</td><td>Yes (SMS/IP)</td><td>Yes (HTTPS)</td><td>Yes (IP/CoAP/MQTT/SMS)</td><td>No for local install path</td></tr>';
-  h+='<tr><td style="font-weight:700">Spec status</td><td>Established; verify current revision</td><td>Established/evolving; verify current revision</td><td>Published baseline used here: SGP.32 v1.2; v1.3 pending/source-verification-needed</td><td>SGP.41 public; SGP.42 source-verification needed</td></tr>';
+  h+='<tr><td style="font-weight:700">Spec status</td><td>Established; active SGP.01/02 v4.3 in GSMA public listings</td><td>Established/evolving; active SGP.22 v2.7 and v3.1 tracks</td><td>Active IoT v1.3 track in GSMA public listings</td><td>SGP.41 public resource; SGP.42 source-verification needed</td></tr>';
   h+='</tbody></table></div>';
   
   /* Section 3: Terminology Cheat Sheet */
@@ -1378,7 +1378,7 @@ function esim101HTML(){
     {year:'2023',x:525,spec:'SGP.32 v1',label:'IoT RSP',desc:'(illustrative milestone)',color:'#0891B2',tab:'iot'},
     {year:'2023',x:670,spec:'SGP.22 v3',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
     {year:'2025',x:815,spec:'SGP.41 v1',label:'IFPP',desc:'(source-verify)',color:'#B45309',tab:'ifpp'},
-    {year:'2026',x:940,spec:'SGP.32 v1.2',label:'IoT RSP',desc:'(v1.3 pending)',color:'#0891B2',tab:'iot'}
+    {year:'2026',x:940,spec:'SGP.32 v1.3',label:'IoT RSP',desc:'(active GSMA listing)',color:'#0891B2',tab:'iot'}
   ];
   milestones.forEach(function(m){
     h+='<g style="cursor:pointer" onclick="jumpToFlow(\''+m.tab+'\',null,0)">';
@@ -1405,7 +1405,7 @@ function esim101HTML(){
   h+='<text x="0" y="60" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.32:</tspan> IoT RSP architecture with eIM for a broad IoT device range.</text>';
   h+='<text x="0" y="80" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.22 v3:</tspan> Multiple Enabled Profiles (MEP) support.</text>';
   h+='<text x="0" y="100" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2025 \u2014 SGP.41:</tspan> In-Factory Profile Provisioning for manufacturing lines.</text>';
-  h+='<text x="0" y="120" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2026 \u2014 SGP.32 v1.2:</tspan> Published IoT technical baseline used here; SGP.32 v1.3 is pending/source-verification-needed.</text>';
+  h+='<text x="0" y="120" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2026 \u2014 SGP.32 v1.3:</tspan> Active IoT technical specification listed by GSMA as published 22 May 2026.</text>';
   h+='</g>';
   h+='</svg></div>';
   
@@ -1498,7 +1498,7 @@ function qrHTML(){
   ['Discovery mechanism','N/A (SM-SR knows all eUICCs)','SM-DS or Activation Code','SM-DS or eIM-triggered','N/A (EID known at factory)'],
   ['Typical devices','Connected cars, smart meters, vending machines, industrial modules','Smartphones, tablets, wearables, laptops','LPWAN sensors, NB-IoT modules, constrained IoT','Any device manufactured in a factory with eUICC'],
   ['Connectivity at install?','Yes (SMS/IP)','Yes (HTTPS)','Yes (eIM channel)','No (local interface \u2014 key advantage)'],
-  ['Spec status','Established; verify current revision ('+SPEC_VERSIONS['SGP.02']+')','Established/evolving; verify current revision ('+SPEC_VERSIONS['SGP.22_v2']+' + '+SPEC_VERSIONS['SGP.22']+')','Published baseline used here: SGP.32 '+SPEC_VERSIONS['SGP.32']+'; v1.3 pending/source-verification-needed','SGP.41 '+SPEC_VERSIONS['SGP.41']+'; SGP.42 '+SPEC_VERSIONS['SGP.42']]
+  ['Spec status','Active M2M listings include SGP.01 '+SPEC_VERSIONS['SGP.01']+' and SGP.02 '+SPEC_VERSIONS['SGP.02'],'Active Consumer listings include SGP.22 '+SPEC_VERSIONS['SGP.22_v2']+' and '+SPEC_VERSIONS['SGP.22'],'Active IoT listings include SGP.31 '+SPEC_VERSIONS['SGP.31']+' and SGP.32 '+SPEC_VERSIONS['SGP.32'],'SGP.41 '+SPEC_VERSIONS['SGP.41']+'; SGP.42 '+SPEC_VERSIONS['SGP.42']]
   ];
   mx.forEach(function(r){h+='<tr>';r.forEach(function(c,i){h+=(i===0?'<td style="font-weight:700;white-space:nowrap">':'<td>')+c+'</td>'});h+='</tr>'});
   h+='</tbody></table></div></div>';
@@ -1882,7 +1882,7 @@ function appxHTML(){
   var h='';
 
   h+='<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-size:12px;color:var(--tx2);">';
-  h+='Updated: <strong style="color:var(--tx0)">June 2026</strong> &mdash; ';
+  h+='Updated: <strong style="color:var(--tx0)">July 2026</strong> &mdash; ';
   h+='<a href="https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/" target="_blank">Check Consumer/IoT Specs</a> \u00B7 ';
   h+='<a href="https://www.gsma.com/solutions-and-impact/technologies/esim/esim-m2m-specifications/" target="_blank">Check M2M Specs</a>';
   h+='</div>';
