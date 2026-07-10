@@ -101,8 +101,9 @@ function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fix
   box.append(el('div',{style:'line-height:1.6',textContent:'Read the question and tap the correct answer. Use Easy / Medium / Hard to change the level, then tap Next.'}));
   const c=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});c.onclick=()=>ov.remove();box.append(c);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
 function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';GAMES.forEach(gm=>{const d=el('div',{className:'card'});d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
-function backToMenu(){if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
-function launch(gm){currentGm=gm;score=0;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=gm.fn();}
+function clearCelebrations(){document.querySelectorAll('[data-game-celebration],.kid-win-overlay,.kid-confetti').forEach(n=>n.remove());}
+function backToMenu(){clearCelebrations();window.__activeGameId='';window.__activeGameName='';if(current&&current.stop)current.stop();current=null;host.innerHTML='';document.getElementById('stage').style.display='none';document.getElementById('menu').style.display='block';buildMenu();}
+function launch(gm){clearCelebrations();window.__activeGameId=gm.id;window.__activeGameName=gm.name;window.__lastGameCelebration='';currentGm=gm;score=0;document.getElementById('menu').style.display='none';document.getElementById('stage').style.display='block';titleEl.textContent=gm.name;setStatus('');setHint('');host.innerHTML='';current=gm.fn();}
 function quiz(gen){
   score=0;
   const diffRow=el('div',{className:'row',style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center'});
