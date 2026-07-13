@@ -127,7 +127,10 @@ const GAMES=[
   {id:'cardbingo',name:'Card Bingo',ico:'🅱️'},
   {id:'suitsweep',name:'Suit Sweep',ico:'🧹'},
   {id:'topcard',name:'Top Card',ico:'🔝'},
-  {id:'royalhunt',name:'Ace Hunt',ico:'🂡'},];
+  {id:'royalhunt',name:'Ace Hunt',ico:'🂡'},
+  {id:'rummy',name:'Gin Rummy',ico:'🍸'},
+  {id:'spades',name:'Spades',ico:'♠️'},
+  {id:'yukon',name:'Yukon Solitaire',ico:'🏔️'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('cd_'+id)||0)}
@@ -146,6 +149,154 @@ function makeDeck(){const d=[];SUITS.forEach(s=>RANKS.forEach((r,i)=>d.push({s,r
 function shuffle(d){for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}return d;}
 function cardFace(c,faceUp=true){if(!faceUp)return el('div',{className:'pcard back',style:'align-items:center;justify-content:center;font-size:22px'},'★');
   const d=el('div',{className:'pcard'+(isRed(c.s)?' red':'')});d.append(el('div',{textContent:c.r}),el('div',{textContent:c.s,style:'align-self:flex-end;font-size:18px'}));return d;}
+
+/* ---------------- YUKON SOLITAIRE ---------------- */
+function game_yukon(gm){
+  setHint('Move any face-up card (with everything on top of it) onto a card one higher of the opposite colour, or move any group to an empty column. Tap a card to pick it up, then tap the destination. Build the four foundations A→K by suit. No stock — plan ahead!');
+  let cols,found,sel,over,awarded;
+  const foundEl=el('div',{style:'display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap'});
+  const board=el('div',{style:'display:flex;gap:6px;justify-content:center;align-items:flex-start;flex-wrap:nowrap'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(foundEl,el('div',{style:'display:flex;gap:10px;justify-content:center;margin:8px 0'},newB),board);
+  function deal(){const d=shuffle(makeDeck());cols=[[],[],[],[],[],[],[]];found=[[],[],[],[]];sel=null;over=false;awarded=false;
+    const down=[0,1,2,3,4,5,6];
+    for(let i=0;i<7;i++){for(let k=0;k<down[i];k++)cols[i].push({c:d.pop(),up:false});const up=i===0?1:5;for(let k=0;k<up;k++)cols[i].push({c:d.pop(),up:true});}
+    render();}
+  function flip(ci){const col=cols[ci];if(col.length&&!col[col.length-1].up)col[col.length-1].up=true;}
+  function canStack(mv,onto){return isRed(mv.s)!==isRed(onto.s)&&onto.v===mv.v+1;}
+  function moveTo(ci){if(!sel)return;const g=cols[sel.ci].slice(sel.idx);const target=cols[ci][cols[ci].length-1];
+    if(cols[ci].length===0||(target.up&&canStack(g[0].c,target.c))){cols[sel.ci]=cols[sel.ci].slice(0,sel.idx);cols[ci]=cols[ci].concat(g);flip(sel.ci);sel=null;check();render();}
+    else{sel=null;render();}}
+  function toFoundation(f){if(!sel)return;const col=cols[sel.ci];if(sel.idx!==col.length-1){sel=null;render();return;}
+    const card=col[col.length-1].c,fnd=found[f];
+    if((fnd.length===0&&card.v===1)||(fnd.length&&fnd[fnd.length-1].s===card.s&&card.v===fnd[fnd.length-1].v+1)){col.pop();fnd.push(card);flip(sel.ci);sel=null;check();render();}
+    else{sel=null;render();}}
+  function check(){const tot=found.reduce((a,f)=>a+f.length,0);if(tot===52&&!over){over=true;if(!awarded){awarded=true;setHs(gm.id,hs(gm.id)+1);}}}
+  function clickCard(ci,idx){if(over)return;const card=cols[ci][idx];
+    if(sel){if(sel.ci===ci){if(idx===sel.idx){sel=null;render();}else if(card.up){sel={ci,idx};render();}else moveTo(ci);}else moveTo(ci);return;}
+    if(card.up){sel={ci,idx};render();}}
+  function render(){foundEl.innerHTML='';found.forEach((fnd,f)=>{let slot;if(fnd.length){slot=cardFace(fnd[fnd.length-1]);}else{slot=el('div',{style:'width:48px;height:70px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:20px',textContent:'A'});}slot.style.cursor='pointer';slot.onclick=()=>toFoundation(f);foundEl.append(slot);});
+    board.innerHTML='';cols.forEach((col,ci)=>{const cel=el('div',{style:'display:flex;flex-direction:column;min-width:44px;min-height:74px'});
+      if(col.length===0){const empty=el('div',{style:'width:44px;height:70px;border:2px dashed var(--border);border-radius:8px;cursor:pointer'});empty.onclick=()=>{if(sel)moveTo(ci);};cel.append(empty);}
+      col.forEach((card,idx)=>{const f=cardFace(card.c,card.up);f.style.marginTop=idx?'-50px':'0';f.style.cursor='pointer';if(sel&&sel.ci===ci&&idx>=sel.idx)f.style.outline='3px solid #fd5';f.onclick=()=>clickCard(ci,idx);cel.append(f);});
+      board.append(cel);});
+    const tot=found.reduce((a,f)=>a+f.length,0);setStatus((over?'🎉 You won! ':'')+tot+'/52 to foundations • Wins: '+hs(gm.id));}
+  newB.onclick=deal;deal();return{stop:()=>{}};
+}
+
+/* ---------------- GIN RUMMY ---------------- */
+function game_rummy(gm){
+  setHint('Draw from the stock or discard pile, then discard one card. Form runs (3+ in a suit) and sets (3+ of a rank). Knock when your deadwood (unmatched card points) is 10 or less; Gin = 0 deadwood. First to 100 points wins the match.');
+  let stock,disc,you,ai,phase,turn,over,scores,handOver;
+  const scoreEl=el('div',{className:'big'});
+  const pilesEl=el('div',{style:'display:flex;gap:16px;justify-content:center;align-items:center;margin:8px 0'});
+  const info=el('div',{style:'color:var(--dim);min-height:22px;text-align:center;max-width:520px'});
+  const handEl=el('div',{style:'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:600px'});
+  const knockB=el('button',{className:'btn',textContent:'Knock ✊'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Match'});
+  host.append(scoreEl,pilesEl,info,el('div',{style:'display:flex;gap:10px;justify-content:center;margin:8px 0'},knockB,newB),handEl);
+  function deadVal(c){return c.v>=11?10:c.v;}
+  function candidateMelds(cards){const melds=[];const byRank={},bySuit={};
+    cards.forEach((c,i)=>{(byRank[c.v]=byRank[c.v]||[]).push(i);(bySuit[c.s]=bySuit[c.s]||[]).push(i);});
+    Object.values(byRank).forEach(idxs=>{if(idxs.length>=3){melds.push(idxs.slice());if(idxs.length===4)for(let k=0;k<4;k++)melds.push(idxs.filter((_,j)=>j!==k));}});
+    Object.values(bySuit).forEach(idxs=>{const s=idxs.slice().sort((a,b)=>cards[a].v-cards[b].v);let run=[s[0]];
+      const add=r=>{for(let a=0;a<r.length;a++)for(let b=a+2;b<r.length;b++)melds.push(r.slice(a,b+1));};
+      for(let k=1;k<s.length;k++){if(cards[s[k]].v===cards[s[k-1]].v+1)run.push(s[k]);else{add(run);run=[s[k]];}}add(run);});
+    return melds;}
+  function bestArrange(cards){const melds=candidateMelds(cards),n=cards.length,full=(1<<n)-1,memo=new Map();
+    function rec(mask){if(mask===full)return{dw:0,arr:[]};if(memo.has(mask))return memo.get(mask);let i=0;while(mask&(1<<i))i++;
+      let sub=rec(mask|(1<<i));let best={dw:sub.dw+deadVal(cards[i]),arr:sub.arr};
+      for(const m of melds){if(m.indexOf(i)<0)continue;let mm=0,ok=true;for(const j of m){if(mask&(1<<j)){ok=false;break;}mm|=(1<<j);}if(!ok)continue;const s2=rec(mask|mm);if(s2.dw<best.dw)best={dw:s2.dw,arr:[m].concat(s2.arr)};}
+      memo.set(mask,best);return best;}
+    return rec(0);}
+  function meldedSet(cards){const a=bestArrange(cards);const s=new Set();a.arr.forEach(m=>m.forEach(i=>s.add(i)));return{set:s,dw:a.dw};}
+  function reset(){scores={you:0,ai:0};deal();}
+  function deal(){const d=shuffle(makeDeck());you=[];ai=[];for(let i=0;i<10;i++){you.push(d.pop());ai.push(d.pop());}disc=[d.pop()];stock=d;phase='draw';turn='you';over=false;handOver=false;info.textContent='Your turn — draw from stock or discard.';render();}
+  function sortHand(h){h.sort((a,b)=>a.s===b.s?a.v-b.v:'♠♥♦♣'.indexOf(a.s)-'♠♥♦♣'.indexOf(b.s));}
+  function drawFrom(src){if(over||turn!=='you'||phase!=='draw')return;if(src==='stock'){if(!stock.length){exhaust();return;}you.push(stock.pop());}else{you.push(disc.pop());}phase='discard';info.textContent='Now tap a card to discard.';sortHand(you);render();}
+  function discard(idx){if(over||turn!=='you'||phase!=='discard')return;disc.push(you.splice(idx,1)[0]);phase='draw';turn='ai';render();setTimeout(aiTurn,800);}
+  function knock(){if(over||turn!=='you'||phase!=='discard'){info.textContent='Draw first, then Knock.';return;}
+    let best=-1,bestDw=99;for(let i=0;i<you.length;i++){const rest=you.slice(0,i).concat(you.slice(i+1));const dw=meldedSet(rest).dw;if(dw<bestDw){bestDw=dw;best=i;}}
+    if(bestDw>10){info.textContent='Your deadwood would be '+bestDw+' — you need 10 or less to knock.';return;}
+    disc.push(you.splice(best,1)[0]);sortHand(you);endHand('you');}
+  function aiTurn(){if(over)return;const cur=meldedSet(ai).dw;const withDisc=meldedSet(ai.concat(disc[disc.length-1]));
+    let drew;if(disc.length&&withDisc.dw<cur){ai.push(disc.pop());drew='discard';}else if(stock.length){ai.push(stock.pop());drew='stock';}else{exhaust();return;}
+    let best=-1,bestDw=99;for(let i=0;i<ai.length;i++){const rest=ai.slice(0,i).concat(ai.slice(i+1));const dw=meldedSet(rest).dw;if(dw<bestDw){bestDw=dw;best=i;}}
+    const card=ai.splice(best,1)[0];disc.push(card);turn='you';phase='draw';
+    info.textContent='AI drew from the '+drew+' and discarded '+card.r+card.s+'. Your turn.';
+    if(bestDw<=(bestDw===0?0:8)){endHand('ai');return;}
+    render();}
+  function exhaust(){const dy=meldedSet(you).dw,da=meldedSet(ai).dw;info.textContent='Stock empty — comparing hands.';
+    if(dy<da)scores.you+=(da-dy);else if(da<dy)scores.ai+=(dy-da);nextOrEnd('The stock ran out.');}
+  function endHand(knocker){handOver=true;const dy=meldedSet(you),da=meldedSet(ai);
+    const kd=knocker==='you'?dy.dw:da.dw,od=knocker==='you'?da.dw:dy.dw;let msg;
+    if(kd===0){const pts=od+20;scores[knocker]+=pts;msg=(knocker==='you'?'🎉 GIN! ':'🤖 AI got GIN! ')+'+'+pts;}
+    else if(kd<od){const pts=od-kd;scores[knocker]+=pts;msg=(knocker==='you'?'✊ You knocked — ':'🤖 AI knocked — ')+knocker+' +'+pts+' (deadwood '+kd+' vs '+od+')';}
+    else{const opp=knocker==='you'?'ai':'you';const pts=(kd-od)+10;scores[opp]+=pts;msg=(knocker==='you'?'You knocked but were undercut! ':'AI knocked but you undercut! ')+opp+' +'+pts;}
+    nextOrEnd(msg);}
+  function nextOrEnd(msg){over=true;render();
+    if(scores.you>=100||scores.ai>=100){const win=scores.you>scores.ai;if(win)setHs(gm.id,hs(gm.id)+1);info.textContent=msg+' — '+(win?'🎉 You win the match '+scores.you+'–'+scores.ai+'!':'AI wins the match '+scores.ai+'–'+scores.you+'.')+' Tap New Match.';}
+    else{info.textContent=msg+' — tap a pile to start the next hand.';setTimeout(()=>{if(scores.you<100&&scores.ai<100)deal();},1600);}}
+  function render(){scoreEl.textContent='You '+scores.you+'  —  '+scores.ai+' AI   (first to 100)';
+    pilesEl.innerHTML='';const stk=stock.length?cardFace(stock[0],false):el('div',{style:'width:48px;height:70px;border:2px dashed var(--border);border-radius:8px'});stk.style.cursor='pointer';stk.onclick=()=>drawFrom('stock');
+    const stkWrap=el('div',{style:'text-align:center'},stk,el('div',{style:'font-size:11px;color:var(--dim)',textContent:'Stock '+stock.length}));
+    const top=disc.length?cardFace(disc[disc.length-1]):el('div',{style:'width:48px;height:70px;border:2px dashed var(--border);border-radius:8px'});top.style.cursor='pointer';top.onclick=()=>drawFrom('discard');
+    const discWrap=el('div',{style:'text-align:center'},top,el('div',{style:'font-size:11px;color:var(--dim)',textContent:'Discard'}));
+    pilesEl.append(stkWrap,discWrap);
+    const md=meldedSet(you);handEl.innerHTML='';you.forEach((c,i)=>{const f=cardFace(c);f.style.cursor='pointer';if(md.set.has(i)){f.style.outline='2px solid #2a6';}f.onclick=()=>{if(phase==='discard'&&turn==='you'&&!over)discard(i);};handEl.append(f);});
+    setStatus('Your deadwood: '+md.dw+'  •  Match wins: '+hs(gm.id));}
+  knockB.onclick=knock;newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- SPADES (4-player, individual) ---------------- */
+function game_spades(gm){
+  setHint('Bid how many of the 13 tricks you will take. Spades are always trump. Follow the led suit if you can; you cannot lead spades until they are "broken" (played on another suit). Make your bid to score 10× the bid (+1 per overtrick). First to 200 wins.');
+  const NP=4,NAMES=['You','West','North','East'];
+  let hands,bids,tricks,scores,leader,trick,turnP,spadesBroken,phase,over;
+  const scoreEl=el('div',{className:'big'});
+  const tableEl=el('div',{style:'display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:6px 0'});
+  const trickEl=el('div',{style:'display:flex;gap:10px;justify-content:center;min-height:78px;margin:8px 0'});
+  const info=el('div',{style:'color:var(--dim);min-height:22px;text-align:center;max-width:520px'});
+  const bidRow=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0'});
+  const handEl=el('div',{style:'display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:640px'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(scoreEl,tableEl,trickEl,info,bidRow,el('div',{style:'display:flex;justify-content:center;margin:6px 0'},newB),handEl);
+  function reset(){scores=[0,0,0,0];deal();}
+  function deal(){const d=shuffle(makeDeck());hands=[[],[],[],[]];for(let i=0;i<52;i++)hands[i%4].push(d[i]);hands.forEach(h=>h.sort((a,b)=>a.s===b.s?a.v-b.v:'♠♥♦♣'.indexOf(a.s)-'♠♥♦♣'.indexOf(b.s)));
+    bids=[null,null,null,null];tricks=[0,0,0,0];leader=0;trick=[];turnP=0;spadesBroken=false;phase='bid';over=false;startBidding();}
+  function aiBid(p){const h=hands[p];let hi=h.filter(c=>c.v>=12).length;let sp=h.filter(c=>c.s==='♠').length;let b=Math.round(hi*0.7+Math.max(0,sp-2)*0.7);return Math.max(1,Math.min(8,b));}
+  function startBidding(){for(let p=1;p<4;p++)bids[p]=aiBid(p);phase='bid';info.textContent='Choose your bid (Nil = 0 tricks).';render();}
+  function setBid(v){if(phase!=='bid')return;bids[0]=v;phase='play';leader=0;turnP=0;trick=[];info.textContent='You lead the first trick.';render();step();}
+  function legal(p,c){if(trick.length===0){if(c.s==='♠'&&!spadesBroken&&hands[p].some(x=>x.s!=='♠'))return false;return true;}
+    const lead=trick[0].card.s;if(hands[p].some(x=>x.s===lead))return c.s===lead;return true;}
+  function legalCards(p){return hands[p].filter(c=>legal(p,c));}
+  function play(p,c){hands[p]=hands[p].filter(x=>!(x.s===c.s&&x.v===c.v));if(c.s==='♠')spadesBroken=true;trick.push({p,card:c});}
+  function aiPlay(p){const opts=legalCards(p);let choice;
+    if(trick.length===0){const nonSp=opts.filter(c=>c.s!=='♠');choice=(nonSp.length?nonSp:opts).slice().sort((a,b)=>a.v-b.v)[0];}
+    else{const lead=trick[0].card.s;const best=curWinner();const wc=trick[best].card;
+      const beats=opts.filter(c=>(c.s===wc.s&&c.v>wc.v)||(c.s==='♠'&&wc.s!=='♠'));
+      if(beats.length&&bidNeed(p))choice=beats.sort((a,b)=>a.v-b.v)[0];else choice=opts.slice().sort((a,b)=>a.v-b.v)[0];}
+    play(p,choice);step();}
+  function bidNeed(p){return tricks[p]<bids[p];}
+  function curWinner(){let bi=0;for(let i=1;i<trick.length;i++){const a=trick[i].card,b=trick[bi].card;if((a.s===b.s&&a.v>b.v)||(a.s==='♠'&&b.s!=='♠'))bi=i;}return bi;}
+  function step(){if(over||phase!=='play')return;
+    if(trick.length===4){render();setTimeout(resolve,800);return;}
+    const p=(leader+trick.length)%4;turnP=p;render();
+    if(p!==0)setTimeout(()=>aiPlay(p),650);else info.textContent='Your turn — tap a highlighted card.';}
+  function resolve(){const w=(leader+curWinner())%4;tricks[w]++;leader=w;trick=[];
+    if(hands[0].length===0){endHand();return;}info.textContent=NAMES[w]+' won the trick.';render();step();}
+  function endHand(){for(let p=0;p<4;p++){if(bids[p]===0){scores[p]+=tricks[p]===0?50:-50;}else if(tricks[p]>=bids[p]){scores[p]+=10*bids[p]+(tricks[p]-bids[p]);}else{scores[p]-=10*bids[p];}}
+    const mx=Math.max(...scores);if(mx>=200){over=true;phase='over';const you=scores[0]===mx&&scores.filter(s=>s===mx).length===1;if(you)setHs(gm.id,hs(gm.id)+1);info.textContent=(you?'🎉 You win the game!':NAMES[scores.indexOf(mx)]+' wins the game.')+' Final: '+scores.join(' / ');render();return;}
+    info.textContent='Hand over. '+NAMES.map((n,p)=>n+' '+tricks[p]+'/'+bids[p]).join(', ')+'. Next hand…';render();setTimeout(()=>{if(!over)deal();},2000);}
+  function render(){scoreEl.textContent='You '+scores[0]+'  •  W '+scores[1]+'  •  N '+scores[2]+'  •  E '+scores[3]+'   (to 200)';
+    tableEl.innerHTML='';for(let p=0;p<4;p++){const box=el('div',{style:`padding:6px 10px;border-radius:8px;border:2px solid ${turnP===p&&phase==='play'?'#fd5':'var(--border)'};background:var(--panel);min-width:78px;text-align:center`});
+      box.append(el('div',{style:'font-weight:800',textContent:NAMES[p]}),el('div',{style:'font-size:12px;color:var(--dim)',textContent:'Bid '+(bids[p]==null?'—':bids[p]===0?'Nil':bids[p])+' • Won '+tricks[p]}));tableEl.append(box);}
+    trickEl.innerHTML='';trick.forEach(t=>{const f=cardFace(t.card);const w=el('div',{style:'text-align:center'},f,el('div',{style:'font-size:11px;color:var(--dim)',textContent:NAMES[t.p]}));trickEl.append(w);});
+    bidRow.innerHTML='';if(phase==='bid'){for(let v=0;v<=8;v++){const b=el('button',{className:'btn'+(v===0?' ghost':''),textContent:v===0?'Nil':v,style:'padding:8px 12px'});b.onclick=()=>setBid(v);bidRow.append(b);}}
+    const lc=phase==='play'&&turnP===0?legalCards(0):[];handEl.innerHTML='';hands[0].forEach(c=>{const f=cardFace(c);const ok=lc.some(x=>x.s===c.s&&x.v===c.v);if(phase==='play'){f.style.opacity=turnP===0?(ok?1:.4):.7;if(ok){f.style.cursor='pointer';f.style.outline='2px solid #2a6';f.onclick=()=>{if(turnP===0&&!over){play(0,c);step();}};}}handEl.append(f);});
+    setStatus('Tricks: you '+tricks[0]+'/'+(bids[0]==null?'—':bids[0])+'  •  Game wins: '+hs(gm.id));}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
 
 /* ---------------- BLACKJACK ---------------- */
 function game_blackjack(gm){

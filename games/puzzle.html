@@ -126,7 +126,9 @@ const GAMES=[
   {id:'pdivby',name:'Puzzle Division',ico:'➗'},
   {id:'pnumword',name:'Puzzle Number Words',ico:'🔤'},
   {id:'pexpand',name:'Puzzle Expanded Form',ico:'📋'},
-  {id:'pordinal',name:'Puzzle Which Position',ico:'🥇'},];
+   {id:'pordinal',name:'Puzzle Which Position',ico:'🥇'},
+  {id:'flow',name:'Flow Connect',ico:'🔵'},
+  {id:'rushhour',name:'Traffic Escape',ico:'🚗'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('puz_'+id)||0)}
@@ -146,6 +148,99 @@ function el(tag,props={},...kids){const e=document.createElement(tag);Object.ass
 function keyHandler(map){const dn=e=>{if(map[e.key]){map[e.key](e);if(e.key.startsWith('Arrow')||e.key===' ')e.preventDefault();}};window.addEventListener('keydown',dn);return ()=>window.removeEventListener('keydown',dn);}
 
 /* ---------------- 2048 ---------------- */
+/* ---------------- FLOW CONNECT ---------------- */
+function game_flow(gm){
+  setHint('Connect each pair of matching dots with a pipe. Drag from a dot along empty squares to its partner. Fill EVERY square and connect every colour to win. Drag over a pipe to reroute it.');
+  const N=5,COLORS=['#e23b4b','#2ab06a','#3a8fd0','#f2c230','#e8792b','#a24fe0'];
+  let endpts,paths,cellColor,active,dragging,solvedShown;
+  const info=el('div',{className:'big'});
+  const boardEl=el('div',{style:`display:grid;grid-template-columns:repeat(${N},52px);gap:3px;justify-content:center;margin:10px auto;touch-action:none`});
+  const newB=el('button',{className:'btn',textContent:'New Puzzle'});
+  const resetB=el('button',{className:'btn ghost',textContent:'Reset'});
+  host.append(info,boardEl,el('div',{style:'display:flex;gap:10px;justify-content:center;margin-top:8px'},newB,resetB));
+  function inb(r,c){return r>=0&&r<N&&c>=0&&c<N;}
+  function adj(a,b){const ar=Math.floor(a/N),ac=a%N,br=Math.floor(b/N),bc=b%N;return Math.abs(ar-br)+Math.abs(ac-bc)===1;}
+  function gen(){for(let attempt=0;attempt<300;attempt++){const cc=Array(N*N).fill(0);const ps=[];let color=0,empties=N*N,ok=true;
+      while(empties>0){color++;if(color>COLORS.length){ok=false;break;}let start=-1;const order=[];for(let i=0;i<N*N;i++)if(!cc[i])order.push(i);start=order[Math.floor(Math.random()*order.length)];
+        let path=[start];cc[start]=color;empties--;
+        while(true){const last=path[path.length-1],lr=Math.floor(last/N),lc=last%N;const nb=[];[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{const nr=lr+dr,ncc=lc+dc;if(inb(nr,ncc)&&!cc[nr*N+ncc])nb.push(nr*N+ncc);});
+          if(!nb.length)break;if(path.length>=3&&Math.random()<0.35)break;const nx=nb[Math.floor(Math.random()*nb.length)];path.push(nx);cc[nx]=color;empties--;}
+        if(path.length<2){ok=false;break;}ps.push(path);}
+      if(ok&&color<=COLORS.length&&ps.every(p=>p.length>=2))return {colors:color,ends:ps.map(p=>[p[0],p[p.length-1]])};}
+    // fallback: single Hamiltonian snake
+    const snake=[];for(let r=0;r<N;r++){const row=[];for(let c=0;c<N;c++)row.push(r*N+c);if(r%2)row.reverse();snake.push(...row);}
+    return {colors:1,ends:[[snake[0],snake[snake.length-1]]]};}
+  function load(g){endpts=g.ends;paths=g.ends.map(e=>[e[0]]);cellColor=Array(N*N).fill(0);active=null;solvedShown=false;
+    endpts.forEach((e,ci)=>{cellColor[e[0]]=ci+1;cellColor[e[1]]=ci+1;});draw();}
+  function isEndpoint(i){for(let ci=0;ci<endpts.length;ci++)if(endpts[ci][0]===i||endpts[ci][1]===i)return ci+1;return 0;}
+  function truncateColor(color,i){const p=paths[color-1];const idx=p.indexOf(i);if(idx<0)return;for(let k=idx+1;k<p.length;k++){const cell=p[k];if(isEndpoint(cell)!==color)cellColor[cell]=0;}p.length=idx+1;}
+  function startAt(i){const ep=isEndpoint(i);if(ep){active=ep;paths[ep-1]=[i];// clear existing pipe of this color except endpoints
+      for(let x=0;x<N*N;x++)if(cellColor[x]===ep&&isEndpoint(x)!==ep)cellColor[x]=0;dragging=true;draw();return;}
+    const col=cellColor[i];if(col){active=col;truncateColor(col,i);dragging=true;draw();}}
+  function extend(i){if(!active||!dragging)return;const p=paths[active-1];const last=p[p.length-1];if(i===last)return;if(!adj(i,last))return;
+    if(p.includes(i)){truncateColor(active,i);draw();return;}
+    const epc=isEndpoint(i);if(epc&&epc!==active)return; // can't cross another endpoint
+    const occ=cellColor[i];if(occ&&occ!==active){truncateColor(occ,i);}
+    p.push(i);cellColor[i]=active;draw();
+    if(epc===active&&i===otherEnd(active,p[0])){/* connected */}
+    checkWin();}
+  function otherEnd(color,from){const e=endpts[color-1];return e[0]===from?e[1]:e[0];}
+  function connected(color){const p=paths[color-1];if(p.length<2)return false;const a=p[0],b=p[p.length-1];const e=endpts[color-1];return (a===e[0]&&b===e[1])||(a===e[1]&&b===e[0]);}
+  function checkWin(){const allConn=endpts.every((e,ci)=>connected(ci+1));const filled=cellColor.every(x=>x!==0);if(allConn&&filled&&!solvedShown){solvedShown=true;setHs(gm.id,hs(gm.id)+1);info.textContent='🎉 Solved! Every pipe connected.';draw();}}
+  function cellFromPoint(x,y){const elx=document.elementFromPoint(x,y);if(elx&&elx.dataset&&elx.dataset.fi!==undefined)return +elx.dataset.fi;return -1;}
+  boardEl.addEventListener('pointerdown',e=>{e.preventDefault();const i=cellFromPoint(e.clientX,e.clientY);if(i>=0)startAt(i);});
+  boardEl.addEventListener('pointermove',e=>{if(!dragging)return;e.preventDefault();const i=cellFromPoint(e.clientX,e.clientY);if(i>=0)extend(i);});
+  window.addEventListener('pointerup',()=>{dragging=false;});
+  function draw(){boardEl.innerHTML='';for(let i=0;i<N*N;i++){const col=cellColor[i];const ep=isEndpoint(i);
+      const cell=el('div',{style:`width:52px;height:52px;border-radius:8px;background:${col?COLORS[col-1]+ (ep?'':'aa'):'#1e1a12'};display:flex;align-items:center;justify-content:center;cursor:pointer`});
+      cell.dataset.fi=i;if(ep)cell.append(el('div',{style:`width:30px;height:30px;border-radius:50%;background:${COLORS[col-1]};box-shadow:0 0 0 3px #0004;pointer-events:none`}));
+      boardEl.append(cell);}
+    const conn=endpts.filter((e,ci)=>connected(ci+1)).length;setStatus('Connected '+conn+'/'+endpts.length+'  •  Solved: '+hs(gm.id));
+    if(!solvedShown)info.textContent='Connect all '+endpts.length+' colours and fill the grid.';}
+  newB.onclick=()=>load(gen());resetB.onclick=()=>load({colors:endpts.length,ends:endpts.map(e=>e.slice())});
+  load(gen());return{stop:()=>{}};
+}
+
+/* ---------------- TRAFFIC ESCAPE (Rush Hour) ---------------- */
+function game_rushhour(gm){
+  setHint('Slide the cars and trucks (tap one, then tap an empty square in its lane) to clear a path. Get the red car 🚗 out through the exit on the right. Fewer moves is better!');
+  const N=6,EXITROW=2,CELL=48;
+  const LEVELS=[
+    [{id:'X',r:2,c:0,len:2,o:'H'},{id:'A',r:0,c:3,len:3,o:'V'}],
+    [{id:'X',r:2,c:1,len:2,o:'H'},{id:'A',r:0,c:3,len:3,o:'V'},{id:'B',r:4,c:0,len:2,o:'H'},{id:'C',r:0,c:5,len:2,o:'V'}],
+    [{id:'X',r:2,c:0,len:2,o:'H'},{id:'A',r:0,c:2,len:3,o:'V'},{id:'C',r:0,c:4,len:3,o:'V'},{id:'D',r:4,c:2,len:2,o:'H'}]
+  ];
+  const COLORMAP={X:'#e23b4b',A:'#2ab06a',B:'#3a8fd0',C:'#f2c230',D:'#a24fe0',E:'#e8792b'};
+  let pieces,level,moves,sel,over;
+  const info=el('div',{className:'big'});
+  const wrap=el('div',{style:`position:relative;width:${N*CELL+2}px;height:${N*CELL+2}px;margin:10px auto;background:#1e1a12;border-radius:10px;border:2px solid var(--border)`});
+  const lvlRow=el('div',{style:'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0'});
+  const prevB=el('button',{className:'btn ghost',textContent:'◀ Level'});
+  const nextB=el('button',{className:'btn ghost',textContent:'Level ▶'});
+  const resetB=el('button',{className:'btn',textContent:'Reset'});
+  lvlRow.append(prevB,resetB,nextB);
+  host.append(info,lvlRow,wrap);
+  function load(l){level=(l+LEVELS.length)%LEVELS.length;pieces=LEVELS[level].map(p=>Object.assign({},p));moves=0;sel=null;over=false;draw();}
+  function occ(){const g=Array(N*N).fill(null);pieces.forEach(p=>{for(let k=0;k<p.len;k++){const r=p.o==='V'?p.r+k:p.r,c=p.o==='H'?p.c+k:p.c;g[r*N+c]=p.id;}});return g;}
+  function cells(p){const out=[];for(let k=0;k<p.len;k++){const r=p.o==='V'?p.r+k:p.r,c=p.o==='H'?p.c+k:p.c;out.push([r,c]);}return out;}
+  function tapCell(r,c){if(over)return;const g=occ();const id=g[r*N+c];
+    if(id){sel=id;draw();return;}
+    if(!sel)return;const p=pieces.find(x=>x.id===sel);if(!p)return;
+    if(p.o==='H'&&r===p.r){if(c<p.c){for(let cc=c;cc<p.c;cc++)if(g[r*N+cc])return;p.c=c;moves++;}else if(c>p.c+p.len-1){for(let cc=p.c+p.len;cc<=c;cc++)if(g[r*N+cc])return;p.c=c-p.len+1;moves++;}draw();checkWin();}
+    else if(p.o==='V'&&c===p.c){if(r<p.r){for(let rr=r;rr<p.r;rr++)if(g[rr*N+c])return;p.r=r;moves++;}else if(r>p.r+p.len-1){for(let rr=p.r+p.len;rr<=r;rr++)if(g[rr*N+c])return;p.r=r-p.len+1;moves++;}draw();checkWin();}}
+  function checkWin(){const x=pieces.find(p=>p.id==='X');if(x&&x.c+x.len-1===N-1&&x.r===EXITROW){over=true;const r=+(localStorage.getItem('puz_'+gm.id+'_l'+level)||0);if(!r||moves<r)localStorage.setItem('puz_'+gm.id+'_l'+level,moves);setHs(gm.id,hs(gm.id)+1);info.textContent='🎉 Escaped in '+moves+' moves!';draw();}}
+  function draw(){wrap.innerHTML='';
+    // exit marker
+    wrap.append(el('div',{style:`position:absolute;right:-2px;top:${EXITROW*CELL+8}px;width:6px;height:${CELL-16}px;background:#e23b4b;border-radius:3px`}));
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)wrap.append(el('div',{style:`position:absolute;left:${c*CELL+1}px;top:${r*CELL+1}px;width:${CELL-2}px;height:${CELL-2}px;border:1px solid #2a2418;border-radius:4px;box-sizing:border-box;cursor:pointer`,onclick:(function(rr,cc){return()=>tapCell(rr,cc);})(r,c)}));
+    pieces.forEach(p=>{const w=(p.o==='H'?p.len:1)*CELL-6,h=(p.o==='V'?p.len:1)*CELL-6;
+      const d=el('div',{style:`position:absolute;left:${p.c*CELL+3}px;top:${p.r*CELL+3}px;width:${w}px;height:${h}px;background:${COLORMAP[p.id]||'#888'};border-radius:8px;box-shadow:0 2px 5px #0007${sel===p.id?';outline:3px solid #fff':''};display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer`,textContent:p.id==='X'?'🚗':''});
+      d.onclick=()=>{sel=p.id;draw();};wrap.append(d);});
+    info.textContent='Level '+(level+1)+'/'+LEVELS.length+'   •   Moves: '+moves+(over?'  •  🎉 Solved!':'');
+    const best=+(localStorage.getItem('puz_'+gm.id+'_l'+level)||0);setStatus('Level '+(level+1)+(best?'  •  Best: '+best+' moves':'')+'  •  Solves: '+hs(gm.id));}
+  prevB.onclick=()=>load(level-1);nextB.onclick=()=>load(level+1);resetB.onclick=()=>load(level);load(0);return{stop:()=>{}};
+}
+
 function game_g2048(gm){
   setHint('Arrow keys / WASD to slide tiles. Reach 2048!');
   const N=4;let grid,score,won,lost;

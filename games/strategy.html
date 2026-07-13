@@ -126,7 +126,8 @@ const GAMES=[
   {id:'sldivby',name:'Division',ico:'➗'},
   {id:'slnumword',name:'Number Words',ico:'🔤'},
   {id:'slexpand',name:'Expanded Form',ico:'📋'},
-  {id:'slordinal',name:'Which Position',ico:'🥇'},];
+   {id:'slordinal',name:'Which Position',ico:'🥇'},
+  {id:'quarto',name:'Quarto',ico:'🔶'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null,currentGm=null;
 const HELP={
@@ -157,6 +158,44 @@ function launch(gm){clearCelebrations();window.__activeGameId=gm.id;window.__act
 function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
 
 /* ---------------- TIC-TAC-TOE ---------------- */
+function game_quarto(gm){
+  setHint('The twist: your opponent picks which piece YOU must place, and you pick theirs. Win by completing a line of four pieces that share ANY one trait — tall/short, gold/silver, round/square, or solid/hollow. Place the handed piece, then hand a piece to the AI.');
+  const LINES=[[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
+  let board,pool,given,turn,phase,over;
+  const info=el('div',{className:'big'});
+  const givenEl=el('div',{style:'display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px'});
+  const boardEl=el('div',{style:'display:grid;grid-template-columns:repeat(4,60px);gap:4px;justify-content:center;margin:8px auto'});
+  const poolEl=el('div',{style:'display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:420px;margin:0 auto'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,givenEl,boardEl,el('div',{style:'text-align:center;color:var(--dim);font-size:13px;margin-top:6px'},'Pieces to hand out:'),poolEl,el('div',{style:'display:flex;justify-content:center;margin-top:8px'},newB));
+  function pieceEl(p,big){const tall=p&1,dark=p&2,round=p&4,hollow=p&8;const sz=(tall?(big?40:34):(big?28:22));const col=dark?'#d4af37':'#c7ccd1';
+    return el('div',{style:`width:${sz}px;height:${sz}px;border-radius:${round?'50%':'7px'};background:${hollow?'transparent':col};border:3px solid ${col};box-shadow:0 1px 3px #0006`});}
+  function lineWin(cells){if(cells.some(i=>board[i]==null))return false;for(let b=0;b<4;b++){const v=(board[cells[0]]>>b)&1;if(cells.every(i=>((board[i]>>b)&1)===v))return true;}return false;}
+  function winner(){return LINES.some(lineWin);}
+  function full(){return board.every(x=>x!=null);}
+  function reset(){board=Array(16).fill(null);pool=[];for(let i=0;i<16;i++)pool.push(i);given=pool.splice(Math.floor(Math.random()*pool.length),1)[0];turn='you';phase='place';over=false;info.textContent='';draw();}
+  function placeAt(i){if(over||turn!=='you'||phase!=='place'||board[i]!=null||given==null)return;board[i]=given;given=null;
+    if(winner()){over=true;addWin(gm.id);draw();info.textContent='🎉 You completed a line — you win!';return;}
+    if(full()){over=true;draw();info.textContent="It's a draw — board full.";return;}
+    phase='select';draw();info.textContent='Now hand a piece to the AI.';}
+  function selectPiece(p){if(over||turn!=='you'||phase!=='select')return;given=p;pool=pool.filter(x=>x!==p);turn='ai';phase='place';draw();setTimeout(aiPlace,700);}
+  function aiPlace(){if(over)return;let cell=-1;for(let i=0;i<16;i++){if(board[i]==null){board[i]=given;if(winner()){draw();over=true;info.textContent='🤖 AI completed a line — AI wins.';return;}board[i]=null;}}
+    // no immediate win: pick a cell (prefer center-ish), place
+    const empties=[];for(let i=0;i<16;i++)if(board[i]==null)empties.push(i);cell=empties[Math.floor(Math.random()*empties.length)];board[cell]=given;given=null;
+    if(full()){over=true;draw();info.textContent="It's a draw — board full.";return;}
+    setTimeout(aiSelect,600);}
+  function aiSelect(){if(over)return;// hand a piece that does NOT let you win immediately, if possible
+    const safe=pool.filter(p=>{for(let i=0;i<16;i++){if(board[i]==null){board[i]=p;const w=winner();board[i]=null;if(w)return false;}}return true;});
+    const choice=(safe.length?safe:pool)[Math.floor(Math.random()*(safe.length?safe.length:pool.length))];
+    given=choice;pool=pool.filter(x=>x!==choice);turn='you';phase='place';draw();info.textContent='AI handed you a piece — place it.';}
+  function draw(){givenEl.innerHTML='';if(given!=null){givenEl.append(el('div',{style:'color:var(--dim);font-size:13px',textContent:(turn==='you'&&phase==='place'?'Place this →':'AI will place →')}),pieceEl(given,true));}
+    else givenEl.append(el('div',{style:'color:var(--dim);font-size:13px',textContent:phase==='select'?'Pick a piece for the AI ↓':' '}));
+    boardEl.innerHTML='';for(let i=0;i<16;i++){const cell=el('div',{style:`width:60px;height:60px;border:1px solid var(--border);border-radius:8px;background:var(--panel);display:flex;align-items:center;justify-content:center;cursor:${(!over&&turn==='you'&&phase==='place'&&board[i]==null)?'pointer':'default'}`});
+      if(board[i]!=null)cell.append(pieceEl(board[i]));cell.onclick=()=>placeAt(i);boardEl.append(cell);}
+    poolEl.innerHTML='';pool.forEach(p=>{const w=el('div',{style:`padding:4px;border-radius:8px;border:2px solid ${(!over&&turn==='you'&&phase==='select')?'#2a6':'transparent'};cursor:${(!over&&turn==='you'&&phase==='select')?'pointer':'default'};display:flex;align-items:center;justify-content:center`});w.append(pieceEl(p));w.onclick=()=>selectPiece(p);poolEl.append(w);});
+    setStatus((over?'Game over':turn==='you'?(phase==='place'?'Place the piece':'Hand a piece to AI'):'AI thinking…')+'  •  Wins: '+wins(gm.id));}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
 function game_ttt(gm){
   setHint('You are X. Beat the unbeatable AI (or force a draw!).');
   let b,over,lastAI;

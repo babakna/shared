@@ -126,7 +126,11 @@ const GAMES=[
   {id:'fdivby',name:'Division',ico:'➗'},
   {id:'fnumword',name:'Number Words',ico:'🔤'},
   {id:'fexpand',name:'Expanded Form',ico:'📋'},
-  {id:'fordinal',name:'Which Position',ico:'🥇'},];
+   {id:'fordinal',name:'Which Position',ico:'🥇'},
+  {id:'pig',name:'Pig (Dice)',ico:'🐷'},
+  {id:'shutbox',name:'Shut the Box',ico:'📦'},
+  {id:'cantstop',name:"Can't Stop",ico:'🎯'},
+  {id:'liarsdice',name:"Liar's Dice",ico:'🎲'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null;
 function hs(id){return +(localStorage.getItem('fam_'+id)||0)}
@@ -144,6 +148,181 @@ function launch(gm){clearCelebrations();window.__activeGameId=gm.id;window.__act
 function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
 const DICE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 function roll(){return 1+Math.floor(Math.random()*6);}
+
+/* ---------------- PIG (dice) ---------------- */
+function game_pig(gm){
+  setHint('Roll to build your turn total — but roll a 1 and you lose it all! Hold to bank your points. First to 100 wins.');
+  let sc,turnT,turn,over;
+  const info=el('div',{className:'big'});
+  const dieEl=el('div',{className:'die',style:'font-size:64px;min-height:70px'});
+  const msg=el('div',{style:'color:#c8b090;min-height:22px'});
+  const rollB=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const holdB=el('button',{className:'btn ghost',textContent:'✋ Hold'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,dieEl,msg,el('div',{style:'display:flex;gap:10px'},rollB,holdB,newB));
+  function reset(){sc=[0,0];turnT=0;turn=0;over=false;dieEl.textContent='🎲';draw();msg.textContent='Your turn — roll!';}
+  function draw(){info.textContent='You: '+sc[0]+'   •   AI: '+sc[1]+'   •   Turn total: '+turnT;setStatus((over?'':turn===0?'Your turn':'AI turn')+'  •  Wins: '+hs(gm.id));rollB.disabled=holdB.disabled=(over||turn!==0);}
+  rollB.onclick=()=>{if(over||turn!==0)return;const r=roll();dieEl.textContent=DICE[r];
+    if(r===1){turnT=0;msg.textContent='💥 Rolled a 1 — turn lost!';turn=1;draw();setTimeout(aiTurn,900);}
+    else{turnT+=r;msg.textContent='Rolled '+r+'. Roll again or hold.';draw();}};
+  holdB.onclick=()=>{if(over||turn!==0)return;sc[0]+=turnT;turnT=0;if(sc[0]>=100){over=true;setHs(gm.id,hs(gm.id)+1);msg.textContent='🎉 You win with '+sc[0]+'!';draw();return;}turn=1;msg.textContent='You banked. AI turn…';draw();setTimeout(aiTurn,800);}
+  function aiTurn(){if(over)return;let t=0;(function go(){if(over)return;const r=roll();dieEl.textContent=DICE[r];
+      if(r===1){t=0;msg.textContent='AI rolled a 1 — its turn is lost.';turn=0;turnT=0;draw();return;}
+      t+=r;info.textContent='You: '+sc[0]+'   •   AI: '+sc[1]+'   •   AI turn total: '+t;
+      if(t>=20||sc[1]+t>=100){sc[1]+=t;if(sc[1]>=100){over=true;msg.textContent='🤖 AI wins with '+sc[1]+'.';draw();return;}turn=0;turnT=0;msg.textContent='AI banked '+t+'. Your turn.';draw();return;}
+      setTimeout(go,700);})();}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- SHUT THE BOX ---------------- */
+function game_shutbox(gm){
+  setHint('Roll the two dice, then tap open tiles that add up to the total to shut them. Shut every tile to win! If no combination is possible, the round ends and your score is the sum of the tiles left (lower is better).');
+  let open,sel,total,rolled,over;
+  const tilesEl=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap'});
+  const diceEl=el('div',{className:'big',style:'font-size:40px;min-height:48px'});
+  const msg=el('div',{style:'color:#c8b090;min-height:22px'});
+  const rollB=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(diceEl,tilesEl,msg,el('div',{style:'display:flex;gap:10px'},rollB,newB));
+  function best(){return getRaw(gm.id)?getRaw(gm.id)+' left':'—';}
+  function reset(){open=[1,2,3,4,5,6,7,8,9];sel=[];total=0;rolled=false;over=false;diceEl.textContent='🎲 🎲';msg.textContent='Tap Roll to begin.';draw();}
+  function canMake(t){const arr=open;const n=arr.length;for(let m=1;m<(1<<n);m++){let s=0;for(let i=0;i<n;i++)if(m&(1<<i))s+=arr[i];if(s===t)return true;}return false;}
+  function draw(){tilesEl.innerHTML='';for(let t=1;t<=9;t++){const isOpen=open.includes(t);const isSel=sel.includes(t);
+      const d=el('div',{textContent:t,style:`width:44px;height:52px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;border-radius:8px;cursor:${isOpen&&rolled&&!over?'pointer':'default'};background:${!isOpen?'#241a0e':isSel?'#fc6':'#2a6'};color:${!isOpen?'#5a4428':isSel?'#222':'#fff'}`});
+      if(isOpen&&rolled&&!over)d.onclick=()=>tap(t);tilesEl.append(d);}
+    setStatus('Open sum: '+open.reduce((a,b)=>a+b,0)+'  •  Best: '+best());}
+  rollB.onclick=()=>{if(over)return;if(rolled&&sel.length){msg.textContent='Finish your selection to match '+total+' first.';return;}
+    const a=roll(),b=roll();total=a+b;diceEl.textContent=DICE[a]+' '+DICE[b]+'  = '+total;rolled=true;sel=[];
+    if(!canMake(total)){over=true;const left=open.reduce((x,y)=>x+y,0);msg.textContent='😕 No tiles add up to '+total+'. Round over — '+left+' left.';const r=getRaw(gm.id);if(r===null||left<+r)localStorage.setItem('fam_'+gm.id,left);draw();setStatus('Score: '+left+' left • Best: '+best());return;}
+    msg.textContent='Tap tiles adding up to '+total+'.';draw();};
+  function tap(t){if(!rolled||over)return;const i=sel.indexOf(t);if(i>=0)sel.splice(i,1);else sel.push(t);
+    const s=sel.reduce((a,b)=>a+b,0);
+    if(s===total){open=open.filter(x=>!sel.includes(x));sel=[];rolled=false;
+      if(open.length===0){over=true;msg.textContent='🎉 Shut the box! Perfect score 0!';if(getRaw(gm.id)===null||0<+getRaw(gm.id))localStorage.setItem('fam_'+gm.id,0);draw();setStatus('Score: 0 • Best: '+best());return;}
+      msg.textContent='Nice! Roll again.';draw();}
+    else if(s>total){msg.textContent='Too much ('+s+') — selection cleared.';sel=[];draw();}
+    else{msg.textContent='Selected '+s+' / '+total;draw();}}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- CAN'T STOP ---------------- */
+function game_cantstop(gm){
+  setHint('Roll 4 dice and split them into two pairs. Advance your runners up those columns. You get 3 runners per turn — press your luck! Hold to lock in progress, but if a roll gives no legal move you BUST and lose this turn. Claim any 3 columns to win.');
+  const H={2:3,3:5,4:7,5:9,6:11,7:13,8:11,9:9,10:7,11:5,12:3};
+  const COLS=[2,3,4,5,6,7,8,9,10,11,12];
+  let perm,claimed,temp,turn,over,dice,phase;
+  const info=el('div',{className:'big'});
+  const boardEl=el('div',{style:'display:flex;flex-direction:column;gap:3px;max-width:560px;margin:0 auto'});
+  const diceEl=el('div',{style:'font-size:30px;min-height:38px;text-align:center'});
+  const optEl=el('div',{style:'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0'});
+  const rollB=el('button',{className:'btn',textContent:'🎲 Roll'});
+  const holdB=el('button',{className:'btn ghost',textContent:'✋ Hold'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,diceEl,optEl,el('div',{style:'display:flex;gap:10px;justify-content:center'},rollB,holdB,newB),boardEl);
+  function reset(){perm=[{},{}];claimed={};temp={};turn=0;over=false;dice=[];phase='roll';COLS.forEach(c=>{perm[0][c]=0;perm[1][c]=0;claimed[c]=0;});draw();info.textContent='Your turn — Roll!';}
+  function totalFor(p,c){return perm[p][c]+((p===turn&&temp[c])?temp[c]:0);}
+  function claims(p){return COLS.filter(c=>claimed[c]===p+1).length;}
+  function playable(sum){if(claimed[sum])return false;return (temp[sum]!==undefined)||Object.keys(temp).length<3;}
+  function pairings(d){return [[d[0]+d[1],d[2]+d[3]],[d[0]+d[2],d[1]+d[3]],[d[0]+d[3],d[1]+d[2]]];}
+  function legalPairings(){return pairings(dice).map(pr=>pr.filter(s=>playable(s))).map((ok,i)=>({idx:i,sums:pairings(dice)[i],play:ok}));}
+  function anyLegal(){return legalPairings().some(p=>p.play.length>0);}
+  function advance(c){if(claimed[c])return;if(temp[c]===undefined)temp[c]=0;temp[c]++;}
+  function doRoll(){if(over||turn!==0||phase!=='roll')return;dice=[roll(),roll(),roll(),roll()];diceEl.textContent='🎲 '+dice.join('  ');
+    if(!anyLegal()){info.textContent='💥 BUST! No legal move — you lose this turn.';temp={};phase='roll';turn=1;draw();setTimeout(aiTurn,1100);return;}
+    phase='choose';draw();}
+  function choose(idx){if(phase!=='choose')return;const pr=pairings(dice)[idx].filter(s=>playable(s));if(!pr.length)return;pr.forEach(advance);phase='roll';
+    COLS.forEach(c=>{if(temp[c]!==undefined&&totalFor(0,c)>=H[c])claimed[c]=claimed[c]||-1;});
+    if(claims(0)+COLS.filter(c=>claimed[c]===-1).length>=3){/* provisional win only on hold */}
+    info.textContent='Advanced. Roll again (press your luck) or Hold.';draw();}
+  function hold(){if(over||turn!==0)return;commit(0);if(claims(0)>=3){over=true;setHs(gm.id,hs(gm.id)+1);info.textContent='🎉 You claimed 3 columns — you win!';draw();return;}temp={};turn=1;phase='roll';info.textContent='You held. AI turn…';draw();setTimeout(aiTurn,900);}
+  function commit(p){Object.keys(temp).forEach(c=>{c=+c;perm[p][c]=Math.min(H[c],perm[p][c]+temp[c]);if(perm[p][c]>=H[c]&&!claimed[c])claimed[c]=p+1;});temp={};}
+  function aiTurn(){if(over)return;let advances=0;phase='roll';
+    (function go(){if(over)return;dice=[roll(),roll(),roll(),roll()];diceEl.textContent='🎲 '+dice.join('  ');
+      const legal=pairings(dice).map(pr=>pr.filter(s=>playableAI(s)));const any=legal.some(l=>l.length);
+      if(!any){info.textContent='🤖 AI busted!';temp={};turn=0;phase='roll';draw();return;}
+      let bi=0;for(let i=1;i<legal.length;i++)if(legal[i].length>legal[bi].length)bi=i;legal[bi].forEach(advanceAI);advances++;
+      draw();
+      const topped=Object.keys(temp).some(c=>perm[1][+c]+temp[+c]>=H[+c]);
+      if(topped||advances>=4||Object.keys(temp).length>=3){commit(1);if(claims(1)>=3){over=true;info.textContent='🤖 AI claimed 3 columns — AI wins.';draw();return;}turn=0;phase='roll';info.textContent='AI held. Your turn — Roll!';draw();return;}
+      setTimeout(go,750);})();}
+  function playableAI(sum){if(claimed[sum])return false;return (temp[sum]!==undefined)||Object.keys(temp).length<3;}
+  function advanceAI(c){if(claimed[c])return;if(temp[c]===undefined)temp[c]=0;temp[c]++;}
+  function draw(){info.textContent||(info.textContent='');
+    boardEl.innerHTML='';COLS.forEach(c=>{const row=el('div',{style:'display:flex;align-items:center;gap:4px'});
+      row.append(el('div',{textContent:c,style:'width:26px;text-align:right;font-weight:800;font-size:12px'}));
+      const track=el('div',{style:'display:flex;gap:2px;flex:1'});
+      for(let k=1;k<=H[c];k++){let bg='#2a1e10';const yt=totalFor(0,c),at=totalFor(1,c);
+        if(claimed[c]===1)bg='#3a8fd0';else if(claimed[c]===2)bg='#d04a4a';
+        else{if(k<=at)bg='#7a2d2d';if(k<=perm[0][c])bg='#2d5a7a';if(turn===0&&temp[c]&&k>perm[0][c]&&k<=yt)bg='#fc6';}
+        track.append(el('div',{style:`flex:1;height:14px;border-radius:3px;background:${bg}`}));}
+      row.append(track);boardEl.append(row);});
+    info.textContent='You claimed '+claims(0)+'/3   •   AI '+claims(1)+'/3'+(turn===0&&Object.keys(temp).length?'   •   runners: '+Object.keys(temp).join(', '):'');
+    optEl.innerHTML='';if(phase==='choose'&&turn===0&&!over){pairings(dice).forEach((pr,i)=>{const ok=pr.filter(s=>playable(s));const b=el('button',{className:'btn'+(ok.length?'':' ghost'),disabled:!ok.length,textContent:pr[0]+' & '+pr[1]+(ok.length<2?'  (only '+ (ok.join(',')||'none')+')':''),style:'padding:8px 12px'});b.onclick=()=>choose(i);optEl.append(b);});}
+    rollB.disabled=over||turn!==0||phase!=='roll';holdB.disabled=over||turn!==0||Object.keys(temp).length===0;
+    setStatus((over?'':turn===0?'Your turn':'AI turn')+'  •  Wins: '+hs(gm.id));}
+  rollB.onclick=doRoll;holdB.onclick=hold;newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- LIAR'S DICE ---------------- */
+function game_liarsdice(gm){
+  setHint('Each player has hidden dice. Take turns bidding how many of a face exist among ALL dice (e.g. "three 4s"). Each bid must be higher (more dice, or the same count with a higher face). Call "Liar!" if you think the bid is too high. Whoever is wrong loses a die. Last player with dice wins.');
+  let yDice,aDice,bid,turn,over,phase,msgTxt;
+  const info=el('div',{className:'big'});
+  const yourEl=el('div',{style:'display:flex;gap:8px;justify-content:center;min-height:52px'});
+  const aiEl=el('div',{style:'display:flex;gap:8px;justify-content:center;min-height:52px'});
+  const bidEl=el('div',{className:'big',style:'min-height:30px'});
+  const msg=el('div',{style:'color:#c8b090;min-height:22px;text-align:center;max-width:520px'});
+  const ctrl=el('div',{style:'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,el('div',{style:'color:#c8b090;font-size:13px',textContent:'🤖 AI dice'}),aiEl,bidEl,msg,ctrl,el('div',{style:'color:#c8b090;font-size:13px',textContent:'🎲 Your dice'}),yourEl,el('div',{style:'display:flex;justify-content:center;margin-top:8px'},newB));
+  let qSel=1,fSel=1;
+  function rollDice(n){const a=[];for(let i=0;i<n;i++)a.push(roll());return a.sort((x,y)=>x-y);}
+  function reset(){yDice=rollDice(5);aDice=rollDice(5);bid=null;turn=Math.random()<0.5?0:1;over=false;phase='bid';msg.textContent='';draw();
+    if(turn===1)setTimeout(aiMove,900);else msg.textContent='You start — make a bid.';}
+  function newRound(loser){if(loser===0)yDice=yDice.slice(1);else aDice=aDice.slice(1);
+    if(!yDice.length){over=true;draw();info.textContent='🤖 AI wins the game!';return;}
+    if(!aDice.length){over=true;draw();info.textContent='🎉 You win the game!';setHs(gm.id,hs(gm.id)+1);return;}
+    yDice=rollDice(yDice.length);aDice=rollDice(aDice.length);bid=null;phase='bid';turn=loser;draw();
+    if(turn===1)setTimeout(aiMove,1000);else msg.textContent='New round — you bid first.';}
+  function totalDice(){return yDice.length+aDice.length;}
+  function countFace(f){return yDice.concat(aDice).filter(d=>d===f).length;}
+  function legalBid(q,f){if(!bid)return q>=1&&f>=1&&f<=6;if(q>bid.q)return f>=1&&f<=6;if(q===bid.q)return f>bid.f;return false;}
+  function makeBid(q,f){if(over||turn!==0||phase!=='bid')return;if(!legalBid(q,f)){msg.textContent='Your bid must be higher than '+bid.q+' × '+bid.f+'.';return;}bid={q,f};turn=1;msg.textContent='You bid '+q+' × '+face(f)+'.';draw();setTimeout(aiMove,900);}
+  function face(f){return DICE[f];}
+  function callLiar(who){const actual=countFace(bid.f);const bidTooHigh=actual<bid.q;
+    let loser;let reveal='Actual '+face(bid.f)+': '+actual+' (bid was '+bid.q+'). ';
+    if(bidTooHigh){loser=(who===0)?1:0;}else{loser=who;}
+    over=false;phase='reveal';drawReveal();
+    const loserName=loser===0?'You lose a die':'AI loses a die';
+    info.textContent=(who===0?'You called Liar! ':'AI called Liar! ')+reveal+loserName+'.';
+    setTimeout(()=>newRound(loser),2200);}
+  function aiMove(){if(over)return;const unknown=yDice.length;// ai knows its own dice
+    function est(f){return aDice.filter(d=>d===f).length+unknown*(1/6);}
+    // decide call
+    if(bid){const exp=est(bid.f);if(bid.q>exp+1.0||bid.q>totalDice()){callLiar(1);return;}}
+    // make a bid: pick face ai has most of
+    let bestF=1,bestC=-1;for(let f=1;f<=6;f++){const c=aDice.filter(d=>d===f).length;if(c>bestC){bestC=c;bestF=f;}}
+    let q,f;
+    if(!bid){q=Math.max(1,Math.round(est(bestF)));f=bestF;}
+    else{if(bestF>bid.f&&Math.round(est(bestF))>=bid.q){q=bid.q;f=bestF;}else{q=bid.q+1;f=bestF;} if(!legalBid(q,f)){q=bid.q+1;f=bid.f;}}
+    q=Math.min(q,totalDice());if(!legalBid(q,f)){callLiar(1);return;}
+    bid={q,f};turn=0;phase='bid';msg.textContent='🤖 AI bids '+q+' × '+face(f)+'. Your move.';draw();}
+  function drawReveal(){aiEl.innerHTML='';aDice.forEach(d=>aiEl.append(el('div',{className:'die',textContent:DICE[d],style:'font-size:34px'})));draw(true);}
+  function draw(revealAI){info.textContent='Your dice: '+yDice.length+'   •   AI dice: '+aDice.length+'   •   Wins: '+hs(gm.id);
+    yourEl.innerHTML='';yDice.forEach(d=>yourEl.append(el('div',{className:'die',textContent:DICE[d],style:'font-size:34px'})));
+    if(!revealAI){aiEl.innerHTML='';aDice.forEach(()=>aiEl.append(el('div',{className:'die',textContent:'❓',style:'font-size:34px;background:#2a1e10;color:#fc6'})));}
+    bidEl.textContent=bid?('Current bid: '+bid.q+' × '+face(bid.f)):'No bid yet';
+    ctrl.innerHTML='';if(!over&&turn===0&&phase==='bid'){
+      const minQ=bid?bid.q:1;const maxQ=totalDice();
+      qSel=Math.max(qSel,minQ);qSel=Math.min(qSel,maxQ);fSel=Math.min(6,Math.max(1,fSel));
+      const qWrap=el('div',{style:'display:flex;align-items:center;gap:4px'},el('button',{className:'btn ghost',textContent:'−',onclick:()=>{qSel=Math.max(minQ,qSel-1);draw();}}),el('div',{style:'min-width:64px;text-align:center;font-weight:800',textContent:qSel+' dice'}),el('button',{className:'btn ghost',textContent:'+',onclick:()=>{qSel=Math.min(maxQ,qSel+1);draw();}}));
+      const fWrap=el('div',{style:'display:flex;align-items:center;gap:4px'},el('button',{className:'btn ghost',textContent:'−',onclick:()=>{fSel=Math.max(1,fSel-1);draw();}}),el('div',{style:'min-width:54px;text-align:center;font-size:26px',textContent:DICE[fSel]}),el('button',{className:'btn ghost',textContent:'+',onclick:()=>{fSel=Math.min(6,fSel+1);draw();}}));
+      const bidBtn=el('button',{className:'btn',textContent:'Bid',onclick:()=>makeBid(qSel,fSel)});
+      const liar=el('button',{className:'btn',style:'background:#a33;color:#fff',textContent:'Call Liar!',onclick:()=>{if(bid)callLiar(0);else msg.textContent='There is no bid to call yet.';}});
+      ctrl.append(qWrap,fWrap,bidBtn,liar);}
+    setStatus((over?'Game over':turn===0?'Your move':'AI thinking…')+'  •  Wins: '+hs(gm.id));}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
 
 /* ---------------- SNAKES & LADDERS ---------------- */
 function game_snakes(gm){

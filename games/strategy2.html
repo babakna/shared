@@ -126,7 +126,11 @@ const GAMES=[
   {id:'2ldivby',name:'Division',ico:'➗'},
   {id:'2lnumword',name:'Number Words',ico:'🔤'},
   {id:'2lexpand',name:'Expanded Form',ico:'📋'},
-  {id:'2lordinal',name:'Which Position',ico:'🥇'},];
+   {id:'2lordinal',name:'Which Position',ico:'🥇'},
+  {id:'quoridor',name:'Quoridor',ico:'🧱'},
+  {id:'hnefatafl',name:'Hnefatafl',ico:'🛡️'},
+  {id:'baghchal',name:'Tigers & Goats',ico:'🐯'},
+  {id:'amazons',name:'Amazons',ico:'👑'},];
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null,currentGm=null;
 const HELP={
@@ -166,6 +170,193 @@ function launch(gm){clearCelebrations();window.__activeGameId=gm.id;window.__act
 function el(tag,props={},...kids){const e=document.createElement(tag);Object.assign(e,props);if(props.style)e.style.cssText=props.style;kids.forEach(k=>e.append(k));return e;}
 
 /* ---------------- GOMOKU ---------------- */
+/* ---------------- QUORIDOR ---------------- */
+function game_quoridor(gm){
+  setHint('Race your pawn to the far side before the AI. On your turn either MOVE one step (tap a highlighted square) or place a WALL to block the AI (switch mode, then tap a gap). Walls cannot completely seal off a pawn. You are blue and must reach the top row.');
+  const N=9,GOAL=[0,8];
+  let pos,hW,vW,wleft,turn,over,mode;
+  const info=el('div',{className:'big'});
+  const modeRow=el('div',{style:'display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0'});
+  const moveBtn=el('button',{className:'btn',textContent:'🚶 Move'});
+  const hBtn=el('button',{className:'btn ghost',textContent:'▬ Wall'});
+  const vBtn=el('button',{className:'btn ghost',textContent:'▮ Wall'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  modeRow.append(moveBtn,hBtn,vBtn,newB);
+  const boardEl=el('div',{style:'display:grid;justify-content:center;margin:6px auto;gap:0'});
+  host.append(info,modeRow,boardEl);
+  let colTemplate='';for(let i=0;i<17;i++)colTemplate+=(i%2?'8px ':'32px ');boardEl.style.gridTemplateColumns=colTemplate.trim();
+  function reset(){pos=[[8,4],[0,4]];hW=new Set();vW=new Set();wleft=[10,10];turn=0;over=false;mode='move';setMode('move');draw();}
+  function setMode(m){mode=m;moveBtn.className='btn'+(m==='move'?'':' ghost');hBtn.className='btn'+(m==='h'?'':' ghost');vBtn.className='btn'+(m==='v'?'':' ghost');}
+  function blocked(r,c,dr,dc){if(dr===-1)return hW.has((r-1)+','+c)||hW.has((r-1)+','+(c-1));if(dr===1)return hW.has(r+','+c)||hW.has(r+','+(c-1));if(dc===-1)return vW.has(r+','+(c-1))||vW.has((r-1)+','+(c-1));return vW.has(r+','+c)||vW.has((r-1)+','+c);}
+  function inb(r,c){return r>=0&&r<N&&c>=0&&c<N;}
+  function pawnMoves(p){const[r,c]=pos[p],[or,oc]=pos[1-p],out=[],D=[[-1,0],[1,0],[0,-1],[0,1]];
+    D.forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(!inb(nr,nc)||blocked(r,c,dr,dc))return;
+      if(nr===or&&nc===oc){const br=nr+dr,bc=nc+dc;if(inb(br,bc)&&!blocked(nr,nc,dr,dc)){out.push([br,bc]);}else{const perp=dr===0?[[-1,0],[1,0]]:[[0,-1],[0,1]];perp.forEach(([pr,pc])=>{const sr=nr+pr,sc=nc+pc;if(inb(sr,sc)&&!blocked(nr,nc,pr,pc))out.push([sr,sc]);});}}
+      else out.push([nr,nc]);});
+    return out;}
+  function pathDist(p,from){const seen=new Set([from[0]+','+from[1]]);let q=[[from[0],from[1],0]];const D=[[-1,0],[1,0],[0,-1],[0,1]];
+    while(q.length){const[r,c,d]=q.shift();if(r===GOAL[p])return d;D.forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(inb(nr,nc)&&!blocked(r,c,dr,dc)&&!seen.has(nr+','+nc)){seen.add(nr+','+nc);q.push([nr,nc,d+1]);}});}return 1e8;}
+  function canH(wr,wc){if(wr<0||wr>7||wc<0||wc>7)return false;if(hW.has(wr+','+wc)||hW.has(wr+','+(wc-1))||hW.has(wr+','+(wc+1))||vW.has(wr+','+wc))return false;hW.add(wr+','+wc);const ok=pathDist(0,pos[0])<1e8&&pathDist(1,pos[1])<1e8;hW.delete(wr+','+wc);return ok;}
+  function canV(wr,wc){if(wr<0||wr>7||wc<0||wc>7)return false;if(vW.has(wr+','+wc)||vW.has((wr-1)+','+wc)||vW.has((wr+1)+','+wc)||hW.has(wr+','+wc))return false;vW.add(wr+','+wc);const ok=pathDist(0,pos[0])<1e8&&pathDist(1,pos[1])<1e8;vW.delete(wr+','+wc);return ok;}
+  function movePawn(r,c){if(over||turn!==0||mode!=='move')return;if(pawnMoves(0).some(m=>m[0]===r&&m[1]===c)){pos[0]=[r,c];if(r===GOAL[0]){over=true;addWin(gm.id);draw();info.textContent='🎉 You reached the top — you win!';return;}endTurn();}}
+  function placeWall(o,wr,wc){if(over||turn!==0||wleft[0]<=0)return;if(o==='h'?canH(wr,wc):canV(wr,wc)){(o==='h'?hW:vW).add(wr+','+wc);wleft[0]--;setMode('move');endTurn();}}
+  function endTurn(){turn=1;draw();setTimeout(aiTurn,600);}
+  function aiTurn(){if(over)return;const youD=pathDist(0,pos[0]),myD=pathDist(1,pos[1]);
+    const moves=pawnMoves(1);let bm=moves[0],bd=1e9;moves.forEach(m=>{const d=pathDist(1,m);if(d<bd){bd=d;bm=m;}});
+    let placed=false;
+    if(wleft[1]>0&&bd>=youD){let best=null,gain=0.5;for(let wr=0;wr<8;wr++)for(let wc=0;wc<8;wc++){['h','v'].forEach(o=>{if(o==='h'?canH(wr,wc):canV(wr,wc)){(o==='h'?hW:vW).add(wr+','+wc);const ny=pathDist(0,pos[0]),nm=pathDist(1,pos[1]);(o==='h'?hW:vW).delete(wr+','+wc);const g=(ny-youD)-Math.max(0,nm-myD)*0.6;if(g>gain){gain=g;best={o,wr,wc};}}});}
+      if(best){(best.o==='h'?hW:vW).add(best.wr+','+best.wc);wleft[1]--;placed=true;}}
+    if(!placed){if(!bm){over=true;draw();info.textContent='🎉 AI is stuck — you win!';return;}pos[1]=bm;if(pos[1][0]===GOAL[1]){over=true;draw();info.textContent='🤖 AI reached the bottom — AI wins.';return;}}
+    turn=0;draw();}
+  function draw(){boardEl.innerHTML='';const legal=(!over&&turn===0&&mode==='move')?pawnMoves(0):[];
+    for(let rr=0;rr<17;rr++)for(let cc=0;cc<17;cc++){
+      if(rr%2===0&&cc%2===0){const r=rr/2,c=cc/2;const cell=el('div',{style:'width:32px;height:32px;background:var(--panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px'});
+        if(pos[0][0]===r&&pos[0][1]===c)cell.append(el('div',{textContent:'🔵'}));else if(pos[1][0]===r&&pos[1][1]===c)cell.append(el('div',{textContent:'🔴'}));
+        if(legal.some(m=>m[0]===r&&m[1]===c)){cell.style.background='#2a6a';cell.style.cursor='pointer';cell.onclick=()=>movePawn(r,c);}
+        boardEl.append(cell);}
+      else if(rr%2===1&&cc%2===0){const wr=(rr-1)/2,c=cc/2;const on=hW.has(wr+','+c)||hW.has(wr+','+(c-1));const seg=el('div',{style:`width:32px;height:8px;background:${on?'#e0a038':'transparent'};border-radius:3px`});
+        if(!over&&turn===0&&mode==='h'&&canH(wr,c)){seg.style.cursor='pointer';seg.style.background='#e0a03855';seg.onclick=()=>placeWall('h',wr,c);}boardEl.append(seg);}
+      else if(rr%2===0&&cc%2===1){const wc=(cc-1)/2,r=rr/2;const on=vW.has(r+','+wc)||vW.has((r-1)+','+wc);const seg=el('div',{style:`width:8px;height:32px;background:${on?'#e0a038':'transparent'};border-radius:3px`});
+        if(!over&&turn===0&&mode==='v'&&canV(r,wc)){seg.style.cursor='pointer';seg.style.background='#e0a03855';seg.onclick=()=>placeWall('v',r,wc);}boardEl.append(seg);}
+      else{const wr=(rr-1)/2,wc=(cc-1)/2;const on=hW.has(wr+','+wc)||vW.has(wr+','+wc);boardEl.append(el('div',{style:`width:8px;height:8px;background:${on?'#e0a038':'transparent'}`}));}}
+    info.textContent='Walls — you: '+wleft[0]+'  •  AI: '+wleft[1]+(over?'':turn===0?'   •   Your move':'   •   AI thinking…');
+    setStatus((over?'Game over':'Quoridor')+'  •  Wins: '+wins(gm.id));}
+  moveBtn.onclick=()=>setMode('move');hBtn.onclick=()=>setMode('h');vBtn.onclick=()=>setMode('v');newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- HNEFATAFL (Brandubh 7x7) ---------------- */
+function game_hnefatafl(gm){
+  setHint('You are the DEFENDERS (⚪ + 👑). Get your King to any corner to win. Pieces move like a rook (straight lines, no jumping). Capture an enemy by flanking it on two opposite sides. The King is captured only when surrounded on all four sides. Attackers (⚫) are the AI.');
+  const N=7,THRONE=24,CORN=new Set([0,6,42,48]);
+  let bd,turn,over,sel;
+  const info=el('div',{className:'big'});
+  const boardEl=el('div',{style:`display:grid;grid-template-columns:repeat(${N},40px);gap:2px;justify-content:center;margin:8px auto`});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,boardEl,el('div',{style:'display:flex;justify-content:center;margin-top:8px'},newB));
+  function k(r,c){return r*N+c;}
+  function reset(){bd=Array(49).fill(null);bd[24]='K';[17,31,23,25].forEach(i=>bd[i]='D');[3,10,38,45,21,22,26,27].forEach(i=>bd[i]='A');turn='D';over=false;sel=null;draw();}
+  function side(p){return p==='A'?'A':'D';}
+  function enemy(p,q){if(!q)return false;return side(p)!==side(q);}
+  function restricted(i){return i===THRONE||CORN.has(i);}
+  function moves(i){const r=Math.floor(i/N),c=i%N,out=[],p=bd[i];[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{let nr=r+dr,nc=c+dc;while(nr>=0&&nr<N&&nc>=0&&nc<N){const j=k(nr,nc);if(bd[j])break;if(restricted(j)&&p!=='K'){nr+=dr;nc+=dc;continue;}out.push(j);nr+=dr;nc+=dc;}});return out;}
+  function hostileTo(i,p){if(i<0)return false;if(CORN.has(i))return true;if(i===THRONE&&!bd[i])return true;const q=bd[i];return q&&side(q)!==side(p);}
+  function doMove(from,to){const p=bd[from];bd[from]=null;bd[to]=p;
+    const r=Math.floor(to/N),c=to%N;[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr<0||nr>=N||nc<0||nc>=N)return;const j=k(nr,nc),q=bd[j];
+      if(q&&side(q)!==side(p)&&q!=='K'){const br=nr+dr,bc=nc+dc,b=(br<0||br>=N||bc<0||bc>=N)?-1:k(br,bc);if(b>=0&&(hostileTo(b,q)||(bd[b]&&side(bd[b])===side(p))))bd[j]=null;else if(b>=0&&CORN.has(b))bd[j]=null;}});
+    checkKing();checkWin();}
+  function kingPos(){return bd.indexOf('K');}
+  function checkKing(){const ki=kingPos();if(ki<0)return;const r=Math.floor(ki/N),c=ki%N;let surround=0,sides=0;[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr<0||nr>=N||nc<0||nc>=N)return;sides++;const j=k(nr,nc);if(bd[j]==='A'||j===THRONE)surround++;});if(sides===4&&surround===4){bd[ki]=null;}}
+  function checkWin(){const ki=kingPos();if(ki<0){over=true;info.textContent='🤖 The King is captured — Attackers (AI) win.';return;}if(CORN.has(ki)){over=true;addWin(gm.id);info.textContent='🎉 The King escaped to a corner — you win!';return;}}
+  function hasMoves(sd){for(let i=0;i<49;i++)if(bd[i]&&side(bd[i])===sd&&moves(i).length)return true;return false;}
+  function click(i){if(over||turn!=='D')return;const p=bd[i];
+    if(sel!=null){if(moves(sel).includes(i)){doMove(sel,i);sel=null;if(!over){turn='A';draw();setTimeout(aiTurn,600);}else draw();return;}if(p&&side(p)==='D'){sel=i;draw();return;}sel=null;draw();return;}
+    if(p&&side(p)==='D'){sel=i;draw();}}
+  function aiTurn(){if(over)return;if(!hasMoves('A')){over=true;draw();info.textContent='🎉 Attackers have no moves — you win!';return;}
+    // 1) capture move if any (prefer king threat), else move toward king
+    const ki=kingPos();const kr=Math.floor(ki/N),kc=ki%N;let bestFrom=-1,bestTo=-1,bestScore=-1e9;
+    for(let i=0;i<49;i++){if(bd[i]!=='A')continue;for(const to of moves(i)){let score=0;
+      // simulate capture count
+      const save=bd.slice();bd[i]=null;bd[to]='A';let caps=0;const r=Math.floor(to/N),c=to%N;[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr<0||nr>=N||nc<0||nc>=N)return;const j=k(nr,nc),q=bd[j];if(q&&side(q)==='D'&&q!=='K'){const br=nr+dr,bc=nc+dc,b=(br<0||br>=N||bc<0||bc>=N)?-1:k(br,bc);if(b>=0&&(hostileTo(b,q)||CORN.has(b)))caps++;}});
+      for(let s=0;s<49;s++)bd[s]=save[s];
+      score+=caps*10;score-=(Math.abs(r-kr)+Math.abs(c-kc))*0.1; // sit near king
+      if(score>bestScore){bestScore=score;bestFrom=i;bestTo=to;}}}
+    if(bestFrom<0){turn='D';draw();return;}doMove(bestFrom,bestTo);if(!over){turn='D';if(!hasMoves('D')){over=true;info.textContent='🤖 You have no moves — Attackers win.';}draw();}else draw();}
+  function draw(){boardEl.innerHTML='';for(let i=0;i<49;i++){let bg='var(--panel)';if(CORN.has(i))bg='#4a3';if(i===THRONE)bg='#a58';const cell=el('div',{style:`width:40px;height:40px;border:1px solid var(--border);border-radius:5px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:24px;cursor:${(!over&&turn==='D'&&(bd[i]&&side(bd[i])==='D'||sel!=null&&moves(sel).includes(i)))?'pointer':'default'}`});
+      if(bd[i]==='A')cell.textContent='⚫';else if(bd[i]==='D')cell.textContent='⚪';else if(bd[i]==='K')cell.textContent='👑';
+      if(sel===i)cell.style.outline='3px solid #fd5';if(sel!=null&&moves(sel).includes(i))cell.style.background='#2a6a';
+      cell.onclick=()=>click(i);boardEl.append(cell);}
+    if(!over)info.textContent=turn==='D'?'Your move — move a ⚪ or 👑 toward a corner.':'AI (attackers) thinking…';
+    setStatus((over?'Game over':'Hnefatafl')+'  •  Wins: '+wins(gm.id));}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- BAGH-CHAL (Tigers & Goats) ---------------- */
+function game_baghchal(gm){
+  setHint('You are the GOATS 🐐. Place your 20 goats one at a time (tap an empty point), then move them to block the tigers. Trap all 4 tigers 🐯 so none can move to win. The AI tigers move or JUMP over a goat to capture it — if they capture 5 goats, they win!');
+  const N=5;let bd,phase,placed,captured,turn,over,sel;
+  const ADJ=[],JUMP={};
+  (function(){for(let r=0;r<N;r++)for(let c=0;c<N;c++){const i=r*N+c,nb=[];[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N)nb.push(nr*N+nc);});
+    if((r+c)%2===0)[[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N)nb.push(nr*N+nc);});ADJ[i]=nb;}
+    const DIRS=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){const i=r*N+c;DIRS.forEach(([dr,dc])=>{const diag=dr!==0&&dc!==0;if(diag&&(r+c)%2!==0)return;const mr=r+dr,mc=c+dc,br=r+2*dr,bc=c+2*dc;if(br<0||br>=N||bc<0||bc>=N)return;JUMP[i+'|'+(mr*N+mc)]=br*N+bc;});}
+  })();
+  const info=el('div',{className:'big'});
+  const wrap=el('div',{style:'position:relative;width:320px;height:320px;margin:10px auto'});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,wrap,el('div',{style:'display:flex;justify-content:center'},newB));
+  function xy(i){return[(i%N)*70+22,Math.floor(i/N)*70+22];}
+  function reset(){bd=Array(25).fill(null);[0,4,20,24].forEach(i=>bd[i]='T');phase='place';placed=0;captured=0;turn='G';over=false;sel=null;draw();}
+  function tigerCanMove(i){if(ADJ[i].some(j=>!bd[j]))return true;return tigerJumps(i).length>0;}
+  function tigerJumps(i){const out=[];ADJ[i].forEach(m=>{if(bd[m]==='G'){const land=JUMP[i+'|'+m];if(land!=null&&!bd[land])out.push([m,land]);}});return out;}
+  function anyTigerMove(){for(let i=0;i<25;i++)if(bd[i]==='T'&&tigerCanMove(i))return true;return false;}
+  function goatCanAct(){if(phase==='place')return placed<20;for(let i=0;i<25;i++)if(bd[i]==='G'&&ADJ[i].some(j=>!bd[j]))return true;return false;}
+  function clickPoint(i){if(over||turn!=='G')return;
+    if(phase==='place'){if(!bd[i]){bd[i]='G';placed++;if(placed>=20)phase='move';endGoat();}return;}
+    if(sel!=null){if(bd[i]==='G'){sel=i;draw();return;}if(!bd[i]&&ADJ[sel].includes(i)){bd[i]='G';bd[sel]=null;sel=null;endGoat();return;}sel=null;draw();return;}
+    if(bd[i]==='G'){sel=i;draw();}}
+  function endGoat(){if(checkWin())return;turn='T';draw();setTimeout(aiTurn,600);}
+  function aiTurn(){if(over)return;
+    // prefer a capturing jump
+    let jumps=[];for(let i=0;i<25;i++)if(bd[i]==='T')tigerJumps(i).forEach(([m,land])=>jumps.push([i,m,land]));
+    if(jumps.length){const[from,mid,land]=jumps[Math.floor(Math.random()*jumps.length)];bd[from]=null;bd[mid]=null;bd[land]='T';captured++;}
+    else{const opts=[];for(let i=0;i<25;i++)if(bd[i]==='T')ADJ[i].forEach(j=>{if(!bd[j])opts.push([i,j]);});
+      if(opts.length){// move a tiger toward nearest goat
+        let best=opts[0],bd0=1e9;opts.forEach(([f,t])=>{let d=1e9;for(let g=0;g<25;g++)if(bd[g]==='G')d=Math.min(d,Math.abs(Math.floor(t/N)-Math.floor(g/N))+Math.abs(t%N-g%N));if(d<bd0){bd0=d;best=[f,t];}});bd[best[0]]=null;bd[best[1]]='T';}
+    }
+    turn='G';if(checkWin())return;if(!goatCanAct()){over=true;info.textContent='🐯 Your goats are stuck — Tigers win.';draw();return;}draw();}
+  function checkWin(){if(captured>=5){over=true;info.textContent='🐯 Tigers captured 5 goats — Tigers win.';draw();return true;}if(!anyTigerMove()){over=true;addWin(gm.id);info.textContent='🎉 All tigers are trapped — you win!';draw();return true;}return false;}
+  function draw(){wrap.innerHTML='';let svg=`<svg width="320" height="320" style="position:absolute;left:0;top:0">`;
+    for(let i=0;i<25;i++){const[x1,y1]=xy(i);ADJ[i].forEach(j=>{if(j>i){const[x2,y2]=xy(j);svg+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8886" stroke-width="2"/>`;}});}
+    svg+='</svg>';wrap.innerHTML=svg;
+    for(let i=0;i<25;i++){const[x,y]=xy(i);const d=el('div',{style:`position:absolute;left:${x-18}px;top:${y-18}px;width:36px;height:36px;border-radius:50%;border:2px solid ${sel===i?'#fd5':'#8888'};background:${bd[i]==='T'?'#e08a2a':bd[i]==='G'?'#e8e8e8':'var(--panel)'};display:flex;align-items:center;justify-content:center;font-size:20px;cursor:${!over&&turn==='G'?'pointer':'default'}`,textContent:bd[i]==='T'?'🐯':bd[i]==='G'?'🐐':''});d.onclick=()=>clickPoint(i);wrap.append(d);}
+    if(!over)info.textContent=(phase==='place'?'Place goats: '+placed+'/20':'Move your goats')+'   •   Captured: '+captured+'/5'+(turn==='T'?'   •   AI…':'');
+    setStatus((over?'Game over':'Tigers & Goats')+'  •  Wins: '+wins(gm.id));}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
+/* ---------------- AMAZONS (6x6) ---------------- */
+function game_amazons(gm){
+  setHint('Each turn: move one of your queens 👑 like a chess queen, THEN shoot a flaming arrow 🔥 from its new square (also queen-style) to burn a square shut. Burned squares block everyone. You lose if you cannot move — so hem the AI in! You are gold.');
+  const N=6;let bd,turn,over,phase,sel,movedTo;
+  const info=el('div',{className:'big'});
+  const boardEl=el('div',{style:`display:grid;grid-template-columns:repeat(${N},46px);gap:2px;justify-content:center;margin:8px auto`});
+  const newB=el('button',{className:'btn ghost',textContent:'New Game'});
+  host.append(info,boardEl,el('div',{style:'display:flex;justify-content:center'},newB));
+  function k(r,c){return r*N+c;}
+  function reset(){bd=Array(36).fill(null);bd[k(0,1)]='B';bd[k(0,4)]='B';bd[k(5,1)]='W';bd[k(5,4)]='W';turn='W';over=false;phase='move';sel=null;movedTo=null;draw();}
+  function inb(r,c){return r>=0&&r<N&&c>=0&&c<N;}
+  function queenMoves(i,ignore){const r=Math.floor(i/N),c=i%N,out=[];[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc])=>{let nr=r+dr,nc=c+dc;while(inb(nr,nc)){const j=k(nr,nc);if(bd[j]&&j!==ignore)break;out.push(j);nr+=dr;nc+=dc;}});return out;}
+  function pieceMoves(side){let out=[];for(let i=0;i<36;i++)if(bd[i]===side)if(queenMoves(i).length)return true;return false;}
+  function click(i){if(over||turn!=='W')return;
+    if(phase==='move'){if(bd[i]==='W'){sel=i;draw();return;}if(sel!=null&&queenMoves(sel).includes(i)){bd[i]='W';bd[sel]=null;movedTo=i;sel=null;phase='shoot';draw();return;}return;}
+    if(phase==='shoot'){if(queenMoves(movedTo).includes(i)){bd[i]='X';phase='move';movedTo=null;endTurn();}}}
+  function endTurn(){draw();if(!pieceMoves('B')){over=true;info.textContent='🎉 The AI cannot move — you win!';draw();return;}turn='B';draw();setTimeout(aiTurn,600);}
+  function aiTurn(){if(over)return;const froms=[];for(let i=0;i<36;i++)if(bd[i]==='B'&&queenMoves(i).length)froms.push(i);
+    if(!froms.length){over=true;addWin(gm.id);info.textContent='🎉 The AI is trapped — you win!';draw();return;}
+    // heuristic: choose move+shoot maximizing (own mobility - your mobility)
+    let best=null,bestScore=-1e9,tries=0;
+    for(const f of froms){for(const to of queenMoves(f)){bd[to]='B';const from=f;bd[from]=null;
+      for(const sh of queenMoves(to)){bd[sh]='X';
+        let my=0,you=0;for(let i=0;i<36;i++){if(bd[i]==='B')my+=queenMoves(i).length;if(bd[i]==='W')you+=queenMoves(i).length;}
+        const sc=my-you*1.2+Math.random()*0.5;if(sc>bestScore){bestScore=sc;best={from,to,sh};}
+        bd[sh]=null;tries++;}
+      bd[to]=null;bd[from]='B';if(tries>1400)break;}
+      if(tries>1400)break;}
+    if(!best){// fallback simple
+      const f=froms[0],to=queenMoves(f)[0];bd[f]=null;bd[to]='B';const shots=queenMoves(to);bd[shots[0]]='X';}
+    else{bd[best.from]=null;bd[best.to]='B';bd[best.sh]='X';}
+    turn='W';phase='move';if(!pieceMoves('W')){over=true;info.textContent='🤖 You cannot move — AI wins.';draw();return;}draw();}
+  function draw(){boardEl.innerHTML='';const legal=(!over&&turn==='W')?(phase==='move'?(sel!=null?queenMoves(sel):[]):queenMoves(movedTo)):[];
+    for(let i=0;i<36;i++){const r=Math.floor(i/N),c=i%N;const light=(r+c)%2===0;let bg=light?'#3a2f22':'#2a2018';if(bd[i]==='X')bg='#111';
+      const cell=el('div',{style:`width:46px;height:46px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:26px;border-radius:4px;cursor:${(!over&&turn==='W')?'pointer':'default'}`});
+      if(bd[i]==='W')cell.textContent='👑';else if(bd[i]==='B')cell.textContent='♛';else if(bd[i]==='X')cell.textContent='🔥';
+      if(sel===i)cell.style.outline='3px solid #fd5';if(legal.includes(i))cell.style.boxShadow='inset 0 0 0 3px #2a6';
+      cell.onclick=()=>click(i);boardEl.append(cell);}
+    if(!over)info.textContent=turn==='W'?(phase==='move'?'Your turn — pick a 👑 and move it.':'Now shoot 🔥 — tap a square.'):'AI thinking…';
+    setStatus((over?'Game over':'Amazons')+'  •  Wins: '+wins(gm.id));}
+  newB.onclick=reset;reset();return{stop:()=>{}};
+}
+
 function game_gomoku(gm){
   setHint('You are ⚫. Get 5 in a row (any direction) before the AI.');
   const N=13;let b,over,lastAI;
