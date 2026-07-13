@@ -480,7 +480,7 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
   </div>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
-    <span class="version">V2.2 — Updated July 2026</span>
+    <span class="version">V2.3 — Updated July 2026</span>
   </div>
 </header>
 <div class="app-container">
@@ -678,12 +678,12 @@ const SIDEBAR_SECTIONS = [
     {num:14, id:'sixg_isac',label:'Integrated Sensing & Communication (ISAC)',type:'flow'},
   ]},
   { title:'Reference', items:[
-    {num:'A', id:'arch_diagrams',label:'Architecture Diagrams',type:'ref'},
-    {num:'B', id:'spec_library',label:'Specification Library',type:'ref'},
-    {num:'C', id:'glossary',label:'Glossary',type:'ref'},
-    {num:'D', id:'latency_comparison',label:'Latency Comparison',type:'ref'},
-    {num:'E', id:'timeline',label:'Technology Timeline',type:'ref'},
-    {num:'F', id:'band_reference',label:'5G Band Map',type:'ref'},
+    {num:'A', id:'arch_diagrams',label:'Architecture Diagrams',type:'ref', badge:'FACT'},
+    {num:'B', id:'spec_library',label:'Specification Library',type:'ref', badge:'FACT'},
+    {num:'C', id:'glossary',label:'Glossary',type:'ref', badge:'FACT'},
+    {num:'D', id:'latency_comparison',label:'Latency Comparison',type:'ref', badge:'PROJECTED'},
+    {num:'E', id:'timeline',label:'Technology Timeline',type:'ref', badge:'PROJECTED'},
+    {num:'F', id:'band_reference',label:'5G Band Map',type:'ref', badge:'FACT'},
   ]},
 ];
 
@@ -1970,6 +1970,8 @@ FLOWS['airan_telemetry'] = {
       "plmn": { "mcc": "001", "mnc": "01" },
       "cellId": "00A100042"
     },
+    // analyticsInput is an illustrative extension — not part of the TS 29.520 subscription body;
+    // real NWDAF collects such data via defined data-collection services
     "analyticsInput": {
       "gpu_utilization_pct": 67,
       "beam_prediction_accuracy": 0.968,
@@ -2354,8 +2356,8 @@ FLOWS['sixg_registration'] = {
 {
   "6gAuthVector": {
     "kemCiphertext": "c4d5e6f7...a8b9",
-    "sharedSecret_256": "<Kyber decapsulated>",
-    "dilithiumSignature": "sig:7a8b9c...",
+    "sharedSecret_256": "<ML-KEM decapsulated>",
+    "mlDsaSignature": "sig:7a8b9c...",
     "kAI_CORE": "<256-bit AI Core key>",
     "antiQuantumToken": "KMAC256:verified"
   },
@@ -2368,7 +2370,7 @@ FLOWS['sixg_registration'] = {
 }
 // Mutual auth complete — quantum-safe keys derived
 // PQC protects against harvest-now-decrypt-later`}},
-    {id:5, label:'Step 5: AI Security Context', from:'ai_core', to:'ai_ran', interface:'AI-N2 — Security + Pre-Allocation', protocol:'Vision — illustrative AI-N2 procedure', badge:'VISION', lineType:'cp',
+    {id:5, label:'Step 5: AI Security Context', from:'ai_core', to:'ai_ran', interface:'Vision — illustrative AI-N2 (not 3GPP N2)', protocol:'Vision — illustrative AI-N2 procedure', badge:'VISION', lineType:'cp',
       description:'AI Core pushes the quantum-safe security context and twin-predicted resource pre-allocation to the AI-RAN node — a single unified message replacing multiple N2 exchanges.',
       ingress:{title:'Unified Security + Allocation Push',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -2661,7 +2663,7 @@ FLOWS['sixg_session'] = {
 }
 // Policy auto-adapts every 60 seconds
 // Not static — continuously re-inferred by AI`}},
-    {id:4, label:'Step 4: AI-N4 UPF Configuration', from:'ai_core', to:'upf_c', interface:'AI-N4 — AI-Driven UPF Config', protocol:'Vision — illustrative AI-N4 (PFCP evolution)', badge:'VISION', lineType:'cp',
+    {id:4, label:'Step 4: AI-N4 UPF Configuration', from:'ai_core', to:'upf_c', interface:'Vision — illustrative AI-N4 (not 3GPP N4)', protocol:'Vision — illustrative AI-N4 (PFCP evolution)', badge:'VISION', lineType:'cp',
       description:'AI Core configures the UPF with AI-predicted forwarding rules, pre-computed traffic patterns from the twin, and outcome-based charging triggers. Replaces static PFCP with intelligent, predictive rules.',
       ingress:{title:'AI-N4 Session Establishment',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -2874,6 +2876,7 @@ FLOWS['sixg_data'] = {
     {from:'ai_ran',to:'upf_c',label:'N3',type:'data'},
     {from:'upf_c',to:'af',label:'N6',type:'data'},
     {from:'ai_core',to:'dig_twin',label:'Twin API',type:'control'},
+    {from:'dig_twin',to:'ai_ran',label:'Vision — twin directive',type:'control'},
     {from:'ai_core',to:'ai_ran',label:'AI-N2',type:'control'},
   ],
   steps:[
@@ -2979,7 +2982,7 @@ FLOWS['sixg_data'] = {
 }
 // L1 decode → zero-copy → N3 in 42μs
 // No CPU bounce — pure GPU data path`}},
-    {id:3, label:'Step 3: UL: GPU Zero-Copy → N3', from:'ai_ran', to:'upf_c', interface:'N3 — GTP-U (6G Enhanced)', protocol:'GTP-U over 6G N3', badge:'VISION', lineType:'dp',
+    {id:3, label:'Step 3: UL: GPU Zero-Copy → N3', from:'ai_ran', to:'upf_c', interface:'Vision — illustrative N3 (6G-enhanced GTP-U)', protocol:'Vision — illustrative GTP-U over N3', badge:'VISION', lineType:'dp',
       description:'Decoded uplink data flows from GPU shared memory directly into the N3 GTP-U tunnel — zero-copy transfer from antenna processing to core network, bypassing CPU entirely.',
       ingress:{title:'GPU Zero-Copy N3 Encapsulation',
         code:`// VISION: 6G AI-native interface (ITU-R M.2160)
@@ -3599,7 +3602,7 @@ FLOWS['sixg_ai_scaling'] = {
     {from:'ai_core',to:'intent',label:'Intent API',type:'control'},
   ],
   steps:[
-    {id:1, label:'Step 1: NWDAF Demand Prediction', from:'nwdaf', to:'ai_core', interface:'Nnwdaf — Predictive Analytics', protocol:'Nnwdaf_AnalyticsInfo (TS 23.288 + 6G AI)', badge:'VISION', lineType:'cp',
+    {id:1, label:'Step 1: NWDAF Demand Prediction', from:'nwdaf', to:'ai_core', interface:'Vision — illustrative analytics notify', protocol:'Vision — illustrative NWDAF-style analytics (not literal TS 23.288/29.520)', badge:'VISION', lineType:'cp',
       description:'NWDAF detects an upcoming demand surge using AI prediction models — traffic will spike in 15 minutes based on event correlation, mobility patterns, and historical data.',
       ingress:{title:'Demand Prediction Alert',
         code:`// VISION: 6G AI-native (ITU-R M.2160)
@@ -5140,8 +5143,8 @@ FLOWS['airan_performance'] = {
     "gpuUtilization_pct": 42
   }
 }`}},
-    {id:2, label:'Step 2: GPU Telemetry Report', from:'ai_ran', to:'aictl', interface:'E2 — O-RAN Near-RT RIC (AI-RAN Controller)', protocol:'E2AP (O-RAN WG3)', badge:'PROJECTED', lineType:'cp',
-      description:'AI-RAN reports GPU performance metrics: L1 latency (87μs vs 200μs conventional), GPU utilization (42%), LDPC iterations (4 vs 8), beam prediction accuracy (94%).',
+    {id:2, label:'Step 2: GPU Telemetry Report', from:'ai_ran', to:'aictl', interface:'E2 — O-RAN Near-RT RIC (AI-RAN Controller)', protocol:'E2AP (O-RAN WG3)', badge:'PROJECTED', lineType:'telemetry',
+      description:'Illustrative lab/model comparison — AI-RAN reports GPU performance metrics: L1 latency (87μs vs 200μs conventional), GPU utilization (42%), LDPC iterations (4 vs 8), beam prediction accuracy (94%).',
       ingress:{title:'GPU Performance Telemetry',
         code:`// PROJECTED: illustrative lab/model comparison based on AI-RAN validation context
 // AI-RAN → AI-RAN Controller telemetry report
@@ -5322,8 +5325,8 @@ FLOWS['airan_performance'] = {
     }
   }
 }`}},
-    {id:6, label:'Step 6: Performance Analytics to NWDAF', from:'aictl', to:'nwdaf', interface:'AI-RAN Ctrl → NWDAF', protocol:'Nnwdaf (TS 29.520)', badge:'PROJECTED', lineType:'cp',
-      description:'AI-RAN metrics forwarded to NWDAF: RAN processing time, inference throughput, GPU scheduling efficiency.',
+    {id:6, label:'Step 6: Performance Analytics to NWDAF', from:'aictl', to:'nwdaf', interface:'AI-RAN Ctrl → NWDAF (illustrative)', protocol:'Illustrative NWDAF feed (not a literal TS 29.520 procedure)', badge:'PROJECTED', lineType:'telemetry',
+      description:'Illustrative: AI-RAN metrics are made available to NWDAF (RAN processing time, inference throughput, GPU scheduling efficiency). In TS 23.288/29.520 NWDAF collects data via defined data-collection services rather than a bespoke push like the one shown here.',
       ingress:{title:'AI-RAN Analytics to NWDAF',
         code:`// PROJECTED: illustrative NWDAF integration based on AI-RAN telemetry
 // AI-RAN Ctrl → NWDAF: performance analytics
@@ -5373,8 +5376,8 @@ FLOWS['airan_performance'] = {
     }
   }
 }`}},
-    {id:7, label:'Step 7: Optimization Recommendation', from:'nwdaf', to:'pcf', interface:'NWDAF → PCF (Nnwdaf)', protocol:'Nnwdaf AnalyticsInfo (TS 29.520)', badge:'PROJECTED', lineType:'cp',
-      description:'Analytics-driven recommendation: "AI-RAN sector 7 GPU underutilized 68% of time — safe to increase inference workload."',
+    {id:7, label:'Step 7: Optimization Recommendation', from:'nwdaf', to:'pcf', interface:'NWDAF → PCF (illustrative)', protocol:'Illustrative analytics insight (not an Npcf policy-control artifact)', badge:'PROJECTED', lineType:'cp',
+      description:'Illustrative analytics insight: "AI-RAN sector 7 GPU underutilized 68% of time — safe to increase inference workload." GPU scheduling is not an Npcf_SMPolicyControl artifact; this shows the intent of analytics-driven optimization, not a standardized NWDAF-to-PCF policy push.',
       ingress:{title:'NWDAF Analytics Recommendation',
         code:`// PROJECTED: illustrative analytics-to-policy recommendation
 // NWDAF → PCF: optimization recommendation
@@ -6841,7 +6844,7 @@ function renderSpecLibrary(el) {
       ['TS 38.460/463','E1 Interface','E1 between gNB-CU-CP and gNB-CU-UP','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3255'],
       ['TS 38.420/423','Xn Interface','Inter-gNB handover, dual connectivity signaling','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3227'],
       ['TR 38.843','AI/ML for NR Air Interface','Rel-18 study item on AI/ML beam management, CSI, and positioning; Rel-19 NR specifications carry the normative work','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4015'],
-      ['TS 38.305','NR Positioning (Rel-19)','Positioning methods (DL-TDoA, UL-AoA, multi-RTT). Rel-19 enhances NR positioning and sidelink-based positioning — precursor to 6G ISAC sensing','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
+      ['TS 38.305','NR Positioning','Positioning methods (DL-TDoA, UL-AoA, multi-RTT); the spec exists from earlier releases, with Rel-19 adding enhancements incl. sidelink-based positioning — precursor to 6G ISAC sensing','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
       ['TR 38.821','NTN Solutions for NR','Non-terrestrial network architecture, satellite mobility, regenerative payload — Rel-19 evolves NTN toward 6G ubiquitous connectivity','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3525'],
       ['TR 38.848','Study on Ambient IoT','Rel-18/19 ambient IoT device classes (passive, semi-passive, active-assisted) — precursor to 6G massive communication','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4037'],
       ['O-RAN WG3','Near-RT RIC and E2 Interface','Near-RT RIC architecture, E2 service models, xApp framework','https://www.o-ran.org/specifications'],
@@ -7026,7 +7029,7 @@ const GLOSSARY_DATA = [
   ['NVLink','NVIDIA NVLink','High-bandwidth, low-latency GPU-to-GPU interconnect enabling direct memory access between GPUs without CPU involvement.','NVIDIA','Used in AI-RAN node architecture for GPU interconnect in multi-GPU configurations.'],
   ['AI/ML for NR','AI/ML for NR Air Interface (Rel-19)','3GPP-standardized use of machine learning at the NR physical layer. TR 38.843 was the Rel-18 study basis; Rel-19 NR specifications advance normative support for beam management prediction, CSI feedback enhancement, and ML-assisted positioning. These are the same capability areas AI-RAN targets at GPU-native speed.','TR 38.843, Rel-19 NR TS series','5G-Advanced precursor to AI-native communication in 6G. Standards track that AI-RAN implementations align with.'],
   ['NTN','Non-Terrestrial Networks (Rel-17/19)','Satellite-based NR access integrated into 5GC. Rel-17 introduced basic NTN; Rel-19 adds regenerative satellite payloads, IoT-NTN, and store-and-forward. Precursor to the ubiquitous connectivity pillar of 6G.','TR 38.821, TS 38.300','5G-Advanced precursor to 6G ubiquitous connectivity — extends coverage to satellite without architectural redesign.'],
-  ['Ambient IoT','Ambient IoT (Rel-18/19)','Zero-battery or near-zero-battery devices using RF energy harvesting and backscatter communication. Rel-19 specifies three device classes: passive (backscatter), semi-passive (small storage), and active-assisted (larger storage). 5G-Advanced precursor to the massive communication scenario in 6G.','TR 38.848, Rel-19 specs','Bridge from 5G IoT (NB-IoT, RedCap) to 6G massive communication (tens of billions of devices).'],
+  ['Ambient IoT','Ambient IoT (Rel-18/19)','Zero-battery or near-zero-battery devices using RF energy harvesting and backscatter communication. TR 38.848 and Rel-18/19 work define/study device classes — passive (backscatter), semi-passive (small storage), and active-assisted (larger storage) — with normative stage varying by feature. 5G-Advanced precursor to the massive communication scenario in 6G.','TR 38.848, Rel-18/19 specs','Bridge from 5G IoT (NB-IoT, RedCap) to 6G massive communication (tens of billions of devices).'],
   ['eRedCap','Enhanced Reduced Capability NR (Rel-19)','Further reduction of NR device complexity beyond Rel-17 RedCap: 5 MHz bandwidth, single Rx antenna, lower power class. Targets industrial sensors, meters, and low-tier wearables.','TS 38.300 (Rel-19), TR 38.875','Expands the 5G device ecosystem downward — between NB-IoT and full NR capability.'],
   ['Federated Learning','Federated Learning (NWDAF, Rel-19)','Distributed ML model training across multiple NWDAF instances — each trains on local data and shares model updates (not raw data). Rel-19 NWDAF enhancement. Precursor to the distributed AI-native analytics envisioned for 6G.','TS 23.288 (Rel-19)','Bridge between single-instance NWDAF inference (Rel-17) and fully autonomous AI-native 6G network intelligence.'],
   ['Rel-19','3GPP Release 19 (5G-Advanced)','The second 5G-Advanced release, with functional freeze handled in phases across the 3GPP TSGs. Normatively specifies AI/ML for NR, ambient IoT Phase 2, NTN evolution, eRedCap, L1/L2 mobility, network slicing Phase 3, NWDAF federated learning, and more. Rel-20 continues 5G-Advanced evolution alongside initial 6G studies.','3GPP','The standards bridge between deployed 5G and the 6G vision. Many Rel-19 features are direct precursors to 6G pillars.'],
@@ -7146,7 +7149,7 @@ function renderIntroRoadTo6G(el) {
     marker.appendChild(path); defs.appendChild(marker); svg.appendChild(defs);
     const stages = [
       {x:10, color:'#16a34a', label:'5G SA Baseline', sub:'Deployed (Rel-15/16/17)', detail:'SBA, Network Slicing, Edge Computing, NWDAF'},
-      {x:230, color:'#2563eb', label:'5G-Advanced', sub:'Deployed (Rel-18/19)', detail:'AI/ML Air Interface, Ambient IoT, eRedCap, NTN'},
+      {x:230, color:'#2563eb', label:'5G-Advanced', sub:'Rel-18 deployed; Rel-19 specified', detail:'AI/ML Air Interface, Ambient IoT, eRedCap, NTN'},
       {x:450, color:'#ea580c', label:'AI-RAN', sub:'Validating / Projected', detail:'GPU-Accelerated RAN, AI Beam Mgmt, Shared Memory'},
       {x:670, color:'#1E3A5F', label:'6G', sub:'Vision (~2030)', detail:'AI-Native Core, ISAC, Digital Twins, Sub-THz'}
     ];
@@ -7241,7 +7244,7 @@ function renderIntroAIRANvsGNB(el) {
   html += '<table class="ref-table"><thead><tr><th>Aspect</th><th>Behavior</th></tr></thead><tbody>';
   html += '<tr><td>N2 Interface (NGAP)</td><td>Identical. AMF cannot distinguish AI-RAN from traditional gNB. Standard NG Setup, UE Context, PDU Session Resource procedures.</td></tr>';
   html += '<tr><td>N3 Interface (GTP-U)</td><td>Identical. Same GTP-U tunnel encapsulation, same TEID management, same QFI in extension headers.</td></tr>';
-  html += '<tr><td>Uu Air Interface</td><td>Identical from UE perspective. Standard NR waveform, same SSB, same PRACH, same DCI/UCI. UE is completely unaware of AI-RAN.</td></tr>';
+  html += '<tr><td>Uu Air Interface</td><td>Identical from the UE perspective for baseline NR: same waveform, SSB, PRACH, and DCI/UCI — the UE is unaware of the AI-RAN GPU acceleration itself. Where Rel-19 AI/ML-for-NR features are used, any UE-side involvement is negotiated per the NR specifications.</td></tr>';
   html += '<tr><td>NAS Signaling</td><td>Unchanged. NAS is end-to-end UE ↔ AMF. AI-RAN relays NAS PDUs transparently, same as any gNB.</td></tr>';
   html += '<tr><td>3GPP Compliance</td><td>Full compliance with TS 38.331 (RRC), TS 38.413 (NGAP), TS 38.214 (PHY procedures), TS 29.281 (GTP-U).</td></tr>';
   html += '<tr><td>Security</td><td>Same AS security (KgNB → KRRCenc, KRRCint, KUPenc, KUPint). Same NAS security (KAMF-based). No changes to the 5G AKA authentication flow.</td></tr>';
@@ -7394,7 +7397,7 @@ function showWelcome() {
     '<div class="badge-legend-item"><span class="badge badge-vision">VISION</span><span>Forward-looking vision for 6G era</span></div>' +
     '</div>' +
     '<div style="margin:14px 0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--bg-tertiary);border-radius:6px;font-size:13px;line-height:1.7;">' +
-    '<strong>Badge → Section mapping:</strong> AI-RAN flows (1–5) are <span class="badge badge-projected" style="font-size:10px;">PROJECTED</span> implementation examples layered on standard 5G behavior. 6G flows (6–14) are <span class="badge badge-vision" style="font-size:10px;">VISION</span> — forward-looking concepts for the 2030 era. Reference pages use <span class="badge badge-fact" style="font-size:10px;">FACT</span> for deployed capabilities.</div>' +
+    '<strong>Badge → Section mapping:</strong> AI-RAN flows (1–5) are <span class="badge badge-projected" style="font-size:10px;">PROJECTED</span> implementation examples layered on standard 5G behavior. 6G flows (6–14) are <span class="badge badge-vision" style="font-size:10px;">VISION</span> — forward-looking concepts for the 2030 era. Reference pages are <span class="badge badge-fact" style="font-size:10px;">FACT</span> for spec/architecture anchors and <span class="badge badge-projected" style="font-size:10px;">PROJECTED</span> for latency/timeline/operator examples.</div>' +
     '<h3>Keyboard Shortcuts</h3>' +
     '<div class="shortcut-grid">' +
     '<div class="shortcut-item"><kbd>→</kbd> / <kbd>Space</kbd> <span>Step forward in current flow</span></div>' +
