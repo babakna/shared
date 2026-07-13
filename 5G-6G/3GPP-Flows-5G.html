@@ -479,7 +479,7 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
   </div>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
-    <span class="version">V2.2 — Updated July 2026</span>
+    <span class="version">V2.3 — Updated July 2026</span>
   </div>
 </header>
 <div class="app-container">
@@ -824,7 +824,7 @@ FLOWS.registration_5gaka = {
 }`}, egress:{title:'AUSF Key Derivation',
         code:`// AUSF Processing:
 // 1. Stores XRES* for later verification
-// 2. Derives HXRES* = SHA256(XRES*)[0..127]
+// 2. Derives HXRES* = 128 LSBs of SHA-256(RAND || XRES*)  [TS 33.501 §6.1.3.2, Annex A.5]
 // 3. Derives KSEAF from KAUSF
 //    KSEAF = KDF(KAUSF, serving-network-name)
 // 4. Constructs 5G SE AV for AMF:
@@ -899,11 +899,11 @@ FLOWS.registration_5gaka = {
     "RES*": "0123456789abcdef0123456789abcdef"
   }
 }
-// AMF computes: HRES* = SHA256(RES*)[0..127]
+// AMF computes: HRES* = 128 LSBs of SHA-256(RAND || RES*)
 // Verifies: HRES* == stored HXRES*  → match ✓`}, egress:{title:'AMF Verification',
         code:`// AMF Processing:
 // 1. Extract RES* from Auth Response
-// 2. Compute HRES* = SHA256(RES*) truncated
+// 2. Compute HRES* = 128 LSBs of SHA-256(RAND || RES*)  [TS 33.501 A.5]
 // 3. Compare HRES* with stored HXRES*
 // 4. If match → forward RES* to AUSF
 // 5. If mismatch → authentication failure`}},
@@ -2187,7 +2187,7 @@ FLOWS.slice_registration = {
 // 2. Authentication (5G AKA)
 // 3. Registration completion`}},
     {id:6, label:'Step 6: AMF → NSACF Slice Admission Control', from:'amf', to:'nsacf', interface:'Nnsacf — SBI (TS 29.536)', protocol:'HTTP/2 POST', badge:'FACT', lineType:'cp',
-      description:'AMF queries NSACF to check if max UEs per slice limit has been reached for each Allowed S-NSSAI (Rel-17+).',
+      description:'AMF queries NSACF to check if max UEs per slice limit has been reached for each Allowed S-NSSAI (Rel-17+). Note: admission control is shown here before authentication for teaching clarity; in TS 23.502 §4.2.2.2.2 primary authentication precedes NSAC.',
       ingress:{title:'Nnsacf_SliceAdmissionControl',
         code:`// POST /nnsacf-nsac/v1/ue-slice-admission
 // (TS 29.536)
@@ -2226,7 +2226,7 @@ FLOWS.slice_registration = {
 // 3. NAS security establishment
 // 4. Include Allowed NSSAI in Reg Accept`}},
     {id:8, label:'Step 8: Authentication (5G AKA)', from:'amf', to:'ausf', interface:'N12 — SBI', protocol:'HTTP/2 (TS 29.509)', badge:'FACT', lineType:'cp',
-      description:'AMF proceeds with standard 5G AKA authentication through AUSF and UDM (same as Flow 1, steps 3-13).',
+      description:'AMF proceeds with standard 5G AKA authentication through AUSF and UDM (same as Flow 1: steps 3–11 for 5G AKA, then 12–13 for NAS security mode).',
       ingress:{title:'5G AKA Authentication',
         code:`// Standard 5G AKA procedure:
 // AMF → AUSF: Nausf_UEAuthentication (SUCI)
@@ -2444,7 +2444,7 @@ FLOWS.slice_charging = {
 // 4. Reports sent when thresholds hit
 // 5. Each report tagged with S-NSSAI
 //    for slice-level disaggregation`}},
-    {id:6, label:'Step 6: Charging Loop (Same as Flow 6)', from:'upf_c', to:'smf', interface:'N4 → N40', protocol:'PFCP + HTTP/2', badge:'FACT', lineType:'cp',
+    {id:6, label:'Step 6: Charging Loop (Same as Flow 6)', from:'upf_c', to:'smf', interface:'N4 (PFCP usage report) then N40 (Nchf)', protocol:'PFCP + HTTP/2', badge:'FACT', lineType:'cp',
       description:'Standard charging loop: UPF reports → SMF → CHF update → new quota. Every record tagged with S-NSSAI for slice billing.',
       ingress:{title:'Slice-Tagged Usage Reports',
         code:`// Usage Report (UPF → SMF → CHF):
@@ -2532,7 +2532,7 @@ FLOWS.ul_dl_data = {
   ],
   steps:[
     {id:1, label:'Step 1: UE Sends Uplink IP Packet', from:'ue', to:'ran', interface:'Uu — NR Air Interface', protocol:'NR SDAP/PDCP/RLC/MAC/PHY (TS 37.324, TS 38.323)', badge:'FACT', lineType:'dp',
-      description:'UE sends IP packet on established DRB. SDAP maps QoS flow to DRB. PDCP encrypts (KUPenc) and integrity protects.',
+      description:'UE sends IP packet on established DRB. SDAP maps QoS flow to DRB. PDCP ciphers (KUPenc) and, where user-plane integrity protection is configured for the DRB, also integrity protects (KUPint).',
       ingress:{title:'UE Uplink Packet Processing',
         code:`// UE Uplink Processing:
 // 1. Application generates IP packet
@@ -2549,14 +2549,16 @@ FLOWS.ul_dl_data = {
 }
 // 3. PDCP Layer (TS 38.323):
 //    - Ciphering: NEA1/NEA2 with KUPenc
-//    - Integrity: NIA1/NIA2 with KUPint (if DRB IP)
+//    - Integrity: NIA1/NIA2 with KUPint (only if UP integrity
+//      protection is configured for this DRB — often absent
+//      on default user-plane DRBs per operator/RAN policy)
 //    - PDCP SN added, header compression (ROHC)
 // 4. RLC → MAC → PHY: segmentation, HARQ, scheduling`},
       egress:{title:'Over-the-Air Transmission',
         code:`// Air Interface Transmission:
 // DRB ID: 1 (mapped from QFI 1)
 // SDAP header: QFI=1, RQI=0
-// PDCP: encrypted + integrity protected
+// PDCP: ciphered (integrity protected only if configured)
 // RLC Mode: AM (Acknowledged Mode)
 // MAC: scheduled via UL grant (DCI Format 0_1)
 // PHY: PUSCH transmission on allocated RBs`}},
@@ -4185,8 +4187,8 @@ FLOWS.slice_devedge = {
     {from:'amf',to:'smf',label:'N11',type:'control'},
   ],
   steps:[
-    {id:1, label:'Step 1: Enterprise App → Network Slice API', from:'af', to:'af', interface:'HTTPS REST — Network Slice API', protocol:'CAMARA-Aligned REST', badge:'FACT',
-      description:'Enterprise developer calls api.example.com ANPA API specifying application ID, target device, desired network behavior, duration, and optionally a specific slice profile.',
+    {id:1, label:'Step 1: Enterprise App → Network Slice API', from:'af', to:'af', interface:'HTTPS REST — Network Slice API', protocol:'CAMARA-Aligned REST', badge:'VALIDATED',
+      description:'Enterprise developer calls the operator\'s CAMARA-aligned Network Slice API (an operator exposure layer, not a 3GPP-defined interface) specifying application ID, target device, desired network behavior, duration, and optionally a specific slice profile. Steps 2 onward map this to standardized NEF/PCF/PFCP provisioning.',
       ingress:{title:'Network Slice API Request',
         code:`// POST https://api.example.com/anpa/v1/sessions
 // Authorization: Bearer <enterprise_oauth_token>
@@ -5471,7 +5473,7 @@ FLOWS.deregistration = {
 /* ====== FLOW 20: NWDAF Load Analytics & Prediction ====== */
 FLOWS.nwdaf_analytics = {
   id:'nwdaf_analytics', title:'NWDAF Load Analytics & Prediction', section:'analytics', badge:'FACT',
-  specRef:'TS 23.288 §6.1, §6.2',
+  specRef:'TS 23.288 §6.1, §6.2 (analytics); TS 29.520 (Nnwdaf API)',
   narrative:'The Network Data Analytics Function (NWDAF) collects data from various NFs, applies ML models, and provides analytics to consumer NFs. In this flow, PCF subscribes to load analytics for proactive policy adjustment. This enables the network to optimize performance using AI/ML — analytics-driven decisions can proactively adjust QoS policies, predict congestion, and rebalance load before users are affected. Rel-19 significantly evolves NWDAF with federated learning (ML model training distributed across multiple NWDAF instances — each trains on local data and shares model updates, not raw data), QoE-aware analytics (incorporating RAN-visible QoE feedback from applications into prediction models), and enhanced analytics for RAN energy optimization. These capabilities move NWDAF from single-instance inference toward distributed AI — a direct bridge to the AI-native network intelligence envisioned for 6G.',
   nodes:['amf','smf','pcf','nwdaf'],
   connections:[
@@ -5480,8 +5482,8 @@ FLOWS.nwdaf_analytics = {
     {from:'nwdaf',to:'smf',label:'Nsmf',type:'control'},
   ],
   steps:[
-    {id:1, label:'Step 1: Analytics Subscription', from:'pcf', to:'nwdaf', interface:'Nnwdaf — SBI', protocol:'Nnwdaf_AnalyticsSubscription_Subscribe (TS 23.288)', badge:'FACT', lineType:'cp',
-      description:'PCF subscribes to load analytics for a specific S-NSSAI.',
+    {id:1, label:'Step 1: Analytics Subscription', from:'pcf', to:'nwdaf', interface:'Nnwdaf — SBI', protocol:'Nnwdaf_AnalyticsSubscription_Subscribe (TS 29.520 API; TS 23.288 analytics)', badge:'FACT', lineType:'cp',
+      description:'PCF subscribes to load analytics for a specific S-NSSAI. The data-collection steps that follow show illustrative input sources; production NF_LOAD analytics may also draw on OAM, NRF, and direct NF data per TS 23.288.',
       ingress:{title:'Analytics Subscription Request',
         code:`// POST /nnwdaf-analyticssubscription/v1/subscriptions
 {
@@ -5617,7 +5619,7 @@ FLOWS.nwdaf_analytics = {
     "urgency": "MEDIUM"
   }
 }`}},
-    {id:7, label:'Step 7: Analytics Notification', from:'nwdaf', to:'pcf', interface:'Callback', protocol:'Nnwdaf_AnalyticsSubscription_Notify (TS 23.288)', badge:'FACT', lineType:'cp',
+    {id:7, label:'Step 7: Analytics Notification', from:'nwdaf', to:'pcf', interface:'Callback', protocol:'Nnwdaf_AnalyticsSubscription_Notify (TS 29.520 API; TS 23.288 analytics)', badge:'FACT', lineType:'cp',
       description:'NWDAF sends analytics result to PCF via callback.',
       ingress:{title:'Analytics Notification',
         code:`// POST /pcf-01.5gc.operator.example/callback
@@ -5679,7 +5681,7 @@ FLOWS.nwdaf_analytics = {
 FLOWS.vonr_call = {
   id:'vonr_call', title:'VoNR Call Setup (MO)', section:'5g_sa', badge:'FACT',
   specRef:'TS 23.228, TS 24.229, TS 23.502',
-  narrative:'Voice over New Radio (VoNR) uses the IP Multimedia Subsystem (IMS) for call signaling over the 5G SA network. The UE establishes a dedicated QoS flow (5QI=1 for conversational voice) alongside the existing data PDU session. SIP signaling flows through the IMS core (P-CSCF → S-CSCF → TAS) while the media plane uses RTP over the dedicated bearer. This is the native 5G voice path.',
+  narrative:'Voice over New Radio (VoNR) uses the IP Multimedia Subsystem (IMS) for call signaling over the 5G SA network. On top of a separate IMS PDU session (DNN="ims", default QoS flow 5QI=5 for SIP), the UE adds a dedicated GBR QoS flow (5QI=1 for conversational voice) for the media. SIP signaling flows through the IMS core (P-CSCF → S-CSCF → TAS) while the media plane uses RTP on the dedicated voice QoS flow. A data PDU session may coexist in parallel. This is the native 5G voice path.',
   nodes:['ue','ran','upf_c','amf','smf','pcf','pcscf','scscf','tas'],
   connections:[
     {from:'ue',to:'ran',label:'Uu',type:'data'},
@@ -5755,7 +5757,7 @@ FLOWS.vonr_call = {
 // 4. Return INVITE to S-CSCF
 // 5. S-CSCF routes to terminating side`}},
     {id:4, label:'Step 4: P-CSCF → PCF: IMS Policy (N5)', from:'pcscf', to:'pcf', interface:'N5 — Npcf_PolicyAuthorization (TS 29.514)', protocol:'HTTP/2', badge:'FACT', lineType:'cp',
-      description:'P-CSCF extracts media requirements from SDP and sends policy authorization to PCF requesting dedicated QoS resources for the voice bearer.',
+      description:'P-CSCF extracts media requirements from SDP and sends policy authorization to PCF requesting dedicated QoS resources for the voice QoS flow (5QI=1 GBR).',
       ingress:{title:'Policy Authorization Request',
         code:`// Npcf_PolicyAuthorization (TS 29.514)
 {
@@ -6761,7 +6763,7 @@ function renderSpecLibrary(el) {
     ]},
     { title:'Rel-19 5G-Advanced (New Capability Areas)', specs:[
       ['TR 38.843','Study on AI/ML for NR Air Interface','Study item on AI/ML for beam management, CSI, positioning at L1/PHY — basis for Rel-19 normative work','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4015'],
-      ['TS 38.305','NR Positioning','Positioning methods (DL-TDoA, UL-AoA, multi-RTT), measurement procedures. Rel-19 adds centimeter-class positioning targets and sidelink-based positioning enhancements','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
+      ['TS 38.305','NR Positioning','Positioning methods (DL-TDoA, UL-AoA, multi-RTT), measurement procedures. The spec predates Rel-19; Rel-19 adds enhanced accuracy (sub-meter to centimeter-class in favorable conditions, deployment-dependent — not a network-wide SLA) and sidelink-based positioning enhancements','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3310'],
       ['TR 38.821','NTN Solutions for NR','Non-terrestrial network architecture, timing advance, satellite mobility, regenerative payload — foundation for Rel-19 NTN evolution','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3525'],
       ['TS 23.304','Proximity-based Services (ProSe) in 5GS','UE-to-UE and UE-to-network relay, sidelink discovery, direct communication — updated in Rel-19 for relay enhancements','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3855'],
       ['TS 38.213','NR Physical Layer Procedures for Control','DCI formats, PUCCH, search spaces. Rel-19 adds sidelink resource allocation and ambient IoT control signaling','https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3215'],
@@ -6873,7 +6875,7 @@ const GLOSSARY_DATA = [
   ['PSA','PDU Session Anchor','The UPF that serves as the anchor point for a PDU session (IP address allocation).','TS 23.501 §5.6.3','Central UPF acting as PSA for non-edge traffic.'],
   ['LBO','Local Breakout','Traffic routing directly to local data network without traversing central core.','TS 23.548','ULCL-based LBO steers traffic to local edge applications.'],
   ['L4S','Low Latency Low Loss Scalable Throughput','Congestion control architecture enabling ultra-low queuing delay.','RFC 9330','5G-Advanced feature for ultra-low queuing delay; rollout timing varies by operator.'],
-  ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications (1ms target).','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
+  ['URLLC','Ultra-Reliable Low-Latency Communication','5G service category for critical, low-latency applications. The ~1 ms figure is an ITU/IMT-2020 scenario target; actual latency/reliability are set per-QoS via 5QI packet delay budgets, not a universal guarantee.','TS 23.501 §5.7','URLLC slices for priority and enterprise critical applications.'],
   ['eMBB','enhanced Mobile Broadband','5G service category for high-throughput consumer broadband.','TS 23.501','Default 5G slice for consumer broadband services.'],
   ['Network Slicing','Network Slicing','End-to-end logical network partitioning with dedicated/shared NF instances.','TS 23.501 §5.15','Example slicing products: Priority URLLC, Enterprise eMBB, Portable Private 5G.'],
   ['ULCL Edge','ULCL Edge','5G-Advanced edge computing solution using ULCL for local breakout.','Product','Example: edge computing with ULCL + EAS for sub-10ms application hosting.'],
@@ -6882,9 +6884,9 @@ const GLOSSARY_DATA = [
   ['Priority URLLC','Priority URLLC','Network slicing product for first responders with prioritized connectivity.','Product','Example: dedicated URLLC-like slice for first responder priority access.'],
   ['Enterprise eMBB','Enterprise eMBB','Business network slicing product for enterprise connectivity.','Product','Example: dedicated eMBB slice with enhanced QoS for business subscribers.'],
   ['CAMARA','Common API framework by GSMA','Standardized network API project under GSMA Open Gateway, enabling cross-operator API exposure for QoD, slicing, device status, and more.','GSMA Open Gateway','Network Slice and QoD APIs align with CAMARA specifications.'],
-  ['ANPA','Application Network Policy Agent','API enabling applications to dynamically request network slices and QoS policies via CAMARA-aligned REST interfaces.','CAMARA / Open Gateway','Powers dynamic slice allocation via NEF (Flow 16).'],
+  ['ANPA','Application Network Policy Agent','An operator/CAMARA API-exposure pattern (not a 3GPP-defined network function) that lets applications dynamically request network slices and QoS policies via CAMARA-aligned REST interfaces; it maps to NEF services (TS 29.522) where deployed.','CAMARA / Open Gateway','Powers dynamic slice allocation via NEF (Flow 16).'],
   ['DNAI','Data Network Access Identifier','Identifies a specific point of data network access (e.g., an edge site). Used in AF traffic influence to steer traffic to a specific UPF/edge location.','TS 23.501 §5.6.7','Operator uses DNAI to identify edge sites for ULCL Edge (e.g., "edge-site-01").'],
-  ['CDR','Charging Data Record','Record generated by CHF containing subscriber usage data for billing. Includes volume, duration, rating group, and service context.','TS 32.255','CHF generates CDRs for all 5G sessions — per-slice and per-service.'],
+  ['CDR','Charging Data Record','Record generated by CHF containing subscriber usage data for billing. Includes volume, duration, rating group, and service context. Offline CDR parameters are per TS 32.255; online/converged charging over Nchf is per TS 32.291.','TS 32.255 (offline), TS 32.291 (Nchf)','CHF generates CDRs for 5G sessions — per-slice and per-service.'],
   ['F-TEID','Fully Qualified Tunnel Endpoint Identifier','Uniquely identifies a GTP-U tunnel endpoint: a combination of TEID and transport layer address (IP). Used on N3/N9 interfaces.','TS 29.244, TS 29.281','Assigned by UPF during PDU session establishment to identify GTP-U tunnel endpoints.'],
   ['TEID','Tunnel Endpoint Identifier','32-bit identifier for a GTP-U tunnel endpoint on N3 (gNB↔UPF) and N9 (UPF↔UPF) interfaces.','TS 29.281','Each GTP-U tunnel is identified by a unique TEID at each end.'],
   ['N14','N14 Reference Point','Control plane interface between two AMF instances, used for AMF-to-AMF rerouting during registration or mobility.','TS 23.501 §5.2','Used in slice-aware registration when AMF reroute to a slice-specific AMF is needed.'],
@@ -6895,8 +6897,8 @@ const GLOSSARY_DATA = [
   ['NTN','Non-Terrestrial Networks','Satellite-based NR access integrated into 5GC. Rel-17 introduced basic NTN; Rel-19 adds regenerative satellite payloads (satellite runs a full gNB), IoT-NTN (eMTC/NB-IoT over satellite), improved LEO mobility, and store-and-forward for intermittent ground station coverage.','TS 38.300, TR 38.821, TS 38.101-5','Precursor to the "ubiquitous connectivity" pillar of 6G (IMT-2030).'],
   ['Sidelink','NR Sidelink (PC5)','Direct device-to-device communication over the PC5 air interface without routing through the gNB. Rel-16 introduced V2X sidelink; Rel-19 extends to UE-to-network relay (out-of-coverage UEs relay through in-coverage peers), public safety relay, and commercial D2D proximity services.','TS 23.304, TS 38.331','Enables coverage extension, V2X, and D2D — foundation for 6G mesh architectures.'],
   ['PC5','PC5 Reference Point','The air interface for NR sidelink (device-to-device) communication. Operates independently of the Uu (UE-to-gNB) interface. Used for V2X, UE relay, and proximity services.','TS 23.287, TS 38.300','Sidelink communication interface for V2X, relay, and D2D use cases.'],
-  ['Ambient IoT','Ambient IoT','Devices that harvest energy from RF signals and communicate using backscatter or minimal active transmission — requiring zero or near-zero battery. Rel-18 defined the concept; Rel-19 specifies three device classes: Device A (passive, backscatter-only), Device B (semi-passive, small energy storage), Device C (active-assisted, larger storage and range).','TR 38.848, Rel-19 specifications','Precursor to 6G massive communication — billions of zero-power tags in logistics, retail, and infrastructure.'],
-  ['L1/L2 Mobility','L1/L2-Based Inter-Cell Mobility','Rel-19 mechanism for fast cell switching using L1/L2 signaling (MAC CE and PHY-layer commands) instead of full RRC reconfiguration. Reduces handover interruption from ~30-50ms to potentially &lt;5ms. Critical for latency-sensitive applications (XR, cloud gaming, V2X).','TS 38.300, TS 38.331 (Rel-19)','Significant mobility improvement — enables near-seamless handover for real-time applications.'],
+  ['Ambient IoT','Ambient IoT','Devices that harvest energy from RF signals and communicate using backscatter or minimal active transmission — requiring zero or near-zero battery. Rel-18 defined the concept; Rel-18/19 work defines/studies device classes — passive (backscatter-only), semi-passive (small energy storage), and active-assisted (larger storage and range) — with normative stage varying by feature.','TR 38.848, Rel-18/19 specifications','Precursor to 6G massive communication — billions of zero-power tags in logistics, retail, and infrastructure.'],
+  ['L1/L2 Mobility','L1/L2-Based Inter-Cell Mobility','Rel-19 mechanism for fast cell switching using L1/L2 signaling (MAC CE and PHY-layer commands) instead of full RRC reconfiguration. Can reduce handover interruption from ~30-50ms toward &lt;5ms in supported scenarios (deployment-dependent, not guaranteed for every handover). Targets latency-sensitive applications (XR, cloud gaming, V2X).','TS 38.300, TS 38.331 (Rel-19)','Significant mobility improvement — enables near-seamless handover for real-time applications.'],
   ['CHO','Conditional Handover','The network pre-configures one or more target cells; the UE autonomously executes handover when configured conditions (e.g., RSRP threshold) are met — without waiting for a network-triggered handover command. Rel-19 improves CHO with better condition evaluation and combination with L1/L2 mobility.','TS 38.331','Reduces handover failures at cell edges and improves mobility robustness.'],
   ['CJT','Coherent Joint Transmission','Rel-19 MIMO technique where geographically separated TRPs (antenna panels) transmit coherently to a UE, acting as a single massive array. Supports up to 128 antenna ports. Requires tight inter-TRP synchronization and joint precoding.','TS 38.214 (Rel-19)','Stepping stone toward distributed MIMO and RIS in 6G architecture.'],
   ['RAN-Visible QoE','RAN-Visible Quality of Experience','Rel-19 mechanism where applications report user-perceived quality metrics (video MOS, stall ratio, frame rate) to the RAN. Enables the gNB to optimize scheduling decisions based on actual experience rather than only QoS class indicators.','TS 38.300 (Rel-19)','Precursor to intent-driven and QoE-aware networking in 6G.'],
@@ -7331,7 +7333,7 @@ function renderIntro5GAdvanced(el) {
   html += '<p>Rel-19 (phased freeze across TSGs) is not incremental — it represents the maturation of the 5G platform. Where Rel-18 introduced AI/ML, ambient IoT, and energy savings as study items or initial frameworks, Rel-19 turns them into production-grade specifications and adds entirely new capability areas. Below is what Rel-19 brings to each technology domain.</p>';
 
   html += '<h4>AI/ML for NR Air Interface</h4>';
-  html += '<p>Rel-18 introduced the framework for AI/ML in the NR physical layer (TR 38.843). Rel-19 <strong>normatively specifies</strong> three AI/ML use cases: <strong>beam management prediction</strong> (the gNB or UE uses ML models to predict optimal beam pairs, reducing beam sweeping overhead and improving mobility), <strong>CSI feedback enhancement</strong> (ML-based compression/reconstruction of channel state information, reducing UL overhead while maintaining DL precoding accuracy), and <strong>positioning</strong> (ML-assisted timing/angle measurement enhancements). These are among the first 3GPP-standardized AI/ML functions at the air interface — a foundational step toward the AI-native RAN architecture envisioned for 6G.</p>';
+  html += '<p>Rel-18 introduced the framework for AI/ML in the NR physical layer via the study item TR 38.843. Rel-19 carries the normative work forward, specifying selected AI/ML features (feature-set and band-dependent) centered on three areas: <strong>beam management prediction</strong> (the gNB or UE uses ML models to predict optimal beam pairs, reducing beam sweeping overhead and improving mobility), <strong>CSI feedback enhancement</strong> (ML-based compression/reconstruction of channel state information, reducing UL overhead while maintaining DL precoding accuracy), and <strong>positioning</strong> (ML-assisted timing/angle measurement enhancements). TR 38.843 remains the study anchor for air-interface AI/ML scope. These are among the first 3GPP-standardized AI/ML functions at the air interface — a foundational step toward the AI-native RAN architecture envisioned for 6G.</p>';
 
   html += '<h4>Ambient IoT (Phase 2)</h4>';
   html += '<p>Rel-18 defined ambient IoT as a concept — devices that harvest energy from RF signals and require zero battery. Rel-19 expands this into <strong>three device classes</strong>: <strong>Device A</strong> (passive, backscatter-only, no energy storage — similar to UHF RFID), <strong>Device B</strong> (semi-passive, small energy storage, can initiate transmissions), and <strong>Device C</strong> (active-assisted, larger energy storage, supports higher data rates and longer range). Rel-19 specifies the air-interface waveforms, inventory protocols, and network architecture for managing billions of these devices within the 5G system — directly paving the way for the "massive communication" scenario in 6G.</p>';
