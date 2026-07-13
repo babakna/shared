@@ -65,7 +65,7 @@ Each course keeps its own styles, scripts, data, and content. The course files a
 
 ## Content Currency
 
-Content reviewed in **July 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
+Version: **v2.3**. Content reviewed on **July 13, 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
 
 ## Adding a New Course
 
