@@ -280,7 +280,7 @@ function game_hearts(gm){
 /* ---------------- FREECELL ---------------- */
 function game_freecell(gm){
   setHint('Build foundations A→K by suit. Columns go down in alternating colours. 4 free cells hold 1 card each.');
-  let cols,free,found,sel;
+  let cols,free,found,sel,awarded;
   const top=el('div',{style:'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px'});
   const freeEls=[0,1,2,3].map(()=>el('div',{style:'width:46px;height:64px'}));
   const foundEls=[0,1,2,3].map(()=>el('div',{style:'width:46px;height:64px'}));
@@ -290,7 +290,7 @@ function game_freecell(gm){
   top.append(...freeEls,el('div',{style:'width:14px'}),...foundEls);
   host.append(newB,top,colRow);
   function slot(onclk){const d=el('div',{style:'width:46px;height:64px;border:2px dashed var(--border);border-radius:7px'});if(onclk)d.onclick=onclk;return d;}
-  function deal(){const d=shuffle(makeDeck());cols=[[],[],[],[],[],[],[],[]];free=[null,null,null,null];found=[[],[],[],[]];sel=null;d.forEach((c,i)=>cols[i%8].push(c));render();}
+  function deal(){const d=shuffle(makeDeck());cols=[[],[],[],[],[],[],[],[]];free=[null,null,null,null];found=[[],[],[],[]];sel=null;awarded=false;d.forEach((c,i)=>cols[i%8].push(c));render();}
   function color(c){return isRed(c.s)?'r':'b';}
   function render(){
     freeEls.forEach((fe,i)=>{fe.innerHTML='';if(free[i]){const f=cardFace(free[i]);f.style.cursor='pointer';if(sel&&sel.from==='free'&&sel.i===i)f.style.outline='3px solid #fd5';f.onclick=()=>pick({from:'free',i});fe.append(f);}else fe.append(slot(()=>drop({to:'free',i})));});
@@ -298,7 +298,7 @@ function game_freecell(gm){
     colEls.forEach((ce,i)=>{ce.innerHTML='';const pile=cols[i];if(!pile.length){ce.append(slot(()=>drop({to:'col',i})));return;}
       pile.forEach((c,j)=>{const f=cardFace(c);f.style.position='absolute';f.style.top=(j*22)+'px';f.style.cursor='pointer';if(sel&&sel.from==='col'&&sel.i===i&&sel.j===j)f.style.outline='3px solid #fd5';
         f.onclick=()=>{if(j===pile.length-1)pick({from:'col',i,j});else drop({to:'col',i});};ce.append(f);});ce.style.height=(pile.length*22+64)+'px';});
-    setStatus(found.reduce((a,f)=>a+f.length,0)+'/52 home'+(won()?' — 🎉 You win!':'')+' • Wins: '+hs(gm.id));if(won())setHs(gm.id,hs(gm.id)+1);}
+    setStatus(found.reduce((a,f)=>a+f.length,0)+'/52 home'+(won()?' — 🎉 You win!':'')+' • Wins: '+hs(gm.id));if(won()&&!awarded){awarded=true;setHs(gm.id,hs(gm.id)+1);}}
   function won(){return found.reduce((a,f)=>a+f.length,0)===52;}
   function topCard(){if(sel.from==='free')return free[sel.i];return cols[sel.i][cols[sel.i].length-1];}
   function pick(s){sel=s;render();}
@@ -314,7 +314,7 @@ function game_freecell(gm){
 /* ---------------- SPIDER (1 suit) ---------------- */
 function game_spider(gm){
   setHint('Build runs K→A. Move ordered runs onto a card one higher. Complete K-to-A to clear. Tap stock to deal.');
-  let cols,stock,done;
+  let cols,stock,done,awarded;
   const info=el('div',{className:'big'});
   const stockB=el('button',{className:'btn',textContent:'Deal Row'});
   const newB=el('button',{className:'btn ghost',textContent:'New Game'});
@@ -323,13 +323,13 @@ function game_spider(gm){
   host.append(info,el('div',{className:'row'},stockB,newB),board);
   let sel=null;
   function deal(){const d=[];for(let k=0;k<8;k++)RANKS.forEach((r,i)=>d.push({r,v:i+1,up:false}));shuffle(d);
-    cols=[[],[],[],[],[],[],[],[],[],[]];done=0;let idx=0;for(let i=0;i<54;i++){cols[i%10].push(d[idx++]);}cols.forEach(c=>c[c.length-1].up=true);stock=d.slice(idx);sel=null;render();}
+    cols=[[],[],[],[],[],[],[],[],[],[]];done=0;awarded=false;let idx=0;for(let i=0;i<54;i++){cols[i%10].push(d[idx++]);}cols.forEach(c=>c[c.length-1].up=true);stock=d.slice(idx);sel=null;render();}
   function card(c){const f=el('div',{className:'pcard'+(c.up?'':' back'),style:'width:40px;height:56px;font-size:13px'});if(c.up){f.append(el('div',{textContent:c.r}),el('div',{textContent:'♠',style:'align-self:flex-end;font-size:12px'}));}else f.textContent='★';return f;}
   function render(){colEls.forEach((ce,i)=>{ce.innerHTML='';const pile=cols[i];if(!pile.length){ce.append(el('div',{style:'width:40px;height:56px;border:2px dashed var(--border);border-radius:6px',onclick:()=>tryMove(i)}));return;}
     pile.forEach((c,j)=>{const f=card(c);f.style.position='absolute';f.style.top=(j*20)+'px';if(sel&&sel.col===i&&sel.idx===j)f.style.outline='3px solid #fd5';
       f.onclick=()=>{if(!c.up)return;if(sel)tryMove(i);else if(isRun(i,j))sel={col:i,idx:j};render();};ce.append(f);});ce.style.height=(pile.length*20+56)+'px';});
     info.textContent='Completed runs: '+done+'/8'+(done===8?' 🎉':'')+'  •  Stock: '+(stock.length/10)+' deals';
-    setStatus(done===8?'🎉 You cleared the board!':'Build K→A. Wins: '+hs(gm.id));if(done===8)setHs(gm.id,hs(gm.id)+1);}
+    setStatus(done===8?'🎉 You cleared the board!':'Build K→A. Wins: '+hs(gm.id));if(done===8&&!awarded){awarded=true;setHs(gm.id,hs(gm.id)+1);}}
   function isRun(col,idx){const p=cols[col];for(let k=idx;k<p.length-1;k++){if(!p[k].up||p[k].v!==p[k+1].v+1)return false;}return p[idx].up;}
   function tryMove(toCol){if(!sel){return;}const from=cols[sel.col];const moving=from.slice(sel.idx);const dest=cols[toCol];
     const ok=dest.length===0||dest[dest.length-1].v===moving[0].v+1;
@@ -342,14 +342,15 @@ function game_spider(gm){
 
 /* ---------------- BACKGAMMON (simplified) ---------------- */
 function game_backgammon(gm){
-  setHint('Move your ⚫ checkers home (points 1-6) then bear off. Roll, then tap a point to move by a die. Doubles = 4 moves.');
+  setHint('Move your ⚫ checkers home (points 1-6) then bear off. Roll, tap a die to pick it, then tap a point to move. Doubles = 4 moves. Unplayable dice are skipped automatically.');
   let pts,bar,off,dice,turn,over,selDie;
   // pts[0..23]: +n you(black) moving down to 0, -n ai(white) moving up to 23. Standard start.
   const board=el('div',{});
   const msg=el('div',{className:'big'});
+  const diceRow=el('div',{className:'row',style:'min-height:34px;gap:8px'});
   const rollB=el('button',{className:'btn',textContent:'🎲 Roll'});
   const newB=el('button',{className:'btn ghost',textContent:'New Game'});
-  host.append(msg,el('div',{className:'row'},rollB,newB),board);
+  host.append(msg,diceRow,el('div',{className:'row'},rollB,newB),board);
   function reset(){pts=Array(24).fill(0);pts[23]=2;pts[12]=5;pts[7]=3;pts[5]=5; pts[0]=-2;pts[11]=-5;pts[16]=-3;pts[18]=-5;
     bar={you:0,ai:0};off={you:0,ai:0};dice=[];turn='you';over=false;selDie=null;msg.textContent='Tap Roll to begin';render();}
   function render(){board.innerHTML='';const wrap=el('div',{style:'display:grid;grid-template-columns:repeat(12,1fr);gap:2px;max-width:560px;margin:0 auto'});
@@ -357,31 +358,43 @@ function game_backgammon(gm){
     for(let i=23;i>=12;i--)wrap.append(ptCell(i));
     for(let i=0;i<12;i++)wrap.append(ptCell(i));
     board.innerHTML='';board.append(wrap);
-    const ds=dice.map(d=>'🎲'+d).join(' ');
+    renderDice();
     setStatus((over?'':turn==='you'?'Your turn ⚫':'AI ⚪')+'  •  Off: you '+off.you+' / ai '+off.ai+'  •  Wins: '+hs(gm.id));
-    msg.textContent=(bar.you?'You have '+bar.you+' on the bar! ':'')+(dice.length?'Dice: '+dice.join(', '):'');}
+    if(!over&&turn==='you'&&dice.length)msg.textContent=(bar.you?'You have '+bar.you+' on the bar — enter first! ':'')+'Pick a die, then a point.';}
+  function renderDice(){diceRow.innerHTML='';if(!dice.length||turn!=='you'||over)return;
+    dice.forEach((d,k)=>{const usable=dieHasMove(d);const chip=el('div',{textContent:'🎲'+d,style:`padding:6px 12px;border-radius:10px;font-weight:800;font-size:16px;cursor:${usable?'pointer':'default'};border:2px solid ${selDie===k?'#2a6':'var(--border)'};background:${selDie===k?'#6e9a':'var(--panel)'};opacity:${usable?1:.4}`});
+      if(usable)chip.onclick=()=>{selDie=k;render();};diceRow.append(chip);});}
   function ptCell(i){const v=pts[i];const d=el('div',{style:`min-height:60px;border:1px solid var(--border);border-radius:6px;padding:2px;text-align:center;font-size:12px;cursor:pointer;background:${selDie!=null&&canMoveFrom(i)?'#6e9a':'var(--panel)'}`});
     d.append(el('div',{style:'font-size:9px;color:var(--dim)',textContent:(i+1)}));
     if(v){d.append(el('div',{style:'font-size:18px',textContent:(v>0?'⚫':'⚪').repeat(Math.min(5,Math.abs(v)))}));if(Math.abs(v)>5)d.append(el('div',{style:'font-size:10px',textContent:'×'+Math.abs(v)}));}
     d.onclick=()=>clickPoint(i);return d;}
-  function canMoveFrom(i){if(turn!=='you'||selDie==null)return false;if(bar.you>0)return false;if(pts[i]<=0)return false;const t=i-dice[selDie];if(t<0)return canBearOff()&&(t===-1||allHomeBeyond(i));return pts[t]>=-1;}
-  function allHomeBeyond(i){for(let k=6;k<24;k++)if(pts[k]>0)return false;return true;}
   function canBearOff(){for(let k=6;k<24;k++)if(pts[k]>0)return false;return bar.you===0;}
-  function clickPoint(i){if(over||turn!=='you'||selDie==null)return;
-    if(bar.you>0){const t=24-dice[selDie];if(pts[t]>=-1){if(pts[t]===-1){pts[t]=0;bar.ai++;}pts[t]++;bar.you--;useDie();}return;}
-    if(pts[i]<=0)return;const t=i-dice[selDie];
-    if(t<0){if(canBearOff()){pts[i]--;off.you++;useDie();}return;}
+  function canBearFrom(i,d){if(!canBearOff())return false;if(d===i+1)return true;if(d>i+1){for(let k=i+1;k<6;k++)if(pts[k]>0)return false;return true;}return false;}
+  function canMoveFrom(i){if(turn!=='you'||selDie==null)return false;const d=dice[selDie];if(bar.you>0)return false;if(pts[i]<=0)return false;const t=i-d;if(t<0)return canBearFrom(i,d);return pts[t]>=-1;}
+  function dieHasMove(d){if(bar.you>0){const e=24-d;return e>=0&&e<24&&pts[e]>=-1;}
+    for(let i=0;i<24;i++){if(pts[i]<=0)continue;const t=i-d;if(t>=0){if(pts[t]>=-1)return true;}else if(canBearFrom(i,d))return true;}return false;}
+  function anyMove(){return dice.some(d=>dieHasMove(d));}
+  function firstUsableDie(){for(let k=0;k<dice.length;k++)if(dieHasMove(dice[k]))return k;return dice.length?0:null;}
+  function clickPoint(i){if(over||turn!=='you'||selDie==null)return;const d=dice[selDie];
+    if(bar.you>0){const e=24-d;if(pts[e]>=-1){if(pts[e]===-1){pts[e]=0;bar.ai++;}pts[e]++;bar.you--;useDie();}return;}
+    if(pts[i]<=0)return;const t=i-d;
+    if(t<0){if(canBearFrom(i,d)){pts[i]--;off.you++;useDie();}return;}
     if(pts[t]>=-1){if(pts[t]===-1){pts[t]=0;bar.ai++;}pts[i]--;pts[t]++;useDie();}}
-  function useDie(){dice.splice(selDie,1);selDie=dice.length?0:null;if(off.you===15){over=true;setHs(gm.id,hs(gm.id)+1);render();setStatus('🎉 You bore off all checkers — you win!');return;}
-    if(!dice.length){turn='ai';render();setTimeout(aiTurn,700);}else render();}
-  rollB.onclick=()=>{if(over||turn!=='you'||dice.length)return;roll();selDie=0;render();};
+  function useDie(){dice.splice(selDie,1);
+    if(off.you===15){over=true;setHs(gm.id,hs(gm.id)+1);render();setStatus('🎉 You bore off all checkers — you win!');return;}
+    if(dice.length&&anyMove()){selDie=firstUsableDie();render();return;}
+    endHumanTurn();}
+  function endHumanTurn(){turn='ai';dice=[];selDie=null;render();setTimeout(aiTurn,700);}
+  rollB.onclick=()=>{if(over||turn!=='you'||dice.length)return;roll();
+    if(!anyMove()){render();msg.textContent='🎲 '+dice.join(' & ')+' — no legal move. Turn passes.';setTimeout(()=>{if(!over)endHumanTurn();},1500);return;}
+    selDie=firstUsableDie();render();};
   function roll(){const a=1+rnd(6),b=1+rnd(6);dice=a===b?[a,a,a,a]:[a,b];}
   function aiTurn(){if(over)return;const a=1+rnd(6),b=1+rnd(6);let ds=a===b?[a,a,a,a]:[a,b];
     ds.forEach(die=>{ // ai moves white (negative) upward toward 23, bear off beyond
       if(bar.ai>0){const t=die-1;if(pts[t]<=1){if(pts[t]===1){pts[t]=0;bar.you++;}pts[t]--;bar.ai--;}return;}
       for(let i=23;i>=0;i--){if(pts[i]<0){const t=i+die;if(t>23){if(aiCanBear()){pts[i]++;off.ai++;break;}continue;}if(pts[t]<=1){if(pts[t]===1){pts[t]=0;bar.you++;}pts[i]++;pts[t]--;break;}}}});
     if(off.ai===15){over=true;render();setStatus('😢 AI bore off everything — AI wins.');return;}
-    turn='you';dice=[];render();}
+    turn='you';dice=[];selDie=null;render();msg.textContent='Your turn — tap Roll.';}
   function aiCanBear(){for(let k=0;k<18;k++)if(pts[k]<0)return false;return true;}
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
@@ -457,7 +470,11 @@ function game_mahjong(gm){
   function render(){board.innerHTML='';tiles.slice().sort((a,b)=>a.z-b.z||a.y-b.y).forEach(t=>{if(t.gone)return;const f=free(t);
     const d=el('div',{textContent:t.face,style:`position:absolute;left:${t.x*60+t.z*5}px;top:${t.y*56+t.z*5}px;width:54px;height:50px;display:flex;align-items:center;justify-content:center;font-size:30px;background:${sel===t?'#ffe08a':'#fafafa'};color:#111;border:1px solid #999;border-radius:7px;box-shadow:1px 2px 3px #0006;cursor:${f?'pointer':'default'};opacity:${f?1:.72}`});
     if(f)d.onclick=()=>click(t);board.append(d);});
-    const left=tiles.filter(t=>!t.gone).length;setStatus(left+' tiles left'+(left===0?' — 🎉 Cleared!':'')+' • Wins: '+hs(gm.id));if(left===0&&!over){over=true;setHs(gm.id,hs(gm.id)+1);}}
+    const left=tiles.filter(t=>!t.gone).length;
+    if(left===0){if(!over){over=true;setHs(gm.id,hs(gm.id)+1);}setStatus('🎉 Cleared! • Wins: '+hs(gm.id));}
+    else if(!hasMove()){setStatus('😕 No matching free tiles left — tap New Game to redeal. • Wins: '+hs(gm.id));}
+    else setStatus(left+' tiles left • Wins: '+hs(gm.id));}
+  function hasMove(){const faces={};tiles.forEach(t=>{if(!t.gone&&free(t))faces[t.face]=(faces[t.face]||0)+1;});return Object.values(faces).some(n=>n>=2);}
   function click(t){if(!free(t))return;if(sel===t){sel=null;render();return;}if(sel&&sel.face===t.face){sel.gone=true;t.gone=true;sel=null;render();return;}sel=t;render();}
   newB.onclick=reset;reset();return{stop:()=>{}};
 }
@@ -982,7 +999,7 @@ applyTheme(localStorage.getItem('theme')||'light');
 (function(){var host=document.getElementById('host');if(!host)return;var pend=false;
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';
- host.style.transform='';host.style.height='';var avail=host.clientWidth,need=host.scrollWidth;var hr0=host.getBoundingClientRect(),L0=hr0.left,R0=hr0.right,ch=host.getElementsByTagName("*");for(var ci=0;ci<ch.length;ci++){var rr=ch[ci].getBoundingClientRect();if(rr.width>0&&rr.height>0){if(rr.left<L0)L0=rr.left;if(rr.right>R0)R0=rr.right;}}var cx0=(hr0.left+hr0.right)/2,he0=Math.max(R0-cx0,cx0-L0);if(2*he0>need)need=2*he0;var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
+ host.style.transform='';host.style.height='';var avail=host.clientWidth,need=host.scrollWidth;var hr0=host.getBoundingClientRect(),L0=hr0.left,R0=hr0.right,ch=host.getElementsByTagName("*");for(var ci=0;ci<ch.length;ci++){var rr=ch[ci].getBoundingClientRect();if(rr.width>0&&rr.height>0){if(rr.left<L0)L0=rr.left;if(rr.right>R0)R0=rr.right;}}var cx0=(hr0.left+hr0.right)/2,he0=Math.max(R0-cx0,cx0-L0);if(2*he0>need)need=2*he0;var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,hasCv=host.getElementsByTagName('canvas').length>0,sc=hasCv?Math.min(avail/need,availH/needH,1):Math.min(avail/need,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
 window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,140);setTimeout(sched,50);setTimeout(sched,150);setTimeout(sched,350);})();

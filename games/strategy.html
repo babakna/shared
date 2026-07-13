@@ -279,10 +279,6 @@ function game_reversi(gm){
   const DIRS=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
   function reset(){b=Array.from({length:N},()=>Array(N).fill(0));b[3][3]=b[4][4]=2;b[3][4]=b[4][3]=1;over=false;lastAI=null;draw();turnInfo();}
   function flips(bd,r,c,p){if(bd[r][c])return[];let all=[];for(const[dr,dc]of DIRS){let line=[],nr=r+dr,nc=c+dc;
-    while(nr>=0&&nr<N&&nc>=0&&nc<N&&bd[nr][nc]===-p+3-3+(3-p)){break;}// placeholder
-  }
-    // proper implementation below
-    all=[];for(const[dr,dc]of DIRS){let line=[],nr=r+dr,nc=c+dc;
       while(nr>=0&&nr<N&&nc>=0&&nc<N&&bd[nr][nc]&&bd[nr][nc]!==p){line.push([nr,nc]);nr+=dr;nc+=dc;}
       if(line.length&&nr>=0&&nr<N&&nc>=0&&nc<N&&bd[nr][nc]===p)all=all.concat(line);}
     return all;}
@@ -365,13 +361,13 @@ function game_battleship(gm){
   function reset(){enemy=placeFleet();you=placeFleet();enemyShots=emptyGrid();over=false;draw();setStatus('Fire at the enemy!  •  Wins: '+wins(gm.id));}
   function shipsLeft(g){return g.flat().filter(v=>v===1).length;}
   function draw(){
-    enemyBox.innerHTML='';const eg=el('div',{style:`display:grid;grid-template-columns:repeat(${N},34px);gap:2px`});
+    enemyBox.innerHTML='';const eg=el('div',{style:`display:grid;grid-template-columns:repeat(${N},40px);gap:2px`});
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=enemy[r][c];const shown=v===2?'•':v===3?'💥':'';
-      const d=el('div',{textContent:shown,style:`width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:${v===3?'#a33':v===2?'#234':'#1a3a6a'};cursor:pointer`});
+      const d=el('div',{textContent:shown,style:`width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:${v===3?'#a33':v===2?'#234':'#1a3a6a'};cursor:pointer`});
       d.onclick=()=>fire(r,c);eg.append(d);}enemyBox.append(eg);
-    youBox.innerHTML='';const yg=el('div',{style:`display:grid;grid-template-columns:repeat(${N},34px);gap:2px`});
+    youBox.innerHTML='';const yg=el('div',{style:`display:grid;grid-template-columns:repeat(${N},40px);gap:2px`});
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=you[r][c];const bg=v===3?'#a33':v===2?'#234':v===1?'#2a6':'#1a3a6a';
-      yg.append(el('div',{textContent:v===3?'💥':v===2?'•':'',style:`width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:${bg}`}));}youBox.append(yg);}
+      yg.append(el('div',{textContent:v===3?'💥':v===2?'•':'',style:`width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:${bg}`}));}youBox.append(yg);}
   function showHint(){const hits=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(enemy[r][c]===3)hits.push([r,c]);for(const [r,c] of hits){for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N&&(enemy[nr][nc]===0||enemy[nr][nc]===1)){setStatus('💡 Try near a hit: row '+(nr+1)+', column '+(nc+1)+'.');return;}}}setStatus('💡 Try the center or checkerboard pattern to find ships.');}
   function fire(r,c){if(over)return;const v=enemy[r][c];if(v===2||v===3)return;enemy[r][c]=v===1?3:2;draw();
     if(shipsLeft(enemy)===0){over=true;addWin(gm.id);setStatus('🎉 You sank the enemy fleet!');return;}
@@ -559,7 +555,7 @@ applyTheme(localStorage.getItem('theme')||'light');
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';
  host.style.transform='';host.style.height='';var avail=host.clientWidth,need=host.scrollWidth;var hr0=host.getBoundingClientRect(),L0=hr0.left,R0=hr0.right,ch=host.getElementsByTagName("*");for(var ci=0;ci<ch.length;ci++){var rr=ch[ci].getBoundingClientRect();if(rr.width>0&&rr.height>0){if(rr.left<L0)L0=rr.left;if(rr.right>R0)R0=rr.right;}}var cx0=(hr0.left+hr0.right)/2,he0=Math.max(R0-cx0,cx0-L0);if(2*he0>need)need=2*he0;
- var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
+ var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,hasCv=host.getElementsByTagName('canvas').length>0,sc=hasCv?Math.min(avail/need,availH/needH,1):Math.min(avail/need,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
 window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,140);setTimeout(sched,50);setTimeout(sched,150);setTimeout(sched,350);})();

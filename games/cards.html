@@ -455,7 +455,10 @@ function game_golf(gm){setHint('Move a column card to the waste if it is one ran
   function draw(){stockEl.innerHTML='';if(stock.length){const s=cardFace(stock[0],false);s.style.cursor='pointer';s.onclick=()=>{if(over)return;waste=stock.pop();draw();};stockEl.append(s);}else stockEl.append(el('div',{style:'width:46px;height:64px;border:2px dashed var(--border);border-radius:7px'}));
     wasteEl.innerHTML='';wasteEl.append(cardFace(waste));
     cE.forEach((ce,i)=>{ce.innerHTML='';cols[i].forEach((c,j)=>{const last=j===cols[i].length-1;const f=cardFace(c);f.style.position='absolute';f.style.top=(j*20)+'px';if(last){f.style.cursor='pointer';f.onclick=()=>play(i);}ce.append(f);});ce.style.height=(cols[i].length*20+64)+'px';});
-    const left=cols.reduce((a,c)=>a+c.length,0);setStatus(left+' cards left'+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0){over=true;setHs(gm.id,1);}}
+    const left=cols.reduce((a,c)=>a+c.length,0);
+    if(left===0){over=true;setHs(gm.id,1);setStatus('🎉 Win! • Best: '+hs(gm.id));}
+    else if(!stock.length&&!cols.some(c=>c.length&&Math.abs(c[c.length-1].v-waste.v)===1)){setStatus(left+' left • 😕 No moves — tap New Game. • Best: '+hs(gm.id));}
+    else setStatus(left+' cards left • Best: '+hs(gm.id));}
   function play(i){if(over||!cols[i].length)return;const c=cols[i][cols[i].length-1];if(Math.abs(c.v-waste.v)===1){waste=cols[i].pop();draw();}}
   nb.onclick=reset;reset();return{stop:()=>{}};}
 
@@ -471,7 +474,14 @@ function game_pyramid(gm){setHint('Remove pairs of free cards that add up to 13 
     if(free(r,c)){f.style.cursor='pointer';if(sel&&sel.r===r&&sel.c===c)f.style.outline='3px solid #fd5';f.onclick=()=>pick(r,c);}else f.style.filter='brightness(.6)';board.append(f);}
     stockEl.innerHTML='';if(stock.length){const s=cardFace(stock[0],false);s.style.cursor='pointer';s.onclick=()=>{waste=stock.pop();sel=null;draw();};stockEl.append(s);}else stockEl.append(el('div',{style:'width:46px;height:64px;border:2px dashed var(--border);border-radius:7px'}));
     wasteEl.innerHTML='';if(waste){const w=cardFace(waste);w.style.cursor='pointer';if(sel&&sel.w)w.style.outline='3px solid #fd5';w.onclick=()=>{if(waste.v===13){waste=null;}else sel=sel&&sel.w?null:{w:true};draw();};wasteEl.append(w);}
-    const left=rows.flat().filter(t=>!t.gone).length;setStatus(left+' left'+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0){over=true;setHs(gm.id,1);}}
+    const left=rows.flat().filter(t=>!t.gone).length;
+    if(left===0){over=true;setHs(gm.id,1);setStatus('🎉 Win! • Best: '+hs(gm.id));}
+    else if(!stock.length&&!hasPyMove()){setStatus(left+' left • 😕 No moves — tap New Game. • Best: '+hs(gm.id));}
+    else setStatus(left+' left • Best: '+hs(gm.id));}
+  function hasPyMove(){const fs=[];for(let r=0;r<7;r++)for(let c=0;c<=r;c++)if(free(r,c))fs.push(rows[r][c].c.v);
+    if(fs.some(v=>v===13))return true;if(waste&&waste.v===13)return true;
+    for(let a=0;a<fs.length;a++){if(waste&&fs[a]+waste.v===13)return true;for(let b=a+1;b<fs.length;b++)if(fs[a]+fs[b]===13)return true;}
+    return false;}
   function pick(r,c){const t=rows[r][c];if(t.c.v===13){t.gone=true;sel=null;draw();return;}
     if(sel){let other=sel.w?waste:rows[sel.r][sel.c].c;if(other&&other.v+t.c.v===13){t.gone=true;if(sel.w)waste=null;else rows[sel.r][sel.c].gone=true;sel=null;draw();return;}sel=null;}
     sel={r,c};draw();}
@@ -496,7 +506,10 @@ function game_tripeaks(gm){setHint('Clear the cards by playing any face-up card 
     if(playable(t)){f.style.cursor='pointer';f.onclick=()=>play(t);}board.append(f);});
     stockEl.innerHTML='';if(stock.length){const s=cardFace(stock[0],false);s.style.cursor='pointer';s.onclick=()=>{waste=stock.pop();draw();};stockEl.append(s);}else stockEl.append(el('div',{style:'width:46px;height:64px;border:2px dashed var(--border);border-radius:7px'}));
     wasteEl.innerHTML='';wasteEl.append(cardFace(waste));
-    const left=cards.filter(t=>!t.gone).length;setStatus(left+' left'+(left===0?' — 🎉 Win!':'')+' • Best: '+hs(gm.id));if(left===0){over=true;setHs(gm.id,1);}}
+    const left=cards.filter(t=>!t.gone).length;
+    if(left===0){over=true;setHs(gm.id,1);setStatus('🎉 Win! • Best: '+hs(gm.id));}
+    else if(!stock.length&&!cards.some(t=>playable(t)&&adj(t.card.v,waste.v))){setStatus(left+' left • 😕 No moves — tap New Game. • Best: '+hs(gm.id));}
+    else setStatus(left+' left • Best: '+hs(gm.id));}
   function adj(a,b){const d=Math.abs(a-b);return d===1||d===12;}
   function play(t){if(over||!playable(t))return;if(adj(t.card.v,waste.v)){waste=t.card;t.gone=true;draw();}}
   nb.onclick=reset;reset();return{stop:()=>{}};}
@@ -513,7 +526,9 @@ function game_acesup(gm){setHint('Deal 4 cards. Discard a card if a higher card 
   function draw(){cE.forEach((ce,i)=>{ce.innerHTML='';piles[i].forEach((c,j)=>{const last=j===piles[i].length-1;const f=cardFace(c);f.style.marginTop=j?'-50px':'0';f.style.position='relative';if(last){f.style.cursor='pointer';if(sel===i)f.style.outline='3px solid #fd5';f.onclick=()=>click(i);}ce.append(f);});if(!piles[i].length){const e=el('div',{style:'width:52px;height:72px;border:2px dashed var(--border);border-radius:7px;cursor:pointer'});e.onclick=()=>click(i);ce.append(e);}});
     const tops=piles.map(p=>p[p.length-1]).filter(Boolean);const aces=tops.filter(c=>c.r==='A').length;const total=piles.reduce((a,p)=>a+p.length,0);
     if(total===4&&aces===4){over=true;msg.textContent='🎉 You win — only Aces left!';setHs(gm.id,1);}
+    else if(!over&&stock.length===0&&!hasAcesMove())msg.textContent='😕 No moves left — tap New Game to redeal.';
     setStatus('Cards left: '+total+' • Stock: '+stock.length+' • Best: '+hs(gm.id));dealB.disabled=stock.length===0;}
+  function hasAcesMove(){for(let i=0;i<4;i++)if(piles[i].length&&canDiscard(i))return true;return piles.some(p=>!p.length)&&piles.some(p=>p.length>1);}
   function canDiscard(i){const c=piles[i][piles[i].length-1];if(!c)return false;return piles.some((p,j)=>{if(j===i||!p.length)return false;const t=p[p.length-1];return t.s===c.s&&rv(t)>rv(c);});}
   function click(i){if(over)return;if(!piles[i].length){if(sel>=0&&piles[sel].length>1){piles[i].push(piles[sel].pop());sel=-1;draw();}else sel=-1;return;}
     if(canDiscard(i)){piles[i].pop();draw();return;}sel=sel===i?-1:i;draw();}
@@ -776,7 +791,7 @@ function game_cardladder(gm){setHint('Tap the cards in order from LOWEST to HIGH
 function fit(){pend=false;var st=document.getElementById('stage');if(!st||st.style.display==='none')return;
  host.style.transformOrigin='top center';
  host.style.transform='';host.style.height='';var avail=host.clientWidth,need=host.scrollWidth;var hr0=host.getBoundingClientRect(),L0=hr0.left,R0=hr0.right,ch=host.getElementsByTagName("*");for(var ci=0;ci<ch.length;ci++){var rr=ch[ci].getBoundingClientRect();if(rr.width>0&&rr.height>0){if(rr.left<L0)L0=rr.left;if(rr.right>R0)R0=rr.right;}}var cx0=(hr0.left+hr0.right)/2,he0=Math.max(R0-cx0,cx0-L0);if(2*he0>need)need=2*he0;
- var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,sc=Math.min(avail/need,availH/needH,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
+ var availH=window.innerHeight-host.getBoundingClientRect().top-52,needH=host.scrollHeight,hasCv=host.getElementsByTagName('canvas').length>0,sc=hasCv?Math.min(avail/need,availH/needH,1):Math.min(avail/need,1);var uz=window.__uz||1,fin=sc*uz;if(Math.abs(fin-1)>0.005){host.style.transform='scale('+fin+')';host.style.height=(needH*fin)+'px';}else{host.style.transform='';host.style.height='';}}
 function sched(){if(pend)return;pend=true;requestAnimationFrame(fit);}
 try{new MutationObserver(sched).observe(host,{childList:true,subtree:true});}catch(e){}
 window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);setInterval(sched,140);setTimeout(sched,50);setTimeout(sched,150);setTimeout(sched,350);})();
