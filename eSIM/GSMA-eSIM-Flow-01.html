@@ -263,14 +263,14 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <!-- CDN dependencies: jsQR (~12KB) for QR scanning, qrcodejs (~15KB) for QR generation.
      If these fail to load, QR tools degrade gracefully (individual tools show their own error messages).
      To enable full offline: inline these scripts by fetching and embedding their contents here. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.2</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V2.4</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -291,7 +291,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
     <button type="button" class="tbtn" data-t="m2m" role="tab" id="tab-m2m" aria-selected="false">SGP.01 / .02 &mdash; M2M</button>
     <button type="button" class="tbtn" data-t="consumer" role="tab" id="tab-consumer" aria-selected="false">SGP.21 / .22 &mdash; Consumer</button>
     <button type="button" class="tbtn" data-t="iot" role="tab" id="tab-iot" aria-selected="false">SGP.31 / .32 &mdash; IoT</button>
-    <button type="button" class="tbtn" data-t="ifpp" role="tab" id="tab-ifpp" aria-selected="false">SGP.41 / .42 &mdash; IFPP</button>
+    <button type="button" class="tbtn" data-t="ifpp" role="tab" id="tab-ifpp" aria-selected="false">SGP.41 &mdash; IFPP</button>
     <button type="button" class="tbtn" data-t="troubleshoot" role="tab" id="tab-troubleshoot" aria-selected="false">Troubleshooting</button>
     <button type="button" class="tbtn" data-t="quickref" role="tab" id="tab-quickref" aria-selected="false">Quick Reference</button>
     <button type="button" class="tbtn" data-t="tools-id" role="tab" id="tab-tools-id" aria-selected="false">Tools &mdash; Identifiers</button>
@@ -317,10 +317,10 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 // Format: 'SGP.XX': 'vX.X' or 'vX.X (qualifier)'
 const SPEC_VERSIONS = {
   'SGP.01':'v4.3','SGP.02':'v4.3','SGP.08':'v1.4','SGP.11':'v4.2.2',
-  'SGP.16':'v1.5','SGP.21':'v3.1','SGP.22':'v3.1','SGP.22_v2':'v2.7',
-  'SGP.23':'v3.1','SGP.24':'v2.6.1 / v3.2.1','SGP.25':'v1.0','SGP.26':'v3.0.2',
+  'SGP.16':'v1.5','SGP.21':'v2.7 / v3.1','SGP.22':'v3.1','SGP.22_v2':'v2.7',
+  'SGP.23':'v1.16 / v3.1.x','SGP.24':'v2.6.1 / v3.2.1','SGP.25':'v1.0','SGP.26':'v3.0.2',
   'SGP.29':'v1.1','SGP.31':'v1.3','SGP.32':'v1.3','SGP.33':'v1.2',
-  'SGP.41':'v1.0 (verify current GSMA resource)','SGP.42':'source-verification needed','FS.18':'\u2014'
+  'SGP.41':'v1.0','IFPP_NOTE':'SGP.41 public IFPP architecture; no public SGP.42 listing found on the GSMA spec page during the July 2026 review','FS.18':'\u2014'
 };
 
 // ── 2. Entity Colors ──
@@ -436,17 +436,17 @@ consumer:{badge:'SGP.21 '+SPEC_VERSIONS['SGP.21']+' / SGP.22 '+SPEC_VERSIONS['SG
 whatsNew:'v3.x introduced MEP (Multiple Enabled Profiles) \u2014 multiple profiles active simultaneously on different eSIM ports. Added ES10d interface for MEP port management. Enhanced profile metadata. Improved notification handling.',
 overview:['SGP.21 and SGP.22 define the Consumer RSP architecture \u2014 the eSIM system used in smartphones, tablets, wearables, and laptops. Unlike M2M, the Consumer architecture introduces a \u201cpull\u201d model where the end-user (via a Local Profile Assistant \u2014 LPA) initiates the profile download. The LPA is a software component on the device that serves as the user interface and orchestration layer between the eUICC and the backend servers.','The architecture replaces the SM-SR with the SM-DP+ (SM-DP Enhanced), which combines both data preparation and secure delivery functions. The SM-DP+ prepares Bound Profile Packages (BPPs) that are cryptographically bound to a specific eUICC using a mutual authentication process. A separate optional entity, the SM-DS (Subscription Manager \u2013 Discovery Server), acts as a rendezvous point \u2014 it allows SM-DP+ servers to register \u201cevents\u201d that the LPA can discover.','Two primary download paths exist. The Activation Code path is the most common: the user receives an Activation Code (often as a QR code) containing the SM-DP+ address and a matching ID. The LPA contacts the SM-DP+ directly. The Discovery Server path uses the SM-DS: the SM-DP+ registers a pending download event, the LPA polls the SM-DS, discovers the event, and then contacts the SM-DP+ to complete download. Both paths end with the same mutual authentication and profile binding procedure defined in ES9+ and ES10x interfaces.','Profile preparation is a prerequisite: the Operator uses the ES2+ interface to order profile downloads on the SM-DP+, providing ICCID, IMSI, and other subscription data. The SM-DP+ generates the profile and waits for the eUICC to connect. SGP.22 v3.0+ introduced significant enhancements including eSIM on MEP (Multiple Enabled Profiles), profile metadata improvements, and enhanced notification mechanisms.','<b>Two-Stage Process:</b> A key architectural principle of SGP.22 is the separation of profile preparation and profile download as two independent flows. Profile preparation (ES2+) happens between the Operator and SM-DP+ \u2014 this is when the profile data is created and staged. Profile download happens between the device (LPA) and SM-DP+ \u2014 this is when the eUICC authenticates, receives the BPP, and installs it. These two stages are decoupled: a profile can be prepared days or weeks before the user initiates download.','<b>Three Spec-Defined Provisioning Paths:</b> In addition to the Activation Code and Discovery Server paths, SGP.22 also defines a <b>Default SM-DP+</b> as a third provisioning mechanism. The LPA can be configured with a default SM-DP+ address (e.g., by the device OEM or carrier) and periodically poll it for available profiles. This enables push-like provisioning without requiring the user to scan a QR code or manually enter an Activation Code.','<b>Beyond Spec:</b> Other provisioning mechanisms exist in practice \u2014 such as MDM (Mobile Device Management) managed provisioning and on-device carrier apps \u2014 but these are implementation-specific and beyond the current scope of GSMA specifications. MDM-based provisioning typically uses the Activation Code path under the hood, with the MDM server delivering the AC payload to the device.','<b>Deployment Examples (illustrative):</b> Smartphones, tablets, wearables, and laptops commonly use Consumer RSP. QR-code onboarding typically uses the Activation Code path; carrier apps, device enrollment, and OEM flows may use Activation Code, Discovery Server, default SM-DP+, or implementation-specific mechanisms. Device, OS, carrier, and vendor support varies and should be verified for the target deployment.'],
 entities:['Operator','SM-DP+','SM-DS','LPA (Device)','eUICC'],
-flows:{'consumer-prep':'Profile Preparation (ES2+)','consumer-ac':'Download \u2014 Activation Code','consumer-ds':'Download \u2014 Discovery Server','consumer-enable':'Enable','consumer-disable':'Disable','consumer-delete':'Profile Delete','consumer-mep':'MEP \u2014 Multi-Port Enable (v3.x)'}},
+flows:{'consumer-prep':'Profile Preparation (ES2+)','consumer-ac':'Download \u2014 Activation Code','consumer-ds':'Download \u2014 Discovery Server','consumer-default-smdp':'Download \u2014 Default SM-DP+','consumer-enable':'Enable','consumer-disable':'Disable','consumer-delete':'Profile Delete','consumer-mep':'MEP \u2014 Multi-Port Enable (v3.x)'}},
 
 iot:{badge:'SGP.31 '+SPEC_VERSIONS['SGP.31']+' / SGP.32 '+SPEC_VERSIONS['SGP.32'],title:'IoT eSIM Architecture',
 whatsNew:'GSMA public listings now show SGP.31 v1.3 and SGP.32 v1.3 active, published 22 May 2026. Use those listings for implementation planning and verify detailed technical behavior against the current GSMA documents.',
 overview:['SGP.31 and SGP.32 define the IoT RSP architecture for eSIM profile management across a broad range of IoT device categories, from capable connected vehicles to constrained sensors. This architecture is designed to address many operational challenges seen in M2M deployments, including bearer constraints, SM-SR complexity, and multi-hop latency, while supporting a wider IoT deployment spectrum.','The architecture introduces the <b>eIM (eSIM IoT Remote Manager)</b> \u2014 a management platform that acts on behalf of the device owner or IoT service provider. The eIM orchestrates profile lifecycle operations (download, enable, disable, delete) without requiring an LPA on the device. The device runs an <b>IPA (IoT Profile Assistant)</b> that handles local eUICC interaction. Two IPA variants exist: <b>IPAd</b> (IPA in Device) runs as software on the IoT device itself, and <b>IPAe</b> (IPA embedded in eUICC) is a software component within the eUICC that performs IPA functions internally for constrained devices.','<b>Direct Mode:</b> The eIM delivers pre-encrypted profiles directly to the IPA on the device via the ESeim interface. The SM-DP+ generates and encrypts the BPP bound to the target eUICC, then delivers it to the eIM. The eIM stores and delivers it to the IPA when the device is reachable. This mode is suitable for capable devices where the eIM has direct connectivity.','<b>Indirect Mode:</b> Originally introduced to handle constrained devices, but now broadly favored for practical reasons. The IPA connects to the SM-DP+ (similar to the Consumer model) with the eIM orchestrating the operation. The eIM triggers the IPA to download from the SM-DP+, and the IPA performs the authentication and BPP retrieval directly with the SM-DP+. IPAe (embedded IPA in the eUICC) implementations typically use Indirect Mode, allowing the eUICC itself to handle the download without requiring device-side software complexity.','The architecture supports both IP and non-IP transport, and operations can be performed over protocols like CoAP, MQTT, or SMS. This flexibility allows SGP.32 to serve devices across the connectivity spectrum \u2014 from NB-IoT modules to LTE-M gateways to Wi-Fi connected industrial equipment.','<b>Prerequisite \u2014 eIM Configuration:</b> Before any eIM-based flow works, the eUICC must be configured to trust the eIM. This is done via <code>ESeim.ConfigureEim</code>, typically during eUICC manufacturing or via an initial bootstrap process. The eUICC stores a list of authorized eIM identifiers and will reject commands from unrecognized eIMs. This trust bootstrap is a critical deployment step \u2014 without it, neither Direct nor Indirect mode operations will succeed.','<b>Deployment Examples (illustrative):</b> Candidate use cases include connected vehicles, smart meters and utilities, industrial equipment, asset trackers, smart agriculture, consumer IoT devices, and constrained sensors. The choice between Direct and Indirect mode depends on deployment requirements, device capabilities, certification status, and connectivity patterns rather than device \u201cconstrainedness\u201d alone.'],
 entities:['Operator','SM-DP+','SM-DS','eIM','IPAd','IPAe','eUICC (IoT)'],
-flows:{'iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
+flows:{'iot-eim-config':'eIM Configuration Prerequisite','iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
 
-ifpp:{badge:'SGP.41 '+SPEC_VERSIONS['SGP.41']+' / SGP.42 '+SPEC_VERSIONS['SGP.42'],title:'In-Factory Profile Provisioning (IFPP)',
-whatsNew:'SGP.41 architecture/requirements are public but may require direct GSMA resource access; SGP.42 technical details remain source-verification-needed for this page.',
-overview:['SGP.41 and SGP.42 define the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 covers architecture and requirements; the SGP.42 technical specification status, version, and implementation details should be verified against current GSMA source pages before relying on this page for implementation planning.','IFPP addresses a manufacturing provisioning use case in the eSIM ecosystem. With online SGP.22 and SGP.32 provisioning flows, profile download commonly requires a connection to the SM-DP+ and multiple round-trip exchanges, which can introduce delays and complexity on factory floors where production speed is important. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The intended security model keeps a pre-generated BPP cryptographically bound to a specific eUICC; exact controls and assurance claims should be verified against current SGP.41/SGP.42 text and vendor implementation guidance.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Because SGP.42 technical details are source-verification-needed for this page, the flows below are conceptual and based on the SGP.41 architectural framework. Update them against the current technical specification before using as an implementation checklist.','<b>Deployment Examples (illustrative):</b> Consumer bootstrap-profile installation, smart meters, automotive modules, and global IoT devices are example IFPP use cases. Treat these as illustrative, not claims about specific vendor, operator, or production deployment. Late Binding examples are conceptual until verified against current SGP.42 text and implementation guidance.'],
+ifpp:{badge:'SGP.41 '+SPEC_VERSIONS['SGP.41'],title:'In-Factory Profile Provisioning (IFPP)',
+whatsNew:'GSMA public materials identify SGP.41 v1.0 as the IFPP architecture and requirements reference. No public SGP.42 listing was found in the current GSMA specification page during the July 2026 review, so implementation details here are treated as conceptual and source-verification-needed.',
+overview:['SGP.41 defines the In-Factory Profile Provisioning (IFPP) framework \u2014 a standardized method for loading eSIM profiles onto eUICCs during device manufacturing, before the device ships to the end customer. SGP.41 covers architecture and requirements; this page does not claim a public SGP.42 technical specification because no public SGP.42 entry was found in the current GSMA specification listing during this review.','IFPP addresses a manufacturing provisioning use case in the eSIM ecosystem. With online SGP.22 and SGP.32 provisioning flows, profile download commonly requires a connection to the SM-DP+ and multiple round-trip exchanges, which can introduce delays and complexity on factory floors where production speed is important. IFPP allows a manufacturer to securely install Bound Profile Packages (BPPs) onto eUICCs during production \u2014 either at the eUICC manufacturing stage or during device assembly \u2014 without requiring a live connection to the SM-DP+ at the moment of installation.','The architecture introduces new entities and concepts. The Profile Provider (typically the SM-DP+) prepares BPPs in advance and delivers them to a Factory System. The Factory System \u2014 operating within a controlled, secure environment \u2014 loads these pre-prepared BPPs onto eUICCs using a local interface. The intended security model keeps a pre-generated BPP cryptographically bound to a specific eUICC; exact controls and assurance claims should be verified against current SGP.41 text and vendor implementation guidance.','Key use cases include smart meters (which may have no power or connectivity after deployment), automotive modules (where factory line speed is critical), and global IoT devices (where the target operator may depend on the shipping destination, determined at the last moment during configuration). IFPP can work alongside SGP.32 \u2014 a device can be provisioned with an initial profile via IFPP in the factory, and later managed remotely via SGP.32 eIM operations in the field.','Note: Because IFPP technical implementation details beyond the public SGP.41 architecture are source-verification-needed for this page, the flows below are conceptual and based on the SGP.41 architectural framework. Update them against the current technical specification before using as an implementation checklist.','<b>Deployment Examples (illustrative):</b> Consumer bootstrap-profile installation, smart meters, automotive modules, and global IoT devices are example IFPP use cases. Treat these as illustrative, not claims about specific vendor, operator, or production deployment. Late Binding examples are conceptual until verified against current SGP.41 text and implementation guidance.'],
 entities:['Operator','SM-DP+ (Profile Provider)','Factory System','eUICC'],
 flows:{'ifpp-prep':'Profile Preparation for Factory','ifpp-install':'Factory Installation','ifpp-late-binding':'Late Binding \u2014 Configuration-Time Provisioning'}}
 };
@@ -572,6 +572,17 @@ const FL={
 {f:2,t:0,n:'\u2197 Continues with Activation Code flow (ES9+.InitiateAuthentication onward)',a:[['Next','LPA contacts SM-DP+ from event'],['Flow','Same as Activation Code from ES9+.InitiateAuthentication onward']],d:'This is not a protocol message. From this point, the flow is identical to the Activation Code download path starting from ES9+.InitiateAuthentication. See the \u201cDownload \u2014 Activation Code\u201d flow tab.',xref:true}
 ]},
 
+
+'consumer-default-smdp':{nodes:['Default SM-DP+|Configured RSP Server','LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','Operator|MNO / MVNO'],steps:[
+{f:1,t:2,n:'ES10a.GetEUICCInfo1',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'The LPA retrieves eUICC capabilities before contacting the configured Default SM-DP+. This is the same compatibility pre-check used by Activation Code and Discovery Server paths.'},
+{f:2,t:1,n:'ES10a.GetEUICCInfo1 Response',a:[['euiccInfo1','Basic capabilities'],['CI PKIDs','Trusted certificate issuers']],d:'The eUICC returns the information the LPA needs for the initial SM-DP+ authentication request.'},
+{f:1,t:0,n:'Default SM-DP+ Lookup / ES9+.InitiateAuthentication',a:[['defaultSmdpAddress','Preconfigured by OEM, carrier, enterprise policy, or device software'],['euiccChallenge','Challenge from eUICC'],['euiccInfo1','eUICC capabilities']],d:'Instead of scanning an Activation Code or querying SM-DS, the LPA contacts its configured Default SM-DP+ address and starts the normal ES9+ authentication sequence.'},
+{f:0,t:1,n:'ES9+.InitiateAuthentication Response',a:[['serverSigned1','Server-signed data'],['serverCertificate','Default SM-DP+ certificate chain'],['profile context','Profile availability if one is staged']],d:'The Default SM-DP+ authenticates as an SM-DP+ and indicates whether a profile is available for this eUICC. If no eligible profile is staged, the LPA stops cleanly and can retry later according to device policy.'},
+{f:1,t:2,n:'ES10b.AuthenticateServer',a:[['serverSigned1','SM-DP+ signed data'],['serverCertificate','Certificate chain']],d:'The LPA passes server authentication material to the eUICC for verification against its trusted CI list.'},
+{f:2,t:1,n:'ES10b.AuthenticateServer Response',a:[['euiccSigned1','eUICC signed data'],['euiccCertificate','eUICC certificate chain']],d:'The eUICC authenticates the server and returns client authentication material.'},
+{f:1,t:0,n:'ES9+.AuthenticateClient',a:[['euiccSigned1','eUICC authentication data'],['euiccCertificate','eUICC certificate chain']],d:'The LPA forwards eUICC credentials to the Default SM-DP+. From this point, successful profile download follows the same AuthenticateClient, user consent, PrepareDownload, GetBoundProfilePackage, LoadBoundProfilePackage, and notification sequence as the Activation Code flow.'},
+{f:0,t:3,n:'Operator Status / Notification',a:[['Result','Profile downloaded or no profile available'],['EID / ICCID','Identifiers when applicable']],d:'When a profile is installed, the SM-DP+ and Operator receive the normal install notification path. Default SM-DP+ is therefore a different discovery/entry mechanism, not a different profile-binding protocol.',xref:true}
+]},
 'consumer-enable':{nodes:['LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','SM-DP+|Data Preparation+'],steps:[
 {f:0,t:1,n:'ES10c.EnableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends the ES10c enable command. On pre-MEP eUICCs, enabling one profile normally disables the currently enabled profile.'},
 {f:1,t:1,n:'Profile Switch (Internal)',a:[['Disable current','Active profile set to disabled'],['Enable target','Requested profile set to enabled'],['REFRESH','Proactive command to modem']],d:'eUICC performs the switch. Only one profile active at a time (pre-MEP). REFRESH notifies baseband.'},
@@ -603,6 +614,14 @@ const FL={
 ]},
 
 /* ── IoT Flows ── */
+'iot-eim-config':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)','Operator|MNO / MVNO'],steps:[
+{f:3,t:0,n:'Authorize eIM for Device Fleet',a:[['EID list','Target eUICCs'],['eIM identifier','Remote manager identity'],['Policy','Which operations the eIM may trigger']],d:'Before SGP.32 lifecycle operations work, the deployment must establish which eIM is authorized to manage each eUICC. This may be done during manufacturing, bootstrap provisioning, or a controlled field update.'},
+{f:0,t:1,n:'ESeim.ConfigureEim Request',a:[['eIM configuration','eIM ID, endpoint, certificate/trust data'],['scope','Allowed operations and validity'],['transactionId','Configuration tracking']],d:'The eIM sends configuration data to the IPA over the selected transport. The transport and packaging are deployment-specific, but the purpose is to place trusted eIM configuration on the target eUICC.'},
+{f:1,t:2,n:'ES10b.LoadEuiccPackage (Configure eIM)',a:[['signed eUICC package','Configuration command set'],['eIM authorization','Signature / trust proof'],['replay protection','Fresh command instance']],d:'The IPA forwards the signed configuration package to the eUICC. The eUICC verifies authorization, target binding, and replay protection before storing the eIM configuration.'},
+{f:2,t:2,n:'Store eIM Configuration (Internal)',a:[['trusted eIM','Identifier and trust material'],['policy','Permitted profile lifecycle operations']],d:'The eUICC stores the authorized eIM configuration. Later Download, Enable, Disable, and Delete packages from unknown or unauthorized eIMs are rejected.'},
+{f:2,t:1,n:'ConfigureEim Result',a:[['resultCode','Success / failure'],['diagnostics','Reason if rejected']],d:'The eUICC returns the package execution result to the IPA.'},
+{f:1,t:0,n:'ESeim.ConfigureEim Result',a:[['resultCode','Configuration outcome'],['EID','Configured eUICC']],d:'The IPA reports the result to the eIM. A successful result is the prerequisite for the subsequent Direct or Indirect IoT profile-management flows.'}
+]},
 'iot-direct-download':{nodes:['Operator|MNO / MVNO','SM-DP+|Data Preparation+','eIM|IoT Remote Manager','IPAd|IPA in Device','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
 {f:0,t:1,n:'ES2+.DownloadOrder',a:[['EID','Target eUICC'],['Profile Data','Subscription credentials'],['Service Config','APN, QoS, network slice']],d:'Operator orders a profile from the SM-DP+ for the target eUICC, providing the EID and subscription data.'},
 {f:1,t:1,n:'BPP / eUICC Package Preparation',a:[['boundProfilePackage','Encrypted package for target EID'],['Profile Metadata','Operator, profile class']],d:'SM-DP+ prepares profile material protected for the target eUICC. In IoT RSP, delivery may be direct through the eIM or indirect through the IPA contacting SM-DP+; exact package wrapping depends on IPAd/IPAe mode and SGP.32 deployment choices.'},
@@ -790,7 +809,7 @@ const GLOSSARY=[
 {term:'LPA',def:'Local Profile Assistant \u2014 software on the device that manages eUICC operations and provides the user interface. Has three sub-components: LPAd (in device), LPAe (in eUICC), LUIe (UI in eUICC).',spec:'SGP.22'},
 {term:'eIM',def:'eSIM IoT Remote Manager \u2014 management platform for IoT eUICC lifecycle operations. Enables remote orchestration without a Consumer-style LPA on the device.',spec:'SGP.32'},
 {term:'IPA (IPAd / IPAe)',def:'IoT Profile Assistant \u2014 lightweight component that handles eUICC interaction in IoT RSP. IPAd runs on the IoT device itself. IPAe (IPA embedded in eUICC) is a software component within the eUICC itself that performs IPA functions internally — used for constrained devices that cannot host IPA as device-side software. Both variants perform the same functions.',spec:'SGP.32'},
-{term:'IFPP',def:'In-Factory Profile Provisioning \u2014 loading eSIM profiles during device manufacturing, before deployment.',spec:'SGP.41/42'},
+{term:'IFPP',def:'In-Factory Profile Provisioning \u2014 loading eSIM profiles during device manufacturing, before deployment.',spec:'SGP.41'},
 {term:'Activation Code',def:'A string containing the SM-DP+ address and matchingId, used to initiate profile download. Format: 1$<smdpAddress>$<matchingId> (optionally with OID and confirmation code). Often delivered as a QR code.',spec:'SGP.22'},
 {term:'CI',def:'Certificate Issuer \u2014 a root of trust for the eSIM PKI. Issues certificates to SM-DP+, SM-DS, and eUICC. Verify the applicable CI and certificate chain for each production or test environment.',spec:'SGP.22'},
 {term:'PPR',def:'Profile Policy Rules \u2014 rules embedded in a profile that control what the user/LPA can do with it (e.g., disabling consent required, deletion not allowed).',spec:'SGP.22'},
@@ -803,9 +822,9 @@ const GLOSSARY=[
 {term:'ES10d',def:'The LPA \u2194 eUICC interface for MEP (Multiple Enabled Profiles) port management, introduced in SGP.22 v3.x. Key operations: GetSIMSlotMapping (query current port-to-profile mapping) and SetSIMSlotMapping (change the mapping to enable profiles on specific eSIM ports).',spec:'SGP.22 v3.x'},
 {term:'euiccInfo1',def:'A data structure retrieved via ES10a.GetEUICCInfo1 before mutual authentication begins. Contains basic eUICC capabilities: supported spec version (svn), CI PKIDs trusted for verification and signing. Used by the LPA to initiate authentication with the correct parameters.',spec:'SGP.22'},
 {term:'euiccInfo2',def:'A data structure retrieved via ES10b during authentication (inside AuthenticateServer). Contains detailed eUICC information: free non-volatile memory, firmware version, installed profile count, PPR capabilities, extCardResource, and more. Richer than euiccInfo1 and only available after the authentication context is established.',spec:'SGP.22'},
-{term:'Factory System',def:'A controlled manufacturing environment that receives pre-generated Bound Profile Packages (BPPs) from the SM-DP+ and installs them onto eUICCs via a local wired interface during device production. Operates within a secure facility with physical and logical access controls.',spec:'SGP.41/42'},
-{term:'Profile Provider',def:'In the IFPP context, the entity (typically the SM-DP+) that prepares BPPs in advance and delivers them to the Factory System for local installation. The Profile Provider generates and cryptographically binds BPPs to target eUICCs before they are physically present on the production line.',spec:'SGP.41/42'},
-{term:'Late Binding',def:'An IFPP provisioning model where the target operator and profile type are determined at the last possible moment during device manufacturing or configuration, rather than being predetermined. Enables a single manufacturing flow for global products where the shipping destination determines the operator.',spec:'SGP.41/42'}
+{term:'Factory System',def:'A controlled manufacturing environment that receives pre-generated Bound Profile Packages (BPPs) from the SM-DP+ and installs them onto eUICCs via a local wired interface during device production. Operates within a secure facility with physical and logical access controls.',spec:'SGP.41'},
+{term:'Profile Provider',def:'In the IFPP context, the entity (typically the SM-DP+) that prepares BPPs in advance and delivers them to the Factory System for local installation. The Profile Provider generates and cryptographically binds BPPs to target eUICCs before they are physically present on the production line.',spec:'SGP.41'},
+{term:'Late Binding',def:'An IFPP provisioning model where the target operator and profile type are determined at the last possible moment during device manufacturing or configuration, rather than being predetermined. Enables a single manufacturing flow for global products where the shipping destination determines the operator.',spec:'SGP.41'}
 ];
 
 /* ═══════════════════════════════════════════
@@ -1180,7 +1199,7 @@ function diagHTML(fid){
   var isIfpp=fid.indexOf('ifpp')===0;
   var nodes=parseNodes(fl),nc=nodes.length,step=gs(fid),total=fl.steps.length;
   var h='';
-  if(isIfpp)h+='<div style="padding:10px 16px;margin-bottom:10px;background:rgba(217,119,6,.1);border:1px solid #D97706;border-radius:8px;font-size:12px;color:#92400E;font-weight:600">\u26A0 Source-verification needed: SGP.42 implementation details should be checked against current GSMA publications. These flow steps are conceptual and may change.</div>';
+  if(isIfpp)h+='<div style="padding:10px 16px;margin-bottom:10px;background:rgba(217,119,6,.1);border:1px solid #D97706;border-radius:8px;font-size:12px;color:#92400E;font-weight:600">\u26A0 Source-verification needed: IFPP implementation details beyond SGP.41 should be checked against current GSMA publications. These flow steps are conceptual and may change.</div>';
   h+='<div class="dbox" id="dx-'+fid+'">';
   h+='<div class="dctrl">';
   h+='<button type="button" class="cbtn" data-a="reset" data-f="'+fid+'">\u23EE Reset</button>';
@@ -1325,14 +1344,14 @@ function esim101HTML(){
   h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'m2m\',null,0)">M2M (SGP.01/.02)</th>';
   h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'consumer\',null,0)">Consumer (SGP.21/.22)</th>';
   h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'iot\',null,0)">IoT (SGP.31/.32)</th>';
-  h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'ifpp\',null,0)">IFPP (SGP.41/.42)</th>';
+  h+='<th style="cursor:pointer;color:var(--mag)" onclick="jumpToFlow(\'ifpp\',null,0)">IFPP (SGP.41)</th>';
   h+='</tr></thead><tbody>';
   h+='<tr><td style="font-weight:700">Device type</td><td>Unattended devices (vehicles, meters, vending, industrial modules)</td><td>Smartphones, tablets, wearables, laptops</td><td>Broad IoT range \u2014 from constrained sensors to connected vehicles</td><td>Devices manufactured with eUICC where factory provisioning is required</td></tr>';
   h+='<tr><td style="font-weight:700">User interaction</td><td>None</td><td>Typically user-mediated through LPA UI and consent; enterprise/OEM flows vary</td><td>None for device user; eIM manages remotely</td><td>None for device user; factory process</td></tr>';
   h+='<tr><td style="font-weight:700">Provisioning model</td><td>Push (network-initiated via SM-SR)</td><td>Pull (device-initiated via LPA)</td><td>Both (Direct = push, Indirect = pull)</td><td>Local (factory wired interface)</td></tr>';
   h+='<tr><td style="font-weight:700">Key backend entity</td><td>SM-DP + SM-SR</td><td>SM-DP+</td><td>SM-DP+ + eIM</td><td>SM-DP+ + Factory System</td></tr>';
   h+='<tr><td style="font-weight:700">Connectivity at install</td><td>Yes (SMS/IP)</td><td>Yes (HTTPS)</td><td>Yes (IP/CoAP/MQTT/SMS)</td><td>No for local install path</td></tr>';
-  h+='<tr><td style="font-weight:700">Spec status</td><td>Established; active SGP.01/02 v4.3 in GSMA public listings</td><td>Established/evolving; active SGP.22 v2.7 and v3.1 tracks</td><td>Active IoT v1.3 track in GSMA public listings</td><td>SGP.41 public resource; SGP.42 source-verification needed</td></tr>';
+  h+='<tr><td style="font-weight:700">Spec status</td><td>Established; active SGP.01/02 v4.3 in GSMA public listings</td><td>Established/evolving; active SGP.22 v2.7 and v3.1 tracks</td><td>Active IoT v1.3 track in GSMA public listings</td><td>SGP.41 public resource; IFPP technical details source-verification needed</td></tr>';
   h+='</tbody></table></div>';
   
   /* Section 3: Terminology Cheat Sheet */
@@ -1379,7 +1398,7 @@ function esim101HTML(){
     {year:'2019',x:380,spec:'SGP.22 v2',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
     {year:'2023',x:525,spec:'SGP.32 v1',label:'IoT RSP',desc:'(illustrative milestone)',color:'#0891B2',tab:'iot'},
     {year:'2023',x:670,spec:'SGP.22 v3',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
-    {year:'2025',x:815,spec:'SGP.41 v1',label:'IFPP',desc:'(source-verify)',color:'#B45309',tab:'ifpp'},
+    {year:'2025',x:815,spec:'SGP.41 v1',label:'IFPP',desc:'(public architecture)',color:'#B45309',tab:'ifpp'},
     {year:'2026',x:940,spec:'SGP.32 v1.3',label:'IoT RSP',desc:'(active GSMA listing)',color:'#0891B2',tab:'iot'}
   ];
   milestones.forEach(function(m){
@@ -1406,7 +1425,7 @@ function esim101HTML(){
   h+='<text x="0" y="40" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2019 \u2014 SGP.22 v2:</tspan> Added Discovery Server path and Confirmation Codes.</text>';
   h+='<text x="0" y="60" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.32:</tspan> IoT RSP architecture with eIM for a broad IoT device range.</text>';
   h+='<text x="0" y="80" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.22 v3:</tspan> Multiple Enabled Profiles (MEP) support.</text>';
-  h+='<text x="0" y="100" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2025 \u2014 SGP.41:</tspan> In-Factory Profile Provisioning for manufacturing lines.</text>';
+  h+='<text x="0" y="100" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2025 \u2014 SGP.41:</tspan> In-Factory Profile Provisioning architecture and requirements for manufacturing lines.</text>';
   h+='<text x="0" y="120" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2026 \u2014 SGP.32 v1.3:</tspan> Active IoT technical specification listed by GSMA as published 22 May 2026.</text>';
   h+='</g>';
   h+='</svg></div>';
@@ -1457,7 +1476,7 @@ function qrHTML(){
   h+='<thead><tr><th></th><th>M2M</th><th>Consumer</th><th>IoT</th><th>IFPP</th></tr></thead><tbody>';
   var sm=[
   ['Architecture','SGP.01','SGP.21','SGP.31','SGP.41'],
-  ['Technical Spec','SGP.02','SGP.22','SGP.32','SGP.42 (source-verify)'],
+  ['Technical Spec','SGP.02','SGP.22','SGP.32','Not public in GSMA listing'],
   ['Test Spec','SGP.11','SGP.23','SGP.33','source-verify'],
   ['Compliance','SGP.16','SGP.24','SGP.24 / current GSMA compliance scope (verify)','source-verify'],
   ['eUICC Security','SGP.08','SGP.25','SGP.25','SGP.25'],
@@ -1488,7 +1507,7 @@ function qrHTML(){
 
   /* Comparison Matrix */
   h+='<div class="asec"><h2>Architecture Comparison Matrix</h2><div class="rtwrap"><table class="rtbl">';
-  h+='<thead><tr><th>Dimension</th><th>M2M (SGP.01/02)</th><th>Consumer (SGP.21/22)</th><th>IoT (SGP.31/32)</th><th>IFPP (SGP.41/42)</th></tr></thead><tbody>';
+  h+='<thead><tr><th>Dimension</th><th>M2M (SGP.01/02)</th><th>Consumer (SGP.21/22)</th><th>IoT (SGP.31/32)</th><th>IFPP (SGP.41)</th></tr></thead><tbody>';
   var mx=[
   ['Model','Push (network-initiated)','Pull (device-initiated)','Both (Direct=push, Indirect=pull)','Factory (local install)'],
   ['Who initiates?','Operator via SM-SR (ES4) or SM-DP-initiated (preloaded profiles)','End user via LPA (scan QR / UI)','eIM (remote manager)','Factory System (manufacturing)'],
@@ -1500,7 +1519,7 @@ function qrHTML(){
   ['Discovery mechanism','N/A (SM-SR knows all eUICCs)','SM-DS or Activation Code','SM-DS or eIM-triggered','N/A (EID known at factory)'],
   ['Typical devices','Connected cars, smart meters, vending machines, industrial modules','Smartphones, tablets, wearables, laptops','LPWAN sensors, NB-IoT modules, constrained IoT','Any device manufactured in a factory with eUICC'],
   ['Connectivity at install?','Yes (SMS/IP)','Yes (HTTPS)','Yes (eIM channel)','No (local interface \u2014 key advantage)'],
-  ['Spec status','Active M2M listings include SGP.01 '+SPEC_VERSIONS['SGP.01']+' and SGP.02 '+SPEC_VERSIONS['SGP.02'],'Active Consumer listings include SGP.22 '+SPEC_VERSIONS['SGP.22_v2']+' and '+SPEC_VERSIONS['SGP.22'],'Active IoT listings include SGP.31 '+SPEC_VERSIONS['SGP.31']+' and SGP.32 '+SPEC_VERSIONS['SGP.32'],'SGP.41 '+SPEC_VERSIONS['SGP.41']+'; SGP.42 '+SPEC_VERSIONS['SGP.42']]
+  ['Spec status','Active M2M listings include SGP.01 '+SPEC_VERSIONS['SGP.01']+' and SGP.02 '+SPEC_VERSIONS['SGP.02'],'Active Consumer listings include SGP.22 '+SPEC_VERSIONS['SGP.22_v2']+' and '+SPEC_VERSIONS['SGP.22'],'Active IoT listings include SGP.31 '+SPEC_VERSIONS['SGP.31']+' and SGP.32 '+SPEC_VERSIONS['SGP.32'],'SGP.41 '+SPEC_VERSIONS['SGP.41']+' public IFPP architecture; implementation details source-verify']
   ];
   mx.forEach(function(r){h+='<tr>';r.forEach(function(c,i){h+=(i===0?'<td style="font-weight:700;white-space:nowrap">':'<td>')+c+'</td>'});h+='</tr>'});
   h+='</tbody></table></div></div>';
@@ -1899,8 +1918,7 @@ function appxHTML(){
       ['SGP.22','RSP Technical Specification (Consumer)',SPEC_VERSIONS['SGP.22']+' (3.x) / '+SPEC_VERSIONS['SGP.22_v2']+' (2.x)','https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/'],
       ['SGP.31','IoT eSIM Architecture',SPEC_VERSIONS['SGP.31'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/'],
       ['SGP.32','IoT eSIM Technical Specification',SPEC_VERSIONS['SGP.32'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/'],
-      ['SGP.41','eSIM IFPP Architecture and Requirements',SPEC_VERSIONS['SGP.41'],'https://www.gsma.com/solutions-and-impact/technologies/esim/gsma_resources/esim-ifpp-architecture-and-requirements/'],
-      ['SGP.42','eSIM IFPP Technical Specification',SPEC_VERSIONS['SGP.42'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/']
+      ['SGP.41','eSIM IFPP Architecture and Requirements',SPEC_VERSIONS['SGP.41'],'https://www.gsma.com/solutions-and-impact/technologies/esim/gsma_resources/esim-ifpp-architecture-and-requirements/']
     ]},
     {cat:'Test Specifications',rows:[
       ['SGP.11','Remote Provisioning Architecture for Embedded UICC Test Specification (M2M)',SPEC_VERSIONS['SGP.11'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-m2m-specifications/'],
@@ -1948,7 +1966,8 @@ function appxHTML(){
   ['ESeim','eIM \u2194 IPAd or IPAe','SGP.32','Direct mode profile management \u2014 eIM delivers commands to IPAd (IPA in device) or IPAe (IPA embedded in eUICC)'],
   ['ESipa','IPA \u2194 SM-DP+','SGP.32','Indirect mode profile download (IoT)'],
   ['ESop','Operator \u2194 eIM','SGP.32','Operator-to-eIM profile ordering and lifecycle management interface'],
-  ['ESdd','SM-DS \u2194 SM-DS','SGP.32','Root-to-Alternative SM-DS event cascade for IoT device discovery']
+  ['ESdd','SM-DS \u2194 SM-DS','SGP.32','Root-to-Alternative SM-DS event cascade for IoT device discovery'],
+  ['Default SM-DP+','LPA \u2194 SM-DP+','SGP.22','Configured SM-DP+ entry path before normal ES9+/ES10 download sequence']
   ].forEach(function(r){h+='<tr><td><code>'+r[0]+'</code></td><td>'+r[1]+'</td><td><code>'+r[2]+'</code></td><td>'+r[3]+'</td></tr>'});
   h+='</tbody></table></div></div>';
 
@@ -1965,6 +1984,7 @@ function appxHTML(){
   ['ES10c.DeleteProfile','ES10c','LPA \u2192 eUICC','Delete a profile from the eUICC'],
   ['ES11.HandleEvent','ES11','LPA \u2192 SM-DS','Check for pending events at SM-DS'],
   ['ES12.RegisterEvent','ES12','SM-DP+ \u2192 SM-DS','Register a pending download event'],
+  ['Default SM-DP+ polling','ES9+/ES10','LPA \u2194 SM-DP+ / eUICC','Configured server path; then normal download authentication and BPP loading'],
   ['ES9+.AuthenticateServer (in InitiateAuth Response)','ES9+','SM-DP+ \u2192 LPA','Server authentication data (serverSigned1, signature, certificate)'],
   ['ES10b.AuthenticateServer','ES10b','LPA \u2192 eUICC','Pass SM-DP+ credentials to eUICC for server verification'],
   ['ES10b.PrepareDownload','ES10b','LPA \u2192 eUICC','Send binding data; eUICC generates session keys'],
@@ -2003,7 +2023,8 @@ function appxHTML(){
 
   /* IoT Messages */
   h+='<div class="asec"><h2>Key Messages \u2014 IoT RSP (SGP.32)</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Message</th><th>Interface</th><th>Direction</th><th>Purpose</th></tr></thead><tbody>';
-  [['ESeim.DownloadProfile','ESeim','eIM \u2192 IPAd/IPAe','Direct mode: deliver protected profile/eUICC package to device'],
+  [['ESeim.ConfigureEim','ESeim','eIM \u2192 IPA/eUICC','Register or update authorized eIM configuration on the eUICC'],
+  ['ESeim.DownloadProfile','ESeim','eIM \u2192 IPAd/IPAe','Direct mode: deliver protected profile/eUICC package to device'],
   ['ESeim.EnableProfile','ESeim','eIM \u2192 IPAd/IPAe','Request enable package delivery to the eUICC'],
   ['ESeim.DisableProfile','ESeim','eIM \u2192 IPAd/IPAe','Request disable package delivery to the eUICC'],
   ['ESeim.DeleteProfile','ESeim','eIM \u2192 IPAd/IPAe','Request delete package delivery to the eUICC'],
@@ -3338,7 +3359,7 @@ function buildSearchIndex(){
     {name:'Spec Evolution Timeline',tab:'esim101'},{name:'Security Domain Hierarchy',tab:'quickref'},
     {name:'IFPP In-Factory Profile Provisioning',tab:'ifpp'},{name:'Factory System',tab:'ifpp'},
     {name:'Late Binding',tab:'ifpp'},{name:'Profile Provider',tab:'ifpp'},
-    {name:'SGP.41 SGP.42 Factory',tab:'ifpp'},{name:'Factory Installation',tab:'ifpp'}
+    {name:'SGP.41 IFPP Factory',tab:'ifpp'},{name:'Factory Installation',tab:'ifpp'}
   ];
   toolNames.forEach(function(t){
     searchIndex.push({text:t.name.toLowerCase(),label:'Tool: '+t.name,action:function(){
