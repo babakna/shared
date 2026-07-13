@@ -306,8 +306,9 @@
                 <label><input type="radio" name="guessDiff" value="hard" onchange="initGuessGame()"> Hard</label>
             </div>
             <div id="guess-prompt" class="question-text"></div>
-            <input type="number" id="guess-input" onkeypress="if(event.key==='Enter') checkGuess()">
-            <button class="action-btn" onclick="checkGuess()">Guess</button>
+            <div id="guess-choices" class="kid-choice-row"></div>
+            <input type="number" id="guess-input" onkeypress="if(event.key==='Enter') checkGuess()" style="display:none">
+            <button class="action-btn" onclick="checkGuess()" style="display:none">Guess</button>
             <div id="guess-result" class="feedback"></div>
             <button class="action-btn" onclick="initGuessGame()" style="display:none;" id="guess-restart">Play Again</button>
         </div>
@@ -843,7 +844,7 @@
         function checkMath() { let ans = parseInt(document.getElementById('math-answer').value); let res = document.getElementById('math-result'); if(ans === expectedMathAnswer) { res.innerText = "Correct! Great job! ⭐"; setTimeout(initMath, 1500); } else { res.innerText = "Not quite, try again! 🤔"; } }
 
         let secretNum;
-        function initGuessGame() { let max = document.querySelector('input[name="guessDiff"]:checked').value === 'easy' ? 20 : (document.querySelector('input[name="guessDiff"]:checked').value === 'medium' ? 50 : 100); secretNum = Math.floor(Math.random() * max) + 1; document.getElementById('guess-prompt').innerText = `I'm thinking of a number between 1 and ${max}!`; document.getElementById('guess-result').innerText = ''; document.getElementById('guess-input').value = ''; document.getElementById('guess-restart').style.display = 'none'; }
+        function initGuessGame() { let max = document.querySelector('input[name="guessDiff"]:checked').value === 'easy' ? 20 : (document.querySelector('input[name="guessDiff"]:checked').value === 'medium' ? 50 : 100); secretNum = Math.floor(Math.random() * max) + 1; document.getElementById('guess-prompt').innerText = `Pick the number I am thinking of between 1 and ${max}.`; document.getElementById('guess-result').innerText = ''; document.getElementById('guess-input').value = ''; document.getElementById('guess-restart').style.display = 'none'; const spread = max <= 20 ? 4 : (max <= 50 ? 8 : 14); populateQuickChoices([String(secretNum)].concat(nA(secretNum, spread)), 'guess-choices', String(secretNum), () => { document.getElementById('guess-result').innerText = `You got it! It was ${secretNum}! 🎉`; document.getElementById('guess-restart').style.display = 'inline-block'; }, () => { document.getElementById('guess-result').innerText = 'Not that one. Try another choice.'; }); }
         function checkGuess() { const g = parseInt(document.getElementById('guess-input').value); const res = document.getElementById('guess-result'); if(isNaN(g)) return; if(g === secretNum) { res.innerText = `You got it! It was ${secretNum}! 🎉`; document.getElementById('guess-restart').style.display = 'inline-block'; } else if(g < secretNum) res.innerText = "Higher! ⬆️"; else res.innerText = "Lower! ⬇️"; document.getElementById('guess-input').value = ''; }
 
         let scrambleWords = { easy: ['RED', 'BLUE', 'PINK'], medium: ['PUPPY', 'KITTEN', 'HORSE'], hard: ['GRAVITY', 'PLANET', 'OXYGEN'] }; let curScramble = "";

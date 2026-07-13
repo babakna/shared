@@ -87,8 +87,8 @@ const GAMES=[
   {id:'spider',name:'Spider Solitaire',ico:'🕷️'},
   {id:'freecell',name:'FreeCell',ico:'🆓'},
   {id:'hearts',name:'Hearts',ico:'♥️'},
-  {id:'crazy8',name:'Crazy Eights',ico:'8️⃣'},
-  {id:'war',name:'War',ico:'⚔️'},
+  {id:'crazy8',name:'Classic Crazy Eights',ico:'8️⃣'},
+  {id:'war',name:'Classic War',ico:'⚔️'},
   {id:'backgammon',name:'Backgammon Lite',ico:'🎲'},
   {id:'cribbage',name:'Cribbage Hand Practice',ico:'🂭'},
   {id:'mahjong',name:'Mahjong Solitaire',ico:'🀄'},
@@ -156,7 +156,7 @@ function hs(id){return +(localStorage.getItem('c2_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('c2_'+id,v);return true}return false}
 function lowBest(id,v){const c=localStorage.getItem('c2_'+id);if(c===null||v<+c){localStorage.setItem('c2_'+id,v);return true}return false}
 function getRaw(id){return localStorage.getItem('c2_'+id)}
-const HIDDEN_PRACTICE_IDS=new Set(['numberseq','quickmaths','memorynum','biggernum','roundgame','comparemath','doublehalf','oddeven','placeval','c2percent','c2triple','c2sign','c2countback','c2square','c2quarter','c2mult10','c2near100','c2skip','c2change','c2timeadd','c2divby','c2numword','c2expand','c2ordinal']);
+const HIDDEN_PRACTICE_IDS=new Set(['numberseq','quickmaths','memorynum','biggernum','roundgame','comparemath','doublehalf','oddeven','placeval','c2percent','c2triple','c2sign','c2countback','c2square','c2quarter','c2mult10','c2near100','c2skip','c2change','c2timeadd','c2divby','c2numword','c2expand','c2ordinal','crazy8','war']);
 function visibleGames(){return GAMES.filter(gm=>!HIDDEN_PRACTICE_IDS.has(gm.id));}
 function buildMenu(){const g=document.getElementById('grid');g.innerHTML='';visibleGames().forEach(gm=>{const d=document.createElement('div');d.className='card';
   d.innerHTML=`<span class="ico">${gm.ico}</span><div class="name">${gm.name}</div><div class="hs">${getRaw(gm.id)?'Best: '+getRaw(gm.id):'&nbsp;'}</div>`;d.onclick=()=>launch(gm);g.append(d);});}
