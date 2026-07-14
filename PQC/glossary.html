@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glossary - PQC Learning Lab</title>
+<meta name="description" content="Plain-English definitions of post-quantum cryptography terms used throughout the PQC Learning Lab.">
+<link rel="stylesheet" href="assets/pqc.css">
+</head>
+<body>
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC Glossary</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+  <section class="hero" style="grid-template-columns:1fr">
+    <div class="hero-copy">
+      <span class="chip">Reference</span>
+      <h1>Glossary</h1>
+      <p class="sub">Plain-English definitions of every key term in the course. Search below or scan the cards.</p>
+      <label for="glossarySearch" style="display:block;font-weight:800;margin:14px 0 6px;color:var(--muted)">Search terms</label>
+      <input id="glossarySearch" type="search" placeholder="Type to filter, e.g. KEM, Shor, hybrid..." style="width:100%;max-width:460px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-size:1rem">
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="grid2" id="glossaryList">
+      <div class="callout" data-term><span class="k">Authentication</span><p>Proving who a party is, or that it holds a particular secret. The security job most affected by quantum computing because it often relies on public-key crypto.</p></div>
+      <div class="callout" data-term><span class="k">Confidentiality</span><p>Keeping content unreadable to outsiders. Provided mainly by symmetric encryption (e.g. AES), which quantum computers weaken only modestly.</p></div>
+      <div class="callout" data-term><span class="k">Integrity</span><p>The ability to detect any change to data. Provided by hashes and MACs.</p></div>
+      <div class="callout" data-term><span class="k">Non-repudiation</span><p>A property of signatures: later proof that a specific private key signed something, so the signer cannot credibly deny it.</p></div>
+      <div class="callout" data-term><span class="k">Symmetric cryptography</span><p>Encryption using one shared secret both sides already hold (e.g. AES-256-GCM). Fast; used for bulk data. Only mildly affected by quantum computers (Grover).</p></div>
+      <div class="callout" data-term><span class="k">Public-key (asymmetric) cryptography</span><p>Uses a public key and a private key. Enables internet-scale trust: identifying strangers, agreeing on secrets in the open, and signatures. The primary target of PQC migration.</p></div>
+      <div class="callout" data-term><span class="k">Qubit</span><p>The basic unit of quantum information. Unlike a bit, it can be in a superposition of 0 and 1 until measured.</p></div>
+      <div class="callout" data-term><span class="k">Superposition</span><p>A qubit's ability to be a controlled blend of 0 and 1 at once, described by amplitudes, until measurement forces a single outcome.</p></div>
+      <div class="callout" data-term><span class="k">Logical qubit</span><p>An error-corrected qubit built from many noisy physical qubits so it behaves reliably enough for long computations.</p></div>
+      <div class="callout" data-term><span class="k">Shor's algorithm</span><p>A quantum algorithm that efficiently solves factoring and discrete logarithms, breaking RSA, Diffie-Hellman, and elliptic-curve cryptography.</p></div>
+      <div class="callout" data-term><span class="k">Grover's algorithm</span><p>A quantum search algorithm with a roughly square-root speedup. Halves the effective strength of symmetric keys/hashes, so longer keys restore safety.</p></div>
+      <div class="callout" data-term><span class="k">CRQC</span><p>Cryptographically Relevant Quantum Computer: a fault-tolerant machine large and reliable enough to break deployed public-key cryptography in practical time. Does not yet exist.</p></div>
+      <div class="callout" data-term><span class="k">Q-day</span><p>The hypothetical day a CRQC becomes available to attackers. Its date is uncertain; migration is driven by data lifetime plus migration time, not a forecast.</p></div>
+      <div class="callout" data-term><span class="k">Harvest now, decrypt later</span><p>An attack that copies encrypted data today and decrypts it after a CRQC exists. Makes long-lived secrets urgent even before Q-day.</p></div>
+      <div class="callout" data-term><span class="k">KEM (Key Encapsulation Mechanism)</span><p>A scheme where a sender uses the recipient's public key to produce a ciphertext and a shared secret; the recipient decapsulates to recover the same secret. ML-KEM is the standardized PQC KEM.</p></div>
+      <div class="callout" data-term><span class="k">ML-KEM (FIPS 203)</span><p>Module-Lattice KEM, derived from CRYSTALS-Kyber. The NIST standard for post-quantum key establishment.</p></div>
+      <div class="callout" data-term><span class="k">ML-DSA (FIPS 204)</span><p>Module-Lattice Digital Signature Algorithm, derived from CRYSTALS-Dilithium. The general-purpose PQC signature standard.</p></div>
+      <div class="callout" data-term><span class="k">SLH-DSA (FIPS 205)</span><p>Stateless Hash-based Digital Signature Algorithm, derived from SPHINCS+. A conservative signature standard resting only on hash security; large signatures.</p></div>
+      <div class="callout" data-term><span class="k">HQC</span><p>A code-based KEM selected by NIST in 2025 as a backup to ML-KEM, providing algorithm diversity on a different mathematical assumption.</p></div>
+      <div class="callout" data-term><span class="k">FN-DSA / Falcon</span><p>A lattice (NTRU) signature scheme known for compact signatures, being finalized as FN-DSA. Attractive where signature size matters, but tricky to implement safely.</p></div>
+      <div class="callout" data-term><span class="k">Hybrid</span><p>Running a classical and a post-quantum mechanism together so the result is secure if either one holds. The common, lower-risk transition mode.</p></div>
+      <div class="callout" data-term><span class="k">Crypto-agility</span><p>The ability to change algorithms, parameters, identifiers, and providers without re-architecting the system. The capability that makes future changes feasible.</p></div>
+      <div class="callout" data-term><span class="k">Certificate</span><p>A signed statement binding a public key to an identity (domain, org, device), vouched for by a trusted authority.</p></div>
+      <div class="callout" data-term><span class="k">Trust chain / PKI</span><p>A chain from a protected root CA through intermediates to a leaf certificate, verified end to end. PQC affects the whole chain, not just the leaf.</p></div>
+      <div class="callout" data-term><span class="k">Constant-time</span><p>Code whose execution time and memory access do not depend on secret values, preventing timing side-channel leaks. Essential for KEM decapsulation and signing.</p></div>
+      <div class="callout" data-term><span class="k">CBOM</span><p>Cryptographic Bill of Materials: an inventory of cryptographic assets and uses (algorithms, keys, certificates, protocols, libraries, hardware) and their relationships.</p></div>
+      <div class="callout" data-term><span class="k">HSM / KMS / TPM / Secure element</span><p>Hardware or managed services that generate and protect keys. They must support PQC algorithms and sizes before you can use PQC keys there - often the true bottleneck.</p></div>
+      <div class="callout" data-term><span class="k">eUICC</span><p>The embedded chip that securely stores SIM profiles in an eSIM-capable device. Constrained memory/compute makes large PQC keys a fit challenge.</p></div>
+      <div class="callout" data-term><span class="k">SUCI / SUPI</span><p>In 5G, the SUPI is the permanent subscriber identifier; SUCI is its concealed form, protected today with elliptic-curve public-key crypto - a PQC candidate.</p></div>
+      <div class="callout" data-term><span class="k">Dual-signing</span><p>Attaching both a classical and a PQC signature to an artifact during transition, so old and new verifiers both work until the classical one can be dropped.</p></div>
+    </div>
+    <p class="section-hint" id="glossaryEmpty" style="display:none">No terms match your search.</p>
+  </section>
+</main>
+
+<footer class="footer"><p class="disclaimer">Educational reference only.</p><p>PQC Learning Lab &middot; V3.0 (July 2026)</p></footer>
+<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">Glossary help</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Type in the search box to filter terms instantly. Throughout the modules, dotted-underlined words show a short definition on hover or click; this page has the full list.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('glossarySearch');
+  var cards=[].slice.call(document.querySelectorAll('#glossaryList [data-term]'));
+  var empty=document.getElementById('glossaryEmpty');
+  if(!input)return;
+  input.addEventListener('input',function(){
+    var q=input.value.trim().toLowerCase();
+    var shown=0;
+    cards.forEach(function(c){
+      var match=c.textContent.toLowerCase().indexOf(q)>-1;
+      c.style.display=match?'':'none';
+      if(match)shown++;
+    });
+    empty.style.display=shown?'none':'block';
+  });
+})();
+</script>
+</body>
+</html>

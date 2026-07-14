@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PQC-100 - Quantum Computing in Plain English</title>
+<meta name="description" content="What a qubit is, what quantum computers can and cannot do, and why they threaten some cryptography and not others - no physics degree required.">
+<link rel="stylesheet" href="assets/pqc.css">
+</head>
+<body data-module="PQC-100">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-100</span><span>Quantum Computing in Plain English</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
+
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: bit vs qubit</a>
+  <a href="#s1"><span class="dot"></span>1. Classical bits vs qubits</a>
+  <a href="#s2"><span class="dot"></span>2. Superposition &amp; interference</a>
+  <a href="#s3"><span class="dot"></span>3. What quantum is good at</a>
+  <a href="#s4"><span class="dot"></span>4. What it can NOT do</a>
+  <a href="#s5"><span class="dot"></span>5. How far away is it?</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Foundations</span>
+    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~20 min read</span><span class="level time">No physics needed</span></div>
+    <h1>Quantum Computing in Plain English</h1>
+    <p class="sub">People say "quantum computers will break encryption" without ever explaining what a quantum computer <em>is</em>. Let's fix that with analogies, not equations &mdash; just enough to understand the threat clearly and avoid the hype.</p>
+    <ul class="outcomes">
+      <li>Describe a qubit and superposition without any math.</li>
+      <li>Explain why quantum helps with <b>some</b> problems and not others.</li>
+      <li>Separate real capability from science-fiction claims.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/quantum-bits.svg" alt="A classic bit shown as 0 or 1 next to a qubit shown as a spinning coin representing a mix of 0 and 1.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: a bit is a coin lying flat, a qubit is a coin spinning</h2>
+  <p class="section-hint">Step through the difference. This single idea explains most of the confusion about quantum computing.</p>
+  <div class="pqc-stepper" data-title="From bit to qubit to answer">
+    <script type="application/json" class="steps">
+    [
+      {"title":"A classical bit","body":"A normal computer bit is a coin lying flat on a table: it is either heads (1) or tails (0). At every moment it holds exactly one definite value.","meta":"1 bit = one of {0, 1}"},
+      {"title":"A qubit before you look","body":"A qubit is like a coin spinning in the air. It is not secretly 0 or 1 yet - it is in a blend of both called superposition, described by amplitudes (think tilt and timing of the spin).","meta":"1 qubit = a blend of 0 and 1"},
+      {"title":"Many qubits together","body":"Put n qubits together and the spinning coins can represent a pattern across all 2^n combinations at once. With 300 qubits that pattern spans more combinations than atoms in the visible universe.","meta":"n qubits describe 2^n amplitudes"},
+      {"title":"Measurement collapses it","body":"The moment you look, each spinning coin lands on a single 0 or 1. You get ONE random answer, weighted by the amplitudes. You cannot simply read out all 2^n values - that is the catch.","meta":"measure -> one classical result"},
+      {"title":"The real trick: interference","body":"A useful quantum algorithm arranges the amplitudes so wrong answers cancel out and the right answer becomes very likely to appear when measured. Cleverly steering interference is the whole game.","meta":"good algorithms amplify the right answer"}
+    ]
+    </script>
+  </div>
+  <div class="callout pitfall"><span class="k">Myth to drop right now</span><p>"A quantum computer just tries all answers at once and instantly picks the right one." Not true. It holds many possibilities, but measurement gives only one result. Speedups come only when a clever algorithm makes the right answer <em>interfere constructively</em>. Most problems get little or no speedup.</p></div>
+</section>
+
+<section class="lesson" id="s1">
+  <div class="lesson-title"><span class="num">1</span><h2>Classical bits vs qubits</h2></div>
+  <p class="lead">Everything your phone does is built from bits that are strictly 0 or 1. A quantum computer adds a new building block.</p>
+  <p>A <span class="term" data-def="The basic unit of quantum information; unlike a bit it can be in a superposition of 0 and 1 until measured.">qubit</span> can be 0, 1, or a controlled mixture of both. Physically it might be a superconducting circuit, a trapped ion, or a photon &mdash; the hardware varies, but the behavior is what matters to us.</p>
+  <p>The power grows with scale. Describing the state of <b>n</b> qubits requires <b>2<sup>n</sup></b> numbers (amplitudes). Ten qubits: 1,024 numbers. Fifty qubits: over a quadrillion. This is why quantum machines can, in principle, explore enormous spaces &mdash; but only if you can extract a useful answer at the end.</p>
+  <div class="callout analogy"><span class="k">Analogy</span><p>A classical computer checking possibilities is like one person walking every path of a maze one at a time. A quantum computer is more like sending a wave through the whole maze at once &mdash; but you only get to see where the wave is loudest, so you must design the maze so the exit is the loudest spot.</p></div>
+</section>
+
+<section class="lesson" id="s2">
+  <div class="lesson-title"><span class="num">2</span><h2>Superposition, entanglement, and interference</h2></div>
+  <p class="lead">Three words do the heavy lifting. You already met superposition; here are the other two.</p>
+  <div class="grid3">
+    <div class="callout"><span class="k" style="color:var(--violet)">Superposition</span><p>A qubit is a blend of 0 and 1 until measured, with amplitudes controlling the odds of each outcome.</p></div>
+    <div class="callout"><span class="k" style="color:var(--teal)">Entanglement</span><p>Qubits can be linked so their outcomes are correlated no matter the distance. This lets operations act on the whole system's structure at once.</p></div>
+    <div class="callout"><span class="k" style="color:var(--primary-ink)">Interference</span><p>Amplitudes can add up or cancel out, like ripples on water. Good algorithms cancel the wrong answers and reinforce the right one.</p></div>
+  </div>
+  <p>Cryptography is threatened not because quantum computers are "faster at everything," but because a few specific algorithms use interference to solve the exact math problems that certain cryptography depends on. That is the bridge to the next section.</p>
+</section>
+
+<section class="lesson" id="s3">
+  <div class="lesson-title"><span class="num">3</span><h2>What quantum computers are actually good at</h2></div>
+  <p class="lead">Two algorithms matter for security. Everything else is mostly a research and modelling story.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Algorithm</th><th>What it does</th><th>Effect on cryptography</th></tr></thead>
+    <tbody>
+      <tr><td><b>Shor's algorithm</b></td><td>Efficiently finds the hidden period in a math structure &mdash; which cracks integer factoring and discrete logarithms.</td><td><b>Breaks</b> RSA, Diffie-Hellman, and elliptic-curve crypto. This is the core reason PQC exists.</td></tr>
+      <tr><td><b>Grover's algorithm</b></td><td>Searches an unsorted space with a roughly square-root speedup (N &rarr; &radic;N tries).</td><td><b>Weakens</b> symmetric keys and hashes. AES-256 keeps a strong margin; short keys should grow.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>Shor turns "factoring a 2048-bit RSA number," which is effectively impossible for classical computers, into something a large enough fault-tolerant quantum computer could do in hours or days. Grover only halves the effective strength of a symmetric key, so AES-256 still behaves like ~128-bit security &mdash; still far out of reach.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Shor drives <b>replacement</b> of public-key crypto. Grover drives <b>bigger keys/hashes</b>, not replacement. That asymmetry shapes the entire migration.</p></div>
+</section>
+
+<section class="lesson" id="s4">
+  <div class="lesson-title"><span class="num">4</span><h2>What quantum computers can NOT do</h2></div>
+  <p class="lead">Cutting through hype is part of understanding the threat.</p>
+  <ul>
+    <li><b>They are not just fast classical computers.</b> For most everyday tasks they offer no advantage &mdash; and are far slower and more fragile.</li>
+    <li><b>They do not break AES-256 or SHA-2/3 outright.</b> Grover only chips at the margin; doubling key length restores safety.</li>
+    <li><b>They cannot read a superposition's full contents.</b> You get one measured answer, so brute-forcing "all passwords at once" is a myth.</li>
+    <li><b>They are extremely error-prone today.</b> Qubits lose their state (decoherence) in microseconds and need heavy error correction.</li>
+  </ul>
+  <div class="callout warn"><span class="k">Nuance</span><p>The honest summary: a <span class="term" data-def="A fault-tolerant quantum computer large and reliable enough to break widely deployed public-key cryptography in practical time.">cryptographically relevant quantum computer (CRQC)</span> does not exist yet, and estimates of its arrival vary widely. But you migrate based on <em>data lifetime + migration time</em>, not on a confident date &mdash; that is PQC-101.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>How far away is a threatening machine?</h2></div>
+  <p class="lead">Today's chips have hundreds to low-thousands of physical qubits. Breaking RSA-2048 needs something very different.</p>
+  <p>The gap is <b>error correction</b>. Physical qubits are noisy, so many of them are combined to form one reliable <span class="term" data-def="An error-corrected qubit built from many physical qubits so it behaves reliably enough for long computations.">logical qubit</span>. Published estimates to break RSA-2048 involve on the order of thousands of logical qubits, which could mean millions of physical qubits &mdash; well beyond current hardware.</p>
+  <div class="callout example"><span class="k">Why plan now anyway</span><p>Two reasons. First, "harvest now, decrypt later": data you send today can be stored and decrypted after a CRQC arrives. Second, replacing cryptography across a large organization takes years. If your data must stay secret longer than "time to a CRQC minus migration time," you are already behind. PQC-101 gives you a calculator for exactly this.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>You do not need to predict the date. You need to know your data's lifetime and start early for the long-lived, exposed, public-key-dependent systems.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Decide first, then reveal.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; Debunk the pitch</h3>
+      <p class="scenario">A vendor claims their quantum computer "instantly tries every possible key and returns the right one."</p>
+      <p class="decide">What is wrong with that claim?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Measurement returns only one outcome. Without an algorithm that makes the correct answer interfere constructively (which brute-force search does not), you just get a random guess. Grover gives only a square-root speedup, not instant answers.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; AES vs RSA</h3>
+      <p class="scenario">Two systems: one protects data with AES-256, another authenticates with RSA-2048.</p>
+      <p class="decide">Which is in more danger from a future quantum computer, and why?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> RSA-2048 &mdash; Shor's algorithm breaks it. AES-256 only faces Grover's square-root speedup, leaving it effectively ~128-bit strength, which is still safe.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; Physical vs logical qubits</h3>
+      <p class="scenario">A headline reads "new chip hits 1,000 qubits."</p>
+      <p class="decide">Does that mean RSA is about to fall?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Almost certainly not. Those are noisy physical qubits. Breaking RSA-2048 needs thousands of <em>logical</em> (error-corrected) qubits, which may require millions of physical qubits. Qubit count alone is a misleading metric.</p>
+    </article>
+  </div>
+</section>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"What is a qubit before measurement?","choices":["A controlled blend (superposition) of 0 and 1","Secretly already 0 or 1","Always exactly 1"],"answer":0,"explain":"A qubit holds a superposition described by amplitudes; it only becomes a definite 0 or 1 when measured."},
+    {"q":"Why isn't a quantum computer just 'try everything at once and read the answer'?","choices":["Measurement returns only one outcome; you must engineer interference","Because it is slower","Because it uses more electricity"],"answer":0,"explain":"You get a single measured result. Speedups require an algorithm that makes the correct answer's amplitude dominate."},
+    {"q":"Which algorithm is the reason RSA and ECC are considered broken by a CRQC?","choices":["Shor's algorithm","Grover's algorithm","Dijkstra's algorithm"],"answer":0,"explain":"Shor efficiently solves factoring and discrete logs, the hard problems behind RSA, DH, and ECC."},
+    {"q":"What does Grover's algorithm mean for AES-256?","choices":["It weakens it to roughly 128-bit strength, still safe","It instantly breaks it","It has no effect at all"],"answer":0,"explain":"Grover gives a square-root speedup, roughly halving effective key bits. AES-256 -> ~128-bit, which remains secure."},
+    {"q":"A chip reaches 1,000 physical qubits. Is RSA-2048 immediately at risk?","choices":["No - breaking RSA needs thousands of error-corrected logical qubits","Yes, that is more than enough","Only if it is blue"],"answer":0,"explain":"Physical qubits are noisy. Error correction turns many physical qubits into one logical qubit; RSA-2048 needs far more capability than raw qubit counts suggest."},
+    {"q":"Why start PQC planning before a CRQC exists?","choices":["Harvest-now-decrypt-later plus multi-year migration time","Quantum computers are already in phones","To make websites load faster"],"answer":0,"explain":"Data captured today can be decrypted later, and migrating a large estate takes years, so long-lived data needs early action."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Educational overview; consult primary standards before decisions.</p>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+  <a href="https://www.nist.gov/pqcrypto" target="_blank" rel="noopener noreferrer">NIST &mdash; PQC overview</a>
+  <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; Post-Quantum Cybersecurity Resources</a>
+</section>
+</main>
+</div>
+
+<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>This module builds intuition, not equations. Step through the bit-vs-qubit walkthrough first, then read the lessons. The goal is to understand the threat without hype.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
+</body>
+</html>

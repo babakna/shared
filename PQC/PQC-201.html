@@ -4,71 +4,195 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-201 - PQC Standards and Algorithm Families</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f9fd;--card:#fff;--ink:#0b1220;--muted:#536178;--line:#dbe6f4;--soft:#ecf3fb;--primary:#174e86;--teal:#0e766e;--red:#b42318;--green:#087443;--amber:#a45d00;--shadow:0 14px 34px rgba(22,50,90,.12);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}[data-theme="dark"]{--bg:#0b1220;--card:#142033;--ink:#eef5ff;--muted:#b9c8dc;--line:#2b405d;--soft:#1f3048;--primary:#77b9ff;--teal:#6bd9ce;--red:#ffb4ac;--green:#79dba7;--amber:#ffd08a;--shadow:0 14px 34px rgba(0,0,0,.30)}html{scroll-behavior:smooth}body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(23,78,134,.14),transparent 34%),var(--bg);color:var(--ink);line-height:1.72;-webkit-text-size-adjust:100%;overflow-x:hidden}.top{position:sticky;top:0;z-index:30;background:rgba(246,249,253,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}[data-theme="dark"] .top{background:rgba(11,18,32,.9)}.top-in{max-width:1260px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:10px;align-items:center;font-weight:900;flex-wrap:wrap}.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--teal))}.version{font-size:.76rem;color:var(--muted);font-weight:900}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-weight:850;cursor:pointer;min-height:38px;text-decoration:none;box-shadow:0 6px 18px rgba(22,50,90,.07)}.btn.small{font-size:.84rem;min-height:34px;padding:7px 10px}.layout{max-width:1260px;margin:0 auto;padding:18px 16px 42px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.side{position:sticky;top:62px;height:calc(100vh - 80px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px}.side a{display:block;text-decoration:none;color:var(--muted);padding:9px 10px;border-radius:10px;font-weight:850;font-size:.88rem}.side a:hover,.side .active{background:var(--soft);color:var(--primary)}.hero{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:30px;margin-bottom:18px}.hero-img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(22,50,90,.12)}.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1;letter-spacing:-.045em;margin:12px 0}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.chip{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:850;font-size:.8rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.outcomes li{list-style:none;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted)}.architecture{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.architecture h2{font-size:1.55rem;margin-bottom:10px}.architecture p{color:var(--muted);margin-bottom:12px}.architecture-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#f8fbff;box-shadow:0 12px 28px rgba(22,50,90,.10)}[data-theme="dark"] .architecture-img{background:#0b1220}.visual-note{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.visual-note span{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted);font-weight:800;font-size:.88rem}@media(max-width:980px){.visual-note{grid-template-columns:1fr}}.lesson,.lab,.quiz,.sources{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}.lesson-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}.lesson-title span{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;font-weight:950}h2{font-size:1.55rem;line-height:1.15}.lesson p,.lab p,.quiz p,.sources p,.lesson li{color:var(--muted);margin-bottom:11px}.diagram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:18px;padding:16px;margin:18px 0}.dnode{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--primary);border-radius:14px;padding:13px;min-height:118px}.dnode:nth-child(2n){border-top-color:var(--teal)}.dnode:nth-child(3n){border-top-color:#6955b8}.dnode:nth-child(4n){border-top-color:var(--amber)}.dnode b{display:block;margin-bottom:6px;color:var(--ink)}.dnode span{display:block;color:var(--muted);font-size:.92rem}.teaching{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.teach{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.teach h3{font-size:1rem;margin-bottom:6px}.teach p{margin:0;color:var(--muted)}.example{background:rgba(14,118,110,.10)}.pitfall{background:rgba(180,35,24,.08)}.takeaway{background:rgba(23,78,134,.10)}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.case{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.case h3{margin-bottom:8px}.answer{display:none;margin-top:10px}.case.open .answer{display:block}.quiz-q{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:var(--soft)}.choices{display:grid;gap:8px;margin-top:8px}.choice{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer}.choice.ok{border-color:var(--green);background:rgba(8,116,67,.12)}.choice.bad{border-color:var(--red);background:rgba(180,35,24,.10)}.feedback{font-weight:850;margin-top:8px}.score{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:900}.sources a{display:block;margin:8px 0;color:var(--primary);font-weight:850}.disclaimer{color:var(--red)!important;font-weight:900}.toplink{position:fixed;right:18px;bottom:18px;border-radius:999px;z-index:25;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-color:transparent}.help-modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,12,24,.55);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;max-width:780px;max-height:86vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:64px 22px 22px}.help-head #closeHelp{position:absolute;top:16px;right:16px}@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:relative;top:auto;height:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.hero{grid-template-columns:1fr}.hero-img{max-height:260px;object-fit:cover}.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr 1fr}}@media(max-width:560px){.layout{padding:12px}.buttons{width:100%}.side,.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr}.btn{font-size:.82rem;padding:8px 9px}.hero{padding:20px}.hero h1{font-size:2.05rem}h2{font-size:1.28rem}.toplink{right:12px;bottom:12px}}
-</style>
+<meta name="description" content="ML-KEM, ML-DSA, SLH-DSA, HQC, and FN-DSA - what each is for, with real key and signature sizes side by side.">
+<link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body>
-<header class="top"><div class="top-in"><div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC-201</span><span>PQC Standards and Algorithm Families</span><span class="version">V2.1 (July 2026)</span></div><div class="buttons"><a class="btn" href="index.html">Home</a><button class="btn" id="themeBtn">Dark</button><button class="btn" id="helpBtn">Help</button></div></div></header>
-<div class="layout"><nav class="side" aria-label="Module sections"><a href="#architecture">Architecture diagram</a><a href="#s1">The standards baseline</a><a href="#s2">KEMs: how ML-KEM is used</a><a href="#s3">Signatures: ML-DSA and SLH-DSA</a><a href="#s4">Hybrid and algorithm agility</a><a href="#labs">Use-case labs</a><a href="#quiz">Knowledge check</a><a href="#sources">Sources</a></nav>
-<main>
-<section class="hero" id="start"><div><span class="chip">Standards</span><h1>PQC Standards and Algorithm Families</h1><p>The NIST standards baseline, what ML-KEM, ML-DSA, SLH-DSA, HQC, and Falcon/FN-DSA are for, and how to avoid choosing algorithms blindly.</p><ul class="outcomes"><li>Map algorithm families to use cases.</li><li>Explain why ML-KEM is not a general file-encryption API.</li><li>Explain algorithm diversity and backup choices.</li></ul><p class="disclaimer">Educational reference only. Production cryptography decisions need current standards checks, vendor validation, security review, interoperability testing, and rollback planning.</p></div><img class="hero-img" src="./diagrams/nist-algorithm-map.svg" alt="PQC Standards and Algorithm Families architecture diagram"></section>
+<body data-module="PQC-201">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
 
-<section class="architecture" id="architecture">
-  <h2>NIST PQC Algorithm Map</h2>
-  <p>A standards map separating key establishment, signatures, backup KEMs, and the deployment contexts where each belongs.</p>
-  <img class="architecture-img" src="./diagrams/nist-algorithm-map.svg" alt="NIST PQC Algorithm Map">
-  <div class="visual-note"><span>Read the picture first</span><span>Then read the lesson text</span><span>Use labs to apply it</span></div>
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: size comparison</a>
+  <a href="#s1"><span class="dot"></span>1. The standards baseline</a>
+  <a href="#s2"><span class="dot"></span>2. KEMs: how ML-KEM works</a>
+  <a href="#s3"><span class="dot"></span>3. Signatures: ML-DSA, SLH-DSA</a>
+  <a href="#s4"><span class="dot"></span>4. Hybrid &amp; algorithm agility</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Standards</span>
+    <div class="meta"><span class="level intermediate">Intermediate</span><span class="level time">~30 min read</span><span class="level time">Real numbers</span></div>
+    <h1>PQC Standards and Algorithm Families</h1>
+    <p class="sub">Meet the actual algorithms NIST standardized, learn which cryptographic job each one does, and see &mdash; in bytes &mdash; why "just swap the algorithm" is never that simple.</p>
+    <ul class="outcomes">
+      <li>Map each algorithm family to the job it does (key exchange vs signatures).</li>
+      <li>Explain why ML-KEM is not a general "encrypt this file" API.</li>
+      <li>Understand algorithm diversity, backups, and agility.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/nist-algorithm-map.svg" alt="A map of NIST PQC standards organized by job: ML-KEM for key establishment, ML-DSA and SLH-DSA for signatures, with HQC as a backup KEM.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: why size is the first thing that bites you</h2>
+  <p class="section-hint">Post-quantum keys and signatures are much bigger than what we use today. That single fact drives handshake sizes, storage schemas, and firmware slots. Compare them.</p>
+  <div class="pqc-bars" data-title="Signature size (bytes, representative parameter sets)" data-unit="Classical schemes shown in grey. PQC signatures are dramatically larger.">
+    <script type="application/json" class="data">
+    [
+      {"label":"Ed25519","value":64,"display":"64 B","kind":"classic"},
+      {"label":"ECDSA P-256","value":72,"display":"~72 B","kind":"classic"},
+      {"label":"RSA-2048","value":256,"display":"256 B","kind":"classic"},
+      {"label":"Falcon-512 (FN-DSA)","value":666,"display":"~666 B","kind":"big"},
+      {"label":"ML-DSA-65","value":3309,"display":"3,309 B","kind":"big"},
+      {"label":"SLH-DSA-128s","value":7856,"display":"7,856 B","kind":"big"}
+    ]
+    </script>
+  </div>
+  <div class="pqc-bars" data-title="Key-establishment payload (public key + ciphertext, bytes)" data-unit="ML-KEM carries far more per handshake than X25519; hybrid carries both.">
+    <script type="application/json" class="data">
+    [
+      {"label":"X25519","value":64,"display":"64 B","kind":"classic"},
+      {"label":"ML-KEM-768","value":2272,"display":"2,272 B","kind":"big"},
+      {"label":"Hybrid X25519+ML-KEM-768","value":2336,"display":"~2,336 B","kind":"big"}
+    ]
+    </script>
+  </div>
+  <div class="callout warn"><span class="k">Numbers are representative</span><p>Sizes come from the NIST FIPS 203/204/205 parameter sets and the Falcon submission; treat them as approximate reference values, not exact wire sizes (encodings add a little). The <em>ratio</em> is the point: PQC signatures are ~10&ndash;100&times; larger than ECDSA.</p></div>
 </section>
 
 <section class="lesson" id="s1">
-  <div class="lesson-title"><span>1</span><h2>The standards baseline</h2></div>
-  <p>NIST finalized FIPS 203, FIPS 204, and FIPS 205 as the first main post-quantum cryptography standards. FIPS 203 specifies ML-KEM, FIPS 204 specifies ML-DSA, and FIPS 205 specifies SLH-DSA.</p><p>The standards divide by job. ML-KEM is for key establishment. ML-DSA and SLH-DSA are for digital signatures. A standards-aligned plan starts by identifying the job, then selecting the relevant algorithm family and parameter set.</p><p>Additional algorithms remain important. HQC was selected by NIST as a backup KEM candidate for standardization, and Falcon/FN-DSA remains part of the signature standards watch. Production commitments should track current final status and validation support.</p>
-  <div class="diagram"><div class="dnode"><b>FIPS 203</b><span>ML-KEM key establishment.</span></div><div class="dnode"><b>FIPS 204</b><span>ML-DSA signatures.</span></div><div class="dnode"><b>FIPS 205</b><span>SLH-DSA signatures.</span></div><div class="dnode"><b>Watch</b><span>HQC and FN-DSA/Falcon status.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A VPN needing shared session secrets looks toward ML-KEM or hybrid KEM support. A firmware-signing workflow looks toward ML-DSA or SLH-DSA support.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not say &#x27;we use PQC&#x27; without saying which algorithm, parameter set, job, protocol, and implementation.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>The correct algorithm depends on the cryptographic job.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">1</span><h2>The standards baseline</h2></div>
+  <p class="lead">In 2024 NIST finalized the first three PQC standards. Organize everything by <em>job</em>.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Standard</th><th>Algorithm</th><th>Job</th><th>Based on</th></tr></thead>
+    <tbody>
+      <tr><td><b>FIPS 203</b></td><td>ML-KEM</td><td>Key establishment (KEM)</td><td>CRYSTALS-Kyber (module lattices)</td></tr>
+      <tr><td><b>FIPS 204</b></td><td>ML-DSA</td><td>Digital signatures (general purpose)</td><td>CRYSTALS-Dilithium (module lattices)</td></tr>
+      <tr><td><b>FIPS 205</b></td><td>SLH-DSA</td><td>Digital signatures (conservative)</td><td>SPHINCS+ (hash-based)</td></tr>
+      <tr><td>Selected 2025</td><td>HQC</td><td>Backup KEM (different math)</td><td>Code-based</td></tr>
+      <tr><td>Draft (FN-DSA)</td><td>Falcon</td><td>Compact signatures</td><td>NTRU lattices</td></tr>
+    </tbody>
+  </table></div>
+  <p>A standards-aligned plan starts by naming the job (key exchange? signature?), then picks the family, then the parameter set. HQC was selected in 2025 as a <b>backup</b> KEM built on different (code-based) math, so a future weakness in lattices would not take down everything. FN-DSA (Falcon) is still being finalized; track its status before committing.</p>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Saying "we use PQC" with no specifics. Always state algorithm, parameter set, job, protocol, and implementation &mdash; otherwise the claim is unverifiable.</p></div>
 </section>
+
 <section class="lesson" id="s2">
-  <div class="lesson-title"><span>2</span><h2>KEMs: how ML-KEM is used</h2></div>
-  <p>A key encapsulation mechanism lets a sender use a recipient public key to create a ciphertext and a shared secret. The recipient uses the private key to decapsulate and recover the same shared secret. The shared secret then feeds symmetric cryptography.</p><p>ML-KEM is derived from CRYSTALS-Kyber and uses module-lattice assumptions. Its parameter sets trade performance, size, and security strength. Implementations must preserve correct decapsulation behavior and avoid side-channel leakage.</p><p>A KEM is not the same thing as encrypting a large file. The usual pattern is KEM for key establishment, then authenticated symmetric encryption for data.</p>
-  <div class="diagram"><div class="dnode"><b>Public key</b><span>Recipient publishes.</span></div><div class="dnode"><b>Encapsulate</b><span>Sender creates secret and ciphertext.</span></div><div class="dnode"><b>Decapsulate</b><span>Recipient recovers secret.</span></div><div class="dnode"><b>Derive keys</b><span>Use secret for symmetric protection.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A server can publish an ML-KEM public key. A client encapsulates a shared secret to that key, then both sides derive keys for authenticated encryption.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not store KEM ciphertexts or public keys in old fixed-size fields without checking actual sizes.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>ML-KEM creates shared secrets; symmetric algorithms protect bulk data.</p></article>
+  <div class="lesson-title"><span class="num">2</span><h2>KEMs: how ML-KEM is actually used</h2></div>
+  <p class="lead">A KEM does not "encrypt your data." It agrees on a shared secret; symmetric crypto does the rest.</p>
+  <p>A <span class="term" data-def="Key Encapsulation Mechanism: the recipient publishes a public key; a sender uses it to produce a ciphertext plus a shared secret; the recipient decapsulates to recover the same secret.">KEM</span> has three moves: the recipient publishes a public key; the sender <b>encapsulates</b> (produces a ciphertext + a shared secret); the recipient <b>decapsulates</b> (recovers the same shared secret). That secret then feeds authenticated symmetric encryption like AES-GCM.</p>
+  <div class="flow">
+    <div class="flow-step"><b>KeyGen</b><span>Recipient publishes an ML-KEM public key.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Encapsulate</b><span>Sender makes ciphertext + shared secret.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Decapsulate</b><span>Recipient recovers the same secret.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Derive keys</b><span>Both sides run AES-GCM etc.</span></div>
   </div>
+  <div class="callout example"><span class="k">Concrete example</span><p>ML-KEM-768 (a common choice) has a 1,184-byte public key and a 1,088-byte ciphertext. A TLS server offers the key; the client encapsulates; both derive session keys. The data stream is then protected by ordinary symmetric encryption.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Trying to "ML-KEM-encrypt" a large blob directly, or stuffing KEM public keys and ciphertexts into old fixed-size fields without checking the new sizes.</p></div>
 </section>
+
 <section class="lesson" id="s3">
-  <div class="lesson-title"><span>3</span><h2>Signatures: ML-DSA and SLH-DSA</h2></div>
-  <p>ML-DSA is a lattice-based general-purpose digital signature standard derived from CRYSTALS-Dilithium. It is expected to be a practical primary choice for many signature workflows as libraries and products support it.</p><p>SLH-DSA is a stateless hash-based signature standard derived from SPHINCS+. It has a different security foundation, which makes it valuable for diversity, but it can have larger signatures and different performance tradeoffs.</p><p>Signature choice depends on verifier constraints, artifact lifetime, signature size, verification speed, validation requirements, and ecosystem support.</p>
-  <div class="diagram"><div class="dnode"><b>ML-DSA</b><span>Practical lattice signature.</span></div><div class="dnode"><b>SLH-DSA</b><span>Hash-based diversity.</span></div><div class="dnode"><b>Verifier</b><span>Must parse and enforce policy.</span></div><div class="dnode"><b>Artifact life</b><span>Long-lived signatures need long-lived verification.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A high-volume package repository may prefer ML-DSA when ecosystem support is mature. A conservative root-signing use case may evaluate SLH-DSA because its foundation differs from lattice assumptions.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not choose signatures by signer convenience alone. Verification is where many long-term compatibility problems appear.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Plan signatures around every verifier that must accept them.</p></article>
+  <div class="lesson-title"><span class="num">3</span><h2>Signatures: ML-DSA and SLH-DSA</h2></div>
+  <p class="lead">Two standardized signature families with a deliberate trade-off between performance and conservatism.</p>
+  <div class="grid2">
+    <div class="callout"><span class="k" style="color:var(--primary-ink)">ML-DSA (lattice)</span><p>The practical, general-purpose default for most workflows as tooling matures. Moderate sizes (ML-DSA-65 signature ~3,309 B), fast verification.</p></div>
+    <div class="callout"><span class="k" style="color:var(--teal)">SLH-DSA (hash-based)</span><p>Rests only on hash-function security &mdash; a very conservative foundation, valuable for long-lived roots. Cost: large signatures (7,856 B and up) and slower signing.</p></div>
   </div>
+  <p>Signature choice depends on verifier constraints, artifact lifetime, signature size, verification speed, validation requirements, and ecosystem support. FN-DSA/Falcon is attractive where signatures must be <em>small</em>, but its floating-point signing is tricky to implement safely.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>A high-volume package repository may prefer ML-DSA (small enough, fast verify). A firmware root of trust that must be trusted for 15 years may choose SLH-DSA precisely because its security rests on a different, well-understood assumption.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Choosing a signature by signer convenience. Verification &mdash; count, speed, and size limits &mdash; is where the long-term compatibility pain shows up.</p></div>
 </section>
+
 <section class="lesson" id="s4">
-  <div class="lesson-title"><span>4</span><h2>Hybrid and algorithm agility</h2></div>
-  <p>Hybrid transition combines classical and PQC mechanisms so organizations can gain PQC protection while classical systems and interoperability remain available. Hybrid is most visible in key exchange, but signature transition may also involve parallel chains or multi-signature strategies.</p><p>Hybrid designs must be protocol-defined or cryptographically reviewed. The two mechanisms need safe combination, transcript binding, downgrade protection, error handling, and telemetry.</p><p>Algorithm agility means the system can change algorithms, parameter sets, identifiers, providers, and policy without rewriting everything. Agility is what makes future HQC or FN-DSA adoption practical if and when needed.</p>
-  <div class="diagram"><div class="dnode"><b>Classical</b><span>Current compatibility.</span></div><div class="dnode"><b>PQC</b><span>Quantum-resistant component.</span></div><div class="dnode"><b>Combine safely</b><span>Protocol-defined.</span></div><div class="dnode"><b>Monitor</b><span>Detect failure and downgrade.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A company pilots hybrid TLS for internal APIs, measures handshake failure rates, then expands only after load balancers and clients prove compatible.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not invent a custom hybrid combiner in application code without qualified cryptographic review.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Hybrid reduces transition risk only when protocol rigor is preserved.</p></article>
+  <div class="lesson-title"><span class="num">4</span><h2>Hybrid transition and algorithm agility</h2></div>
+  <p class="lead">You rarely flip a switch. You run old and new together, and you design to change again later.</p>
+  <p><b>Hybrid</b> combines a classical mechanism (e.g. X25519) and a PQC mechanism (e.g. ML-KEM) so you are protected if either holds &mdash; buying safety while ecosystems catch up. <span class="term" data-def="The ability to change algorithms, parameters, identifiers, and providers without re-architecting the system.">Algorithm agility</span> means your systems can swap algorithms, parameters, identifiers, and providers without a rewrite &mdash; which is what makes a future move to HQC or FN-DSA feasible.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>A company pilots hybrid TLS on internal APIs, measures handshake failure rates, then expands only after load balancers and clients prove compatible. Agility is what lets them later add a backup KEM without touching every service.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Inventing a custom hybrid "combiner" in application code. Combination must be protocol-defined and cryptographically reviewed (transcript binding, downgrade protection, error handling).</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Hybrid reduces transition risk only when protocol rigor is preserved. Agility is the design goal that outlives any single algorithm choice.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Decide first, then reveal.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; TLS key exchange</h3>
+      <p class="scenario">You need quantum-safe key establishment for web traffic during a multi-year transition.</p>
+      <p class="decide">Which family, and in what mode?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> ML-KEM, typically in a <em>hybrid</em> mode (e.g. X25519+ML-KEM-768) so you keep interoperability while gaining PQC protection.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; Document signing</h3>
+      <p class="scenario">You must sign documents whose signatures may be verified for many years.</p>
+      <p class="decide">ML-DSA or SLH-DSA &mdash; how do you decide?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Either can be correct. Decide on verifier compatibility, acceptable signature size, verification speed, and how conservative the trust anchor must be. SLH-DSA's hash-only foundation appeals for very long-lived, high-assurance roots; ML-DSA is the smaller, faster default.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; Backup KEM planning</h3>
+      <p class="scenario">A colleague says "let's wait for HQC instead of deploying ML-KEM now."</p>
+      <p class="decide">Good idea?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> No. HQC's role is <em>diversity/backup</em> on different math, not a reason to delay. Deploy ML-KEM now and keep agility so HQC can be added later if warranted.</p>
+    </article>
   </div>
 </section>
-<section class="lab" id="labs"><h2>Use-Case Labs</h2><p>These are practical exercises. Read the challenge, decide your answer, then reveal the recommended answer and compare.</p><div class="cases"><article class="case"><h3>TLS key exchange</h3><p><b>Challenge:</b> Choose the relevant standard family.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> ML-KEM, often in a hybrid transition mode, is the relevant starting point.</p></article><article class="case"><h3>Document signing</h3><p><b>Challenge:</b> Choose the relevant standard family.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> ML-DSA or SLH-DSA; the choice depends on verifier compatibility, size, performance, and policy.</p></article><article class="case"><h3>Backup KEM planning</h3><p><b>Challenge:</b> Explain HQC&#x27;s role.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> HQC provides a different mathematical foundation as a backup KEM path, not a reason to delay ML-KEM planning.</p></article></div></section>
-<section class="quiz" id="quiz"><h2>Knowledge Check</h2><p>Pick an answer. The page will mark the correct answer and keep score.</p><div id="quizBox"></div><div class="score" id="quizScore">Score: 0/0</div></section>
-<section class="sources" id="sources"><h2>Primary Sources</h2><p>Use these as the standards trail before production decisions.</p><a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC Post-Quantum Cryptography Project</a><a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203: ML-KEM</a><a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204: ML-DSA</a><a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205: SLH-DSA</a><a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST HQC selection announcement</a><a href="https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc" target="_blank" rel="noopener noreferrer">NCCoE Migration to Post-Quantum Cryptography</a><a href="https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-national-se/" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 guidance</a></section>
-</main></div>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"Which standard specifies ML-KEM?","choices":["FIPS 203","FIPS 204","FIPS 205"],"answer":0,"explain":"FIPS 203 = ML-KEM (key establishment). FIPS 204 = ML-DSA, FIPS 205 = SLH-DSA (signatures)."},
+    {"q":"What is a KEM actually for?","choices":["Agreeing on a shared secret, not encrypting big files","Document typography","Password reset screens"],"answer":0,"explain":"A KEM establishes a shared secret; symmetric crypto then protects the bulk data."},
+    {"q":"What is SLH-DSA's advantage over ML-DSA?","choices":["Its security rests only on hash functions (conservative, diverse)","It has the smallest signatures","It needs no verifier"],"answer":0,"explain":"SLH-DSA is hash-based, giving a different, conservative foundation - at the cost of large signatures and slower signing."},
+    {"q":"Roughly how does an ML-DSA-65 signature compare to ECDSA P-256?","choices":["Much larger (thousands of bytes vs ~72)","Identical size","Much smaller"],"answer":0,"explain":"ML-DSA-65 is ~3,309 bytes versus ~72 for ECDSA P-256 - the size jump drives many migration issues."},
+    {"q":"What is the point of hybrid key exchange?","choices":["Stay safe if either the classical or PQC part holds","Double the encryption speed","Remove the need for certificates"],"answer":0,"explain":"Hybrid combines classical and PQC so a break in one does not break the session, easing transition."},
+    {"q":"Why build algorithm agility?","choices":["Standards, products, and risks change over time","To skip all testing","To avoid keeping an inventory"],"answer":0,"explain":"Agility lets you swap algorithms/parameters/providers later (e.g. adopt HQC) without re-architecting."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Educational; verify sizes and status against the standards themselves.</p>
+  <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203 &mdash; ML-KEM</a>
+  <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
+  <a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205 &mdash; SLH-DSA</a>
+  <a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST &mdash; HQC selection announcement</a>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; PQC project (FN-DSA status)</a>
+</section>
+</main>
+</div>
+
 <button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
-<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card"><div class="help-head"><h2 id="helpTitle">How to use this module</h2><button class="btn" id="closeHelp">Close</button></div><p>This module is intentionally lesson-based, not a glossary. Read the explanation, inspect the diagram, review the example and pitfall, then use the use-case labs to apply the concept.</p><p>Use the side navigation to jump, the Top button on mobile, and the knowledge check to test retention.</p><p class="disclaimer">This is educational material, not production cryptographic approval.</p></div></div>
-<script>
-const root=document.documentElement,themeBtn=document.getElementById('themeBtn');function setTheme(t){root.dataset.theme=t;localStorage.setItem('pqc-theme',t);themeBtn.textContent=t==='dark'?'Light':'Dark'}setTheme(localStorage.getItem('pqc-theme')||'light');themeBtn.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');const help=document.getElementById('helpModal');document.getElementById('helpBtn').onclick=()=>help.classList.add('open');document.getElementById('closeHelp').onclick=()=>help.classList.remove('open');help.addEventListener('click',e=>{if(e.target===help)help.classList.remove('open')});document.querySelectorAll('.reveal').forEach(btn=>btn.onclick=()=>{const card=btn.closest('.case');card.classList.toggle('open');btn.textContent=card.classList.contains('open')?'Hide answer':'Show answer'});const nav=[...document.querySelectorAll('.side a')];const secs=nav.map(a=>document.querySelector(a.getAttribute('href')));addEventListener('scroll',()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<130)idx=i});nav.forEach((a,i)=>a.classList.toggle('active',i===idx))},{passive:true});const quiz=[["Which standard specifies ML-KEM?", ["FIPS 203", "FIPS 204", "FIPS 205"], 0], ["What is ML-KEM for?", ["Key establishment", "Document typography", "Password reset UI"], 0], ["What is SLH-DSA?", ["A stateless hash-based signature standard", "A VPN brand", "A storage format"], 0], ["Why build algorithm agility?", ["Standards, products, and risks can change", "To remove testing", "To avoid inventories"], 0]];const qb=document.getElementById('quizBox'),score=document.getElementById('quizScore');let answers={};function renderQuiz(){qb.innerHTML=quiz.map((q,i)=>`<div class="quiz-q"><strong>${i+1}. ${q[0]}</strong><div class="choices">${q[1].map((c,j)=>`<button class="choice" data-q="${i}" data-a="${j}">${c}</button>`).join('')}</div><div class="feedback" id="fb${i}"></div></div>`).join('');qb.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.q),a=Number(b.dataset.a);answers[i]=a;const parent=b.closest('.quiz-q');parent.querySelectorAll('.choice').forEach((x,j)=>{x.classList.remove('ok','bad');if(j===quiz[i][2])x.classList.add('ok');else if(j===a)x.classList.add('bad')});document.getElementById('fb'+i).textContent=a===quiz[i][2]?'Correct':'Review the lesson and compare with the use-case labs.';updateScore()})}function updateScore(){const total=quiz.length,got=Object.keys(answers).filter(i=>answers[i]===quiz[i][2]).length;score.textContent=`Score: ${got}/${total}`}renderQuiz();updateScore();
-</script>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Start with the size comparison &mdash; those ratios explain most PQC engineering pain. Then read each family's lesson and try the labs.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
 </body>
 </html>

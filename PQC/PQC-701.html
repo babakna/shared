@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PQC-701 - Capstone: Migrate "Northwind Telecom"</title>
+<meta name="description" content="A guided capstone: take a fictional telecom operator through a full quantum-safe migration and make the key decisions yourself.">
+<link rel="stylesheet" href="assets/pqc.css">
+</head>
+<body data-module="PQC-701">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-701</span><span>Capstone: Migrate Northwind Telecom</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
+
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>The scenario</a>
+  <a href="#s1"><span class="dot"></span>1. Inventory &amp; triage</a>
+  <a href="#s2"><span class="dot"></span>2. Choose algorithms</a>
+  <a href="#s3"><span class="dot"></span>3. Sequence the waves</a>
+  <a href="#s4"><span class="dot"></span>4. Prove &amp; govern</a>
+  <a href="#quiz"><span class="dot"></span>Final assessment</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Capstone</span>
+    <div class="meta"><span class="level advanced">Advanced</span><span class="level time">~30 min</span><span class="level time">Everything together</span></div>
+    <h1>Capstone: Migrate "Northwind Telecom"</h1>
+    <p class="sub">You are the newly appointed crypto-migration lead at a mid-size mobile operator. Over four decision points you will apply everything from PQC-001 through 601 to a single, realistic organization. Make the call, then compare.</p>
+    <ul class="outcomes">
+      <li>Turn an inventory into a risk-tiered plan.</li>
+      <li>Pick algorithms and modes for each system.</li>
+      <li>Sequence waves and define the evidence of success.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/migration-roadmap.svg" alt="A migration roadmap used as the capstone backdrop.">
+</section>
+
+<section class="block" id="explore">
+  <h2>The scenario: Northwind Telecom</h2>
+  <p class="section-hint">Meet the estate you must make quantum-safe. Step through the systems in scope.</p>
+  <div class="pqc-stepper" data-title="Northwind Telecom - systems in scope">
+    <script type="application/json" class="steps">
+    [
+      {"title":"Public customer portal & API","body":"External TLS behind a CDN, serving browsers and a 3-year-old mobile app that pins certificates. Sessions carry auth tokens and personal data.","meta":"job: key exchange + cert signatures"},
+      {"title":"Core network (5G)","body":"Service-based interfaces use mutual TLS; SUCI conceals subscriber identity with elliptic-curve public-key crypto. Roaming partners vary in readiness.","meta":"job: TLS + identity concealment"},
+      {"title":"eSIM provisioning","body":"GSMA RSP with a certificate hierarchy; profiles installed on constrained eUICC secure elements across many device models.","meta":"job: PKI signatures + key establishment"},
+      {"title":"Field devices","body":"Millions of IoT sensors and routers, 8-12 year life, firmware verified by ECDSA in bootloaders - some immutable.","meta":"job: signatures, immutable verifiers"},
+      {"title":"Data platform","body":"AES-256 data lake with 7-year backups; data keys wrapped by an RSA-based KMS.","meta":"job: key wrapping (not bulk crypto)"}
+    ]
+    </script>
+  </div>
+  <div class="callout takeaway"><span class="k">Your mission</span><p>Produce a defensible plan: inventory &amp; triage, algorithm choices, wave sequence, and the evidence you will show the board. Work each decision below before revealing.</p></div>
+</section>
+
+<section class="block lab" id="s1">
+  <div class="lesson-title"><span class="num">1</span><h2>Decision 1 &middot; Inventory &amp; triage</h2></div>
+  <div class="cases"><article class="case">
+    <p class="scenario">You have four weeks before the first steering committee. Everyone wants "their" system migrated first.</p>
+    <p class="decide">What is your first deliverable, and how do you rank the five systems above?</p>
+    <button class="btn small reveal">Show recommended answer</button>
+    <p class="answer"><span class="k">Recommended answer</span> First deliverable: a <b>CBOM</b> covering all five, with owners and data lifetimes. Triage by harvest-now-decrypt-later risk: <b>Tier 1</b> = eSIM provisioning + KMS key-wrapping + core TLS/SUCI + public portal key exchange (long-lived, exposed, public-key). <b>Highest-urgency-but-hardest</b> = field devices with immutable verifiers (start the hardware/agility track now even though field fixes are slow). The AES-256 bulk data is <em>not</em> the risk &mdash; its RSA key-wrapping is.</p>
+  </article></div>
+</section>
+
+<section class="block lab" id="s2">
+  <div class="lesson-title"><span class="num">2</span><h2>Decision 2 &middot; Choose algorithms and modes</h2></div>
+  <div class="cases"><article class="case">
+    <p class="scenario">For each Tier-1 system you must pick a family and mode now.</p>
+    <p class="decide">What do you choose for portal TLS, KMS key-wrapping, eSIM signatures, and the firmware verifier?</p>
+    <button class="btn small reveal">Show recommended answer</button>
+    <p class="answer"><span class="k">Recommended answer</span> Portal TLS: <b>hybrid X25519+ML-KEM</b> key exchange (keep classical certs until PKI is ready). KMS: <b>ML-KEM/hybrid</b> key wrapping, then rewrap data keys (no bulk re-encryption). eSIM: <b>ML-DSA</b> where the eUICC can fit it, with parameter sets chosen for size/verify speed; stage the GSMA trust chain. Firmware: new hardware with a <b>crypto-agile, PQC-capable (or dual) verifier</b> &mdash; SLH-DSA is attractive for a long-lived root of trust. Store algorithm identifiers everywhere for agility.</p>
+  </article></div>
+</section>
+
+<section class="block lab" id="s3">
+  <div class="lesson-title"><span class="num">3</span><h2>Decision 3 &middot; Sequence the waves</h2></div>
+  <div class="cases"><article class="case">
+    <p class="scenario">Leadership wants a single "all done by next year" date.</p>
+    <p class="decide">How do you sequence realistically, and what do you tell leadership?</p>
+    <button class="btn small reveal">Show recommended answer</button>
+    <p class="answer"><span class="k">Recommended answer</span> Reject the single date; propose waves. <b>Wave 0:</b> inventory + governance + agility policy for new hardware. <b>Wave 1:</b> hybrid TLS on portal and core SBA, KMS rewrap (quick, high-value). <b>Wave 2:</b> eSIM trust chain with SIM/device vendors. <b>Wave 3:</b> firmware dual-signing + agile bootloaders in new device SKUs. <b>Wave 4:</b> long tail, roaming partners, exceptions with expiry. Tell leadership: aggressive dates for Tier 1, refresh-cycle for Tier 2, a hardware/replacement track for immutable devices, and a dashboard instead of a fictitious uniform date.</p>
+  </article></div>
+</section>
+
+<section class="block lab" id="s4">
+  <div class="lesson-title"><span class="num">4</span><h2>Decision 4 &middot; Prove it and govern it</h2></div>
+  <div class="cases"><article class="case">
+    <p class="scenario">Six months in, the board asks whether Northwind is really becoming quantum-safe.</p>
+    <p class="decide">What evidence do you present, and how do you handle the immutable-device fleet?</p>
+    <button class="btn small reveal">Show recommended answer</button>
+    <p class="answer"><span class="k">Recommended answer</span> Present system metrics: CBOM coverage %, share of portal/core sessions negotiating a PQC group, KMS keys rewrapped, eSIM trust-chain readiness, new device SKUs shipping with agile verifiers, and open blockers with owners/dates. For immutable field devices: a documented, board-accepted <b>exception</b> with compensating controls (segmentation, monitoring, shorter data lifetimes) and a scheduled replacement program &mdash; residual risk owned, time-boxed, and re-reviewed. Evidence, not assertions; exceptions that expire, not permanent silence.</p>
+  </article></div>
+</section>
+
+<section class="block quiz" id="quiz">
+  <h2>Final assessment</h2>
+  <p class="section-hint">Eight questions spanning the whole course. Score 70%+ to complete the capstone.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"Northwind's AES-256 data lake: what is actually at quantum risk?","choices":["The RSA key-wrapping in the KMS","AES-256 itself","The disk format"],"answer":0,"explain":"AES-256 resists Grover with margin; the RSA-wrapped data keys are the harvest-now target. Rewrap them via a PQC/hybrid KEM."},
+    {"q":"For the public portal during transition, the best key exchange is:","choices":["Hybrid X25519+ML-KEM","RSA-4096","Plain X25519"],"answer":0,"explain":"Hybrid gives PQC protection while preserving interoperability with the pinned, older mobile app and middleboxes."},
+    {"q":"Why start the field-device track immediately despite slow field fixes?","choices":["Immutable verifiers can't be upgraded later; manufacturing decisions dominate","Devices are cheap","They update hourly"],"answer":0,"explain":"You can't retrofit an immutable verifier, so agile PQC-capable hardware must enter the pipeline now."},
+    {"q":"A single 'all crypto done next year' deadline is:","choices":["Unrealistic - use risk tiers and waves","The best practice","Required by NIST"],"answer":0,"explain":"Tiers differ in urgency and some items are vendor/hardware-blocked; one date creates panic and waste."},
+    {"q":"What proves migration progress to the board?","choices":["System metrics (negotiated PQC groups, coverage, rewraps, blockers)","A confident slide","The number of vendors emailed"],"answer":0,"explain":"Evidence comes from systems, not assertions."},
+    {"q":"For a long-lived firmware root of trust, why consider SLH-DSA?","choices":["Its hash-based foundation is conservative and diverse from lattices","It has the smallest signatures","It needs no verifier"],"answer":0,"explain":"Diversity of assumption matters most for very long-lived, high-assurance roots."},
+    {"q":"An immutable device fleet that can't be fixed should be handled by:","choices":["A time-boxed, owned exception with compensating controls + replacement plan","Ignoring it","Claiming it is already safe"],"answer":0,"explain":"Residual risk must be explicitly accepted, mitigated, and scheduled for replacement - not hidden."},
+    {"q":"The single capability that makes future algorithm changes feasible is:","choices":["Crypto-agility (stored algorithm IDs, swappable providers, hybrid)","A faster CPU","More disk space"],"answer":0,"explain":"Agility lets Northwind adopt backups (e.g. HQC) or new parameters without re-architecting."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Northwind Telecom is fictional. Anchor real plans in primary guidance.</p>
+  <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+  <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/" target="_blank" rel="noopener noreferrer">GSMA &mdash; eSIM / RSP</a>
+  <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; Post-Quantum resources</a>
+</section>
+</main>
+</div>
+
+<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this capstone</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Work each of the four decisions before revealing the recommendation, then take the eight-question final assessment. It draws on every earlier module.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Northwind Telecom is a teaching scenario. Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
+</body>
+</html>

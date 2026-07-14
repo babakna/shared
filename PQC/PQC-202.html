@@ -3,72 +3,178 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PQC-202 - Protocols in Practice: TLS, SSH, VPN, PKI, Email, and Code Signing</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f9fd;--card:#fff;--ink:#0b1220;--muted:#536178;--line:#dbe6f4;--soft:#ecf3fb;--primary:#174e86;--teal:#0e766e;--red:#b42318;--green:#087443;--amber:#a45d00;--shadow:0 14px 34px rgba(22,50,90,.12);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}[data-theme="dark"]{--bg:#0b1220;--card:#142033;--ink:#eef5ff;--muted:#b9c8dc;--line:#2b405d;--soft:#1f3048;--primary:#77b9ff;--teal:#6bd9ce;--red:#ffb4ac;--green:#79dba7;--amber:#ffd08a;--shadow:0 14px 34px rgba(0,0,0,.30)}html{scroll-behavior:smooth}body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(23,78,134,.14),transparent 34%),var(--bg);color:var(--ink);line-height:1.72;-webkit-text-size-adjust:100%;overflow-x:hidden}.top{position:sticky;top:0;z-index:30;background:rgba(246,249,253,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}[data-theme="dark"] .top{background:rgba(11,18,32,.9)}.top-in{max-width:1260px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:10px;align-items:center;font-weight:900;flex-wrap:wrap}.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--teal))}.version{font-size:.76rem;color:var(--muted);font-weight:900}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-weight:850;cursor:pointer;min-height:38px;text-decoration:none;box-shadow:0 6px 18px rgba(22,50,90,.07)}.btn.small{font-size:.84rem;min-height:34px;padding:7px 10px}.layout{max-width:1260px;margin:0 auto;padding:18px 16px 42px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.side{position:sticky;top:62px;height:calc(100vh - 80px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px}.side a{display:block;text-decoration:none;color:var(--muted);padding:9px 10px;border-radius:10px;font-weight:850;font-size:.88rem}.side a:hover,.side .active{background:var(--soft);color:var(--primary)}.hero{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:30px;margin-bottom:18px}.hero-img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(22,50,90,.12)}.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1;letter-spacing:-.045em;margin:12px 0}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.chip{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:850;font-size:.8rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.outcomes li{list-style:none;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted)}.architecture{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.architecture h2{font-size:1.55rem;margin-bottom:10px}.architecture p{color:var(--muted);margin-bottom:12px}.architecture-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#f8fbff;box-shadow:0 12px 28px rgba(22,50,90,.10)}[data-theme="dark"] .architecture-img{background:#0b1220}.visual-note{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.visual-note span{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted);font-weight:800;font-size:.88rem}@media(max-width:980px){.visual-note{grid-template-columns:1fr}}.lesson,.lab,.quiz,.sources{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}.lesson-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}.lesson-title span{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;font-weight:950}h2{font-size:1.55rem;line-height:1.15}.lesson p,.lab p,.quiz p,.sources p,.lesson li{color:var(--muted);margin-bottom:11px}.diagram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:18px;padding:16px;margin:18px 0}.dnode{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--primary);border-radius:14px;padding:13px;min-height:118px}.dnode:nth-child(2n){border-top-color:var(--teal)}.dnode:nth-child(3n){border-top-color:#6955b8}.dnode:nth-child(4n){border-top-color:var(--amber)}.dnode b{display:block;margin-bottom:6px;color:var(--ink)}.dnode span{display:block;color:var(--muted);font-size:.92rem}.teaching{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.teach{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.teach h3{font-size:1rem;margin-bottom:6px}.teach p{margin:0;color:var(--muted)}.example{background:rgba(14,118,110,.10)}.pitfall{background:rgba(180,35,24,.08)}.takeaway{background:rgba(23,78,134,.10)}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.case{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.case h3{margin-bottom:8px}.answer{display:none;margin-top:10px}.case.open .answer{display:block}.quiz-q{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:var(--soft)}.choices{display:grid;gap:8px;margin-top:8px}.choice{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer}.choice.ok{border-color:var(--green);background:rgba(8,116,67,.12)}.choice.bad{border-color:var(--red);background:rgba(180,35,24,.10)}.feedback{font-weight:850;margin-top:8px}.score{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:900}.sources a{display:block;margin:8px 0;color:var(--primary);font-weight:850}.disclaimer{color:var(--red)!important;font-weight:900}.toplink{position:fixed;right:18px;bottom:18px;border-radius:999px;z-index:25;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-color:transparent}.help-modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,12,24,.55);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;max-width:780px;max-height:86vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:64px 22px 22px}.help-head #closeHelp{position:absolute;top:16px;right:16px}@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:relative;top:auto;height:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.hero{grid-template-columns:1fr}.hero-img{max-height:260px;object-fit:cover}.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr 1fr}}@media(max-width:560px){.layout{padding:12px}.buttons{width:100%}.side,.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr}.btn{font-size:.82rem;padding:8px 9px}.hero{padding:20px}.hero h1{font-size:2.05rem}h2{font-size:1.28rem}.toplink{right:12px;bottom:12px}}
-</style>
+<title>PQC-202 - Protocols in Practice</title>
+<meta name="description" content="Where PQC shows up in TLS, SSH, VPN, PKI, email, and code signing - and what breaks if you ignore the surrounding ecosystem.">
+<link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body>
-<header class="top"><div class="top-in"><div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC-202</span><span>Protocols in Practice: TLS, SSH, VPN, PKI, Email, and Code Signing</span><span class="version">V2.1 (July 2026)</span></div><div class="buttons"><a class="btn" href="index.html">Home</a><button class="btn" id="themeBtn">Dark</button><button class="btn" id="helpBtn">Help</button></div></div></header>
-<div class="layout"><nav class="side" aria-label="Module sections"><a href="#architecture">Architecture diagram</a><a href="#s1">TLS and HTTPS</a><a href="#s2">SSH and VPN</a><a href="#s3">Email and messaging trust</a><a href="#s4">Code signing and package ecosystems</a><a href="#labs">Use-case labs</a><a href="#quiz">Knowledge check</a><a href="#sources">Sources</a></nav>
-<main>
-<section class="hero" id="start"><div><span class="chip">Protocol practice</span><h1>Protocols in Practice: TLS, SSH, VPN, PKI, Email, and Code Signing</h1><p>Concrete protocol-level examples showing where PQC changes appear and what breaks if the surrounding ecosystem is ignored.</p><ul class="outcomes"><li>Describe how PQC appears in common protocols.</li><li>Identify common interoperability and certificate-chain risks.</li><li>Separate protocol migration from application feature work.</li></ul><p class="disclaimer">Educational reference only. Production cryptography decisions need current standards checks, vendor validation, security review, interoperability testing, and rollback planning.</p></div><img class="hero-img" src="./diagrams/protocol-stack.svg" alt="Protocols in Practice: TLS, SSH, VPN, PKI, Email, and Code Signing architecture diagram"></section>
+<body data-module="PQC-202">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
 
-<section class="architecture" id="architecture">
-  <h2>Protocol Stack Impact</h2>
-  <p>Where PQC shows up across TLS, SSH, VPN, PKI, email, code signing, clients, middleboxes, and verifiers.</p>
-  <img class="architecture-img" src="./diagrams/protocol-stack.svg" alt="Protocol Stack Impact">
-  <div class="visual-note"><span>Read the picture first</span><span>Then read the lesson text</span><span>Use labs to apply it</span></div>
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: PQC across protocols</a>
+  <a href="#s1"><span class="dot"></span>1. TLS and HTTPS</a>
+  <a href="#s2"><span class="dot"></span>2. SSH and VPN</a>
+  <a href="#s3"><span class="dot"></span>3. Email and messaging</a>
+  <a href="#s4"><span class="dot"></span>4. Code &amp; package signing</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Protocols</span>
+    <div class="meta"><span class="level intermediate">Intermediate</span><span class="level time">~30 min read</span><span class="level time">Interactive</span></div>
+    <h1>Protocols in Practice</h1>
+    <p class="sub">Algorithms live inside protocols, and protocols live inside ecosystems. This module shows exactly where PQC appears in the systems you use daily &mdash; and why the surrounding parts, not the crypto, usually break first.</p>
+    <ul class="outcomes">
+      <li>Locate the PQC change points in TLS, SSH, VPN, email, and code signing.</li>
+      <li>Predict what breaks when the ecosystem is ignored.</li>
+      <li>Read a real command that negotiates a hybrid PQC handshake.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/protocol-stack.svg" alt="A protocol stack highlighting where post-quantum key exchange and signatures plug into TLS, SSH, VPN, email, and code signing.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: where does PQC plug into each protocol?</h2>
+  <p class="section-hint">Each protocol changes in a different place. Step through the map.</p>
+  <div class="pqc-stepper" data-title="PQC change points by protocol">
+    <script type="application/json" class="steps">
+    [
+      {"title":"TLS / HTTPS","body":"Key exchange group (ML-KEM, usually hybrid) plus certificate and handshake signatures (ML-DSA/SLH-DSA). Biggest risk: middleboxes and old clients choking on larger handshakes.","meta":"change: key exchange + signatures"},
+      {"title":"SSH","body":"Key-exchange method names carry PQC (e.g. hybrid ML-KEM methods) and host/user keys can move to PQC signatures. Biggest risk: mismatched client/server versions and pinned host keys.","meta":"change: kex method + host keys"},
+      {"title":"IPsec / VPN","body":"IKEv2 gains PQC key exchange, sometimes via multiple key-exchange rounds. Biggest risk: vendor appliances that update slowly and fragmentation of larger messages.","meta":"change: IKEv2 key exchange"},
+      {"title":"Email (S/MIME) & messaging","body":"Signing and key establishment move to PQC. Biggest risk: long-lived stored mail, diverse clients, and directory/key-distribution lag.","meta":"change: signing + key establishment"},
+      {"title":"Code & package signing","body":"Signatures move to ML-DSA/SLH-DSA. Biggest risk: every verifier (bootloaders, package managers, app stores) must accept the new signature before you can enforce it.","meta":"change: signatures + all verifiers"}
+    ]
+    </script>
+  </div>
+  <div class="callout takeaway"><span class="k">Pattern</span><p>In every protocol the crypto swap is the easy 20%. The other 80% is intermediaries, versions, sizes, and verifiers.</p></div>
 </section>
 
 <section class="lesson" id="s1">
-  <div class="lesson-title"><span>1</span><h2>TLS and HTTPS</h2></div>
-  <p>For HTTPS, PQC usually appears first in key establishment experiments and hybrid modes. Later, certificate signatures and certificate-chain support become a major part of the transition.</p><p>The migration surface includes browsers, mobile OS TLS stacks, CDNs, load balancers, WAFs, proxies, application servers, observability tools, certificate automation, and incident response playbooks.</p><p>A real test should measure handshake size, latency, failure rate, client compatibility, middlebox behavior, downgrade resistance, and certificate parsing.</p>
-  <div class="diagram"><div class="dnode"><b>Client</b><span>Browser, app, device.</span></div><div class="dnode"><b>Middleboxes</b><span>CDN, proxy, WAF.</span></div><div class="dnode"><b>Origin</b><span>Server TLS stack.</span></div><div class="dnode"><b>Telemetry</b><span>Failures, latency, downgrade.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>An API may support hybrid TLS at the origin but fail when traffic passes through an older enterprise proxy.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not declare success based only on a direct curl test from a developer laptop.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>TLS migration is path-dependent.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">1</span><h2>TLS and HTTPS</h2></div>
+  <p class="lead">TLS is the highest-traffic migration and the best-tooled today.</p>
+  <p>Modern stacks support hybrid key exchange combining X25519 with ML-KEM. You can even negotiate it from the command line to see it work:</p>
+  <pre class="code"><span class="cmt"># Negotiate a hybrid X25519+ML-KEM-768 group with OpenSSL 3.5+ (or oqs-provider)</span>
+openssl s_client -connect example.com:443 \
+  -groups <span class="str">X25519MLKEM768</span> -tls1_3
+
+<span class="cmt"># Look for the negotiated group in the output:</span>
+<span class="cmt">#   Negotiated TLS1.3 group: X25519MLKEM768</span></pre>
+  <div class="callout example"><span class="k">Concrete example</span><p>Major browsers and CDNs already negotiate hybrid ML-KEM for a large share of traffic. Certificates, however, still mostly use classical signatures because PQC certificate chains are bigger and the whole PKI must catch up first (see PQC-102 and PQC-001).</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Enabling PQC on the server and declaring victory. Test through your real CDN, WAF, load balancer, and oldest supported clients &mdash; that is where larger handshakes fail.</p></div>
 </section>
+
 <section class="lesson" id="s2">
-  <div class="lesson-title"><span>2</span><h2>SSH and VPN</h2></div>
-  <p>SSH and VPNs often protect administrative or internal access, so they can be high priority even if not public websites. Their key exchange, host keys, certificates, and client compatibility all matter.</p><p>Many environments have old clients, appliances, jump hosts, scripts, and automation that assume specific algorithms. PQC migration must be staged to avoid locking out administrators or silently falling back to weak modes.</p><p>Policy needs to define which algorithms are preferred, which are allowed only temporarily, and which are blocked.</p>
-  <div class="diagram"><div class="dnode"><b>User/client</b><span>Admin tools and scripts.</span></div><div class="dnode"><b>Gateway</b><span>VPN or jump host.</span></div><div class="dnode"><b>Internal target</b><span>Protected systems.</span></div><div class="dnode"><b>Policy</b><span>Allowed algorithms and fallback.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A jump host can support a hybrid key exchange, but an old automation client may fail unless the rollout first upgrades client tooling.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not remove legacy support before confirming emergency access paths.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Administrative access protocols require careful compatibility and rollback planning.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">2</span><h2>SSH and VPN</h2></div>
+  <p class="lead">Both are key-exchange-heavy and both have long-lived, slow-moving endpoints.</p>
+  <p>OpenSSH added post-quantum hybrid key exchange (e.g. an ML-KEM/X25519 method) and now defaults to it in recent versions &mdash; a great example of a quiet, successful migration. VPNs based on IKEv2 can carry PQC key exchange, sometimes using multiple key-exchange payloads, but appliance firmware often lags.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Protocol</th><th>PQC change</th><th>Ecosystem risk</th></tr></thead>
+    <tbody>
+      <tr><td>SSH</td><td>Hybrid ML-KEM key-exchange method; PQC host/user keys later</td><td>Old clients/servers negotiate down; pinned host keys</td></tr>
+      <tr><td>IPsec/IKEv2 VPN</td><td>PQC key exchange in IKE_SA</td><td>Vendor appliance update cadence; message fragmentation</td></tr>
+      <tr><td>WireGuard-style</td><td>Needs a PQC-aware variant/overlay</td><td>Fixed handshake design; requires protocol changes</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>You upgrade servers to a PQC-capable SSH, but a fleet of old jump hosts silently falls back to classical key exchange. Without monitoring which group was actually negotiated, you would believe you migrated when you did not.</p></div>
 </section>
+
 <section class="lesson" id="s3">
-  <div class="lesson-title"><span>3</span><h2>Email and messaging trust</h2></div>
-  <p>Email security uses several cryptographic layers, including TLS transport, DKIM signatures, S/MIME or PGP in some environments, and identity or domain authentication. Each layer has different migration timing.</p><p>Messaging systems may use end-to-end encryption, identity keys, device keys, prekeys, signatures, and server transport protection. PQC migration depends heavily on protocol design and client support.</p><p>The learner should identify which layer protects confidentiality, which proves identity, and which creates forward secrecy.</p>
-  <div class="diagram"><div class="dnode"><b>Transport</b><span>TLS between servers.</span></div><div class="dnode"><b>Domain</b><span>DKIM and SPF/DMARC ecosystem.</span></div><div class="dnode"><b>End-to-end</b><span>S/MIME, PGP, messaging protocols.</span></div><div class="dnode"><b>Client</b><span>Key and certificate support.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A mail server may adopt hybrid TLS before S/MIME certificate ecosystems are ready for PQC signatures.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not assume transport encryption solves end-to-end message confidentiality.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Email and messaging have layered cryptography with different PQC paths.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">3</span><h2>Email and messaging trust</h2></div>
+  <p class="lead">Email is the hardest "easy" case: ancient, federated, and full of long-lived stored data.</p>
+  <p>S/MIME and PGP use signatures and key establishment that both move to PQC. But mail is stored for years, read by a huge variety of clients, and depends on directories/key servers to distribute keys. Modern secure messengers (Signal-style) have moved faster: some added PQC key establishment to their key-agreement ratchets, precisely because their clients update frequently and centrally.</p>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>The more centrally and frequently a system's clients update, the easier PQC is. Federated, long-retention systems (email) are the slowest.</p></div>
 </section>
+
 <section class="lesson" id="s4">
-  <div class="lesson-title"><span>4</span><h2>Code signing and package ecosystems</h2></div>
-  <p>Code signing protects software supply chains. A signature may be verified by package managers, operating systems, bootloaders, CI/CD tools, app stores, browsers, security scanners, and customer environments.</p><p>PQC signature migration must account for artifact formats, signature size, timestamping, transparency logs, offline verification, HSM support, and old verifiers. It is often a long-tail migration.</p><p>A safe transition can use parallel signatures, metadata versioning, staged verifier updates, and explicit policy.</p>
-  <div class="diagram"><div class="dnode"><b>Build</b><span>Creates artifact.</span></div><div class="dnode"><b>Sign</b><span>Private key in HSM/KMS.</span></div><div class="dnode"><b>Distribute</b><span>Registry, app store, update server.</span></div><div class="dnode"><b>Verify</b><span>OS, device, customer, scanner.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A container signing system may support a new signature algorithm while a customer&#x27;s policy engine still rejects the artifact because it cannot parse the new signature metadata.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not update the signing pipeline before all critical verifiers are ready.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Code signing is a supply-chain ecosystem, not a single tool.</p></article>
+  <div class="lesson-title"><span class="num">4</span><h2>Code signing and package ecosystems</h2></div>
+  <p class="lead">Signatures again &mdash; and here the verifiers are everywhere and outlive the signer.</p>
+  <p>Firmware, OS packages, container images, app-store binaries, and software releases are all signed. Migration is gated by <em>verifiers</em>: bootloaders, package managers, app stores, and update clients must all accept the new signature algorithm before you can enforce it. Some ecosystems adopt PQC by adding a parallel signature alongside the classical one during transition.</p>
+  <details class="deep"><summary>Go deeper: dual-signing during transition</summary>
+    <div class="deep-body">
+      <p>A common pattern: attach <em>both</em> a classical signature and a PQC signature to each artifact. New verifiers check the PQC one; old verifiers keep using the classical one. Once all verifiers support PQC, the classical signature is dropped. This trades bigger artifacts and more signing work for a safe, gradual cutover &mdash; and it only works if your artifact format allows multiple signatures.</p>
+    </div>
+  </details>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Enforcing PQC-only signing before the long tail of verifiers can validate it &mdash; instantly bricking updates for older devices.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Decide first, then reveal.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; "We turned on PQC in TLS"</h3>
+      <p class="scenario">A team enabled hybrid ML-KEM on their load balancer and reported the migration done.</p>
+      <p class="decide">What evidence would actually prove it, and what did they likely miss?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Prove it by logging the negotiated group across real clients and paths, not just a lab curl. They likely missed old clients/middleboxes that downgrade, and the certificate signatures (still classical). Key exchange PQC is necessary but not the whole story.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; VPN appliance</h3>
+      <p class="scenario">Your VPN vendor says PQC support is "coming next year."</p>
+      <p class="decide">What can you do now?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Inventory it, record the dependency and data lifetime, add it to procurement/roadmap tracking, and consider compensating controls (segmentation, shorter-lived data) until the firmware supports PQC key exchange.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; Firmware signing cutover</h3>
+      <p class="scenario">You want to require PQC signatures on firmware for a fleet with 8-year-old devices in the field.</p>
+      <p class="decide">How do you avoid bricking the old fleet?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Dual-sign (classical + PQC) during transition so old bootloaders keep validating, roll PQC-capable bootloaders through the fleet, then drop the classical signature only once verification coverage is confirmed.</p>
+    </article>
   </div>
 </section>
-<section class="lab" id="labs"><h2>Use-Case Labs</h2><p>These are practical exercises. Read the challenge, decide your answer, then reveal the recommended answer and compare.</p><div class="cases"><article class="case"><h3>Public API</h3><p><b>Challenge:</b> Design the first PQC pilot.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Start with hybrid TLS in a controlled path, then test clients, middleboxes, telemetry, and rollback before broad rollout.</p></article><article class="case"><h3>SSH admin fleet</h3><p><b>Challenge:</b> Avoid lockout.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Inventory clients and automation, stage upgrades, keep approved fallback with monitoring, then tighten policy.</p></article><article class="case"><h3>Software package release</h3><p><b>Challenge:</b> Plan signature transition.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Update verifiers and metadata first, then add PQC or parallel signatures, then enforce policy.</p></article></div></section>
-<section class="quiz" id="quiz"><h2>Knowledge Check</h2><p>Pick an answer. The page will mark the correct answer and keep score.</p><div id="quizBox"></div><div class="score" id="quizScore">Score: 0/0</div></section>
-<section class="sources" id="sources"><h2>Primary Sources</h2><p>Use these as the standards trail before production decisions.</p><a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC Post-Quantum Cryptography Project</a><a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203: ML-KEM</a><a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204: ML-DSA</a><a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205: SLH-DSA</a><a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST HQC selection announcement</a><a href="https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc" target="_blank" rel="noopener noreferrer">NCCoE Migration to Post-Quantum Cryptography</a><a href="https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-national-se/" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 guidance</a></section>
-</main></div>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"In TLS, which two things does PQC change?","choices":["Key-exchange group and certificate/handshake signatures","The HTML doctype","The DNS record type"],"answer":0,"explain":"TLS migrates the key-establishment group (ML-KEM, usually hybrid) and the signatures (ML-DSA/SLH-DSA)."},
+    {"q":"Why is code/package signing gated by verifiers?","choices":["Every device that checks a signature must accept the new algorithm first","Signers are slow","Packages are too small"],"answer":0,"explain":"You cannot enforce a signature algorithm until all verifiers (bootloaders, package managers, stores) can validate it."},
+    {"q":"Why is email one of the hardest protocols to migrate?","choices":["It is federated, long-retention, and read by many diverse clients","It has no cryptography","It is only used offline"],"answer":0,"explain":"Long-lived stored mail plus federation and client diversity make coordinated change slow."},
+    {"q":"What proves a TLS PQC rollout actually happened?","choices":["Logging the negotiated group across real clients/paths","The server booted","A screenshot of the config file"],"answer":0,"explain":"Only observing the negotiated group on real traffic distinguishes success from silent downgrade."},
+    {"q":"What is 'dual-signing' during transition?","choices":["Attaching both classical and PQC signatures until all verifiers support PQC","Signing twice with the same key","Encrypting the signature"],"answer":0,"explain":"Dual-signing lets old verifiers use the classical signature and new ones use PQC, enabling a gradual cutover."},
+    {"q":"Which factor makes a protocol EASIER to migrate?","choices":["Clients that update centrally and frequently","More middleboxes","Longer data retention"],"answer":0,"explain":"Frequent, central client updates (e.g. modern messengers) make coordinated PQC adoption far easier than federated, slow-updating systems."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Educational; verify current protocol support with your vendors.</p>
+  <a href="https://datatracker.ietf.org/doc/rfc8446/" target="_blank" rel="noopener noreferrer">IETF RFC 8446 &mdash; TLS 1.3</a>
+  <a href="https://datatracker.ietf.org/doc/rfc9370/" target="_blank" rel="noopener noreferrer">IETF RFC 9370 &mdash; Multiple key exchanges in IKEv2</a>
+  <a href="https://www.openssh.com/releasenotes.html" target="_blank" rel="noopener noreferrer">OpenSSH release notes (PQ key exchange)</a>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+</section>
+</main>
+</div>
+
 <button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
-<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card"><div class="help-head"><h2 id="helpTitle">How to use this module</h2><button class="btn" id="closeHelp">Close</button></div><p>This module is intentionally lesson-based, not a glossary. Read the explanation, inspect the diagram, review the example and pitfall, then use the use-case labs to apply the concept.</p><p>Use the side navigation to jump, the Top button on mobile, and the knowledge check to test retention.</p><p class="disclaimer">This is educational material, not production cryptographic approval.</p></div></div>
-<script>
-const root=document.documentElement,themeBtn=document.getElementById('themeBtn');function setTheme(t){root.dataset.theme=t;localStorage.setItem('pqc-theme',t);themeBtn.textContent=t==='dark'?'Light':'Dark'}setTheme(localStorage.getItem('pqc-theme')||'light');themeBtn.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');const help=document.getElementById('helpModal');document.getElementById('helpBtn').onclick=()=>help.classList.add('open');document.getElementById('closeHelp').onclick=()=>help.classList.remove('open');help.addEventListener('click',e=>{if(e.target===help)help.classList.remove('open')});document.querySelectorAll('.reveal').forEach(btn=>btn.onclick=()=>{const card=btn.closest('.case');card.classList.toggle('open');btn.textContent=card.classList.contains('open')?'Hide answer':'Show answer'});const nav=[...document.querySelectorAll('.side a')];const secs=nav.map(a=>document.querySelector(a.getAttribute('href')));addEventListener('scroll',()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<130)idx=i});nav.forEach((a,i)=>a.classList.toggle('active',i===idx))},{passive:true});const quiz=[["What is a common TLS PQC failure point?", ["Middleboxes and client compatibility", "Button colors", "Text wrapping only"], 0], ["Why are VPN/SSH high priority?", ["They protect administrative or internal access", "They are always public blogs", "They never use crypto"], 0], ["Why is code signing migration long-tailed?", ["Many verifiers must parse and trust signatures", "Only one signer exists", "No policies exist"], 0], ["What should protocol pilots measure?", ["Size, latency, failures, downgrade, and compatibility", "Only logo size", "Only word count"], 0]];const qb=document.getElementById('quizBox'),score=document.getElementById('quizScore');let answers={};function renderQuiz(){qb.innerHTML=quiz.map((q,i)=>`<div class="quiz-q"><strong>${i+1}. ${q[0]}</strong><div class="choices">${q[1].map((c,j)=>`<button class="choice" data-q="${i}" data-a="${j}">${c}</button>`).join('')}</div><div class="feedback" id="fb${i}"></div></div>`).join('');qb.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.q),a=Number(b.dataset.a);answers[i]=a;const parent=b.closest('.quiz-q');parent.querySelectorAll('.choice').forEach((x,j)=>{x.classList.remove('ok','bad');if(j===quiz[i][2])x.classList.add('ok');else if(j===a)x.classList.add('bad')});document.getElementById('fb'+i).textContent=a===quiz[i][2]?'Correct':'Review the lesson and compare with the use-case labs.';updateScore()})}function updateScore(){const total=quiz.length,got=Object.keys(answers).filter(i=>answers[i]===quiz[i][2]).length;score.textContent=`Score: ${got}/${total}`}renderQuiz();updateScore();
-</script>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Step through the protocol map, then read each protocol's lesson. The command example is illustrative &mdash; exact group names and tool versions change, so verify before relying on it.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
 </body>
 </html>

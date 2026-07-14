@@ -4,71 +4,189 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-101 - Why Quantum Computing Changes the Threat Model</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f9fd;--card:#fff;--ink:#0b1220;--muted:#536178;--line:#dbe6f4;--soft:#ecf3fb;--primary:#174e86;--teal:#0e766e;--red:#b42318;--green:#087443;--amber:#a45d00;--shadow:0 14px 34px rgba(22,50,90,.12);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}[data-theme="dark"]{--bg:#0b1220;--card:#142033;--ink:#eef5ff;--muted:#b9c8dc;--line:#2b405d;--soft:#1f3048;--primary:#77b9ff;--teal:#6bd9ce;--red:#ffb4ac;--green:#79dba7;--amber:#ffd08a;--shadow:0 14px 34px rgba(0,0,0,.30)}html{scroll-behavior:smooth}body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(23,78,134,.14),transparent 34%),var(--bg);color:var(--ink);line-height:1.72;-webkit-text-size-adjust:100%;overflow-x:hidden}.top{position:sticky;top:0;z-index:30;background:rgba(246,249,253,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}[data-theme="dark"] .top{background:rgba(11,18,32,.9)}.top-in{max-width:1260px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:10px;align-items:center;font-weight:900;flex-wrap:wrap}.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--teal))}.version{font-size:.76rem;color:var(--muted);font-weight:900}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-weight:850;cursor:pointer;min-height:38px;text-decoration:none;box-shadow:0 6px 18px rgba(22,50,90,.07)}.btn.small{font-size:.84rem;min-height:34px;padding:7px 10px}.layout{max-width:1260px;margin:0 auto;padding:18px 16px 42px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.side{position:sticky;top:62px;height:calc(100vh - 80px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px}.side a{display:block;text-decoration:none;color:var(--muted);padding:9px 10px;border-radius:10px;font-weight:850;font-size:.88rem}.side a:hover,.side .active{background:var(--soft);color:var(--primary)}.hero{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:30px;margin-bottom:18px}.hero-img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(22,50,90,.12)}.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1;letter-spacing:-.045em;margin:12px 0}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.chip{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:850;font-size:.8rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.outcomes li{list-style:none;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted)}.architecture{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.architecture h2{font-size:1.55rem;margin-bottom:10px}.architecture p{color:var(--muted);margin-bottom:12px}.architecture-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#f8fbff;box-shadow:0 12px 28px rgba(22,50,90,.10)}[data-theme="dark"] .architecture-img{background:#0b1220}.visual-note{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.visual-note span{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted);font-weight:800;font-size:.88rem}@media(max-width:980px){.visual-note{grid-template-columns:1fr}}.lesson,.lab,.quiz,.sources{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}.lesson-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}.lesson-title span{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;font-weight:950}h2{font-size:1.55rem;line-height:1.15}.lesson p,.lab p,.quiz p,.sources p,.lesson li{color:var(--muted);margin-bottom:11px}.diagram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:18px;padding:16px;margin:18px 0}.dnode{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--primary);border-radius:14px;padding:13px;min-height:118px}.dnode:nth-child(2n){border-top-color:var(--teal)}.dnode:nth-child(3n){border-top-color:#6955b8}.dnode:nth-child(4n){border-top-color:var(--amber)}.dnode b{display:block;margin-bottom:6px;color:var(--ink)}.dnode span{display:block;color:var(--muted);font-size:.92rem}.teaching{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.teach{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.teach h3{font-size:1rem;margin-bottom:6px}.teach p{margin:0;color:var(--muted)}.example{background:rgba(14,118,110,.10)}.pitfall{background:rgba(180,35,24,.08)}.takeaway{background:rgba(23,78,134,.10)}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.case{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.case h3{margin-bottom:8px}.answer{display:none;margin-top:10px}.case.open .answer{display:block}.quiz-q{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:var(--soft)}.choices{display:grid;gap:8px;margin-top:8px}.choice{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer}.choice.ok{border-color:var(--green);background:rgba(8,116,67,.12)}.choice.bad{border-color:var(--red);background:rgba(180,35,24,.10)}.feedback{font-weight:850;margin-top:8px}.score{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:900}.sources a{display:block;margin:8px 0;color:var(--primary);font-weight:850}.disclaimer{color:var(--red)!important;font-weight:900}.toplink{position:fixed;right:18px;bottom:18px;border-radius:999px;z-index:25;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-color:transparent}.help-modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,12,24,.55);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;max-width:780px;max-height:86vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:64px 22px 22px}.help-head #closeHelp{position:absolute;top:16px;right:16px}@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:relative;top:auto;height:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.hero{grid-template-columns:1fr}.hero-img{max-height:260px;object-fit:cover}.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr 1fr}}@media(max-width:560px){.layout{padding:12px}.buttons{width:100%}.side,.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr}.btn{font-size:.82rem;padding:8px 9px}.hero{padding:20px}.hero h1{font-size:2.05rem}h2{font-size:1.28rem}.toplink{right:12px;bottom:12px}}
-</style>
+<meta name="description" content="Shor vs Grover, Q-day, harvest-now-decrypt-later, and how to triage risk - with an interactive calculator.">
+<link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body>
-<header class="top"><div class="top-in"><div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC-101</span><span>Why Quantum Computing Changes the Threat Model</span><span class="version">V2.1 (July 2026)</span></div><div class="buttons"><a class="btn" href="index.html">Home</a><button class="btn" id="themeBtn">Dark</button><button class="btn" id="helpBtn">Help</button></div></div></header>
-<div class="layout"><nav class="side" aria-label="Module sections"><a href="#architecture">Architecture diagram</a><a href="#s1">What a cryptographically relevant quantum computer means</a><a href="#s2">Shor&#x27;s algorithm versus Grover&#x27;s algorithm</a><a href="#s3">Harvest now, decrypt later</a><a href="#s4">Practical risk triage</a><a href="#labs">Use-case labs</a><a href="#quiz">Knowledge check</a><a href="#sources">Sources</a></nav>
-<main>
-<section class="hero" id="start"><div><span class="chip">PQC introduction</span><h1>Why Quantum Computing Changes the Threat Model</h1><p>A practical introduction to Shor, Grover, Q-day, harvest-now-decrypt-later, data lifetime, and why migration begins before a cryptographically relevant quantum computer exists.</p><ul class="outcomes"><li>Explain why Shor&#x27;s algorithm changes the public-key threat model.</li><li>Explain why symmetric encryption and hashes are affected differently.</li><li>Prioritize systems by data lifetime, exposure, and migration timeline.</li></ul><p class="disclaimer">Educational reference only. Production cryptography decisions need current standards checks, vendor validation, security review, interoperability testing, and rollback planning.</p></div><img class="hero-img" src="./diagrams/quantum-threat-timeline.svg" alt="Why Quantum Computing Changes the Threat Model architecture diagram"></section>
+<body data-module="PQC-101">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-101</span><span>Why Quantum Changes the Threat Model</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
 
-<section class="architecture" id="architecture">
-  <h2>Quantum Threat Timeline</h2>
-  <p>A harvest-now-decrypt-later model showing why long-life secrets create migration urgency before a cryptographically relevant quantum computer exists.</p>
-  <img class="architecture-img" src="./diagrams/quantum-threat-timeline.svg" alt="Quantum Threat Timeline">
-  <div class="visual-note"><span>Read the picture first</span><span>Then read the lesson text</span><span>Use labs to apply it</span></div>
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: risk calculator</a>
+  <a href="#s1"><span class="dot"></span>1. What "Q-day" means</a>
+  <a href="#s2"><span class="dot"></span>2. Shor vs Grover</a>
+  <a href="#s3"><span class="dot"></span>3. Harvest now, decrypt later</a>
+  <a href="#s4"><span class="dot"></span>4. Practical risk triage</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">The threat</span>
+    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~25 min read</span><span class="level time">Interactive</span></div>
+    <h1>Why Quantum Computing Changes the Threat Model</h1>
+    <p class="sub">The risk is not "encryption dies overnight." It is a specific, uneven threat with a timing twist that makes waiting dangerous. This module makes the logic concrete &mdash; and lets you compute the urgency yourself.</p>
+    <ul class="outcomes">
+      <li>Explain why Shor's algorithm changes the public-key threat model.</li>
+      <li>Explain why symmetric encryption and hashes are affected differently.</li>
+      <li>Prioritize systems by data lifetime, exposure, and migration time.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/quantum-threat-timeline.svg" alt="A timeline showing data captured today, a later arrival of a capable quantum computer, and the window where captured data is exposed.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: is this data at risk? A harvest-now-decrypt-later calculator</h2>
+  <p class="section-hint">Drag the sliders for one of your systems. The tool compares how long your data must stay secret against when a capable quantum computer might arrive.</p>
+  <div class="pqc-slider" id="hndlWidget">
+    <div class="sl-title">Risk inputs</div>
+    <label>How many years must this data stay confidential? <span class="sl-val" id="hndlLifeV"></span></label>
+    <input type="range" id="hndlLife" min="1" max="30" value="20">
+    <label>Estimated years until a cryptographically relevant quantum computer: <span class="sl-val" id="hndlQdayV"></span></label>
+    <input type="range" id="hndlQday" min="1" max="30" value="12">
+    <label>Years your organization needs to migrate this system: <span class="sl-val" id="hndlMigV"></span></label>
+    <input type="range" id="hndlMig" min="1" max="12" value="5">
+    <div class="sl-readout" id="hndlOut"></div>
+  </div>
+  <div class="callout warn"><span class="k">These are your assumptions</span><p>Nobody knows the real "Q-day." The point of the tool is the <em>relationship</em>: if data lifetime exceeds time-to-quantum, captured traffic is exposed while it still matters &mdash; and migration time eats into your runway.</p></div>
 </section>
 
 <section class="lesson" id="s1">
-  <div class="lesson-title"><span>1</span><h2>What a cryptographically relevant quantum computer means</h2></div>
-  <p>A cryptographically relevant quantum computer is not merely a small laboratory machine. It means a fault-tolerant quantum computer powerful enough to break widely deployed public-key cryptography in practical time.</p><p>The exact arrival date is uncertain. Migration planning does not depend on knowing the date exactly. Security planning often works under uncertainty: if the consequence is high and migration takes years, waiting for certainty is not responsible.</p><p>PQC migration is therefore a risk-management program. The question is not &#x27;is Q-day tomorrow?&#x27; The question is &#x27;which data and trust systems would still matter by the time migration is complete?&#x27;</p>
-  <div class="diagram"><div class="dnode"><b>Today</b><span>Systems still use RSA/ECC.</span></div><div class="dnode"><b>Capture</b><span>Attackers store ciphertext.</span></div><div class="dnode"><b>Future</b><span>Quantum capability may improve.</span></div><div class="dnode"><b>Impact</b><span>Long-life secrets may be exposed.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A government archive or telecom subscriber dataset may require confidentiality for decades. Even if Q-day is not near, migration may need to start now because the data remains valuable later.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not treat uncertain timing as zero risk. Uncertainty affects planning, not the existence of the exposure.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Risk is driven by data lifetime plus migration time, not only by the forecast date.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">1</span><h2>What a "cryptographically relevant quantum computer" means</h2></div>
+  <p class="lead">Not any quantum computer &mdash; a big, reliable, error-corrected one able to break deployed public-key crypto in practical time.</p>
+  <p>The exact arrival date (often called <span class="term" data-def="The hypothetical day a cryptographically relevant quantum computer becomes available to break classical public-key cryptography.">Q-day</span>) is genuinely uncertain, and credible estimates span a wide range. Security planning does not require a precise date. It requires reasoning under uncertainty: if the consequence is severe and the fix takes years, waiting for certainty is not responsible.</p>
+  <div class="callout takeaway"><span class="k">Reframe the question</span><p>Don't ask "Is Q-day tomorrow?" Ask "Which of my data and trust systems would still matter by the time my migration is finished?" That question you can answer today.</p></div>
 </section>
+
 <section class="lesson" id="s2">
-  <div class="lesson-title"><span>2</span><h2>Shor&#x27;s algorithm versus Grover&#x27;s algorithm</h2></div>
-  <p>Shor&#x27;s algorithm is the reason RSA, finite-field Diffie-Hellman, elliptic-curve Diffie-Hellman, ECDSA, and EdDSA are considered quantum-vulnerable. These systems rely on mathematical problems that Shor&#x27;s algorithm can solve efficiently on a sufficiently capable quantum computer.</p><p>Grover&#x27;s algorithm gives a quadratic speedup for search problems. That affects symmetric-key and hash security margins differently. It does not create the same public-key collapse story. Larger symmetric keys and hash outputs can preserve strong security margins.</p><p>This is why a migration plan should not say &#x27;all cryptography is broken.&#x27; It should say: classical public-key key establishment and signatures need replacement; symmetric and hash choices need adequate strength and review.</p>
-  <div class="diagram"><div class="dnode"><b>Shor</b><span>Public-key math at risk.</span></div><div class="dnode"><b>Grover</b><span>Search speedup.</span></div><div class="dnode"><b>Public key</b><span>Replace or hybridize.</span></div><div class="dnode"><b>Symmetric/hash</b><span>Use strong margins.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>RSA-2048 and ECDSA are public-key concerns. AES-256 and SHA-384/SHA-512 style margins are different discussions and are not replaced by ML-KEM or ML-DSA.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not tell stakeholders that quantum computers break every encryption method equally. That creates confusion and bad priorities.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Shor drives public-key replacement; Grover drives margin review.</p></article>
+  <div class="lesson-title"><span class="num">2</span><h2>Shor's algorithm versus Grover's algorithm</h2></div>
+  <p class="lead">One algorithm is a demolition charge for public-key crypto; the other is a slow leak you can patch with bigger keys.</p>
+  <div class="grid2">
+    <div class="callout pitfall"><span class="k">Shor &rarr; public-key collapses</span><p>Breaks RSA, finite-field Diffie-Hellman, ECDH, ECDSA, and EdDSA by efficiently solving factoring and discrete logs. These do not survive a CRQC. They must be <b>replaced or hybridized</b>.</p></div>
+    <div class="callout tip"><span class="k">Grover &rarr; margins shrink</span><p>Gives a square-root speedup for brute-force search. Symmetric keys and hashes lose roughly half their effective bits. AES-256 and SHA-384/512-class outputs keep strong margins.</p></div>
   </div>
+  <div class="pqc-bars" data-title="Effective security against a large quantum computer (illustrative)" data-unit="Higher bar = harder to break. Classical schemes on top are broken by Shor.">
+    <script type="application/json" class="data">
+    [
+      {"label":"RSA-2048","value":4,"display":"broken (Shor)","kind":"classic"},
+      {"label":"ECDH / ECDSA P-256","value":4,"display":"broken (Shor)","kind":"classic"},
+      {"label":"AES-128","value":64,"display":"~64-bit (Grover)"},
+      {"label":"AES-256","value":128,"display":"~128-bit (safe)"},
+      {"label":"SHA-256","value":128,"display":"~128-bit collision margin"}
+    ]
+    </script>
+  </div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Telling stakeholders "quantum breaks all encryption equally." It does not, and that message creates panic and bad priorities. The precise message: replace classical public-key; review symmetric/hash sizes.</p></div>
 </section>
+
 <section class="lesson" id="s3">
-  <div class="lesson-title"><span>3</span><h2>Harvest now, decrypt later</h2></div>
-  <p>Harvest-now-decrypt-later is the attack pattern where encrypted traffic or stored encrypted objects are copied now and decrypted later when the attacker has stronger capability. The attacker does not need to break the system today to create future risk.</p><p>The attack matters most when data has a long confidentiality lifetime and is available to capture. Medical, legal, identity, telecom, financial, government, source-code, and sensitive business data are common examples.</p><p>This is the strongest practical reason to start planning before Q-day. A system that protects short-lived public information may not need the same priority as a system that protects secrets for twenty years.</p>
-  <div class="diagram"><div class="dnode"><b>Confidentiality lifetime</b><span>How long secrecy matters.</span></div><div class="dnode"><b>Exposure</b><span>Can attackers collect it?</span></div><div class="dnode"><b>Migration timeline</b><span>How long to fix.</span></div><div class="dnode"><b>Priority</b><span>Lifetime &gt; migration time = urgent.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>Encrypted traffic carrying merger documents may be stored by an adversary today. If the key exchange is later broken and the documents are still sensitive, the damage occurs in the future but the capture happened now.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not rank risk only by whether the system is internet-facing. Long-life internal data can be higher priority.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Long-life secrets create present-day urgency.</p></article>
+  <div class="lesson-title"><span class="num">3</span><h2>Harvest now, decrypt later</h2></div>
+  <p class="lead">The attacker does not need a quantum computer today to hurt you with one tomorrow.</p>
+  <p><span class="term" data-def="An attack where encrypted data is copied and stored today, then decrypted later once a capable quantum computer exists.">Harvest now, decrypt later</span> means an adversary records your encrypted traffic or copies encrypted files <em>now</em> and simply waits. When a CRQC arrives, they decrypt the archive. The theft happened today; the damage lands in the future &mdash; but only if the data is still sensitive then.</p>
+  <div class="flow">
+    <div class="flow-step"><b>Today</b><span>Attacker copies your encrypted traffic.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Waits</b><span>Stores it cheaply for years.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Q-day</b><span>Uses Shor to recover the session keys.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Impact</b><span>Decrypts anything still sensitive.</span></div>
   </div>
+  <div class="callout example"><span class="k">Concrete example</span><p>Encrypted traffic carrying merger documents or 25-year medical records is captured today. If the key exchange is broken in 12 years and those documents still matter, the breach is real &mdash; even though nothing looked wrong at capture time.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Ranking risk only by "is it internet-facing?" Long-lived internal secrets can outrank a public marketing site.</p></div>
 </section>
+
 <section class="lesson" id="s4">
-  <div class="lesson-title"><span>4</span><h2>Practical risk triage</h2></div>
-  <p>A simple first-pass triage scores systems by data lifetime, exposure, business impact, public-key dependence, and migration difficulty. It is not a final cryptographic review, but it helps decide where to start.</p><p>High-priority areas usually include external TLS, VPN, SSH, identity systems, code and firmware signing, certificate authorities, HSM/KMS dependencies, long-lived encrypted archives, and vendor products that will take a long time to update.</p><p>Low-priority does not mean ignore. It means inventory, monitor standards and vendors, and schedule migration with normal refresh cycles unless the risk changes.</p>
-  <div class="diagram"><div class="dnode"><b>High</b><span>Long-life + exposed + public-key.</span></div><div class="dnode"><b>Medium</b><span>Important but bounded.</span></div><div class="dnode"><b>Low</b><span>Short-lived or low impact.</span></div><div class="dnode"><b>Track</b><span>Inventory and revisit.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>An internal dashboard with no sensitive data and short retention may be tracked. A firmware signing root used by field devices may need immediate architecture review.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not make a single global deadline without understanding dependencies. Some systems need urgent work; others need planned refresh.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Prioritization prevents both panic and neglect.</p></article>
+  <div class="lesson-title"><span class="num">4</span><h2>Practical risk triage</h2></div>
+  <p class="lead">A first-pass score, not a final cryptographic review, tells you where to start.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Factor</th><th>Question</th><th>Raises priority when...</th></tr></thead>
+    <tbody>
+      <tr><td>Data lifetime</td><td>How long must it stay secret / trusted?</td><td>Years to decades.</td></tr>
+      <tr><td>Exposure</td><td>Can an attacker capture it?</td><td>Crosses untrusted networks or third parties.</td></tr>
+      <tr><td>Public-key dependence</td><td>Does it rely on RSA/ECC for key exchange or signatures?</td><td>Yes, and hard to change.</td></tr>
+      <tr><td>Business impact</td><td>What if it is exposed or forged?</td><td>Regulated, safety-critical, or reputational.</td></tr>
+      <tr><td>Migration difficulty</td><td>How long to fix?</td><td>Vendor-controlled, embedded, or long-lived.</td></tr>
+    </tbody>
+  </table></div>
+  <p>High-priority areas usually include external TLS, VPN, SSH, identity systems, code and firmware signing, certificate authorities, HSM/KMS dependencies, long-lived encrypted archives, and slow-to-update vendor products. Low-priority does not mean "ignore" &mdash; it means inventory, monitor, and migrate on the normal refresh cycle.</p>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Prioritization prevents both panic and neglect. Some systems need urgent architecture review; others just need to be tracked.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Decide first, then reveal.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; VPN vs marketing site</h3>
+      <p class="scenario">You can only migrate one system this quarter: the corporate VPN carrying internal traffic, or the public marketing website.</p>
+      <p class="decide">Which goes first, and why?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> The VPN. It carries long-lived, sensitive internal data over untrusted networks and depends on public-key key exchange &mdash; a textbook harvest-now-decrypt-later target. The marketing site's content is public and short-lived.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; Old signed firmware</h3>
+      <p class="scenario">Field devices accept firmware signed with a classical signature and will run for 10+ years.</p>
+      <p class="decide">Why can signatures be urgent even with no confidential data involved?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> If the signature algorithm is broken during the device's life, an attacker could forge updates and take over the fleet. Long-lived trust roots and verifiers must move early even when confidentiality is irrelevant.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; Short-lived news page</h3>
+      <p class="scenario">A public news page serves content that is irrelevant within a day.</p>
+      <p class="decide">First migration wave, or track it?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Track it. Nothing is secret and nothing is long-lived, so harvest-now-decrypt-later does not apply. Migrate it on the normal refresh cycle behind higher-risk systems.</p>
+    </article>
   </div>
 </section>
-<section class="lab" id="labs"><h2>Use-Case Labs</h2><p>These are practical exercises. Read the challenge, decide your answer, then reveal the recommended answer and compare.</p><div class="cases"><article class="case"><h3>VPN with sensitive internal traffic</h3><p><b>Challenge:</b> Prioritize against a public marketing website.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> The VPN usually ranks higher because it carries internal access and potentially long-lived sensitive data.</p></article><article class="case"><h3>Old signed firmware</h3><p><b>Challenge:</b> Explain why signatures can be urgent even without encrypted data.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> If field devices trust vulnerable signatures for years, forged updates become a future integrity and safety risk.</p></article><article class="case"><h3>Short-lived public news page</h3><p><b>Challenge:</b> Decide if it is the first migration wave.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Usually no. Track it, but long-lived secrets and trust roots move first.</p></article></div></section>
-<section class="quiz" id="quiz"><h2>Knowledge Check</h2><p>Pick an answer. The page will mark the correct answer and keep score.</p><div id="quizBox"></div><div class="score" id="quizScore">Score: 0/0</div></section>
-<section class="sources" id="sources"><h2>Primary Sources</h2><p>Use these as the standards trail before production decisions.</p><a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC Post-Quantum Cryptography Project</a><a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203: ML-KEM</a><a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204: ML-DSA</a><a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205: SLH-DSA</a><a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST HQC selection announcement</a><a href="https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc" target="_blank" rel="noopener noreferrer">NCCoE Migration to Post-Quantum Cryptography</a><a href="https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-national-se/" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 guidance</a></section>
-</main></div>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"Which algorithm is the main concern for RSA and ECC?","choices":["Shor's algorithm","Dijkstra's algorithm","PageRank"],"answer":0,"explain":"Shor efficiently solves factoring and discrete logs, breaking RSA, DH, and elliptic-curve schemes."},
+    {"q":"What does harvest-now-decrypt-later mean?","choices":["Capture ciphertext today and decrypt it after a quantum computer exists","Delete old logs nightly","Send every message twice"],"answer":0,"explain":"Recorded encrypted data can be broken later, so long-lived secrets are at risk even before Q-day."},
+    {"q":"What makes a system HIGH priority for migration?","choices":["Long data lifetime, real exposure, and vulnerable public-key use","The prettiest UI","The smallest file size"],"answer":0,"explain":"Priority combines how long data must stay secret, whether it can be captured, and how much it relies on breakable public-key crypto."},
+    {"q":"Does running PQC require you to own a quantum computer?","choices":["No - PQC algorithms run on normal computers","Yes","Only on weekends"],"answer":0,"explain":"Post-quantum algorithms are classical software; they are designed to resist quantum attacks, not to require quantum hardware."},
+    {"q":"If data lifetime is 20 years and a CRQC is estimated in 12, what does the calculator conclude?","choices":["Harvest-now risk - about 8 years of exposure while it still matters","No risk at all","It depends on the font"],"answer":0,"explain":"Lifetime (20) minus time-to-quantum (12) = 8 years where captured data could be decrypted while still sensitive."},
+    {"q":"What is the correct message to stakeholders?","choices":["Replace classical public-key; review symmetric/hash sizes","All encryption dies at once","Nothing needs to change ever"],"answer":0,"explain":"The threat is uneven: public-key must be replaced/hybridized; symmetric and hashes mainly need adequate sizes."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Educational; verify against primary guidance before decisions.</p>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+  <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
+  <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; CNSA 2.0 / Post-Quantum resources</a>
+</section>
+</main>
+</div>
+
 <button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
-<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card"><div class="help-head"><h2 id="helpTitle">How to use this module</h2><button class="btn" id="closeHelp">Close</button></div><p>This module is intentionally lesson-based, not a glossary. Read the explanation, inspect the diagram, review the example and pitfall, then use the use-case labs to apply the concept.</p><p>Use the side navigation to jump, the Top button on mobile, and the knowledge check to test retention.</p><p class="disclaimer">This is educational material, not production cryptographic approval.</p></div></div>
-<script>
-const root=document.documentElement,themeBtn=document.getElementById('themeBtn');function setTheme(t){root.dataset.theme=t;localStorage.setItem('pqc-theme',t);themeBtn.textContent=t==='dark'?'Light':'Dark'}setTheme(localStorage.getItem('pqc-theme')||'light');themeBtn.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');const help=document.getElementById('helpModal');document.getElementById('helpBtn').onclick=()=>help.classList.add('open');document.getElementById('closeHelp').onclick=()=>help.classList.remove('open');help.addEventListener('click',e=>{if(e.target===help)help.classList.remove('open')});document.querySelectorAll('.reveal').forEach(btn=>btn.onclick=()=>{const card=btn.closest('.case');card.classList.toggle('open');btn.textContent=card.classList.contains('open')?'Hide answer':'Show answer'});const nav=[...document.querySelectorAll('.side a')];const secs=nav.map(a=>document.querySelector(a.getAttribute('href')));addEventListener('scroll',()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<130)idx=i});nav.forEach((a,i)=>a.classList.toggle('active',i===idx))},{passive:true});const quiz=[["Which algorithm is the main concern for RSA/ECC?", ["Shor's algorithm", "Dijkstra's algorithm", "PageRank"], 0], ["What does harvest-now-decrypt-later mean?", ["Capture ciphertext now for possible future decryption", "Delete old logs", "Send data twice"], 0], ["What makes a system high priority?", ["Long data lifetime, exposure, and vulnerable public-key use", "The prettiest UI", "The smallest file"], 0], ["Does PQC require a quantum computer to run?", ["No", "Yes", "Only on weekends"], 0]];const qb=document.getElementById('quizBox'),score=document.getElementById('quizScore');let answers={};function renderQuiz(){qb.innerHTML=quiz.map((q,i)=>`<div class="quiz-q"><strong>${i+1}. ${q[0]}</strong><div class="choices">${q[1].map((c,j)=>`<button class="choice" data-q="${i}" data-a="${j}">${c}</button>`).join('')}</div><div class="feedback" id="fb${i}"></div></div>`).join('');qb.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.q),a=Number(b.dataset.a);answers[i]=a;const parent=b.closest('.quiz-q');parent.querySelectorAll('.choice').forEach((x,j)=>{x.classList.remove('ok','bad');if(j===quiz[i][2])x.classList.add('ok');else if(j===a)x.classList.add('bad')});document.getElementById('fb'+i).textContent=a===quiz[i][2]?'Correct':'Review the lesson and compare with the use-case labs.';updateScore()})}function updateScore(){const total=quiz.length,got=Object.keys(answers).filter(i=>answers[i]===quiz[i][2]).length;score.textContent=`Score: ${got}/${total}`}renderQuiz();updateScore();
-</script>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Play with the risk calculator using real numbers from a system you know. Then read the lessons to understand why the calculator works the way it does.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
 </body>
 </html>

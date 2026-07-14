@@ -3,72 +3,205 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PQC-001 - Start Here: Security and Cryptography Basics</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f9fd;--card:#fff;--ink:#0b1220;--muted:#536178;--line:#dbe6f4;--soft:#ecf3fb;--primary:#174e86;--teal:#0e766e;--red:#b42318;--green:#087443;--amber:#a45d00;--shadow:0 14px 34px rgba(22,50,90,.12);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}[data-theme="dark"]{--bg:#0b1220;--card:#142033;--ink:#eef5ff;--muted:#b9c8dc;--line:#2b405d;--soft:#1f3048;--primary:#77b9ff;--teal:#6bd9ce;--red:#ffb4ac;--green:#79dba7;--amber:#ffd08a;--shadow:0 14px 34px rgba(0,0,0,.30)}html{scroll-behavior:smooth}body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(23,78,134,.14),transparent 34%),var(--bg);color:var(--ink);line-height:1.72;-webkit-text-size-adjust:100%;overflow-x:hidden}.top{position:sticky;top:0;z-index:30;background:rgba(246,249,253,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}[data-theme="dark"] .top{background:rgba(11,18,32,.9)}.top-in{max-width:1260px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:10px;align-items:center;font-weight:900;flex-wrap:wrap}.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--teal))}.version{font-size:.76rem;color:var(--muted);font-weight:900}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-weight:850;cursor:pointer;min-height:38px;text-decoration:none;box-shadow:0 6px 18px rgba(22,50,90,.07)}.btn.small{font-size:.84rem;min-height:34px;padding:7px 10px}.layout{max-width:1260px;margin:0 auto;padding:18px 16px 42px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.side{position:sticky;top:62px;height:calc(100vh - 80px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px}.side a{display:block;text-decoration:none;color:var(--muted);padding:9px 10px;border-radius:10px;font-weight:850;font-size:.88rem}.side a:hover,.side .active{background:var(--soft);color:var(--primary)}.hero{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:30px;margin-bottom:18px}.hero-img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(22,50,90,.12)}.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1;letter-spacing:-.045em;margin:12px 0}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.chip{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:850;font-size:.8rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.outcomes li{list-style:none;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted)}.architecture{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.architecture h2{font-size:1.55rem;margin-bottom:10px}.architecture p{color:var(--muted);margin-bottom:12px}.architecture-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#f8fbff;box-shadow:0 12px 28px rgba(22,50,90,.10)}[data-theme="dark"] .architecture-img{background:#0b1220}.visual-note{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.visual-note span{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted);font-weight:800;font-size:.88rem}@media(max-width:980px){.visual-note{grid-template-columns:1fr}}.lesson,.lab,.quiz,.sources{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}.lesson-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}.lesson-title span{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;font-weight:950}h2{font-size:1.55rem;line-height:1.15}.lesson p,.lab p,.quiz p,.sources p,.lesson li{color:var(--muted);margin-bottom:11px}.diagram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:18px;padding:16px;margin:18px 0}.dnode{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--primary);border-radius:14px;padding:13px;min-height:118px}.dnode:nth-child(2n){border-top-color:var(--teal)}.dnode:nth-child(3n){border-top-color:#6955b8}.dnode:nth-child(4n){border-top-color:var(--amber)}.dnode b{display:block;margin-bottom:6px;color:var(--ink)}.dnode span{display:block;color:var(--muted);font-size:.92rem}.teaching{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.teach{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.teach h3{font-size:1rem;margin-bottom:6px}.teach p{margin:0;color:var(--muted)}.example{background:rgba(14,118,110,.10)}.pitfall{background:rgba(180,35,24,.08)}.takeaway{background:rgba(23,78,134,.10)}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.case{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.case h3{margin-bottom:8px}.answer{display:none;margin-top:10px}.case.open .answer{display:block}.quiz-q{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:var(--soft)}.choices{display:grid;gap:8px;margin-top:8px}.choice{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer}.choice.ok{border-color:var(--green);background:rgba(8,116,67,.12)}.choice.bad{border-color:var(--red);background:rgba(180,35,24,.10)}.feedback{font-weight:850;margin-top:8px}.score{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:900}.sources a{display:block;margin:8px 0;color:var(--primary);font-weight:850}.disclaimer{color:var(--red)!important;font-weight:900}.toplink{position:fixed;right:18px;bottom:18px;border-radius:999px;z-index:25;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-color:transparent}.help-modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,12,24,.55);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;max-width:780px;max-height:86vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:64px 22px 22px}.help-head #closeHelp{position:absolute;top:16px;right:16px}@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:relative;top:auto;height:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.hero{grid-template-columns:1fr}.hero-img{max-height:260px;object-fit:cover}.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr 1fr}}@media(max-width:560px){.layout{padding:12px}.buttons{width:100%}.side,.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr}.btn{font-size:.82rem;padding:8px 9px}.hero{padding:20px}.hero h1{font-size:2.05rem}h2{font-size:1.28rem}.toplink{right:12px;bottom:12px}}
-</style>
+<title>PQC-001 - Security &amp; Cryptography Basics</title>
+<meta name="description" content="A no-background starting point: what cryptography protects and the four security jobs, explained with everyday analogies.">
+<link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body>
-<header class="top"><div class="top-in"><div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC-001</span><span>Start Here: Security and Cryptography Basics</span><span class="version">V2.1 (July 2026)</span></div><div class="buttons"><a class="btn" href="index.html">Home</a><button class="btn" id="themeBtn">Dark</button><button class="btn" id="helpBtn">Help</button></div></div></header>
-<div class="layout"><nav class="side" aria-label="Module sections"><a href="#architecture">Architecture diagram</a><a href="#s1">What problem cryptography solves</a><a href="#s2">The four common security jobs</a><a href="#s3">Symmetric versus public-key cryptography</a><a href="#s4">Certificates and trust chains</a><a href="#labs">Use-case labs</a><a href="#quiz">Knowledge check</a><a href="#sources">Sources</a></nav>
-<main>
-<section class="hero" id="start"><div><span class="chip">Beginner foundation</span><h1>Start Here: Security and Cryptography Basics</h1><p>A non-assumed starting point for learners who need to understand what cryptography protects before learning why post-quantum cryptography matters.</p><ul class="outcomes"><li>Explain confidentiality, integrity, authentication, and signatures in plain English.</li><li>Distinguish encryption, hashing, MACs, digital signatures, and certificates.</li><li>Recognize why public-key cryptography is the part most affected by quantum computers.</li></ul><p class="disclaimer">Educational reference only. Production cryptography decisions need current standards checks, vendor validation, security review, interoperability testing, and rollback planning.</p></div><img class="hero-img" src="./diagrams/crypto-trust-chain.svg" alt="Start Here: Security and Cryptography Basics architecture diagram"></section>
+<body data-module="PQC-001">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
 
-<section class="architecture" id="architecture">
-  <h2>Security Trust Chain</h2>
-  <p>A beginner-level architecture view: identity is verified first, a shared secret is negotiated, encrypted records carry data, and integrity checks detect tampering.</p>
-  <img class="architecture-img" src="./diagrams/crypto-trust-chain.svg" alt="Security Trust Chain">
-  <div class="visual-note"><span>Read the picture first</span><span>Then read the lesson text</span><span>Use labs to apply it</span></div>
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: opening a bank site</a>
+  <a href="#s1"><span class="dot"></span>1. What cryptography is for</a>
+  <a href="#s2"><span class="dot"></span>2. The four security jobs</a>
+  <a href="#s3"><span class="dot"></span>3. Symmetric vs public-key</a>
+  <a href="#s4"><span class="dot"></span>4. Certificates &amp; trust chains</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Start here</span>
+    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~20 min read</span><span class="level time">No background needed</span></div>
+    <h1>Security &amp; Cryptography Basics</h1>
+    <p class="sub">Before we talk about "post-quantum" anything, let's answer a simpler question: what is cryptography actually doing for you every day, and why is only <em>part</em> of it at risk from quantum computers?</p>
+    <ul class="outcomes">
+      <li>Explain confidentiality, integrity, authentication, and signatures in plain words.</li>
+      <li>Tell encryption, hashing, MACs, signatures, and certificates apart.</li>
+      <li>See why <b>public-key</b> cryptography is the piece quantum computers threaten most.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/crypto-trust-chain.svg" alt="Illustration of a trust chain: a root of trust vouches for a website's key, which secures your connection.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: what really happens when you open a bank website</h2>
+  <p class="section-hint">You typed a web address and saw a login page. But before a single pixel appeared, your browser and the bank did four cryptographic jobs. Step through them.</p>
+  <div class="pqc-stepper" data-title="Opening https://yourbank.com">
+    <script type="application/json" class="steps">
+    [
+      {"title":"Prove who you are talking to","body":"Your browser asks the server for its digital certificate and checks that a trusted authority vouches for it. This stops an impostor from pretending to be your bank. This is authentication.","meta":"job: authentication"},
+      {"title":"Agree on a secret in public","body":"Even though anyone can watch the network, the two sides run a key-exchange so they end up sharing a secret number that eavesdroppers cannot compute. This is key establishment.","meta":"job: key establishment (public-key)"},
+      {"title":"Lock the conversation","body":"Using that shared secret, everything after this point is encrypted with fast symmetric encryption (for example AES-GCM), so eavesdroppers see only scrambled bytes. This is confidentiality.","meta":"job: confidentiality (symmetric)"},
+      {"title":"Detect tampering","body":"Every encrypted record carries an integrity check. If anyone flips even one bit in transit, the receiver notices and rejects it. This is integrity.","meta":"job: integrity"}
+    ]
+    </script>
+  </div>
+  <div class="callout takeaway"><span class="k">Why this matters</span><p>Only step 2 &mdash; the public-key key establishment &mdash; and the certificate signatures in step 1 are directly broken by a quantum computer. The fast symmetric encryption in step 3 mostly just needs bigger keys. Keep that split in mind for the whole course.</p></div>
 </section>
 
 <section class="lesson" id="s1">
-  <div class="lesson-title"><span>1</span><h2>What problem cryptography solves</h2></div>
-  <p>Cryptography exists because modern systems communicate over networks they do not fully control. A phone, browser, router, server, cloud workload, SIM, or IoT device may be sending data through equipment owned by many different parties. Attackers may be able to watch traffic, copy old messages, inject new messages, impersonate a service, or modify files in transit.</p><p>The beginner mistake is thinking cryptography only means hiding messages. Hiding is one job, but trust is the broader purpose. Cryptography helps answer: who am I talking to, did this data change, is this update really from the vendor, did this transaction come from the private key holder, and can two systems agree on a fresh secret in public?</p><p>Post-quantum cryptography is not a new app category. It is a replacement and transition path for specific cryptographic jobs that depend on vulnerable public-key mathematics.</p>
-  <div class="diagram"><div class="dnode"><b>Attacker can observe</b><span>Network traffic may be copied.</span></div><div class="dnode"><b>Attacker can modify</b><span>Packets and files can be changed.</span></div><div class="dnode"><b>Crypto verifies</b><span>Systems check identity and integrity.</span></div><div class="dnode"><b>Crypto protects</b><span>Data is encrypted after trust is established.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>When a browser opens a banking site, it checks a certificate, negotiates keys, encrypts the session, and verifies protected records. The user sees a login page, but the browser and server completed several trust-building steps first.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not equate security with encryption alone. An encrypted connection to an impersonator is still unsafe.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Cryptography is a trust system, not just a secrecy tool.</p></article>
+  <div class="lesson-title"><span class="num">1</span><h2>What problem cryptography solves</h2></div>
+  <p class="lead">Cryptography exists because your data travels through equipment you do not own or trust.</p>
+  <p>A phone, browser, router, cell tower, server, cloud service, SIM card, or IoT sensor constantly sends data across networks owned by many different parties. Along that path an attacker might <b>watch</b> traffic, <b>copy</b> old messages to use later, <b>inject</b> new messages, <b>impersonate</b> a service, or <b>modify</b> a file while it is in transit.</p>
+  <div class="callout analogy"><span class="k">Analogy</span><p>Sending data over the internet is like mailing a postcard through thousands of strangers' hands. Cryptography is what turns that postcard into a sealed, tamper-evident envelope that also proves who sent it.</p></div>
+  <p>The common beginner assumption is that cryptography just means "hiding messages." Hiding is one job, but <b>trust</b> is the bigger purpose. Cryptography helps answer: <em>Who am I really talking to? Did this data change? Is this update genuinely from the vendor? Did this payment come from the real account holder? Can two strangers agree on a secret while everyone is listening?</em></p>
+  <div class="flow">
+    <div class="flow-step"><b>Observe</b><span>Traffic can be copied by anyone on the path.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Modify</b><span>Packets and files can be altered in transit.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Verify</b><span>Crypto checks identity and detects tampering.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Protect</b><span>Data is encrypted only after trust is established.</span></div>
   </div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Post-quantum cryptography is not a new kind of app. It is a replacement path for the specific cryptographic jobs that rely on math a quantum computer can break.</p></div>
 </section>
+
 <section class="lesson" id="s2">
-  <div class="lesson-title"><span>2</span><h2>The four common security jobs</h2></div>
-  <p>Confidentiality means unauthorized parties cannot read the content. Integrity means changes can be detected. Authentication means a party can prove identity or possession of a secret. Non-repudiation means a signature can later prove a particular private key signed something.</p><p>A single product may use all four jobs at once. A secure software update can be public, so confidentiality may not matter, but integrity and signature verification are critical. A medical record stored in the cloud needs confidentiality and integrity. A cellular network needs authentication and key establishment.</p><p>PQC affects these jobs unevenly. Bulk encryption and hash functions remain important, while public-key key establishment and signatures need the most direct migration attention.</p>
-  <div class="diagram"><div class="dnode"><b>Confidentiality</b><span>Keep content private.</span></div><div class="dnode"><b>Integrity</b><span>Detect changes.</span></div><div class="dnode"><b>Authentication</b><span>Prove who or what.</span></div><div class="dnode"><b>Signature</b><span>Prove origin over time.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A firmware update file may be downloadable by anyone. The device still refuses to install it unless the signature proves it came from the vendor and the bytes were not altered.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not use the same word &#x27;encryption&#x27; for every cryptographic job. That hides what actually needs to be migrated.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Name the cryptographic job before choosing an algorithm.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">2</span><h2>The four security jobs</h2></div>
+  <p class="lead">Almost everything in security is one of four jobs. Naming the job is the first skill.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Job</th><th>Plain meaning</th><th>Everyday example</th><th>Quantum impact</th></tr></thead>
+    <tbody>
+      <tr><td><b>Confidentiality</b></td><td>Outsiders cannot read the content.</td><td>Your chat messages look like noise to your ISP.</td><td>Low if symmetric keys are large enough.</td></tr>
+      <tr><td><b>Integrity</b></td><td>Any change is detected.</td><td>A downloaded file's checksum still matches.</td><td>Low (hashes just need enough length).</td></tr>
+      <tr><td><b>Authentication</b></td><td>A party proves who it is / that it holds a secret.</td><td>Your bank proves it is really your bank.</td><td><b>High</b> &mdash; often relies on public-key.</td></tr>
+      <tr><td><b>Non-repudiation (signatures)</b></td><td>A signature later proves a specific key signed something.</td><td>A software update is provably from the vendor.</td><td><b>High</b> &mdash; classical signatures are at risk.</td></tr>
+    </tbody>
+  </table></div>
+  <p>A single product usually uses all four at once, in different amounts. A public software update does not need confidentiality (anyone may download it) but absolutely needs integrity and a signature. A medical record in the cloud needs confidentiality and integrity. A cell network needs authentication and key establishment.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>A firmware file may be downloadable by anyone with no secrecy at all. The device still refuses to install it unless a <b>signature</b> proves it came from the vendor and the bytes were not altered. That is authentication + integrity doing the work, not confidentiality.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Calling every cryptographic job "encryption." That vague habit hides which jobs actually need to be migrated for post-quantum.</p></div>
 </section>
+
 <section class="lesson" id="s3">
-  <div class="lesson-title"><span>3</span><h2>Symmetric versus public-key cryptography</h2></div>
-  <p>Symmetric cryptography uses a shared secret. It is fast and practical for protecting large amounts of data once both sides already have the secret. AES-GCM is a common example for authenticated encryption.</p><p>Public-key cryptography uses a public key and a private key. It helps systems identify each other, establish shared secrets over public networks, and verify signatures. RSA, Diffie-Hellman, elliptic-curve Diffie-Hellman, ECDSA, and EdDSA are widely deployed classical public-key systems.</p><p>A sufficiently capable quantum computer running Shor&#x27;s algorithm threatens the public-key systems above. Grover&#x27;s algorithm affects symmetric security margins differently, so larger symmetric keys and hashes remain useful.</p>
-  <div class="diagram"><div class="dnode"><b>Symmetric</b><span>Fast after secret exists.</span></div><div class="dnode"><b>Public key</b><span>Solves internet-scale trust.</span></div><div class="dnode"><b>Quantum issue</b><span>Threatens classical public-key math.</span></div><div class="dnode"><b>Migration</b><span>Replace or hybridize public-key parts.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>TLS uses public-key techniques to authenticate and establish secrets, then uses fast symmetric encryption for the actual data stream.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not say PQC replaces AES. PQC mainly changes public-key key establishment and signatures.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Find public-key use first; that is the main PQC migration target.</p></article>
+  <div class="lesson-title"><span class="num">3</span><h2>Symmetric vs public-key cryptography</h2></div>
+  <p class="lead">There are two big families, and quantum computers hit them very differently.</p>
+  <div class="grid2">
+    <div class="callout"><span class="k" style="color:var(--teal)">Symmetric</span><p><b>One shared secret</b> both sides already know. Very fast, great for protecting lots of data. Example: <code class="inl">AES-256-GCM</code>. Problem: how do two strangers get the same secret in the first place?</p></div>
+    <div class="callout"><span class="k" style="color:var(--primary-ink)">Public-key (asymmetric)</span><p>A <b>public key</b> anyone can see and a <b>private key</b> kept secret. Solves internet-scale trust: identifying strangers, agreeing on secrets in the open, and signatures. Examples: RSA, Diffie-Hellman, ECDH, ECDSA, EdDSA.</p></div>
   </div>
+  <div class="callout analogy"><span class="k">Analogy</span><p>Symmetric encryption is a padlock where both people already have the same key. Public-key is a mailbox with a public slot anyone can drop mail into, but only the owner's private key can open it. Public-key is how you safely hand someone the padlock key in the first place.</p></div>
+  <p>Here is the crucial part for this whole course: a capable quantum computer running <span class="term" data-def="A quantum algorithm that efficiently solves the integer-factoring and discrete-log problems that RSA, Diffie-Hellman, and elliptic-curve cryptography rely on.">Shor's algorithm</span> breaks the public-key family above. <span class="term" data-def="A quantum search algorithm giving a roughly square-root speedup; it weakens but does not collapse symmetric keys and hashes, which can be lengthened.">Grover's algorithm</span> only weakens symmetric keys and hashes, and you can restore the margin by using longer keys.</p>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Find the <b>public-key</b> uses first &mdash; key establishment and signatures. That is the main post-quantum migration target. PQC does <em>not</em> replace AES.</p></div>
 </section>
+
 <section class="lesson" id="s4">
-  <div class="lesson-title"><span>4</span><h2>Certificates and trust chains</h2></div>
-  <p>A certificate is a signed statement binding a public key to an identity such as a domain, organization, service, device, or signing authority. A public key alone is only data; the certificate explains who the key represents.</p><p>A trust chain usually starts at a trusted root, passes through one or more intermediates, and ends at a leaf certificate used by a website, API, device, or signing workflow. Verifiers check signatures, names, validity periods, usage rules, revocation information, and policy.</p><p>PQC changes certificates because new algorithms can mean new identifiers, larger keys, larger signatures, larger certificate chains, and legacy parser failures. PKI migration is therefore an ecosystem problem.</p>
-  <div class="diagram"><div class="dnode"><b>Root</b><span>High-trust anchor.</span></div><div class="dnode"><b>Intermediate</b><span>Operational signer.</span></div><div class="dnode"><b>Leaf</b><span>Website, API, device, or code key.</span></div><div class="dnode"><b>Verifier</b><span>Browser, OS, device, or service.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A browser may trust a root CA, which signs an intermediate CA, which signs a website certificate. If an old client cannot parse the new PQC signature identifier, the connection can fail even if the server is configured correctly.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not migrate only a leaf certificate while ignoring roots, intermediates, clients, CT logs, proxies, and automation.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>PQC PKI readiness means the whole trust chain can issue, carry, parse, and verify the new material.</p></article>
+  <div class="lesson-title"><span class="num">4</span><h2>Certificates and trust chains</h2></div>
+  <p class="lead">A public key by itself is just a number. A certificate is what says whose number it is.</p>
+  <p>A <b>certificate</b> is a signed statement binding a public key to an identity &mdash; a domain, an organization, a device, or a signing authority. It is signed by someone you already trust, so you can trust the key inside it without meeting the owner.</p>
+  <p>Trust usually flows down a <b>chain</b>: a highly protected <b>root</b> signs an <b>intermediate</b>, which signs a <b>leaf</b> certificate used by a website, API, or device. A verifier (your browser, OS, or device) checks the signatures, names, validity dates, allowed uses, and revocation status at every link.</p>
+  <div class="flow">
+    <div class="flow-step"><b>Root CA</b><span>Rarely used, heavily protected trust anchor.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Intermediate CA</b><span>Signs day-to-day certificates.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Leaf</b><span>The website / device / code-signing key.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Verifier</b><span>Browser / OS / device checks the whole chain.</span></div>
+  </div>
+  <details class="deep"><summary>Go deeper: why PQC makes certificates an ecosystem problem</summary>
+    <div class="deep-body">
+      <p>Post-quantum signatures introduce new algorithm identifiers and much larger keys and signatures. A classical ECDSA P-256 signature is ~64 bytes; an ML-DSA-65 signature is ~3,309 bytes &mdash; roughly 50&times; larger. That ripples outward:</p>
+      <ul>
+        <li>Certificate chains get bigger, so handshakes carry more bytes.</li>
+        <li>Old clients that cannot parse the new identifiers may reject a perfectly valid certificate.</li>
+        <li>Fixed-size database columns, buffers, and hardware slots can overflow.</li>
+      </ul>
+      <p>So "PQC-ready PKI" means the <em>entire</em> chain &mdash; roots, intermediates, clients, logs, proxies, automation &mdash; can issue, carry, parse, and verify the new material. Migrating one leaf certificate is not enough.</p>
+    </div>
+  </details>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Upgrading only a leaf certificate while ignoring roots, intermediates, old clients, certificate-transparency logs, proxies, and automation. The weakest parser in the chain decides whether the connection works.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Read each scenario, decide your answer, then reveal the recommended one and compare your reasoning.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; Banking website</h3>
+      <p class="scenario">A customer opens their bank's site and sees their balance.</p>
+      <p class="decide">Which cryptographic jobs happened <em>before</em> any account data was shown?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Authentication (certificate proves the bank), key establishment (a fresh session secret), confidentiality (symmetric encryption of the traffic), and integrity (tamper detection on each record). All four, in that order.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; Public firmware file</h3>
+      <p class="scenario">A firmware update is posted on a public download page; anyone can grab it.</p>
+      <p class="decide">Which job matters most, and which barely matters?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Signature + integrity matter most: the device must know the file is authentic and unchanged. Confidentiality barely matters because the file is meant to be public.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; Medical archive</h3>
+      <p class="scenario">Encrypted patient records must stay confidential for 25 years.</p>
+      <p class="decide">Does "harvest now, decrypt later" apply, even if no one can decrypt it today?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Yes. A long confidentiality lifetime means an attacker who copies the ciphertext today could decrypt it years later once quantum capability exists &mdash; while it still matters. This is exactly the case PQC-101 explores.</p>
+    </article>
   </div>
 </section>
-<section class="lab" id="labs"><h2>Use-Case Labs</h2><p>These are practical exercises. Read the challenge, decide your answer, then reveal the recommended answer and compare.</p><div class="cases"><article class="case"><h3>Banking website</h3><p><b>Challenge:</b> Identify which cryptographic jobs happen before a customer sees account data.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Certificate validation authenticates the bank; key establishment creates a session secret; symmetric encryption protects traffic; integrity checks detect tampering.</p></article><article class="case"><h3>Firmware update</h3><p><b>Challenge:</b> Decide which job matters most when the update file is public.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Signature verification and integrity matter most because the device must know the file is authentic and unchanged.</p></article><article class="case"><h3>Medical archive</h3><p><b>Challenge:</b> Decide whether harvest-now-decrypt-later matters.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Yes. Long confidentiality lifetime makes future decryption risk relevant even if attackers cannot decrypt today.</p></article></div></section>
-<section class="quiz" id="quiz"><h2>Knowledge Check</h2><p>Pick an answer. The page will mark the correct answer and keep score.</p><div id="quizBox"></div><div class="score" id="quizScore">Score: 0/0</div></section>
-<section class="sources" id="sources"><h2>Primary Sources</h2><p>Use these as the standards trail before production decisions.</p><a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC Post-Quantum Cryptography Project</a><a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203: ML-KEM</a><a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204: ML-DSA</a><a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205: SLH-DSA</a><a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST HQC selection announcement</a><a href="https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc" target="_blank" rel="noopener noreferrer">NCCoE Migration to Post-Quantum Cryptography</a><a href="https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-national-se/" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 guidance</a></section>
-</main></div>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Pick an answer to see whether it is right and why. Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"Which job proves a software update really came from the vendor?","choices":["A digital signature","Compression","The screen lock"],"answer":0,"explain":"A signature is created with the vendor's private key and verified with their public key, proving origin and (with integrity) that nothing changed."},
+    {"q":"What does a certificate bind together?","choices":["An identity and a public key","A battery and a charger","A font and a color"],"answer":0,"explain":"A certificate is a signed statement that a given public key belongs to a specific identity, vouched for by a trusted authority."},
+    {"q":"What is the main target of a post-quantum migration?","choices":["Public-key key establishment and signatures","Every image file","All user passwords"],"answer":0,"explain":"Shor's algorithm breaks classical public-key math (key exchange and signatures). Symmetric encryption and hashes are affected far less."},
+    {"q":"Why is an encrypted session to an impostor still unsafe?","choices":["Authentication failed, so you have a private line to the wrong party","Encryption is too fast","The page is too long"],"answer":0,"explain":"Confidentiality without authentication just means you are secretly talking to an attacker. Trust must come first."},
+    {"q":"Which pair is affected LEAST by quantum computers?","choices":["AES-256 and SHA-384","RSA and ECDH","ECDSA and EdDSA"],"answer":0,"explain":"Symmetric encryption (AES) and hashes (SHA) only need larger sizes to keep their margin. RSA, ECDH, ECDSA, EdDSA are public-key and are the real problem."},
+    {"q":"You upgrade a website's leaf certificate to a PQC signature but nothing else. What is the risk?","choices":["Old clients or middleboxes may fail to parse the new, larger certificate","The website loads faster","Passwords become unnecessary"],"answer":0,"explain":"PKI is an ecosystem. Roots, intermediates, clients, logs, and proxies all must understand the new identifiers and sizes."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Use these as your standards trail. This module is educational, not production approval.</p>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+  <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203 &mdash; ML-KEM</a>
+  <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
+  <a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205 &mdash; SLH-DSA</a>
+  <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
+</section>
+</main>
+</div>
+
 <button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
-<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card"><div class="help-head"><h2 id="helpTitle">How to use this module</h2><button class="btn" id="closeHelp">Close</button></div><p>This module is intentionally lesson-based, not a glossary. Read the explanation, inspect the diagram, review the example and pitfall, then use the use-case labs to apply the concept.</p><p>Use the side navigation to jump, the Top button on mobile, and the knowledge check to test retention.</p><p class="disclaimer">This is educational material, not production cryptographic approval.</p></div></div>
-<script>
-const root=document.documentElement,themeBtn=document.getElementById('themeBtn');function setTheme(t){root.dataset.theme=t;localStorage.setItem('pqc-theme',t);themeBtn.textContent=t==='dark'?'Light':'Dark'}setTheme(localStorage.getItem('pqc-theme')||'light');themeBtn.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');const help=document.getElementById('helpModal');document.getElementById('helpBtn').onclick=()=>help.classList.add('open');document.getElementById('closeHelp').onclick=()=>help.classList.remove('open');help.addEventListener('click',e=>{if(e.target===help)help.classList.remove('open')});document.querySelectorAll('.reveal').forEach(btn=>btn.onclick=()=>{const card=btn.closest('.case');card.classList.toggle('open');btn.textContent=card.classList.contains('open')?'Hide answer':'Show answer'});const nav=[...document.querySelectorAll('.side a')];const secs=nav.map(a=>document.querySelector(a.getAttribute('href')));addEventListener('scroll',()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<130)idx=i});nav.forEach((a,i)=>a.classList.toggle('active',i===idx))},{passive:true});const quiz=[["Which job proves a software update came from the vendor?", ["Digital signature", "Compression", "Screen lock"], 0], ["What does a certificate bind together?", ["Identity and public key", "Battery and charger", "Font and color"], 0], ["What is the main PQC migration target?", ["Public-key key establishment and signatures", "Every image file", "All passwords"], 0], ["Why is an encrypted session to an impersonator unsafe?", ["Authentication failed", "Encryption is too fast", "The page is too long"], 0]];const qb=document.getElementById('quizBox'),score=document.getElementById('quizScore');let answers={};function renderQuiz(){qb.innerHTML=quiz.map((q,i)=>`<div class="quiz-q"><strong>${i+1}. ${q[0]}</strong><div class="choices">${q[1].map((c,j)=>`<button class="choice" data-q="${i}" data-a="${j}">${c}</button>`).join('')}</div><div class="feedback" id="fb${i}"></div></div>`).join('');qb.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.q),a=Number(b.dataset.a);answers[i]=a;const parent=b.closest('.quiz-q');parent.querySelectorAll('.choice').forEach((x,j)=>{x.classList.remove('ok','bad');if(j===quiz[i][2])x.classList.add('ok');else if(j===a)x.classList.add('bad')});document.getElementById('fb'+i).textContent=a===quiz[i][2]?'Correct':'Review the lesson and compare with the use-case labs.';updateScore()})}function updateScore(){const total=quiz.length,got=Object.keys(answers).filter(i=>answers[i]===quiz[i][2]).length;score.textContent=`Score: ${got}/${total}`}renderQuiz();updateScore();
-</script>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Work top to bottom: try the interactive walkthrough, read each numbered lesson, open the "Go deeper" panels if you want more detail, do the labs, then take the quiz.</p>
+  <p>Unfamiliar word? Most key terms link to the <a href="glossary.html">Glossary</a>. Use the side navigation to jump around, and the Top button to return here.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
 </body>
 </html>

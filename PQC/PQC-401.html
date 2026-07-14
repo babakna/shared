@@ -4,71 +4,168 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-401 - Enterprise Migration Playbook</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f9fd;--card:#fff;--ink:#0b1220;--muted:#536178;--line:#dbe6f4;--soft:#ecf3fb;--primary:#174e86;--teal:#0e766e;--red:#b42318;--green:#087443;--amber:#a45d00;--shadow:0 14px 34px rgba(22,50,90,.12);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}[data-theme="dark"]{--bg:#0b1220;--card:#142033;--ink:#eef5ff;--muted:#b9c8dc;--line:#2b405d;--soft:#1f3048;--primary:#77b9ff;--teal:#6bd9ce;--red:#ffb4ac;--green:#79dba7;--amber:#ffd08a;--shadow:0 14px 34px rgba(0,0,0,.30)}html{scroll-behavior:smooth}body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(23,78,134,.14),transparent 34%),var(--bg);color:var(--ink);line-height:1.72;-webkit-text-size-adjust:100%;overflow-x:hidden}.top{position:sticky;top:0;z-index:30;background:rgba(246,249,253,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}[data-theme="dark"] .top{background:rgba(11,18,32,.9)}.top-in{max-width:1260px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:10px;align-items:center;font-weight:900;flex-wrap:wrap}.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--teal))}.version{font-size:.76rem;color:var(--muted);font-weight:900}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-weight:850;cursor:pointer;min-height:38px;text-decoration:none;box-shadow:0 6px 18px rgba(22,50,90,.07)}.btn.small{font-size:.84rem;min-height:34px;padding:7px 10px}.layout{max-width:1260px;margin:0 auto;padding:18px 16px 42px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.side{position:sticky;top:62px;height:calc(100vh - 80px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px}.side a{display:block;text-decoration:none;color:var(--muted);padding:9px 10px;border-radius:10px;font-weight:850;font-size:.88rem}.side a:hover,.side .active{background:var(--soft);color:var(--primary)}.hero{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:30px;margin-bottom:18px}.hero-img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(22,50,90,.12)}.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1;letter-spacing:-.045em;margin:12px 0}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.chip{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:850;font-size:.8rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.outcomes li{list-style:none;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted)}.architecture{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.architecture h2{font-size:1.55rem;margin-bottom:10px}.architecture p{color:var(--muted);margin-bottom:12px}.architecture-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#f8fbff;box-shadow:0 12px 28px rgba(22,50,90,.10)}[data-theme="dark"] .architecture-img{background:#0b1220}.visual-note{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.visual-note span{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted);font-weight:800;font-size:.88rem}@media(max-width:980px){.visual-note{grid-template-columns:1fr}}.lesson,.lab,.quiz,.sources{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}.lesson-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}.lesson-title span{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;font-weight:950}h2{font-size:1.55rem;line-height:1.15}.lesson p,.lab p,.quiz p,.sources p,.lesson li{color:var(--muted);margin-bottom:11px}.diagram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:18px;padding:16px;margin:18px 0}.dnode{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--primary);border-radius:14px;padding:13px;min-height:118px}.dnode:nth-child(2n){border-top-color:var(--teal)}.dnode:nth-child(3n){border-top-color:#6955b8}.dnode:nth-child(4n){border-top-color:var(--amber)}.dnode b{display:block;margin-bottom:6px;color:var(--ink)}.dnode span{display:block;color:var(--muted);font-size:.92rem}.teaching{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.teach{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.teach h3{font-size:1rem;margin-bottom:6px}.teach p{margin:0;color:var(--muted)}.example{background:rgba(14,118,110,.10)}.pitfall{background:rgba(180,35,24,.08)}.takeaway{background:rgba(23,78,134,.10)}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.case{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.case h3{margin-bottom:8px}.answer{display:none;margin-top:10px}.case.open .answer{display:block}.quiz-q{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:var(--soft)}.choices{display:grid;gap:8px;margin-top:8px}.choice{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer}.choice.ok{border-color:var(--green);background:rgba(8,116,67,.12)}.choice.bad{border-color:var(--red);background:rgba(180,35,24,.10)}.feedback{font-weight:850;margin-top:8px}.score{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:900}.sources a{display:block;margin:8px 0;color:var(--primary);font-weight:850}.disclaimer{color:var(--red)!important;font-weight:900}.toplink{position:fixed;right:18px;bottom:18px;border-radius:999px;z-index:25;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-color:transparent}.help-modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,12,24,.55);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;max-width:780px;max-height:86vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:64px 22px 22px}.help-head #closeHelp{position:absolute;top:16px;right:16px}@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:relative;top:auto;height:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.hero{grid-template-columns:1fr}.hero-img{max-height:260px;object-fit:cover}.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr 1fr}}@media(max-width:560px){.layout{padding:12px}.buttons{width:100%}.side,.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr}.btn{font-size:.82rem;padding:8px 9px}.hero{padding:20px}.hero h1{font-size:2.05rem}h2{font-size:1.28rem}.toplink{right:12px;bottom:12px}}
-</style>
+<meta name="description" content="An operating model for PQC migration: inventory, prioritization, vendors and contracts, governance, rollout waves, and evidence.">
+<link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body>
-<header class="top"><div class="top-in"><div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC-401</span><span>Enterprise Migration Playbook</span><span class="version">V2.1 (July 2026)</span></div><div class="buttons"><a class="btn" href="index.html">Home</a><button class="btn" id="themeBtn">Dark</button><button class="btn" id="helpBtn">Help</button></div></div></header>
-<div class="layout"><nav class="side" aria-label="Module sections"><a href="#architecture">Architecture diagram</a><a href="#s1">Inventory is the first deliverable</a><a href="#s2">Prioritization model</a><a href="#s3">Vendors, procurement, and contracts</a><a href="#s4">Governance, exceptions, rollout, and monitoring</a><a href="#labs">Use-case labs</a><a href="#quiz">Knowledge check</a><a href="#sources">Sources</a></nav>
-<main>
-<section class="hero" id="start"><div><span class="chip">Enterprise migration</span><h1>Enterprise Migration Playbook</h1><p>A practical operating model for crypto inventory, prioritization, vendor management, governance, exceptions, rollout waves, monitoring, and evidence.</p><ul class="outcomes"><li>Build a PQC migration roadmap from inventory evidence.</li><li>Prioritize systems by lifetime, exposure, criticality, and feasibility.</li><li>Define governance, exception, rollout, and monitoring practices.</li></ul><p class="disclaimer">Educational reference only. Production cryptography decisions need current standards checks, vendor validation, security review, interoperability testing, and rollback planning.</p></div><img class="hero-img" src="./diagrams/migration-roadmap.svg" alt="Enterprise Migration Playbook architecture diagram"></section>
+<body data-module="PQC-401">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-401</span><span>Enterprise Migration Playbook</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
 
-<section class="architecture" id="architecture">
-  <h2>Enterprise Migration Roadmap</h2>
-  <p>A staged migration architecture: inventory, risk ranking, vendor readiness, pilot waves, production rollout, monitoring, and exceptions.</p>
-  <img class="architecture-img" src="./diagrams/migration-roadmap.svg" alt="Enterprise Migration Roadmap">
-  <div class="visual-note"><span>Read the picture first</span><span>Then read the lesson text</span><span>Use labs to apply it</span></div>
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: rollout waves</a>
+  <a href="#s1"><span class="dot"></span>1. Inventory is deliverable #1</a>
+  <a href="#s2"><span class="dot"></span>2. Prioritization model</a>
+  <a href="#s3"><span class="dot"></span>3. Vendors &amp; contracts</a>
+  <a href="#s4"><span class="dot"></span>4. Governance &amp; monitoring</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Migrate</span>
+    <div class="meta"><span class="level advanced">Advanced</span><span class="level time">~30 min read</span><span class="level time">Operating model</span></div>
+    <h1>Enterprise Migration Playbook</h1>
+    <p class="sub">PQC migration is a multi-year program, not a project. This module is the operating model: how to inventory, prioritize, manage vendors, govern exceptions, roll out in waves, and prove progress.</p>
+    <ul class="outcomes">
+      <li>Stand up a crypto inventory and prioritization model.</li>
+      <li>Manage vendor and contractual dependencies.</li>
+      <li>Run governed rollout waves with monitoring and evidence.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/migration-roadmap.svg" alt="A migration roadmap from discovery and prioritization through hybrid pilots, waves, and monitoring.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: how a wave-based rollout actually runs</h2>
+  <p class="section-hint">You do not migrate everything at once. Step through a realistic wave sequence.</p>
+  <div class="pqc-stepper" data-title="Migration waves">
+    <script type="application/json" class="steps">
+    [
+      {"title":"Wave 0 - Discover & govern","body":"Build the crypto inventory (CBOM), stand up governance, define policy and crypto-agility requirements for new systems. Nothing migrates yet; you are building the map and the rules.","meta":"output: inventory + policy"},
+      {"title":"Wave 1 - Quick wins & pilots","body":"Turn on hybrid key exchange where it is already supported (modern TLS, SSH, internal mesh). Pilot on low-risk, high-control systems and prove the monitoring works.","meta":"output: proven hybrid pattern"},
+      {"title":"Wave 2 - High-priority harvest-now targets","body":"Migrate long-lived, exposed, public-key-dependent systems: VPNs, external TLS, key-wrapping in KMS, identity. These carry the real harvest-now-decrypt-later risk.","meta":"output: top risks reduced"},
+      {"title":"Wave 3 - Signatures & PKI","body":"Move certificate, code, and firmware signing as verifier support matures, often via dual-signing. This wave is gated by the slowest verifier.","meta":"output: signing modernized"},
+      {"title":"Wave 4 - Long tail & exceptions","body":"Vendor-blocked appliances, embedded devices, and granted exceptions. Track, apply compensating controls, and schedule replacement. Re-baseline the inventory continuously.","meta":"output: managed residual risk"}
+    ]
+    </script>
+  </div>
 </section>
 
 <section class="lesson" id="s1">
-  <div class="lesson-title"><span>1</span><h2>Inventory is the first deliverable</h2></div>
-  <p>A PQC program starts with a cryptographic inventory: where cryptography is used, what algorithms and key sizes are present, which protocol or product supplies them, who owns the system, and what data or trust relationship is protected.</p><p>The inventory should include external endpoints, internal APIs, VPNs, SSH, certificates, code signing, firmware signing, identity, databases, backups, message queues, HSMs, KMS, TPMs, secure elements, vendor products, and managed services.</p><p>The first version will be incomplete. That is acceptable if it is honest about confidence and coverage. The point is to replace vague anxiety with accountable evidence.</p>
-  <div class="diagram"><div class="dnode"><b>Discover</b><span>Find crypto use.</span></div><div class="dnode"><b>Classify</b><span>Job and risk.</span></div><div class="dnode"><b>Own</b><span>Assign team.</span></div><div class="dnode"><b>Evidence</b><span>Scan or confirmation.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>An inventory row for a public API includes owner, URL, TLS stack, certificate chain, key exchange, signature algorithm, client types, data lifetime, and test status.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not wait for perfect discovery before prioritizing obvious high-risk systems.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>A partial inventory with owners beats a perfect plan that never starts.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">1</span><h2>Inventory is the first deliverable</h2></div>
+  <p class="lead">You cannot migrate what you cannot see. The crypto inventory (CBOM) is the foundation of everything else.</p>
+  <p>The inventory records where cryptography is used, for what job, with which algorithm and parameters, in which library or product, protecting what data for how long, owned by whom, and its PQC status. PQC-402 is a hands-on workshop for building one. Without it, prioritization is guesswork and progress is unmeasurable.</p>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Treat the inventory as a living product with an owner, not a one-time spreadsheet. Vendors, certificates, and libraries change constantly.</p></div>
 </section>
+
 <section class="lesson" id="s2">
-  <div class="lesson-title"><span>2</span><h2>Prioritization model</h2></div>
-  <p>Prioritize by confidentiality lifetime, exposure, business impact, public-key dependency, migration complexity, and vendor readiness. This prevents both underreaction and chaotic overreaction.</p><p>High-priority systems often include long-lived confidential data, public or partner-exposed key exchanges, signing roots, firmware signing, identity systems, and products with slow vendor roadmaps.</p><p>Low-priority does not mean forgotten. It means tracked, assigned, and scheduled around normal refresh unless risk or support changes.</p>
-  <div class="diagram"><div class="dnode"><b>Lifetime</b><span>How long secrecy matters.</span></div><div class="dnode"><b>Exposure</b><span>Can attackers collect traffic?</span></div><div class="dnode"><b>Impact</b><span>Business or safety consequence.</span></div><div class="dnode"><b>Feasibility</b><span>Can it be changed now?</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A short-lived public content site may rank below an internal legal archive if the archive contains confidential data that must remain private for decades.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not prioritize only by executive visibility.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Risk ranking should be explainable and repeatable.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">2</span><h2>Prioritization model</h2></div>
+  <p class="lead">Rank by risk, not by whatever is easiest to touch.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Tier</th><th>Profile</th><th>Examples</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><b>Tier 1</b></td><td>Long-lived + exposed + public-key</td><td>External TLS, VPN, KMS key-wrapping, identity, firmware roots</td><td>Migrate first (Waves 1&ndash;3)</td></tr>
+      <tr><td><b>Tier 2</b></td><td>Important but bounded lifetime/exposure</td><td>Internal apps, medium-retention data</td><td>Migrate on refresh cycle</td></tr>
+      <tr><td><b>Tier 3</b></td><td>Short-lived or low impact</td><td>Public content, ephemeral caches</td><td>Track and revisit</td></tr>
+      <tr><td><b>Blocked</b></td><td>Vendor/hardware cannot yet support PQC</td><td>Appliances, embedded fleets</td><td>Exception + compensating controls</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Setting a single company-wide deadline. Tier 1 needs urgency; Tier 3 does not; blocked items need a different track entirely. One date for all creates panic and waste.</p></div>
 </section>
+
 <section class="lesson" id="s3">
-  <div class="lesson-title"><span>3</span><h2>Vendors, procurement, and contracts</h2></div>
-  <p>Enterprises depend on vendors for operating systems, browsers, load balancers, VPNs, HSMs, cloud services, identity platforms, network equipment, mobile apps, and embedded devices. Vendor readiness can control migration timing.</p><p>Procurement questions should be specific: which algorithms, parameter sets, protocols, hybrid modes, certificate formats, validation status, telemetry, roadmap date, rollback controls, and known limitations are supported?</p><p>Contracts and architecture standards should require crypto agility. A product that cannot change algorithms without replacement becomes a future risk.</p>
-  <div class="diagram"><div class="dnode"><b>Ask</b><span>Specific capability.</span></div><div class="dnode"><b>Verify</b><span>Test in environment.</span></div><div class="dnode"><b>Track</b><span>Roadmap and limits.</span></div><div class="dnode"><b>Contract</b><span>Agility requirements.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A vendor saying &#x27;quantum-safe ready&#x27; is not sufficient. Ask for release version, supported groups, certificate support, test method, and customer configuration steps.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not accept marketing language as migration evidence.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Vendor claims must become testable requirements.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">3</span><h2>Vendors, procurement, and contracts</h2></div>
+  <p class="lead">Much of your crypto is inside products you do not control. Procurement is a migration lever.</p>
+  <ul>
+    <li><b>Ask for roadmaps:</b> require vendors to state PQC support timelines for the exact products and versions you run.</li>
+    <li><b>Contract language:</b> add crypto-agility and PQC-readiness clauses to new and renewing contracts.</li>
+    <li><b>Evidence:</b> prefer validated implementations and interoperability test results over marketing claims.</li>
+    <li><b>Exit/compensating options:</b> know what you do if a critical vendor is late.</li>
+  </ul>
+  <div class="callout example"><span class="k">Concrete example</span><p>A VPN appliance vendor promises PQC "next year." You log it as a Tier-1-but-blocked dependency, add a PQC clause to the renewal, segment the network as a compensating control, and set a decision date to evaluate alternatives if the roadmap slips.</p></div>
 </section>
+
 <section class="lesson" id="s4">
-  <div class="lesson-title"><span>4</span><h2>Governance, exceptions, rollout, and monitoring</h2></div>
-  <p>Governance defines approved algorithms, deprecated algorithms, exception criteria, procurement language, evidence requirements, and review cadence. It keeps different teams from making incompatible decisions.</p><p>Exceptions are normal but must be explicit. Each exception needs a reason, risk, owner, compensating control, expiration date, and remediation plan.</p><p>Rollout should occur in waves with telemetry and rollback. Monitoring should capture handshake failures, certificate errors, unknown algorithms, signature failures, downgrade attempts, and client compatibility.</p>
-  <div class="diagram"><div class="dnode"><b>Policy</b><span>Allowed and blocked.</span></div><div class="dnode"><b>Exception</b><span>Time-limited risk.</span></div><div class="dnode"><b>Wave</b><span>Pilot then scale.</span></div><div class="dnode"><b>Monitor</b><span>Detect breakage and downgrade.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A legacy VPN exception might expire in six months, require restricted access, list impacted users, and reference a vendor upgrade date.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not allow permanent undocumented exceptions. They become hidden architecture.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Governance makes PQC migration operationally accountable.</p></article>
+  <div class="lesson-title"><span class="num">4</span><h2>Governance, exceptions, rollout, and monitoring</h2></div>
+  <p class="lead">A program needs owners, an exception process, and evidence &mdash; or it stalls invisibly.</p>
+  <p>Define who owns crypto policy, who approves exceptions (and for how long), and what evidence closes a migration item. Each action gets an owner, target date, dependency, evidence requirement, and rollback plan. A dashboard shows coverage, risk tiers, blockers, completed tests, active exceptions, and next-wave candidates.</p>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Evidence beats assertion. "We enabled hybrid TLS" is a claim; "98% of sessions negotiated a PQC group last week, here is the dashboard" is evidence. Exceptions must expire, not become permanent.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Decide first, then reveal.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; The single deadline</h3>
+      <p class="scenario">Leadership wants "all crypto PQC by end of next year, one deadline for everyone."</p>
+      <p class="decide">How do you respond constructively?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Reframe to risk tiers and waves: commit to aggressive dates for Tier 1 (harvest-now targets), refresh-cycle dates for Tier 2, tracking for Tier 3, and an exception track for vendor-blocked items. Offer a dashboard so leadership sees real progress instead of a false uniform date.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; The permanent exception</h3>
+      <p class="scenario">A team requests an indefinite exception for a legacy system "because it's hard."</p>
+      <p class="decide">What do you require before granting it?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Time-box it with an expiry and named owner, require compensating controls (segmentation, monitoring, reduced data lifetime), document the residual risk and who accepts it, and set a re-review date. Exceptions expire; they do not become silent permanent risk.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; Proving progress</h3>
+      <p class="scenario">The board asks "are we actually migrating, or just talking?"</p>
+      <p class="decide">What evidence do you show?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Inventory coverage %, Tier-1 systems migrated vs total, share of sessions negotiating PQC groups, dual-signing coverage, open blockers with owners/dates, and active exceptions with expiry. Metrics from systems, not status decks.</p>
+    </article>
   </div>
 </section>
-<section class="lab" id="labs"><h2>Use-Case Labs</h2><p>These are practical exercises. Read the challenge, decide your answer, then reveal the recommended answer and compare.</p><div class="cases"><article class="case"><h3>Executive roadmap</h3><p><b>Challenge:</b> Turn a request for &#x27;PQC by next quarter&#x27; into a realistic plan.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Inventory first, prioritize high-risk systems, launch pilots, document vendor blockers, and set evidence-based waves.</p></article><article class="case"><h3>Vendor questionnaire</h3><p><b>Challenge:</b> Write three useful questions.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Ask exact algorithms/parameters, protocol modes/cert support, and test/validation/rollback evidence.</p></article><article class="case"><h3>Exception review</h3><p><b>Challenge:</b> Decide whether an exception is acceptable.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> It is acceptable only if owner, risk, compensating control, expiration, and remediation are documented.</p></article></div></section>
-<section class="quiz" id="quiz"><h2>Knowledge Check</h2><p>Pick an answer. The page will mark the correct answer and keep score.</p><div id="quizBox"></div><div class="score" id="quizScore">Score: 0/0</div></section>
-<section class="sources" id="sources"><h2>Primary Sources</h2><p>Use these as the standards trail before production decisions.</p><a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC Post-Quantum Cryptography Project</a><a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203: ML-KEM</a><a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204: ML-DSA</a><a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205: SLH-DSA</a><a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST HQC selection announcement</a><a href="https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc" target="_blank" rel="noopener noreferrer">NCCoE Migration to Post-Quantum Cryptography</a><a href="https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-national-se/" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 guidance</a></section>
-</main></div>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"What is the first deliverable of a PQC program?","choices":["A crypto inventory (CBOM)","A press release","A new logo"],"answer":0,"explain":"You cannot prioritize or measure migration without knowing where crypto is used - the inventory comes first."},
+    {"q":"Which systems are Tier 1 (migrate first)?","choices":["Long-lived, exposed, public-key-dependent systems","The newest internal tools","Whatever is easiest to change"],"answer":0,"explain":"Tier 1 = harvest-now-decrypt-later risk: long data lifetime, real exposure, and vulnerable public-key use."},
+    {"q":"Why is a single company-wide deadline a bad idea?","choices":["Tiers differ; urgency, refresh, and blocked items need different tracks","Deadlines are illegal","It makes the dashboard too colorful"],"answer":0,"explain":"One date for everything creates panic for some systems and waste for others, and ignores vendor-blocked cases."},
+    {"q":"How should procurement support migration?","choices":["Require PQC roadmaps and crypto-agility clauses; prefer evidence over claims","Ban all vendors","Only buy the cheapest product"],"answer":0,"explain":"Contracts and roadmap requirements turn vendor dependencies into managed, time-bound commitments."},
+    {"q":"What must be true of every exception?","choices":["Time-boxed, owned, with compensating controls and a re-review date","Permanent and unowned","Secret from leadership"],"answer":0,"explain":"Exceptions must expire and carry accountability, or they become invisible permanent risk."},
+    {"q":"What counts as real evidence of progress?","choices":["System metrics: PQC-negotiated sessions, Tier-1 coverage, open blockers","A confident status slide","The number of meetings held"],"answer":0,"explain":"Evidence comes from systems (negotiated groups, coverage, dual-signing), not assertions."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Educational; align with your regulators and security team.</p>
+  <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
+  <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; CNSA 2.0 / migration guidance</a>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+</section>
+</main>
+</div>
+
 <button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
-<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card"><div class="help-head"><h2 id="helpTitle">How to use this module</h2><button class="btn" id="closeHelp">Close</button></div><p>This module is intentionally lesson-based, not a glossary. Read the explanation, inspect the diagram, review the example and pitfall, then use the use-case labs to apply the concept.</p><p>Use the side navigation to jump, the Top button on mobile, and the knowledge check to test retention.</p><p class="disclaimer">This is educational material, not production cryptographic approval.</p></div></div>
-<script>
-const root=document.documentElement,themeBtn=document.getElementById('themeBtn');function setTheme(t){root.dataset.theme=t;localStorage.setItem('pqc-theme',t);themeBtn.textContent=t==='dark'?'Light':'Dark'}setTheme(localStorage.getItem('pqc-theme')||'light');themeBtn.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');const help=document.getElementById('helpModal');document.getElementById('helpBtn').onclick=()=>help.classList.add('open');document.getElementById('closeHelp').onclick=()=>help.classList.remove('open');help.addEventListener('click',e=>{if(e.target===help)help.classList.remove('open')});document.querySelectorAll('.reveal').forEach(btn=>btn.onclick=()=>{const card=btn.closest('.case');card.classList.toggle('open');btn.textContent=card.classList.contains('open')?'Hide answer':'Show answer'});const nav=[...document.querySelectorAll('.side a')];const secs=nav.map(a=>document.querySelector(a.getAttribute('href')));addEventListener('scroll',()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<130)idx=i});nav.forEach((a,i)=>a.classList.toggle('active',i===idx))},{passive:true});const quiz=[["What is the first deliverable?", ["Cryptographic inventory", "A slogan", "A new logo"], 0], ["What should vendor readiness include?", ["Specific algorithms, versions, limits, and test evidence", "Only marketing language", "Only price"], 0], ["What should exceptions include?", ["Owner, reason, control, expiration, remediation", "No dates", "No accountability"], 0], ["Why rollout in waves?", ["To test evidence, monitor, and control risk", "To avoid all documentation", "Because standards require one color"], 0]];const qb=document.getElementById('quizBox'),score=document.getElementById('quizScore');let answers={};function renderQuiz(){qb.innerHTML=quiz.map((q,i)=>`<div class="quiz-q"><strong>${i+1}. ${q[0]}</strong><div class="choices">${q[1].map((c,j)=>`<button class="choice" data-q="${i}" data-a="${j}">${c}</button>`).join('')}</div><div class="feedback" id="fb${i}"></div></div>`).join('');qb.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.q),a=Number(b.dataset.a);answers[i]=a;const parent=b.closest('.quiz-q');parent.querySelectorAll('.choice').forEach((x,j)=>{x.classList.remove('ok','bad');if(j===quiz[i][2])x.classList.add('ok');else if(j===a)x.classList.add('bad')});document.getElementById('fb'+i).textContent=a===quiz[i][2]?'Correct':'Review the lesson and compare with the use-case labs.';updateScore()})}function updateScore(){const total=quiz.length,got=Object.keys(answers).filter(i=>answers[i]===quiz[i][2]).length;score.textContent=`Score: ${got}/${total}`}renderQuiz();updateScore();
-</script>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Walk the rollout waves, then read how inventory, prioritization, vendors, and governance fit together. Pair this with the hands-on CBOM workshop in PQC-402.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
 </body>
 </html>

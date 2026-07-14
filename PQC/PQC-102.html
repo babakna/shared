@@ -4,71 +4,180 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-102 - Cryptographic Building Blocks Deep Dive</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f9fd;--card:#fff;--ink:#0b1220;--muted:#536178;--line:#dbe6f4;--soft:#ecf3fb;--primary:#174e86;--teal:#0e766e;--red:#b42318;--green:#087443;--amber:#a45d00;--shadow:0 14px 34px rgba(22,50,90,.12);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}[data-theme="dark"]{--bg:#0b1220;--card:#142033;--ink:#eef5ff;--muted:#b9c8dc;--line:#2b405d;--soft:#1f3048;--primary:#77b9ff;--teal:#6bd9ce;--red:#ffb4ac;--green:#79dba7;--amber:#ffd08a;--shadow:0 14px 34px rgba(0,0,0,.30)}html{scroll-behavior:smooth}body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(23,78,134,.14),transparent 34%),var(--bg);color:var(--ink);line-height:1.72;-webkit-text-size-adjust:100%;overflow-x:hidden}.top{position:sticky;top:0;z-index:30;background:rgba(246,249,253,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}[data-theme="dark"] .top{background:rgba(11,18,32,.9)}.top-in{max-width:1260px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:10px;align-items:center;font-weight:900;flex-wrap:wrap}.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--teal))}.version{font-size:.76rem;color:var(--muted);font-weight:900}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 11px;font-weight:850;cursor:pointer;min-height:38px;text-decoration:none;box-shadow:0 6px 18px rgba(22,50,90,.07)}.btn.small{font-size:.84rem;min-height:34px;padding:7px 10px}.layout{max-width:1260px;margin:0 auto;padding:18px 16px 42px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px}.side{position:sticky;top:62px;height:calc(100vh - 80px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px}.side a{display:block;text-decoration:none;color:var(--muted);padding:9px 10px;border-radius:10px;font-weight:850;font-size:.88rem}.side a:hover,.side .active{background:var(--soft);color:var(--primary)}.hero{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:30px;margin-bottom:18px}.hero-img{width:100%;border-radius:20px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(22,50,90,.12)}.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1;letter-spacing:-.045em;margin:12px 0}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.chip{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:850;font-size:.8rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.outcomes li{list-style:none;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted)}.architecture{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.architecture h2{font-size:1.55rem;margin-bottom:10px}.architecture p{color:var(--muted);margin-bottom:12px}.architecture-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#f8fbff;box-shadow:0 12px 28px rgba(22,50,90,.10)}[data-theme="dark"] .architecture-img{background:#0b1220}.visual-note{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.visual-note span{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted);font-weight:800;font-size:.88rem}@media(max-width:980px){.visual-note{grid-template-columns:1fr}}.lesson,.lab,.quiz,.sources{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}.lesson-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}.lesson-title span{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;font-weight:950}h2{font-size:1.55rem;line-height:1.15}.lesson p,.lab p,.quiz p,.sources p,.lesson li{color:var(--muted);margin-bottom:11px}.diagram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:linear-gradient(135deg,rgba(23,78,134,.08),rgba(14,118,110,.08));border:1px solid var(--line);border-radius:18px;padding:16px;margin:18px 0}.dnode{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--primary);border-radius:14px;padding:13px;min-height:118px}.dnode:nth-child(2n){border-top-color:var(--teal)}.dnode:nth-child(3n){border-top-color:#6955b8}.dnode:nth-child(4n){border-top-color:var(--amber)}.dnode b{display:block;margin-bottom:6px;color:var(--ink)}.dnode span{display:block;color:var(--muted);font-size:.92rem}.teaching{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.teach{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.teach h3{font-size:1rem;margin-bottom:6px}.teach p{margin:0;color:var(--muted)}.example{background:rgba(14,118,110,.10)}.pitfall{background:rgba(180,35,24,.08)}.takeaway{background:rgba(23,78,134,.10)}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.case{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.case h3{margin-bottom:8px}.answer{display:none;margin-top:10px}.case.open .answer{display:block}.quiz-q{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:var(--soft)}.choices{display:grid;gap:8px;margin-top:8px}.choice{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer}.choice.ok{border-color:var(--green);background:rgba(8,116,67,.12)}.choice.bad{border-color:var(--red);background:rgba(180,35,24,.10)}.feedback{font-weight:850;margin-top:8px}.score{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:900}.sources a{display:block;margin:8px 0;color:var(--primary);font-weight:850}.disclaimer{color:var(--red)!important;font-weight:900}.toplink{position:fixed;right:18px;bottom:18px;border-radius:999px;z-index:25;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-color:transparent}.help-modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,12,24,.55);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;max-width:780px;max-height:86vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:64px 22px 22px}.help-head #closeHelp{position:absolute;top:16px;right:16px}@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:relative;top:auto;height:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.hero{grid-template-columns:1fr}.hero-img{max-height:260px;object-fit:cover}.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr 1fr}}@media(max-width:560px){.layout{padding:12px}.buttons{width:100%}.side,.diagram,.teaching,.cases,.outcomes{grid-template-columns:1fr}.btn{font-size:.82rem;padding:8px 9px}.hero{padding:20px}.hero h1{font-size:2.05rem}h2{font-size:1.28rem}.toplink{right:12px;bottom:12px}}
-</style>
+<meta name="description" content="Keys, hashes, MACs, signatures, certificates, and a step-by-step TLS handshake - and where PQC actually changes things.">
+<link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body>
-<header class="top"><div class="top-in"><div class="brand"><span class="mark" aria-hidden="true"></span><span>PQC-102</span><span>Cryptographic Building Blocks Deep Dive</span><span class="version">V2.1 (July 2026)</span></div><div class="buttons"><a class="btn" href="index.html">Home</a><button class="btn" id="themeBtn">Dark</button><button class="btn" id="helpBtn">Help</button></div></div></header>
-<div class="layout"><nav class="side" aria-label="Module sections"><a href="#architecture">Architecture diagram</a><a href="#s1">Algorithms are public; keys are protected</a><a href="#s2">Hashes, MACs, and password hashing</a><a href="#s3">Digital signatures and verification policy</a><a href="#s4">TLS as a bundle of cryptographic jobs</a><a href="#labs">Use-case labs</a><a href="#quiz">Knowledge check</a><a href="#sources">Sources</a></nav>
-<main>
-<section class="hero" id="start"><div><span class="chip">Core crypto</span><h1>Cryptographic Building Blocks Deep Dive</h1><p>A deeper lesson set for keys, hashes, signatures, certificates, TLS, and the implementation mistakes that cause real failures.</p><ul class="outcomes"><li>Explain keys, hashes, MACs, signatures, certificates, and TLS roles.</li><li>Identify where implementation and operational mistakes defeat strong algorithms.</li><li>Prepare for later modules on protocols, PKI, and migration.</li></ul><p class="disclaimer">Educational reference only. Production cryptography decisions need current standards checks, vendor validation, security review, interoperability testing, and rollback planning.</p></div><img class="hero-img" src="./diagrams/crypto-building-blocks.svg" alt="Cryptographic Building Blocks Deep Dive architecture diagram"></section>
+<body data-module="PQC-102">
+<div class="readbar"></div>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V3.0 (July 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
+</div></header>
 
-<section class="architecture" id="architecture">
-  <h2>Cryptographic Building Blocks</h2>
-  <p>How hashes, MACs, signatures, certificates, public-key exchange, and symmetric encryption fit together in a real system.</p>
-  <img class="architecture-img" src="./diagrams/crypto-building-blocks.svg" alt="Cryptographic Building Blocks">
-  <div class="visual-note"><span>Read the picture first</span><span>Then read the lesson text</span><span>Use labs to apply it</span></div>
+<div class="layout">
+<nav class="side" aria-label="Module sections">
+  <div class="side-title">In this module</div>
+  <a href="#explore"><span class="dot"></span>Try it: the TLS handshake</a>
+  <a href="#s1"><span class="dot"></span>1. Public algorithms, secret keys</a>
+  <a href="#s2"><span class="dot"></span>2. Hashes, MACs, passwords</a>
+  <a href="#s3"><span class="dot"></span>3. Signatures &amp; verification</a>
+  <a href="#s4"><span class="dot"></span>4. TLS as a bundle of jobs</a>
+  <a href="#labs"><span class="dot"></span>Hands-on labs</a>
+  <a href="#quiz"><span class="dot"></span>Knowledge check</a>
+  <a href="#sources"><span class="dot"></span>Sources</a>
+</nav>
+
+<main>
+<section class="hero" id="start">
+  <div class="hero-copy">
+    <span class="chip">Core crypto</span>
+    <div class="meta"><span class="level beginner">Beginner+</span><span class="level time">~25 min read</span><span class="level time">Interactive</span></div>
+    <h1>Cryptographic Building Blocks Deep Dive</h1>
+    <p class="sub">A tour of the parts every secure system is assembled from &mdash; and, crucially, which parts a post-quantum migration touches. We finish by walking through a real TLS handshake step by step.</p>
+    <ul class="outcomes">
+      <li>Tell keys, hashes, MACs, signatures, and certificates apart and know what each is for.</li>
+      <li>See where implementation and operational mistakes defeat strong algorithms.</li>
+      <li>Identify exactly which handshake steps PQC changes.</li>
+    </ul>
+  </div>
+  <img class="hero-art" src="diagrams/crypto-building-blocks.svg" alt="Building blocks of cryptography: hashes, MACs, signatures, certificates, key exchange, and symmetric encryption combining into a secure channel.">
+</section>
+
+<section class="block" id="explore">
+  <h2>Try it: walk through a TLS 1.3 handshake</h2>
+  <p class="section-hint">This is what happens in a fraction of a second before HTTPS shows a page. Notice which steps a quantum computer threatens (marked PQC).</p>
+  <div class="pqc-stepper" data-title="TLS 1.3 handshake, simplified">
+    <script type="application/json" class="steps">
+    [
+      {"title":"ClientHello","body":"Your browser lists the TLS version, cipher suites, and key-exchange groups it supports, and includes its key-share for key exchange. In a PQC deployment this is where a post-quantum (or hybrid) group is offered.","meta":"PQC touches this: key-exchange group"},
+      {"title":"ServerHello + key share","body":"The server picks a group and sends its own key-share. Both sides now run key establishment to derive the same shared secret without ever sending it. Today this is ECDHE; post-quantum uses ML-KEM, often hybrid X25519+ML-KEM.","meta":"PQC target: key establishment"},
+      {"title":"Certificate","body":"The server sends its certificate chain proving its identity. The certificates are signed - classically by ECDSA/RSA, in future by ML-DSA/SLH-DSA. Larger PQC signatures make this message bigger.","meta":"PQC target: certificate signatures"},
+      {"title":"CertificateVerify","body":"The server signs a transcript of the handshake with its private key so the client knows the certificate holder is really present, not replayed. Another signature that PQC changes.","meta":"PQC target: handshake signature"},
+      {"title":"Finished + records","body":"Both sides derive symmetric keys from the shared secret and switch to fast authenticated encryption (for example AES-256-GCM or ChaCha20-Poly1305). This bulk encryption is largely unaffected by PQC.","meta":"mostly unchanged (symmetric)"}
+    ]
+    </script>
+  </div>
+  <div class="callout takeaway"><span class="k">Read the pattern</span><p>Of five steps, PQC changes the <b>key exchange</b> and the <b>signatures</b> (steps 1&ndash;4). The bulk data encryption (step 5) mainly needs adequate key size. This is the shape of nearly every protocol migration.</p></div>
 </section>
 
 <section class="lesson" id="s1">
-  <div class="lesson-title"><span>1</span><h2>Algorithms are public; keys are protected</h2></div>
-  <p>Modern cryptography does not rely on hiding the algorithm. Public standards are reviewed by many experts, implemented by many vendors, and tested across many environments. Security depends on strong design plus secret or private key material that remains protected.</p><p>A key is not just a string. It has origin, owner, allowed purpose, creation time, rotation rules, backup method, revocation path, and destruction requirements. Key management failures often cause more damage than algorithm weakness.</p><p>PQC does not change this principle. ML-KEM, ML-DSA, and SLH-DSA are public. The private keys, seeds, randomness, and implementation behavior must still be protected.</p>
-  <div class="diagram"><div class="dnode"><b>Public standard</b><span>Reviewed design.</span></div><div class="dnode"><b>Secret/private key</b><span>Protected material.</span></div><div class="dnode"><b>Allowed purpose</b><span>Encrypt, sign, verify, or wrap.</span></div><div class="dnode"><b>Lifecycle</b><span>Generate, store, rotate, revoke.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>Publishing the AES algorithm does not let attackers decrypt AES-256. Accidentally logging the AES key may.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not invent a secret algorithm because it feels safer. Use reviewed standards and protect keys correctly.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>The algorithm is the public recipe; the key is the protected control.</p></article>
-  </div>
+  <div class="lesson-title"><span class="num">1</span><h2>Algorithms are public; keys are protected</h2></div>
+  <p class="lead">Modern cryptography does not hide the algorithm. It hides the key.</p>
+  <p>Public, reviewed standards get analyzed by thousands of experts and implemented by many vendors. Security comes from a strong design <em>plus</em> secret key material that stays protected. A key is not just a random string &mdash; it has an origin, an owner, an allowed purpose, a creation time, rotation rules, a backup method, a revocation path, and destruction requirements. Key-management failures cause more real breaches than algorithm weaknesses.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>Publishing the AES specification does not help anyone decrypt AES-256. Accidentally writing the AES key into a log file does. The recipe is public; the key is the control.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Inventing a secret in-house algorithm because secrecy "feels safer." Unreviewed crypto fails in ways experts would have caught. Use vetted standards and protect the keys.</p></div>
+  <p>PQC changes nothing about this principle. ML-KEM, ML-DSA, and SLH-DSA are fully public. Their private keys, seeds, and randomness still need protection &mdash; and PQC adds new concerns like larger key material and side-channel-safe implementations (covered in PQC-301).</p>
 </section>
+
 <section class="lesson" id="s2">
-  <div class="lesson-title"><span>2</span><h2>Hashes, MACs, and password hashing</h2></div>
-  <p>A cryptographic hash creates a fixed-size digest. It is useful for fingerprints, integrity checks, Merkle trees, transparency logs, and signature internals. It is not reversible encryption.</p><p>A message authentication code, or MAC, proves integrity using a shared secret. A hash alone can show data changed if the expected digest is trusted; a MAC proves the checker knows the shared secret.</p><p>Password hashing is a separate use case. Passwords should use password-hashing schemes with salts and work factors, not plain fast hashes. This matters because the same word &#x27;hash&#x27; appears in several different contexts.</p>
-  <div class="diagram"><div class="dnode"><b>Hash</b><span>Fingerprint.</span></div><div class="dnode"><b>MAC</b><span>Shared-secret integrity.</span></div><div class="dnode"><b>Password hash</b><span>Slow and salted.</span></div><div class="dnode"><b>Signature</b><span>Public verification of origin.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A download page may publish a SHA-256 digest. An API request may use an HMAC to prove a shared secret. A login system should use a password-hashing design, not just SHA-256(password).</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not confuse hash integrity with authentication. If an attacker can replace both a file and its posted digest, the digest does not prove origin.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Hashes fingerprint; MACs authenticate with a shared secret; password hashing protects low-entropy secrets.</p></article>
+  <div class="lesson-title"><span class="num">2</span><h2>Hashes, MACs, and password hashing</h2></div>
+  <p class="lead">Three different jobs that all get sloppily called "hashing."</p>
+  <div class="grid3">
+    <div class="callout"><span class="k">Hash</span><p>A one-way fingerprint of data (e.g. SHA-256). Same input &rarr; same digest. Used for integrity checks, transparency logs, and inside signatures. Not reversible and not a secret.</p></div>
+    <div class="callout"><span class="k">MAC</span><p>Proves integrity <em>and</em> that the sender knew a shared secret (e.g. HMAC). A plain hash only detects change if you already trust the expected value; a MAC proves who computed it.</p></div>
+    <div class="callout"><span class="k">Password hashing</span><p>Deliberately slow, salted schemes (e.g. Argon2, bcrypt, scrypt) for low-entropy secrets. Never store <code class="inl">SHA-256(password)</code> &mdash; it is far too fast to brute-force.</p></div>
   </div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A download page publishes a SHA-256 digest (integrity, if you trust the page). An API request carries an HMAC (proves shared-secret origin). A login system stores an Argon2 hash (protects weak passwords). Same word, three different mechanisms.</p></div>
+  <div class="callout takeaway"><span class="k">Quantum note</span><p>Hashes and MACs are symmetric-world tools: Grover pushes toward longer outputs, but they are not "broken" the way RSA is. Password hashing is unaffected by the PQC transition itself.</p></div>
 </section>
+
 <section class="lesson" id="s3">
-  <div class="lesson-title"><span>3</span><h2>Digital signatures and verification policy</h2></div>
-  <p>A digital signature is created with a private signing key and checked with a public verification key. Anyone can verify, but only the private key holder should be able to sign.</p><p>Verification policy is as important as signature creation. A verifier must know which algorithms are accepted, which keys are trusted, which uses are allowed, whether the signature is expired or revoked, and whether legacy fallback is permitted.</p><p>PQC signatures matter because existing RSA, ECDSA, and EdDSA signatures are in certificate chains, firmware, documents, code releases, package repositories, and identity systems.</p>
-  <div class="diagram"><div class="dnode"><b>Signer</b><span>Private key creates signature.</span></div><div class="dnode"><b>Artifact</b><span>Firmware, cert, package, document.</span></div><div class="dnode"><b>Verifier</b><span>Public key checks it.</span></div><div class="dnode"><b>Policy</b><span>Allowed algorithms and keys.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A device bootloader may verify firmware before installation. If the bootloader cannot understand future PQC signatures, the device may need an agility update before a PQC signing policy can be enforced.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not only ask &#x27;can we sign?&#x27; Ask &#x27;can every verifier parse and enforce the new signature policy?&#x27;</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Signature migration is often constrained by old verifiers.</p></article>
+  <div class="lesson-title"><span class="num">3</span><h2>Digital signatures and verification policy</h2></div>
+  <p class="lead">Signing is easy to talk about; the hard part is every place that must <em>verify</em>.</p>
+  <p>A signature is made with a private key and checked with the matching public key. Anyone can verify; only the key holder can sign. But the verifier's <b>policy</b> is where migrations live or die: which algorithms are accepted, which keys are trusted, which uses are allowed, whether a signature is expired or revoked, and whether legacy fallback is permitted.</p>
+  <div class="flow">
+    <div class="flow-step"><b>Signer</b><span>Private key produces the signature.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Artifact</b><span>Firmware, cert, package, or document.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Verifier</b><span>Public key + policy checks it.</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="flow-step"><b>Every verifier</b><span>All of them must accept the new algorithm.</span></div>
   </div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A device bootloader verifies firmware before installing it. If the bootloader cannot parse a future PQC signature, you cannot enforce a PQC signing policy until the bootloader itself gains "agility" support &mdash; possibly a hardware refresh.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Asking only "can we sign with PQC?" The real question is "can <em>every</em> verifier in the world that reads our artifacts parse and enforce it?"</p></div>
 </section>
+
 <section class="lesson" id="s4">
-  <div class="lesson-title"><span>4</span><h2>TLS as a bundle of cryptographic jobs</h2></div>
-  <p>TLS is the protocol behind HTTPS and many APIs. It combines identity, negotiation, key establishment, encryption, integrity, and downgrade protection. That is why changing TLS for PQC is more than swapping a function call.</p><p>A simplified handshake negotiates supported parameters, authenticates the server through a certificate, establishes a shared secret, derives symmetric keys, and then protects records. PQC can affect the key establishment and certificate-signature parts.</p><p>Hybrid key exchange is a common transition model because it combines classical and PQC contributions. It needs protocol-defined combination and downgrade protection.</p>
-  <div class="diagram"><div class="dnode"><b>Negotiate</b><span>Pick supported options.</span></div><div class="dnode"><b>Authenticate</b><span>Certificate proves identity.</span></div><div class="dnode"><b>Establish secret</b><span>Classical, PQC, or hybrid.</span></div><div class="dnode"><b>Protect records</b><span>Symmetric encryption.</span></div></div>
-  <div class="teaching">
-    <article class="teach example"><h3>Concrete example</h3><p>A hybrid TLS pilot may work directly between client and server but fail through a middlebox that rejects larger handshakes or unknown extensions.</p></article>
-    <article class="teach pitfall"><h3>Common pitfall</h3><p>Do not test only the crypto library. Test browser, mobile app, proxy, WAF, CDN, load balancer, logging, monitoring, and rollback.</p></article>
-    <article class="teach takeaway"><h3>Takeaway</h3><p>Protocol migration must be tested on the real path.</p></article>
+  <div class="lesson-title"><span class="num">4</span><h2>TLS as a bundle of cryptographic jobs</h2></div>
+  <p class="lead">TLS is not one algorithm; it is identity + negotiation + key establishment + encryption + integrity + downgrade protection, working together.</p>
+  <p>That is why "making TLS post-quantum" is more than swapping a function call. You saw the five steps above. <span class="term" data-def="A transition approach that runs a classical and a post-quantum mechanism together, so the result is safe if either one holds.">Hybrid key exchange</span> is the common transition model: run classical ECDHE and ML-KEM together, combine both secrets, and you are protected if either survives. It must be protocol-defined, with downgrade protection.</p>
+  <details class="deep"><summary>Go deeper: why hybrid handshakes sometimes fail on the real network path</summary>
+    <div class="deep-body">
+      <p>A hybrid ClientHello is larger because it carries an extra, bigger key-share. That can push the message past sizes that some middleboxes, load balancers, or old TLS stacks handle gracefully &mdash; a class of bugs sometimes called "TLS ossification." Symptoms: the handshake works browser-to-server in a lab but fails through a corporate proxy, a legacy VPN concentrator, or an ancient mobile OS.</p>
+      <p>Lesson: test on the <em>real</em> path (client, OS TLS stack, proxy, WAF, CDN, load balancer, logging, monitoring, rollback), not just the crypto library.</p>
+    </div>
+  </details>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Testing only the crypto library. The library is rarely where PQC breaks &mdash; the surrounding ecosystem is.</p></div>
+</section>
+
+<section class="block lab" id="labs">
+  <h2>Hands-on labs</h2>
+  <p class="section-hint">Decide first, then reveal.</p>
+  <div class="cases">
+    <article class="case">
+      <h3>Lab 1 &middot; Package repository</h3>
+      <p class="scenario">A repo posts each package's SHA-256 hash next to the download.</p>
+      <p class="decide">Why isn't publishing the hash enough to trust the package?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> A hash only proves integrity if you already trust the expected value. An attacker who can replace the package can also replace the posted hash. You need a <em>signature</em> to prove maintainer origin.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 2 &middot; Legacy mobile app</h3>
+      <p class="scenario">A hybrid-PQC TLS pilot works in the browser but a five-year-old mobile app fails to connect.</p>
+      <p class="decide">Name likely causes.</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> The app's bundled TLS stack, the OS, a proxy on the path, or certificate pinning may not understand the new group identifiers or the larger handshake size. It is an ecosystem issue, not a server bug.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 3 &middot; CI/CD signing key</h3>
+      <p class="scenario">Your build pipeline signs releases that customers verify.</p>
+      <p class="decide">What must change for a PQC signing migration?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> The signing system, its HSM/KMS, the build tools, and <em>every</em> consumer that verifies releases must support the new signature policy &mdash; and you need a rollback path if a consumer cannot.</p>
+    </article>
   </div>
 </section>
-<section class="lab" id="labs"><h2>Use-Case Labs</h2><p>These are practical exercises. Read the challenge, decide your answer, then reveal the recommended answer and compare.</p><div class="cases"><article class="case"><h3>Package repository</h3><p><b>Challenge:</b> Explain why hashes are not enough for package trust.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> Hashes detect changes only if the expected hash is trusted; signatures prove repository or maintainer origin.</p></article><article class="case"><h3>Legacy mobile app</h3><p><b>Challenge:</b> Find why TLS hybrid testing may fail.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> The app, OS TLS stack, proxy path, or pinned certificates may not support the new identifiers or sizes.</p></article><article class="case"><h3>CI/CD signing key</h3><p><b>Challenge:</b> Identify migration concern.</p><button class="btn small reveal">Show answer</button><p class="answer"><b>Recommended answer:</b> The signing system, HSM/KMS, build tools, and all verification consumers must support the new signature policy.</p></article></div></section>
-<section class="quiz" id="quiz"><h2>Knowledge Check</h2><p>Pick an answer. The page will mark the correct answer and keep score.</p><div id="quizBox"></div><div class="score" id="quizScore">Score: 0/0</div></section>
-<section class="sources" id="sources"><h2>Primary Sources</h2><p>Use these as the standards trail before production decisions.</p><a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC Post-Quantum Cryptography Project</a><a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203: ML-KEM</a><a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204: ML-DSA</a><a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205: SLH-DSA</a><a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST HQC selection announcement</a><a href="https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc" target="_blank" rel="noopener noreferrer">NCCoE Migration to Post-Quantum Cryptography</a><a href="https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/3148990/nsa-releases-future-quantum-resistant-qr-algorithm-requirements-for-national-se/" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 guidance</a></section>
-</main></div>
+
+<section class="block quiz" id="quiz">
+  <h2>Knowledge check</h2>
+  <p class="section-hint">Score 70%+ to mark this module complete.</p>
+  <div id="quizBox"></div>
+  <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
+  <script type="application/json" id="quizData">
+  [
+    {"q":"In a modern cryptosystem, what must stay secret?","choices":["The key","The algorithm's name","The user manual"],"answer":0,"explain":"Security relies on protecting keys, not on hiding public, peer-reviewed algorithms."},
+    {"q":"What is a hash?","choices":["A one-way fingerprint of data","A reversible lockbox","A certificate authority"],"answer":0,"explain":"A cryptographic hash maps data to a fixed-size digest and is not reversible."},
+    {"q":"What extra thing does a MAC prove that a bare hash does not?","choices":["That the producer knew a shared secret","That the file is compressed","That the network is fast"],"answer":0,"explain":"A MAC binds integrity to knowledge of a shared secret, so it proves origin, not just change."},
+    {"q":"In the TLS handshake, which steps does PQC primarily change?","choices":["Key exchange and the signatures","Only the TCP connection","Only the HTML rendering"],"answer":0,"explain":"PQC replaces the key-establishment group and the certificate/handshake signatures; bulk record encryption is largely unchanged."},
+    {"q":"What must be tested for a signature migration?","choices":["Every verifier and its policy path","Only the signing laptop","Only font rendering"],"answer":0,"explain":"The constraint is usually the verifiers: they all must parse and accept the new algorithm."},
+    {"q":"Why do hybrid TLS handshakes sometimes fail in production but not in a lab?","choices":["Larger handshakes trip middleboxes, old stacks, or pinning","The server is on the wrong continent","Hybrid mode disables encryption"],"answer":0,"explain":"Bigger key-shares increase message size; ossified middleboxes and legacy clients on the real path can choke on it."}
+  ]
+  </script>
+</section>
+
+<section class="block sources" id="sources">
+  <h2>Primary sources</h2>
+  <p class="section-hint">Educational; verify against primary guidance before decisions.</p>
+  <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203 &mdash; ML-KEM</a>
+  <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
+  <a href="https://datatracker.ietf.org/doc/rfc8446/" target="_blank" rel="noopener noreferrer">IETF RFC 8446 &mdash; TLS 1.3</a>
+  <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
+</section>
+</main>
+</div>
+
 <button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
-<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card"><div class="help-head"><h2 id="helpTitle">How to use this module</h2><button class="btn" id="closeHelp">Close</button></div><p>This module is intentionally lesson-based, not a glossary. Read the explanation, inspect the diagram, review the example and pitfall, then use the use-case labs to apply the concept.</p><p>Use the side navigation to jump, the Top button on mobile, and the knowledge check to test retention.</p><p class="disclaimer">This is educational material, not production cryptographic approval.</p></div></div>
-<script>
-const root=document.documentElement,themeBtn=document.getElementById('themeBtn');function setTheme(t){root.dataset.theme=t;localStorage.setItem('pqc-theme',t);themeBtn.textContent=t==='dark'?'Light':'Dark'}setTheme(localStorage.getItem('pqc-theme')||'light');themeBtn.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');const help=document.getElementById('helpModal');document.getElementById('helpBtn').onclick=()=>help.classList.add('open');document.getElementById('closeHelp').onclick=()=>help.classList.remove('open');help.addEventListener('click',e=>{if(e.target===help)help.classList.remove('open')});document.querySelectorAll('.reveal').forEach(btn=>btn.onclick=()=>{const card=btn.closest('.case');card.classList.toggle('open');btn.textContent=card.classList.contains('open')?'Hide answer':'Show answer'});const nav=[...document.querySelectorAll('.side a')];const secs=nav.map(a=>document.querySelector(a.getAttribute('href')));addEventListener('scroll',()=>{let idx=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<130)idx=i});nav.forEach((a,i)=>a.classList.toggle('active',i===idx))},{passive:true});const quiz=[["What should remain secret in a public standard cryptosystem?", ["The key", "The algorithm name", "The textbook"], 0], ["What is a hash?", ["A fingerprint of data", "A reversible lockbox", "A certificate authority"], 0], ["What must be tested for signature migration?", ["All verifiers and policy paths", "Only the signing laptop", "Only font rendering"], 0], ["TLS includes which jobs?", ["Identity, key establishment, encryption, integrity, negotiation", "Only compression", "Only password storage"], 0]];const qb=document.getElementById('quizBox'),score=document.getElementById('quizScore');let answers={};function renderQuiz(){qb.innerHTML=quiz.map((q,i)=>`<div class="quiz-q"><strong>${i+1}. ${q[0]}</strong><div class="choices">${q[1].map((c,j)=>`<button class="choice" data-q="${i}" data-a="${j}">${c}</button>`).join('')}</div><div class="feedback" id="fb${i}"></div></div>`).join('');qb.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.q),a=Number(b.dataset.a);answers[i]=a;const parent=b.closest('.quiz-q');parent.querySelectorAll('.choice').forEach((x,j)=>{x.classList.remove('ok','bad');if(j===quiz[i][2])x.classList.add('ok');else if(j===a)x.classList.add('bad')});document.getElementById('fb'+i).textContent=a===quiz[i][2]?'Correct':'Review the lesson and compare with the use-case labs.';updateScore()})}function updateScore(){const total=quiz.length,got=Object.keys(answers).filter(i=>answers[i]===quiz[i][2]).length;score.textContent=`Score: ${got}/${total}`}renderQuiz();updateScore();
-</script>
+
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
+  <h2 id="helpTitle">How to use this module</h2>
+  <div class="help-ver" data-help-version>V3.0 (July 2026)</div>
+  <button class="btn" id="closeHelp">Close</button>
+  <p>Step through the TLS handshake first and note the "PQC touches this" markers. Then read the lessons and open the "Go deeper" panel for the middlebox story.</p>
+  <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
+  <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
+</div></div>
+
+<script src="assets/pqc.js"></script>
 </body>
 </html>
