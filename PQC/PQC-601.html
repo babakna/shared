@@ -10,7 +10,7 @@
 <body data-module="PQC-601">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-601</span><span>Research, Governance &amp; Architecture Review</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-601</span><span>Research, Governance &amp; Architecture Review</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. Algorithm diversity</a>
   <a href="#s3"><span class="dot"></span>3. Architecture review method</a>
   <a href="#s4"><span class="dot"></span>4. Communicating decisions</a>
+  <a href="#s5"><span class="dot"></span>5. Crypto-agility maturity model</a>
+  <a href="#s6"><span class="dot"></span>6. The readiness artifact</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -31,7 +33,7 @@
 <section class="hero" id="start">
   <div class="hero-copy">
     <span class="chip">Advanced</span>
-    <div class="meta"><span class="level advanced">Advanced</span><span class="level time">~25 min read</span><span class="level time">Governance</span></div>
+    <div class="meta"><span class="level advanced">Advanced</span><span class="level time">~30 min read</span><span class="level time">Governance</span></div>
     <h1>Research Watch, Governance &amp; Architecture Review</h1>
     <p class="sub">PQC is a moving field. This module is about staying current without whiplash: how to track research, keep diversity and agility, review architectures rigorously, and communicate decisions leaders can act on.</p>
     <ul class="outcomes">
@@ -63,6 +65,8 @@
   <div class="lesson-title"><span class="num">1</span><h2>Research watch without panic</h2></div>
   <p class="lead">Cryptography advances by attacks; most narrow a margin rather than break a scheme.</p>
   <p>Establish trusted sources and a triage habit. Distinguish an asymptotic/theoretical result from a practical break, a classical attack from a quantum one, and a peer-reviewed result from a preprint. The right reflex to a scary headline is "does this touch a parameter set we deploy, and what does NIST say?" &mdash; not an emergency migration.</p>
+  <p>Curate a small, high-signal watch list so you are reading the source, not the hype. Useful anchors include the NIST PQC project and its mailing list, the IACR ePrint archive (where most cryptanalysis appears first), IETF working groups (TLS, LAMPS), standards bodies relevant to your sector (ETSI, GSMA, 3GPP), and a handful of respected cryptographers. Assign someone to skim these on a cadence and log anything that names an algorithm you actually deploy.</p>
+  <p>When a result appears, classify it before you react. Is it a <em>classical</em> or a <em>quantum</em> attack? An <em>asymptotic</em> improvement (better exponent, still astronomically expensive) or a <em>practical</em> break? Against the <em>exact</em> parameter set you run, or a weakened toy version? Peer-reviewed or a fresh preprint awaiting scrutiny? These four questions turn a frightening headline into a single row in your risk log with a proportionate action attached.</p>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Reacting to every preprint as if it were a break, or the opposite &mdash; ignoring research entirely. Both are governance failures. Build a calibrated, documented triage.</p></div>
 </section>
 
@@ -75,6 +79,8 @@
     <div class="callout"><span class="k">Hash-based</span><p>SLH-DSA. Conservative signatures resting only on hash security.</p></div>
     <div class="callout"><span class="k">Code-based</span><p>HQC. Backup KEM on a different assumption.</p></div>
   </div>
+  <p>Why does resting everything on one math family feel efficient but is actually fragile? Because a single breakthrough &mdash; a clever new attack on lattice problems, say &mdash; would weaken <em>every</em> system you built, all at once, with no fallback. History is full of cryptographic assumptions that looked unbreakable for decades and then bent (MD5, SHA-1, and 512-bit RSA all had their day). Nobody expects lattices to fall, but "we did not expect it" is exactly the scenario diversity exists to survive. Keeping a differently-founded backup is cheap insurance against a low-probability, high-impact event.</p>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>It is the reason a careful investor does not put every dollar in one stock, however good. The point is not that the stock is bad &mdash; it is that a single surprise should never be able to wipe out the whole portfolio. Algorithm diversity is portfolio thinking applied to trust.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Diversity is only useful if agility lets you switch. Design so a family can be swapped without re-architecting.</p></div>
 </section>
 
@@ -90,6 +96,8 @@
     <li><b>Evidence:</b> validation, test vectors, and interop results captured?</li>
   </ul>
   <div class="callout example"><span class="k">Concrete example</span><p>A review of a "PQC-ready" service finds hybrid TLS enabled but no stored algorithm identifiers and no rollback path. Verdict: not agile, not production-ready &mdash; fix agility and rollback before sign-off.</p></div>
+  <p>The value of a fixed question set is that it removes personality from the review. Without it, whether a design passes depends on which reviewer showed up and how much they happened to care about, say, rollback that day. With it, every design faces the same six questions, so a "PQC-ready" stamp means the same thing across the whole organization and over time. That consistency is what lets you compare systems, delegate reviews to less senior staff, and defend a sign-off months later when someone asks why a service was approved.</p>
+  <div class="callout tip"><span class="k">Turn the questions into a scorecard</span><p>Convert the six review areas into a short rubric &mdash; for each, mark pass, gap, or blocker with a one-line justification. A design with any "blocker" cannot ship; a design with "gaps" ships only with an owned, dated remediation plan. This turns a subjective conversation into a repeatable gate that a program office can actually run at scale.</p></div>
 </section>
 
 <section class="lesson" id="s4">
@@ -97,6 +105,47 @@
   <p class="lead">A decision no one understands or owns will not survive contact with reality.</p>
   <p>Produce a readiness artifact that states, in plain language: what was assessed, what was decided, why, who owns it, what residual risk remains, and when it will be re-reviewed. Match the message to the audience &mdash; engineers need parameters and interop data; executives need risk, cost, timeline, and accountability. Avoid both false confidence and vague doom.</p>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Accountable, plain-language artifacts are what turn PQC from a perpetual discussion into a governed program with an owner and a date.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>A crypto-agility maturity model</h2></div>
+  <p class="lead">"Are we agile?" is too vague to govern. A maturity ladder makes it measurable.</p>
+  <p>Give each system a maturity level so you can report progress and set targets. Most organizations start scattered across Levels 0&ndash;1 and aim to pull their Tier-1 systems up to Level 3+ during the migration. The point is not to reach Level 4 everywhere &mdash; it is to know where each system sits and to raise the ones that matter.</p>
+  <figure class="figure">
+    <div class="fig-title">Crypto-agility maturity &mdash; climb it deliberately</div>
+    <svg viewBox="0 0 680 230" role="img" aria-label="A five-step maturity ladder: Level 0 unaware, Level 1 inventoried, Level 2 hybrid-capable, Level 3 agile by config, Level 4 continuously governed.">
+      <g>
+        <rect x="14" y="176" width="118" height="40" rx="8" class="g-box" stroke-width="1.5"/><text class="g-tm" x="73" y="193" font-size="11" text-anchor="middle" font-weight="800">L0 Unaware</text><text class="g-tm" x="73" y="207" font-size="9" text-anchor="middle">crypto hidden</text>
+        <rect x="146" y="146" width="118" height="70" rx="8" class="g-box" stroke-width="1.5"/><text class="g-tm" x="205" y="166" font-size="11" text-anchor="middle" font-weight="800">L1 Inventoried</text><text class="g-tm" x="205" y="180" font-size="9" text-anchor="middle">CBOM exists</text>
+        <rect x="278" y="116" width="118" height="100" rx="8" class="g-box-t" stroke-width="1.5"/><text class="g-t" x="337" y="136" font-size="11" text-anchor="middle" font-weight="800">L2 Hybrid-capable</text><text class="g-tm" x="337" y="150" font-size="9" text-anchor="middle">can run PQC+classical</text>
+        <rect x="410" y="86" width="118" height="130" rx="8" class="g-box-p" stroke-width="2"/><text class="g-t" x="469" y="106" font-size="11" text-anchor="middle" font-weight="800">L3 Agile</text><text class="g-tm" x="469" y="120" font-size="9" text-anchor="middle">swap by config,</text><text class="g-tm" x="469" y="132" font-size="9" text-anchor="middle">alg IDs stored</text>
+        <rect x="542" y="50" width="124" height="166" rx="8" class="g-box-v" stroke-width="2"/><text class="g-t" x="604" y="72" font-size="11" text-anchor="middle" font-weight="800">L4 Governed</text><text class="g-tm" x="604" y="86" font-size="9" text-anchor="middle">monitored, loop-driven,</text><text class="g-tm" x="604" y="98" font-size="9" text-anchor="middle">auto re-baselined</text>
+      </g>
+      <path class="g-line-p" d="M20 210 L120 200 L250 172 L380 142 L500 112 L640 76" fill="none" marker-end="url(#ml)"/>
+      <defs><marker id="ml" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>Level 3 &mdash; "swap algorithms by configuration, with algorithm IDs stored" &mdash; is the realistic target for important systems. Level 4 adds continuous monitoring and the research-to-decision loop from this module.</figcaption>
+  </figure>
+  <div class="callout tip"><span class="k">Practice</span><p>Add a maturity-level column to your CBOM. Now "improve agility" becomes a concrete, trackable goal per system, and leadership can see the estate climbing the ladder over time.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>The readiness artifact, section by section</h2></div>
+  <p class="lead">The deliverable of governance is a short, honest document anyone can act on &mdash; here is the template.</p>
+  <p>A readiness artifact is not a 60-page report; it is a one-to-two page record per system (or per decision) that makes the reasoning auditable. Use the same sections every time so reviewers know exactly where to look and nothing important is quietly omitted.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Section</th><th>What it captures</th></tr></thead>
+    <tbody>
+      <tr><td><b>Scope</b></td><td>Which system/decision, which cryptographic jobs, and the data it protects</td></tr>
+      <tr><td><b>Current state</b></td><td>Exact algorithms, parameters, versions, and dependencies (from the CBOM)</td></tr>
+      <tr><td><b>Target &amp; decision</b></td><td>Chosen algorithms/hybrid mode, maturity level, and why</td></tr>
+      <tr><td><b>Evidence</b></td><td>Validation, test vectors, interop results, monitoring of negotiated groups</td></tr>
+      <tr><td><b>Residual risk</b></td><td>What is still exposed, blocked, or uncertain &mdash; stated plainly, no false confidence</td></tr>
+      <tr><td><b>Ownership &amp; review</b></td><td>Named owner, who accepted the risk, and the re-review date</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A one-page artifact for the external VPN reads: scope (VPN key exchange, 10-year traffic); current (classical IKEv2); target (hybrid ML-KEM, Level 3, HNDL priority); evidence (interop tested, negotiated-group logging live); residual risk (vendor firmware limits pure-PQC until Q2, segmented as mitigation); owner (Network Security), re-review in 6 months. Anyone can now see what was decided and why.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>If you cannot fill in "residual risk" and "owner," you have not finished the decision. Those two lines are what make governance real rather than decorative.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -124,6 +173,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Jobs/data/lifetime, exact algorithms/parameters/hybrid mode with stored algorithm IDs, agility evidence, full ecosystem/verifier list, downgrade protection + monitoring + tested rollback, and validation/interop evidence &mdash; plus a named owner, residual risk, and re-review date.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Rate the maturity</h3>
+      <p class="scenario">A service runs hybrid TLS, but algorithms are hard-coded, there are no stored algorithm IDs, and no one monitors the negotiated group.</p>
+      <p class="decide">What maturity level is it, and what is the next step up?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> It is Level 2 (hybrid-capable) at best &mdash; it can run PQC, but it is not Level 3 "agile" because it cannot swap algorithms by configuration and stores no algorithm IDs. The next step is to introduce the provider abstraction and algorithm IDs (reach Level 3), then add negotiated-group monitoring toward Level 4.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; The missing lines</h3>
+      <p class="scenario">A readiness artifact is complete except that "residual risk" and "owner" are left blank.</p>
+      <p class="decide">Is it ready to sign?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> No. Without a named owner who accepts the risk and an explicit statement of what remains exposed, the decision is not accountable &mdash; it is decoration. Those two lines are the whole point of governance; fill them in (even if residual risk is "none known, re-review in 6 months") before sign-off.</p>
+    </article>
   </div>
 </section>
 
@@ -139,7 +202,10 @@
     {"q":"Diversity is only useful if you also have...","choices":["Crypto-agility to actually switch families/parameters","More servers","A bigger logo"],"answer":0,"explain":"Backups you cannot deploy without re-architecting are not real resilience."},
     {"q":"What makes an architecture 'PQC-ready' at review?","choices":["Agility, full ecosystem coverage, monitoring, rollback, and evidence","Hybrid TLS enabled somewhere","A vendor's marketing claim"],"answer":0,"explain":"Readiness requires agility, verifier/ecosystem coverage, downgrade protection, monitoring, tested rollback, and validation evidence."},
     {"q":"What belongs in a readiness artifact?","choices":["What was decided, why, owner, residual risk, and re-review date","Only a green checkmark","Nothing - keep it verbal"],"answer":0,"explain":"Accountable, plain-language artifacts turn PQC into a governed program rather than an endless discussion."},
-    {"q":"How should you tailor communication?","choices":["Engineers get parameters/interop; executives get risk/cost/timeline/ownership","Send everyone the raw crypto proofs","Say 'it's fine' to all audiences"],"answer":0,"explain":"Match the message to the audience while avoiding both false confidence and vague doom."}
+    {"q":"How should you tailor communication?","choices":["Engineers get parameters/interop; executives get risk/cost/timeline/ownership","Send everyone the raw crypto proofs","Say 'it's fine' to all audiences"],"answer":0,"explain":"Match the message to the audience while avoiding both false confidence and vague doom."},
+    {"q":"What is the realistic crypto-agility target (Level 3) for important systems?","choices":["Swap algorithms by configuration, with algorithm IDs stored","Hybrid enabled once, then never touched","No cryptography at all"],"answer":0,"explain":"Level 3 means you can change algorithms/parameters via config without re-architecting, and every artifact records which algorithm produced it."},
+    {"q":"Why add a maturity-level column to the CBOM?","choices":["It turns 'improve agility' into a trackable, per-system goal","To make the table wider","Maturity cannot be measured"],"answer":0,"explain":"A per-system level lets you report progress and target raising Tier-1 systems up the ladder."},
+    {"q":"Which two lines make a readiness artifact actually accountable?","choices":["Residual risk and a named owner (with re-review date)","The title and the date","The font and the color"],"answer":0,"explain":"Without an owner who accepts the stated residual risk, the decision is decoration, not governance."}
   ]
   </script>
 </section>
@@ -158,7 +224,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Walk the research-to-decision loop, then use the architecture-review questions as a checklist on your own designs. Finish with the capstone (PQC-701).</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

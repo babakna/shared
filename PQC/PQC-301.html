@@ -10,7 +10,7 @@
 <body data-module="PQC-301">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-301</span><span>Developer Implementation Engineering</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-301</span><span>Developer Implementation Engineering</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. Metadata &amp; serialization</a>
   <a href="#s3"><span class="dot"></span>3. Randomness &amp; side channels</a>
   <a href="#s4"><span class="dot"></span>4. HSM, KMS, TPM, SE</a>
+  <a href="#s5"><span class="dot"></span>5. Designing for crypto-agility</a>
+  <a href="#s6"><span class="dot"></span>6. Performance &amp; sizing budgets</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -75,6 +77,8 @@ kem = <span class="str">"ML-KEM-768"</span>
     <li><b>Maintenance:</b> who patches it, how fast, and is it pinned to a reviewed version?</li>
     <li><b>API stability:</b> pre-standard "Kyber" APIs differ from final "ML-KEM"; do not ship a draft.</li>
   </ul>
+  <p>"Supported" is a spectrum, and the gap between the ends is where projects get burned. At the shallow end, a library merely <em>compiles</em> an ML-KEM function. At the deep end, it is a FIPS-validated module, passes the official ACVP test vectors for your exact parameter set, runs decapsulation and signing in constant time, is actively maintained with a fast patch cadence, and exposes the final standardized names and encodings. Write these out as acceptance criteria and check each one &mdash; do not let "it has the function" stand in for "it is production-ready."</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>Two teams both "support ML-KEM." Team A pulled a research branch that still uses round-3 Kyber constants; Team B uses a maintained, FIPS-track build of FIPS 203. Their handshakes will not interoperate, and Team A's build may never be approvable for regulated use. Same words on the slide, completely different reality &mdash; which is why the algorithm identifier and version belong in your inventory.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Shipping a pre-standardization implementation (round-3 Kyber) and assuming it interoperates with FIPS 203 ML-KEM. Parameters and encodings changed; they do not match.</p></div>
 </section>
 
@@ -93,13 +97,18 @@ kem = <span class="str">"ML-KEM-768"</span>
   </table></div>
   <div class="callout example"><span class="k">Concrete example</span><p>A JWT-style token that embedded an ECDSA signature now must carry a 3 KB ML-DSA signature. Header size limits on proxies, cookies, and some HTTP servers can reject it &mdash; a failure that looks like a networking bug, not a crypto bug.</p></div>
   <div class="callout tip"><span class="k">Practice</span><p>Store an explicit algorithm identifier next to every key and signature. Agility is impossible if you cannot tell which algorithm produced a stored artifact.</p></div>
+  <p>Here is why size is the sneaky killer: cryptographic artifacts do not live in one place. A single signature might be generated in an HSM, serialized into a certificate, embedded in a token, cached in a database, logged for audit, replicated to a backup, and re-parsed by a dozen services &mdash; each with its own idea of "how big could this possibly get." Any one of those with a hard-coded limit becomes a landmine that only detonates in production, often intermittently, and usually looks like an unrelated networking or database error. The fix is boring but reliable: treat "audit every size assumption" as a first-class migration task, not an afterthought.</p>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>Imagine your postal system was built for postcards and someone suddenly starts mailing thick parcels. The letters still say the same thing, but now they jam the sorting machines, do not fit the slots, and overflow the mailboxes. PQC keys and signatures are those parcels: the <em>meaning</em> is identical, but every pipe they pass through has to be widened to carry them.</p></div>
 </section>
 
 <section class="lesson" id="s3">
   <div class="lesson-title"><span class="num">3</span><h2>Randomness and side-channel safety</h2></div>
   <p class="lead">PQC schemes are as sensitive to bad randomness and timing leaks as classical ones &mdash; sometimes more.</p>
   <p>Key generation and encapsulation need a strong CSPRNG seeded from the OS. On constrained/embedded devices, weak entropy at first boot is a real failure mode. Separately, secret-dependent timing or memory-access patterns can leak private keys; that is why decapsulation and signing must be <span class="term" data-def="Code whose execution time and memory access do not depend on secret values, preventing timing side-channel leaks.">constant-time</span>.</p>
+  <p>Embedded and IoT devices deserve special caution on two fronts. First, <b>entropy at first boot</b>: a device that generates keys immediately after manufacture, before it has gathered enough randomness, can produce weak or even duplicated keys across a whole production run &mdash; a failure that has bitten real fleets. Seed from a hardware RNG and, if needed, defer key generation until entropy is sufficient. Second, <b>physical side channels</b>: an attacker with the device in hand can measure power draw or electromagnetic emissions during decapsulation or signing, or inject faults to induce revealing errors. These are not theoretical for high-value or widely distributed devices, and they require hardened, evaluated implementations &mdash; not just constant-time software.</p>
+  <div class="callout example"><span class="k">What a side channel actually is</span><p>A side channel is information that leaks not from <em>what</em> a program computes but from <em>how</em> it computes &mdash; how long it takes, how much power it draws, what sounds or emissions it makes. Imagine guessing a safe's combination by listening to the tumblers, or learning someone's PIN from how long their finger hovers over each key. The secret was never "revealed," yet it leaked anyway. Constant-time code closes the timing version of this leak by making every code path take the same time regardless of the secret; hardened hardware closes the power and electromagnetic versions.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Rolling your own reference implementation "for speed." Naive lattice code often leaks through timing. Use reviewed, constant-time libraries and, on devices, evaluate for physical side channels (power/EM).</p></div>
+  <p>The uncomfortable lesson from decades of classical crypto is that <em>the algorithm is almost never where real systems get broken</em>. AES and RSA were rarely defeated by attacking the math; they were defeated by leaked keys, bad randomness, timing side channels, and implementation bugs. PQC inherits this reality and, because its operations are newer and more complex, arguably widens the attack surface for implementation mistakes. That is why this entire module is about handling, sizing, randomness, and side channels rather than lattice theory: getting the plumbing right is what actually keeps you safe.</p>
   <details class="deep"><summary>Go deeper: decapsulation failures must not leak</summary>
     <div class="deep-body">
       <p>ML-KEM uses an "implicit rejection" design: if a ciphertext is malformed, decapsulation still returns a pseudo-random secret rather than an obvious error, so an attacker cannot tell valid from invalid by observing behavior. If your integration adds an early error return or a distinguishable log/timing on failure, you can reintroduce a chosen-ciphertext oracle the algorithm was designed to prevent. Do not "helpfully" branch on decapsulation outcome.</p>
@@ -121,6 +130,54 @@ kem = <span class="str">"ML-KEM-768"</span>
     <div class="flow-step"><b>Rollout</b><span>Gated by the slowest dependency.</span></div>
   </div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Safe rollout: feature-flag PQC, run hybrid first, canary a small population, watch handshake/verify failure metrics, and keep a fast rollback. Never big-bang a crypto change.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Designing for crypto-agility in code</h2></div>
+  <p class="lead">The goal is not "use ML-KEM." It is "be able to change algorithms later without a rewrite."</p>
+  <p>Most legacy code hard-wires the algorithm: <code class="inl">rsa_sign(...)</code> or <code class="inl">ecdh(...)</code> scattered across the codebase, with key sizes and encodings assumed inline. That is exactly what made this migration a multi-year project. The antidote is an abstraction layer: application code asks for a <em>capability</em> ("sign this", "establish a key"), and a small provider layer picks the concrete algorithm from configuration and policy.</p>
+  <figure class="figure">
+    <div class="fig-title">A crypto-agility abstraction layer</div>
+    <svg viewBox="0 0 680 200" role="img" aria-label="Application code calls a capability interface (sign, verify, establish key). A provider layer selects the concrete algorithm from policy, and can swap ECDSA for ML-DSA or add HQC without changing application code.">
+      <rect class="g-box" x="20" y="20" width="640" height="42" rx="10" stroke-width="1.5"/>
+      <text class="g-t" x="340" y="46" font-size="13" text-anchor="middle" font-weight="800">Application code &mdash; asks for a capability, not an algorithm</text>
+      <line class="g-line-p" x1="340" y1="62" x2="340" y2="82" marker-end="url(#ca)"/>
+      <rect class="g-box-p" x="120" y="84" width="440" height="42" rx="10" stroke-width="2"/>
+      <text class="g-t" x="340" y="103" font-size="12.5" text-anchor="middle" font-weight="800">Crypto provider layer</text>
+      <text class="g-tm" x="340" y="119" font-size="10.5" text-anchor="middle">sign() &middot; verify() &middot; establishKey() &mdash; chooses algorithm from policy + config</text>
+      <g class="g-line"><line x1="200" y1="126" x2="140" y2="150" marker-end="url(#ca)"/><line x1="300" y1="126" x2="300" y2="150" marker-end="url(#ca)"/><line x1="420" y1="126" x2="470" y2="150" marker-end="url(#ca)"/></g>
+      <rect class="g-box" x="60" y="152" width="150" height="38" rx="8" stroke-width="1.5"/><text class="g-tm" x="135" y="176" font-size="11.5" text-anchor="middle">ECDSA (legacy)</text>
+      <rect class="g-box-t" x="228" y="152" width="150" height="38" rx="8" stroke-width="1.5"/><text class="g-t" x="303" y="176" font-size="11.5" text-anchor="middle" font-weight="800">ML-DSA / ML-KEM</text>
+      <rect class="g-box-v" x="396" y="152" width="180" height="38" rx="8" stroke-width="1.5"/><text class="g-tm" x="486" y="176" font-size="11.5" text-anchor="middle">HQC / future (drop-in)</text>
+      <defs><marker id="ca" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>With this shape, adopting a backup algorithm later is a config and provider change &mdash; not a hunt-and-replace across the whole codebase. Every stored artifact also carries an algorithm ID so you can tell what produced it.</figcaption>
+  </figure>
+  <pre class="code"><span class="cmt"># Application asks for a capability; policy decides the algorithm.</span>
+signer = crypto.get_signer(policy=<span class="str">"default-2026"</span>)   <span class="cmt"># -> ML-DSA-65 today</span>
+sig    = signer.sign(message)
+blob   = {<span class="str">"alg"</span>: signer.alg_id, <span class="str">"sig"</span>: sig}    <span class="cmt"># store the alg ID with it</span>
+
+<span class="cmt"># Next year, switch to a backup family with ONE policy change:</span>
+<span class="cmt">#   policy "default-2027" -> SLH-DSA, no application code edits.</span></pre>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Treating agility as "we'll refactor when we need to." You need it <em>before</em> the emergency. Build the abstraction now, while there is no time pressure, so a future algorithm break is a config change instead of a fire drill.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Performance and sizing budgets</h2></div>
+  <p class="lead">PQC is fast enough for almost everything &mdash; but the bytes, not the CPU, are what you must budget.</p>
+  <p>A frequent worry is that PQC will be too slow. In practice, lattice operations (ML-KEM, ML-DSA) are competitive with or faster than RSA on modern CPUs; the real cost is <b>size</b>. The table below gives representative relative figures to build intuition &mdash; measure your own stack, but expect the pattern to hold.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Concern</th><th>Classical baseline</th><th>PQC (typical Level 3)</th><th>Practical impact</th></tr></thead>
+    <tbody>
+      <tr><td>Key-exchange CPU</td><td>X25519: very fast</td><td>ML-KEM-768: comparable, often faster than RSA</td><td>Rarely the bottleneck</td></tr>
+      <tr><td>Signature verify CPU</td><td>ECDSA: fast</td><td>ML-DSA-65: fast; SLH-DSA: slower</td><td>Watch SLH-DSA at high verify volume</td></tr>
+      <tr><td>Handshake bytes</td><td>~1&ndash;2 KB total</td><td>+~1&ndash;2 KB (KEM) to +many KB (PQC certs)</td><td><b>The real budget item</b> &mdash; extra round trips, packet loss</td></tr>
+      <tr><td>Storage per key/sig</td><td>tens&ndash;hundreds of bytes</td><td>~1&ndash;8 KB</td><td>DB growth, cache pressure, token limits</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>On a busy TLS terminator, moving to hybrid ML-KEM typically costs negligible extra CPU but adds ~1&nbsp;KB per handshake. Add PQC certificates and a chain can grow by several KB, which can push the handshake across TCP's initial congestion window and add a round trip on lossy mobile links. Budget bytes and round trips, not gigahertz.</p></div>
+  <div class="callout tip"><span class="k">Practice</span><p>Add a "handshake byte budget" and a "max artifact size" to your test suite, and alert if a PQC change blows past it. Sizing regressions are the failures that reach production disguised as flaky networking.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -148,6 +205,20 @@ kem = <span class="str">"ML-KEM-768"</span>
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> You are blocked on a hardware dependency, not code. Record it as the critical-path item, get the vendor firmware roadmap, and keep the key backend swappable so you can cut over when support ships.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Retrofit agility</h3>
+      <p class="scenario">A codebase has <code class="inl">ecdsa_sign()</code> and hard-coded key sizes called from 40 different files.</p>
+      <p class="decide">What is the highest-leverage first change &mdash; before touching any algorithm?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Introduce a crypto provider abstraction: replace the 40 direct calls with a capability interface (<code class="inl">signer.sign()</code>) that selects the algorithm from policy, and store an algorithm ID with every artifact. Once that layer exists, adopting ML-DSA &mdash; or a future backup &mdash; becomes a config change instead of a 40-file refactor under time pressure.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; "PQC is too slow"</h3>
+      <p class="scenario">A stakeholder resists PQC citing CPU cost.</p>
+      <p class="decide">Is CPU the right concern, and what should you actually budget?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Usually not. Lattice KEM/signature CPU is competitive with (often faster than) RSA. The real budget item is <em>size</em>: larger handshakes and artifacts that can add round trips and stress buffers, tokens, and storage. Add byte-size budgets to tests; do not over-index on gigahertz.</p>
+    </article>
   </div>
 </section>
 
@@ -163,7 +234,10 @@ kem = <span class="str">"ML-KEM-768"</span>
     {"q":"Why must decapsulation be constant-time and non-branching on failure?","choices":["Otherwise it can leak a chosen-ciphertext oracle","To save electricity","To reduce code size"],"answer":0,"explain":"Secret-dependent timing/behavior can distinguish valid vs invalid ciphertexts, defeating ML-KEM's implicit rejection."},
     {"q":"You shipped a round-3 'Kyber' build. Will it interoperate with FIPS 203 ML-KEM?","choices":["No - parameters/encodings changed between draft and final","Yes, they are identical","Only over IPv6"],"answer":0,"explain":"Pre-standard implementations differ from the finalized ML-KEM and are not interoperable."},
     {"q":"Your app supports ML-DSA but the HSM does not. What is the status?","choices":["Blocked on a hardware/service dependency, not code","Fully migrated","A UI bug"],"answer":0,"explain":"Key storage backends (HSM/KMS/TPM/SE) must support the algorithm; they are often the true bottleneck."},
-    {"q":"What is a safe rollout pattern for a crypto change?","choices":["Feature-flag, hybrid, canary, monitor failures, fast rollback","Deploy to 100% at once","Disable monitoring to reduce noise"],"answer":0,"explain":"Gradual, observable rollout with rollback prevents a crypto change from causing a mass outage."}
+    {"q":"What is a safe rollout pattern for a crypto change?","choices":["Feature-flag, hybrid, canary, monitor failures, fast rollback","Deploy to 100% at once","Disable monitoring to reduce noise"],"answer":0,"explain":"Gradual, observable rollout with rollback prevents a crypto change from causing a mass outage."},
+    {"q":"What does designing for crypto-agility mean in code?","choices":["Application asks for a capability; a provider layer picks the algorithm from policy","Hard-code the newest algorithm everywhere","Never store algorithm identifiers"],"answer":0,"explain":"An abstraction layer plus stored algorithm IDs lets you swap algorithms via config later, instead of a codebase-wide rewrite."},
+    {"q":"For PQC, which resource is usually the real budget constraint?","choices":["Size (handshake bytes, artifact/storage sizes)","Raw CPU speed","Screen pixels"],"answer":0,"explain":"Lattice KEM/signatures are CPU-competitive with RSA; the larger keys, ciphertexts, signatures, and chains are what stress buffers, tokens, and networks."},
+    {"q":"Why build the agility abstraction before you urgently need it?","choices":["So a future algorithm break is a config change, not a fire drill","To slow down development","Because it is required by law"],"answer":0,"explain":"Building the provider layer while there is no time pressure turns a future emergency swap into a low-risk configuration change."}
   ]
   </script>
 </section>
@@ -183,7 +257,7 @@ kem = <span class="str">"ML-KEM-768"</span>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>The code is illustrative and API names change across library versions &mdash; read the current docs before using it. Focus on the engineering constraints: sizes, randomness, constant-time, and hardware dependencies.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

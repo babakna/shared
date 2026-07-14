@@ -10,7 +10,7 @@
 <body data-module="PQC-100">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-100</span><span>Quantum Computing in Plain English</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-100</span><span>Quantum Computing in Plain English</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -23,6 +23,8 @@
   <a href="#s3"><span class="dot"></span>3. What quantum is good at</a>
   <a href="#s4"><span class="dot"></span>4. What it can NOT do</a>
   <a href="#s5"><span class="dot"></span>5. How far away is it?</a>
+  <a href="#s6"><span class="dot"></span>6. How Shor breaks RSA</a>
+  <a href="#s7"><span class="dot"></span>7. Reading a quantum headline</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -32,7 +34,7 @@
 <section class="hero" id="start">
   <div class="hero-copy">
     <span class="chip">Foundations</span>
-    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~20 min read</span><span class="level time">No physics needed</span></div>
+    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~30 min read</span><span class="level time">No physics needed</span></div>
     <h1>Quantum Computing in Plain English</h1>
     <p class="sub">People say "quantum computers will break encryption" without ever explaining what a quantum computer <em>is</em>. Let's fix that with analogies, not equations &mdash; just enough to understand the threat clearly and avoid the hype.</p>
     <ul class="outcomes">
@@ -67,6 +69,10 @@
   <p>A <span class="term" data-def="The basic unit of quantum information; unlike a bit it can be in a superposition of 0 and 1 until measured.">qubit</span> can be 0, 1, or a controlled mixture of both. Physically it might be a superconducting circuit, a trapped ion, or a photon &mdash; the hardware varies, but the behavior is what matters to us.</p>
   <p>The power grows with scale. Describing the state of <b>n</b> qubits requires <b>2<sup>n</sup></b> numbers (amplitudes). Ten qubits: 1,024 numbers. Fifty qubits: over a quadrillion. This is why quantum machines can, in principle, explore enormous spaces &mdash; but only if you can extract a useful answer at the end.</p>
   <div class="callout analogy"><span class="k">Analogy</span><p>A classical computer checking possibilities is like one person walking every path of a maze one at a time. A quantum computer is more like sending a wave through the whole maze at once &mdash; but you only get to see where the wave is loudest, so you must design the maze so the exit is the loudest spot.</p></div>
+  <p>Here is the catch that keeps quantum computers from being magic. That 2<sup>n</sup> of amplitudes lives <em>inside</em> the machine while it computes, but you can never read all of it out. Measurement gives you a single n-bit answer. So the exponential space is real, but it is only useful if the algorithm can concentrate the "loudness" onto the answer you want before you look. For most problems, no one knows how to do that &mdash; which is why quantum computers are not general-purpose speed demons.</p>
+  <div class="callout example"><span class="k">Just how big is 2<sup>n</sup>?</span><p>50 qubits describe ~1.1 quadrillion amplitudes &mdash; already beyond a large supercomputer's memory. 300 qubits describe more amplitudes than there are atoms in the observable universe. Yet measuring those 300 qubits still yields just 300 bits. The gap between "how much structure is inside" and "how little you can read out" is the entire art of quantum algorithm design.</p></div>
+  <div class="callout pitfall"><span class="k">Myth to drop right now</span><p>The popular line that "a qubit is 0 and 1 at the same time, so a quantum computer just tries all answers in parallel and picks the right one" is wrong &mdash; and believing it will mislead you about the entire threat. If that were true, quantum computers would instantly solve almost everything, and they emphatically do not. The truth is subtler: the machine holds all those possibilities <em>internally</em>, but reading the result collapses it to one outcome. Speedups only appear for the rare problems where clever interference can make the desired answer overwhelmingly likely before you measure. Factoring (Shor) is one of those rare problems; most tasks are not.</p></div>
+  <p>This is exactly why post-quantum cryptography is a <em>targeted</em> replacement, not a panic. Quantum computers do not break "all encryption." They break the specific public-key schemes whose security rests on a hidden mathematical structure that interference can expose &mdash; and they only dent symmetric ciphers and hashes, which you fix by using larger sizes. Holding that distinction firmly, from your very first module, is what will keep you calm and precise while others around you overreact to headlines.</p>
 </section>
 
 <section class="lesson" id="s2">
@@ -77,6 +83,26 @@
     <div class="callout"><span class="k" style="color:var(--teal)">Entanglement</span><p>Qubits can be linked so their outcomes are correlated no matter the distance. This lets operations act on the whole system's structure at once.</p></div>
     <div class="callout"><span class="k" style="color:var(--primary-ink)">Interference</span><p>Amplitudes can add up or cancel out, like ripples on water. Good algorithms cancel the wrong answers and reinforce the right one.</p></div>
   </div>
+  <p>Interference is the single most important word here, and the least understood. It is what separates a quantum computer from "a computer that guesses randomly." A random guess spreads its chances evenly across all answers; a good quantum algorithm sculpts those chances so almost all of them cancel and one survives. The picture below shows the difference.</p>
+  <figure class="figure">
+    <div class="fig-title">Interference: turning many faint possibilities into one clear answer</div>
+    <svg viewBox="0 0 680 240" role="img" aria-label="Left: without interference, all candidate answers have small equal probability. Right: after a good quantum algorithm, wrong answers cancel and the correct answer stands tall.">
+      <text class="g-tm" x="20" y="26" font-size="13" font-weight="800">Random guess &mdash; every answer equally faint</text>
+      <g fill="#7C8AA0">
+        <rect x="24" y="150" width="14" height="30" rx="2"/><rect x="46" y="146" width="14" height="34" rx="2"/><rect x="68" y="152" width="14" height="28" rx="2"/><rect x="90" y="148" width="14" height="32" rx="2"/><rect x="112" y="150" width="14" height="30" rx="2"/><rect x="134" y="145" width="14" height="35" rx="2"/><rect x="156" y="151" width="14" height="29" rx="2"/><rect x="178" y="149" width="14" height="31" rx="2"/><rect x="200" y="147" width="14" height="33" rx="2"/><rect x="222" y="150" width="14" height="30" rx="2"/><rect x="244" y="148" width="14" height="32" rx="2"/><rect x="266" y="151" width="14" height="29" rx="2"/>
+      </g>
+      <line class="g-line" x1="20" y1="180" x2="292" y2="180"/>
+      <text x="330" y="130" font-size="30" text-anchor="middle" class="g-mono">&rarr;</text>
+      <text class="g-tm" x="386" y="26" font-size="13" font-weight="800">After interference &mdash; one answer stands tall</text>
+      <g fill="#c9d3e0">
+        <rect x="390" y="176" width="14" height="4" rx="2"/><rect x="412" y="174" width="14" height="6" rx="2"/><rect x="434" y="177" width="14" height="3" rx="2"/><rect x="456" y="175" width="14" height="5" rx="2"/><rect x="500" y="176" width="14" height="4" rx="2"/><rect x="522" y="175" width="14" height="5" rx="2"/><rect x="544" y="177" width="14" height="3" rx="2"/><rect x="566" y="174" width="14" height="6" rx="2"/><rect x="588" y="176" width="14" height="4" rx="2"/><rect x="610" y="175" width="14" height="5" rx="2"/><rect x="632" y="177" width="14" height="3" rx="2"/>
+      </g>
+      <rect x="478" y="60" width="14" height="120" rx="2" fill="#1657A0"/>
+      <text class="g-t" x="485" y="52" font-size="12" text-anchor="middle" font-weight="800">answer</text>
+      <line class="g-line" x1="386" y1="180" x2="656" y2="180"/>
+    </svg>
+    <figcaption>Both pictures use the same qubits. The difference is the algorithm: a useful one arranges the amplitudes so the correct answer is what you almost always measure.</figcaption>
+  </figure>
   <p>Cryptography is threatened not because quantum computers are "faster at everything," but because a few specific algorithms use interference to solve the exact math problems that certain cryptography depends on. That is the bridge to the next section.</p>
 </section>
 
@@ -91,6 +117,8 @@
     </tbody>
   </table></div>
   <div class="callout example"><span class="k">Concrete example</span><p>Shor turns "factoring a 2048-bit RSA number," which is effectively impossible for classical computers, into something a large enough fault-tolerant quantum computer could do in hours or days. Grover only halves the effective strength of a symmetric key, so AES-256 still behaves like ~128-bit security &mdash; still far out of reach.</p></div>
+  <p>Outside cryptography, quantum computers are genuinely promising for a narrow set of problems where nature itself is quantum: simulating molecules and materials (batteries, catalysts, drugs), certain optimization problems, and some machine-learning subroutines. These are exciting and real. But note what is <em>not</em> on the list: they will not make your spreadsheet, database, web server, or video game meaningfully faster. "Quantum" is a specialized accelerator, not a faster CPU.</p>
+  <div class="callout warn"><span class="k">Keep it in proportion</span><p>The security story is dominated by exactly one algorithm &mdash; Shor &mdash; against exactly one family &mdash; public-key. Everything else quantum computing might do is irrelevant to your migration. If you remember only that, you will not be fooled by breathless claims that "quantum breaks all encryption."</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Shor drives <b>replacement</b> of public-key crypto. Grover drives <b>bigger keys/hashes</b>, not replacement. That asymmetry shapes the entire migration.</p></div>
 </section>
 
@@ -102,7 +130,11 @@
     <li><b>They do not break AES-256 or SHA-2/3 outright.</b> Grover only chips at the margin; doubling key length restores safety.</li>
     <li><b>They cannot read a superposition's full contents.</b> You get one measured answer, so brute-forcing "all passwords at once" is a myth.</li>
     <li><b>They are extremely error-prone today.</b> Qubits lose their state (decoherence) in microseconds and need heavy error correction.</li>
+    <li><b>They do not speed up ordinary software.</b> Databases, web servers, spreadsheets, and games get no benefit &mdash; the speedups apply only to a narrow class of structured problems.</li>
+    <li><b>They cannot "download your data" from the future.</b> The only reason today's data is at risk is that an attacker can store your encrypted traffic now and decrypt it later &mdash; the machine still has to do real work on captured ciphertext.</li>
+    <li><b>They will not run in your pocket.</b> Leading machines need near-absolute-zero cooling or ultra-high vacuum and fill a room. The threat is a handful of large facilities, not a phone.</li>
   </ul>
+  <div class="callout example"><span class="k">The decoherence problem, concretely</span><p>A superconducting qubit may hold its state for well under a millisecond before noise scrambles it. Breaking RSA-2048 requires billions of precise operations run reliably. Bridging that gap needs error correction so good that many noisy physical qubits act as one stable logical qubit &mdash; which is why the physical-qubit numbers must be so enormous.</p></div>
   <div class="callout warn"><span class="k">Nuance</span><p>The honest summary: a <span class="term" data-def="A fault-tolerant quantum computer large and reliable enough to break widely deployed public-key cryptography in practical time.">cryptographically relevant quantum computer (CRQC)</span> does not exist yet, and estimates of its arrival vary widely. But you migrate based on <em>data lifetime + migration time</em>, not on a confident date &mdash; that is PQC-101.</p></div>
 </section>
 
@@ -112,6 +144,52 @@
   <p>The gap is <b>error correction</b>. Physical qubits are noisy, so many of them are combined to form one reliable <span class="term" data-def="An error-corrected qubit built from many physical qubits so it behaves reliably enough for long computations.">logical qubit</span>. Published estimates to break RSA-2048 involve on the order of thousands of logical qubits, which could mean millions of physical qubits &mdash; well beyond current hardware.</p>
   <div class="callout example"><span class="k">Why plan now anyway</span><p>Two reasons. First, "harvest now, decrypt later": data you send today can be stored and decrypted after a CRQC arrives. Second, replacing cryptography across a large organization takes years. If your data must stay secret longer than "time to a CRQC minus migration time," you are already behind. PQC-101 gives you a calculator for exactly this.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>You do not need to predict the date. You need to know your data's lifetime and start early for the long-lived, exposed, public-key-dependent systems.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>How Shor actually breaks RSA (no math required)</h2></div>
+  <p class="lead">You do not need the equations &mdash; but the intuition makes the whole threat click.</p>
+  <p>RSA's security rests on one fact: it is easy to multiply two large prime numbers <b>p</b> and <b>q</b> to get a public number <b>N</b>, but fiendishly hard to go backwards and recover p and q from N alone. A classical computer trying to factor a 2048-bit N would take longer than the age of the universe. That "hard to reverse" gap is the lock.</p>
+  <p>Shor's insight is that factoring can be <em>reframed</em> as a different question: pick a random number and look at its powers modulo N &mdash; the sequence <code class="inl">a, a&sup2;, a&sup3;, &hellip; mod N</code>. That sequence always eventually <b>repeats</b>, and the length of the repeat (its <b>period</b>) is secretly tied to the factors. Finding a period is exactly the kind of hidden, repeating structure that quantum interference is spectacularly good at uncovering. Once the period is known, ordinary school-level math turns it into p and q.</p>
+  <figure class="figure">
+    <div class="fig-title">Shor's attack, as a pipeline</div>
+    <svg viewBox="0 0 690 150" role="img" aria-label="Shor's algorithm pipeline: from the public number N, a quantum computer finds the period of a repeating sequence, classical math turns the period into the prime factors, and the private key is recovered.">
+      <rect class="g-box" x="10" y="34" width="150" height="80" rx="12" stroke-width="2"/>
+      <text class="g-t" x="85" y="66" font-size="13" text-anchor="middle" font-weight="800">Public key</text>
+      <text class="g-mono" x="85" y="88" font-size="13" text-anchor="middle">N = p &times; q</text>
+      <rect class="g-box-p" x="188" y="34" width="160" height="80" rx="12" stroke-width="2"/>
+      <text class="g-t" x="268" y="60" font-size="12.5" text-anchor="middle" font-weight="800">Quantum step</text>
+      <text class="g-tm" x="268" y="79" font-size="11" text-anchor="middle">a&sup1;,a&sup2;,a&sup3;&hellip; mod N repeats</text>
+      <text class="g-mono" x="268" y="97" font-size="12" text-anchor="middle">find period r</text>
+      <rect class="g-box-t" x="376" y="34" width="150" height="80" rx="12" stroke-width="2"/>
+      <text class="g-t" x="451" y="66" font-size="12.5" text-anchor="middle" font-weight="800">Classical math</text>
+      <text class="g-mono" x="451" y="88" font-size="12" text-anchor="middle">r &rarr; p, q</text>
+      <rect class="g-box-r" x="554" y="34" width="126" height="80" rx="12" stroke-width="2"/>
+      <text x="617" y="66" font-size="12.5" text-anchor="middle" font-weight="800" fill="#B42318">Private key</text>
+      <text x="617" y="88" font-size="12" text-anchor="middle" fill="#B42318">recovered</text>
+      <g class="g-line-p"><line x1="160" y1="74" x2="188" y2="74" marker-end="url(#sh)"/><line x1="348" y1="74" x2="376" y2="74" marker-end="url(#sh)"/><line x1="526" y1="74" x2="554" y2="74" marker-end="url(#sh)"/></g>
+      <defs><marker id="sh" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>Only the middle box needs a quantum computer. That single step &mdash; finding a period fast &mdash; is what turns an impossible factoring problem into a solvable one, and it is why RSA, Diffie-Hellman, and elliptic-curve cryptography all fall.</figcaption>
+  </figure>
+  <div class="callout example"><span class="k">Why it hits ECC too</span><p>Elliptic-curve cryptography (ECDH, ECDSA) relies on a cousin problem &mdash; the "discrete logarithm" &mdash; which is <em>also</em> a hidden-period problem in disguise. So the same Shor machinery breaks it. That is why one quantum breakthrough threatens essentially the entire public-key family at once, rather than one algorithm at a time.</p></div>
+</section>
+
+<section class="lesson" id="s7">
+  <div class="lesson-title"><span class="num">7</span><h2>Reading a quantum-computing headline without being fooled</h2></div>
+  <p class="lead">Quantum news is full of hype. Here is a translation guide you can use forever.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>The headline says&hellip;</th><th>What you should actually check</th></tr></thead>
+    <tbody>
+      <tr><td>"New 1,000-qubit chip"</td><td>Physical or <b>logical</b> qubits? Breaking RSA-2048 needs on the order of thousands of error-corrected <em>logical</em> qubits &mdash; which today would take millions of physical ones. Raw count means little.</td></tr>
+      <tr><td>"Quantum supremacy / advantage"</td><td>Almost always a contrived benchmark chosen to favor quantum hardware &mdash; not factoring, not real cryptography. Impressive science, no crypto impact.</td></tr>
+      <tr><td>"Quantum computer broke encryption"</td><td>Which encryption, and what size? Factoring a 5- or 6-bit toy number is a classroom demo, not a threat to RSA-2048. Look for the bit length.</td></tr>
+      <tr><td>"Error rates / gate fidelity improved"</td><td>This is the metric that <em>actually</em> matters. Error correction, not qubit count, is the real bottleneck to a code-breaking machine.</td></tr>
+      <tr><td>"Experts say by 20XX"</td><td>Is it peer-reviewed, and do standards bodies (NIST) share the view? Treat single vendor roadmaps as optimistic marketing, not a planning date.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Reacting to qubit-count headlines with either panic or dismissal. Both are wrong. The right response is to migrate long-lived, exposed, public-key-dependent systems on your own schedule &mdash; regardless of this week's press release.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>A "cryptographically relevant" quantum computer is defined by <em>error-corrected logical qubits running Shor at scale</em>, not by a big physical-qubit number in a headline. Judge the news by that bar.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -139,6 +217,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Almost certainly not. Those are noisy physical qubits. Breaking RSA-2048 needs thousands of <em>logical</em> (error-corrected) qubits, which may require millions of physical qubits. Qubit count alone is a misleading metric.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Why ECC falls too</h3>
+      <p class="scenario">A colleague says "we use elliptic-curve crypto, not RSA, so Shor doesn't apply to us."</p>
+      <p class="decide">Are they right?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> No. ECC's security rests on the discrete-logarithm problem, which is another hidden-period problem that Shor's algorithm solves just as efficiently. ECDH and ECDSA are broken by the same machine that breaks RSA &mdash; in fact often with fewer resources, since ECC keys are smaller.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Interpret the metric</h3>
+      <p class="scenario">Two press releases: Chip A has 5,000 physical qubits with 1% gate error; Chip B has 500 physical qubits with 0.001% error.</p>
+      <p class="decide">Which is a bigger step toward breaking RSA?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Chip B's dramatically lower error rate is far more meaningful. Error correction (which needs low physical error rates) is the true bottleneck; a huge pile of noisy qubits cannot run Shor at scale. Fidelity beats raw count.</p>
+    </article>
   </div>
 </section>
 
@@ -154,7 +246,10 @@
     {"q":"Which algorithm is the reason RSA and ECC are considered broken by a CRQC?","choices":["Shor's algorithm","Grover's algorithm","Dijkstra's algorithm"],"answer":0,"explain":"Shor efficiently solves factoring and discrete logs, the hard problems behind RSA, DH, and ECC."},
     {"q":"What does Grover's algorithm mean for AES-256?","choices":["It weakens it to roughly 128-bit strength, still safe","It instantly breaks it","It has no effect at all"],"answer":0,"explain":"Grover gives a square-root speedup, roughly halving effective key bits. AES-256 -> ~128-bit, which remains secure."},
     {"q":"A chip reaches 1,000 physical qubits. Is RSA-2048 immediately at risk?","choices":["No - breaking RSA needs thousands of error-corrected logical qubits","Yes, that is more than enough","Only if it is blue"],"answer":0,"explain":"Physical qubits are noisy. Error correction turns many physical qubits into one logical qubit; RSA-2048 needs far more capability than raw qubit counts suggest."},
-    {"q":"Why start PQC planning before a CRQC exists?","choices":["Harvest-now-decrypt-later plus multi-year migration time","Quantum computers are already in phones","To make websites load faster"],"answer":0,"explain":"Data captured today can be decrypted later, and migrating a large estate takes years, so long-lived data needs early action."}
+    {"q":"Why start PQC planning before a CRQC exists?","choices":["Harvest-now-decrypt-later plus multi-year migration time","Quantum computers are already in phones","To make websites load faster"],"answer":0,"explain":"Data captured today can be decrypted later, and migrating a large estate takes years, so long-lived data needs early action."},
+    {"q":"In Shor's algorithm, what is the one step that requires a quantum computer?","choices":["Finding the period of a repeating sequence mod N","Multiplying p and q","Storing the public key"],"answer":0,"explain":"Multiplying primes and turning the period into factors are easy classically. Only period-finding needs quantum interference, and that is the whole breakthrough."},
+    {"q":"Which metric best signals real progress toward a code-breaking machine?","choices":["Lower gate error rate / higher fidelity (enables error correction)","Total physical qubit count alone","The vendor's marketing budget"],"answer":0,"explain":"Error correction is the bottleneck. Without low error rates, adding noisy qubits does not enable running Shor at the scale needed for RSA-2048."},
+    {"q":"Why does one quantum breakthrough threaten RSA, DH, and ECC together?","choices":["They all reduce to hidden-period problems Shor solves","They all use the same key size","They are all symmetric ciphers"],"answer":0,"explain":"Factoring and discrete logs (including the elliptic-curve variant) are all period-finding problems, so Shor breaks the whole public-key family at once."}
   ]
   </script>
 </section>
@@ -173,7 +268,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>This module builds intuition, not equations. Step through the bit-vs-qubit walkthrough first, then read the lessons. The goal is to understand the threat without hype.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

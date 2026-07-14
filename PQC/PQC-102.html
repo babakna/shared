@@ -10,7 +10,7 @@
 <body data-module="PQC-102">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. Hashes, MACs, passwords</a>
   <a href="#s3"><span class="dot"></span>3. Signatures &amp; verification</a>
   <a href="#s4"><span class="dot"></span>4. TLS as a bundle of jobs</a>
+  <a href="#s5"><span class="dot"></span>5. How data is encrypted (AEAD)</a>
+  <a href="#s6"><span class="dot"></span>6. Hybrid key establishment</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -31,7 +33,7 @@
 <section class="hero" id="start">
   <div class="hero-copy">
     <span class="chip">Core crypto</span>
-    <div class="meta"><span class="level beginner">Beginner+</span><span class="level time">~25 min read</span><span class="level time">Interactive</span></div>
+    <div class="meta"><span class="level beginner">Beginner+</span><span class="level time">~30 min read</span><span class="level time">Interactive</span></div>
     <h1>Cryptographic Building Blocks Deep Dive</h1>
     <p class="sub">A tour of the parts every secure system is assembled from &mdash; and, crucially, which parts a post-quantum migration touches. We finish by walking through a real TLS handshake step by step.</p>
     <ul class="outcomes">
@@ -66,7 +68,10 @@
   <p>Public, reviewed standards get analyzed by thousands of experts and implemented by many vendors. Security comes from a strong design <em>plus</em> secret key material that stays protected. A key is not just a random string &mdash; it has an origin, an owner, an allowed purpose, a creation time, rotation rules, a backup method, a revocation path, and destruction requirements. Key-management failures cause more real breaches than algorithm weaknesses.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>Publishing the AES specification does not help anyone decrypt AES-256. Accidentally writing the AES key into a log file does. The recipe is public; the key is the control.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Inventing a secret in-house algorithm because secrecy "feels safer." Unreviewed crypto fails in ways experts would have caught. Use vetted standards and protect the keys.</p></div>
+  <p>This idea is old enough to have a name: <b>Kerckhoffs's principle</b> (1883) says a system should stay secure even if everything about it except the key is public. It is why NIST runs multi-year, worldwide public competitions to pick algorithms &mdash; ML-KEM and ML-DSA were chosen exactly this way, after years of cryptographers trying to break every candidate in the open. "Security through obscurity" fails because you cannot patch a secret design once it leaks, and you never get the free global peer review.</p>
+  <p>Because the key carries all the security, it needs a full <b>lifecycle</b>: generated from strong randomness, stored so it cannot be exported (ideally in an HSM), used only for its declared purpose, rotated on a schedule, revocable if compromised, and destroyed at end of life. A brilliant algorithm with a key sitting in a world-readable config file is worthless. This is why PQC-301 spends so much time on key handling rather than the math.</p>
   <p>PQC changes nothing about this principle. ML-KEM, ML-DSA, and SLH-DSA are fully public. Their private keys, seeds, and randomness still need protection &mdash; and PQC adds new concerns like larger key material and side-channel-safe implementations (covered in PQC-301).</p>
+  <div class="callout example"><span class="k">Why "public algorithm" is a strength, not a weakness</span><p>Newcomers often feel that publishing exactly how encryption works must make it easier to break. The opposite is true. Because the design is public, thousands of the world's best cryptographers have spent years trying to break it &mdash; and every weakness they found got fixed before you ever relied on it. A secret in-house algorithm gets reviewed by, at best, the handful of people who built it. You are choosing between a lock tested by the entire world and a lock tested by five colleagues on a deadline. The public one wins every time.</p></div>
 </section>
 
 <section class="lesson" id="s2">
@@ -78,6 +83,8 @@
     <div class="callout"><span class="k">Password hashing</span><p>Deliberately slow, salted schemes (e.g. Argon2, bcrypt, scrypt) for low-entropy secrets. Never store <code class="inl">SHA-256(password)</code> &mdash; it is far too fast to brute-force.</p></div>
   </div>
   <div class="callout example"><span class="k">Concrete example</span><p>A download page publishes a SHA-256 digest (integrity, if you trust the page). An API request carries an HMAC (proves shared-secret origin). A login system stores an Argon2 hash (protects weak passwords). Same word, three different mechanisms.</p></div>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>Picture three security jobs at a building. A <b>hash</b> is a tamper-evident seal on a package &mdash; anyone can see if it was opened, but a seal alone does not prove <em>who</em> sealed it. A <b>MAC</b> is a seal stamped with a signet ring only you and the recipient own &mdash; now it also proves it came from someone holding the shared secret. <b>Password hashing</b> is a deliberately stiff, slow lock on the front door: you <em>want</em> it to take effort to open, so a thief who steals the lock cannot try millions of keys per second. Calling all three "hashing" is like calling a seal, a signet, and a deadbolt all "the door thing."</p></div>
+  <p>The distinction matters in practice because using the wrong tool quietly removes the protection you thought you had. A plain hash where you needed a MAC lets an attacker who can alter the data simply recompute the hash to match &mdash; the check passes and you learn nothing. A fast hash where you needed a slow password hash means a leaked database of "hashed" passwords can be cracked in hours. No algorithm is broken in these stories; the <em>wrong job</em> was assigned to the right tool.</p>
   <div class="callout takeaway"><span class="k">Quantum note</span><p>Hashes and MACs are symmetric-world tools: Grover pushes toward longer outputs, but they are not "broken" the way RSA is. Password hashing is unaffected by the PQC transition itself.</p></div>
 </section>
 
@@ -95,12 +102,22 @@
     <div class="flow-step"><b>Every verifier</b><span>All of them must accept the new algorithm.</span></div>
   </div>
   <div class="callout example"><span class="k">Concrete example</span><p>A device bootloader verifies firmware before installing it. If the bootloader cannot parse a future PQC signature, you cannot enforce a PQC signing policy until the bootloader itself gains "agility" support &mdash; possibly a hardware refresh.</p></div>
+  <p>There is also a subtle detail worth knowing: you almost never sign a whole file directly. Instead you <b>hash-then-sign</b> &mdash; compute a fixed-size digest of the artifact, then sign the digest. That is why hashes (lesson 2) live <em>inside</em> signatures, and why a weak hash quietly undermines an otherwise strong signature. In the PQC transition both pieces get attention: the signature algorithm is replaced (ML-DSA/SLH-DSA), and the hash may be lengthened to keep its collision margin against Grover.</p>
+  <div class="callout warn"><span class="k">Signatures vs key exchange have different clocks</span><p>Harvest-now-decrypt-later makes <em>key exchange</em> urgent, because captured traffic can be decrypted later. Signatures are different: a signature only needs to be unforgeable <em>at verification time</em>. But long-lived signed artifacts &mdash; firmware in a 10-year device, documents that must stay provable for decades &mdash; still need PQC signatures early, because the verifier will outlive the algorithm.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Asking only "can we sign with PQC?" The real question is "can <em>every</em> verifier in the world that reads our artifacts parse and enforce it?"</p></div>
 </section>
 
 <section class="lesson" id="s4">
   <div class="lesson-title"><span class="num">4</span><h2>TLS as a bundle of cryptographic jobs</h2></div>
   <p class="lead">TLS is not one algorithm; it is identity + negotiation + key establishment + encryption + integrity + downgrade protection, working together.</p>
+  <p>To see why one small connection is such a big migration, list the distinct cryptographic jobs a single TLS 1.3 session performs &mdash; and note which the quantum threat touches:</p>
+  <ul>
+    <li><b>Identity / authentication</b> &mdash; the certificate proves the server is who it claims. <span style="color:var(--red);font-weight:800">PQC target (signatures).</span></li>
+    <li><b>Negotiation</b> &mdash; both sides agree on versions, ciphers, and groups, with protection against a downgrade attack. <span style="color:var(--muted)">Structural, not crypto-broken.</span></li>
+    <li><b>Key establishment</b> &mdash; derive a shared secret without sending it. <span style="color:var(--red);font-weight:800">PQC target (ML-KEM).</span></li>
+    <li><b>Handshake signature</b> &mdash; prove the certificate holder is live now. <span style="color:var(--red);font-weight:800">PQC target (signatures).</span></li>
+    <li><b>Bulk encryption + integrity</b> &mdash; AEAD protects the actual data. <span style="color:var(--green);font-weight:800">Kept/resized.</span></li>
+  </ul>
   <p>That is why "making TLS post-quantum" is more than swapping a function call. You saw the five steps above. <span class="term" data-def="A transition approach that runs a classical and a post-quantum mechanism together, so the result is safe if either one holds.">Hybrid key exchange</span> is the common transition model: run classical ECDHE and ML-KEM together, combine both secrets, and you are protected if either survives. It must be protocol-defined, with downgrade protection.</p>
   <details class="deep"><summary>Go deeper: why hybrid handshakes sometimes fail on the real network path</summary>
     <div class="deep-body">
@@ -109,6 +126,49 @@
     </div>
   </details>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Testing only the crypto library. The library is rarely where PQC breaks &mdash; the surrounding ecosystem is.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>How your data actually gets encrypted (AEAD)</h2></div>
+  <p class="lead">Once the handshake agrees on a key, one workhorse does the real protection: authenticated encryption.</p>
+  <p>The key exchange gets all the quantum attention, but it only produces a shared secret. The actual bytes of your session &mdash; every request, password, and page &mdash; are protected by <b>AEAD</b>: Authenticated Encryption with Associated Data. Modern AEAD ciphers like <code class="inl">AES-256-GCM</code> and <code class="inl">ChaCha20-Poly1305</code> do confidentiality and integrity in a single pass, which is why they dominate TLS, SSH, and VPNs.</p>
+  <p>An AEAD cipher takes four inputs and produces two outputs. It needs the <b>key</b> (from the handshake), a unique <b>nonce</b> (a number used once), the <b>plaintext</b>, and optional <b>associated data</b> (headers you want authenticated but not encrypted). It outputs the <b>ciphertext</b> plus an <b>authentication tag</b> &mdash; the fingerprint that makes tampering detectable.</p>
+  <figure class="figure">
+    <div class="fig-title">One AEAD "seal" step (e.g. AES-256-GCM)</div>
+    <svg viewBox="0 0 680 210" role="img" aria-label="AEAD encryption takes a key, a unique nonce, plaintext, and associated data, and outputs ciphertext plus an authentication tag.">
+      <rect class="g-box-t" x="14" y="24" width="150" height="30" rx="8" stroke-width="1.5"/><text class="g-t" x="89" y="44" font-size="12.5" text-anchor="middle">Key (from handshake)</text>
+      <rect class="g-box-t" x="14" y="62" width="150" height="30" rx="8" stroke-width="1.5"/><text class="g-t" x="89" y="82" font-size="12.5" text-anchor="middle">Nonce (used once)</text>
+      <rect class="g-box" x="14" y="100" width="150" height="30" rx="8" stroke-width="1.5"/><text class="g-tm" x="89" y="120" font-size="12.5" text-anchor="middle">Plaintext</text>
+      <rect class="g-box" x="14" y="138" width="150" height="30" rx="8" stroke-width="1.5"/><text class="g-tm" x="89" y="158" font-size="12.5" text-anchor="middle">Associated data</text>
+      <rect class="g-box-p" x="270" y="72" width="150" height="60" rx="12" stroke-width="2.5"/><text class="g-t" x="345" y="100" font-size="14" text-anchor="middle" font-weight="800">AEAD</text><text class="g-tm" x="345" y="118" font-size="11" text-anchor="middle">encrypt + authenticate</text>
+      <rect class="g-box" x="512" y="62" width="154" height="30" rx="8" stroke-width="1.5"/><text class="g-tm" x="589" y="82" font-size="12.5" text-anchor="middle">Ciphertext</text>
+      <rect x="512" y="112" width="154" height="30" rx="8" fill="rgba(10,124,70,.14)" stroke="#0A7C46" stroke-width="1.5"/><text x="589" y="132" font-size="12.5" text-anchor="middle" font-weight="800" fill="#0A7C46">Auth tag</text>
+      <g class="g-line-p"><line x1="164" y1="39" x2="270" y2="88" marker-end="url(#ae)"/><line x1="164" y1="77" x2="270" y2="98" marker-end="url(#ae)"/><line x1="164" y1="115" x2="270" y2="108" marker-end="url(#ae)"/><line x1="164" y1="153" x2="270" y2="118" marker-end="url(#ae)"/><line x1="420" y1="95" x2="512" y2="77" marker-end="url(#ae)"/><line x1="420" y1="110" x2="512" y2="127" marker-end="url(#ae)"/></g>
+      <defs><marker id="ae" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>The receiver recomputes the tag; if even one bit of ciphertext or associated data changed, the tags differ and the message is rejected. This is the "detect tampering" job running on every record.</figcaption>
+  </figure>
+  <div class="callout pitfall"><span class="k">The one rule you must never break</span><p>Never reuse a nonce with the same key. Nonce reuse in AES-GCM can leak plaintext and even the authentication key. This is the most common catastrophic misuse of AEAD &mdash; and it has nothing to do with quantum; it is a classic implementation trap that PQC-301 revisits.</p></div>
+  <div class="callout takeaway"><span class="k">Quantum note</span><p>AEAD is symmetric. AES-256-GCM keeps a strong margin against Grover, so in the PQC transition it is <em>resized/kept</em>, not replaced. The quantum action is entirely in how the key was established.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Hybrid key establishment, step by step</h2></div>
+  <p class="lead">The safest way to adopt a young algorithm is to not bet everything on it yet.</p>
+  <p>ML-KEM is well-analyzed but far newer than ECDH. Rather than trust it alone, most deployments run <b>both</b> a classical and a post-quantum key exchange in the same handshake and combine the two shared secrets with a key-derivation function (KDF). The result is secure as long as <em>either</em> half remains unbroken &mdash; classical protects you if an unknown flaw is found in ML-KEM, and ML-KEM protects you against a quantum computer. You only lose if both break, which is highly unlikely.</p>
+  <figure class="figure">
+    <div class="fig-title">Hybrid: combine two independent shared secrets</div>
+    <svg viewBox="0 0 680 200" role="img" aria-label="Hybrid key establishment runs classical ECDH and post-quantum ML-KEM in parallel, then combines both shared secrets in a key-derivation function to produce the session key.">
+      <rect class="g-box" x="20" y="30" width="220" height="46" rx="10" stroke-width="1.5"/><text class="g-t" x="130" y="52" font-size="13" text-anchor="middle" font-weight="800">Classical: X25519 (ECDH)</text><text class="g-tm" x="130" y="68" font-size="11" text-anchor="middle">shared secret A</text>
+      <rect class="g-box-p" x="20" y="112" width="220" height="46" rx="10" stroke-width="2"/><text class="g-t" x="130" y="134" font-size="13" text-anchor="middle" font-weight="800">Post-quantum: ML-KEM-768</text><text class="g-tm" x="130" y="150" font-size="11" text-anchor="middle">shared secret B</text>
+      <rect class="g-box-t" x="330" y="66" width="150" height="66" rx="12" stroke-width="2"/><text class="g-t" x="405" y="94" font-size="13" text-anchor="middle" font-weight="800">KDF</text><text class="g-tm" x="405" y="112" font-size="11" text-anchor="middle">combine A + B</text>
+      <rect x="556" y="72" width="112" height="54" rx="12" fill="rgba(10,124,70,.14)" stroke="#0A7C46" stroke-width="2"/><text x="612" y="96" font-size="12.5" text-anchor="middle" font-weight="800" fill="#0A7C46">Session key</text><text x="612" y="114" font-size="10.5" text-anchor="middle" fill="#0A7C46">for AEAD</text>
+      <g class="g-line-p"><line x1="240" y1="53" x2="330" y2="88" marker-end="url(#hy)"/><line x1="240" y1="135" x2="330" y2="110" marker-end="url(#hy)"/><line x1="480" y1="99" x2="556" y2="99" marker-end="url(#hy)"/></g>
+      <defs><marker id="hy" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>Safe if <em>either</em> algorithm holds. This "defense in depth" is why standards like TLS and SSH ship hybrid modes first, before any pure-PQC mode.</figcaption>
+  </figure>
+  <div class="callout example"><span class="k">You can spot it in the wild</span><p>In a modern browser's connection details you may see a group named <code class="inl">X25519MLKEM768</code>. The <code class="inl">X25519</code> half is classical ECDH; the <code class="inl">MLKEM768</code> half is post-quantum. Both ran, and their secrets were combined &mdash; exactly the picture above.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -136,6 +196,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> The signing system, its HSM/KMS, the build tools, and <em>every</em> consumer that verifies releases must support the new signature policy &mdash; and you need a rollback path if a consumer cannot.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Why hybrid, not pure PQC?</h3>
+      <p class="scenario">A stakeholder asks why you are deploying <code class="inl">X25519+ML-KEM-768</code> instead of ML-KEM alone, "which is the whole point."</p>
+      <p class="decide">Give the security argument for hybrid.</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> ML-KEM is well-studied but far younger than ECDH. Hybrid combines both secrets so the connection stays safe if <em>either</em> holds &mdash; classical covers an unknown flaw in ML-KEM, ML-KEM covers the quantum threat. You only lose if both break, which is extremely unlikely. It is defense in depth during a transition.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Nonce reuse</h3>
+      <p class="scenario">An engineer proposes using a fixed nonce for AES-GCM "to save a few bytes per message."</p>
+      <p class="decide">Why is this dangerous, and is it a quantum issue?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Reusing a nonce with the same key in AES-GCM can leak plaintext relationships and even the authentication key, destroying both confidentiality and integrity. It is a classic (non-quantum) implementation catastrophe &mdash; a reminder that most real breaches come from misuse, not algorithm weakness.</p>
+    </article>
   </div>
 </section>
 
@@ -151,7 +225,11 @@
     {"q":"What extra thing does a MAC prove that a bare hash does not?","choices":["That the producer knew a shared secret","That the file is compressed","That the network is fast"],"answer":0,"explain":"A MAC binds integrity to knowledge of a shared secret, so it proves origin, not just change."},
     {"q":"In the TLS handshake, which steps does PQC primarily change?","choices":["Key exchange and the signatures","Only the TCP connection","Only the HTML rendering"],"answer":0,"explain":"PQC replaces the key-establishment group and the certificate/handshake signatures; bulk record encryption is largely unchanged."},
     {"q":"What must be tested for a signature migration?","choices":["Every verifier and its policy path","Only the signing laptop","Only font rendering"],"answer":0,"explain":"The constraint is usually the verifiers: they all must parse and accept the new algorithm."},
-    {"q":"Why do hybrid TLS handshakes sometimes fail in production but not in a lab?","choices":["Larger handshakes trip middleboxes, old stacks, or pinning","The server is on the wrong continent","Hybrid mode disables encryption"],"answer":0,"explain":"Bigger key-shares increase message size; ossified middleboxes and legacy clients on the real path can choke on it."}
+    {"q":"Why do hybrid TLS handshakes sometimes fail in production but not in a lab?","choices":["Larger handshakes trip middleboxes, old stacks, or pinning","The server is on the wrong continent","Hybrid mode disables encryption"],"answer":0,"explain":"Bigger key-shares increase message size; ossified middleboxes and legacy clients on the real path can choke on it."},
+    {"q":"What does an AEAD cipher (like AES-256-GCM) output?","choices":["Ciphertext plus an authentication tag","Only ciphertext","A new private key"],"answer":0,"explain":"AEAD does confidentiality and integrity together, producing ciphertext and a tag that detects any tampering."},
+    {"q":"What is the cardinal rule of using AES-GCM?","choices":["Never reuse a nonce with the same key","Always reuse the same nonce","Never use a key longer than 128 bits"],"answer":0,"explain":"Nonce reuse in GCM can leak plaintext and the authentication key. Each (key, nonce) pair must be unique."},
+    {"q":"In hybrid key establishment, when is the connection safe?","choices":["If either the classical or the post-quantum half remains unbroken","Only if both halves break","Only on Tuesdays"],"answer":0,"explain":"The two shared secrets are combined in a KDF, so the session key is safe unless BOTH algorithms are broken simultaneously."},
+    {"q":"In the PQC transition, what happens to AES-256-GCM?","choices":["It is kept/resized, not replaced (it is symmetric)","It is replaced by ML-KEM","It is replaced by ML-DSA"],"answer":0,"explain":"AEAD is symmetric and only mildly affected by Grover. The quantum change is in how the key was established, not the bulk cipher."}
   ]
   </script>
 </section>
@@ -171,7 +249,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through the TLS handshake first and note the "PQC touches this" markers. Then read the lessons and open the "Go deeper" panel for the middlebox story.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

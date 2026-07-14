@@ -10,7 +10,7 @@
 <body data-module="PQC-402">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-402</span><span>Crypto Inventory &amp; CBOM Workshop</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-402</span><span>Crypto Inventory &amp; CBOM Workshop</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. Minimum useful fields</a>
   <a href="#s3"><span class="dot"></span>3. Discovery methods</a>
   <a href="#s4"><span class="dot"></span>4. From CBOM to work queue</a>
+  <a href="#s5"><span class="dot"></span>5. Scoring risk consistently</a>
+  <a href="#s6"><span class="dot"></span>6. Standards &amp; keeping it alive</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -31,7 +33,7 @@
 <section class="hero" id="start">
   <div class="hero-copy">
     <span class="chip">Workshop</span>
-    <div class="meta"><span class="level intermediate">Intermediate</span><span class="level time">~25 min</span><span class="level time">Hands-on tool</span></div>
+    <div class="meta"><span class="level intermediate">Intermediate</span><span class="level time">~30 min</span><span class="level time">Hands-on tool</span></div>
     <h1>Crypto Inventory &amp; CBOM Workshop</h1>
     <p class="sub">A cryptographic bill of materials is the map your whole migration runs on. In this module you will actually build one in the browser, watch it auto-classify risk, and export it.</p>
     <ul class="outcomes">
@@ -77,6 +79,8 @@
     <span class="arrow">&rarr;</span>
     <div class="flow-step"><b>Risk</b><span>Lifetime, exposure, readiness.</span></div>
   </div>
+  <p>People often ask why they cannot just reuse their existing SBOM. The reason is that an SBOM answers "what software do we run?" while a CBOM answers "what cryptography does that software actually <em>use</em>, and how exposed is it?" A library can appear in your SBOM as a harmless dependency while quietly performing RSA key-wrapping on your most sensitive data. The CBOM is the layer that connects a component to the cryptographic <em>job</em> it performs and the <em>data</em> it protects &mdash; and that connection is exactly what you need to rank risk. Think of the SBOM as the parts list and the CBOM as the wiring diagram that shows which parts guard which valuables.</p>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>An SBOM is the inventory of every lock brand installed in a building. A CBOM tells you which of those locks are on the vault versus the broom closet, who holds each key, and which ones a known lock-pick can already defeat. Only the second view lets you decide what to re-key first.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>A CBOM is the evidence base for every PQC decision. No inventory, no program.</p></div>
 </section>
 
@@ -85,6 +89,7 @@
   <p class="lead">A row without an owner or a data lifetime cannot be prioritized or actioned.</p>
   <p>Record ownership and enough precision to act. Algorithm names must be exact &mdash; "TLS" is not enough; record the key-exchange, the certificate signature, the protocol version, the library, and any pinned or legacy clients. Also record <b>confidence</b>: some data comes from automated scans, some from vendor statements, some from manual review. Confidence prevents false certainty.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>Instead of <em>"external API uses SSL,"</em> write: <em>"external API, TLS 1.3, X25519 key exchange, ECDSA P-256 certificate, nginx/OpenSSL 3.x, browser + mobile clients (one pinned), 1-year data, owner Team Web, status: plan hybrid."</em> That row can be prioritized and assigned.</p></div>
+  <p>Do not try to capture forty fields on the first pass &mdash; you will never finish. Start with the handful that actually drive a decision: <b>system, crypto job, exact algorithm/parameters, dependency (library or product), data lifetime, exposure, owner, and PQC status</b>. Those eight are enough to score risk and assign work. Everything else &mdash; certificate expiry, HSM slot, key custodian, ticket links &mdash; is valuable enrichment you can add once the skeleton exists and is being maintained.</p>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Hiding unknowns. An "algorithm: unknown" row is not a gap to paper over &mdash; it is a work item with an owner and a discovery method.</p></div>
 </section>
 
@@ -102,13 +107,57 @@
     </tbody>
   </table></div>
   <div class="callout example"><span class="k">Concrete example</span><p>A scanner finds all your public TLS endpoints, but only an architecture interview reveals the offline root key used to sign firmware &mdash; often your highest-risk, longest-lived asset.</p></div>
+  <div class="callout warn"><span class="k">The most dangerous crypto is the crypto you cannot see</span><p>The assets most likely to be missed are frequently the most critical: offline signing roots, an HSM's key-wrapping scheme, a hard-coded key in a legacy service, or a third-party library buried three dependencies deep. Because scanners cannot reach them, they stay off the inventory &mdash; and an asset that is not on the CBOM is an asset no one is migrating. Deliberately hunt the blind spots; do not assume "scan complete" means "coverage complete."</p></div>
 </section>
 
 <section class="lesson" id="s4">
   <div class="lesson-title"><span class="num">4</span><h2>From CBOM to work queue</h2></div>
   <p class="lead">An inventory that does not produce actions is just documentation.</p>
   <p>Each row should generate work: test hybrid TLS, enlarge a schema field, request a vendor roadmap, add certificate-chain monitoring, replace a weak algorithm, file an exception, or schedule device replacement. Each action carries an owner, target date, dependency, evidence requirement, and rollback plan. The dashboard then shows coverage, risk tiers, blockers, tests done, exceptions, and next-wave candidates &mdash; which is exactly the evidence PQC-401 asks for.</p>
+  <figure class="figure">
+    <div class="fig-title">The CBOM is a loop, not a document</div>
+    <svg viewBox="0 0 680 170" role="img" aria-label="CBOM lifecycle: discover, record, score, act, monitor, then re-baseline back to discover.">
+      <g>
+        <rect class="g-box" x="12" y="60" width="96" height="50" rx="10" stroke-width="1.5"/><text class="g-t" x="60" y="90" font-size="12.5" text-anchor="middle" font-weight="800">Discover</text>
+        <rect class="g-box" x="140" y="60" width="96" height="50" rx="10" stroke-width="1.5"/><text class="g-t" x="188" y="90" font-size="12.5" text-anchor="middle" font-weight="800">Record</text>
+        <rect class="g-box-p" x="268" y="60" width="96" height="50" rx="10" stroke-width="2"/><text class="g-t" x="316" y="90" font-size="12.5" text-anchor="middle" font-weight="800">Score</text>
+        <rect class="g-box-t" x="396" y="60" width="96" height="50" rx="10" stroke-width="2"/><text class="g-t" x="444" y="90" font-size="12.5" text-anchor="middle" font-weight="800">Act</text>
+        <rect class="g-box" x="524" y="60" width="96" height="50" rx="10" stroke-width="1.5"/><text class="g-t" x="572" y="90" font-size="12.5" text-anchor="middle" font-weight="800">Monitor</text>
+      </g>
+      <g class="g-line-p"><line x1="108" y1="85" x2="140" y2="85" marker-end="url(#cb)"/><line x1="236" y1="85" x2="268" y2="85" marker-end="url(#cb)"/><line x1="364" y1="85" x2="396" y2="85" marker-end="url(#cb)"/><line x1="492" y1="85" x2="524" y2="85" marker-end="url(#cb)"/></g>
+      <path class="g-line-p" d="M572 60 C572 24 60 24 60 60" fill="none" marker-end="url(#cb)"/>
+      <text class="g-tm" x="316" y="20" font-size="11" text-anchor="middle">re-baseline &mdash; certs, vendors, and libraries change constantly</text>
+      <defs><marker id="cb" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>A CBOM you build once and file away is stale within months. Treat it as a living product that cycles continuously &mdash; the "Score" and "Act" steps are what make it a program rather than a spreadsheet.</figcaption>
+  </figure>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Inventory without action is not a migration program. The CBOM feeds the work queue; the work queue feeds the dashboard.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Scoring risk consistently</h2></div>
+  <p class="lead">Gut-feel priorities collapse under scrutiny. A simple, repeatable score defends your ordering.</p>
+  <p>Every reviewer will argue their system is the most urgent. The way out is a transparent rubric applied to every row, so priority comes from the data, not the loudest owner. A workable scheme rates four factors 1&ndash;3 and combines them &mdash; the same four factors from the PQC-101 triage, now turned into numbers your CBOM tool can sort on.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Factor</th><th>Score 1 (low)</th><th>Score 2</th><th>Score 3 (high)</th></tr></thead>
+    <tbody>
+      <tr><td>Data lifetime</td><td>&lt; 1 year</td><td>1&ndash;5 years</td><td>&gt; 5 years</td></tr>
+      <tr><td>Exposure</td><td>Internal only</td><td>Partner / limited</td><td>Public internet</td></tr>
+      <tr><td>Public-key dependence</td><td>Symmetric/hash only</td><td>Some PK, easy to swap</td><td>Core PK, hard to change</td></tr>
+      <tr><td>Migration difficulty</td><td>You control it, easy</td><td>Some dependencies</td><td>Vendor/hardware-blocked</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>An external VPN with 10-year sensitive traffic on vendor hardware scores 3+3+3+3 = <b>12</b> (Tier 1, urgent). A public marketing page scores 1+3+1+1 = <b>6</b> (exposed but nothing to harvest &mdash; low). Sorting the CBOM by this score produces your wave order automatically, and you can point to the rubric when someone disputes their ranking.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Over-engineering the score. Four factors on a 1&ndash;3 scale is enough to sort a first pass. A 40-field weighted model that no one maintains is worse than a simple one people actually use.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Standards and keeping the CBOM alive</h2></div>
+  <p class="lead">A machine-readable CBOM plugs into your existing supply-chain tooling &mdash; and stays current automatically.</p>
+  <p>The spreadsheet you built above is a great start, but a real program wants the CBOM in a standard, machine-readable format so it can be generated, diffed, and consumed by other tools. The industry direction is <b>CycloneDX CBOM</b>, an extension of the widely used SBOM format that adds cryptographic asset types (algorithms, keys, certificates, protocols) and their relationships. Expressing your inventory this way lets you generate it from build pipelines and scanners, track it in version control, and feed it straight into risk dashboards.</p>
+  <div class="callout tip"><span class="k">Automate the refresh</span><p>Wire discovery into CI/CD and periodic scans so the CBOM regenerates on every build and on a schedule. A CBOM that only updates when a human remembers is stale by definition &mdash; and staleness is exactly what a multi-year migration cannot afford.</p></div>
+  <div class="callout warn"><span class="k">Source-verification needed</span><p>CBOM tooling and the CycloneDX cryptographic schema are evolving quickly. Confirm the current field definitions and tool support against the CycloneDX project before standardizing your format organization-wide.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Start as a spreadsheet to learn the fields; graduate to a standard machine-readable CBOM (CycloneDX) generated automatically so the inventory never goes stale.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -136,6 +185,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Assign an owner and a discovery method with a due date. "Unknown" is a tracked work item, never an acceptable final state.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Score two systems</h3>
+      <p class="scenario">System A: internal log store, symmetric encryption, 90-day retention, fully under your control. System B: public API with an ECDSA cert and 8-year customer contracts behind it, on a vendor gateway.</p>
+      <p class="decide">Apply the 1&ndash;3 rubric &mdash; which is higher priority?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> System A &asymp; 1(lifetime)+1(exposure)+1(PK)+1(difficulty) = 4 (low). System B &asymp; 3+3+3+2 = 11 (Tier 1). System B wins clearly &mdash; long-lived, exposed, public-key-dependent, and partly vendor-gated. The rubric makes the ordering defensible instead of a debate.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Keep it from going stale</h3>
+      <p class="scenario">Your CBOM was accurate at launch but is untouched six months later; certificates and libraries have since changed.</p>
+      <p class="decide">How do you stop the inventory from rotting?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Make it a machine-readable, regenerated artifact: adopt a standard format (CycloneDX CBOM), generate it from CI/CD and scheduled scans, store it in version control, and diff it over time. Assign the inventory an owner and treat the discover&rarr;record&rarr;score&rarr;act&rarr;monitor loop as continuous, not a one-time exercise.</p>
+    </article>
   </div>
 </section>
 
@@ -151,7 +214,10 @@
     {"q":"Why combine multiple discovery methods?","choices":["No single method finds all crypto (offline/embedded/vendor gaps)","To use more tools for their own sake","To slow the project down"],"answer":0,"explain":"Scanners miss offline/embedded/vendor crypto; interviews and config review fill the gaps."},
     {"q":"What should you do with an 'algorithm: unknown' row?","choices":["Assign an owner and discovery method with a due date","Delete it","Mark the project complete"],"answer":0,"explain":"Unknowns are work items, not acceptable end states."},
     {"q":"What turns a CBOM into a migration program?","choices":["Each row generating owned, dated actions feeding a dashboard","Printing it once","Storing it in a locked drawer"],"answer":0,"explain":"Inventory must drive a work queue and measurable evidence, or it is just documentation."},
-    {"q":"Why record confidence (scan vs vendor vs review)?","choices":["To avoid false certainty about what is deployed","To make it colorful","Confidence is not needed"],"answer":0,"explain":"Different sources have different reliability; recording confidence prevents acting on wrong assumptions."}
+    {"q":"Why record confidence (scan vs vendor vs review)?","choices":["To avoid false certainty about what is deployed","To make it colorful","Confidence is not needed"],"answer":0,"explain":"Different sources have different reliability; recording confidence prevents acting on wrong assumptions."},
+    {"q":"What is the point of a simple 1-3 risk rubric?","choices":["Consistent, defensible priority ordering from the data, not the loudest owner","To make scoring take longer","To avoid keeping an inventory"],"answer":0,"explain":"Rating lifetime, exposure, PK dependence, and difficulty on a 1-3 scale lets the CBOM sort into wave order objectively."},
+    {"q":"Which standard format is the industry direction for a machine-readable CBOM?","choices":["CycloneDX CBOM (an SBOM extension for crypto assets)","A single PDF","A whiteboard photo"],"answer":0,"explain":"CycloneDX adds cryptographic asset types to the SBOM format so the inventory can be generated, diffed, and consumed by tools."},
+    {"q":"How do you keep a CBOM from going stale?","choices":["Regenerate it automatically from CI/CD and scheduled scans; treat it as a loop","Print it once and file it","Update it only when audited"],"answer":0,"explain":"Certificates, vendors, and libraries change constantly, so the inventory must be a continuously regenerated, owned artifact."}
   ]
   </script>
 </section>
@@ -170,7 +236,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Edit the CBOM table directly, add your own systems, and export CSV/JSON to seed a real inventory. The Risk column is a simple demo classifier based on the PQC status text.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

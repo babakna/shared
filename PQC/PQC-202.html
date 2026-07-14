@@ -10,7 +10,7 @@
 <body data-module="PQC-202">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. SSH and VPN</a>
   <a href="#s3"><span class="dot"></span>3. Email and messaging</a>
   <a href="#s4"><span class="dot"></span>4. Code &amp; package signing</a>
+  <a href="#s5"><span class="dot"></span>5. The universal migration pattern</a>
+  <a href="#s6"><span class="dot"></span>6. Proving the rollout worked</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -71,6 +73,7 @@ openssl s_client -connect example.com:443 \
 <span class="cmt"># Look for the negotiated group in the output:</span>
 <span class="cmt">#   Negotiated TLS1.3 group: X25519MLKEM768</span></pre>
   <div class="callout example"><span class="k">Concrete example</span><p>Major browsers and CDNs already negotiate hybrid ML-KEM for a large share of traffic. Certificates, however, still mostly use classical signatures because PQC certificate chains are bigger and the whole PKI must catch up first (see PQC-102 and PQC-001).</p></div>
+  <p>Why is key exchange already common but PQC certificates lagging? Size. A hybrid key-share adds about a kilobyte to one message; a PQC <em>certificate chain</em> can add many kilobytes to <em>every</em> handshake, because a chain carries a leaf, one or more intermediates, and the signatures binding them &mdash; each of which grows. That inflates the handshake, stresses the initial-window and packet-loss behavior of TCP/QUIC, and can trip certificate-transparency logs and old parsers. So the ecosystem is doing the cheaper half (key exchange) first and staging the harder half (certificates) behind it.</p>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Enabling PQC on the server and declaring victory. Test through your real CDN, WAF, load balancer, and oldest supported clients &mdash; that is where larger handshakes fail.</p></div>
 </section>
 
@@ -87,12 +90,18 @@ openssl s_client -connect example.com:443 \
     </tbody>
   </table></div>
   <div class="callout example"><span class="k">Concrete example</span><p>You upgrade servers to a PQC-capable SSH, but a fleet of old jump hosts silently falls back to classical key exchange. Without monitoring which group was actually negotiated, you would believe you migrated when you did not.</p></div>
+  <p>That silent-fallback trap is worth dwelling on, because it is the single most common way a PQC rollout <em>looks</em> finished while leaving you exposed. Most protocols are polite: if two endpoints cannot agree on the new algorithm, they quietly negotiate down to something both understand rather than failing. That politeness is great for uptime and terrible for security assurance, because "no errors" can mean "everyone upgraded" or "everyone fell back" &mdash; and you cannot tell the two apart without measuring. The fix is to <b>log the negotiated group or algorithm on every connection</b> and alert when the classical path is still being used. Until you measure it, your migration status is a hope, not a fact.</p>
+  <div class="callout tip"><span class="k">Rule of thumb</span><p>For any migration, decide in advance the one metric that <em>proves</em> success &mdash; usually "share of connections that negotiated the PQC algorithm." If you cannot see that number on a dashboard, you are not done, no matter what the config files say.</p></div>
 </section>
 
 <section class="lesson" id="s3">
   <div class="lesson-title"><span class="num">3</span><h2>Email and messaging trust</h2></div>
   <p class="lead">Email is the hardest "easy" case: ancient, federated, and full of long-lived stored data.</p>
   <p>S/MIME and PGP use signatures and key establishment that both move to PQC. But mail is stored for years, read by a huge variety of clients, and depends on directories/key servers to distribute keys. Modern secure messengers (Signal-style) have moved faster: some added PQC key establishment to their key-agreement ratchets, precisely because their clients update frequently and centrally.</p>
+  <p>Two live examples show where email is heading. Apple's iMessage moved to <b>PQ3</b> and Signal introduced <b>PQXDH</b>, both adding post-quantum key establishment to their ongoing key-agreement (so even future messages in a long-lived conversation get fresh PQC protection). They could do this quickly precisely because their clients are centrally distributed and auto-update. Email's S/MIME and PGP will get there too, but only as clients, directories, and archive formats catch up &mdash; which is measured in years, not release cycles.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>A signed email from 2026 may still need to be <em>verified</em> in 2040 for a legal dispute. If it was signed with a classical algorithm that is broken by then, its evidentiary value collapses. This is why archived, signed mail is a genuine harvest-and-forge concern, not just a key-exchange one.</p></div>
+  <p>There is a useful rule of thumb hiding in these examples. Ask two questions about any system: <b>who controls the clients</b>, and <b>how long does the data live</b>. A messenger controls its own app and its data is ephemeral, so it can flip to PQC in a single release. Email controls neither &mdash; anyone can run any client, and messages sit in archives for a decade &mdash; so it moves at the speed of the slowest widely-used client. Every protocol in this module sits somewhere on that grid, and where it sits predicts how painful its migration will be far better than any technical detail of the algorithm itself.</p>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>It is the difference between updating an app you built for your own staff versus changing the rules of the postal service. One is a Tuesday deployment; the other is a multi-year negotiation with everyone who has ever owned a mailbox. Same idea, wildly different difficulty &mdash; and that gap is governed by control and longevity, not cryptography.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>The more centrally and frequently a system's clients update, the easier PQC is. Federated, long-retention systems (email) are the slowest.</p></div>
 </section>
 
@@ -100,12 +109,67 @@ openssl s_client -connect example.com:443 \
   <div class="lesson-title"><span class="num">4</span><h2>Code signing and package ecosystems</h2></div>
   <p class="lead">Signatures again &mdash; and here the verifiers are everywhere and outlive the signer.</p>
   <p>Firmware, OS packages, container images, app-store binaries, and software releases are all signed. Migration is gated by <em>verifiers</em>: bootloaders, package managers, app stores, and update clients must all accept the new signature algorithm before you can enforce it. Some ecosystems adopt PQC by adding a parallel signature alongside the classical one during transition.</p>
+  <p>This connects directly to software supply-chain security. The industry is converging on signed build provenance and software bills of materials (SBOMs) so you can prove <em>what</em> shipped and <em>who</em> built it. Every one of those signatures is a future PQC migration target &mdash; and, unlike a TLS session, a signed 2026 release may still need to be verifiable in 2040. The longer an artifact's trust must last, the stronger the case for a conservative choice like SLH-DSA and for dual-signing during the transition.</p>
   <details class="deep"><summary>Go deeper: dual-signing during transition</summary>
     <div class="deep-body">
       <p>A common pattern: attach <em>both</em> a classical signature and a PQC signature to each artifact. New verifiers check the PQC one; old verifiers keep using the classical one. Once all verifiers support PQC, the classical signature is dropped. This trades bigger artifacts and more signing work for a safe, gradual cutover &mdash; and it only works if your artifact format allows multiple signatures.</p>
     </div>
   </details>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Enforcing PQC-only signing before the long tail of verifiers can validate it &mdash; instantly bricking updates for older devices.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>The universal migration pattern</h2></div>
+  <p class="lead">Every protocol above follows the same four phases. Learn it once and you can migrate anything.</p>
+  <p>Whether it is TLS key exchange, SSH, a VPN tunnel, or firmware signing, safe migrations do not "flip a switch." They run classical and post-quantum <em>together</em> for a while, watch what actually happens on the wire, and only remove the old algorithm once the new one is proven everywhere. The shape is always the same:</p>
+  <figure class="figure">
+    <div class="fig-title">The four phases of a safe protocol migration</div>
+    <svg viewBox="0 0 690 168" role="img" aria-label="Migration phases: inventory, then run classical and post-quantum together (hybrid or dual-sign), then monitor what is negotiated, then remove the classical algorithm.">
+      <rect class="g-box" x="10" y="44" width="150" height="80" rx="12" stroke-width="2"/>
+      <text class="g-t" x="85" y="72" font-size="12.5" text-anchor="middle" font-weight="800">1. Inventory</text>
+      <text class="g-tm" x="85" y="92" font-size="10.5" text-anchor="middle">find every use,</text>
+      <text class="g-tm" x="85" y="106" font-size="10.5" text-anchor="middle">client, verifier</text>
+      <rect class="g-box-p" x="184" y="44" width="150" height="80" rx="12" stroke-width="2"/>
+      <text class="g-t" x="259" y="72" font-size="12.5" text-anchor="middle" font-weight="800">2. Run both</text>
+      <text class="g-tm" x="259" y="92" font-size="10.5" text-anchor="middle">hybrid KEX or</text>
+      <text class="g-tm" x="259" y="106" font-size="10.5" text-anchor="middle">dual-sign</text>
+      <rect class="g-box-t" x="358" y="44" width="150" height="80" rx="12" stroke-width="2"/>
+      <text class="g-t" x="433" y="72" font-size="12.5" text-anchor="middle" font-weight="800">3. Monitor</text>
+      <text class="g-tm" x="433" y="92" font-size="10.5" text-anchor="middle">log what is really</text>
+      <text class="g-tm" x="433" y="106" font-size="10.5" text-anchor="middle">negotiated</text>
+      <rect class="g-box" x="532" y="44" width="150" height="80" rx="12" stroke-width="2" style="stroke:var(--green)"/>
+      <text x="607" y="72" font-size="12.5" text-anchor="middle" font-weight="800" fill="var(--green)">4. Retire old</text>
+      <text class="g-tm" x="607" y="92" font-size="10.5" text-anchor="middle">drop classical</text>
+      <text class="g-tm" x="607" y="106" font-size="10.5" text-anchor="middle">once 100% covered</text>
+      <g class="g-line-p"><line x1="160" y1="84" x2="184" y2="84" marker-end="url(#mp)"/><line x1="334" y1="84" x2="358" y2="84" marker-end="url(#mp)"/><line x1="508" y1="84" x2="532" y2="84" marker-end="url(#mp)"/></g>
+      <text class="g-tm" x="345" y="150" font-size="11" text-anchor="middle">Phases 2&ndash;3 can run for years. Never skip to phase 4 without the monitoring data from phase 3.</text>
+      <defs><marker id="mp" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>Hybrid key exchange and dual-signing are just two names for the same idea: phase 2, "run both." The dangerous step is jumping to phase 4 before phase 3 proves every client and verifier is ready.</figcaption>
+  </figure>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>"Run both, then measure, then retire" is the whole game. If you remember only one pattern from this module, remember these four boxes.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Proving the rollout actually worked</h2></div>
+  <p class="lead">A config that <em>says</em> PQC is on tells you nothing. Only the wire tells the truth.</p>
+  <p>The single most common failure mode in these migrations is the <b>silent downgrade</b>: you enable hybrid key exchange, but old clients or a middlebox quietly negotiate classical instead, and everyone believes the job is done. The fix is observability &mdash; measure what was actually negotiated, per connection, across real clients and paths.</p>
+  <pre class="code"><span class="cmt"># Check what a specific server actually negotiates</span>
+openssl s_client -connect example.com:443 -groups <span class="str">X25519MLKEM768</span> -tls1_3 \
+  | grep <span class="str">"Negotiated TLS1.3 group"</span>
+
+<span class="cmt"># On an SSH server, confirm the kex method in use</span>
+ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></pre>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Protocol</th><th>What to measure</th><th>Green signal</th></tr></thead>
+    <tbody>
+      <tr><td>TLS</td><td>Negotiated group per connection</td><td>% of traffic on a hybrid ML-KEM group, trending up</td></tr>
+      <tr><td>SSH</td><td>Negotiated kex method in logs</td><td>Hybrid ML-KEM method, not a classical fallback</td></tr>
+      <tr><td>VPN/IKEv2</td><td>Additional key-exchange rounds present</td><td>PQC exchange completes without fragmentation errors</td></tr>
+      <tr><td>Signing</td><td>Verifier coverage for the PQC algorithm</td><td>100% of verifiers validate before classical is dropped</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Measuring only success rate ("connections still work"). Connections working can mean classical fallback is silently rescuing you. Measure the <em>algorithm</em>, not just the outcome.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -133,6 +197,20 @@ openssl s_client -connect example.com:443 \
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Dual-sign (classical + PQC) during transition so old bootloaders keep validating, roll PQC-capable bootloaders through the fleet, then drop the classical signature only once verification coverage is confirmed.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Which phase are you in?</h3>
+      <p class="scenario">A team has enabled hybrid ML-KEM on all servers and dashboards show 40% of traffic on the hybrid group, climbing weekly.</p>
+      <p class="decide">Which migration phase is this, and what must happen before removing classical?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> This is phase 3 (monitor) &mdash; "run both" is live and they are measuring the negotiated group. Before phase 4 (retire classical), the hybrid share must reach effectively 100% of supported clients, or you will cut off the long tail still negotiating classical. Removing classical at 40% would break most users.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; The connections-still-work trap</h3>
+      <p class="scenario">After enabling hybrid TLS, an engineer reports "100% success rate, migration complete."</p>
+      <p class="decide">Why is that metric misleading?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> A 100% success rate can mean classical fallback is silently rescuing every connection that cannot do PQC. Success rate measures <em>availability</em>, not <em>which algorithm ran</em>. You must log the negotiated group per connection to know whether PQC is actually protecting traffic.</p>
+    </article>
   </div>
 </section>
 
@@ -148,7 +226,10 @@ openssl s_client -connect example.com:443 \
     {"q":"Why is email one of the hardest protocols to migrate?","choices":["It is federated, long-retention, and read by many diverse clients","It has no cryptography","It is only used offline"],"answer":0,"explain":"Long-lived stored mail plus federation and client diversity make coordinated change slow."},
     {"q":"What proves a TLS PQC rollout actually happened?","choices":["Logging the negotiated group across real clients/paths","The server booted","A screenshot of the config file"],"answer":0,"explain":"Only observing the negotiated group on real traffic distinguishes success from silent downgrade."},
     {"q":"What is 'dual-signing' during transition?","choices":["Attaching both classical and PQC signatures until all verifiers support PQC","Signing twice with the same key","Encrypting the signature"],"answer":0,"explain":"Dual-signing lets old verifiers use the classical signature and new ones use PQC, enabling a gradual cutover."},
-    {"q":"Which factor makes a protocol EASIER to migrate?","choices":["Clients that update centrally and frequently","More middleboxes","Longer data retention"],"answer":0,"explain":"Frequent, central client updates (e.g. modern messengers) make coordinated PQC adoption far easier than federated, slow-updating systems."}
+    {"q":"Which factor makes a protocol EASIER to migrate?","choices":["Clients that update centrally and frequently","More middleboxes","Longer data retention"],"answer":0,"explain":"Frequent, central client updates (e.g. modern messengers) make coordinated PQC adoption far easier than federated, slow-updating systems."},
+    {"q":"What are the four phases of a safe protocol migration?","choices":["Inventory, run both, monitor, retire old","Delete, rebuild, hope, pray","Encrypt, compress, sign, forget"],"answer":0,"explain":"Inventory every use, run classical+PQC together (hybrid/dual-sign), monitor what is negotiated, then retire the classical algorithm once coverage is complete."},
+    {"q":"What is a 'silent downgrade'?","choices":["PQC is enabled but classical is quietly negotiated instead","The server crashes loudly","Encryption is turned off on purpose"],"answer":0,"explain":"Old clients or middleboxes can negotiate classical even when PQC is offered, so you must measure the negotiated algorithm, not just assume."},
+    {"q":"Why is a 100% connection success rate NOT proof of a PQC rollout?","choices":["Classical fallback can silently rescue connections that can't do PQC","Success rate is always fake","PQC has no effect on connections"],"answer":0,"explain":"Success rate measures availability, not which algorithm ran. Log the negotiated group per connection to confirm PQC actually protected the traffic."}
   ]
   </script>
 </section>
@@ -168,7 +249,7 @@ openssl s_client -connect example.com:443 \
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through the protocol map, then read each protocol's lesson. The command example is illustrative &mdash; exact group names and tool versions change, so verify before relying on it.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

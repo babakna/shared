@@ -1,10 +1,10 @@
 # Post-Quantum Cryptography Learning Lab
 
-V4.0 (July 2026)
+V5.0 (July 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
 
-## What changed in V4.0
+## What changed in V5.0
 
 - **Steppers are now visual pipelines, not text pages.** Every "click Next" walkthrough now renders an SVG pipeline with an icon per stage; the current stage highlights and the connectors fill in as you advance, so you *see* where you are instead of just reading paragraphs.
 - **Deeper step content.** Each step was rewritten with concrete detail, real examples, and inline code/labels (e.g. `X25519+ML-KEM-768`), and several walkthroughs gained extra steps.

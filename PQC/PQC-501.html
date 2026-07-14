@@ -10,7 +10,7 @@
 <body data-module="PQC-501">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. 5G and future 6G trust</a>
   <a href="#s3"><span class="dot"></span>3. SIM &amp; eSIM lifecycle</a>
   <a href="#s4"><span class="dot"></span>4. IoT &amp; long-lived devices</a>
+  <a href="#s5"><span class="dot"></span>5. Constrained-device strategies</a>
+  <a href="#s6"><span class="dot"></span>6. Coordinating the federation</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -64,6 +66,22 @@
   <div class="lesson-title"><span class="num">1</span><h2>Telecom PQC is an ecosystem problem</h2></div>
   <p class="lead">A phone call or data session crosses devices, SIMs, radios, cores, and often multiple operators &mdash; owned by different companies.</p>
   <p>No single organization can "turn on PQC" for a mobile network. Device vendors, SIM/eUICC makers, network-equipment vendors, operators, roaming partners, and standards bodies (3GPP, GSMA) must move in a coordinated way. That is why telecom relies on standards and long lead times, and why crypto-agility is essential: you are negotiating change across a federation.</p>
+  <figure class="figure">
+    <div class="fig-title">One data session, many owners &mdash; every link must support PQC</div>
+    <svg viewBox="0 0 690 150" role="img" aria-label="A mobile session crosses device, eSIM chip, radio access network, operator core, and roaming partner. Each is owned by a different party and must independently support post-quantum cryptography.">
+      <g>
+        <rect class="g-box" x="8" y="46" width="112" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="64" y="72" font-size="12" text-anchor="middle" font-weight="800">Device</text><text class="g-tm" x="64" y="90" font-size="9.5" text-anchor="middle">handset maker</text>
+        <rect class="g-box-p" x="140" y="46" width="112" height="58" rx="10" stroke-width="2"/><text class="g-t" x="196" y="72" font-size="12" text-anchor="middle" font-weight="800">eSIM (eUICC)</text><text class="g-tm" x="196" y="90" font-size="9.5" text-anchor="middle">chip vendor</text>
+        <rect class="g-box" x="272" y="46" width="112" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="328" y="72" font-size="12" text-anchor="middle" font-weight="800">Radio (RAN)</text><text class="g-tm" x="328" y="90" font-size="9.5" text-anchor="middle">network vendor</text>
+        <rect class="g-box" x="404" y="46" width="112" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="460" y="72" font-size="12" text-anchor="middle" font-weight="800">Core</text><text class="g-tm" x="460" y="90" font-size="9.5" text-anchor="middle">operator</text>
+        <rect class="g-box-v" x="536" y="46" width="146" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="609" y="72" font-size="12" text-anchor="middle" font-weight="800">Roaming partner</text><text class="g-tm" x="609" y="90" font-size="9.5" text-anchor="middle">another operator</text>
+      </g>
+      <g class="g-line-p"><line x1="120" y1="75" x2="140" y2="75" marker-end="url(#tc)"/><line x1="252" y1="75" x2="272" y2="75" marker-end="url(#tc)"/><line x1="384" y1="75" x2="404" y2="75" marker-end="url(#tc)"/><line x1="516" y1="75" x2="536" y2="75" marker-end="url(#tc)"/></g>
+      <text class="g-tm" x="345" y="130" font-size="11" text-anchor="middle">A single weak link (an eUICC or a partner that can't do PQC) forces the whole chain to fall back.</text>
+      <defs><marker id="tc" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>Unlike a web server you fully control, a mobile session depends on five independently owned links. This is why telecom PQC is paced by standards and the slowest partner, not by any one operator's ambition.</figcaption>
+  </figure>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Treat telecom PQC like international PKI migration: the slowest interoperating partner sets the pace, so agility and standards alignment matter more than any single clever implementation.</p></div>
 </section>
 
@@ -71,14 +89,17 @@
   <div class="lesson-title"><span class="num">2</span><h2>5G and future 6G trust layers</h2></div>
   <p class="lead">5G already improved subscriber-identity privacy; PQC extends that trajectory into 6G-era design.</p>
   <p>5G introduced concealment of the long-term subscriber identifier (SUPI) using a public-key scheme (SUCI) so the identifier is not sent in the clear &mdash; that public-key step is a natural PQC candidate. Core network functions authenticate each other over TLS-based interfaces (SBA), which inherit the TLS PQC story from PQC-202. The subscriber authentication itself (5G-AKA) is largely symmetric and less directly affected. 6G is being designed with quantum-safe assumptions from the start.</p>
+  <p>It helps to sort the telecom crypto surface into three buckets, because they age very differently. <b>Symmetric-heavy</b> pieces &mdash; the AKA authentication and the over-the-air ciphering &mdash; only need larger keys (Grover, not Shor), so they are the least urgent. <b>Public-key</b> pieces &mdash; SUCI concealment, the SBA TLS interfaces, and every certificate in the provisioning chain &mdash; are the Shor-vulnerable targets that need new algorithms. And <b>long-lived secrets</b> &mdash; anything an attacker could harvest now and exploit after Q-day &mdash; set the urgency. Mapping each interface into one of these buckets is the fastest way to prioritize a telecom estate.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>The SUCI concealment that hides your permanent identity uses elliptic-curve public-key cryptography today. A quantum adversary who harvested those exchanges could later de-conceal identifiers &mdash; a privacy harvest-now-decrypt-later case, motivating PQC there.</p></div>
+  <div class="callout tip"><span class="k">Why 6G gets it easier</span><p>Because 6G is being specified now, PQC and crypto-agility can be baked into the standards rather than retrofitted. That is the whole lesson of this course applied at ecosystem scale: designing for agility up front is far cheaper than negotiating a change across a live federation later.</p></div>
 </section>
 
 <section class="lesson" id="s3">
   <div class="lesson-title"><span class="num">3</span><h2>SIM and eSIM lifecycle</h2></div>
   <p class="lead">The (e)SIM is a tiny, hardened computer with real constraints &mdash; and a long, multi-party trust chain.</p>
   <p>SIM/eSIM provisioning (GSMA RSP) relies on a certificate hierarchy and secure channels, as you saw in the walkthrough. The challenges: the <span class="term" data-def="Embedded UICC - the chip that securely stores SIM profiles in an eSIM-capable device.">eUICC</span> secure element has limited memory and compute, so larger PQC keys and signatures are a genuine fit problem; and the trust hierarchy spans device makers, SIM vendors, and operators who must all support the new algorithms.</p>
-  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Assuming a server-side upgrade suffices. If the eUICC or the GSMA trust chain cannot handle PQC certificate sizes and algorithms, profile provisioning simply fails.</p></div>
+  <p>To see why the eSIM is such a hard case, picture the constraints stacked together. The chip is deliberately tiny and cheap, with kilobytes &mdash; not megabytes &mdash; of room, so a multi-kilobyte ML-DSA signature is a real budget problem, not a rounding error. It is hardened against physical attack, so you cannot casually "just update it" in the field. Its trust chain reaches back through SIM vendors and the GSMA root, none of which any single operator controls. And the profiles it holds may live in a device for the better part of a decade. Any one of those factors would slow a migration; the eSIM has all four at once, which is why it is often the pacing item for telecom PQC rather than the flashy radio or core.</p>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>Upgrading the eSIM trust chain is like changing the locks on every safe-deposit box in a banking network where the vault doors were made by different companies, the boxes are welded shut, and the master key hierarchy is shared across the whole industry. You cannot just email a patch &mdash; everyone who touches the chain has to agree and re-tool.</p></div>
 </section>
 
 <section class="lesson" id="s4">
@@ -94,6 +115,33 @@
     </tbody>
   </table></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>For device fleets, the decision made at <em>manufacture</em> dominates. Build agility and PQC-capable verification into new hardware now, because you cannot retrofit an immutable verifier later.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Strategies for constrained devices</h2></div>
+  <p class="lead">When the chip cannot hold or run a full PQC scheme, you have more options than "give up."</p>
+  <p>The size and speed of ML-KEM/ML-DSA are fine on a phone but genuinely challenging on a kilobyte-scale secure element or an ultra-low-power sensor. A few patterns repeatedly solve this without abandoning security:</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Strategy</th><th>How it helps</th><th>Trade-off</th></tr></thead>
+    <tbody>
+      <tr><td>Pick the job-appropriate scheme</td><td>KEM verify/encaps and ML-DSA verify are cheap even when signing is not</td><td>Match the burden to what the device actually does (usually verify)</td></tr>
+      <tr><td>Verify-only on device</td><td>Devices only <em>check</em> signatures; heavy signing stays in the cloud</td><td>Requires the device role to be verification, not signing</td></tr>
+      <tr><td>Stateful hash signatures (LMS/XMSS)</td><td>Tiny public keys, ideal for firmware verification</td><td>Signer must manage state carefully (never reuse)</td></tr>
+      <tr><td>Terminate PQC at a gateway</td><td>A capable gateway does PQC to the internet; a lightweight link protects the last hop</td><td>Adds a trusted gateway to the model</td></tr>
+      <tr><td>Hardware acceleration / next-gen SE</td><td>New secure elements add PQC support and speed</td><td>A manufacturing-cycle dependency, not a field fix</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A smart meter cannot afford to <em>generate</em> ML-DSA signatures, but it only ever needs to <em>verify</em> firmware. ML-DSA verification is fast and its public key is manageable, so verify-only PQC fits comfortably &mdash; and for the firmware root, tiny-public-key LMS/XMSS is an even better match. The expensive signing all happens back in the vendor's HSM.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Assuming "too constrained for PQC" based on the <em>signing</em> cost. Most devices verify far more than they sign; verification is usually affordable, and the burden can be shifted to where the compute lives.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Coordinating the federation</h2></div>
+  <p class="lead">In a system no one owns end to end, the migration is a negotiation as much as an engineering task.</p>
+  <p>Because a mobile session spans five independently owned links, an operator's PQC plan is really a program of <em>alignment</em>: pushing requirements into standards (3GPP, GSMA), writing PQC and crypto-agility clauses into device, chip, and equipment contracts, tracking each roaming partner's roadmap, and staging changes so that no link is forced to fall back permanently. The technical work is real, but the pacing item is coordination.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>An operator wanting PQC-protected eSIM provisioning cannot ship it alone: the GSMA trust hierarchy, the eUICC vendors, and the provisioning-server (SM-DP+) vendors must all support the new algorithms and larger certificates first. The operator's most effective lever is often standards participation and procurement clauses &mdash; not code.</p></div>
+  <div class="callout tip"><span class="k">The operator's real toolkit</span><p>Notice how little of this is code. An operator's most powerful PQC levers are influence in standards bodies, precise PQC and crypto-agility requirements in supplier contracts, and disciplined tracking of every partner's roadmap. Engineering readiness matters, but in a federation the migration is won or lost on coordination.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>For federated systems, invest early in standards influence and contract language. Those, plus crypto-agility, let you move the instant your slowest partner is ready &mdash; and not a release later.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -121,6 +169,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> At design/manufacture: make the firmware verifier crypto-agile and PQC-capable (or dual-verify). You cannot fix an immutable verifier in the field, so the manufacturing decision dominates the device's whole life.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Verify-only sensor</h3>
+      <p class="scenario">A battery-powered sensor is "too weak for PQC," but it only checks firmware signatures &mdash; it never signs anything.</p>
+      <p class="decide">Is it really too weak, and what fits?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Probably not. Signing is the expensive operation; <em>verification</em> is comparatively cheap. ML-DSA verification is fast, and a tiny-public-key stateful hash scheme (LMS/XMSS) fits firmware verification very well. Keep the heavy signing in the vendor HSM and let the device only verify. "Too constrained" is usually a signing conclusion misapplied to a verify-only role.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Operator lever</h3>
+      <p class="scenario">An operator wants PQC-protected eSIM provisioning but its code is already ready.</p>
+      <p class="decide">Why can't they just ship it, and what is their most effective action?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> The GSMA trust hierarchy, eUICC vendors, and SM-DP+ provisioning servers must all support the new algorithms and larger certificates first &mdash; the operator owns only part of the chain. Their highest-leverage moves are standards participation (GSMA/3GPP) and PQC/agility clauses in procurement, which pull the rest of the federation forward.</p>
+    </article>
   </div>
 </section>
 
@@ -136,7 +198,10 @@
     {"q":"What 5G feature is a natural PQC candidate for subscriber privacy?","choices":["SUCI concealment of the subscriber identifier (public-key based)","The ringtone","The data cap"],"answer":0,"explain":"SUCI uses elliptic-curve public-key crypto to hide the identifier; harvested exchanges could later be de-concealed, motivating PQC."},
     {"q":"What makes IoT/field devices worst-case for PQC?","choices":["Constrained hardware + long life + hard-to-update verifiers","They are too powerful","They update every hour"],"answer":0,"explain":"Small compute, decade-long life, and immutable verifiers combine into the hardest migration profile."},
     {"q":"For a 12-year device, when is the dominant PQC decision made?","choices":["At design/manufacture (agile, PQC-capable verifier)","After it fails in the field","Never - it self-updates"],"answer":0,"explain":"You cannot retrofit an immutable verifier; manufacturing-time agility governs the device's entire life."},
-    {"q":"On a roaming session where one partner lacks PQC, what sets the security?","choices":["The weaker partner (fallback to common support)","The stronger partner","The device color"],"answer":0,"explain":"Interworking negotiates down to what both support, so the slowest partner paces the migration."}
+    {"q":"On a roaming session where one partner lacks PQC, what sets the security?","choices":["The weaker partner (fallback to common support)","The stronger partner","The device color"],"answer":0,"explain":"Interworking negotiates down to what both support, so the slowest partner paces the migration."},
+    {"q":"A device only VERIFIES signatures, never signs. Is it too constrained for PQC?","choices":["Usually no - verification is far cheaper than signing","Yes, all PQC is too heavy for any device","Only if it has a screen"],"answer":0,"explain":"Signing is the costly operation. Verification (ML-DSA, or tiny-key LMS/XMSS for firmware) is typically affordable, and heavy signing stays in the cloud/HSM."},
+    {"q":"What is an operator's most effective lever for telecom PQC?","choices":["Standards participation and procurement/contract clauses","Rewriting its own code faster","Changing the phone color"],"answer":0,"explain":"Because the chain spans many owners, alignment via standards (GSMA/3GPP) and contracts moves the federation more than any single implementation."},
+    {"q":"Why does a single weak link force the whole mobile chain to fall back?","choices":["A session spans five independently owned links that must all support PQC","The device reboots","Encryption is optional in 5G"],"answer":0,"explain":"Device, eUICC, RAN, core, and roaming partner are each owned separately; if any cannot do PQC, interworking negotiates down."}
   ]
   </script>
 </section>
@@ -156,7 +221,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through eSIM provisioning first to see the multi-party trust chain, then read how 5G/6G, SIM/eSIM, and IoT each add their own constraints.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

@@ -10,7 +10,7 @@
 <body data-module="PQC-001">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -19,9 +19,12 @@
   <div class="side-title">In this module</div>
   <a href="#explore"><span class="dot"></span>Try it: opening a bank site</a>
   <a href="#s1"><span class="dot"></span>1. What cryptography is for</a>
+  <a href="#s1b"><span class="dot"></span>&#9733; Beginners: you already use it</a>
   <a href="#s2"><span class="dot"></span>2. The four security jobs</a>
   <a href="#s3"><span class="dot"></span>3. Symmetric vs public-key</a>
   <a href="#s4"><span class="dot"></span>4. Certificates &amp; trust chains</a>
+  <a href="#s5"><span class="dot"></span>5. Where crypto lives in real systems</a>
+  <a href="#s6"><span class="dot"></span>6. Classical &rarr; post-quantum</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -31,7 +34,7 @@
 <section class="hero" id="start">
   <div class="hero-copy">
     <span class="chip">Start here</span>
-    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~20 min read</span><span class="level time">No background needed</span></div>
+    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~35 min read</span><span class="level time">No background needed</span></div>
     <h1>Security &amp; Cryptography Basics</h1>
     <p class="sub">Before we talk about "post-quantum" anything, let's answer a simpler question: what is cryptography actually doing for you every day, and why is only <em>part</em> of it at risk from quantum computers?</p>
     <ul class="outcomes">
@@ -76,7 +79,17 @@
     <span class="arrow">&rarr;</span>
     <div class="flow-step"><b>Protect</b><span>Data is encrypted only after trust is established.</span></div>
   </div>
+  <p>Notice the order in that flow. People assume encryption comes first, but you cannot safely encrypt anything until you know <em>who</em> you are encrypting it for. If you skip verification and jump straight to "protect," you might build a perfectly private, unbreakable channel &mdash; straight to an attacker. That is why authentication and key establishment run <b>before</b> the bulk encryption in every real protocol.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>You join open airport Wi-Fi and open your bank. Between your laptop and the bank sit the airport router, the ISP, and a dozen internet routers you have never heard of. Cryptography does not stop them from <em>carrying</em> your traffic &mdash; it makes what they carry useless to read, impossible to alter undetected, and provably from the real bank. The network stays untrusted; the data becomes safe anyway.</p></div>
+  <div class="callout warn"><span class="k">Why this is urgent, not academic</span><p>An attacker does not need to break your encryption <em>today</em>. They can record your encrypted traffic now, store it cheaply, and wait until a quantum computer can crack the key-exchange later. Anything that must stay secret for years is already exposed. You will meet this idea &mdash; "harvest now, decrypt later" &mdash; throughout the course.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Post-quantum cryptography is not a new kind of app. It is a replacement path for the specific cryptographic jobs that rely on math a quantum computer can break.</p></div>
+</section>
+
+<section class="lesson" id="s1b">
+  <div class="lesson-title"><span class="num">&#9733;</span><h2>A note for absolute beginners: you already use this</h2></div>
+  <p class="lead">Cryptography is not exotic. You rely on it dozens of times before breakfast, usually without noticing.</p>
+  <p>The little padlock in your browser's address bar? That is a full cryptographic handshake &mdash; identity check, key agreement, and encryption &mdash; happening in a fraction of a second. Tapping your card to pay, unlocking your phone with your face, opening a chat app, connecting to Wi-Fi, getting a software update that your device trusts enough to install: every one of those is cryptography quietly doing one of the jobs in this module. You do not need a maths background to understand it, because you already understand the <em>goals</em>. You want the payment to be from you, the update to be from the real vendor, and the message to stay between you and your friend. This course simply names those goals and shows the machinery behind them.</p>
+  <div class="callout tip"><span class="k">How to read this course</span><p>Whenever a term feels abstract, translate it back into one of those daily moments. "Authentication" is your phone recognizing your face; "integrity" is knowing a download was not tampered with; "confidentiality" is your ISP seeing noise instead of your chat. Keep that habit and the post-quantum material later will feel like an upgrade to familiar machinery, not a new subject.</p></div>
 </section>
 
 <section class="lesson" id="s2">
@@ -93,7 +106,9 @@
   </table></div>
   <p>A single product usually uses all four at once, in different amounts. A public software update does not need confidentiality (anyone may download it) but absolutely needs integrity and a signature. A medical record in the cloud needs confidentiality and integrity. A cell network needs authentication and key establishment.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>A firmware file may be downloadable by anyone with no secrecy at all. The device still refuses to install it unless a <b>signature</b> proves it came from the vendor and the bytes were not altered. That is authentication + integrity doing the work, not confidentiality.</p></div>
-  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Calling every cryptographic job "encryption." That vague habit hides which jobs actually need to be migrated for post-quantum.</p></div>
+  <p>These four jobs also map cleanly onto the <b>tools</b> that do them, which is the vocabulary you will use for the rest of the course. Confidentiality is delivered by <em>encryption</em> (symmetric ciphers like AES). Integrity is delivered by <em>hashes and MACs</em>. Authentication and non-repudiation are delivered by <em>key establishment</em> and <em>digital signatures</em>, which are the public-key tools. Keep that mapping in your head: it is the reason only <em>some</em> tools need replacing for the quantum era.</p>
+  <div class="callout tip"><span class="k">Rule of thumb</span><p>When you look at any system, ask: <em>which of the four jobs is this doing, and with which tool?</em> If the answer involves a signature or a key exchange, you have found a quantum-migration target. If it is "just AES encrypting a disk," you mostly need a big enough key.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Calling every cryptographic job "encryption." That vague habit hides which jobs actually need to be migrated for post-quantum. "We encrypt everything" tells you nothing about whether the system authenticates its peers or signs its updates &mdash; the parts quantum computers actually break.</p></div>
 </section>
 
 <section class="lesson" id="s3">
@@ -104,6 +119,33 @@
     <div class="callout"><span class="k" style="color:var(--primary-ink)">Public-key (asymmetric)</span><p>A <b>public key</b> anyone can see and a <b>private key</b> kept secret. Solves internet-scale trust: identifying strangers, agreeing on secrets in the open, and signatures. Examples: RSA, Diffie-Hellman, ECDH, ECDSA, EdDSA.</p></div>
   </div>
   <div class="callout analogy"><span class="k">Analogy</span><p>Symmetric encryption is a padlock where both people already have the same key. Public-key is a mailbox with a public slot anyone can drop mail into, but only the owner's private key can open it. Public-key is how you safely hand someone the padlock key in the first place.</p></div>
+  <figure class="figure">
+    <div class="fig-title">The two families &mdash; and how a quantum computer hits each</div>
+    <svg viewBox="0 0 660 250" role="img" aria-label="Diagram: symmetric cryptography is only mildly affected by Grover's algorithm, while public-key cryptography is broken by Shor's algorithm.">
+      <rect class="g-box-t" x="12" y="12" width="308" height="226" rx="14" stroke-width="2"/>
+      <text class="g-t" x="34" y="44" font-size="17">Symmetric</text>
+      <text class="g-tm" x="34" y="66" font-size="12.5">One shared secret &middot; very fast &middot; bulk data</text>
+      <rect class="g-box" x="34" y="86" width="78" height="52" rx="10" stroke-width="1.5"/><text class="g-tm" x="73" y="116" font-size="12" text-anchor="middle">You</text>
+      <rect class="g-box" x="220" y="86" width="78" height="52" rx="10" stroke-width="1.5"/><text class="g-tm" x="259" y="116" font-size="12" text-anchor="middle">Server</text>
+      <line class="g-line-p" x1="112" y1="112" x2="220" y2="112"/>
+      <circle cx="166" cy="112" r="15" fill="#0E766E"/><text x="166" y="117" font-size="14" text-anchor="middle" fill="#fff">&#128273;</text>
+      <text class="g-tm" x="166" y="150" font-size="11" text-anchor="middle">same key both sides</text>
+      <rect x="34" y="176" width="264" height="46" rx="10" fill="rgba(10,124,70,.14)" stroke="#0A7C46" stroke-width="1.5"/>
+      <text x="46" y="196" font-size="12.5" font-weight="800" fill="#0A7C46">Quantum impact: LOW (Grover)</text>
+      <text x="46" y="214" font-size="11.5" fill="#0A7C46">Just double the key size (AES-256) and the margin is back.</text>
+      <rect class="g-box-p" x="340" y="12" width="308" height="226" rx="14" stroke-width="2"/>
+      <text class="g-t" x="362" y="44" font-size="17">Public-key (asymmetric)</text>
+      <text class="g-tm" x="362" y="66" font-size="12.5">Public + private pair &middot; internet-scale trust</text>
+      <rect class="g-box" x="362" y="86" width="120" height="52" rx="10" stroke-width="1.5"/><text class="g-tm" x="422" y="110" font-size="12" text-anchor="middle">Public key</text><text class="g-tm" x="422" y="126" font-size="10.5" text-anchor="middle">shared openly</text>
+      <rect class="g-box" x="506" y="86" width="120" height="52" rx="10" stroke-width="1.5"/><text class="g-tm" x="566" y="110" font-size="12" text-anchor="middle">Private key</text><text class="g-tm" x="566" y="126" font-size="10.5" text-anchor="middle">kept secret</text>
+      <path class="g-line-p" d="M482 112 h24" marker-end="url(#a1)"/>
+      <rect x="362" y="176" width="264" height="46" rx="10" fill="rgba(180,35,24,.12)" stroke="#B42318" stroke-width="1.5"/>
+      <text x="374" y="196" font-size="12.5" font-weight="800" fill="#B42318">Quantum impact: HIGH (Shor)</text>
+      <text x="374" y="214" font-size="11.5" fill="#B42318">RSA / ECDH / ECDSA break outright &mdash; must be replaced.</text>
+      <defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>The whole post-quantum problem in one picture: symmetric cryptography survives with larger keys; public-key cryptography is the part that must be rebuilt.</figcaption>
+  </figure>
   <p>Here is the crucial part for this whole course: a capable quantum computer running <span class="term" data-def="A quantum algorithm that efficiently solves the integer-factoring and discrete-log problems that RSA, Diffie-Hellman, and elliptic-curve cryptography rely on.">Shor's algorithm</span> breaks the public-key family above. <span class="term" data-def="A quantum search algorithm giving a roughly square-root speedup; it weakens but does not collapse symmetric keys and hashes, which can be lengthened.">Grover's algorithm</span> only weakens symmetric keys and hashes, and you can restore the margin by using longer keys.</p>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Find the <b>public-key</b> uses first &mdash; key establishment and signatures. That is the main post-quantum migration target. PQC does <em>not</em> replace AES.</p></div>
 </section>
@@ -122,6 +164,8 @@
     <span class="arrow">&rarr;</span>
     <div class="flow-step"><b>Verifier</b><span>Browser / OS / device checks the whole chain.</span></div>
   </div>
+  <p>Your device ships with a built-in list of a few dozen <b>root</b> certificates it trusts absolutely &mdash; the "trust store." Everything else is trusted only because a chain of signatures leads back to one of those roots. This is what lets you connect securely to a website you have never visited: you do not trust the site directly, you trust the root that vouched for it. It is delegation of trust, signed at every step.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>When you see the padlock on <code class="inl">https://yourbank.com</code>, your browser has already checked three things without asking you: the leaf certificate's name matches the address bar, each signature in the chain is valid, and none of the certificates has expired or been revoked. If any check fails, you get the full-page red warning instead of the login form.</p></div>
   <details class="deep"><summary>Go deeper: why PQC makes certificates an ecosystem problem</summary>
     <div class="deep-body">
       <p>Post-quantum signatures introduce new algorithm identifiers and much larger keys and signatures. A classical ECDSA P-256 signature is ~64 bytes; an ML-DSA-65 signature is ~3,309 bytes &mdash; roughly 50&times; larger. That ripples outward:</p>
@@ -134,6 +178,53 @@
     </div>
   </details>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Upgrading only a leaf certificate while ignoring roots, intermediates, old clients, certificate-transparency logs, proxies, and automation. The weakest parser in the chain decides whether the connection works.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Where these jobs show up in systems you use</h2></div>
+  <p class="lead">The same four jobs appear, in different mixes, in almost everything digital you touch.</p>
+  <p>Beginners often think cryptography is a special feature of "secure" apps. In reality it is woven into ordinary systems &mdash; your browser, your office VPN, the app store, your laptop's disk, your Wi-Fi, your messenger. The value of learning the four jobs is that you can now look at <em>any</em> of these and predict which parts a quantum computer threatens. The matrix below does exactly that: green marks a job done by symmetric or hash tools (low quantum risk), red marks a job done by public-key tools (high quantum risk).</p>
+  <figure class="figure">
+    <div class="fig-title">Everyday systems &times; the crypto jobs inside them</div>
+    <svg viewBox="0 0 700 316" role="img" aria-label="Matrix showing which cryptographic jobs each everyday system uses, colored by quantum risk. Public-key jobs (authentication, signatures, key exchange) are high risk; symmetric and hash jobs (confidentiality, integrity) are low risk.">
+      <g class="g-tm" font-size="11.5" font-weight="800" text-anchor="middle">
+        <text x="212" y="30">Confid.</text><text x="316" y="30">Integrity</text><text x="420" y="30">Auth</text><text x="524" y="30">Signature</text><text x="628" y="30">Key exch.</text>
+      </g>
+      <g class="g-line" opacity=".5"><line x1="160" y1="40" x2="160" y2="304"/><line x1="264" y1="40" x2="264" y2="304"/><line x1="368" y1="40" x2="368" y2="304"/><line x1="472" y1="40" x2="472" y2="304"/><line x1="576" y1="40" x2="576" y2="304"/></g>
+      <g class="g-t" font-size="12.5" font-weight="700">
+        <text x="16" y="94">HTTPS website</text><text x="16" y="132">Corporate VPN</text><text x="16" y="170">Signed SW update</text><text x="16" y="208">Encrypted disk</text><text x="16" y="246">Wi-Fi (WPA3)</text><text x="16" y="284">Messaging app</text>
+      </g>
+      <g>
+        <circle cx="212" cy="90" r="7" fill="#0A7C46"/><circle cx="316" cy="90" r="7" fill="#0A7C46"/><circle cx="420" cy="90" r="7" fill="#B42318"/><circle cx="524" cy="90" r="7" fill="#B42318"/><circle cx="628" cy="90" r="7" fill="#B42318"/>
+        <circle cx="212" cy="128" r="7" fill="#0A7C46"/><circle cx="316" cy="128" r="7" fill="#0A7C46"/><circle cx="420" cy="128" r="7" fill="#B42318"/><circle cx="628" cy="128" r="7" fill="#B42318"/>
+        <circle cx="316" cy="166" r="7" fill="#0A7C46"/><circle cx="420" cy="166" r="7" fill="#B42318"/><circle cx="524" cy="166" r="7" fill="#B42318"/>
+        <circle cx="212" cy="204" r="7" fill="#0A7C46"/><circle cx="316" cy="204" r="7" fill="#0A7C46"/>
+        <circle cx="212" cy="242" r="7" fill="#0A7C46"/><circle cx="316" cy="242" r="7" fill="#0A7C46"/><circle cx="420" cy="242" r="7" fill="#B42318"/><circle cx="628" cy="242" r="7" fill="#B42318"/>
+        <circle cx="212" cy="280" r="7" fill="#0A7C46"/><circle cx="316" cy="280" r="7" fill="#0A7C46"/><circle cx="420" cy="280" r="7" fill="#B42318"/><circle cx="524" cy="280" r="7" fill="#B42318"/><circle cx="628" cy="280" r="7" fill="#B42318"/>
+      </g>
+      <g font-size="11" font-weight="700"><circle cx="180" cy="308" r="6" fill="#0A7C46"/><text class="g-tm" x="192" y="312">low quantum risk (symmetric / hash)</text><circle cx="430" cy="308" r="6" fill="#B42318"/><text class="g-tm" x="442" y="312">high quantum risk (public-key)</text></g>
+    </svg>
+    <figcaption>Read any row: the red dots are the parts of that system a quantum computer threatens. Almost every system keeps its green (symmetric) parts and only needs its red (public-key) parts rebuilt.</figcaption>
+  </figure>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>You do not migrate "a system" to post-quantum &mdash; you migrate the specific red cells inside it. That reframing is what turns an overwhelming task into a finite checklist.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>From classical to post-quantum: what actually changes</h2></div>
+  <p class="lead">Migration is two different actions: <b>replace</b> the broken public-key algorithms, and <b>resize</b> the symmetric ones.</p>
+  <p>This is the single most useful table in the whole course for a beginner. On the left are the classical algorithms you will find in almost any system built before ~2024. On the right is what they become in a post-quantum world. Notice that only the public-key rows change <em>algorithm</em>; the symmetric and hash rows keep the same algorithm and just grow.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Job</th><th>Classical tool (today)</th><th>Post-quantum path</th><th>Change type</th></tr></thead>
+    <tbody>
+      <tr><td><b>Key establishment</b></td><td>RSA, Diffie-Hellman, ECDH</td><td><code class="inl">ML-KEM</code> (FIPS 203), usually hybrid with ECDH</td><td class="risk-cell" style="color:var(--red)">Replace</td></tr>
+      <tr><td><b>Digital signatures</b></td><td>RSA, ECDSA, EdDSA</td><td><code class="inl">ML-DSA</code> (FIPS 204), <code class="inl">SLH-DSA</code> (FIPS 205), FN-DSA</td><td class="risk-cell" style="color:var(--red)">Replace</td></tr>
+      <tr><td><b>Bulk encryption</b></td><td>AES-128</td><td>AES-256 (same algorithm, bigger key)</td><td style="color:var(--green);font-weight:800">Resize</td></tr>
+      <tr><td><b>Hashing / integrity</b></td><td>SHA-256</td><td>SHA-384 / SHA-512 (longer output)</td><td style="color:var(--green);font-weight:800">Resize</td></tr>
+    </tbody>
+  </table></div>
+  <p>Why the asymmetry? A quantum computer running <b>Shor's algorithm</b> solves the exact math problem (factoring, discrete logs) that RSA and elliptic-curve crypto rely on, so those are broken no matter how big you make the key &mdash; they must be replaced with entirely different math. But <b>Grover's algorithm</b> only gives a square-root speedup against symmetric keys and hashes, which you neutralize simply by doubling the size. Replacing is hard and disruptive; resizing is mostly a configuration change.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>A TLS 1.3 connection today might use <code class="inl">ECDHE</code> for key exchange, <code class="inl">ECDSA</code> for the certificate, and <code class="inl">AES-128-GCM</code> for data. The post-quantum version keeps AES (bumped to 256), but swaps ECDHE for hybrid <code class="inl">X25519+ML-KEM-768</code> and the ECDSA certificate for <code class="inl">ML-DSA</code>. Same connection, two algorithms replaced, one resized.</p></div>
+  <div class="callout tip"><span class="k">You now have the whole map</span><p>Every later module &mdash; standards, protocols, implementation, migration &mdash; is just this table applied in detail to real systems. If you understand "replace the public-key parts, resize the symmetric parts," you understand post-quantum cryptography at a strategic level.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -161,6 +252,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Yes. A long confidentiality lifetime means an attacker who copies the ciphertext today could decrypt it years later once quantum capability exists &mdash; while it still matters. This is exactly the case PQC-101 explores.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Wi-Fi at a coffee shop</h3>
+      <p class="scenario">You join open Wi-Fi with no password and browse an HTTPS site.</p>
+      <p class="decide">The Wi-Fi is "open" &mdash; is your bank session exposed to everyone on the network?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> No. Open Wi-Fi means the <em>network</em> link is unauthenticated and unencrypted, but HTTPS establishes its own authenticated, encrypted channel end-to-end. Others see that you contacted the bank, but not your credentials or balance. The four jobs happen at the HTTPS layer, independent of the Wi-Fi. (This is also why a fake certificate warning on open Wi-Fi should never be clicked through.)</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Name the tool</h3>
+      <p class="scenario">A system "signs each log entry so tampering is detectable and the author is provable."</p>
+      <p class="decide">Which cryptographic jobs and tools are in play, and which are quantum-vulnerable?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Integrity (detect tampering) via a hash, plus non-repudiation/authentication via a <b>digital signature</b>. The signature is public-key, so it is the quantum-vulnerable part and a migration target (to ML-DSA or SLH-DSA). The hash only needs adequate length.</p>
+    </article>
   </div>
 </section>
 
@@ -176,7 +281,10 @@
     {"q":"What is the main target of a post-quantum migration?","choices":["Public-key key establishment and signatures","Every image file","All user passwords"],"answer":0,"explain":"Shor's algorithm breaks classical public-key math (key exchange and signatures). Symmetric encryption and hashes are affected far less."},
     {"q":"Why is an encrypted session to an impostor still unsafe?","choices":["Authentication failed, so you have a private line to the wrong party","Encryption is too fast","The page is too long"],"answer":0,"explain":"Confidentiality without authentication just means you are secretly talking to an attacker. Trust must come first."},
     {"q":"Which pair is affected LEAST by quantum computers?","choices":["AES-256 and SHA-384","RSA and ECDH","ECDSA and EdDSA"],"answer":0,"explain":"Symmetric encryption (AES) and hashes (SHA) only need larger sizes to keep their margin. RSA, ECDH, ECDSA, EdDSA are public-key and are the real problem."},
-    {"q":"You upgrade a website's leaf certificate to a PQC signature but nothing else. What is the risk?","choices":["Old clients or middleboxes may fail to parse the new, larger certificate","The website loads faster","Passwords become unnecessary"],"answer":0,"explain":"PKI is an ecosystem. Roots, intermediates, clients, logs, and proxies all must understand the new identifiers and sizes."}
+    {"q":"You upgrade a website's leaf certificate to a PQC signature but nothing else. What is the risk?","choices":["Old clients or middleboxes may fail to parse the new, larger certificate","The website loads faster","Passwords become unnecessary"],"answer":0,"explain":"PKI is an ecosystem. Roots, intermediates, clients, logs, and proxies all must understand the new identifiers and sizes."},
+    {"q":"In post-quantum migration, what happens to AES?","choices":["It stays, usually moving to a 256-bit key (resize, not replace)","It is deleted entirely","It is replaced by ML-KEM"],"answer":0,"explain":"AES is symmetric. Grover only gives a square-root speedup, so AES-256 keeps a strong margin. ML-KEM replaces key exchange, not bulk encryption."},
+    {"q":"Why must authentication happen before bulk encryption in a connection?","choices":["Otherwise you might build a private channel to an impostor","Encryption is slower than authentication","Certificates cannot be compressed"],"answer":0,"explain":"Confidentiality without authentication just means you are secretly talking to the wrong party. Trust must be established first."},
+    {"q":"In the systems matrix, why are 'confidentiality' and 'integrity' marked low quantum risk?","choices":["They are done by symmetric ciphers and hashes, which only need larger sizes","They are never used in practice","Quantum computers cannot read encrypted data at all"],"answer":0,"explain":"Those jobs use symmetric/hash tools affected only by Grover's square-root speedup, fixed by doubling sizes. The public-key jobs (auth, signature, key exchange) are the ones Shor breaks."}
   ]
   </script>
 </section>
@@ -197,7 +305,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Work top to bottom: try the interactive walkthrough, read each numbered lesson, open the "Go deeper" panels if you want more detail, do the labs, then take the quiz.</p>
   <p>Unfamiliar word? Most key terms link to the <a href="glossary.html">Glossary</a>. Use the side navigation to jump around, and the Top button to return here.</p>

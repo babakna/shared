@@ -10,7 +10,7 @@
 <body data-module="PQC-101">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-101</span><span>Why Quantum Changes the Threat Model</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-101</span><span>Why Quantum Changes the Threat Model</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. Shor vs Grover</a>
   <a href="#s3"><span class="dot"></span>3. Harvest now, decrypt later</a>
   <a href="#s4"><span class="dot"></span>4. Practical risk triage</a>
+  <a href="#s5"><span class="dot"></span>5. Mosca's inequality</a>
+  <a href="#s6"><span class="dot"></span>6. Communicating the risk</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -31,7 +33,7 @@
 <section class="hero" id="start">
   <div class="hero-copy">
     <span class="chip">The threat</span>
-    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~25 min read</span><span class="level time">Interactive</span></div>
+    <div class="meta"><span class="level beginner">Beginner</span><span class="level time">~30 min read</span><span class="level time">Interactive</span></div>
     <h1>Why Quantum Computing Changes the Threat Model</h1>
     <p class="sub">The risk is not "encryption dies overnight." It is a specific, uneven threat with a timing twist that makes waiting dangerous. This module makes the logic concrete &mdash; and lets you compute the urgency yourself.</p>
     <ul class="outcomes">
@@ -63,6 +65,9 @@
   <div class="lesson-title"><span class="num">1</span><h2>What a "cryptographically relevant quantum computer" means</h2></div>
   <p class="lead">Not any quantum computer &mdash; a big, reliable, error-corrected one able to break deployed public-key crypto in practical time.</p>
   <p>The exact arrival date (often called <span class="term" data-def="The hypothetical day a cryptographically relevant quantum computer becomes available to break classical public-key cryptography.">Q-day</span>) is genuinely uncertain, and credible estimates span a wide range. Security planning does not require a precise date. It requires reasoning under uncertainty: if the consequence is severe and the fix takes years, waiting for certainty is not responsible.</p>
+  <p>Two words in that definition carry all the weight: <b>error-corrected</b> and <b>practical time</b>. A machine that can run Shor once, slowly, on a toy number is a scientific milestone but not a threat. A "cryptographically relevant" machine can run Shor against a real 2048-bit key and finish before the answer stops mattering. The distance between those two is measured in orders of magnitude of reliable, error-corrected qubits &mdash; which is exactly why credible arrival estimates range from roughly a decade to "much longer," and why no honest expert gives you a single confident date.</p>
+  <div class="callout example"><span class="k">Why the uncertainty is not an excuse to wait</span><p>Imagine a fire that <em>might</em> reach your building in 10 to 30 years, and evacuating everything takes 8. You would not wait for the smoke. You would start moving the irreplaceable items now. Cryptographic migration works the same way: the fix is slow, so the trigger to act is the <em>combination</em> of consequence and lead time, not a confirmed date.</p></div>
+  <p>It helps to separate three things people constantly blur together: <b>a quantum computer exists</b>, <b>a quantum computer is cryptographically relevant</b>, and <b>a quantum computer is in the hands of an adversary targeting you</b>. Today we have the first (small, noisy machines). The second is the milestone this module cares about. The third is a further step that may lag the second by years for most organizations &mdash; but for the highest-value targets, you should assume a capable nation-state is first in line. Your risk tier decides which of these thresholds you plan against.</p>
   <div class="callout takeaway"><span class="k">Reframe the question</span><p>Don't ask "Is Q-day tomorrow?" Ask "Which of my data and trust systems would still matter by the time my migration is finished?" That question you can answer today.</p></div>
 </section>
 
@@ -73,6 +78,7 @@
     <div class="callout pitfall"><span class="k">Shor &rarr; public-key collapses</span><p>Breaks RSA, finite-field Diffie-Hellman, ECDH, ECDSA, and EdDSA by efficiently solving factoring and discrete logs. These do not survive a CRQC. They must be <b>replaced or hybridized</b>.</p></div>
     <div class="callout tip"><span class="k">Grover &rarr; margins shrink</span><p>Gives a square-root speedup for brute-force search. Symmetric keys and hashes lose roughly half their effective bits. AES-256 and SHA-384/512-class outputs keep strong margins.</p></div>
   </div>
+  <p>Keep the contrast sharp, because it drives your whole strategy: Shor is a <em>structural</em> attack that dismantles specific public-key math, so those algorithms are finished and must be replaced; Grover is a <em>brute-force</em> speedup that just halves your effective symmetric strength, so you compensate simply by doubling key sizes (AES-128 &rarr; AES-256). One demands new algorithms; the other demands bigger numbers you already have. That is why "quantum breaks encryption" is a misleading headline &mdash; it breaks one family and mildly dents the other.</p>
   <div class="pqc-bars" data-title="Effective security against a large quantum computer (illustrative)" data-unit="Higher bar = harder to break. Classical schemes on top are broken by Shor.">
     <script type="application/json" class="data">
     [
@@ -101,6 +107,8 @@
     <div class="flow-step"><b>Impact</b><span>Decrypts anything still sensitive.</span></div>
   </div>
   <div class="callout example"><span class="k">Concrete example</span><p>Encrypted traffic carrying merger documents or 25-year medical records is captured today. If the key exchange is broken in 12 years and those documents still matter, the breach is real &mdash; even though nothing looked wrong at capture time.</p></div>
+  <p>Not all data is worth harvesting. A well-resourced adversary chooses targets by <em>value &times; lifetime</em>: they store what will still be damaging years from now. That is why some data types are classic harvest targets and others are not. State secrets, intelligence, and diplomatic cables (secret for decades); genomic and medical records (secret for a lifetime); trade secrets, source code, and unreleased designs; long-term financial and legal records; and the master keys that protect all of the above. By contrast, a one-day-old news feed, a public price list, or an already-published document has essentially zero harvest value.</p>
+  <div class="callout tip"><span class="k">The uncomfortable part</span><p>You cannot detect harvesting. Copying encrypted traffic leaves no trace on your systems, and the attacker never has to touch your servers. There is no alert, no log, no breach notification &mdash; which is exactly why the defense has to be proactive migration rather than detection.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Ranking risk only by "is it internet-facing?" Long-lived internal secrets can outrank a public marketing site.</p></div>
 </section>
 
@@ -119,6 +127,48 @@
   </table></div>
   <p>High-priority areas usually include external TLS, VPN, SSH, identity systems, code and firmware signing, certificate authorities, HSM/KMS dependencies, long-lived encrypted archives, and slow-to-update vendor products. Low-priority does not mean "ignore" &mdash; it means inventory, monitor, and migrate on the normal refresh cycle.</p>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Prioritization prevents both panic and neglect. Some systems need urgent architecture review; others just need to be tracked.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Mosca's inequality: the one formula that decides urgency</h2></div>
+  <p class="lead">Three numbers tell you whether you are already behind &mdash; no crystal ball required.</p>
+  <p>Cryptographer Michele Mosca framed the whole timing problem as a simple comparison. Let <b>X</b> be how long your data must stay secure, <b>Y</b> be how long your migration will take, and <b>Z</b> be the time until a cryptographically relevant quantum computer arrives. The uncomfortable rule is: if <b>X + Y &gt; Z</b>, you have a problem <em>right now</em>, because data protected today will still matter when it becomes decryptable.</p>
+  <figure class="figure">
+    <div class="fig-title">Mosca's inequality &mdash; X + Y vs Z</div>
+    <svg viewBox="0 0 680 210" role="img" aria-label="Timeline showing migration time Y plus data lifetime X extending past the estimated arrival of a quantum computer Z, leaving an exposure gap.">
+      <line class="g-line" x1="60" y1="18" x2="60" y2="192" stroke-dasharray="4 4"/>
+      <text class="g-tm" x="60" y="14" font-size="11" text-anchor="middle" font-weight="800">now</text>
+      <rect x="60" y="40" width="120" height="34" rx="6" fill="#1657A0"/><text x="120" y="62" font-size="12" text-anchor="middle" fill="#fff" font-weight="800">Migrate (Y=5y)</text>
+      <rect x="180" y="40" width="480" height="34" rx="6" fill="#0E766E"/><text x="360" y="62" font-size="12" text-anchor="middle" fill="#fff" font-weight="800">Data must stay secret (X=20y)</text>
+      <rect x="348" y="40" width="312" height="34" rx="6" fill="#B42318" opacity=".38"/>
+      <rect x="60" y="104" width="288" height="34" rx="6" fill="#7C8AA0"/><text x="204" y="126" font-size="12" text-anchor="middle" fill="#fff" font-weight="800">Time to Q-day (Z=12y)</text>
+      <line class="g-line-p" x1="348" y1="30" x2="348" y2="150" stroke-dasharray="5 4" stroke="#B42318"/>
+      <text x="348" y="26" font-size="11" text-anchor="middle" font-weight="800" fill="#B42318">Q-day</text>
+      <text x="504" y="94" font-size="12" text-anchor="middle" font-weight="800" fill="#B42318">exposure gap &asymp; 13 years</text>
+      <text class="g-t" x="60" y="176" font-size="13" font-weight="800">X + Y = 25  &gt;  Z = 12  &rarr; act now</text>
+    </svg>
+    <figcaption>With these example numbers, anything you encrypt today is exposed for roughly 13 years after Q-day while it still matters. The only levers you control are Y (migrate faster) and X (shorten data lifetime) &mdash; Z is not up to you.</figcaption>
+  </figure>
+  <p>This is exactly what the calculator at the top of the module computes. Notice which levers you actually control: you cannot move Q-day (Z), but you <em>can</em> shrink your migration time (Y) by starting early and building crypto-agility, and you can sometimes shorten data lifetime (X) by re-encrypting or rotating. Every month you delay adds directly to the exposure gap.</p>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Assuming a comfortable Z ("quantum is 20 years away, relax"). Even a generous Z can be smaller than X + Y for long-lived data in a large organization &mdash; and Z estimates have only ever gotten shorter, never longer.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Communicating the risk without causing panic</h2></div>
+  <p class="lead">Half of this job is saying the right thing to executives, auditors, and engineers.</p>
+  <p>The quantum threat is unusually easy to communicate badly. Say too little and nobody funds the multi-year program; say too much and you trigger a "rip everything out now" panic that wastes money on low-risk systems. The fix is a precise, proportionate message tuned to the audience.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Say this</th><th>Not this</th></tr></thead>
+    <tbody>
+      <tr><td>"Public-key crypto (key exchange and signatures) must be replaced over the next several years."</td><td>"Quantum computers will break all our encryption overnight."</td></tr>
+      <tr><td>"Symmetric encryption and hashes mostly just need larger sizes."</td><td>"Everything cryptographic is equally doomed."</td></tr>
+      <tr><td>"Long-lived, exposed data is at risk <em>today</em> via harvest-now-decrypt-later."</td><td>"There's no risk until Q-day arrives."</td></tr>
+      <tr><td>"We prioritize by data lifetime, exposure, and migration difficulty."</td><td>"We'll migrate everything at once, alphabetically."</td></tr>
+      <tr><td>"This is a multi-year, agility-building program &mdash; start now, move steadily."</td><td>"One project, done next quarter."</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout tip"><span class="k">Executive one-liner</span><p>"A future quantum computer will break the public-key cryptography that secures our identities, connections, and signatures. The fix takes years and some of our data is already being harvested for later decryption, so we are starting a prioritized, multi-year migration now." That single sentence funds the program without causing panic.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Accuracy is the antidote to both complacency and hysteria. Name the specific threat, the specific fix, and the specific priority order &mdash; every time.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -146,6 +196,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Track it. Nothing is secret and nothing is long-lived, so harvest-now-decrypt-later does not apply. Migrate it on the normal refresh cycle behind higher-risk systems.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Apply Mosca's inequality</h3>
+      <p class="scenario">A system's data must stay secret for 15 years (X), migration will take 6 years (Y), and your planning estimate for Q-day is 10 years (Z).</p>
+      <p class="decide">Do you have a problem today?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Yes. X + Y = 21, which is greater than Z = 10, so data encrypted today would be exposed for about 11 years after Q-day while still sensitive. You are already behind and should start immediately &mdash; and note that even doubling your Q-day estimate to 20 still leaves X + Y &gt; Z.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Brief the board</h3>
+      <p class="scenario">An executive reads a headline and asks: "Should we panic and replace all our encryption this quarter?"</p>
+      <p class="decide">What is the accurate, calming, funded answer?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> "No panic, but yes action. The threat is specific: public-key key exchange and signatures must be replaced over several years; symmetric encryption mostly needs larger keys. Some long-lived data is already at risk from harvest-now-decrypt-later, so we are starting a prioritized, multi-year migration now &mdash; not a one-quarter rip-and-replace."</p>
+    </article>
   </div>
 </section>
 
@@ -161,7 +225,10 @@
     {"q":"What makes a system HIGH priority for migration?","choices":["Long data lifetime, real exposure, and vulnerable public-key use","The prettiest UI","The smallest file size"],"answer":0,"explain":"Priority combines how long data must stay secret, whether it can be captured, and how much it relies on breakable public-key crypto."},
     {"q":"Does running PQC require you to own a quantum computer?","choices":["No - PQC algorithms run on normal computers","Yes","Only on weekends"],"answer":0,"explain":"Post-quantum algorithms are classical software; they are designed to resist quantum attacks, not to require quantum hardware."},
     {"q":"If data lifetime is 20 years and a CRQC is estimated in 12, what does the calculator conclude?","choices":["Harvest-now risk - about 8 years of exposure while it still matters","No risk at all","It depends on the font"],"answer":0,"explain":"Lifetime (20) minus time-to-quantum (12) = 8 years where captured data could be decrypted while still sensitive."},
-    {"q":"What is the correct message to stakeholders?","choices":["Replace classical public-key; review symmetric/hash sizes","All encryption dies at once","Nothing needs to change ever"],"answer":0,"explain":"The threat is uneven: public-key must be replaced/hybridized; symmetric and hashes mainly need adequate sizes."}
+    {"q":"What is the correct message to stakeholders?","choices":["Replace classical public-key; review symmetric/hash sizes","All encryption dies at once","Nothing needs to change ever"],"answer":0,"explain":"The threat is uneven: public-key must be replaced/hybridized; symmetric and hashes mainly need adequate sizes."},
+    {"q":"Mosca's inequality says you have a problem now when...","choices":["X (data lifetime) + Y (migration time) > Z (time to Q-day)","Z > X + Y","You own a quantum computer"],"answer":0,"explain":"If data lifetime plus migration time exceeds time-to-quantum, data encrypted today is still sensitive when it becomes decryptable."},
+    {"q":"Which levers in Mosca's inequality can you actually control?","choices":["Y (migrate faster) and sometimes X (shorten data lifetime)","Z (move Q-day)","None of them"],"answer":0,"explain":"You cannot change when quantum arrives (Z), but starting early shrinks migration time Y, and re-encryption/rotation can shorten data lifetime X."},
+    {"q":"A generous Q-day estimate of 20 years means you can safely wait. True?","choices":["Not necessarily - X + Y can still exceed 20 for long-lived data","Yes, always safe","Only if data is public"],"answer":0,"explain":"For long-lived data in a large org, data lifetime plus multi-year migration can exceed even a 20-year Z, so waiting is still risky."}
   ]
   </script>
 </section>
@@ -180,7 +247,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Play with the risk calculator using real numbers from a system you know. Then read the lessons to understand why the calculator works the way it does.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

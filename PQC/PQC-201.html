@@ -10,7 +10,7 @@
 <body data-module="PQC-201">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. KEMs: how ML-KEM works</a>
   <a href="#s3"><span class="dot"></span>3. Signatures: ML-DSA, SLH-DSA</a>
   <a href="#s4"><span class="dot"></span>4. Hybrid &amp; algorithm agility</a>
+  <a href="#s5"><span class="dot"></span>5. Parameter sets &amp; security levels</a>
+  <a href="#s6"><span class="dot"></span>6. Why lattices, hashes, codes?</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -83,14 +85,18 @@
       <tr><td>Draft (FN-DSA)</td><td>Falcon</td><td>Compact signatures</td><td>NTRU lattices</td></tr>
     </tbody>
   </table></div>
+  <p>These did not appear overnight. NIST ran an open, global competition: a public call in 2016, dozens of submissions from teams worldwide, several rounds of public cryptanalysis where researchers openly tried to break each other's designs, draft selections in 2022, and the finalized FIPS 203/204/205 in August 2024. That decade of adversarial peer review is exactly why you should trust these standards over any proprietary alternative &mdash; and why "roll your own PQC" is an even worse idea than rolling your own classical crypto.</p>
   <p>A standards-aligned plan starts by naming the job (key exchange? signature?), then picks the family, then the parameter set. HQC was selected in 2025 as a <b>backup</b> KEM built on different (code-based) math, so a future weakness in lattices would not take down everything. FN-DSA (Falcon) is still being finalized; track its status before committing.</p>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Saying "we use PQC" with no specifics. Always state algorithm, parameter set, job, protocol, and implementation &mdash; otherwise the claim is unverifiable.</p></div>
+  <div class="callout example"><span class="k">Why two names for the same thing?</span><p>You will see "Kyber" and "ML-KEM," or "Dilithium" and "ML-DSA," used almost interchangeably &mdash; and it trips up newcomers constantly. The romantic names (Kyber, Dilithium, SPHINCS+, Falcon) are what the research teams called their <em>submissions</em>. Once NIST standardized them it gave them formal, boring names: ML-KEM, ML-DSA, SLH-DSA, FN-DSA. They are the same core designs, but the standardized versions have finalized parameters and encodings. Rule of thumb: in a specification or product, use and expect the <b>ML-/SLH-/FN-</b> names; if something still says "Kyber," ask whether it is the final standard or a pre-standard build.</p></div>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>Think of "job first, then family, then parameter set" like buying a vehicle. First decide the job (haul cargo vs. commute), then the family (truck vs. sedan), then the trim level (engine size, options). Nobody sensibly starts by arguing about trim levels before knowing whether they need a truck &mdash; yet teams routinely argue about PQC parameter sets before agreeing on what job the cryptography is even doing.</p></div>
 </section>
 
 <section class="lesson" id="s2">
   <div class="lesson-title"><span class="num">2</span><h2>KEMs: how ML-KEM is actually used</h2></div>
   <p class="lead">A KEM does not "encrypt your data." It agrees on a shared secret; symmetric crypto does the rest.</p>
   <p>A <span class="term" data-def="Key Encapsulation Mechanism: the recipient publishes a public key; a sender uses it to produce a ciphertext plus a shared secret; the recipient decapsulates to recover the same secret.">KEM</span> has three moves: the recipient publishes a public key; the sender <b>encapsulates</b> (produces a ciphertext + a shared secret); the recipient <b>decapsulates</b> (recovers the same shared secret). That secret then feeds authenticated symmetric encryption like AES-GCM.</p>
+  <div class="callout example"><span class="k">Everyday analogy</span><p>A KEM is like mailing someone an open padlock (your public key) that only you can unlock. They snap a random secret inside a box, click your padlock shut, and ship it back. Anyone watching the box in transit cannot open it; only you, with the private key, can. The "secret in the box" then becomes the shared key both sides use with fast symmetric encryption. Notice the KEM never <em>sent</em> your data &mdash; it only agreed on a key.</p></div>
   <div class="flow">
     <div class="flow-step"><b>KeyGen</b><span>Recipient publishes an ML-KEM public key.</span></div>
     <span class="arrow">&rarr;</span>
@@ -100,6 +106,22 @@
     <span class="arrow">&rarr;</span>
     <div class="flow-step"><b>Derive keys</b><span>Both sides run AES-GCM etc.</span></div>
   </div>
+  <figure class="figure">
+    <div class="fig-title">ML-KEM-768 on the wire &mdash; who sends what, and how big</div>
+    <svg viewBox="0 0 680 210" role="img" aria-label="ML-KEM message flow: the recipient sends a 1184-byte public key; the sender returns a 1088-byte ciphertext; both independently derive the same 32-byte shared secret.">
+      <rect class="g-box-t" x="20" y="70" width="150" height="70" rx="12" stroke-width="2"/><text class="g-t" x="95" y="100" font-size="14" text-anchor="middle" font-weight="800">Recipient</text><text class="g-tm" x="95" y="120" font-size="11" text-anchor="middle">has key pair</text>
+      <rect class="g-box-p" x="510" y="70" width="150" height="70" rx="12" stroke-width="2"/><text class="g-t" x="585" y="100" font-size="14" text-anchor="middle" font-weight="800">Sender</text><text class="g-tm" x="585" y="120" font-size="11" text-anchor="middle">wants shared key</text>
+      <line class="g-line-p" x1="170" y1="92" x2="510" y2="92" marker-end="url(#k1)"/>
+      <text class="g-t" x="340" y="84" font-size="12" text-anchor="middle" font-weight="800">public key &mdash; 1,184 B</text>
+      <line class="g-line-p" x1="510" y1="122" x2="170" y2="122" marker-end="url(#k1)"/>
+      <text class="g-t" x="340" y="140" font-size="12" text-anchor="middle" font-weight="800">ciphertext &mdash; 1,088 B</text>
+      <rect x="20" y="160" width="150" height="34" rx="8" fill="rgba(10,124,70,.14)" stroke="#0A7C46" stroke-width="1.5"/><text x="95" y="182" font-size="11.5" text-anchor="middle" font-weight="800" fill="#0A7C46">secret: 32 B</text>
+      <rect x="510" y="160" width="150" height="34" rx="8" fill="rgba(10,124,70,.14)" stroke="#0A7C46" stroke-width="1.5"/><text x="585" y="182" font-size="11.5" text-anchor="middle" font-weight="800" fill="#0A7C46">same secret: 32 B</text>
+      <text class="g-tm" x="340" y="184" font-size="11" text-anchor="middle">both derive the identical 32-byte secret</text>
+      <defs><marker id="k1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+    </svg>
+    <figcaption>Compare with classical X25519, where each side sends a 32-byte value. ML-KEM's ~1&nbsp;KB messages are the "size tax" that ripples into handshakes, packets, and storage &mdash; but the resulting secret is the same tiny 32 bytes.</figcaption>
+  </figure>
   <div class="callout example"><span class="k">Concrete example</span><p>ML-KEM-768 (a common choice) has a 1,184-byte public key and a 1,088-byte ciphertext. A TLS server offers the key; the client encapsulates; both derive session keys. The data stream is then protected by ordinary symmetric encryption.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Trying to "ML-KEM-encrypt" a large blob directly, or stuffing KEM public keys and ciphertexts into old fixed-size fields without checking the new sizes.</p></div>
 </section>
@@ -113,6 +135,8 @@
   </div>
   <p>Signature choice depends on verifier constraints, artifact lifetime, signature size, verification speed, validation requirements, and ecosystem support. FN-DSA/Falcon is attractive where signatures must be <em>small</em>, but its floating-point signing is tricky to implement safely.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>A high-volume package repository may prefer ML-DSA (small enough, fast verify). A firmware root of trust that must be trusted for 15 years may choose SLH-DSA precisely because its security rests on a different, well-understood assumption.</p></div>
+  <p>There is one more signature category worth knowing for firmware and boot use: <b>stateful hash-based signatures</b> &mdash; LMS and XMSS, standardized in NIST SP 800-208. They are extremely conservative (hash-only) and have tiny public keys, but they carry a sharp edge: the signer must never reuse a one-time state, or security collapses. That makes them excellent for a carefully controlled, low-volume signer (like a firmware signing appliance) and dangerous for a general-purpose service. SLH-DSA is the <em>stateless</em> hash-based option precisely to avoid that footgun at the cost of larger signatures.</p>
+  <div class="callout warn"><span class="k">Verification is the real cost center</span><p>An artifact is signed once but verified thousands or millions of times. So the metric that matters at scale is verification speed and signature size on the <em>verifier</em>, not signing convenience. ML-DSA verifies fast; SLH-DSA's large signatures cost bandwidth and storage everywhere they travel. Choose for the verifier's world, not the signer's.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Choosing a signature by signer convenience. Verification &mdash; count, speed, and size limits &mdash; is where the long-term compatibility pain shows up.</p></div>
 </section>
 
@@ -123,6 +147,56 @@
   <div class="callout example"><span class="k">Concrete example</span><p>A company pilots hybrid TLS on internal APIs, measures handshake failure rates, then expands only after load balancers and clients prove compatible. Agility is what lets them later add a backup KEM without touching every service.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Inventing a custom hybrid "combiner" in application code. Combination must be protocol-defined and cryptographically reviewed (transcript binding, downgrade protection, error handling).</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Hybrid reduces transition risk only when protocol rigor is preserved. Agility is the design goal that outlives any single algorithm choice.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Parameter sets and security levels</h2></div>
+  <p class="lead">Each algorithm ships in a few "sizes." NIST labels them by how hard they are to break.</p>
+  <p>You do not just pick "ML-KEM" &mdash; you pick a <b>parameter set</b>, which fixes the security level and therefore the key/signature sizes. NIST defines target categories tied to breaking a well-known symmetric primitive: roughly, <b>Level 1</b> &asymp; brute-forcing AES-128, <b>Level 3</b> &asymp; AES-192, and <b>Level 5</b> &asymp; AES-256. Higher level means more security margin and bigger, slower material. Most deployments today standardize on the middle option (Level 3) as a balanced default, matching CNSA 2.0-style guidance that leans toward the higher levels for national-security use.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>NIST level</th><th>Comparable to</th><th>KEM</th><th>Signature (lattice)</th><th>Typical use</th></tr></thead>
+    <tbody>
+      <tr><td>Level 1</td><td>AES-128</td><td>ML-KEM-512</td><td>ML-DSA-44</td><td>Constrained / low-margin</td></tr>
+      <tr><td><b>Level 3</b></td><td>AES-192</td><td><b>ML-KEM-768</b></td><td><b>ML-DSA-65</b></td><td><b>Balanced default</b></td></tr>
+      <tr><td>Level 5</td><td>AES-256</td><td>ML-KEM-1024</td><td>ML-DSA-87</td><td>Highest assurance / long-lived</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A public web service picks ML-KEM-768 (Level 3) to balance size and margin. A national-security system or a 20-year root of trust may step up to ML-KEM-1024 / ML-DSA-87 (Level 5), accepting the larger payloads because the data must outlive several hardware generations.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Mixing levels inconsistently across a system &mdash; e.g. a Level 5 signature protecting a Level 1 key exchange. Match the level to the weakest link and the data's real lifetime, and document the choice.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Why lattices, hashes, and codes? The math families</h2></div>
+  <p class="lead">Post-quantum security comes from hard problems that even a quantum computer cannot shortcut.</p>
+  <p>Classical public-key crypto rests on factoring and discrete logs &mdash; both of which Shor solves. Post-quantum algorithms deliberately rest on <em>different</em> hard problems with no known efficient quantum attack. Three families dominate the standards, and NIST chose to standardize more than one on purpose: if one family is ever weakened, the others provide a fallback. That is "algorithm diversity" baked into the standards themselves.</p>
+  <figure class="figure">
+    <div class="fig-title">The three hard-problem families behind the standards</div>
+    <svg viewBox="0 0 680 200" role="img" aria-label="Three post-quantum families: lattice-based (ML-KEM, ML-DSA), hash-based (SLH-DSA), and code-based (HQC), each resting on a different hard problem.">
+      <rect class="g-box-p" x="16" y="24" width="204" height="152" rx="14" stroke-width="2"/>
+      <text class="g-t" x="118" y="52" font-size="14" text-anchor="middle" font-weight="800">Lattice-based</text>
+      <text class="g-tm" x="118" y="76" font-size="11.5" text-anchor="middle">Hard problem: finding short</text>
+      <text class="g-tm" x="118" y="92" font-size="11.5" text-anchor="middle">vectors in a high-dim grid</text>
+      <text class="g-mono" x="118" y="122" font-size="12" text-anchor="middle">ML-KEM (203)</text>
+      <text class="g-mono" x="118" y="140" font-size="12" text-anchor="middle">ML-DSA (204)</text>
+      <text class="g-tm" x="118" y="164" font-size="10.5" text-anchor="middle">fast &amp; compact &mdash; the default</text>
+      <rect class="g-box-t" x="238" y="24" width="204" height="152" rx="14" stroke-width="2"/>
+      <text class="g-t" x="340" y="52" font-size="14" text-anchor="middle" font-weight="800">Hash-based</text>
+      <text class="g-tm" x="340" y="76" font-size="11.5" text-anchor="middle">Hard problem: reversing a</text>
+      <text class="g-tm" x="340" y="92" font-size="11.5" text-anchor="middle">secure hash function</text>
+      <text class="g-mono" x="340" y="122" font-size="12" text-anchor="middle">SLH-DSA (205)</text>
+      <text class="g-tm" x="340" y="150" font-size="10.5" text-anchor="middle">most conservative;</text>
+      <text class="g-tm" x="340" y="165" font-size="10.5" text-anchor="middle">large but battle-tested</text>
+      <rect class="g-box-v" x="460" y="24" width="204" height="152" rx="14" stroke-width="2"/>
+      <text class="g-t" x="562" y="52" font-size="14" text-anchor="middle" font-weight="800">Code-based</text>
+      <text class="g-tm" x="562" y="76" font-size="11.5" text-anchor="middle">Hard problem: decoding a</text>
+      <text class="g-tm" x="562" y="92" font-size="11.5" text-anchor="middle">random linear code</text>
+      <text class="g-mono" x="562" y="122" font-size="12" text-anchor="middle">HQC (2025)</text>
+      <text class="g-tm" x="562" y="150" font-size="10.5" text-anchor="middle">backup KEM on</text>
+      <text class="g-tm" x="562" y="165" font-size="10.5" text-anchor="middle">different math</text>
+    </svg>
+    <figcaption>Different foundations, on purpose. A breakthrough against lattices would still leave hash-based and code-based schemes standing &mdash; which is why NIST standardized across families rather than betting on one.</figcaption>
+  </figure>
+  <div class="callout tip"><span class="k">Why you should care as a practitioner</span><p>You do not need the mathematics, but you should know <em>which family</em> each algorithm belongs to. If a future result weakens lattices, you will want to already have the agility to shift signatures toward SLH-DSA (hash-based) or key exchange toward HQC (code-based). Diversity is only useful if your architecture can actually switch.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -150,6 +224,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> No. HQC's role is <em>diversity/backup</em> on different math, not a reason to delay. Deploy ML-KEM now and keep agility so HQC can be added later if warranted.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; Pick a security level</h3>
+      <p class="scenario">Team A runs a public API; Team B builds a firmware root of trust meant to be trusted for 20 years.</p>
+      <p class="decide">Which parameter levels make sense for each?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Team A can use Level 3 (ML-KEM-768 / ML-DSA-65) for a balanced size-vs-margin default. Team B should lean to Level 5 (ML-KEM-1024 / ML-DSA-87 or SLH-DSA) because the root must survive multiple hardware generations, and the larger material is an acceptable cost for a rarely used, long-lived anchor.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Diversity in practice</h3>
+      <p class="scenario">A researcher publishes a partial attack that weakens lattice assumptions (hypothetically).</p>
+      <p class="decide">What lets you respond calmly instead of scrambling?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Algorithm agility plus family diversity. If your architecture can swap algorithms by configuration, you can shift signatures to hash-based SLH-DSA and key exchange to code-based HQC without re-architecting. The value of standardizing multiple families is only realized if your systems can actually switch families.</p>
+    </article>
   </div>
 </section>
 
@@ -165,7 +253,11 @@
     {"q":"What is SLH-DSA's advantage over ML-DSA?","choices":["Its security rests only on hash functions (conservative, diverse)","It has the smallest signatures","It needs no verifier"],"answer":0,"explain":"SLH-DSA is hash-based, giving a different, conservative foundation - at the cost of large signatures and slower signing."},
     {"q":"Roughly how does an ML-DSA-65 signature compare to ECDSA P-256?","choices":["Much larger (thousands of bytes vs ~72)","Identical size","Much smaller"],"answer":0,"explain":"ML-DSA-65 is ~3,309 bytes versus ~72 for ECDSA P-256 - the size jump drives many migration issues."},
     {"q":"What is the point of hybrid key exchange?","choices":["Stay safe if either the classical or PQC part holds","Double the encryption speed","Remove the need for certificates"],"answer":0,"explain":"Hybrid combines classical and PQC so a break in one does not break the session, easing transition."},
-    {"q":"Why build algorithm agility?","choices":["Standards, products, and risks change over time","To skip all testing","To avoid keeping an inventory"],"answer":0,"explain":"Agility lets you swap algorithms/parameters/providers later (e.g. adopt HQC) without re-architecting."}
+    {"q":"Why build algorithm agility?","choices":["Standards, products, and risks change over time","To skip all testing","To avoid keeping an inventory"],"answer":0,"explain":"Agility lets you swap algorithms/parameters/providers later (e.g. adopt HQC) without re-architecting."},
+    {"q":"What does a NIST 'Level 3' parameter set roughly correspond to?","choices":["Security comparable to breaking AES-192","No security at all","Comparable to breaking AES-64"],"answer":0,"explain":"NIST levels map to symmetric strength: L1~AES-128, L3~AES-192, L5~AES-256. Level 3 (e.g. ML-KEM-768) is a common balanced default."},
+    {"q":"ML-KEM and ML-DSA are based on which math family?","choices":["Lattices","Hash functions","Elliptic curves"],"answer":0,"explain":"Both are lattice-based (from CRYSTALS-Kyber and -Dilithium). SLH-DSA is hash-based; HQC is code-based."},
+    {"q":"Why did NIST standardize algorithms from more than one math family?","choices":["Diversity: a break in one family leaves the others standing","To make the standards longer","Because lattices are insecure"],"answer":0,"explain":"Standardizing lattice, hash-based, and code-based schemes provides a fallback if any single family is later weakened."},
+    {"q":"An ML-KEM-768 exchange sends ~1 KB messages but the shared secret is...","choices":["A small 32-byte key that feeds symmetric encryption","Also about 1 KB","The entire file"],"answer":0,"explain":"The public key (~1,184 B) and ciphertext (~1,088 B) are large, but they produce a compact 32-byte secret used by AES-GCM."}
   ]
   </script>
 </section>
@@ -186,7 +278,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Start with the size comparison &mdash; those ratios explain most PQC engineering pain. Then read each family's lesson and try the labs.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

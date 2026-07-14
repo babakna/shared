@@ -10,7 +10,7 @@
 <body data-module="PQC-401">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-401</span><span>Enterprise Migration Playbook</span><span class="version">V4.0 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-401</span><span>Enterprise Migration Playbook</span><span class="version">V5.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -22,6 +22,8 @@
   <a href="#s2"><span class="dot"></span>2. Prioritization model</a>
   <a href="#s3"><span class="dot"></span>3. Vendors &amp; contracts</a>
   <a href="#s4"><span class="dot"></span>4. Governance &amp; monitoring</a>
+  <a href="#s5"><span class="dot"></span>5. Roadmap, budget &amp; org</a>
+  <a href="#s6"><span class="dot"></span>6. Standards &amp; mandates</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -63,6 +65,8 @@
   <div class="lesson-title"><span class="num">1</span><h2>Inventory is the first deliverable</h2></div>
   <p class="lead">You cannot migrate what you cannot see. The crypto inventory (CBOM) is the foundation of everything else.</p>
   <p>The inventory records where cryptography is used, for what job, with which algorithm and parameters, in which library or product, protecting what data for how long, owned by whom, and its PQC status. PQC-402 is a hands-on workshop for building one. Without it, prioritization is guesswork and progress is unmeasurable.</p>
+  <p>The most common reason migration programs stall in year one is not technical &mdash; it is that leadership cannot answer "how big is this and where do we start?" because there is no inventory. An honest CBOM turns an unbounded fear ("quantum will break our security") into a bounded, ranked backlog ("we have 214 cryptographic dependencies; 31 are Tier 1; here are their owners and dates"). That reframing is what unlocks funding and calm decision-making. Spend the money and time here first; every later wave gets cheaper because of it.</p>
+  <div class="callout example"><span class="k">What "living product" really means</span><p>A vendor ships a firmware update that swaps a library; a certificate authority rotates an intermediate; a team adopts a new service that quietly embeds classical crypto. Each of these silently changes your exposure. A CBOM that is refreshed on a schedule (and wired into procurement and CI/CD) catches these; a spreadsheet built once and forgotten is stale within a quarter and quietly lies to you.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Treat the inventory as a living product with an owner, not a one-time spreadsheet. Vendors, certificates, and libraries change constantly.</p></div>
 </section>
 
@@ -78,6 +82,28 @@
       <tr><td><b>Blocked</b></td><td>Vendor/hardware cannot yet support PQC</td><td>Appliances, embedded fleets</td><td>Exception + compensating controls</td></tr>
     </tbody>
   </table></div>
+  <figure class="figure">
+    <div class="fig-title">Prioritization at a glance &mdash; data lifetime &times; exposure</div>
+    <svg viewBox="0 0 540 300" role="img" aria-label="A quadrant chart: systems that are both long-lived and exposed are Tier 1; short-lived, internal systems are Tier 3.">
+      <rect x="70" y="30" width="200" height="110" fill="rgba(22,87,160,.10)"/>
+      <rect x="270" y="30" width="200" height="110" fill="rgba(180,35,24,.12)"/>
+      <rect x="70" y="140" width="200" height="110" fill="rgba(124,138,160,.10)"/>
+      <rect x="270" y="140" width="200" height="110" fill="rgba(22,87,160,.10)"/>
+      <line class="g-line" x1="70" y1="30" x2="70" y2="250"/><line class="g-line" x1="70" y1="250" x2="470" y2="250"/>
+      <text class="g-tm" x="40" y="145" font-size="12" text-anchor="middle" transform="rotate(-90 40 145)" font-weight="800">data lifetime &rarr;</text>
+      <text class="g-tm" x="270" y="278" font-size="12" text-anchor="middle" font-weight="800">exposure &rarr;</text>
+      <text class="g-t" x="170" y="88" font-size="13" text-anchor="middle" font-weight="800">Tier 2</text><text class="g-tm" x="170" y="106" font-size="10.5" text-anchor="middle">long-lived, internal</text>
+      <text x="370" y="82" font-size="14" text-anchor="middle" font-weight="800" fill="#B42318">Tier 1</text><text x="370" y="100" font-size="10.5" text-anchor="middle" fill="#B42318">long-lived + exposed</text><text x="370" y="115" font-size="10" text-anchor="middle" fill="#B42318">migrate first</text>
+      <text class="g-t" x="170" y="198" font-size="13" text-anchor="middle" font-weight="800">Tier 3</text><text class="g-tm" x="170" y="216" font-size="10.5" text-anchor="middle">short-lived, internal</text>
+      <text class="g-t" x="370" y="198" font-size="13" text-anchor="middle" font-weight="800">Tier 2</text><text class="g-tm" x="370" y="216" font-size="10.5" text-anchor="middle">short-lived, exposed</text>
+      <g><circle cx="400" cy="55" r="5" fill="#B42318"/><text class="g-tm" x="410" y="59" font-size="10">VPN / KMS wrap</text>
+      <circle cx="360" cy="70" r="5" fill="#B42318"/><text class="g-tm" x="300" y="52" font-size="10">medical archive</text>
+      <circle cx="150" cy="70" r="5" fill="#1657A0"/><text class="g-tm" x="90" y="60" font-size="10">internal app</text>
+      <circle cx="410" cy="225" r="5" fill="#1657A0"/><text class="g-tm" x="330" y="240" font-size="10">public web session</text>
+      <circle cx="120" cy="228" r="5" fill="#7C8AA0"/><text class="g-tm" x="90" y="243" font-size="10">cache</text></g>
+    </svg>
+    <figcaption>Plot each inventory item once. The top-right corner &mdash; long-lived and exposed &mdash; is your harvest-now-decrypt-later hot zone and the target of Waves 1&ndash;3.</figcaption>
+  </figure>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Setting a single company-wide deadline. Tier 1 needs urgency; Tier 3 does not; blocked items need a different track entirely. One date for all creates panic and waste.</p></div>
 </section>
 
@@ -98,6 +124,42 @@
   <p class="lead">A program needs owners, an exception process, and evidence &mdash; or it stalls invisibly.</p>
   <p>Define who owns crypto policy, who approves exceptions (and for how long), and what evidence closes a migration item. Each action gets an owner, target date, dependency, evidence requirement, and rollback plan. A dashboard shows coverage, risk tiers, blockers, completed tests, active exceptions, and next-wave candidates.</p>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Evidence beats assertion. "We enabled hybrid TLS" is a claim; "98% of sessions negotiated a PQC group last week, here is the dashboard" is evidence. Exceptions must expire, not become permanent.</p></div>
+</section>
+
+<section class="lesson" id="s5">
+  <div class="lesson-title"><span class="num">5</span><h2>Roadmap, budget, and operating model</h2></div>
+  <p class="lead">A multi-year program needs a named owner, a funding line, and a clear division of labor &mdash; or it dissolves into everyone's side project.</p>
+  <p>The most common way PQC programs fail is not technical: it is organizational. No single owner, no dedicated budget, and crypto scattered across teams who each assume someone else is handling it. Fix that first. Give the program an accountable owner (often the CISO office), a standing budget that spans several fiscal years, and an explicit RACI so every wave has someone responsible.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Role</th><th>Owns</th><th>Typical home</th></tr></thead>
+    <tbody>
+      <tr><td>Program lead</td><td>Roadmap, budget, reporting to leadership</td><td>CISO / security office</td></tr>
+      <tr><td>Crypto architect</td><td>Algorithm/parameter policy, agility standards</td><td>Security architecture</td></tr>
+      <tr><td>Inventory owner</td><td>The living CBOM and its accuracy</td><td>Security eng / asset mgmt</td></tr>
+      <tr><td>System owners</td><td>Migrating their own services per wave</td><td>Each product / platform team</td></tr>
+      <tr><td>Procurement</td><td>Vendor roadmaps and contract clauses</td><td>Sourcing / legal</td></tr>
+    </tbody>
+  </table></div>
+  <p>Budget for the non-obvious costs. The algorithm swap is nearly free; the money goes to discovery tooling, HSM/appliance upgrades and re-validation, extra compute and bandwidth from larger handshakes, vendor upgrades, testing across a huge client matrix, and the staff time to run a multi-year program. Fund it as an ongoing capability, not a one-off project, because you will do this again for the <em>next</em> algorithm.</p>
+  <div class="callout tip"><span class="k">Reusable dividend</span><p>Everything you build here &mdash; the inventory, the agility abstraction, the wave playbook, the monitoring &mdash; is exactly what you will need for the next cryptographic transition. Frame the budget as buying permanent crypto-agility, not a single quantum fix.</p></div>
+</section>
+
+<section class="lesson" id="s6">
+  <div class="lesson-title"><span class="num">6</span><h2>Standards, mandates, and timelines</h2></div>
+  <p class="lead">External deadlines increasingly drive the program &mdash; know which ones apply to you.</p>
+  <p>PQC migration is shifting from "good idea" to "required." Several bodies have published direction that may bind your organization or your customers. The specifics evolve, so treat the dates below as a map of <em>where to look</em>, and verify the current text against the primary source before you commit to any deadline.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Source</th><th>What it drives</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>NIST FIPS 203/204/205</td><td>The approved algorithms themselves</td><td>Finalized Aug 2024</td></tr>
+      <tr><td>NSA CNSA 2.0</td><td>Timeline for national-security systems and their suppliers (e.g. software/firmware signing early, broad adoption later this decade)</td><td>Verify current dates at source</td></tr>
+      <tr><td>US NSM-10 / OMB</td><td>Federal agencies to inventory and plan migration</td><td>Applies to US federal + contractors</td></tr>
+      <tr><td>NIST IR 8547 (draft)</td><td>Proposed deprecation of 112-bit-security classical PKC around 2030, disallow ~2035</td><td>Draft &mdash; source-verification needed</td></tr>
+      <tr><td>Sector regulators / PCI / EU</td><td>Industry-specific crypto-agility and PQC expectations</td><td>Varies by jurisdiction/sector</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn"><span class="k">Source-verification needed</span><p>The exact milestone dates in mandates change as drafts are finalized. Use this table to know <em>which</em> documents govern you, then confirm the live dates with the issuing body &mdash; do not quote a specific year to leadership without checking the current source.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Map your systems to the mandates that bind them. A regulatory deadline turns "we should" into "we must by [date]," which is often what finally funds the program.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -125,6 +187,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> Inventory coverage %, Tier-1 systems migrated vs total, share of sessions negotiating PQC groups, dual-signing coverage, open blockers with owners/dates, and active exceptions with expiry. Metrics from systems, not status decks.</p>
     </article>
+    <article class="case">
+      <h3>Lab 4 &middot; No owner, no budget</h3>
+      <p class="scenario">Two years in, PQC work is stalled: no dedicated owner, and each team treats it as a side project.</p>
+      <p class="decide">What is the root cause and the fix?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> The root cause is organizational, not technical. Fix it by naming an accountable program owner (typically the CISO office), securing a multi-year budget line, and publishing a RACI so every wave has a responsible team. Frame the spend as buying permanent crypto-agility, reusable for the next transition &mdash; not a one-off quantum project.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 5 &middot; Which deadline binds us?</h3>
+      <p class="scenario">A US federal contractor asks whether the quantum migration is optional.</p>
+      <p class="decide">How do you determine the binding timeline?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Map the organization to the mandates that apply: NSM-10/OMB direction for federal agencies and contractors, CNSA 2.0 for national-security systems and their suppliers, plus any sector regulator. Then verify the <em>current</em> dates at the primary source (they shift as drafts finalize). For a federal contractor, migration is not optional &mdash; it is schedule-driven, and the inventory is usually the first required deliverable.</p>
+    </article>
   </div>
 </section>
 
@@ -140,7 +216,10 @@
     {"q":"Why is a single company-wide deadline a bad idea?","choices":["Tiers differ; urgency, refresh, and blocked items need different tracks","Deadlines are illegal","It makes the dashboard too colorful"],"answer":0,"explain":"One date for everything creates panic for some systems and waste for others, and ignores vendor-blocked cases."},
     {"q":"How should procurement support migration?","choices":["Require PQC roadmaps and crypto-agility clauses; prefer evidence over claims","Ban all vendors","Only buy the cheapest product"],"answer":0,"explain":"Contracts and roadmap requirements turn vendor dependencies into managed, time-bound commitments."},
     {"q":"What must be true of every exception?","choices":["Time-boxed, owned, with compensating controls and a re-review date","Permanent and unowned","Secret from leadership"],"answer":0,"explain":"Exceptions must expire and carry accountability, or they become invisible permanent risk."},
-    {"q":"What counts as real evidence of progress?","choices":["System metrics: PQC-negotiated sessions, Tier-1 coverage, open blockers","A confident status slide","The number of meetings held"],"answer":0,"explain":"Evidence comes from systems (negotiated groups, coverage, dual-signing), not assertions."}
+    {"q":"What counts as real evidence of progress?","choices":["System metrics: PQC-negotiated sessions, Tier-1 coverage, open blockers","A confident status slide","The number of meetings held"],"answer":0,"explain":"Evidence comes from systems (negotiated groups, coverage, dual-signing), not assertions."},
+    {"q":"What is the most common reason PQC programs stall?","choices":["Organizational: no owner, no budget, no clear responsibility","The algorithms are too slow","There are no standards yet"],"answer":0,"explain":"The technical swap is easy; programs fail without an accountable owner, multi-year funding, and a clear RACI."},
+    {"q":"Where does most of a PQC migration budget actually go?","choices":["Discovery tooling, HSM/appliance upgrades, testing, extra bandwidth, staff time","Buying the algorithms","Marketing the change"],"answer":0,"explain":"The algorithms are free standards; cost is in inventory, hardware/vendor upgrades and re-validation, the huge test matrix, and running a multi-year program."},
+    {"q":"How should you treat specific dates in mandates like CNSA 2.0 or NIST IR 8547?","choices":["Identify which document binds you, then verify current dates at the source","Quote them from memory to leadership","Assume they never change"],"answer":0,"explain":"Milestone dates shift as drafts finalize. Map systems to the governing mandate, then confirm live dates with the issuing body before committing."}
   ]
   </script>
 </section>
@@ -159,7 +238,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
+  <div class="help-ver" data-help-version>V5.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Walk the rollout waves, then read how inventory, prioritization, vendors, and governance fit together. Pair this with the hands-on CBOM workshop in PQC-402.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
