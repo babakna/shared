@@ -1,6 +1,6 @@
 # Post-Quantum Cryptography Learning Lab
 
-V2.0 (July 2026)
+V2.1 (July 2026)
 
 Static educational curriculum under `Shared/PQC`.
 
@@ -18,7 +18,7 @@ Static educational curriculum under `Shared/PQC`.
 - `PQC-501.html`: Network, 5G/6G, SIM/eSIM, IoT, and Device Ecosystems
 - `PQC-601.html`: Advanced Research Watch, Governance, and Architecture Review
 
-Each module includes a distinct visual asset, detailed lessons, diagrams, concrete examples, common pitfalls, takeaways, use-case labs with revealable answers, and a knowledge check. The content is designed for self-study from absolute beginner through advanced planning.
+Each module includes a distinct architecture SVG, detailed lessons, concrete examples, common pitfalls, takeaways, use-case labs with revealable answers, and a knowledge check. The content is designed for self-study from absolute beginner through advanced planning.
 
 ## Source alignment
 
