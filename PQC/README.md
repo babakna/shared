@@ -1,8 +1,13 @@
 # Post-Quantum Cryptography Learning Lab
 
-V3.0 (July 2026)
+V3.1 (July 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V3.1
+
+- Home page module list is now a vertical, single-column layout matching the other apps in the collection.
+- Each module opens in a new browser tab.
 
 ## What changed in V3.0
 
