@@ -1,27 +1,25 @@
 # Post-Quantum Cryptography Learning Lab
 
-Static educational module for Post-Quantum Cryptography (PQC), following the Shared AI/eSIM style.
+V2.0 (July 2026)
 
-## Files
+Static educational curriculum under `Shared/PQC`.
 
-- `index.html` - PQC landing page and future-module roadmap.
-- `PQC-101.html` - interactive foundation-first course covering cryptography basics, PQC standards, ecosystem impact, migration planning, and an open-ended curriculum roadmap.
-- `A.png`, `B.png` - local bitmap visuals used by the landing page and course.
+## Modules
 
-## Version
+- `PQC-001.html`: Start Here: Security and Cryptography Basics
+- `PQC-101.html`: Why Quantum Computing Changes the Threat Model
+- `PQC-102.html`: Cryptographic Building Blocks Deep Dive
+- `PQC-201.html`: PQC Standards and Algorithm Families
+- `PQC-202.html`: Protocols in Practice: TLS, SSH, VPN, PKI, Email, and Code Signing
+- `PQC-301.html`: Developer Implementation Engineering
+- `PQC-302.html`: Use-Case Labs: Web, Cloud, Messaging, Firmware, and Data at Rest
+- `PQC-401.html`: Enterprise Migration Playbook
+- `PQC-402.html`: Crypto Inventory and CBOM Workshop
+- `PQC-501.html`: Network, 5G/6G, SIM/eSIM, IoT, and Device Ecosystems
+- `PQC-601.html`: Advanced Research Watch, Governance, and Architecture Review
 
-V1.2 (July 2026)
+Each module includes a distinct visual asset, detailed lessons, diagrams, concrete examples, common pitfalls, takeaways, use-case labs with revealable answers, and a knowledge check. The content is designed for self-study from absolute beginner through advanced planning.
 
-## Source posture
+## Source alignment
 
-The course content is aligned to official NIST/CSRC, NCCoE, and NSA references current during the July 2026 update window. Visible page labels intentionally use month-only versioning.
-
-## Active modules
-
-- PQC-101: Cryptography Foundations to PQC Readiness
-- PQC-102: Cryptography Foundations Deep Dive
-- PQC-201: PQC Standards, Algorithms, and Protocols
-- PQC-301: Implementation Engineering
-- PQC-401: Enterprise Migration Playbook
-- PQC-501: Network, 5G/6G, SIM/eSIM, and IoT Ecosystem
-- PQC-601: Advanced Research Watch and Scenario Labs
+The content is aligned to NIST PQC standards and guidance sources including FIPS 203, FIPS 204, FIPS 205, NIST's PQC project, HQC selection, NCCoE migration guidance, and NSA CNSA 2.0 guidance. It is educational reference material, not production approval.
