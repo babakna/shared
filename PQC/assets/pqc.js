@@ -1,7 +1,7 @@
-/* PQC Learning Lab shared engine - V3.1 */
+/* PQC Learning Lab shared engine - V4.0 */
 (function () {
   "use strict";
-  var VERSION = "V3.1 (July 2026)";
+  var VERSION = "V4.0 (July 2026)";
   var root = document.documentElement;
 
   /* ---------- Theme (light default) ---------- */
@@ -141,7 +141,19 @@
     if (box) renderQuiz();
   }
 
-  /* ---------- Stepper widget ---------- */
+  /* ---------- Stepper widget (visual pipeline) ---------- */
+  function stEsc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function stWrap(t) {
+    var words = String(t).split(/\s+/), lines = [], cur = "";
+    for (var i = 0; i < words.length; i++) {
+      var test = cur ? cur + " " + words[i] : words[i];
+      if (test.length > 15 && cur) { lines.push(cur); cur = words[i]; } else { cur = test; }
+    }
+    if (cur) lines.push(cur);
+    if (lines.length > 2) lines = [lines[0], lines.slice(1).join(" ")];
+    if (lines[1] && lines[1].length > 17) lines[1] = lines[1].slice(0, 16) + "\u2026";
+    return lines.slice(0, 2);
+  }
   document.querySelectorAll(".pqc-stepper").forEach(function (el) {
     var dataEl = el.querySelector("script.steps");
     var steps = [];
@@ -149,40 +161,59 @@
     if (!steps.length) return;
     var title = el.getAttribute("data-title") || "Walkthrough";
     var cur = 0, seen = {};
+    var N = steps.length, W = 172, H = 148;
+
+    var svg = '<svg viewBox="0 0 ' + (N * W) + ' ' + H + '" class="st-svg" preserveAspectRatio="xMidYMid meet" style="min-width:' + (N * 96) + 'px" role="img" aria-label="' + stEsc(title) + ' pipeline">';
+    var i, cx;
+    for (i = 1; i < N; i++) {
+      svg += '<line class="conn" x1="' + ((i - 1) * W + W / 2 + 34) + '" y1="58" x2="' + (i * W + W / 2 - 34) + '" y2="58"/>';
+    }
+    for (i = 0; i < N; i++) {
+      cx = i * W + W / 2;
+      var icon = steps[i].icon || String(i + 1);
+      var labels = stWrap(steps[i].title);
+      svg += '<g class="st-node" data-node="' + i + '">';
+      svg += '<circle class="pulse" cx="' + cx + '" cy="58" r="34"/>';
+      svg += '<circle class="node-c" cx="' + cx + '" cy="58" r="34"/>';
+      svg += '<text class="node-icon" x="' + cx + '" y="58" dy=".35em" text-anchor="middle">' + stEsc(icon) + '</text>';
+      svg += '<text class="node-l" x="' + cx + '" y="106" text-anchor="middle">' + stEsc(labels[0] || "") + '</text>';
+      if (labels[1]) svg += '<text class="node-l" x="' + cx + '" y="124" text-anchor="middle">' + stEsc(labels[1]) + '</text>';
+      svg += '</g>';
+    }
+    svg += '</svg>';
+
     var wrap = document.createElement("div");
+    wrap.className = "st-wrap";
     wrap.innerHTML =
-      '<div class="st-top"><span class="st-title">' + title + '</span>' +
-      '<span class="st-count"></span></div>' +
-      '<div class="st-dots"></div>' +
+      '<div class="st-top"><span class="st-title">' + stEsc(title) + '</span><span class="st-count"></span></div>' +
+      '<div class="st-scene">' + svg + '</div>' +
       '<div class="st-body"></div>' +
       '<div class="st-nav"><button class="btn small st-prev">\u2190 Prev</button>' +
       '<button class="btn small primary st-next">Next \u2192</button></div>';
     el.appendChild(wrap);
-    var dotsEl = wrap.querySelector(".st-dots");
+
     var bodyEl = wrap.querySelector(".st-body");
     var countEl = wrap.querySelector(".st-count");
-    steps.forEach(function (s, i) {
-      var d = document.createElement("button");
-      d.className = "st-dot";
-      d.setAttribute("aria-label", "Step " + (i + 1));
-      d.addEventListener("click", function () { cur = i; draw(); });
-      dotsEl.appendChild(d);
-    });
+    var nodes = wrap.querySelectorAll(".st-node");
+    var conns = wrap.querySelectorAll(".conn");
+    nodes.forEach(function (n, i) { n.style.cursor = "pointer"; n.addEventListener("click", function () { cur = i; draw(); }); });
+
     function draw() {
       seen[cur] = true;
       var s = steps[cur];
-      bodyEl.innerHTML = "<h4>" + (cur + 1) + ". " + s.title + "</h4><p>" + s.body + "</p>" +
-        (s.meta ? '<span class="st-meta">' + s.meta + "</span>" : "");
-      countEl.textContent = "Step " + (cur + 1) + " of " + steps.length;
-      dotsEl.querySelectorAll(".st-dot").forEach(function (d, i) {
-        d.classList.toggle("on", i === cur);
-        d.classList.toggle("done", !!seen[i] && i !== cur);
-      });
+      bodyEl.innerHTML = "<h4>" + (s.icon ? s.icon + " " : "") + stEsc(s.title) + "</h4><p>" + s.body + "</p>" +
+        (s.meta ? '<span class="st-meta">' + stEsc(s.meta) + "</span>" : "");
+      countEl.textContent = "Step " + (cur + 1) + " of " + N;
+      nodes.forEach(function (n, i) { n.classList.toggle("on", i === cur); n.classList.toggle("done", !!seen[i] && i !== cur); });
+      conns.forEach(function (c, k) { c.classList.toggle("done", k < cur); });
       wrap.querySelector(".st-prev").disabled = cur === 0;
-      wrap.querySelector(".st-next").disabled = cur === steps.length - 1;
+      wrap.querySelector(".st-next").disabled = cur === N - 1;
+      // keep active node visible when scene scrolls horizontally
+      var active = nodes[cur];
+      if (active && active.scrollIntoView) { try { active.scrollIntoView({ inline: "center", block: "nearest" }); } catch (e) {} }
     }
     wrap.querySelector(".st-prev").addEventListener("click", function () { if (cur > 0) { cur--; draw(); } });
-    wrap.querySelector(".st-next").addEventListener("click", function () { if (cur < steps.length - 1) { cur++; draw(); } });
+    wrap.querySelector(".st-next").addEventListener("click", function () { if (cur < N - 1) { cur++; draw(); } });
     draw();
   });
 

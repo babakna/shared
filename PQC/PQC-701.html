@@ -10,7 +10,7 @@
 <body data-module="PQC-701">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-701</span><span>Capstone: Migrate Northwind Telecom</span><span class="version">V3.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-701</span><span>Capstone: Migrate Northwind Telecom</span><span class="version">V4.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -48,11 +48,11 @@
   <div class="pqc-stepper" data-title="Northwind Telecom - systems in scope">
     <script type="application/json" class="steps">
     [
-      {"title":"Public customer portal & API","body":"External TLS behind a CDN, serving browsers and a 3-year-old mobile app that pins certificates. Sessions carry auth tokens and personal data.","meta":"job: key exchange + cert signatures"},
-      {"title":"Core network (5G)","body":"Service-based interfaces use mutual TLS; SUCI conceals subscriber identity with elliptic-curve public-key crypto. Roaming partners vary in readiness.","meta":"job: TLS + identity concealment"},
-      {"title":"eSIM provisioning","body":"GSMA RSP with a certificate hierarchy; profiles installed on constrained eUICC secure elements across many device models.","meta":"job: PKI signatures + key establishment"},
-      {"title":"Field devices","body":"Millions of IoT sensors and routers, 8-12 year life, firmware verified by ECDSA in bootloaders - some immutable.","meta":"job: signatures, immutable verifiers"},
-      {"title":"Data platform","body":"AES-256 data lake with 7-year backups; data keys wrapped by an RSA-based KMS.","meta":"job: key wrapping (not bulk crypto)"}
+      {"icon":"\ud83c\udf10","title":"Public customer portal & API","body":"External TLS sits behind a CDN, serving modern browsers plus a 3-year-old mobile app that <b>pins certificates</b>. Sessions carry auth tokens and personal data. The pinning app is the trap: change the certificate signature and it stops trusting you until users update. Jobs at play: key exchange and certificate signatures.","meta":"job: key exchange + cert signatures"},
+      {"icon":"\ud83d\udcf6","title":"Core network (5G)","body":"Service-based interfaces between network functions use mutual TLS, and SUCI conceals the subscriber's identity using elliptic-curve public-key crypto. Roaming partners vary widely in PQC readiness, so you cannot move unilaterally without breaking interconnect. Jobs: mutual TLS + identity concealment.","meta":"job: mutual TLS + identity concealment"},
+      {"icon":"\ud83e\udeaa","title":"eSIM provisioning","body":"GSMA Remote SIM Provisioning runs on a certificate hierarchy, delivering profiles onto constrained eUICC secure elements across dozens of device models. Larger PQC keys must fit tiny chips, and the whole GSMA trust chain must move together. Jobs: PKI signatures + key establishment.","meta":"job: PKI signatures + key establishment"},
+      {"icon":"\ud83d\udce1","title":"Field devices","body":"Millions of IoT sensors and routers with an 8-12 year service life, whose firmware is verified by ECDSA in the bootloader - and some of those bootloaders are <b>immutable</b>. Where the verifier is burned into silicon, the only real fix is hardware replacement. Job: signatures, with unforgiving verifiers.","meta":"job: signatures, immutable verifiers"},
+      {"icon":"\ud83d\udcbe","title":"Data platform","body":"An AES-256 data lake with 7-year backups. The bulk data is symmetric and largely fine - but the data keys are <b>wrapped by an RSA-based KMS</b>, and that RSA wrapping is the quantum-vulnerable, harvest-now-decrypt-later weak point. Job: key wrapping, not bulk crypto.","meta":"job: key wrapping (the real weak point)"}
     ]
     </script>
   </div>
@@ -133,7 +133,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this capstone</h2>
-  <div class="help-ver" data-help-version>V3.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Work each of the four decisions before revealing the recommendation, then take the eight-question final assessment. It draws on every earlier module.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

@@ -10,7 +10,7 @@
 <body data-module="PQC-501">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V3.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V4.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -49,11 +49,11 @@
   <div class="pqc-stepper" data-title="eSIM (RSP) profile download, simplified">
     <script type="application/json" class="steps">
     [
-      {"title":"Device asks for a profile","body":"The device's eUICC (embedded SIM chip) contacts the operator's provisioning server (SM-DP+). Both authenticate using certificates in a GSMA trust hierarchy - signatures that will move to PQC.","meta":"PQC: mutual authentication signatures"},
-      {"title":"Mutual authentication","body":"The eUICC and server verify each other's certificate chains rooted in a GSMA CI (certificate issuer). Every party in that hierarchy must eventually support PQC signatures and the larger certs.","meta":"PQC: GSMA PKI trust chain"},
-      {"title":"Secure channel + key establishment","body":"A protected channel is set up to deliver the profile. The key establishment here is a harvest-now-decrypt-later target and moves to PQC/hybrid KEM.","meta":"PQC: key establishment"},
-      {"title":"Profile installed on the eUICC","body":"The encrypted profile (operator keys/identity) is installed into a tiny, constrained secure element. Larger PQC keys must fit its limited memory and compute.","meta":"constraint: secure element size/compute"},
-      {"title":"Device attaches to the network","body":"With the profile active, the device runs 5G authentication (AKA) with the operator core - a separate, symmetric-heavy step that PQC touches less directly.","meta":"mostly symmetric (5G-AKA)"}
+      {"icon":"\ud83d\udcf1","title":"Device asks for a profile","body":"The device's eUICC (the embedded SIM chip soldered into the phone) contacts the operator's provisioning server, called the SM-DP+. Before anything sensitive moves, both sides prepare to prove who they are using certificates issued under a GSMA trust hierarchy - a chain of digital signatures that will all eventually move to PQC.","meta":"start: identity based on signatures"},
+      {"icon":"\ud83e\udeaa","title":"Mutual authentication","body":"The eUICC and the SM-DP+ each verify the other's certificate chain, rooted in a GSMA Certificate Issuer (CI). This is <b>mutual</b> - unlike a website, the tiny chip must also prove itself. Every party in that hierarchy (chip maker, operator, CI) must support PQC signatures and the larger certificates before the chain can go post-quantum.","meta":"PQC: GSMA PKI trust chain (signatures)"},
+      {"icon":"\ud83d\udd10","title":"Secure channel + key establishment","body":"With identities proven, the two sides run key establishment to open an encrypted channel for delivering the profile. This is a classic <b>harvest-now-decrypt-later</b> target - capture it today, decrypt after Q-day - so it is a prime candidate to move to a PQC or hybrid KEM (ML-KEM).","meta":"PQC: key establishment (HNDL target)"},
+      {"icon":"\ud83e\udde9","title":"Profile installed on the eUICC","body":"The encrypted profile - operator keys, IMSI/identity, network settings - is installed into a tiny, memory- and compute-constrained secure element. This is the sizing squeeze: ML-KEM and ML-DSA keys are far larger than ECC, and they must fit and run inside a chip designed years ago with kilobytes to spare.","meta":"constraint: secure element size + compute"},
+      {"icon":"\ud83d\udce1","title":"Device attaches to the network","body":"With the profile active, the device performs 5G Authentication and Key Agreement (5G-AKA) with the operator core. This step is largely <b>symmetric</b> (it leans on a pre-shared key in the profile), so PQC touches it far less directly than the certificate and key-establishment steps above.","meta":"mostly symmetric (5G-AKA)"}
     ]
     </script>
   </div>
@@ -156,7 +156,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V3.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through eSIM provisioning first to see the multi-party trust chain, then read how 5G/6G, SIM/eSIM, and IoT each add their own constraints.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

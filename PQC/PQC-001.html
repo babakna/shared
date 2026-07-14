@@ -10,7 +10,7 @@
 <body data-module="PQC-001">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V3.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V4.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -49,10 +49,12 @@
   <div class="pqc-stepper" data-title="Opening https://yourbank.com">
     <script type="application/json" class="steps">
     [
-      {"title":"Prove who you are talking to","body":"Your browser asks the server for its digital certificate and checks that a trusted authority vouches for it. This stops an impostor from pretending to be your bank. This is authentication.","meta":"job: authentication"},
-      {"title":"Agree on a secret in public","body":"Even though anyone can watch the network, the two sides run a key-exchange so they end up sharing a secret number that eavesdroppers cannot compute. This is key establishment.","meta":"job: key establishment (public-key)"},
-      {"title":"Lock the conversation","body":"Using that shared secret, everything after this point is encrypted with fast symmetric encryption (for example AES-GCM), so eavesdroppers see only scrambled bytes. This is confidentiality.","meta":"job: confidentiality (symmetric)"},
-      {"title":"Detect tampering","body":"Every encrypted record carries an integrity check. If anyone flips even one bit in transit, the receiver notices and rejects it. This is integrity.","meta":"job: integrity"}
+      {"icon":"\ud83c\udf10","title":"You type the address","body":"You enter <code>https://yourbank.com</code> and press Enter. Your browser turns that name into an IP address (DNS) and opens a plain TCP connection to the bank's server. Right now <b>nothing is protected</b> - any Wi-Fi router, ISP, or coffee-shop attacker on the path can see you are talking to the bank. Every protective job below happens next, inside the TLS handshake, in a few hundred milliseconds, before a single pixel of the login page appears.","meta":"still plaintext - nothing is secret yet"},
+      {"icon":"\ud83e\udeaa","title":"Prove who you are talking to","body":"The server sends its digital certificate - an ID card signed by a Certificate Authority (CA) your browser already trusts. Your browser verifies the signature, the domain name, and the expiry date. An impostor can copy the certificate, but not the matching private key, so their proof fails and you get a scary warning. This job is <b>authentication</b>, and it rests on digital signatures.","meta":"job: authentication (signatures) - QUANTUM-VULNERABLE"},
+      {"icon":"\ud83e\udd1d","title":"Agree on a secret in public","body":"Both sides now need one shared secret key, but every byte they exchange can be watched. They run a key-exchange (today Elliptic-Curve Diffie-Hellman) so that after a couple of messages both compute the <b>same</b> secret number, while an eavesdropper who recorded everything still cannot. This near-magical trick is public-key <b>key establishment</b> - and it is the single step a large quantum computer breaks outright.","meta":"job: key establishment (public-key) - QUANTUM-VULNERABLE"},
+      {"icon":"\ud83d\udd12","title":"Lock the conversation","body":"Using that shared secret, both sides switch to fast <b>symmetric</b> encryption such as AES-256-GCM. Your password, balance, and every click become bytes that look like random noise. Symmetric math is thousands of times faster than public-key math, which is why it protects the bulk data. Quantum computers only weaken it modestly (Grover's algorithm), so here we mostly just use a big enough key.","meta":"job: confidentiality (symmetric) - mostly OK"},
+      {"icon":"\ud83d\udee1\ufe0f","title":"Detect tampering","body":"Every encrypted record carries an authentication tag - a fingerprint only holders of the key can produce. Flip one bit, inject a packet, or replay an old message and the tag no longer matches, so the receiver rejects it instantly. This job is <b>integrity</b>, and unlike the handshake it runs on <em>every single message</em> for the whole session.","meta":"job: integrity (authenticated encryption)"},
+      {"icon":"\u2705","title":"You see the login page","body":"Only now does the encrypted, tamper-proof channel deliver the real HTML. The padlock in your address bar means all four jobs succeeded. This runs on <b>billions</b> of connections a day - which is exactly why quietly breaking the public-key steps (authentication and key establishment) would be a global catastrophe, and why we are migrating them first.","meta":"result: a trusted, private channel"}
     ]
     </script>
   </div>
@@ -195,7 +197,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V3.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Work top to bottom: try the interactive walkthrough, read each numbered lesson, open the "Go deeper" panels if you want more detail, do the labs, then take the quiz.</p>
   <p>Unfamiliar word? Most key terms link to the <a href="glossary.html">Glossary</a>. Use the side navigation to jump around, and the Top button to return here.</p>

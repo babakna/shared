@@ -10,7 +10,7 @@
 <body data-module="PQC-102">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V3.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V4.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -49,11 +49,11 @@
   <div class="pqc-stepper" data-title="TLS 1.3 handshake, simplified">
     <script type="application/json" class="steps">
     [
-      {"title":"ClientHello","body":"Your browser lists the TLS version, cipher suites, and key-exchange groups it supports, and includes its key-share for key exchange. In a PQC deployment this is where a post-quantum (or hybrid) group is offered.","meta":"PQC touches this: key-exchange group"},
-      {"title":"ServerHello + key share","body":"The server picks a group and sends its own key-share. Both sides now run key establishment to derive the same shared secret without ever sending it. Today this is ECDHE; post-quantum uses ML-KEM, often hybrid X25519+ML-KEM.","meta":"PQC target: key establishment"},
-      {"title":"Certificate","body":"The server sends its certificate chain proving its identity. The certificates are signed - classically by ECDSA/RSA, in future by ML-DSA/SLH-DSA. Larger PQC signatures make this message bigger.","meta":"PQC target: certificate signatures"},
-      {"title":"CertificateVerify","body":"The server signs a transcript of the handshake with its private key so the client knows the certificate holder is really present, not replayed. Another signature that PQC changes.","meta":"PQC target: handshake signature"},
-      {"title":"Finished + records","body":"Both sides derive symmetric keys from the shared secret and switch to fast authenticated encryption (for example AES-256-GCM or ChaCha20-Poly1305). This bulk encryption is largely unaffected by PQC.","meta":"mostly unchanged (symmetric)"}
+      {"icon":"\ud83d\udc4b","title":"ClientHello","body":"Your browser opens by listing what it supports: the TLS version (1.3), the symmetric cipher suites (like AES-256-GCM), and the key-exchange groups. To save a network round trip it also attaches a key-share <em>guess</em>. In a PQC deployment this message is exactly where a post-quantum or hybrid group - for example <code>X25519+ML-KEM-768</code> - is advertised.","meta":"PQC touches this: key-exchange group offered"},
+      {"icon":"\ud83e\udd1d","title":"ServerHello + key share","body":"The server picks one cipher suite and one group, then returns its own key-share. Both sides now run the key-exchange math and <b>independently derive the SAME shared secret</b> without ever transmitting it. Today that is ECDHE; post-quantum uses the ML-KEM key-encapsulation mechanism, usually hybrid so that even a break in one half still leaves the connection safe.","meta":"PQC target: key establishment (ML-KEM)"},
+      {"icon":"\ud83e\udeaa","title":"Certificate","body":"The server presents its certificate chain proving its identity, signed by a Certificate Authority. Classically these are ECDSA or RSA signatures; in future they become ML-DSA or SLH-DSA. This is where PQC hurts most on <b>size</b> - an ML-DSA chain can add several kilobytes, which may spill across extra TCP packets and expose slow middleboxes.","meta":"PQC target: certificate signatures (much bigger)"},
+      {"icon":"\u270d\ufe0f","title":"CertificateVerify","body":"The server signs a hash of the entire handshake so far with the private key matching its certificate. This proves the certificate holder is <b>live and present right now</b>, not a replay of a recorded session. It is a second signature operation - separate from the certificate itself - that PQC also changes.","meta":"PQC target: live handshake signature"},
+      {"icon":"\ud83d\udd12","title":"Finished + application data","body":"Both sides derive symmetric keys from the shared secret, exchange Finished messages to confirm nothing was tampered with mid-handshake, then switch to fast authenticated encryption (AES-256-GCM or ChaCha20-Poly1305). This bulk data protection is largely <b>unaffected</b> by quantum computers - it just wants a big enough key (256-bit).","meta":"mostly unchanged (symmetric bulk encryption)"}
     ]
     </script>
   </div>
@@ -171,7 +171,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V3.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through the TLS handshake first and note the "PQC touches this" markers. Then read the lessons and open the "Go deeper" panel for the middlebox story.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

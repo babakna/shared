@@ -10,7 +10,7 @@
 <body data-module="PQC-302">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-302</span><span>Use-Case Labs</span><span class="version">V3.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-302</span><span>Use-Case Labs</span><span class="version">V4.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -49,10 +49,10 @@
   <div class="pqc-stepper" data-title="Ask these in order">
     <script type="application/json" class="steps">
     [
-      {"title":"What cryptographic job is this?","body":"Key establishment, signature, bulk encryption, or hashing? This decides the algorithm family. Name it precisely - 'it uses TLS' is not an answer.","meta":"job -> family"},
-      {"title":"What is the data lifetime and exposure?","body":"How long must it stay secret or trusted, and can an attacker capture it? Long-lived + exposed = harvest-now-decrypt-later priority.","meta":"lifetime + exposure -> priority"},
-      {"title":"Who are all the verifiers/endpoints?","body":"For signatures, every verifier must accept the new algorithm. For key exchange, every client and middlebox must handle the new sizes. List the slowest one.","meta":"ecosystem -> the real constraint"},
-      {"title":"How do we roll out and roll back?","body":"Hybrid first, feature-flag, canary, monitor negotiated groups/verify failures, and keep a fast rollback. Define the evidence that proves success.","meta":"rollout -> evidence + rollback"}
+      {"icon":"\ud83e\udde9","title":"What cryptographic job is this?","body":"Is it key establishment, a signature, bulk encryption, or hashing? This one answer decides the algorithm family: KEM (ML-KEM) for key establishment, signatures (ML-DSA/SLH-DSA) for authenticity, symmetric (AES-256) for bulk data. Name it precisely - 'it uses TLS' is <em>not</em> an answer, because TLS bundles three different jobs that migrate differently.","meta":"job -> algorithm family"},
+      {"icon":"\u23f3","title":"What is the data lifetime and exposure?","body":"How long must this data stay secret or trusted, and can an attacker capture it in transit or at rest today? <b>Long-lived + exposed = your harvest-now-decrypt-later priority</b>: an adversary records the ciphertext now and decrypts it after Q-day. A 10-second, internal-only value is far lower priority than a 25-year medical record crossing the public internet.","meta":"lifetime x exposure -> priority"},
+      {"icon":"\ud83d\udc65","title":"Who are all the verifiers/endpoints?","body":"For signatures, <em>every</em> verifier must accept the new algorithm before you can switch - miss one bootloader and devices brick. For key exchange, every client, proxy, and middlebox must tolerate the larger sizes. List them all, then find the <b>slowest one</b>: that laggard, not the crypto, sets your real timeline.","meta":"ecosystem -> the true constraint"},
+      {"icon":"\ud83d\ude80","title":"How do we roll out and roll back?","body":"Default pattern: hybrid first, behind a feature flag, on a small canary, while you monitor the negotiated group and signature-verify failure rate - and keep a one-click rollback. Decide up front what evidence <em>proves</em> success (e.g. '95% of sessions negotiated ML-KEM, zero verify errors') before you call it done.","meta":"rollout -> evidence + rollback"}
     ]
     </script>
   </div>
@@ -143,7 +143,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V3.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V4.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Try to answer each lab before revealing. Apply the four-question framework every time &mdash; the goal is a repeatable method, not memorized answers.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
