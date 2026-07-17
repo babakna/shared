@@ -1,11 +1,14 @@
 # Post-Quantum Cryptography Learning Lab
 
-V5.0 (July 2026)
+V5.1 (July 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
 
-## What changed in V5.0
+## What changed in V5.1
 
+- Refreshed U.S. federal PQC migration mandate coverage for EO 14412 and OMB M-26-15.
+- Added NIST CSWP 39upd1 crypto-agility guidance to governance and source alignment.
+- Upversioned the curriculum after the July 2026 tutorial audit.
 - **Steppers are now visual pipelines, not text pages.** Every "click Next" walkthrough now renders an SVG pipeline with an icon per stage; the current stage highlights and the connectors fill in as you advance, so you *see* where you are instead of just reading paragraphs.
 - **Deeper step content.** Each step was rewritten with concrete detail, real examples, and inline code/labels (e.g. `X25519+ML-KEM-768`), and several walkthroughs gained extra steps.
 - **More media throughout.** Icon-driven pipelines add colour and visual structure to the previously text-heavy explore sections.
@@ -59,4 +62,4 @@ Stage 5 &mdash; Capstone
 
 ## Source alignment
 
-Content is aligned to NIST PQC standards and guidance including FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA), the HQC selection, NCCoE migration guidance, and NSA CNSA 2.0. Algorithm sizes are representative values from the FIPS parameter sets. This is educational reference material, not production cryptographic approval; verify against current primary sources and your security team before any deployment.
+Content is aligned to NIST PQC standards and guidance including FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA), the HQC selection, NCCoE migration guidance, NIST CSWP 39upd1 crypto-agility guidance, White House EO 14412, OMB M-26-15, and NSA CNSA 2.0. Algorithm sizes are representative values from the FIPS parameter sets. This is educational reference material, not production cryptographic approval; verify against current primary sources and your security team before any deployment.
