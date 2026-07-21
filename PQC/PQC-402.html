@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-402 - Crypto Inventory &amp; CBOM Workshop</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="Build a cryptographic bill of materials in an editable table, classify risk automatically, and export it to CSV or JSON.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-402">
+<body id="top" data-module="PQC-402">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-402</span><span>Crypto Inventory &amp; CBOM Workshop</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-402</span><span>Crypto Inventory &amp; CBOM Workshop</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -47,23 +48,24 @@
 
 <section class="block" id="explore">
   <h2>Workshop: build a cryptographic bill of materials</h2>
-  <p class="section-hint">Edit any cell (click and type). The Risk column updates from the PQC status. Add rows for your own systems, then export. This is a starter template, not a compliance tool.</p>
+  <p class="section-hint">Edit text fields, choose 1&ndash;3 for each of four factors, and the tool calculates a 4&ndash;12 score plus priority tier. Add rows, sort highest first, then export. This is a transparent workshop model, not a compliance tool.</p>
   <div class="pqc-cbom" id="cbomWidget">
     <div class="cbom-controls">
       <button class="btn small primary" id="cbomAdd">+ Add row</button>
+      <button class="btn small" id="cbomSort">Sort by score</button>
       <button class="btn small" id="cbomCsv">Export CSV</button>
       <button class="btn small" id="cbomJson">Export JSON</button>
     </div>
     <div class="table-scroll">
       <table>
         <thead><tr>
-          <th>System</th><th>Crypto job</th><th>Algorithm</th><th>Key/param</th><th>Library/product</th><th>Data lifetime</th><th>Owner</th><th>PQC status</th><th>Risk</th><th></th>
+          <th>System</th><th>Crypto job</th><th>Algorithm</th><th>Key/param</th><th>Library/product</th><th>Dependency</th><th>Data lifetime</th><th>Lifetime score</th><th>Exposure score</th><th>Public-key dependence</th><th>Migration difficulty</th><th>Confidence</th><th>Owner</th><th>PQC status</th><th>Score</th><th>Priority</th><th>Delete</th>
         </tr></thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
-  <div class="callout tip"><span class="k">Try this</span><p>Change a row's PQC status to include the words "at risk" or "plan" and watch the Risk column recolor to High/Medium/Low. Then add a row for a system you actually run and export the CSV.</p></div>
+  <div class="callout tip"><span class="k">Scoring model</span><p>Add lifetime + exposure + public-key dependence + migration difficulty. <b>10&ndash;12 = Tier 1</b>, <b>7&ndash;9 = Tier 2</b>, <b>4&ndash;6 = Tier 3</b>. Confidence and PQC status are exported context but do not silently alter the score. Try changing a factor, sort, and inspect the backup row: AES stays, but its RSA-protected DEKs make the row a public-key migration target.</p></div>
 </section>
 
 <section class="lesson" id="s1">
@@ -137,7 +139,7 @@
 <section class="lesson" id="s5">
   <div class="lesson-title"><span class="num">5</span><h2>Scoring risk consistently</h2></div>
   <p class="lead">Gut-feel priorities collapse under scrutiny. A simple, repeatable score defends your ordering.</p>
-  <p>Every reviewer will argue their system is the most urgent. The way out is a transparent rubric applied to every row, so priority comes from the data, not the loudest owner. A workable scheme rates four factors 1&ndash;3 and combines them &mdash; the same four factors from the PQC-101 triage, now turned into numbers your CBOM tool can sort on.</p>
+  <p>Every reviewer will argue their system is the most urgent. The way out is a transparent rubric applied to every row, so priority comes from the data, not the loudest owner. This course rates four factors 1&ndash;3 and sums them. It is a triage heuristic: record confidence, review edge cases, and never let the number override a documented safety, legal, or mission-critical concern.</p>
   <div class="table-scroll"><table class="data">
     <thead><tr><th>Factor</th><th>Score 1 (low)</th><th>Score 2</th><th>Score 3 (high)</th></tr></thead>
     <tbody>
@@ -147,6 +149,7 @@
       <tr><td>Migration difficulty</td><td>You control it, easy</td><td>Some dependencies</td><td>Vendor/hardware-blocked</td></tr>
     </tbody>
   </table></div>
+  <p><b>Tier mapping:</b> 10&ndash;12 = Tier 1 (start/plan now), 7&ndash;9 = Tier 2 (next governed wave), and 4&ndash;6 = Tier 3 (monitor/refresh cycle). A high difficulty score raises urgency because it consumes runway; it does not mean the system is easy to finish.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>An external VPN with 10-year sensitive traffic on vendor hardware scores 3+3+3+3 = <b>12</b> (Tier 1, urgent). A public marketing page scores 1+3+1+1 = <b>6</b> (exposed but nothing to harvest &mdash; low). Sorting the CBOM by this score produces your wave order automatically, and you can point to the rubric when someone disputes their ranking.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Over-engineering the score. Four factors on a 1&ndash;3 scale is enough to sort a first pass. A 40-field weighted model that no one maintains is worse than a simple one people actually use.</p></div>
 </section>
@@ -232,13 +235,13 @@
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
-  <p>Edit the CBOM table directly, add your own systems, and export CSV/JSON to seed a real inventory. The Risk column is a simple demo classifier based on the PQC status text.</p>
+  <p>Edit the CBOM fields, score the four factors from 1 to 3, sort by total, and export CSV/JSON. The score is calculated from the visible rubric; confidence and status remain separate evidence fields.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
   <p class="disclaimer">Educational material only, not production cryptographic approval. Exports are a template, not a compliance artifact.</p>
 </div></div>

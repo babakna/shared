@@ -1,8 +1,19 @@
 # Post-Quantum Cryptography Learning Lab
 
-V5.1 (July 2026)
+V6.0 (July 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V6.0
+
+- Added a persistent 13-module journey bar, direct module selector, previous/next links, end-of-module continuation controls, and landing-page completion tracking.
+- Rebuilt steppers for keyboard operation, explicit disabled/completed states, and a visible Restart action after the final step.
+- Replaced unreliable inline Top handlers, added modal focus management and keyboard term popovers, improved contrast, and removed narrow-screen page overflow.
+- Corrected TLS 1.3 sequencing and ML-KEM wire roles; distinguished KEM output from KDF-derived traffic/wrapping keys; corrected SLH-DSA state and certificate-pinning explanations.
+- Separated harvest-now confidentiality exposure from Mosca schedule urgency, replaced blanket symmetric-key rules with parameter/policy guidance, and scoped dynamic deployment claims with dates and primary sources.
+- Rebuilt the CBOM workshop with complete fields, a visible four-factor 1&ndash;3 rubric, calculated 4&ndash;12 scores, Tier 1/2/3 priorities, sorting, and complete CSV/JSON exports.
+- Corrected U.S. agency versus contractor mandate scope, consumer eSIM/RSP actor flow, eUICC packaging/capacity claims, and 3GPP quantum-safe study status.
+- Updated protocol and governance sources, including RFC 9846, active IETF hybrid TLS work, NIST SP 800-227, GSMA architecture, 3GPP Release 20 study work, Signal SPQR, and dated deployment measurements.
 
 ## What changed in V5.1
 

@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-001 - Security &amp; Cryptography Basics</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="A no-background starting point: what cryptography protects and the four security jobs, explained with everyday analogies.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-001">
+<body id="top" data-module="PQC-001">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-001</span><span>Security &amp; Cryptography Basics</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -53,15 +54,15 @@
     <script type="application/json" class="steps">
     [
       {"icon":"\ud83c\udf10","title":"You type the address","body":"You enter <code>https://yourbank.com</code> and press Enter. Your browser turns that name into an IP address (DNS) and opens a plain TCP connection to the bank's server. Right now <b>nothing is protected</b> - any Wi-Fi router, ISP, or coffee-shop attacker on the path can see you are talking to the bank. Every protective job below happens next, inside the TLS handshake, in a few hundred milliseconds, before a single pixel of the login page appears.","meta":"still plaintext - nothing is secret yet"},
-      {"icon":"\ud83e\udeaa","title":"Prove who you are talking to","body":"The server sends its digital certificate - an ID card signed by a Certificate Authority (CA) your browser already trusts. Your browser verifies the signature, the domain name, and the expiry date. An impostor can copy the certificate, but not the matching private key, so their proof fails and you get a scary warning. This job is <b>authentication</b>, and it rests on digital signatures.","meta":"job: authentication (signatures) - QUANTUM-VULNERABLE"},
-      {"icon":"\ud83e\udd1d","title":"Agree on a secret in public","body":"Both sides now need one shared secret key, but every byte they exchange can be watched. They run a key-exchange (today Elliptic-Curve Diffie-Hellman) so that after a couple of messages both compute the <b>same</b> secret number, while an eavesdropper who recorded everything still cannot. This near-magical trick is public-key <b>key establishment</b> - and it is the single step a large quantum computer breaks outright.","meta":"job: key establishment (public-key) - QUANTUM-VULNERABLE"},
-      {"icon":"\ud83d\udd12","title":"Lock the conversation","body":"Using that shared secret, both sides switch to fast <b>symmetric</b> encryption such as AES-256-GCM. Your password, balance, and every click become bytes that look like random noise. Symmetric math is thousands of times faster than public-key math, which is why it protects the bulk data. Quantum computers only weaken it modestly (Grover's algorithm), so here we mostly just use a big enough key.","meta":"job: confidentiality (symmetric) - mostly OK"},
-      {"icon":"\ud83d\udee1\ufe0f","title":"Detect tampering","body":"Every encrypted record carries an authentication tag - a fingerprint only holders of the key can produce. Flip one bit, inject a packet, or replay an old message and the tag no longer matches, so the receiver rejects it instantly. This job is <b>integrity</b>, and unlike the handshake it runs on <em>every single message</em> for the whole session.","meta":"job: integrity (authenticated encryption)"},
+      {"icon":"\ud83e\udd1d","title":"Negotiate and derive handshake keys","body":"The browser sends a TLS <code>ClientHello</code> with supported options and a key share; the server answers with <code>ServerHello</code> and its share. Both sides derive the same handshake secrets without sending those secrets over the network. Classical TLS 1.3 normally uses ephemeral (EC)DHE here; a quantum-safe transition can combine it with ML-KEM.","meta":"job: key establishment - QUANTUM-VULNERABLE when classical-only"},
+      {"icon":"\ud83e\udeaa","title":"Authenticate the server","body":"Inside the now-encrypted handshake, the server sends its certificate chain and a <code>CertificateVerify</code> signature over the handshake transcript. The browser checks the chain, domain, validity, and proof that the server holds the matching private key. This is <b>authentication</b>; the classical certificate signature is a separate quantum-migration target.","meta":"job: authentication (signatures) - QUANTUM-VULNERABLE when classical-only"},
+      {"icon":"\u2705","title":"Confirm the handshake","body":"Each side sends a <code>Finished</code> message authenticated with keys derived from the handshake. Successful verification confirms that both saw the same transcript and derived the same secrets; then they derive fresh application-traffic keys.","meta":"boundary: handshake complete; application keys ready"},
+      {"icon":"\ud83d\udee1\ufe0f","title":"Protect every application record","body":"TLS uses an authenticated-encryption cipher such as AES-GCM or ChaCha20-Poly1305. It encrypts the page data and attaches a tag that detects tampering. These symmetric primitives are not broken by Shor's algorithm; parameter choices still follow current policy and the required security margin.","meta":"jobs: confidentiality + integrity (AEAD)"},
       {"icon":"\u2705","title":"You see the login page","body":"Only now does the encrypted, tamper-proof channel deliver the real HTML. The padlock in your address bar means all four jobs succeeded. This runs on <b>billions</b> of connections a day - which is exactly why quietly breaking the public-key steps (authentication and key establishment) would be a global catastrophe, and why we are migrating them first.","meta":"result: a trusted, private channel"}
     ]
     </script>
   </div>
-  <div class="callout takeaway"><span class="k">Why this matters</span><p>Only step 2 &mdash; the public-key key establishment &mdash; and the certificate signatures in step 1 are directly broken by a quantum computer. The fast symmetric encryption in step 3 mostly just needs bigger keys. Keep that split in mind for the whole course.</p></div>
+  <div class="callout takeaway"><span class="k">Why this matters</span><p>TLS has two distinct public-key migration targets: key establishment in the hello exchange and signature-based authentication in the certificate flight. Its symmetric authenticated encryption remains usable with policy-approved parameters. Keep that split in mind for the whole course.</p></div>
 </section>
 
 <section class="lesson" id="s1">
@@ -106,7 +107,7 @@
   </table></div>
   <p>A single product usually uses all four at once, in different amounts. A public software update does not need confidentiality (anyone may download it) but absolutely needs integrity and a signature. A medical record in the cloud needs confidentiality and integrity. A cell network needs authentication and key establishment.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>A firmware file may be downloadable by anyone with no secrecy at all. The device still refuses to install it unless a <b>signature</b> proves it came from the vendor and the bytes were not altered. That is authentication + integrity doing the work, not confidentiality.</p></div>
-  <p>These four jobs also map cleanly onto the <b>tools</b> that do them, which is the vocabulary you will use for the rest of the course. Confidentiality is delivered by <em>encryption</em> (symmetric ciphers like AES). Integrity is delivered by <em>hashes and MACs</em>. Authentication and non-repudiation are delivered by <em>key establishment</em> and <em>digital signatures</em>, which are the public-key tools. Keep that mapping in your head: it is the reason only <em>some</em> tools need replacing for the quantum era.</p>
+  <p>These jobs map to different <b>tools</b>. Confidentiality commonly uses symmetric encryption such as AES. Integrity uses authenticated encryption, MACs, hashes, or signatures depending on the context. Authentication can use signatures, certificates, MACs, or other credential protocols. <b>Key establishment is its own job:</b> it creates shared secret material; it does not by itself prove an identity unless the protocol authenticates the exchange. Classical public-key key establishment and signatures are the main quantum-migration targets.</p>
   <div class="callout tip"><span class="k">Rule of thumb</span><p>When you look at any system, ask: <em>which of the four jobs is this doing, and with which tool?</em> If the answer involves a signature or a key exchange, you have found a quantum-migration target. If it is "just AES encrypting a disk," you mostly need a big enough key.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Calling every cryptographic job "encryption." That vague habit hides which jobs actually need to be migrated for post-quantum. "We encrypt everything" tells you nothing about whether the system authenticates its peers or signs its updates &mdash; the parts quantum computers actually break.</p></div>
 </section>
@@ -132,21 +133,19 @@
       <text class="g-tm" x="166" y="150" font-size="11" text-anchor="middle">same key both sides</text>
       <rect x="34" y="176" width="264" height="46" rx="10" fill="rgba(10,124,70,.14)" stroke="#0A7C46" stroke-width="1.5"/>
       <text x="46" y="196" font-size="12.5" font-weight="800" fill="#0A7C46">Quantum impact: LOW (Grover)</text>
-      <text x="46" y="214" font-size="11.5" fill="#0A7C46">Just double the key size (AES-256) and the margin is back.</text>
+      <text x="46" y="214" font-size="11.5" fill="#0A7C46">AES stays usable; choose approved parameters.</text>
       <rect class="g-box-p" x="340" y="12" width="308" height="226" rx="14" stroke-width="2"/>
       <text class="g-t" x="362" y="44" font-size="17">Public-key (asymmetric)</text>
       <text class="g-tm" x="362" y="66" font-size="12.5">Public + private pair &middot; internet-scale trust</text>
-      <rect class="g-box" x="362" y="86" width="120" height="52" rx="10" stroke-width="1.5"/><text class="g-tm" x="422" y="110" font-size="12" text-anchor="middle">Public key</text><text class="g-tm" x="422" y="126" font-size="10.5" text-anchor="middle">shared openly</text>
-      <rect class="g-box" x="506" y="86" width="120" height="52" rx="10" stroke-width="1.5"/><text class="g-tm" x="566" y="110" font-size="12" text-anchor="middle">Private key</text><text class="g-tm" x="566" y="126" font-size="10.5" text-anchor="middle">kept secret</text>
-      <path class="g-line-p" d="M482 112 h24" marker-end="url(#a1)"/>
+      <rect class="g-box" x="356" y="82" width="132" height="66" rx="10" stroke-width="1.5"/><text class="g-tm" x="422" y="106" font-size="12" text-anchor="middle">Public key</text><text class="g-tm" x="422" y="124" font-size="10.5" text-anchor="middle">verify / encapsulate</text><text class="g-tm" x="422" y="139" font-size="10.5" text-anchor="middle">safe to distribute</text>
+      <rect class="g-box" x="500" y="82" width="132" height="66" rx="10" stroke-width="1.5"/><text class="g-tm" x="566" y="106" font-size="12" text-anchor="middle">Private key</text><text class="g-tm" x="566" y="124" font-size="10.5" text-anchor="middle">sign / decapsulate</text><text class="g-tm" x="566" y="139" font-size="10.5" text-anchor="middle">must stay secret</text>
       <rect x="362" y="176" width="264" height="46" rx="10" fill="rgba(180,35,24,.12)" stroke="#B42318" stroke-width="1.5"/>
       <text x="374" y="196" font-size="12.5" font-weight="800" fill="#B42318">Quantum impact: HIGH (Shor)</text>
-      <text x="374" y="214" font-size="11.5" fill="#B42318">RSA / ECDH / ECDSA break outright &mdash; must be replaced.</text>
-      <defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
+      <text x="374" y="214" font-size="11.5" fill="#B42318">RSA, ECDH, ECDSA fail; replace them.</text>
     </svg>
-    <figcaption>The whole post-quantum problem in one picture: symmetric cryptography survives with larger keys; public-key cryptography is the part that must be rebuilt.</figcaption>
+    <figcaption>A public/private key pair contains related keys with different operations; the public key does not turn into or reveal the private key. Post-quantum migration replaces vulnerable public-key schemes while retaining approved symmetric primitives.</figcaption>
   </figure>
-  <p>Here is the crucial part for this whole course: a capable quantum computer running <span class="term" data-def="A quantum algorithm that efficiently solves the integer-factoring and discrete-log problems that RSA, Diffie-Hellman, and elliptic-curve cryptography rely on.">Shor's algorithm</span> breaks the public-key family above. <span class="term" data-def="A quantum search algorithm giving a roughly square-root speedup; it weakens but does not collapse symmetric keys and hashes, which can be lengthened.">Grover's algorithm</span> only weakens symmetric keys and hashes, and you can restore the margin by using longer keys.</p>
+  <p>Here is the crucial part for this whole course: a capable quantum computer running <span class="term" data-def="A quantum algorithm that efficiently solves the integer-factoring and discrete-log problems that RSA, Diffie-Hellman, and elliptic-curve cryptography rely on.">Shor's algorithm</span> breaks the public-key family above. <span class="term" data-def="A quantum search algorithm giving a roughly square-root speedup; it weakens but does not collapse symmetric keys and hashes, which can be lengthened.">Grover's algorithm</span> only weakens symmetric cryptography and hashes in an idealized query model; approved parameters and policy determine the required margin.</p>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Find the <b>public-key</b> uses first &mdash; key establishment and signatures. That is the main post-quantum migration target. PQC does <em>not</em> replace AES.</p></div>
 </section>
 
@@ -211,20 +210,20 @@
 
 <section class="lesson" id="s6">
   <div class="lesson-title"><span class="num">6</span><h2>From classical to post-quantum: what actually changes</h2></div>
-  <p class="lead">Migration is two different actions: <b>replace</b> the broken public-key algorithms, and <b>resize</b> the symmetric ones.</p>
-  <p>This is the single most useful table in the whole course for a beginner. On the left are the classical algorithms you will find in almost any system built before ~2024. On the right is what they become in a post-quantum world. Notice that only the public-key rows change <em>algorithm</em>; the symmetric and hash rows keep the same algorithm and just grow.</p>
+  <p class="lead">Migration replaces the public-key algorithms broken by Shor and validates symmetric/hash parameters against current policy and the system's security needs.</p>
+  <p>On the left are common classical algorithms. On the right is the migration direction. Public-key rows require new algorithm families; symmetric and hash primitives generally remain, although an organization may choose larger parameters for a greater quantum-security margin. That is a risk and policy decision, not a universal requirement to double every parameter.</p>
   <div class="table-scroll"><table class="data">
     <thead><tr><th>Job</th><th>Classical tool (today)</th><th>Post-quantum path</th><th>Change type</th></tr></thead>
     <tbody>
       <tr><td><b>Key establishment</b></td><td>RSA, Diffie-Hellman, ECDH</td><td><code class="inl">ML-KEM</code> (FIPS 203), usually hybrid with ECDH</td><td class="risk-cell" style="color:var(--red)">Replace</td></tr>
       <tr><td><b>Digital signatures</b></td><td>RSA, ECDSA, EdDSA</td><td><code class="inl">ML-DSA</code> (FIPS 204), <code class="inl">SLH-DSA</code> (FIPS 205), FN-DSA</td><td class="risk-cell" style="color:var(--red)">Replace</td></tr>
-      <tr><td><b>Bulk encryption</b></td><td>AES-128</td><td>AES-256 (same algorithm, bigger key)</td><td style="color:var(--green);font-weight:800">Resize</td></tr>
-      <tr><td><b>Hashing / integrity</b></td><td>SHA-256</td><td>SHA-384 / SHA-512 (longer output)</td><td style="color:var(--green);font-weight:800">Resize</td></tr>
+      <tr><td><b>Bulk encryption</b></td><td>AES-128 / AES-256</td><td>Retain an approved AES mode; AES-256 offers the larger margin</td><td style="color:var(--green);font-weight:800">Validate</td></tr>
+      <tr><td><b>Hashing / integrity</b></td><td>SHA-256 and larger</td><td>Retain approved hashes; size output to the job and policy</td><td style="color:var(--green);font-weight:800">Validate</td></tr>
     </tbody>
   </table></div>
-  <p>Why the asymmetry? A quantum computer running <b>Shor's algorithm</b> solves the exact math problem (factoring, discrete logs) that RSA and elliptic-curve crypto rely on, so those are broken no matter how big you make the key &mdash; they must be replaced with entirely different math. But <b>Grover's algorithm</b> only gives a square-root speedup against symmetric keys and hashes, which you neutralize simply by doubling the size. Replacing is hard and disruptive; resizing is mostly a configuration change.</p>
-  <div class="callout example"><span class="k">Concrete example</span><p>A TLS 1.3 connection today might use <code class="inl">ECDHE</code> for key exchange, <code class="inl">ECDSA</code> for the certificate, and <code class="inl">AES-128-GCM</code> for data. The post-quantum version keeps AES (bumped to 256), but swaps ECDHE for hybrid <code class="inl">X25519+ML-KEM-768</code> and the ECDSA certificate for <code class="inl">ML-DSA</code>. Same connection, two algorithms replaced, one resized.</p></div>
-  <div class="callout tip"><span class="k">You now have the whole map</span><p>Every later module &mdash; standards, protocols, implementation, migration &mdash; is just this table applied in detail to real systems. If you understand "replace the public-key parts, resize the symmetric parts," you understand post-quantum cryptography at a strategic level.</p></div>
+  <p>Why the asymmetry? Shor's algorithm solves the factoring and discrete-log problems behind RSA and elliptic-curve cryptography, so larger classical public keys do not fix them. Grover gives an idealized square-root search speedup against symmetric keys, but practical quantum resource costs and the required security category also matter. NIST therefore evaluates whole parameter sets rather than prescribing one blanket doubling rule.</p>
+  <div class="callout example"><span class="k">Concrete example</span><p>A TLS connection may use ECDHE for key establishment, ECDSA for certificate authentication, and AES-GCM for records. A transition can use hybrid X25519+ML-KEM for key establishment while retaining AES-GCM. Post-quantum certificate authentication follows a separate ecosystem schedule; do not imply that switching the KEM automatically switches the certificate.</p></div>
+  <div class="callout tip"><span class="k">You now have the whole map</span><p>Every later module applies this split to real systems: replace quantum-vulnerable public-key dependencies, keep an inventory of symmetric/hash uses, and validate every parameter against the current standard, protocol profile, and risk requirement.</p></div>
 </section>
 
 <section class="block lab" id="labs">
@@ -280,11 +279,11 @@
     {"q":"What does a certificate bind together?","choices":["An identity and a public key","A battery and a charger","A font and a color"],"answer":0,"explain":"A certificate is a signed statement that a given public key belongs to a specific identity, vouched for by a trusted authority."},
     {"q":"What is the main target of a post-quantum migration?","choices":["Public-key key establishment and signatures","Every image file","All user passwords"],"answer":0,"explain":"Shor's algorithm breaks classical public-key math (key exchange and signatures). Symmetric encryption and hashes are affected far less."},
     {"q":"Why is an encrypted session to an impostor still unsafe?","choices":["Authentication failed, so you have a private line to the wrong party","Encryption is too fast","The page is too long"],"answer":0,"explain":"Confidentiality without authentication just means you are secretly talking to an attacker. Trust must come first."},
-    {"q":"Which pair is affected LEAST by quantum computers?","choices":["AES-256 and SHA-384","RSA and ECDH","ECDSA and EdDSA"],"answer":0,"explain":"Symmetric encryption (AES) and hashes (SHA) only need larger sizes to keep their margin. RSA, ECDH, ECDSA, EdDSA are public-key and are the real problem."},
+    {"q":"Which pair is affected LEAST by Shor's algorithm?","choices":["AES-256 and SHA-384","RSA and ECDH","ECDSA and EdDSA"],"answer":0,"explain":"Shor structurally breaks the factoring/discrete-log public-key schemes. AES and SHA remain approved families; evaluate their parameters and the required hash property against current policy."},
     {"q":"You upgrade a website's leaf certificate to a PQC signature but nothing else. What is the risk?","choices":["Old clients or middleboxes may fail to parse the new, larger certificate","The website loads faster","Passwords become unnecessary"],"answer":0,"explain":"PKI is an ecosystem. Roots, intermediates, clients, logs, and proxies all must understand the new identifiers and sizes."},
     {"q":"In post-quantum migration, what happens to AES?","choices":["It stays, usually moving to a 256-bit key (resize, not replace)","It is deleted entirely","It is replaced by ML-KEM"],"answer":0,"explain":"AES is symmetric. Grover only gives a square-root speedup, so AES-256 keeps a strong margin. ML-KEM replaces key exchange, not bulk encryption."},
     {"q":"Why must authentication happen before bulk encryption in a connection?","choices":["Otherwise you might build a private channel to an impostor","Encryption is slower than authentication","Certificates cannot be compressed"],"answer":0,"explain":"Confidentiality without authentication just means you are secretly talking to the wrong party. Trust must be established first."},
-    {"q":"In the systems matrix, why are 'confidentiality' and 'integrity' marked low quantum risk?","choices":["They are done by symmetric ciphers and hashes, which only need larger sizes","They are never used in practice","Quantum computers cannot read encrypted data at all"],"answer":0,"explain":"Those jobs use symmetric/hash tools affected only by Grover's square-root speedup, fixed by doubling sizes. The public-key jobs (auth, signature, key exchange) are the ones Shor breaks."}
+    {"q":"In the systems matrix, why are symmetric confidentiality and hash integrity marked lower quantum risk?","choices":["Their approved algorithm families remain usable with policy-selected parameters","They are never used in practice","Quantum computers cannot attack generic search at all"],"answer":0,"explain":"Shor does not structurally break AES or SHA. Generic quantum attacks change security margins, so parameters and security properties still need review; classical public-key jobs require algorithm replacement."}
   ]
   </script>
 </section>
@@ -297,15 +296,17 @@
   <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
   <a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205 &mdash; SLH-DSA</a>
   <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
+  <a href="https://datatracker.ietf.org/doc/html/rfc9846" target="_blank" rel="noopener noreferrer">IETF RFC 9846 &mdash; TLS 1.3</a>
+  <a href="https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/faqs" target="_blank" rel="noopener noreferrer">NIST PQC FAQ &mdash; security categories and symmetric-key context</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Work top to bottom: try the interactive walkthrough, read each numbered lesson, open the "Go deeper" panels if you want more detail, do the labs, then take the quiz.</p>
   <p>Unfamiliar word? Most key terms link to the <a href="glossary.html">Glossary</a>. Use the side navigation to jump around, and the Top button to return here.</p>

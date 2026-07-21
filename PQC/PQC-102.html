@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-102 - Cryptographic Building Blocks Deep Dive</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="Keys, hashes, MACs, signatures, certificates, and a step-by-step TLS handshake - and where PQC actually changes things.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-102">
+<body id="top" data-module="PQC-102">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-102</span><span>Cryptographic Building Blocks</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -51,15 +52,15 @@
   <div class="pqc-stepper" data-title="TLS 1.3 handshake, simplified">
     <script type="application/json" class="steps">
     [
-      {"icon":"\ud83d\udc4b","title":"ClientHello","body":"Your browser opens by listing what it supports: the TLS version (1.3), the symmetric cipher suites (like AES-256-GCM), and the key-exchange groups. To save a network round trip it also attaches a key-share <em>guess</em>. In a PQC deployment this message is exactly where a post-quantum or hybrid group - for example <code>X25519+ML-KEM-768</code> - is advertised.","meta":"PQC touches this: key-exchange group offered"},
-      {"icon":"\ud83e\udd1d","title":"ServerHello + key share","body":"The server picks one cipher suite and one group, then returns its own key-share. Both sides now run the key-exchange math and <b>independently derive the SAME shared secret</b> without ever transmitting it. Today that is ECDHE; post-quantum uses the ML-KEM key-encapsulation mechanism, usually hybrid so that even a break in one half still leaves the connection safe.","meta":"PQC target: key establishment (ML-KEM)"},
-      {"icon":"\ud83e\udeaa","title":"Certificate","body":"The server presents its certificate chain proving its identity, signed by a Certificate Authority. Classically these are ECDSA or RSA signatures; in future they become ML-DSA or SLH-DSA. This is where PQC hurts most on <b>size</b> - an ML-DSA chain can add several kilobytes, which may spill across extra TCP packets and expose slow middleboxes.","meta":"PQC target: certificate signatures (much bigger)"},
+      {"icon":"\ud83d\udc4b","title":"ClientHello","body":"The browser offers TLS 1.3 cipher suites (for example AES-128-GCM, AES-256-GCM, or ChaCha20-Poly1305) and supported key-establishment groups. It also sends a key share. In the active IETF ECDHE+ML-KEM design, the client's hybrid share contains an ECDHE share and the ML-KEM encapsulation key.","meta":"PQC wire role: client sends the ML-KEM encapsulation key"},
+      {"icon":"\ud83e\udd1d","title":"ServerHello + key share","body":"The server selects a suite and group. For the hybrid group it returns its ECDHE share plus the ML-KEM ciphertext created by encapsulating to the client's key. Both endpoints combine the ECDHE and ML-KEM secrets through the TLS 1.3 key schedule and derive encrypted-handshake keys. The specification is an IETF work in progress, so implement the named protocol profile rather than inventing a combiner.","meta":"PQC target: protocol-defined hybrid key establishment"},
+      {"icon":"\ud83e\udeaa","title":"Encrypted certificate flight","body":"Using the handshake keys, the server sends its certificate chain and authentication parameters. Certificate signatures are classically RSA/ECDSA today; post-quantum certificate profiles are a separate migration track. Larger keys, signatures, and chains affect transport, parsers, logs, issuance, and every verifier.","meta":"PQC target: certificate ecosystem and signatures"},
       {"icon":"\u270d\ufe0f","title":"CertificateVerify","body":"The server signs a hash of the entire handshake so far with the private key matching its certificate. This proves the certificate holder is <b>live and present right now</b>, not a replay of a recorded session. It is a second signature operation - separate from the certificate itself - that PQC also changes.","meta":"PQC target: live handshake signature"},
-      {"icon":"\ud83d\udd12","title":"Finished + application data","body":"Both sides derive symmetric keys from the shared secret, exchange Finished messages to confirm nothing was tampered with mid-handshake, then switch to fast authenticated encryption (AES-256-GCM or ChaCha20-Poly1305). This bulk data protection is largely <b>unaffected</b> by quantum computers - it just wants a big enough key (256-bit).","meta":"mostly unchanged (symmetric bulk encryption)"}
+      {"icon":"\ud83d\udd12","title":"Finished + application data","body":"Each side verifies a <code>Finished</code> value bound to the transcript, then the TLS key schedule derives application-traffic secrets. An approved AEAD protects records. These symmetric primitives are not broken by Shor; select the suite and parameters from current policy rather than assuming every deployment must use a 256-bit AES key.","meta":"retained: transcript-bound key schedule + approved AEAD"}
     ]
     </script>
   </div>
-  <div class="callout takeaway"><span class="k">Read the pattern</span><p>Of five steps, PQC changes the <b>key exchange</b> and the <b>signatures</b> (steps 1&ndash;4). The bulk data encryption (step 5) mainly needs adequate key size. This is the shape of nearly every protocol migration.</p></div>
+  <div class="callout takeaway"><span class="k">Read the pattern</span><p>PQC changes two separate jobs: key establishment in the hello exchange and signature-based authentication in the certificate flight. The transcript-bound key schedule and record AEAD remain, with approved parameters. Treat the active hybrid draft as work in progress and the certificate transition as its own ecosystem project.</p></div>
 </section>
 
 <section class="lesson" id="s1">
@@ -116,7 +117,7 @@
     <li><b>Negotiation</b> &mdash; both sides agree on versions, ciphers, and groups, with protection against a downgrade attack. <span style="color:var(--muted)">Structural, not crypto-broken.</span></li>
     <li><b>Key establishment</b> &mdash; derive a shared secret without sending it. <span style="color:var(--red);font-weight:800">PQC target (ML-KEM).</span></li>
     <li><b>Handshake signature</b> &mdash; prove the certificate holder is live now. <span style="color:var(--red);font-weight:800">PQC target (signatures).</span></li>
-    <li><b>Bulk encryption + integrity</b> &mdash; AEAD protects the actual data. <span style="color:var(--green);font-weight:800">Kept/resized.</span></li>
+    <li><b>Bulk encryption + integrity</b> &mdash; AEAD protects the actual data. <span style="color:var(--green);font-weight:800">Retained with policy-approved parameters.</span></li>
   </ul>
   <p>That is why "making TLS post-quantum" is more than swapping a function call. You saw the five steps above. <span class="term" data-def="A transition approach that runs a classical and a post-quantum mechanism together, so the result is safe if either one holds.">Hybrid key exchange</span> is the common transition model: run classical ECDHE and ML-KEM together, combine both secrets, and you are protected if either survives. It must be protocol-defined, with downgrade protection.</p>
   <details class="deep"><summary>Go deeper: why hybrid handshakes sometimes fail on the real network path</summary>
@@ -155,7 +156,7 @@
 <section class="lesson" id="s6">
   <div class="lesson-title"><span class="num">6</span><h2>Hybrid key establishment, step by step</h2></div>
   <p class="lead">The safest way to adopt a young algorithm is to not bet everything on it yet.</p>
-  <p>ML-KEM is well-analyzed but far newer than ECDH. Rather than trust it alone, most deployments run <b>both</b> a classical and a post-quantum key exchange in the same handshake and combine the two shared secrets with a key-derivation function (KDF). The result is secure as long as <em>either</em> half remains unbroken &mdash; classical protects you if an unknown flaw is found in ML-KEM, and ML-KEM protects you against a quantum computer. You only lose if both break, which is highly unlikely.</p>
+  <p>ML-KEM is well-analyzed but newer in deployment than ECDH. Current transition profiles often run <b>both</b> a classical and post-quantum mechanism and combine their secrets through a protocol-defined KDF. The intended robustness claim depends on the combiner, transcript binding, input validation, and downgrade protection; concatenating two secrets in application code does not automatically provide it.</p>
   <figure class="figure">
     <div class="fig-title">Hybrid: combine two independent shared secrets</div>
     <svg viewBox="0 0 680 200" role="img" aria-label="Hybrid key establishment runs classical ECDH and post-quantum ML-KEM in parallel, then combines both shared secrets in a key-derivation function to produce the session key.">
@@ -166,7 +167,7 @@
       <g class="g-line-p"><line x1="240" y1="53" x2="330" y2="88" marker-end="url(#hy)"/><line x1="240" y1="135" x2="330" y2="110" marker-end="url(#hy)"/><line x1="480" y1="99" x2="556" y2="99" marker-end="url(#hy)"/></g>
       <defs><marker id="hy" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
     </svg>
-    <figcaption>Safe if <em>either</em> algorithm holds. This "defense in depth" is why standards like TLS and SSH ship hybrid modes first, before any pure-PQC mode.</figcaption>
+    <figcaption>A reviewed hybrid construction is designed to retain security when one component remains secure. The protocol definition &mdash; including transcript binding and downgrade handling &mdash; is part of that claim.</figcaption>
   </figure>
   <div class="callout example"><span class="k">You can spot it in the wild</span><p>In a modern browser's connection details you may see a group named <code class="inl">X25519MLKEM768</code>. The <code class="inl">X25519</code> half is classical ECDH; the <code class="inl">MLKEM768</code> half is post-quantum. Both ran, and their secrets were combined &mdash; exactly the picture above.</p></div>
 </section>
@@ -187,7 +188,7 @@
       <p class="scenario">A hybrid-PQC TLS pilot works in the browser but a five-year-old mobile app fails to connect.</p>
       <p class="decide">Name likely causes.</p>
       <button class="btn small reveal">Show recommended answer</button>
-      <p class="answer"><span class="k">Recommended answer</span> The app's bundled TLS stack, the OS, a proxy on the path, or certificate pinning may not understand the new group identifiers or the larger handshake size. It is an ecosystem issue, not a server bug.</p>
+      <p class="answer"><span class="k">Recommended answer</span> The app's bundled TLS stack or OS may not implement the group, and a proxy/middlebox may reject the identifier or larger ClientHello. Certificate pinning is a separate issue only if the certificate or pinned public key also changes; hybrid key establishment alone does not inherently change a certificate/SPKI pin.</p>
     </article>
     <article class="case">
       <h3>Lab 3 &middot; CI/CD signing key</h3>
@@ -239,17 +240,18 @@
   <p class="section-hint">Educational; verify against primary guidance before decisions.</p>
   <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203 &mdash; ML-KEM</a>
   <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
-  <a href="https://datatracker.ietf.org/doc/rfc8446/" target="_blank" rel="noopener noreferrer">IETF RFC 8446 &mdash; TLS 1.3</a>
+  <a href="https://datatracker.ietf.org/doc/html/rfc9846" target="_blank" rel="noopener noreferrer">IETF RFC 9846 &mdash; TLS 1.3</a>
+  <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-ecdhe-mlkem" target="_blank" rel="noopener noreferrer">IETF ECDHE-MLKEM for TLS 1.3 &mdash; active Internet-Draft (work in progress)</a>
   <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through the TLS handshake first and note the "PQC touches this" markers. Then read the lessons and open the "Go deeper" panel for the middlebox story.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

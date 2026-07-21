@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-201 - PQC Standards and Algorithm Families</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="ML-KEM, ML-DSA, SLH-DSA, HQC, and FN-DSA - what each is for, with real key and signature sizes side by side.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-201">
+<body id="top" data-module="PQC-201">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -95,7 +96,7 @@
 <section class="lesson" id="s2">
   <div class="lesson-title"><span class="num">2</span><h2>KEMs: how ML-KEM is actually used</h2></div>
   <p class="lead">A KEM does not "encrypt your data." It agrees on a shared secret; symmetric crypto does the rest.</p>
-  <p>A <span class="term" data-def="Key Encapsulation Mechanism: the recipient publishes a public key; a sender uses it to produce a ciphertext plus a shared secret; the recipient decapsulates to recover the same secret.">KEM</span> has three moves: the recipient publishes a public key; the sender <b>encapsulates</b> (produces a ciphertext + a shared secret); the recipient <b>decapsulates</b> (recovers the same shared secret). That secret then feeds authenticated symmetric encryption like AES-GCM.</p>
+  <p>A <span class="term" data-def="Key Encapsulation Mechanism: the recipient publishes a public key; a sender uses it to produce a ciphertext plus a shared secret; the recipient decapsulates to recover the same secret.">KEM</span> has three moves: the recipient publishes a public key; the sender <b>encapsulates</b> (produces a ciphertext + a shared secret); the recipient <b>decapsulates</b> (recovers the same shared secret). A protocol normally combines and expands that secret with a defined key-derivation function (KDF), then uses the derived keys with authenticated encryption such as AES-GCM.</p>
   <div class="callout example"><span class="k">Everyday analogy</span><p>A KEM is like mailing someone an open padlock (your public key) that only you can unlock. They snap a random secret inside a box, click your padlock shut, and ship it back. Anyone watching the box in transit cannot open it; only you, with the private key, can. The "secret in the box" then becomes the shared key both sides use with fast symmetric encryption. Notice the KEM never <em>sent</em> your data &mdash; it only agreed on a key.</p></div>
   <div class="flow">
     <div class="flow-step"><b>KeyGen</b><span>Recipient publishes an ML-KEM public key.</span></div>
@@ -104,7 +105,7 @@
     <span class="arrow">&rarr;</span>
     <div class="flow-step"><b>Decapsulate</b><span>Recipient recovers the same secret.</span></div>
     <span class="arrow">&rarr;</span>
-    <div class="flow-step"><b>Derive keys</b><span>Both sides run AES-GCM etc.</span></div>
+    <div class="flow-step"><b>Derive keys</b><span>A protocol KDF creates AEAD keys and other traffic secrets.</span></div>
   </div>
   <figure class="figure">
     <div class="fig-title">ML-KEM-768 on the wire &mdash; who sends what, and how big</div>
@@ -122,7 +123,7 @@
     </svg>
     <figcaption>Compare with classical X25519, where each side sends a 32-byte value. ML-KEM's ~1&nbsp;KB messages are the "size tax" that ripples into handshakes, packets, and storage &mdash; but the resulting secret is the same tiny 32 bytes.</figcaption>
   </figure>
-  <div class="callout example"><span class="k">Concrete example</span><p>ML-KEM-768 (a common choice) has a 1,184-byte public key and a 1,088-byte ciphertext. A TLS server offers the key; the client encapsulates; both derive session keys. The data stream is then protected by ordinary symmetric encryption.</p></div>
+  <div class="callout example"><span class="k">Generic KEM vs TLS</span><p>In the generic recipient/sender model above, the recipient publishes the KEM public key. The active IETF TLS hybrid design instantiates the roles differently: the <b>client</b> sends the ML-KEM encapsulation key in its key share, and the <b>server</b> encapsulates and returns the ciphertext in its key share. TLS then combines the classical and ML-KEM shared secrets through its key schedule. Do not infer wire direction from the generic API model.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Trying to "ML-KEM-encrypt" a large blob directly, or stuffing KEM public keys and ciphertexts into old fixed-size fields without checking the new sizes.</p></div>
 </section>
 
@@ -152,16 +153,16 @@
 <section class="lesson" id="s5">
   <div class="lesson-title"><span class="num">5</span><h2>Parameter sets and security levels</h2></div>
   <p class="lead">Each algorithm ships in a few "sizes." NIST labels them by how hard they are to break.</p>
-  <p>You do not just pick "ML-KEM" &mdash; you pick a <b>parameter set</b>, which fixes the security level and therefore the key/signature sizes. NIST defines target categories tied to breaking a well-known symmetric primitive: roughly, <b>Level 1</b> &asymp; brute-forcing AES-128, <b>Level 3</b> &asymp; AES-192, and <b>Level 5</b> &asymp; AES-256. Higher level means more security margin and bigger, slower material. Most deployments today standardize on the middle option (Level 3) as a balanced default, matching CNSA 2.0-style guidance that leans toward the higher levels for national-security use.</p>
+  <p>You do not just pick "ML-KEM" &mdash; you pick a <b>parameter set</b>, which fixes the target security category and the key/signature sizes. NIST categories compare attack effort with well-studied symmetric primitives: roughly, <b>Category 1</b> with AES-128 key search, <b>Category 3</b> with AES-192, and <b>Category 5</b> with AES-256. The correct set comes from the protocol profile and governing policy. For example, the current IETF TLS hybrid work profiles ML-KEM-768, while NSA's CNSA 2.0 profile for National Security Systems specifies ML-KEM-1024 and ML-DSA-87. Those are different scopes, not evidence for one universal default.</p>
   <div class="table-scroll"><table class="data">
-    <thead><tr><th>NIST level</th><th>Comparable to</th><th>KEM</th><th>Signature (lattice)</th><th>Typical use</th></tr></thead>
+    <thead><tr><th>NIST category</th><th>Comparable attack effort</th><th>KEM</th><th>Signature (lattice)</th><th>Profile context</th></tr></thead>
     <tbody>
       <tr><td>Level 1</td><td>AES-128</td><td>ML-KEM-512</td><td>ML-DSA-44</td><td>Constrained / low-margin</td></tr>
-      <tr><td><b>Level 3</b></td><td>AES-192</td><td><b>ML-KEM-768</b></td><td><b>ML-DSA-65</b></td><td><b>Balanced default</b></td></tr>
-      <tr><td>Level 5</td><td>AES-256</td><td>ML-KEM-1024</td><td>ML-DSA-87</td><td>Highest assurance / long-lived</td></tr>
+      <tr><td><b>Level 3</b></td><td>AES-192</td><td><b>ML-KEM-768</b></td><td><b>ML-DSA-65</b></td><td>Used by profiles including current hybrid TLS work</td></tr>
+      <tr><td>Level 5</td><td>AES-256</td><td>ML-KEM-1024</td><td>ML-DSA-87</td><td>Required by some high-assurance profiles, including CNSA 2.0</td></tr>
     </tbody>
   </table></div>
-  <div class="callout example"><span class="k">Concrete example</span><p>A public web service picks ML-KEM-768 (Level 3) to balance size and margin. A national-security system or a 20-year root of trust may step up to ML-KEM-1024 / ML-DSA-87 (Level 5), accepting the larger payloads because the data must outlive several hardware generations.</p></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A web service following the active hybrid TLS specification implements its profiled ML-KEM-768 group. A U.S. National Security System follows CNSA 2.0 and its transition schedule, including ML-KEM-1024 and ML-DSA-87. A commercial firmware program documents its own verifier, lifetime, compliance, and size constraints before selecting a signature set.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Mixing levels inconsistently across a system &mdash; e.g. a Level 5 signature protecting a Level 1 key exchange. Match the level to the weakest link and the data's real lifetime, and document the choice.</p></div>
 </section>
 
@@ -229,7 +230,7 @@
       <p class="scenario">Team A runs a public API; Team B builds a firmware root of trust meant to be trusted for 20 years.</p>
       <p class="decide">Which parameter levels make sense for each?</p>
       <button class="btn small reveal">Show recommended answer</button>
-      <p class="answer"><span class="k">Recommended answer</span> Team A can use Level 3 (ML-KEM-768 / ML-DSA-65) for a balanced size-vs-margin default. Team B should lean to Level 5 (ML-KEM-1024 / ML-DSA-87 or SLH-DSA) because the root must survive multiple hardware generations, and the larger material is an acceptable cost for a rarely used, long-lived anchor.</p>
+      <p class="answer"><span class="k">Recommended answer</span> Team A must follow its deployed protocol profile; the current IETF hybrid TLS work uses ML-KEM-768 for key establishment. Team B is choosing a <em>signature</em>, not a KEM, and should select the approved ML-DSA or SLH-DSA set after testing boot-ROM size, verification time, artifact lifetime, and policy. CNSA 2.0 systems use ML-DSA-87; that mandate should not be generalized to every firmware product.</p>
     </article>
     <article class="case">
       <h3>Lab 5 &middot; Diversity in practice</h3>
@@ -254,7 +255,7 @@
     {"q":"Roughly how does an ML-DSA-65 signature compare to ECDSA P-256?","choices":["Much larger (thousands of bytes vs ~72)","Identical size","Much smaller"],"answer":0,"explain":"ML-DSA-65 is ~3,309 bytes versus ~72 for ECDSA P-256 - the size jump drives many migration issues."},
     {"q":"What is the point of hybrid key exchange?","choices":["Stay safe if either the classical or PQC part holds","Double the encryption speed","Remove the need for certificates"],"answer":0,"explain":"Hybrid combines classical and PQC so a break in one does not break the session, easing transition."},
     {"q":"Why build algorithm agility?","choices":["Standards, products, and risks change over time","To skip all testing","To avoid keeping an inventory"],"answer":0,"explain":"Agility lets you swap algorithms/parameters/providers later (e.g. adopt HQC) without re-architecting."},
-    {"q":"What does a NIST 'Level 3' parameter set roughly correspond to?","choices":["Security comparable to breaking AES-192","No security at all","Comparable to breaking AES-64"],"answer":0,"explain":"NIST levels map to symmetric strength: L1~AES-128, L3~AES-192, L5~AES-256. Level 3 (e.g. ML-KEM-768) is a common balanced default."},
+    {"q":"What does NIST security Category 3 roughly compare attack effort with?","choices":["Exhaustive key search on AES-192","No security at all","Breaking AES-64"],"answer":0,"explain":"NIST Categories 1, 3, and 5 compare attack effort with AES-128, AES-192, and AES-256 key search. The deployed parameter set still comes from the relevant protocol and policy profile."},
     {"q":"ML-KEM and ML-DSA are based on which math family?","choices":["Lattices","Hash functions","Elliptic curves"],"answer":0,"explain":"Both are lattice-based (from CRYSTALS-Kyber and -Dilithium). SLH-DSA is hash-based; HQC is code-based."},
     {"q":"Why did NIST standardize algorithms from more than one math family?","choices":["Diversity: a break in one family leaves the others standing","To make the standards longer","Because lattices are insecure"],"answer":0,"explain":"Standardizing lattice, hash-based, and code-based schemes provides a fallback if any single family is later weakened."},
     {"q":"An ML-KEM-768 exchange sends ~1 KB messages but the shared secret is...","choices":["A small 32-byte key that feeds symmetric encryption","Also about 1 KB","The entire file"],"answer":0,"explain":"The public key (~1,184 B) and ciphertext (~1,088 B) are large, but they produce a compact 32-byte secret used by AES-GCM."}
@@ -270,15 +271,18 @@
   <a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205 &mdash; SLH-DSA</a>
   <a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST &mdash; HQC selection announcement</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; PQC project (FN-DSA status)</a>
+  <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; Recommendations for Key-Encapsulation Mechanisms</a>
+  <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-ecdhe-mlkem" target="_blank" rel="noopener noreferrer">IETF TLS ECDHE-MLKEM &mdash; active Internet-Draft (work in progress)</a>
+  <a href="https://media.defense.gov/2022/Sep/07/2003071836/-1/-1/0/CSI_CNSA_2.0_FAQ_.PDF" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 FAQ &mdash; National Security System parameter profile</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Start with the size comparison &mdash; those ratios explain most PQC engineering pain. Then read each family's lesson and try the labs.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

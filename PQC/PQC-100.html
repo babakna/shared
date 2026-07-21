@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-100 - Quantum Computing in Plain English</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="What a qubit is, what quantum computers can and cannot do, and why they threaten some cryptography and not others - no physics degree required.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-100">
+<body id="top" data-module="PQC-100">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-100</span><span>Quantum Computing in Plain English</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-100</span><span>Quantum Computing in Plain English</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -116,10 +117,10 @@
       <tr><td><b>Grover's algorithm</b></td><td>Searches an unsorted space with a roughly square-root speedup (N &rarr; &radic;N tries).</td><td><b>Weakens</b> symmetric keys and hashes. AES-256 keeps a strong margin; short keys should grow.</td></tr>
     </tbody>
   </table></div>
-  <div class="callout example"><span class="k">Concrete example</span><p>Shor turns "factoring a 2048-bit RSA number," which is effectively impossible for classical computers, into something a large enough fault-tolerant quantum computer could do in hours or days. Grover only halves the effective strength of a symmetric key, so AES-256 still behaves like ~128-bit security &mdash; still far out of reach.</p></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>Shor changes factoring and discrete logarithms from infeasible classical problems into polynomial-time quantum algorithms on a sufficiently capable fault-tolerant machine. In an idealized query model, Grover changes exhaustive search against a 256-bit key from roughly 2<sup>256</sup> trials to roughly 2<sup>128</sup> sequential oracle queries; real resource cost is higher and architecture-dependent.</p></div>
   <p>Outside cryptography, quantum computers are genuinely promising for a narrow set of problems where nature itself is quantum: simulating molecules and materials (batteries, catalysts, drugs), certain optimization problems, and some machine-learning subroutines. These are exciting and real. But note what is <em>not</em> on the list: they will not make your spreadsheet, database, web server, or video game meaningfully faster. "Quantum" is a specialized accelerator, not a faster CPU.</p>
   <div class="callout warn"><span class="k">Keep it in proportion</span><p>The security story is dominated by exactly one algorithm &mdash; Shor &mdash; against exactly one family &mdash; public-key. Everything else quantum computing might do is irrelevant to your migration. If you remember only that, you will not be fooled by breathless claims that "quantum breaks all encryption."</p></div>
-  <div class="callout takeaway"><span class="k">Takeaway</span><p>Shor drives <b>replacement</b> of public-key crypto. Grover drives <b>bigger keys/hashes</b>, not replacement. That asymmetry shapes the entire migration.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Shor drives <b>replacement</b> of vulnerable public-key schemes. Grover changes generic key/preimage search margins; approved symmetric/hash families remain, with parameters selected for the required security category and property.</p></div>
 </section>
 
 <section class="lesson" id="s4">
@@ -127,21 +128,21 @@
   <p class="lead">Cutting through hype is part of understanding the threat.</p>
   <ul>
     <li><b>They are not just fast classical computers.</b> For most everyday tasks they offer no advantage &mdash; and are far slower and more fragile.</li>
-    <li><b>They do not break AES-256 or SHA-2/3 outright.</b> Grover only chips at the margin; doubling key length restores safety.</li>
+    <li><b>They do not structurally break AES or SHA-2/3.</b> Generic quantum search changes security margins, but the exact impact differs for key search, preimage resistance, and collision resistance.</li>
     <li><b>They cannot read a superposition's full contents.</b> You get one measured answer, so brute-forcing "all passwords at once" is a myth.</li>
-    <li><b>They are extremely error-prone today.</b> Qubits lose their state (decoherence) in microseconds and need heavy error correction.</li>
+    <li><b>Current hardware is noisy.</b> Coherence times and gate errors vary by technology, and long cryptanalytic circuits require fault tolerance and heavy error correction.</li>
     <li><b>They do not speed up ordinary software.</b> Databases, web servers, spreadsheets, and games get no benefit &mdash; the speedups apply only to a narrow class of structured problems.</li>
     <li><b>They cannot "download your data" from the future.</b> The only reason today's data is at risk is that an attacker can store your encrypted traffic now and decrypt it later &mdash; the machine still has to do real work on captured ciphertext.</li>
-    <li><b>They will not run in your pocket.</b> Leading machines need near-absolute-zero cooling or ultra-high vacuum and fill a room. The threat is a handful of large facilities, not a phone.</li>
+    <li><b>Current systems require specialized infrastructure.</b> The engineering footprint varies by qubit technology; security planning should assume a capable adversary can centralize the computation rather than relying on today's machine size as a defense.</li>
   </ul>
-  <div class="callout example"><span class="k">The decoherence problem, concretely</span><p>A superconducting qubit may hold its state for well under a millisecond before noise scrambles it. Breaking RSA-2048 requires billions of precise operations run reliably. Bridging that gap needs error correction so good that many noisy physical qubits act as one stable logical qubit &mdash; which is why the physical-qubit numbers must be so enormous.</p></div>
+  <div class="callout example"><span class="k">The fault-tolerance gap</span><p>Breaking a deployed key requires a long, reliable logical circuit. Physical qubits and gates fail, so quantum error correction must encode logical qubits across many physical components and repeatedly detect faults. Resource estimates vary sharply with hardware, code, gate speed, error rate, and algorithm optimization; report the assumptions with any qubit count.</p></div>
   <div class="callout warn"><span class="k">Nuance</span><p>The honest summary: a <span class="term" data-def="A fault-tolerant quantum computer large and reliable enough to break widely deployed public-key cryptography in practical time.">cryptographically relevant quantum computer (CRQC)</span> does not exist yet, and estimates of its arrival vary widely. But you migrate based on <em>data lifetime + migration time</em>, not on a confident date &mdash; that is PQC-101.</p></div>
 </section>
 
 <section class="lesson" id="s5">
   <div class="lesson-title"><span class="num">5</span><h2>How far away is a threatening machine?</h2></div>
-  <p class="lead">Today's chips have hundreds to low-thousands of physical qubits. Breaking RSA-2048 needs something very different.</p>
-  <p>The gap is <b>error correction</b>. Physical qubits are noisy, so many of them are combined to form one reliable <span class="term" data-def="An error-corrected qubit built from many physical qubits so it behaves reliably enough for long computations.">logical qubit</span>. Published estimates to break RSA-2048 involve on the order of thousands of logical qubits, which could mean millions of physical qubits &mdash; well beyond current hardware.</p>
+  <p class="lead">Raw physical-qubit announcements do not tell you whether a machine can run a cryptanalytic workload.</p>
+  <p>The gap is <b>fault tolerance</b>. Noisy physical qubits must be encoded into reliable <span class="term" data-def="An error-corrected qubit built from many physical qubits so it behaves reliably enough for long computations.">logical qubits</span>. Published RSA-2048 resource estimates generally require thousands of logical qubits plus long error-corrected circuits; the physical overhead varies by architecture and assumptions. Compare logical error rate, circuit resources, runtime, and demonstrated fault-tolerant operations &mdash; not raw qubit count alone.</p>
   <div class="callout example"><span class="k">Why plan now anyway</span><p>Two reasons. First, "harvest now, decrypt later": data you send today can be stored and decrypted after a CRQC arrives. Second, replacing cryptography across a large organization takes years. If your data must stay secret longer than "time to a CRQC minus migration time," you are already behind. PQC-101 gives you a calculator for exactly this.</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>You do not need to predict the date. You need to know your data's lifetime and start early for the long-lived, exposed, public-key-dependent systems.</p></div>
 </section>
@@ -181,7 +182,7 @@
   <div class="table-scroll"><table class="data">
     <thead><tr><th>The headline says&hellip;</th><th>What you should actually check</th></tr></thead>
     <tbody>
-      <tr><td>"New 1,000-qubit chip"</td><td>Physical or <b>logical</b> qubits? Breaking RSA-2048 needs on the order of thousands of error-corrected <em>logical</em> qubits &mdash; which today would take millions of physical ones. Raw count means little.</td></tr>
+      <tr><td>"New 1,000-qubit chip"</td><td>Physical or <b>logical</b> qubits? What logical error rate, gate set, circuit depth, runtime, and error-correction overhead were demonstrated? Raw count alone does not establish cryptanalytic capability.</td></tr>
       <tr><td>"Quantum supremacy / advantage"</td><td>Almost always a contrived benchmark chosen to favor quantum hardware &mdash; not factoring, not real cryptography. Impressive science, no crypto impact.</td></tr>
       <tr><td>"Quantum computer broke encryption"</td><td>Which encryption, and what size? Factoring a 5- or 6-bit toy number is a classroom demo, not a threat to RSA-2048. Look for the bit length.</td></tr>
       <tr><td>"Error rates / gate fidelity improved"</td><td>This is the metric that <em>actually</em> matters. Error correction, not qubit count, is the real bottleneck to a code-breaking machine.</td></tr>
@@ -215,7 +216,7 @@
       <p class="scenario">A headline reads "new chip hits 1,000 qubits."</p>
       <p class="decide">Does that mean RSA is about to fall?</p>
       <button class="btn small reveal">Show recommended answer</button>
-      <p class="answer"><span class="k">Recommended answer</span> Almost certainly not. Those are noisy physical qubits. Breaking RSA-2048 needs thousands of <em>logical</em> (error-corrected) qubits, which may require millions of physical qubits. Qubit count alone is a misleading metric.</p>
+      <p class="answer"><span class="k">Recommended answer</span> No conclusion follows from that count alone. Ask whether they are physical or logical qubits, the logical error rate, supported gates, circuit depth/runtime, and fault-tolerance overhead. RSA-2048 resource studies require a very large logical computation under explicit assumptions.</p>
     </article>
     <article class="case">
       <h3>Lab 4 &middot; Why ECC falls too</h3>
@@ -245,7 +246,7 @@
     {"q":"Why isn't a quantum computer just 'try everything at once and read the answer'?","choices":["Measurement returns only one outcome; you must engineer interference","Because it is slower","Because it uses more electricity"],"answer":0,"explain":"You get a single measured result. Speedups require an algorithm that makes the correct answer's amplitude dominate."},
     {"q":"Which algorithm is the reason RSA and ECC are considered broken by a CRQC?","choices":["Shor's algorithm","Grover's algorithm","Dijkstra's algorithm"],"answer":0,"explain":"Shor efficiently solves factoring and discrete logs, the hard problems behind RSA, DH, and ECC."},
     {"q":"What does Grover's algorithm mean for AES-256?","choices":["It weakens it to roughly 128-bit strength, still safe","It instantly breaks it","It has no effect at all"],"answer":0,"explain":"Grover gives a square-root speedup, roughly halving effective key bits. AES-256 -> ~128-bit, which remains secure."},
-    {"q":"A chip reaches 1,000 physical qubits. Is RSA-2048 immediately at risk?","choices":["No - breaking RSA needs thousands of error-corrected logical qubits","Yes, that is more than enough","Only if it is blue"],"answer":0,"explain":"Physical qubits are noisy. Error correction turns many physical qubits into one logical qubit; RSA-2048 needs far more capability than raw qubit counts suggest."},
+    {"q":"A chip reaches 1,000 physical qubits. Is RSA-2048 immediately at risk?","choices":["No conclusion from count alone - evaluate logical error rate and cryptanalytic circuit resources","Yes, that is more than enough","Only if it is blue"],"answer":0,"explain":"Raw physical-qubit count does not establish fault-tolerant capability. Logical error rates, gates, circuit depth, runtime, and overhead determine whether Shor can run at scale."},
     {"q":"Why start PQC planning before a CRQC exists?","choices":["Harvest-now-decrypt-later plus multi-year migration time","Quantum computers are already in phones","To make websites load faster"],"answer":0,"explain":"Data captured today can be decrypted later, and migrating a large estate takes years, so long-lived data needs early action."},
     {"q":"In Shor's algorithm, what is the one step that requires a quantum computer?","choices":["Finding the period of a repeating sequence mod N","Multiplying p and q","Storing the public key"],"answer":0,"explain":"Multiplying primes and turning the period into factors are easy classically. Only period-finding needs quantum interference, and that is the whole breakthrough."},
     {"q":"Which metric best signals real progress toward a code-breaking machine?","choices":["Lower gate error rate / higher fidelity (enables error correction)","Total physical qubit count alone","The vendor's marketing budget"],"answer":0,"explain":"Error correction is the bottleneck. Without low error rates, adding noisy qubits does not enable running Shor at the scale needed for RSA-2048."},
@@ -259,16 +260,17 @@
   <p class="section-hint">Educational overview; consult primary standards before decisions.</p>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
   <a href="https://www.nist.gov/pqcrypto" target="_blank" rel="noopener noreferrer">NIST &mdash; PQC overview</a>
+  <a href="https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/faqs" target="_blank" rel="noopener noreferrer">NIST PQC FAQ &mdash; security categories and quantum attack context</a>
   <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; Post-Quantum Cybersecurity Resources</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>This module builds intuition, not equations. Step through the bit-vs-qubit walkthrough first, then read the lessons. The goal is to understand the threat without hype.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

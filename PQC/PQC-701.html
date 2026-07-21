@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-701 - Capstone: Migrate "Northwind Telecom"</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="A guided capstone: take a fictional telecom operator through a full quantum-safe migration and make the key decisions yourself.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-701">
+<body id="top" data-module="PQC-701">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-701</span><span>Capstone: Migrate Northwind Telecom</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-701</span><span>Capstone: Migrate Northwind Telecom</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -50,7 +51,7 @@
   <div class="pqc-stepper" data-title="Northwind Telecom - systems in scope">
     <script type="application/json" class="steps">
     [
-      {"icon":"\ud83c\udf10","title":"Public customer portal & API","body":"External TLS sits behind a CDN, serving modern browsers plus a 3-year-old mobile app that <b>pins certificates</b>. Sessions carry auth tokens and personal data. The pinning app is the trap: change the certificate signature and it stops trusting you until users update. Jobs at play: key exchange and certificate signatures.","meta":"job: key exchange + cert signatures"},
+      {"icon":"\ud83c\udf10","title":"Public customer portal & API","body":"External TLS sits behind a CDN, serving modern browsers plus a 3-year-old mobile app that uses <b>pinning</b>. First inventory the pin type: an exact-certificate pin breaks on any certificate replacement; an SPKI pin may survive a certificate re-sign if the subject key is unchanged, but a transition to a new PQC public key changes the SPKI. Plan an overlapping pin set and client update before the key/certificate migration.","meta":"job: key establishment + certificate authentication; constraint: pin type"},
       {"icon":"\ud83d\udcf6","title":"Core network (5G)","body":"Service-based interfaces between network functions use mutual TLS, and SUCI conceals the subscriber's identity using elliptic-curve public-key crypto. Roaming partners vary widely in PQC readiness, so you cannot move unilaterally without breaking interconnect. Jobs: mutual TLS + identity concealment.","meta":"job: mutual TLS + identity concealment"},
       {"icon":"\ud83e\udeaa","title":"eSIM provisioning","body":"GSMA Remote SIM Provisioning runs on a certificate hierarchy, delivering profiles onto constrained eUICC secure elements across dozens of device models. Larger PQC keys must fit tiny chips, and the whole GSMA trust chain must move together. Jobs: PKI signatures + key establishment.","meta":"job: PKI signatures + key establishment"},
       {"icon":"\ud83d\udce1","title":"Field devices","body":"Millions of IoT sensors and routers with an 8-12 year service life, whose firmware is verified by ECDSA in the bootloader - and some of those bootloaders are <b>immutable</b>. Where the verifier is burned into silicon, the only real fix is hardware replacement. Job: signatures, with unforgiving verifiers.","meta":"job: signatures, immutable verifiers"},
@@ -115,7 +116,7 @@
     <p class="scenario">For each Tier-1 system you must pick a family and mode now.</p>
     <p class="decide">What do you choose for portal TLS, KMS key-wrapping, eSIM signatures, and the firmware verifier?</p>
     <button class="btn small reveal">Show recommended answer</button>
-    <p class="answer"><span class="k">Recommended answer</span> Portal TLS: <b>hybrid X25519+ML-KEM</b> key exchange (keep classical certs until PKI is ready). KMS: <b>ML-KEM/hybrid</b> key wrapping, then rewrap data keys (no bulk re-encryption). eSIM: <b>ML-DSA</b> where the eUICC can fit it, with parameter sets chosen for size/verify speed; stage the GSMA trust chain. Firmware: new hardware with a <b>crypto-agile, PQC-capable (or dual) verifier</b> &mdash; SLH-DSA is attractive for a long-lived root of trust. Store algorithm identifiers everywhere for agility.</p>
+    <p class="answer"><span class="k">Recommended answer</span> Portal TLS: deploy the protocol-defined hybrid ECDHE+ML-KEM group supported by the real edge/client stack; inventory certificate vs SPKI pins and update overlapping pins before changing keys. KMS: use a reviewed KEM-based envelope in which ML-KEM/hybrid secret material goes through a context-bound KDF and an approved AEAD/wrap construction, then rewrap DEKs without bulk re-encryption. eSIM and firmware signatures require ecosystem and verifier testing before selecting an approved ML-DSA/SLH-DSA profile. Store the envelope version, algorithm identifiers, parameters, and context everywhere.</p>
   </article></div>
 </section>
 
@@ -187,7 +188,7 @@
   <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
   <script type="application/json" id="quizData">
   [
-    {"q":"Northwind's AES-256 data lake: what is actually at quantum risk?","choices":["The RSA key-wrapping in the KMS","AES-256 itself","The disk format"],"answer":0,"explain":"AES-256 resists Grover with margin; the RSA-wrapped data keys are the harvest-now target. Rewrap them via a PQC/hybrid KEM."},
+    {"q":"Northwind's AES-256 data lake: what is actually at quantum risk?","choices":["The RSA protection of its data-encryption keys","AES-256 itself","The disk format"],"answer":0,"explain":"The RSA-protected DEKs are the public-key harvest target. Move them to a reviewed KEM+KDF+AEAD envelope and rewrap the DEKs."},
     {"q":"For the public portal during transition, the best key exchange is:","choices":["Hybrid X25519+ML-KEM","RSA-4096","Plain X25519"],"answer":0,"explain":"Hybrid gives PQC protection while preserving interoperability with the pinned, older mobile app and middleboxes."},
     {"q":"Why start the field-device track immediately despite slow field fixes?","choices":["Immutable verifiers can't be upgraded later; manufacturing decisions dominate","Devices are cheap","They update hourly"],"answer":0,"explain":"You can't retrofit an immutable verifier, so agile PQC-capable hardware must enter the pipeline now."},
     {"q":"A single 'all crypto done next year' deadline is:","choices":["Unrealistic - use risk tiers and waves","The best practice","Required by NIST"],"answer":0,"explain":"Tiers differ in urgency and some items are vendor/hardware-blocked; one date creates panic and waste."},
@@ -207,16 +208,17 @@
   <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
   <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/" target="_blank" rel="noopener noreferrer">GSMA &mdash; eSIM / RSP</a>
+  <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; KEM use and composition</a>
   <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; Post-Quantum resources</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this capstone</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Work each of the four decisions before revealing the recommendation, then take the eight-question final assessment. It draws on every earlier module.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

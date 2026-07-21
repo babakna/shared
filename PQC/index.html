@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="A free, self-paced Post-Quantum Cryptography course: 13 interactive modules from zero cryptography knowledge to planning a real quantum-safe migration. No logins, no install, no tracking. Brought to you by Babak.">
 <title>Post-Quantum Cryptography &mdash; Learn &middot; Build &middot; Migrate</title>
+<link rel="icon" href="data:,">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
 --bg:#FAFBFE;--card:#FFFFFF;--text:#0C1222;--text-sec:#41506A;
---text-muted:#7C8AA0;--border:#E1E9F4;
---blue:#1657A0;--teal:#0E766E;--violet:#6244C5;--amber:#A45D00;--green:#0A7C46;
+--text-muted:#607089;--border:#D6E1EF;
+--blue:#1657A0;--teal:#0E766E;--violet:#6244C5;--amber:#A45D00;--green:#0A7C46;--soft:#EDF2FA;--danger:#B42318;
 --font:'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
 --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
 }
+[data-theme="dark"]{--bg:#0A1120;--card:#131F33;--text:#EEF5FF;--text-sec:#B3C3D9;--text-muted:#91A4BE;--border:#294059;--blue:#78B9FF;--teal:#57D1C6;--violet:#B6A8FF;--amber:#F2C078;--green:#66D69C;--soft:#18273D;--danger:#FF9A90}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
 
 .page-wrap{position:relative;min-height:100vh;overflow-x:hidden}
@@ -23,6 +25,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .bg-glow-3{width:420px;height:420px;top:680px;right:-70px;background:radial-gradient(circle,rgba(98,68,197,0.09) 0%,transparent 70%)}
 
 .content{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:48px 24px 32px}
+.index-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.index-brand{font-weight:900;color:var(--text);display:flex;gap:8px;align-items:center}.index-brand span{font-size:.74rem;color:var(--text-muted)}
+.index-actions{display:flex;gap:8px}.btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:8px 12px;min-height:38px;font:800 .84rem var(--font);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{border-color:var(--blue)}.btn:focus-visible,.card-link:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 
 header{text-align:center;margin-bottom:38px}
 .hero-logo{width:112px;height:112px;display:block;margin:0 auto 22px}
@@ -33,10 +39,10 @@ header{text-align:center;margin-bottom:38px}
 .hero-version{font-size:.78rem;color:var(--text-muted);font-weight:700;letter-spacing:.05em;margin:0 auto 24px;text-align:center;text-transform:uppercase}
 .hero-desc{font-size:1.05rem;color:var(--text-sec);max-width:640px;margin:0 auto 12px;line-height:1.7}
 .hero-sub{font-size:.9rem;color:var(--text-muted);max-width:600px;margin:0 auto 22px;line-height:1.65}
-.stats-bar{display:inline-block;background:#EDF2FA;border:1px solid var(--border);border-radius:20px;padding:8px 22px;font-size:.82rem;color:var(--text-sec);font-weight:600}
+.stats-bar{display:inline-block;background:var(--soft);border:1px solid var(--border);border-radius:20px;padding:8px 22px;font-size:.82rem;color:var(--text-sec);font-weight:600}
 
 nav.progression{display:flex;align-items:center;justify-content:center;gap:0;margin:26px auto 8px;flex-wrap:wrap;padding:0 8px}
-.prog-pill{font-size:.76rem;font-weight:700;padding:5px 14px;border-radius:14px;background:#EDF2FA;color:var(--text-sec);white-space:nowrap}
+.prog-pill{font-size:.76rem;font-weight:700;padding:5px 14px;border-radius:14px;background:var(--soft);color:var(--text-sec);white-space:nowrap}
 .prog-line{width:26px;height:2px;background:var(--border);flex-shrink:0}
 .prog-mobile{display:none;font-size:.82rem;color:var(--text-muted);font-weight:600;text-align:center;margin:8px auto 0}
 
@@ -50,6 +56,7 @@ nav.progression{display:flex;align-items:center;justify-content:center;gap:0;mar
 .card-link{text-decoration:none;color:inherit;display:block;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s ease}
 .card-link:hover{transform:translateY(-2px)}
 .card{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;gap:18px;transition:box-shadow .2s ease}
+.card{position:relative}.card .check{position:absolute;right:14px;top:14px;width:25px;height:25px;border:2px solid var(--border);border-radius:50%;display:grid;place-items:center;color:transparent;font-size:.78rem;font-weight:900}.card.done{border-color:var(--green)}.card.done .check{background:var(--green);border-color:var(--green);color:#fff}.card.done .card-arrow{margin-right:26px}
 .card-illust{width:92px;min-width:92px;height:76px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .card-illust svg{width:52px;height:52px}
 .card-body{flex:1;min-width:0}
@@ -87,7 +94,10 @@ nav.progression{display:flex;align-items:center;justify-content:center;gap:0;mar
 .extra-d{font-size:.8rem;color:var(--text-muted);font-weight:600}
 
 footer{text-align:center;padding:30px 0 34px;margin-top:38px;border-top:1px solid var(--border);font-size:.82rem;color:var(--text-muted);line-height:1.7}
-footer .disc{color:#B42318;font-weight:700;max-width:640px;margin:0 auto 8px}
+footer .disc{color:var(--danger);font-weight:700;max-width:640px;margin:0 auto 8px}
+.course-progress{margin:30px 0 6px;padding:18px;background:var(--card);border:1px solid var(--border);border-radius:14px;text-align:left}.progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}.progress-label{font-weight:800;color:var(--text-sec)}.progress-track{height:12px;background:var(--border);border-radius:999px;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .4s ease}
+.toplink{position:fixed;right:18px;bottom:18px;z-index:25;background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;border:0;border-radius:999px}
+.help-modal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,12,24,.62);align-items:center;justify-content:center;padding:16px}.help-modal.open{display:flex}.help-card{position:relative;width:min(680px,100%);max-height:86vh;overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:26px;box-shadow:0 16px 44px rgba(0,0,0,.28)}.help-card h2{margin-bottom:4px}.help-card p,.help-card li{color:var(--text-sec);margin-bottom:8px}.help-card ul{padding-left:20px}.help-card #closeHelp{position:absolute;right:14px;top:14px}.help-ver{color:var(--text-muted);font-size:.82rem;font-weight:800;margin-bottom:12px}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .anim{animation:fadeUp .5s ease both}
@@ -122,12 +132,17 @@ nav.progression{display:none}
 @media print{.bg-glow{display:none!important}.card{border:1px solid #ccc!important;box-shadow:none!important;break-inside:avoid}.card-link,.card-link:hover{transform:none!important}body{background:#fff}}
 </style>
 </head>
-<body>
+<body id="top">
 <div class="page-wrap">
 <div class="bg-glow bg-glow-1"></div>
 <div class="bg-glow bg-glow-2"></div>
 <div class="bg-glow bg-glow-3"></div>
-<main class="content">
+<main class="content" id="moduleGrid">
+
+<div class="index-tools" aria-label="Course tools">
+<div class="index-brand">PQC Learning Lab <span>V6.0 (July 2026)</span></div>
+<div class="index-actions"><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn aria-haspopup="dialog">Help</button></div>
+</div>
 
 <header>
 <svg class="hero-logo anim anim-d0" viewBox="0 0 120 120" role="img" aria-label="Post-Quantum Cryptography">
@@ -146,7 +161,7 @@ nav.progression{display:none}
 </svg>
 <h1 class="hero-title anim anim-d0">Post-Quantum <span class="grad">Cryptography</span></h1>
 <p class="hero-byline anim anim-d0">Brought to you by <span class="hero-byline-name">Babak</span></p>
-<p class="hero-version anim anim-d0">V5.1 (July 2026)</p>
+<p class="hero-version anim anim-d0">V6.0 (July 2026)</p>
 <p class="hero-desc anim anim-d1">A structured, self-paced course that takes you from &ldquo;what is cryptography?&rdquo; all the way to planning and defending a real quantum-safe migration. Thirteen interactive modules &mdash; plain-language first, then the real numbers, code, and decisions. No logins, no install, no tracking. Just open and learn.</p>
 <p class="hero-sub anim anim-d1">Built for anyone who needs to understand the post-quantum shift &mdash; engineers, architects, security and risk teams, and curious beginners. Every module explains the idea before the jargon, so you can start with no background at all.</p>
 <div class="anim anim-d15"><span class="stats-bar">13 Interactive Modules &middot; Steppers, Calculators &amp; Labs &middot; Aligned to NIST FIPS 203 / 204 / 205</span></div>
@@ -160,6 +175,11 @@ nav.progression{display:none}
 </nav>
 <div class="prog-mobile anim anim-d2">Foundations &rarr; Capstone &middot; Beginner &rarr; Advanced</div>
 </header>
+
+<section class="course-progress" aria-labelledby="progressTitle">
+<div class="progress-head"><div><strong id="progressTitle">Your course progress</strong><div class="progress-label" id="progressLabel">0 of 13 modules complete (0%)</div></div><button class="btn" id="resetProgress" type="button">Reset progress</button></div>
+<div class="progress-track" role="progressbar" aria-label="Modules completed" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" id="progressFill"></div></div>
+</section>
 
 <!-- STAGE 1 -->
 <section class="stage anim anim-d2" aria-label="Stage 1 Foundations">
@@ -292,11 +312,16 @@ nav.progression{display:none}
 
 <footer>
 <p class="disc">Educational reference only. Use current vendor, regulatory, and security-team guidance before any production deployment.</p>
-<p>Post-Quantum Cryptography Learning Lab &middot; V5.1 (July 2026) &middot; Aligned to NIST FIPS 203 / 204 / 205 and related guidance.</p>
+<p>Post-Quantum Cryptography Learning Lab &middot; V6.0 (July 2026) &middot; Aligned to NIST FIPS 203 / 204 / 205 and related guidance.</p>
 <p>Brought to you by Babak &middot; No external dependencies &middot; Runs entirely in your browser</p>
 </footer>
 
 </main>
 </div>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+<div class="help-card"><button class="btn" id="closeHelp" type="button" aria-label="Close help">Close</button><h2 id="helpTitle">How to use this course</h2><div class="help-ver" data-help-version>V6.0 (July 2026)</div><ul><li>Follow the five-stage path or open any module directly.</li><li>Pass a module quiz to save completion in this browser.</li><li>Use the journey bar inside a module to move without returning here.</li><li>Use the Dark button to switch themes; your choice is saved locally.</li></ul><p>No account or tracking is used. Progress stays in this browser's local storage.</p></div>
+</div>
+<script src="assets/pqc.js"></script>
 </body>
 </html>

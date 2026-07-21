@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-601 - Research Watch, Governance &amp; Architecture Review</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="Track PQC research without panic, manage algorithm diversity, review architectures, and produce accountable readiness artifacts.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-601">
+<body id="top" data-module="PQC-601">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-601</span><span>Research, Governance &amp; Architecture Review</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-601</span><span>Research, Governance &amp; Architecture Review</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -52,7 +53,7 @@
     <script type="application/json" class="steps">
     [
       {"icon":"\ud83d\udc41\ufe0f","title":"Watch","body":"Monitor NIST, standards bodies (IETF, ETSI, GSMA), and reputable cryptographers. When a claim appears, capture it <b>precisely</b>: which scheme, which parameter set, which attack model (classical vs quantum), the claimed cost, and whether it is peer-reviewed or a preprint. Vague dread is not an input; a specific claim is.","meta":"input: a precise, sourced claim"},
-      {"icon":"\u2696\ufe0f","title":"Assess","body":"Ask two questions: does it touch an algorithm/parameter <em>you actually deploy</em>, and is it a practical break or just an asymptotic improvement? Then check whether NIST or the relevant standard has changed guidance. History says most results shave security margins or prompt parameter tweaks - they rarely turn into an overnight break.","meta":"filter: relevance x severity"},
+      {"icon":"\u2696\ufe0f","title":"Assess","body":"Ask two questions: does it touch an algorithm/parameter <em>you actually deploy</em>, and is it a practical break or an asymptotic improvement? Then check whether NIST or the relevant standards body changed guidance. Do not infer practical impact from a headline; reproduce the claimed cost and assumptions in your risk record.","meta":"filter: relevance x severity"},
       {"icon":"\u2705","title":"Decide","body":"Choose a <b>proportionate</b> action: do nothing, keep watching, adjust parameters, accelerate a backup family, or (rarely) trigger emergency response. Record who decided, the evidence, and the reasoning - so the decision is auditable and you are not re-litigating it in six months.","meta":"output: a proportionate, recorded action"},
       {"icon":"\u2699\ufe0f","title":"Act via agility","body":"If action is needed, your crypto-agility - algorithm identifiers, swappable crypto providers, hybrid support - lets you change a parameter or even a whole family <em>without</em> re-architecting the system. This is the payoff for the agility work done in earlier waves; without it, every research scare becomes a fire drill.","meta":"lever: crypto-agility"},
       {"icon":"\ud83d\udce2","title":"Communicate & re-baseline","body":"Tell stakeholders, in plain language, what changed, what you did about it, and what residual risk remains - no jargon, no false certainty. Then update the crypto inventory and the readiness artifact and return to Watch. The loop never ends; that is the point of a mature program.","meta":"output: updated artifacts, loop back"}
@@ -73,9 +74,9 @@
 <section class="lesson" id="s2">
   <div class="lesson-title"><span class="num">2</span><h2>Algorithm diversity and backup paths</h2></div>
   <p class="lead">Do not bet the entire estate on one mathematical assumption.</p>
-  <p>Most standardized PQC (ML-KEM, ML-DSA, Falcon) rests on lattice problems. That is well-studied, but concentration is a risk. This is exactly why NIST advanced HQC (code-based) as a backup KEM and standardized SLH-DSA (hash-based) alongside lattice signatures. A resilient architecture can adopt a differently-founded backup <em>if</em> it was built with agility.</p>
+  <p>ML-KEM and ML-DSA are lattice-based, and NIST selected the lattice-based Falcon design for future FN-DSA standardization. Concentration in one mathematical family is a risk. NIST selected HQC (code-based) as a backup KEM and standardized SLH-DSA (hash-based) alongside ML-DSA. A resilient architecture can adopt a differently founded backup <em>if</em> it was built with agility and the alternative is approved for the relevant use.</p>
   <div class="grid3">
-    <div class="callout"><span class="k">Lattice</span><p>ML-KEM, ML-DSA, Falcon. Efficient, the default choice.</p></div>
+    <div class="callout"><span class="k">Lattice</span><p>ML-KEM and ML-DSA are final standards; Falcon/FN-DSA standardization remains a status item to track.</p></div>
     <div class="callout"><span class="k">Hash-based</span><p>SLH-DSA. Conservative signatures resting only on hash security.</p></div>
     <div class="callout"><span class="k">Code-based</span><p>HQC. Backup KEM on a different assumption.</p></div>
   </div>
@@ -110,7 +111,7 @@
 <section class="lesson" id="s5">
   <div class="lesson-title"><span class="num">5</span><h2>A crypto-agility maturity model</h2></div>
   <p class="lead">"Are we agile?" is too vague to govern. A maturity ladder makes it measurable.</p>
-  <p>Give each system a maturity level so you can report progress and set targets. Most organizations start scattered across Levels 0&ndash;1 and aim to pull their Tier-1 systems up to Level 3+ during the migration. The point is not to reach Level 4 everywhere &mdash; it is to know where each system sits and to raise the ones that matter.</p>
+  <p>This course uses the five levels below as an <b>illustrative operating model</b>, not as a NIST maturity benchmark or an industry statistic. Baseline each system from evidence, set a target appropriate to its risk and lifecycle, and define the acceptance evidence for moving up. Do not claim that "most organizations" occupy a particular level without a cited survey.</p>
   <figure class="figure">
     <div class="fig-title">Crypto-agility maturity &mdash; climb it deliberately</div>
     <svg viewBox="0 0 680 230" role="img" aria-label="A five-step maturity ladder: Level 0 unaware, Level 1 inventoried, Level 2 hybrid-capable, Level 3 agile by config, Level 4 continuously governed.">
@@ -124,7 +125,7 @@
       <path class="g-line-p" d="M20 210 L120 200 L250 172 L380 142 L500 112 L640 76" fill="none" marker-end="url(#ml)"/>
       <defs><marker id="ml" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
     </svg>
-    <figcaption>Level 3 &mdash; "swap algorithms by configuration, with algorithm IDs stored" &mdash; is the realistic target for important systems. Level 4 adds continuous monitoring and the research-to-decision loop from this module.</figcaption>
+    <figcaption>Course-defined ladder: Level 3 represents configurable algorithm replacement with stored identifiers; Level 4 adds continuous evidence and governance. Choose targets per system rather than treating this illustration as a universal standard.</figcaption>
   </figure>
   <div class="callout tip"><span class="k">Practice</span><p>Add a maturity-level column to your CBOM. Now "improve agility" becomes a concrete, trackable goal per system, and leadership can see the estate climbing the ladder over time.</p></div>
 </section>
@@ -216,15 +217,17 @@
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
   <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Crypto agility considerations</a>
   <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; CNSA 2.0 / Post-Quantum resources</a>
+  <a href="https://csrc.nist.gov/pubs/cswp/39/upd1/considerations-for-achieving-crypto-agility/final" target="_blank" rel="noopener noreferrer">NIST CSWP 39upd1 &mdash; Considerations for Achieving Crypto Agility</a>
+  <a href="https://csrc.nist.gov/csrc/media/presentations/2025/nist-pqc-migration-project-and-crypto-agility-proj/nist_pqc_migration_project-newhouse_2.10.pdf" target="_blank" rel="noopener noreferrer">NIST &mdash; PQC migration and crypto-agility project overview</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Walk the research-to-decision loop, then use the architecture-review questions as a checklist on your own designs. Finish with the capstone (PQC-701).</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

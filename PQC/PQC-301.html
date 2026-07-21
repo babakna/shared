@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-301 - Developer Implementation Engineering</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="Libraries, parameters, serialization, randomness, side channels, and HSM/KMS - with real code and commands for implementing PQC safely.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-301">
+<body id="top" data-module="PQC-301">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-301</span><span>Developer Implementation Engineering</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-301</span><span>Developer Implementation Engineering</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -63,8 +64,8 @@ kem = <span class="str">"ML-KEM-768"</span>
     <span class="cmt"># Recipient decapsulates to recover the SAME secret</span>
     secret_recipient = recipient.decap_secret(ciphertext)
 
-<span class="kw">assert</span> secret_sender == secret_recipient   <span class="cmt"># now feed this into AES-256-GCM</span></pre>
-  <div class="callout takeaway"><span class="k">The lesson</span><p>The shared secret is 32 bytes &mdash; you still hand it to a KDF and symmetric cipher. The KEM only replaces the "agree on a secret" step. Everything you learned about AES-GCM still applies.</p></div>
+<span class="kw">assert</span> secret_sender == secret_recipient   <span class="cmt"># input to a protocol-defined KDF; never use raw as an AEAD key</span></pre>
+  <div class="callout takeaway"><span class="k">The lesson</span><p>The shared secret is 32 bytes, but it is <b>keying material</b>, not a complete application protocol. Bind it to the transcript and context through the protocol's approved KDF, derive separate traffic keys/nonces as specified, then use an AEAD. The KEM only replaces the "agree on secret material" step.</p></div>
 </section>
 
 <section class="lesson" id="s1">
@@ -92,7 +93,7 @@ kem = <span class="str">"ML-KEM-768"</span>
       <tr><td>Signature</td><td>ECDSA ~72 B</td><td>ML-DSA-65 ~3,309 B</td><td>DB columns, headers, token limits</td></tr>
       <tr><td>KEM public key</td><td>X25519 32 B</td><td>ML-KEM-768 1,184 B</td><td>Handshake buffers, caches</td></tr>
       <tr><td>KEM ciphertext</td><td>X25519 share 32 B</td><td>ML-KEM-768 1,088 B</td><td>Message/packet size limits</td></tr>
-      <tr><td>Signing key</td><td>P-256 32 B</td><td>SLH-DSA large state / seeds</td><td>HSM object sizes, key stores</td></tr>
+      <tr><td>Signing key</td><td>P-256 scalar: 32 B</td><td>SLH-DSA is stateless; private key is 4n bytes, while signatures are large</td><td>HSM algorithm support; signature transport/storage</td></tr>
     </tbody>
   </table></div>
   <div class="callout example"><span class="k">Concrete example</span><p>A JWT-style token that embedded an ECDSA signature now must carry a 3 KB ML-DSA signature. Header size limits on proxies, cookies, and some HTTP servers can reject it &mdash; a failure that looks like a networking bug, not a crypto bug.</p></div>
@@ -229,7 +230,7 @@ blob   = {<span class="str">"alg"</span>: signer.alg_id, <span class="str">"sig"
   <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
   <script type="application/json" id="quizData">
   [
-    {"q":"A KEM in code is essentially which three operations?","choices":["Generate keypair, encapsulate, decapsulate","Compress, encrypt, email","Login, logout, refresh"],"answer":0,"explain":"KeyGen, encapsulate (sender), decapsulate (recipient) - producing a shared secret you then feed to symmetric crypto."},
+    {"q":"A KEM in code is essentially which three operations?","choices":["Generate keypair, encapsulate, decapsulate","Compress, encrypt, email","Login, logout, refresh"],"answer":0,"explain":"KeyGen, encapsulate (sender), and decapsulate (recipient) produce shared secret material that a protocol-defined KDF turns into symmetric traffic keys."},
     {"q":"What is the most common PQC integration bug?","choices":["A field/buffer too small for the new sizes","Wrong screen resolution","Too many code comments"],"answer":0,"explain":"PQC keys/signatures are far larger; fixed-size columns, headers, and buffers overflow or truncate."},
     {"q":"Why must decapsulation be constant-time and non-branching on failure?","choices":["Otherwise it can leak a chosen-ciphertext oracle","To save electricity","To reduce code size"],"answer":0,"explain":"Secret-dependent timing/behavior can distinguish valid vs invalid ciphertexts, defeating ML-KEM's implicit rejection."},
     {"q":"You shipped a round-3 'Kyber' build. Will it interoperate with FIPS 203 ML-KEM?","choices":["No - parameters/encodings changed between draft and final","Yes, they are identical","Only over IPv6"],"answer":0,"explain":"Pre-standard implementations differ from the finalized ML-KEM and are not interoperable."},
@@ -245,19 +246,21 @@ blob   = {<span class="str">"alg"</span>: signer.alg_id, <span class="str">"sig"
 <section class="block sources" id="sources">
   <h2>Primary sources</h2>
   <p class="section-hint">Educational; use official test vectors and validated modules for production.</p>
-  <a href="https://openquantumsafe.org/" target="_blank" rel="noopener noreferrer">Open Quantum Safe (liboqs)</a>
+  <a href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener noreferrer">Open Quantum Safe &mdash; liboqs repository</a>
   <a href="https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program" target="_blank" rel="noopener noreferrer">NIST CAVP / ACVP validation</a>
   <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203 &mdash; ML-KEM</a>
   <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
+  <a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205 &mdash; stateless SLH-DSA key and signature formats</a>
+  <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; secure KEM use and composition</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>The code is illustrative and API names change across library versions &mdash; read the current docs before using it. Focus on the engineering constraints: sizes, randomness, constant-time, and hardware dependencies.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

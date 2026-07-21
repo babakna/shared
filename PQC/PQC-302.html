@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-302 - Use-Case Labs</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="Apply PQC to real systems: web/API, cloud service mesh, messaging, data at rest, and firmware - through guided decision scenarios.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-302">
+<body id="top" data-module="PQC-302">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-302</span><span>Use-Case Labs</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-302</span><span>Use-Case Labs</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -82,7 +83,7 @@
   <div class="lesson-title"><span class="num">1</span><h2>Lab 1 &middot; Public website and API platform</h2></div>
   <p class="lead">A customer-facing web app plus a public REST API, behind a CDN and WAF, serving browsers and a 4-year-old mobile app.</p>
   <div class="cases"><article class="case">
-    <p class="scenario">Traffic is short-lived per session, but sessions carry auth tokens and some personal data. The mobile app pins certificates.</p>
+    <p class="scenario">Traffic is short-lived per session, but sessions carry auth tokens and some personal data. The mobile app uses an exact-certificate pin.</p>
     <p class="decide">Where do you start, and what is the hidden landmine?</p>
     <button class="btn small reveal">Show recommended answer</button>
     <p class="answer"><span class="k">Recommended answer</span> Start with <b>hybrid ML-KEM key exchange</b> at the edge (CDN/load balancer) &mdash; that is the harvest-now-decrypt-later protection. The landmine is the <b>pinned mobile app</b> and any middlebox that rejects larger handshakes: test the real client matrix and log the negotiated group. Certificate signatures stay classical until the PKI is ready. Job: key establishment; constraint: oldest client + pinning.</p>
@@ -121,9 +122,9 @@
     <p class="scenario">Someone panics: "AES is quantum-broken, we must re-encrypt petabytes!"</p>
     <p class="decide">What is actually at risk, and what is the efficient fix?</p>
     <button class="btn small reveal">Show recommended answer</button>
-    <p class="answer"><span class="k">Recommended answer</span> AES-256 is fine (Grover only). The risk is the <b>RSA key-wrapping</b>: an attacker who harvests the wrapped keys could unwrap them post-quantum and then decrypt everything. Fix is cheap: move key <em>wrapping</em> to a PQC/hybrid KEM in the KMS and rewrap the data keys &mdash; no need to re-encrypt the petabytes of bulk data. Job: key establishment (wrapping), not bulk encryption.</p>
+    <p class="answer"><span class="k">Recommended answer</span> Keep the approved AES-256 bulk encryption. The vulnerable dependency is the <b>RSA protection of the data-encryption keys (DEKs)</b>. Replace it with a standardized, vendor-supported KEM-based envelope: ML-KEM (often hybrid during transition) establishes secret material, a context-bound KDF derives a key-encryption key, and an approved AEAD/wrap construction protects each DEK. Rewrap the small DEKs and their metadata; the petabytes of ciphertext need not be decrypted and encrypted again.</p>
   </article></div>
-  <div class="callout example"><span class="k">Framework applied</span><p><b>1 Job:</b> two jobs, but only the <em>key wrapping</em> (RSA) is public-key &mdash; the bulk AES-256 is symmetric and stays. <b>2 Lifetime&times;exposure:</b> 7-year backups &mdash; long lifetime makes the wrapped keys a prime harvest target. <b>3 Verifiers/endpoints:</b> the KMS is the single control point. <b>4 Rollout:</b> add a PQC/hybrid wrap in the KMS, rewrap data keys; petabytes of bulk data are never touched.</p></div>
+  <div class="callout example"><span class="k">Framework applied</span><p><b>1 Job:</b> bulk data encryption plus asymmetric DEK protection; the latter is the public-key migration target. <b>2 Lifetime&times;exposure:</b> 7-year backups make harvested RSA-protected DEKs valuable. <b>3 Endpoints:</b> KMS, restore tools, metadata readers, and disaster-recovery paths must all understand the new envelope version. <b>4 Rollout:</b> use the KMS's reviewed KEM+KDF+AEAD construction, store algorithm/context identifiers, rewrap DEKs, and prove old and new restores before retiring RSA.</p></div>
 </section>
 
 <section class="lesson lab" id="s5">
@@ -169,7 +170,7 @@
   <div class="quiz-actions"><div class="score" id="quizScore">Score: 0/0</div><button class="btn small ghost" id="quizReset">Reset answers</button></div>
   <script type="application/json" id="quizData">
   [
-    {"q":"For AES-256 backups with RSA-wrapped keys, what is the efficient PQC fix?","choices":["Move key wrapping to a PQC/hybrid KEM and rewrap data keys","Re-encrypt all bulk data with a new cipher","Delete the backups"],"answer":0,"explain":"AES-256 is fine; the RSA wrapping is the risk. Rewrapping data keys avoids re-encrypting petabytes."},
+    {"q":"For AES-256 backups with RSA-protected data keys, what is the efficient PQC fix?","choices":["Use a reviewed KEM+KDF+AEAD envelope and rewrap the data keys","Re-encrypt all bulk data with a new cipher","Delete the backups"],"answer":0,"explain":"The RSA protection is the public-key risk. A standardized envelope derives a wrapping key from the KEM secret; rewrapping small DEKs avoids re-encrypting petabytes."},
     {"q":"Why is an internal, short-lived mTLS mesh one of the easiest migrations?","choices":["You control all endpoints and the CA, and certs are short-lived","It uses no cryptography","It never rotates keys"],"answer":0,"explain":"Central control + frequent rotation + no long-lived signatures = a fast, low-risk migration."},
     {"q":"On a public web platform, what is the classic hidden landmine?","choices":["Pinned/old clients and middleboxes rejecting larger handshakes","The favicon","CSS specificity"],"answer":0,"explain":"Larger PQC handshakes trip pinning and ossified middleboxes; test the real client matrix."},
     {"q":"For 10-year field devices, which combination is worst-case?","choices":["Signatures + long life + an immutable verifier","Hashing + short life","Bulk encryption + cloud KMS"],"answer":0,"explain":"If the verifier can't be updated and the device lives for years, you may be unable to fix the installed base - act earliest."},
@@ -187,15 +188,16 @@
   <a href="https://www.nccoe.nist.gov/crypto-agility-considerations-migrating-post-quantum-cryptographic-algorithms" target="_blank" rel="noopener noreferrer">NCCoE &mdash; Migration to Post-Quantum Cryptography</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
   <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer">NIST FIPS 203 &mdash; ML-KEM</a>
+  <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; KEM use and secure composition</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Try to answer each lab before revealing. Apply the four-question framework every time &mdash; the goal is a repeatable method, not memorized answers.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

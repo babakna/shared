@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PQC-501 - Network, 5G/6G, SIM/eSIM, and IoT</title>
+<link rel="icon" href="data:,">
 <meta name="description" content="A systems view of PQC across telecom identity, 5G/6G trust, SIM/eSIM provisioning, IoT fleets, and long-lived devices.">
 <link rel="stylesheet" href="assets/pqc.css">
 </head>
-<body data-module="PQC-501">
+<body id="top" data-module="PQC-501">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V5.1 (July 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V6.0 (July 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -51,11 +52,12 @@
   <div class="pqc-stepper" data-title="eSIM (RSP) profile download, simplified">
     <script type="application/json" class="steps">
     [
-      {"icon":"\ud83d\udcf1","title":"Device asks for a profile","body":"The device's eUICC (the embedded SIM chip soldered into the phone) contacts the operator's provisioning server, called the SM-DP+. Before anything sensitive moves, both sides prepare to prove who they are using certificates issued under a GSMA trust hierarchy - a chain of digital signatures that will all eventually move to PQC.","meta":"start: identity based on signatures"},
-      {"icon":"\ud83e\udeaa","title":"Mutual authentication","body":"The eUICC and the SM-DP+ each verify the other's certificate chain, rooted in a GSMA Certificate Issuer (CI). This is <b>mutual</b> - unlike a website, the tiny chip must also prove itself. Every party in that hierarchy (chip maker, operator, CI) must support PQC signatures and the larger certificates before the chain can go post-quantum.","meta":"PQC: GSMA PKI trust chain (signatures)"},
-      {"icon":"\ud83d\udd10","title":"Secure channel + key establishment","body":"With identities proven, the two sides run key establishment to open an encrypted channel for delivering the profile. This is a classic <b>harvest-now-decrypt-later</b> target - capture it today, decrypt after Q-day - so it is a prime candidate to move to a PQC or hybrid KEM (ML-KEM).","meta":"PQC: key establishment (HNDL target)"},
-      {"icon":"\ud83e\udde9","title":"Profile installed on the eUICC","body":"The encrypted profile - operator keys, IMSI/identity, network settings - is installed into a tiny, memory- and compute-constrained secure element. This is the sizing squeeze: ML-KEM and ML-DSA keys are far larger than ECC, and they must fit and run inside a chip designed years ago with kilobytes to spare.","meta":"constraint: secure element size + compute"},
-      {"icon":"\ud83d\udce1","title":"Device attaches to the network","body":"With the profile active, the device performs 5G Authentication and Key Agreement (5G-AKA) with the operator core. This step is largely <b>symmetric</b> (it leans on a pre-shared key in the profile), so PQC touches it far less directly than the certificate and key-establishment steps above.","meta":"mostly symmetric (5G-AKA)"}
+      {"icon":"\ud83d\udcf1","title":"User or operator starts activation","body":"An activation code, default server address, or operator flow reaches the device's <b>Local Profile Assistant (LPA)</b>. The LPA is device software that coordinates the consumer RSP procedure; the eUICC is the secure element that will hold the profile. An eUICC can be embedded or removable depending on the form factor.","meta":"actor: user/operator -> device LPA"},
+      {"icon":"\ud83c\udf10","title":"LPA connects to the SM-DP+","body":"The LPA opens the network connection to the operator's SM-DP+ and relays protocol messages between that server and the eUICC. The LPA is the network-facing delivery agent; describing the eUICC as directly contacting an internet server skips an important actor and interface boundary.","meta":"path: LPA <-> SM-DP+; LPA <-> eUICC"},
+      {"icon":"\ud83e\udeaa","title":"Server and eUICC authenticate","body":"Through the LPA relay, the SM-DP+ and eUICC perform the certificate-based authentication defined by the GSMA RSP architecture. Certificate issuers and permitted roles form an ecosystem trust chain. A PQC transition must preserve the exact authenticated transcript, roles, and downgrade protections rather than merely replacing a certificate algorithm.","meta":"PQC target: RSP authentication and trust chain"},
+      {"icon":"\ud83d\udd10","title":"SM-DP+ binds and protects the profile","body":"The SM-DP+ prepares a bound profile package for the target eUICC and protects the delivery using the RSP protocol's cryptographic construction. Future PQC work must specify how new key establishment/signature algorithms compose with this protocol; a generic ML-KEM call is not a drop-in RSP profile.","meta":"artifact: bound profile package for one eUICC"},
+      {"icon":"\ud83e\udde9","title":"LPA transfers; eUICC installs","body":"The LPA downloads the bound profile package and transfers it over the device's local eUICC interface. The eUICC verifies, decrypts, installs, and can enable the profile. Key, signature, working-memory, transaction-size, and timing limits must be benchmarked on each supported secure-element generation.","meta":"destination: eUICC; constraint: measured device resources"},
+      {"icon":"\ud83d\udce1","title":"Device attaches to the network","body":"With the profile active, the device performs 5G Authentication and Key Agreement with the operator core. 5G-AKA is primarily symmetric, so its quantum analysis is different from the public-key RSP trust chain and SUCI concealment.","meta":"mostly symmetric: analyze parameters and protocol separately"}
     ]
     </script>
   </div>
@@ -67,38 +69,38 @@
   <p class="lead">A phone call or data session crosses devices, SIMs, radios, cores, and often multiple operators &mdash; owned by different companies.</p>
   <p>No single organization can "turn on PQC" for a mobile network. Device vendors, SIM/eUICC makers, network-equipment vendors, operators, roaming partners, and standards bodies (3GPP, GSMA) must move in a coordinated way. That is why telecom relies on standards and long lead times, and why crypto-agility is essential: you are negotiating change across a federation.</p>
   <figure class="figure">
-    <div class="fig-title">One data session, many owners &mdash; every link must support PQC</div>
-    <svg viewBox="0 0 690 150" role="img" aria-label="A mobile session crosses device, eSIM chip, radio access network, operator core, and roaming partner. Each is owned by a different party and must independently support post-quantum cryptography.">
+    <div class="fig-title">One ecosystem, distinct protocol surfaces and owners</div>
+    <svg viewBox="0 0 690 150" role="img" aria-label="A map of distinct telecom cryptographic surfaces: the device LPA coordinates profile delivery, the eUICC authenticates and stores profiles, radio security is mostly symmetric, the core uses TLS and SUCI functions, and roaming uses inter-operator protocols. Readiness is assessed per interface, not as one universal PQC negotiation.">
       <g>
-        <rect class="g-box" x="8" y="46" width="112" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="64" y="72" font-size="12" text-anchor="middle" font-weight="800">Device</text><text class="g-tm" x="64" y="90" font-size="9.5" text-anchor="middle">handset maker</text>
-        <rect class="g-box-p" x="140" y="46" width="112" height="58" rx="10" stroke-width="2"/><text class="g-t" x="196" y="72" font-size="12" text-anchor="middle" font-weight="800">eSIM (eUICC)</text><text class="g-tm" x="196" y="90" font-size="9.5" text-anchor="middle">chip vendor</text>
-        <rect class="g-box" x="272" y="46" width="112" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="328" y="72" font-size="12" text-anchor="middle" font-weight="800">Radio (RAN)</text><text class="g-tm" x="328" y="90" font-size="9.5" text-anchor="middle">network vendor</text>
-        <rect class="g-box" x="404" y="46" width="112" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="460" y="72" font-size="12" text-anchor="middle" font-weight="800">Core</text><text class="g-tm" x="460" y="90" font-size="9.5" text-anchor="middle">operator</text>
-        <rect class="g-box-v" x="536" y="46" width="146" height="58" rx="10" stroke-width="1.5"/><text class="g-t" x="609" y="72" font-size="12" text-anchor="middle" font-weight="800">Roaming partner</text><text class="g-tm" x="609" y="90" font-size="9.5" text-anchor="middle">another operator</text>
+        <rect class="g-box" x="8" y="42" width="112" height="66" rx="10" stroke-width="1.5"/><text class="g-t" x="64" y="66" font-size="12" text-anchor="middle" font-weight="800">Device / LPA</text><text class="g-tm" x="64" y="84" font-size="9.5" text-anchor="middle">RSP network client</text><text class="g-tm" x="64" y="98" font-size="9" text-anchor="middle">device vendor</text>
+        <rect class="g-box-p" x="140" y="42" width="112" height="66" rx="10" stroke-width="2"/><text class="g-t" x="196" y="66" font-size="12" text-anchor="middle" font-weight="800">eUICC</text><text class="g-tm" x="196" y="84" font-size="9.5" text-anchor="middle">profile auth/store</text><text class="g-tm" x="196" y="98" font-size="9" text-anchor="middle">secure-element vendor</text>
+        <rect class="g-box-t" x="272" y="42" width="112" height="66" rx="10" stroke-width="1.5"/><text class="g-t" x="328" y="66" font-size="12" text-anchor="middle" font-weight="800">Radio (RAN)</text><text class="g-tm" x="328" y="84" font-size="9.5" text-anchor="middle">mostly symmetric</text><text class="g-tm" x="328" y="98" font-size="9" text-anchor="middle">network vendor</text>
+        <rect class="g-box-p" x="404" y="42" width="112" height="66" rx="10" stroke-width="1.5"/><text class="g-t" x="460" y="66" font-size="12" text-anchor="middle" font-weight="800">Operator core</text><text class="g-tm" x="460" y="84" font-size="9.5" text-anchor="middle">SBA TLS / SUCI</text><text class="g-tm" x="460" y="98" font-size="9" text-anchor="middle">operator</text>
+        <rect class="g-box-v" x="536" y="42" width="146" height="66" rx="10" stroke-width="1.5"/><text class="g-t" x="609" y="66" font-size="12" text-anchor="middle" font-weight="800">Roaming partner</text><text class="g-tm" x="609" y="84" font-size="9.5" text-anchor="middle">inter-operator trust</text><text class="g-tm" x="609" y="98" font-size="9" text-anchor="middle">another operator</text>
       </g>
       <g class="g-line-p"><line x1="120" y1="75" x2="140" y2="75" marker-end="url(#tc)"/><line x1="252" y1="75" x2="272" y2="75" marker-end="url(#tc)"/><line x1="384" y1="75" x2="404" y2="75" marker-end="url(#tc)"/><line x1="516" y1="75" x2="536" y2="75" marker-end="url(#tc)"/></g>
-      <text class="g-tm" x="345" y="130" font-size="11" text-anchor="middle">A single weak link (an eUICC or a partner that can't do PQC) forces the whole chain to fall back.</text>
+      <text class="g-tm" x="345" y="132" font-size="10.5" text-anchor="middle">Separate protocols: track algorithm, owner, dependency, and fallback independently for each interface.</text>
       <defs><marker id="tc" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#1657A0"/></marker></defs>
     </svg>
-    <figcaption>Unlike a web server you fully control, a mobile session depends on five independently owned links. This is why telecom PQC is paced by standards and the slowest partner, not by any one operator's ambition.</figcaption>
+    <figcaption>This is an ownership and dependency map, not one end-to-end cryptographic handshake. A lagging partner can block a specific interface without forcing unrelated local interfaces to remain classical.</figcaption>
   </figure>
-  <div class="callout takeaway"><span class="k">Takeaway</span><p>Treat telecom PQC like international PKI migration: the slowest interoperating partner sets the pace, so agility and standards alignment matter more than any single clever implementation.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>Treat telecom PQC as a portfolio of interoperating interfaces. The slowest required partner sets the pace <em>for that interface</em>; local interfaces can still advance when negotiation, policy, and downgrade telemetry are designed correctly.</p></div>
 </section>
 
 <section class="lesson" id="s2">
   <div class="lesson-title"><span class="num">2</span><h2>5G and future 6G trust layers</h2></div>
-  <p class="lead">5G already improved subscriber-identity privacy; PQC extends that trajectory into 6G-era design.</p>
-  <p>5G introduced concealment of the long-term subscriber identifier (SUPI) using a public-key scheme (SUCI) so the identifier is not sent in the clear &mdash; that public-key step is a natural PQC candidate. Core network functions authenticate each other over TLS-based interfaces (SBA), which inherit the TLS PQC story from PQC-202. The subscriber authentication itself (5G-AKA) is largely symmetric and less directly affected. 6G is being designed with quantum-safe assumptions from the start.</p>
-  <p>It helps to sort the telecom crypto surface into three buckets, because they age very differently. <b>Symmetric-heavy</b> pieces &mdash; the AKA authentication and the over-the-air ciphering &mdash; only need larger keys (Grover, not Shor), so they are the least urgent. <b>Public-key</b> pieces &mdash; SUCI concealment, the SBA TLS interfaces, and every certificate in the provisioning chain &mdash; are the Shor-vulnerable targets that need new algorithms. And <b>long-lived secrets</b> &mdash; anything an attacker could harvest now and exploit after Q-day &mdash; set the urgency. Mapping each interface into one of these buckets is the fastest way to prioritize a telecom estate.</p>
+  <p class="lead">5G improved subscriber-identity privacy; standards work is now examining quantum-safe impacts, but final 6G cryptographic profiles are not settled.</p>
+  <p>5G conceals the long-term subscriber identifier (SUPI) as SUCI using a public-key protection scheme, making that interface a natural PQC study target. Core network functions use TLS-based service interfaces and inherit TLS migration issues. 5G-AKA is primarily symmetric and needs a separate parameter/protocol review. 3GPP Release 20 includes a study item on the impact of quantum computing on 5G; cite that as active study work, not proof that a complete 6G PQC design has been finalized.</p>
+  <p>Sort the surface into three buckets. <b>Symmetric-heavy</b> pieces such as AKA and over-the-air protection are not broken by Shor; validate their parameters against the future profile instead of applying a blanket "double every key" rule. <b>Public-key</b> pieces such as SUCI, SBA TLS, and RSP certificates are the main replacement targets. <b>Long-lived confidentiality or authenticity</b> determines urgency. Mapping each interface this way is faster and more accurate than labeling an entire generation "quantum-safe."</p>
   <div class="callout example"><span class="k">Concrete example</span><p>The SUCI concealment that hides your permanent identity uses elliptic-curve public-key cryptography today. A quantum adversary who harvested those exchanges could later de-conceal identifiers &mdash; a privacy harvest-now-decrypt-later case, motivating PQC there.</p></div>
-  <div class="callout tip"><span class="k">Why 6G gets it easier</span><p>Because 6G is being specified now, PQC and crypto-agility can be baked into the standards rather than retrofitted. That is the whole lesson of this course applied at ecosystem scale: designing for agility up front is far cheaper than negotiating a change across a live federation later.</p></div>
+  <div class="callout tip"><span class="k">The 6G opportunity</span><p>Early standards work can make algorithm identifiers, negotiation, larger objects, telemetry, and replacement paths explicit before deployment. That is an opportunity, not a guarantee: track the normative 3GPP/GSMA output and test the resulting profiles before calling a system 6G quantum-safe.</p></div>
 </section>
 
 <section class="lesson" id="s3">
   <div class="lesson-title"><span class="num">3</span><h2>SIM and eSIM lifecycle</h2></div>
   <p class="lead">The (e)SIM is a tiny, hardened computer with real constraints &mdash; and a long, multi-party trust chain.</p>
-  <p>SIM/eSIM provisioning (GSMA RSP) relies on a certificate hierarchy and secure channels, as you saw in the walkthrough. The challenges: the <span class="term" data-def="Embedded UICC - the chip that securely stores SIM profiles in an eSIM-capable device.">eUICC</span> secure element has limited memory and compute, so larger PQC keys and signatures are a genuine fit problem; and the trust hierarchy spans device makers, SIM vendors, and operators who must all support the new algorithms.</p>
-  <p>To see why the eSIM is such a hard case, picture the constraints stacked together. The chip is deliberately tiny and cheap, with kilobytes &mdash; not megabytes &mdash; of room, so a multi-kilobyte ML-DSA signature is a real budget problem, not a rounding error. It is hardened against physical attack, so you cannot casually "just update it" in the field. Its trust chain reaches back through SIM vendors and the GSMA root, none of which any single operator controls. And the profiles it holds may live in a device for the better part of a decade. Any one of those factors would slow a migration; the eSIM has all four at once, which is why it is often the pacing item for telecom PQC rather than the flashy radio or core.</p>
+  <p>SIM/eSIM provisioning (GSMA RSP) relies on certificate-based authentication and protected profile delivery. The <span class="term" data-def="An eUICC is a secure UICC that can manage downloadable profiles; it may be embedded, integrated, or supplied in another supported form factor rather than always being soldered into a phone.">eUICC</span> has finite nonvolatile memory, RAM, transaction buffers, and compute. Larger PQC objects can be a fit problem, but "eUICC" does not mean one fixed capacity or always-soldered packaging.</p>
+  <p>Use vendor measurements, not a kilobytes-versus-megabytes slogan. Current commercial eSIM secure elements advertise capacities such as roughly 1.1 MB or 1.8 MB of user nonvolatile memory, while working RAM and per-command buffers can be much smaller; profiles, OS code, and security metadata also consume space. The engineering questions are whether the exact key, signature, certificate chain, temporary buffers, and transaction fit simultaneously and meet timing/power limits on each supported generation.</p>
   <div class="callout example"><span class="k">Everyday analogy</span><p>Upgrading the eSIM trust chain is like changing the locks on every safe-deposit box in a banking network where the vault doors were made by different companies, the boxes are welded shut, and the master key hierarchy is shared across the whole industry. You cannot just email a patch &mdash; everyone who touches the chain has to agree and re-tool.</p></div>
 </section>
 
@@ -120,7 +122,7 @@
 <section class="lesson" id="s5">
   <div class="lesson-title"><span class="num">5</span><h2>Strategies for constrained devices</h2></div>
   <p class="lead">When the chip cannot hold or run a full PQC scheme, you have more options than "give up."</p>
-  <p>The size and speed of ML-KEM/ML-DSA are fine on a phone but genuinely challenging on a kilobyte-scale secure element or an ultra-low-power sensor. A few patterns repeatedly solve this without abandoning security:</p>
+  <p>The size and speed of ML-KEM/ML-DSA are generally manageable on modern application processors but may challenge a secure element or ultra-low-power sensor depending on RAM, buffers, acceleration, firmware, and role. Benchmark the exact parameter set and operation; avoid deciding from storage capacity alone.</p>
   <div class="table-scroll"><table class="data">
     <thead><tr><th>Strategy</th><th>How it helps</th><th>Trade-off</th></tr></thead>
     <tbody>
@@ -131,8 +133,8 @@
       <tr><td>Hardware acceleration / next-gen SE</td><td>New secure elements add PQC support and speed</td><td>A manufacturing-cycle dependency, not a field fix</td></tr>
     </tbody>
   </table></div>
-  <div class="callout example"><span class="k">Concrete example</span><p>A smart meter cannot afford to <em>generate</em> ML-DSA signatures, but it only ever needs to <em>verify</em> firmware. ML-DSA verification is fast and its public key is manageable, so verify-only PQC fits comfortably &mdash; and for the firmware root, tiny-public-key LMS/XMSS is an even better match. The expensive signing all happens back in the vendor's HSM.</p></div>
-  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Assuming "too constrained for PQC" based on the <em>signing</em> cost. Most devices verify far more than they sign; verification is usually affordable, and the burden can be shifted to where the compute lives.</p></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A smart meter may only verify firmware while signing stays in the vendor HSM. That role separation can make ML-DSA or a stateful hash-based verifier feasible, but "verify-only" is not proof of fit. Measure public-key storage, signature transport, RAM, code size, verification latency, power, failure handling, and the secure-boot format before selecting the scheme.</p></div>
+  <div class="callout pitfall"><span class="k">Common pitfall</span><p>Benchmarking signing when the device only verifies &mdash; or assuming verification is automatically affordable. Measure the operation the product actually performs on production-equivalent hardware, including worst-case memory and update-package size.</p></div>
 </section>
 
 <section class="lesson" id="s6">
@@ -153,7 +155,7 @@
       <p class="scenario">Your network supports PQC, but a roaming partner does not.</p>
       <p class="decide">What determines the effective security of a roaming session?</p>
       <button class="btn small reveal">Show recommended answer</button>
-      <p class="answer"><span class="k">Recommended answer</span> The weaker partner. Interworking falls back to what both support, so the slowest partner sets the pace. Track partner roadmaps and use standards/contracts to drive alignment; agility lets you upgrade the moment they do.</p>
+      <p class="answer"><span class="k">Recommended answer</span> That specific roaming/interconnect path can use only a mutually standardized and implemented profile; it may remain classical or fail if no safe common profile exists. This does <em>not</em> require unrelated home-network interfaces to fall back. Track negotiated algorithms per interface, manage downgrade policy, and coordinate the partner roadmap through standards and contracts.</p>
     </article>
     <article class="case">
       <h3>Lab 2 &middot; eUICC won't fit</h3>
@@ -198,10 +200,10 @@
     {"q":"What 5G feature is a natural PQC candidate for subscriber privacy?","choices":["SUCI concealment of the subscriber identifier (public-key based)","The ringtone","The data cap"],"answer":0,"explain":"SUCI uses elliptic-curve public-key crypto to hide the identifier; harvested exchanges could later be de-concealed, motivating PQC."},
     {"q":"What makes IoT/field devices worst-case for PQC?","choices":["Constrained hardware + long life + hard-to-update verifiers","They are too powerful","They update every hour"],"answer":0,"explain":"Small compute, decade-long life, and immutable verifiers combine into the hardest migration profile."},
     {"q":"For a 12-year device, when is the dominant PQC decision made?","choices":["At design/manufacture (agile, PQC-capable verifier)","After it fails in the field","Never - it self-updates"],"answer":0,"explain":"You cannot retrofit an immutable verifier; manufacturing-time agility governs the device's entire life."},
-    {"q":"On a roaming session where one partner lacks PQC, what sets the security?","choices":["The weaker partner (fallback to common support)","The stronger partner","The device color"],"answer":0,"explain":"Interworking negotiates down to what both support, so the slowest partner paces the migration."},
+    {"q":"A roaming partner lacks a mutually supported PQC profile. What is the correct conclusion?","choices":["That interconnect remains classical or unavailable under policy; unrelated interfaces can still migrate","Every interface worldwide must fall back","The stronger partner silently forces PQC"],"answer":0,"explain":"Assess each protocol boundary separately. A partner constrains its interconnect, not every cryptographic surface in the home network."},
     {"q":"A device only VERIFIES signatures, never signs. Is it too constrained for PQC?","choices":["Usually no - verification is far cheaper than signing","Yes, all PQC is too heavy for any device","Only if it has a screen"],"answer":0,"explain":"Signing is the costly operation. Verification (ML-DSA, or tiny-key LMS/XMSS for firmware) is typically affordable, and heavy signing stays in the cloud/HSM."},
     {"q":"What is an operator's most effective lever for telecom PQC?","choices":["Standards participation and procurement/contract clauses","Rewriting its own code faster","Changing the phone color"],"answer":0,"explain":"Because the chain spans many owners, alignment via standards (GSMA/3GPP) and contracts moves the federation more than any single implementation."},
-    {"q":"Why does a single weak link force the whole mobile chain to fall back?","choices":["A session spans five independently owned links that must all support PQC","The device reboots","Encryption is optional in 5G"],"answer":0,"explain":"Device, eUICC, RAN, core, and roaming partner are each owned separately; if any cannot do PQC, interworking negotiates down."}
+    {"q":"Why should telecom PQC readiness be tracked per interface?","choices":["RSP, radio security, SBA TLS, SUCI, and roaming are distinct protocols with different owners and fallbacks","They are all one TLS handshake","Only the RAN uses cryptography"],"answer":0,"explain":"The ecosystem is connected, but its cryptographic surfaces are not one negotiation. Inventory and evidence must identify each interface and dependency."}
   ]
   </script>
 </section>
@@ -210,18 +212,23 @@
   <h2>Primary sources</h2>
   <p class="section-hint">Educational; consult 3GPP/GSMA and vendors for current specifics.</p>
   <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/" target="_blank" rel="noopener noreferrer">GSMA &mdash; eSIM / Remote SIM Provisioning</a>
-  <a href="https://www.3gpp.org/technologies/sec" target="_blank" rel="noopener noreferrer">3GPP &mdash; Security specifications</a>
+  <a href="https://portal.3gpp.org/Specifications.aspx?WiUid=33025&amp;q=1" target="_blank" rel="noopener noreferrer">3GPP Portal &mdash; security specifications</a>
   <a href="https://www.nsa.gov/Cybersecurity/Post-Quantum-Cybersecurity-Resources/" target="_blank" rel="noopener noreferrer">NSA &mdash; Post-Quantum resources</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
+  <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/wp-content/uploads/2024/07/A-guide-to-eSIM-Architectures.pdf" target="_blank" rel="noopener noreferrer">GSMA &mdash; Guide to eSIM architectures and actors</a>
+  <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/wp-content/uploads/2024/09/SGP.21-v2.6.pdf" target="_blank" rel="noopener noreferrer">GSMA SGP.21 &mdash; Consumer RSP architecture</a>
+  <a href="https://portal.3gpp.org/desktopmodules/WorkItem/WorkItemDetails.aspx?workitemId=1080045" target="_blank" rel="noopener noreferrer">3GPP Release 20 study &mdash; impact of quantum computing on 5G</a>
+  <a href="https://www.infineon.com/assets/row/public/documents/30/49/infineon-oc1230-datasheet-en.pdf?fileId=8ac78c8c8d2fe47b018e3d401d0a6772" target="_blank" rel="noopener noreferrer">Infineon OC1230 datasheet &mdash; example 1.1 MB eSIM capacity</a>
+  <a href="https://www.infineon.com/assets/row/public/documents/30/41/infineon-tegrion-short-product-overview-sli22-en.pdf" target="_blank" rel="noopener noreferrer">Infineon SLI22 overview &mdash; example 1.8 MB NVM / 96 KB RAM</a>
 </section>
 </main>
 </div>
 
-<button class="btn toplink" onclick="scrollTo({top:0,behavior:'smooth'})">Top</button>
+<a class="btn toplink" href="#top" aria-label="Return to top">Top</a>
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V5.1 (July 2026)</div>
+  <div class="help-ver" data-help-version>V6.0 (July 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through eSIM provisioning first to see the multi-party trust chain, then read how 5G/6G, SIM/eSIM, and IoT each add their own constraints.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
