@@ -1,8 +1,13 @@
 # Post-Quantum Cryptography Learning Lab
 
-V6.0 (July 2026)
+V6.1 (July 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V6.1
+
+- Corrected the NIST algorithm-status presentation: FIPS 203/204/205 are final, FN-DSA/FIPS 206 remains in development, and HQC is selected for future backup-KEM standardization.
+- Synchronized the shared course engine and every visible module, glossary, Help, and landing-page version surface at V6.1.
 
 ## What changed in V6.0
 
