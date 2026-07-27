@@ -1,8 +1,13 @@
 # Post-Quantum Cryptography Learning Lab
 
-V6.1 (July 2026)
+V7.0 (July 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V7.0
+
+- Unified every AI, eSIM, PQC, and 5G/6G tutorial and landing page on one shared V7.0 release identifier.
+- Synchronized static headers, runtime-generated version labels, Help surfaces, footers, shared assets, and course documentation.
 
 ## What changed in V6.1
 
