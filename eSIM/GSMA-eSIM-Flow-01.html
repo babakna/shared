@@ -349,8 +349,8 @@ const EC={
 // The set of CIs GROWS over time, and a test CI must never be confused with a production
 // one, so verify against the GSMA CI registry / SGP.26 for current values and expiry dates.
 var CI_PKIDS=[
-  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795BEBFB',gen:'GSM Association RSP2 Root CI1 (DigiCert)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3.',status:'Production'},
-  {pkid:'4C27967AD20C14B391E9601E41E604AD57C0222F',gen:'OISTE GSMA CI G1 (WISeKey)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3.',status:'Production'},
+  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795BEBFB',gen:'GSM Association RSP2 Root CI1 (DigiCert)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3. Reported expiry 2052-02-21 \u2014 expiry NOT independently verified.',status:'Production'},
+  {pkid:'4C27967AD20C14B391E9601E41E604AD57C0222F',gen:'OISTE GSMA CI G1 (WISeKey)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3. Reported expiry 2059-01-07 \u2014 expiry NOT independently verified.',status:'Production'},
   {pkid:'D7A7D0C7C04EA76076E3F44FAEBDE8779E2948D4',gen:'GSM Association M2M31 Root CI2 (Cybertrust)',usage:'Production trust anchor for SGP.01/SGP.02 \u2014 M2M architecture, not Consumer RSP.',status:'Production (M2M)'},
   {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
   {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
@@ -1539,7 +1539,7 @@ function qrHTML(){
   h+='<div style="padding:10px 14px;background:rgba(30,58,95,0.06);border:1px solid var(--mag);border-radius:8px;margin-bottom:14px;font-size:13px;color:var(--tx1);line-height:1.7">';
   h+='<b style="color:var(--mag)">Diagnosing mutual authentication failures:</b> Extract <code>euiccCiPKIdListForVerification</code> from ES10b.GetEUICCInfo, then compare each PKID against this table. If the SM-DP+ certificate was issued by a CI whose PKID is NOT in the eUICC\u2019s trusted list, authentication will fail.';
   h+='</div>';
-  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:10px">PKIDs are the SHA-1 Subject Key Identifiers of the CI root certificates, transcribed from the published GSMA CI material. New CIs are added over time \u2014 confirm against the GSMA CI registry (and SGP.26 for test material) for current values and expiry. <b style="color:#D97706">Never trust an SGP.26 test CI in production.</b></p>';
+  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:10px">PKIDs are the SHA-1 Subject Key Identifiers of the CI root certificates, transcribed from the published GSMA CI material. PKID hex values were transcribed from the euicc-manual CI registry mirror; the GSMA CI page returned HTTP 403 during verification, so <b>expiry dates are unconfirmed</b> and the CI set may have grown since. Confirm against the GSMA CI registry (and SGP.26 for test material) before relying on any value. <b style="color:#D97706">Never trust an SGP.26 test CI in production.</b></p>';
   h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>PKID (hex)</th><th>Generation</th><th>Usage</th><th>Status</th></tr></thead><tbody>';
   CI_PKIDS.forEach(function(c){
     var sColor=c.status==='Test'?'#D97706':(c.status.indexOf('Production')===0?'#059669':'#6B7280');
@@ -1816,11 +1816,13 @@ function toolsIdHTML(){
 
   h+='<div class="asec"><h2>EUM Issuer Database</h2>';
   h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Names are the entity registered in the <b>ITU-T E.118 Issuer Identifier Number</b> registry for EIDs beginning “89”. The registry is not retroactively renamed when a business is acquired, so the present-day owner is given in parentheses where it differs. Rows marked <i>community-sourced</i> come from the euicc-manual EUM list and observed EUM certificates rather than the ITU registry.</p>';
-  h+='<details class="ts-card"><summary>ITU-T E.118 scheme — “89” prefixes ('+Object.keys(EUM_TABLE).length+')</summary><div class="ts-body">';
-  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>Prefix (8 digits)</th><th>Registered issuer</th><th>Source</th></tr></thead><tbody>';
+  h+='<details class="ts-card"><summary>ITU-T E.118 scheme — “89” issuer identifiers ('+Object.keys(EUM_TABLE).length+')</summary><div class="ts-body">';
+  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:8px">Keyed by the 6-digit ITU IIN. An EID zero-pads the country and issuer fields to 3 digits each, so IIN <code>893324</code> appears in an EID as <code>89033024</code>.</p>';
+  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>IIN</th><th>As EID prefix</th><th>Registered issuer</th><th>Source</th></tr></thead><tbody>';
   Object.keys(EUM_TABLE).sort().forEach(function(prefix){
     var r=EUM_TABLE[prefix];
-    h+='<tr><td><code>'+esc(prefix)+'</code></td><td><b>'+esc(r.name)+'</b></td><td>'+(r.src==='itu'?'ITU registry':'community-sourced')+'</td></tr>';
+    var asEid='89'+'0'+prefix.substring(2,4)+'0'+prefix.substring(4,6);
+    h+='<tr><td><code>'+esc(prefix)+'</code></td><td><code>'+esc(asEid)+'</code></td><td><b>'+esc(r.name)+'</b></td><td>'+(r.src==='itu'?'ITU registry':'<span style="color:#D97706">community-sourced (unconfirmed)</span>')+'</td></tr>';
   });
   h+='</tbody></table></div></div></details>';
   h+='<details class="ts-card"><summary>GSMA EID Scheme (SGP.29) — range holders ('+Object.keys(EIN_TABLE).length+')</summary><div class="ts-body">';
@@ -2305,32 +2307,40 @@ function bindGlossarySearch(){
 
 // ── 9. EUM Manufacturer Table ──
 // Format: '8-digit-prefix': 'Manufacturer Name' (reference subset; source-verification needed)
-// EUM identifiers for the ITU-T E.118 based scheme (EIDs starting '89').
-// Format: '8-digit prefix': {name:'...', src:'itu'|'osmocom'}
-//   src 'itu'     = present in the official ITU-T E.118 Issuer Identifier Number registry.
-//   src 'osmocom' = from the euicc-manual EUM list / observed EUM certificates; not found
-//                   in the ITU registry, so treat as community-sourced rather than official.
+// EUM issuer identifiers, keyed by the ITU-T E.118 Issuer Identification Number (IIN)
+// in its registry form: MII(2) + country(2) + issuer(2) = 6 digits, e.g. '893324'.
+// NOTE on key shape: an EID zero-pads the country and issuer fields to 3 digits each
+// (so IIN 89 33 24 appears in an EID as '89033024'). eumIinFromEid() converts.
+// Format: 'IIN': {name:'...', src:'itu'|'community'}
+//   src 'itu'       = present in the official ITU-T E.118 IIN registry (2023 edition).
+//   src 'community' = from the euicc-manual EUM list / observed EUM certificates only;
+//                     NOT found in the ITU registry, so the attribution is unconfirmed.
 // Names are the REGISTERED entity, with the present-day owner in parentheses where the
-// business has since moved. The registry is the source of truth and is not retroactively
-// renamed when a company is acquired or rebranded.
+// business has moved. The registry is not renamed when a company is acquired.
 var EUM_TABLE={
-  '89033023':{name:'Gemalto SA (now Thales)',src:'itu'},
-  '89033024':{name:'Oberthur Technologies (now IDEMIA)',src:'itu'},
-  '89033090':{name:'Thales SA',src:'itu'},
-  '89034011':{name:'Valid',src:'itu'},
-  '89041290':{name:'STMicroelectronics',src:'osmocom'},
-  '89043051':{name:'NXP Semiconductors (Austria)',src:'itu'},
-  '89043052':{name:'NXP Semiconductors (Austria)',src:'itu'},
-  '89044045':{name:'Kigen (UK)',src:'itu'},
-  '89044047':{name:'Truphone',src:'osmocom'},
-  '89049032':{name:'Giesecke & Devrient',src:'itu'},
-  '89049038':{name:'G+D Mobile Security',src:'itu'},
-  '89049041':{name:'NXP Semiconductors (Germany)',src:'itu'},
-  '89049044':{name:'sysmocom (test/development)',src:'osmocom'},
-  '89086001':{name:'Hengbao',src:'osmocom'},
-  '89086029':{name:'Wuhan Tianyu',src:'osmocom'},
-  '89086030':{name:'Eastcompeace',src:'osmocom'}
+  '893323':{name:'Gemalto SA (now Thales)',src:'itu'},
+  '893324':{name:'Oberthur Technologies (now IDEMIA)',src:'itu'},
+  '893390':{name:'Thales SA',src:'itu'},
+  '893411':{name:'Valid',src:'itu'},
+  '894130':{name:'STMicroelectronics International NV',src:'itu'},
+  '894351':{name:'NXP Semiconductors (Austria)',src:'itu'},
+  '894352':{name:'NXP Semiconductors (Austria)',src:'itu'},
+  '894445':{name:'Kigen UK Limited',src:'itu'},
+  '894447':{name:'Truphone Limited',src:'itu'},
+  '894932':{name:'Giesecke & Devrient',src:'itu'},
+  '894938':{name:'G+D Mobile Security',src:'itu'},
+  '894941':{name:'NXP Semiconductors (Germany)',src:'itu'},
+  '898601':{name:'Hengbao',src:'community'},
+  '898629':{name:'Wuhan Tianyu',src:'community'},
+  '898630':{name:'Eastcompeace',src:'community'}
 };
+// Convert the 8-digit prefix of an '89' EID into its 6-digit ITU IIN by removing the
+// zero padding from the 3-digit country and issuer fields.
+function eumIinFromEid(eid32){
+  if(eid32.substring(0,2)!=='89')return null;
+  var cc=eid32.substring(2,5),ii=eid32.substring(5,8);
+  return '89'+cc.substring(1)+ii.substring(1);
+}
 // GSMA EID Scheme (SGP.29) registered companies -- the NEW scheme, which does NOT use an
 // '89' prefix. Keyed by the 5-digit EIN/ERHI range-holder identifier.
 // Source: gsmaservices.com EID scheme registered companies list.
@@ -2556,6 +2566,16 @@ var REMOTE_INS={
 
 // ── 8. MCC/MNC Operator Lookup ──
 // Format: 'MCCMNC': 'Operator Name'
+// MNC length by MCC (ITU-T E.212). North American MCCs use 3-digit MNCs; most of the
+// rest of the world uses 2. Recorded explicitly so IMSI parsing never has to guess.
+var MCC_MNC_LEN={
+  '302':3,'310':3,'311':3,'312':3,'313':3,'314':3,'315':3,'316':3,
+  '330':3,'334':3,'338':3,'342':3,'344':3,'346':3,'348':3,'350':3,
+  '352':3,'354':3,'356':3,'358':3,'360':3,'362':3,'363':3,'364':3,
+  '365':3,'366':3,'368':3,'370':3,'372':3,'374':3,'376':3,'708':3,
+  '710':3,'712':3,'714':3,'716':3,'722':3,'732':3,'738':3,'740':3,
+  '744':3,'746':3,'748':3
+};
 var MCC_MNC={
   '310260':'T-Mobile USA','310200':'T-Mobile USA','310210':'T-Mobile USA',
   '310220':'T-Mobile USA','310230':'T-Mobile USA','310240':'T-Mobile USA',
@@ -2667,7 +2687,8 @@ function bindEIDDecoder(){
     var platform=val.substring(8,13);
     var issuerInfo=val.substring(13,18);
     var serial=val.substring(18,30);
-    var eumRec=stdMII?(EUM_TABLE[prefix8]||null):null;
+    var eumIin=stdMII?eumIinFromEid(val):null;
+    var eumRec=eumIin?(EUM_TABLE[eumIin]||null):null;
     var eumName=eumRec?eumRec.name:null;
     var countryName=stdMII?(COUNTRY_CODES[cc.substring(1)]||COUNTRY_CODES[cc]||'Unknown ('+cc+')'):'N/A';
     var seg;
@@ -2714,8 +2735,8 @@ function bindEIDDecoder(){
     if(stdMII){
       rh+='<div class="eid-row"><b>Country</b><span>'+esc(countryName)+'</span></div>';
       var eumTxt;
-      if(eumName)eumTxt=esc(eumName)+(eumRec.src==='itu'?' <span style="font-size:11px;color:var(--tx2)">(ITU E.118 registry)</span>':' <span style="font-size:11px;color:var(--tx2)">(community-sourced \u2014 not in ITU registry)</span>');
-      else eumTxt='Unverified \u2014 prefix '+esc(prefix8)+' is not in this tool\u2019s list';
+      if(eumName)eumTxt=esc(eumName)+' <span style="font-size:11px;color:var(--tx2)">(IIN '+esc(eumIin)+' \u2014 '+(eumRec.src==='itu'?'ITU E.118 registry':'community-sourced, UNCONFIRMED against the ITU registry')+')</span>';
+      else eumTxt='Unverified \u2014 IIN '+esc(eumIin||'?')+' is not in this tool\u2019s list';
       rh+='<div class="eid-row"><b>EUM (Issuer)</b><span>'+eumTxt+'</span></div>';
     }
     rh+='</div>';
@@ -3213,7 +3234,7 @@ function bindBatchValidator(){
       if(!/^\d{32}$/.test(v)){formatErr++;results.push({eid:v,fmt:fmt,valid:null,eum:'',dev:'',pn:'',error:'Format error ('+v.length+' digits)'});return}
       var ok=eidChecksumValid(v),prefix8=v.substring(0,8);
       var isE118=v.substring(0,2)==='89';
-      var rec=isE118?EUM_TABLE[prefix8]:null;
+      var rec=isE118?EUM_TABLE[eumIinFromEid(v)]:null;
       var eum=rec?rec.name:(isE118?'Unverified':'GSMA scheme (SGP.29)');
       var scheme=isE118?'ITU-T E.118':'GSMA SGP.29';
       if(ok)valid++;else invalid++;
@@ -3267,12 +3288,20 @@ function bindIMSIDecoder(){
     if(!v){res.innerHTML='<div class="ac-error">Enter an IMSI.</div>';return}
     if(!/^\d+$/.test(v)||v.length<5||v.length>15){res.innerHTML='<div class="ac-error">IMSI must be 5\u201315 digits.</div>';return}
     var mcc=v.substring(0,3);
-    var MCC_2DIGIT_MNC={'2':'','3':'','4':''};
-    var twoDigitMCCs=['202','204','206','208','213','214','216','218','219','220','222','225','226','228','230','231','232','234','235','238','240','242','244','246','247','248','255','257','259','260','262','266','268','270','272','274','276','278','280','282','283','284','286','288','290','293','294','295','297'];
-    var operator=null,mncLen=3;
-    var try6=v.substring(0,6);if(MCC_MNC[try6]){operator=MCC_MNC[try6];mncLen=3}
-    else{var try5=v.substring(0,5);if(MCC_MNC[try5]){operator=MCC_MNC[try5];mncLen=2}}
-    if(!operator&&twoDigitMCCs.indexOf(mcc)!==-1)mncLen=2;
+    /* MNC length is a property of the MCC, not something to infer from which lookup
+       happens to hit first. MCC_MNC_LEN records the length explicitly; North American
+       MCCs use 3-digit MNCs, most others use 2. Trying 6 digits before 5 would silently
+       shadow a 2-digit entry if a 3-digit key ever shared its prefix. */
+    var operator=null,mncLen=MCC_MNC_LEN[mcc]||2;
+    var key=v.substring(0,3+mncLen);
+    if(MCC_MNC[key])operator=MCC_MNC[key];
+    else{
+      /* Unknown MCC: fall back to trying both widths, longest first, but only to
+         recover the operator name -- mncLen stays as declared for the MCC. */
+      var alt=v.substring(0,6);
+      if(MCC_MNC[alt]){operator=MCC_MNC[alt];mncLen=3}
+      else{alt=v.substring(0,5);if(MCC_MNC[alt]){operator=MCC_MNC[alt];mncLen=2}}
+    }
     var mnc=v.substring(3,3+mncLen),msin=v.substring(3+mncLen);
     var fmt=v.replace(/(.{3})(.{2,3})(.*)/, '$1 $2 $3');
     var rh='<div class="eid-formatted">'+fmt+'</div>';
