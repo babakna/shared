@@ -1,7 +1,7 @@
-/* PQC Learning Lab shared engine - V7.0 */
+/* PQC Learning Lab shared engine - V8.0 */
 (function () {
   "use strict";
-  var VERSION = "V7.0 (July 2026)";
+  var VERSION = "V8.0 (August 2026)";
   var root = document.documentElement;
 
   var COURSE = [

@@ -1,12 +1,12 @@
 # Post-Quantum Cryptography Learning Lab
 
-V7.0 (July 2026)
+V8.0 (August 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
 
-## What changed in V7.0
+## What changed in V8.0
 
-- Unified every AI, eSIM, PQC, and 5G/6G tutorial and landing page on one shared V7.0 release identifier.
+- Unified every AI, eSIM, PQC, and 5G/6G tutorial and landing page on one shared V8.0 release identifier.
 - Synchronized static headers, runtime-generated version labels, Help surfaces, footers, shared assets, and course documentation.
 
 ## What changed in V6.1
@@ -29,7 +29,7 @@ A free, self-paced, static HTML course that takes a learner from **zero cryptogr
 
 - Refreshed U.S. federal PQC migration mandate coverage for EO 14412 and OMB M-26-15.
 - Added NIST CSWP 39upd1 crypto-agility guidance to governance and source alignment.
-- Upversioned the curriculum after the July 2026 tutorial audit.
+- Upversioned the curriculum after the August 2026 deep audit.
 - **Steppers are now visual pipelines, not text pages.** Every "click Next" walkthrough now renders an SVG pipeline with an icon per stage; the current stage highlights and the connectors fill in as you advance, so you *see* where you are instead of just reading paragraphs.
 - **Deeper step content.** Each step was rewritten with concrete detail, real examples, and inline code/labels (e.g. `X25519+ML-KEM-768`), and several walkthroughs gained extra steps.
 - **More media throughout.** Icon-driven pipelines add colour and visual structure to the previously text-heavy explore sections.

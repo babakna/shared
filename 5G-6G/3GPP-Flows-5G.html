@@ -479,7 +479,7 @@ table.ref-table tr:hover td { background: var(--bg-hover); }
   </div>
   <div class="header-right">
     <button id="theme-toggle" title="Toggle light/dark theme">☀️ Light</button>
-    <span class="version">V7.0 (July 2026)</span>
+    <span class="version">V8.0 (August 2026)</span>
   </div>
 </header>
 <div class="app-container">
@@ -934,11 +934,11 @@ FLOWS.registration_5gaka = {
         code:`// AMF Processing:
 // 1. Receives KSEAF and confirmed SUPI
 // 2. KAMF = KDF(KSEAF, SUPI, ABBA)
-// 3. Initiates NAS Security Mode Command
+// 3. Initiates NAS SECURITY MODE COMMAND
 // 4. Selects NAS security algorithms`}},
-    {id:12, label:'Step 12: NAS Security Mode Command', from:'amf', to:'ue', interface:'N2/Uu — NAS via NGAP', protocol:'NAS 5GMM (TS 24.501)', badge:'FACT', lineType:'cp', through:['ran'],
-      description:'AMF sends NAS Security Mode Command with selected algorithms. UE derives NAS security keys.',
-      ingress:{title:'NAS Security Mode Command',
+    {id:12, label:'Step 12: NAS SECURITY MODE COMMAND', from:'amf', to:'ue', interface:'N2/Uu — NAS via NGAP', protocol:'NAS 5GMM (TS 24.501)', badge:'FACT', lineType:'cp', through:['ran'],
+      description:'AMF sends NAS SECURITY MODE COMMAND with selected algorithms. UE derives NAS security keys.',
+      ingress:{title:'NAS SECURITY MODE COMMAND',
         code:`// NAS: Security Mode Command (TS 24.501 §8.2.25)
 {
   "Extended Protocol Discriminator": "5GS MM",
@@ -962,9 +962,9 @@ FLOWS.registration_5gaka = {
 //    KNASenc = KDF(KAMF, NEA-alg-id, 1)
 // 4. Activate NAS security context
 // 5. Prepare Security Mode Complete`}},
-    {id:13, label:'Step 13: NAS Security Mode Complete', from:'ue', to:'amf', interface:'Uu/N2 — NAS via NGAP', protocol:'NAS 5GMM (TS 24.501)', badge:'FACT', lineType:'cp', through:['ran'],
-      description:'UE sends NAS Security Mode Complete (encrypted and integrity protected). NAS security context is now active.',
-      ingress:{title:'NAS Security Mode Complete',
+    {id:13, label:'Step 13: NAS SECURITY MODE COMPLETE', from:'ue', to:'amf', interface:'Uu/N2 — NAS via NGAP', protocol:'NAS 5GMM (TS 24.501)', badge:'FACT', lineType:'cp', through:['ran'],
+      description:'UE sends NAS SECURITY MODE COMPLETE (encrypted and integrity protected). NAS security context is now active.',
+      ingress:{title:'NAS SECURITY MODE COMPLETE',
         code:`// NAS: Security Mode Complete (TS 24.501 §8.2.26)
 // ** Encrypted + Integrity Protected **
 {
@@ -2239,7 +2239,7 @@ FLOWS.slice_registration = {
 // UE → AMF: NAS Auth Response (RES*)
 // AMF → AUSF: RES* verification
 // AUSF: RES* == XRES* → SUCCESS
-// NAS Security Mode Command/Complete
+// NAS SECURITY MODE COMMAND/Complete
 //
 // (See Flow 1 for full details)`}, egress:{title:'Authentication Complete',
         code:`// 5G AKA completed successfully
@@ -6998,7 +6998,7 @@ function renderIntroWhatIs5G(el) {
   html += '<div class="badge-legend-item" style="flex-direction:column;align-items:flex-start;gap:6px;"><strong style="color:var(--accent);font-size:14px;">mMTC</strong><span style="font-weight:600;color:var(--text-primary);">Massive Machine-Type Communication</span><span>Connecting very large numbers of low-power devices</span><span style="font-size:12px;color:var(--text-tertiary);">Examples: Smart city sensors, agricultural IoT, asset tracking, smart meters</span><span style="font-size:12px;font-weight:700;color:var(--highlight);">1,000,000 devices per km²</span></div>';
   html += '</div>';
 
-  html += '<h3>ITU-R IMT-2020 Performance Targets</h3>';
+  html += '<h3>ITU-R IMT-2020 Performance Targets</h3>'; html += '<p style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">These are ITU-R M.2410-0 <em>minimum requirements for evaluation</em> \u2014 measured under ideal, error-free conditions with aggregated bandwidth. They are not achievable NR peak rates in a deployed network.</p>';
   html += '<table class="ref-table"><thead><tr><th>Metric</th><th>Target</th><th>Comparison to 4G (IMT-Advanced)</th></tr></thead><tbody>';
   html += '<tr><td>Peak Data Rate (DL)</td><td>20 Gbps</td><td>20× improvement</td></tr>';
   html += '<tr><td>Peak Data Rate (UL)</td><td>10 Gbps</td><td>20× improvement</td></tr>';
