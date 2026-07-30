@@ -270,7 +270,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V7.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V8.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -337,17 +337,25 @@ const EC={
 };
 // ── Additional data objects defined below in DATA SECTION ──
 // (APDU_SW, SGP22_SUBJECTS, SGP22_REASONS, ICCID_ISSUERS, TLV_TAGS,
-//  REMOTE_INS, MCC_MNC, EUM_TABLE, DEVICE_PATTERNS, GLOSSARY, COUNTRY_CODES)
+//  REMOTE_INS, MCC_MNC, EUM_TABLE, EIN_TABLE, SMDS_ADDRESSES, GLOSSARY, COUNTRY_CODES)
 // These follow the same schema comment pattern and are referenced by tools.
 
 // ── 13. CI PKID Reference Table ──
 // SOURCE-VERIFICATION NEEDED: CI PKID rows below are illustrative placeholders.
 // Confirm CI PKID, certificate chain, and production/test status against the current GSMA PKI/CI registry before use.
+// CI Public Key Identifiers (SHA-1 Subject Key Identifiers of the CI root certificates).
+// Transcribed from the euicc-manual PKI/CI registry, which mirrors the published GSMA CI
+// certificates. These are public trust-anchor identifiers, not secrets.
+// The set of CIs GROWS over time, and a test CI must never be confused with a production
+// one, so verify against the GSMA CI registry / SGP.26 for current values and expiry dates.
 var CI_PKIDS=[
-  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795AEBFB',gen:'Example CI PKID',usage:'Illustrative placeholder only. Verify CI PKID, certificate chain, and production/test status against the GSMA PKI/CI registry before use.',status:'Unverified'},
-  {pkid:'3C4FB01011E3F9CECAF83CCDB5EBB36F49B8B85A',gen:'Example CI PKID',usage:'Illustrative placeholder only. Do not treat this as a live production trust anchor without source verification.',status:'Unverified'},
-  {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'Example test CI PKID',usage:'Illustrative lab/test placeholder only. Confirm against the current GSMA test certificate material before use.',status:'Unverified'},
-  {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'Example test CI PKID',usage:'Illustrative lab/test placeholder only. Confirm against the current GSMA test certificate material before use.',status:'Unverified'}
+  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795BEBFB',gen:'GSM Association RSP2 Root CI1 (DigiCert)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3.',status:'Production'},
+  {pkid:'4C27967AD20C14B391E9601E41E604AD57C0222F',gen:'OISTE GSMA CI G1 (WISeKey)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3.',status:'Production'},
+  {pkid:'D7A7D0C7C04EA76076E3F44FAEBDE8779E2948D4',gen:'GSM Association M2M31 Root CI2 (Cybertrust)',usage:'Production trust anchor for SGP.01/SGP.02 \u2014 M2M architecture, not Consumer RSP.',status:'Production (M2M)'},
+  {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
+  {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
+  {pkid:'34EECF13156518D48D30BDF06853404D115F955D',gen:'SGP.26 test CI (v3.0.1)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
+  {pkid:'2209F61CD9EC5C9C854E787341FF83ECF9776A5B',gen:'SGP.26 test CI (v3.0.1)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'}
 ];
 
 // ── 14. Error Flow Decision Tree ──
@@ -371,7 +379,7 @@ var DECISION_TREE={
     {label:'Timeout',next:'dl_auth_timeout'},
     {label:'Unknown error code',next:'dl_auth_unknown'}
   ]},
-  'dl_auth_cert':{result:true,title:'ROOT CAUSE: CI PKID mismatch between eUICC and SM-DP+',desc:'The eUICC does not trust the Certificate Issuer that signed the SM-DP+ certificate. Extract euiccCiPKIdListForVerification from ES10a.GetEUICCInfo1 and compare against the SM-DP+ certificate\u2019s CI PKID.',links:[{label:'Troubleshooting: Mutual authentication fails',tab:'troubleshoot'},{label:'CI PKID Reference Table',tab:'quickref'},{label:'Consumer AC flow, Steps 6\u20139',tab:'consumer',flow:'consumer-ac',step:6}]},
+  'dl_auth_cert':{result:true,title:'ROOT CAUSE: CI PKID mismatch between eUICC and SM-DP+',desc:'The eUICC does not trust the Certificate Issuer that signed the SM-DP+ certificate. Extract euiccCiPKIdListForVerification from ES10b.GetEUICCInfo and compare against the SM-DP+ certificate\u2019s CI PKID.',links:[{label:'Troubleshooting: Mutual authentication fails',tab:'troubleshoot'},{label:'CI PKID Reference Table',tab:'quickref'},{label:'Consumer AC flow, Steps 6\u20139',tab:'consumer',flow:'consumer-ac',step:6}]},
   'dl_auth_mid':{result:true,title:'ROOT CAUSE: Matching ID mismatch',desc:'The Matching ID in the Activation Code does not match any pending profile on the SM-DP+. Verify the AC was generated for this specific order and has not been used already.',links:[{label:'Troubleshooting: Activation code error',tab:'troubleshoot'},{label:'Consumer AC flow, Step 4',tab:'consumer',flow:'consumer-ac',step:4}]},
   'dl_auth_timeout':{result:true,title:'ROOT CAUSE: Network / connectivity issue',desc:'The device cannot reach the SM-DP+ server. Check DNS resolution, HTTPS connectivity (port 443, TLS 1.2+), and any proxy/firewall rules blocking the SM-DP+ FQDN.',links:[{label:'Troubleshooting: Download fails \u2014 connectivity',tab:'troubleshoot'}]},
   'dl_auth_unknown':{result:true,title:'Use the SGP.22 Error Code Decoder',desc:'Extract the subjectCode and reasonCode from the ES9+ response and use the SGP.22 Error Code Decoder tool on the Debug tab to identify the specific error.',links:[{label:'SGP.22 Error Code Decoder',tab:'tools-dbg'}]},
@@ -383,8 +391,8 @@ var DECISION_TREE={
     {label:'Disable failed',next:'dis_fail'}
   ]},
   'en_fail':{result:true,title:'ROOT CAUSE: Profile state or PPR restriction',desc:'Enable may fail if the profile is not in a disabled state, or PPR flags prevent the operation. Check ES10c.GetProfilesInfo for profile state and PPR flags.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'},{label:'Profile State Machine',tab:'tools-dbg'}]},
-  'dis_fail':{result:true,title:'ROOT CAUSE: PPR disableNotAllowed flag set',desc:'The profile\u2019s Policy Rules include pprDisableNotAllowed (bit 0). This can only be changed by the Operator via ES2+.UpdatePolicyRules.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'}]},
-  'del':{result:true,title:'ROOT CAUSE: Profile state or PPR restriction',desc:'Delete requires the profile to be disabled first. Also check if pprDeleteNotAllowed (bit 1) is set. If the profile is enabled, disable it first.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'},{label:'Profile State Machine',tab:'tools-dbg'}]},
+  'dis_fail':{result:true,title:'ROOT CAUSE: PPR1 set \u2014 disabling not allowed',desc:'The profile\u2019s Policy Rules include PPR1, ppr1(bit 1) in the PprIds BIT STRING: \u201cDisabling of this Profile is not allowed\u201d. A PPR can only be unset by the Profile Owner via ES6.UpdateMetadata (or the RPM \u201cUpdate Metadata\u201d command); each PPR bit is logically ANDed with the request, so PPRs can be cleared but not set after download.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'}]},
+  'del':{result:true,title:'ROOT CAUSE: Profile state or PPR restriction',desc:'Delete requires the profile to be disabled first. Also check whether PPR2, ppr2(bit 2): \u201cDeletion of this Profile is not allowed\u201d, is set. If the profile is enabled, disable it first.',links:[{label:'Troubleshooting: PPR blocks operation',tab:'troubleshoot'},{label:'Profile State Machine',tab:'tools-dbg'}]},
   'disc':{result:true,title:'ROOT CAUSE: SM-DS connectivity or event registration issue',desc:'The LPA cannot discover pending events. Verify SM-DS FQDN is reachable, the SM-DP+ successfully registered an event (ES12.RegisterEvent), and the eUICC\u2019s Root SM-DS address is configured correctly.',links:[{label:'Consumer DS flow',tab:'consumer',flow:'consumer-ds',step:1}]},
   'notif':{result:true,title:'ROOT CAUSE: SM-DP+ unreachable for notification delivery',desc:'Notifications are queued on the eUICC but cannot be sent. Check HTTPS connectivity to the SM-DP+ FQDN. This is non-critical \u2014 the profile operation succeeded, but the Operator won\u2019t see the status update until notifications are delivered.',links:[{label:'Troubleshooting: Notifications pending',tab:'troubleshoot'}]}
 };
@@ -440,7 +448,7 @@ flows:{'consumer-prep':'Profile Preparation (ES2+)','consumer-ac':'Download \u20
 
 iot:{badge:'SGP.31 '+SPEC_VERSIONS['SGP.31']+' / SGP.32 '+SPEC_VERSIONS['SGP.32'],title:'IoT eSIM Architecture',
 whatsNew:'GSMA public listings now show SGP.31 v1.3 and SGP.32 v1.3 active, published 22 May 2026. Use those listings for implementation planning and verify detailed technical behavior against the current GSMA documents.',
-overview:['SGP.31 and SGP.32 define the IoT RSP architecture for eSIM profile management across a broad range of IoT device categories, from capable connected vehicles to constrained sensors. This architecture is designed to address many operational challenges seen in M2M deployments, including bearer constraints, SM-SR complexity, and multi-hop latency, while supporting a wider IoT deployment spectrum.','The architecture introduces the <b>eIM (eSIM IoT Remote Manager)</b> \u2014 a management platform that acts on behalf of the device owner or IoT service provider. The eIM orchestrates profile lifecycle operations (download, enable, disable, delete) without requiring an LPA on the device. The device runs an <b>IPA (IoT Profile Assistant)</b> that handles local eUICC interaction. Two IPA variants exist: <b>IPAd</b> (IPA in Device) runs as software on the IoT device itself, and <b>IPAe</b> (IPA embedded in eUICC) is a software component within the eUICC that performs IPA functions internally for constrained devices.','<b>Direct Mode:</b> The eIM delivers pre-encrypted profiles directly to the IPA on the device via the ESeim interface. The SM-DP+ generates and encrypts the BPP bound to the target eUICC, then delivers it to the eIM. The eIM stores and delivers it to the IPA when the device is reachable. This mode is suitable for capable devices where the eIM has direct connectivity.','<b>Indirect Mode:</b> Originally introduced to handle constrained devices, but now broadly favored for practical reasons. The IPA connects to the SM-DP+ (similar to the Consumer model) with the eIM orchestrating the operation. The eIM triggers the IPA to download from the SM-DP+, and the IPA performs the authentication and BPP retrieval directly with the SM-DP+. IPAe (embedded IPA in the eUICC) implementations typically use Indirect Mode, allowing the eUICC itself to handle the download without requiring device-side software complexity.','The architecture supports both IP and non-IP transport, and operations can be performed over protocols like CoAP, MQTT, or SMS. This flexibility allows SGP.32 to serve devices across the connectivity spectrum \u2014 from NB-IoT modules to LTE-M gateways to Wi-Fi connected industrial equipment.','<b>Prerequisite \u2014 eIM Configuration:</b> Before any eIM-based flow works, the eUICC must be configured to trust the eIM. This is done via <code>ESeim.ConfigureEim</code>, typically during eUICC manufacturing or via an initial bootstrap process. The eUICC stores a list of authorized eIM identifiers and will reject commands from unrecognized eIMs. This trust bootstrap is a critical deployment step \u2014 without it, neither Direct nor Indirect mode operations will succeed.','<b>Deployment Examples (illustrative):</b> Candidate use cases include connected vehicles, smart meters and utilities, industrial equipment, asset trackers, smart agriculture, consumer IoT devices, and constrained sensors. The choice between Direct and Indirect mode depends on deployment requirements, device capabilities, certification status, and connectivity patterns rather than device \u201cconstrainedness\u201d alone.'],
+overview:['SGP.31 and SGP.32 define the IoT RSP architecture for eSIM profile management across a broad range of IoT device categories, from capable connected vehicles to constrained sensors. This architecture is designed to address many operational challenges seen in M2M deployments, including bearer constraints, SM-SR complexity, and multi-hop latency, while supporting a wider IoT deployment spectrum.','The architecture introduces the <b>eIM (eSIM IoT Remote Manager)</b> \u2014 a management platform that acts on behalf of the device owner or IoT service provider. The eIM orchestrates profile lifecycle operations (download, enable, disable, delete) without requiring an LPA on the device. The device runs an <b>IPA (IoT Profile Assistant)</b> that handles local eUICC interaction. Two IPA variants exist: <b>IPAd</b> (IPA in Device) runs as software on the IoT device itself, and <b>IPAe</b> (IPA embedded in eUICC) is a software component within the eUICC that performs IPA functions internally for constrained devices.','<b>Direct Mode:</b> The eIM delivers pre-encrypted profiles directly to the IPA on the device via the ESep interface. The SM-DP+ generates and encrypts the BPP bound to the target eUICC, then delivers it to the eIM. The eIM stores and delivers it to the IPA when the device is reachable. This mode is suitable for capable devices where the eIM has direct connectivity.','<b>Indirect Mode:</b> Originally introduced to handle constrained devices, but now broadly favored for practical reasons. The IPA connects to the SM-DP+ (similar to the Consumer model) with the eIM orchestrating the operation. The eIM triggers the IPA to download from the SM-DP+, and the IPA performs the authentication and BPP retrieval directly with the SM-DP+. IPAe (embedded IPA in the eUICC) implementations typically use Indirect Mode, allowing the eUICC itself to handle the download without requiring device-side software complexity.','The architecture supports both IP and non-IP transport, and operations can be performed over protocols like CoAP, MQTT, or SMS. This flexibility allows SGP.32 to serve devices across the connectivity spectrum \u2014 from NB-IoT modules to LTE-M gateways to Wi-Fi connected industrial equipment.','<b>Prerequisite \u2014 eIM Configuration:</b> Before any eIM-based flow works, the eUICC must be configured to trust the eIM. This is done via <code>ESep.AddEim / ESep.UpdateEim</code>, typically during eUICC manufacturing or via an initial bootstrap process. The eUICC stores a list of authorized eIM identifiers and will reject commands from unrecognized eIMs. This trust bootstrap is a critical deployment step \u2014 without it, neither Direct nor Indirect mode operations will succeed.','<b>Deployment Examples (illustrative):</b> Candidate use cases include connected vehicles, smart meters and utilities, industrial equipment, asset trackers, smart agriculture, consumer IoT devices, and constrained sensors. The choice between Direct and Indirect mode depends on deployment requirements, device capabilities, certification status, and connectivity patterns rather than device \u201cconstrainedness\u201d alone.'],
 entities:['Operator','SM-DP+','SM-DS','eIM','IPAd','IPAe','eUICC (IoT)'],
 flows:{'iot-eim-config':'eIM Configuration Prerequisite','iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
 
@@ -541,8 +549,8 @@ const FL={
 
 'consumer-ac':{nodes:['Operator|MNO / MVNO','SM-DP+|Data Preparation+','LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM'],steps:[
 {f:0,t:2,n:'Activation Code Delivery',a:[['Activation Code','1$smdp.example.com$ABCD-EFGH'],['Format','QR code / manual entry / push']],d:'Operator delivers the Activation Code to the user via QR code, email, app push, or manual entry.'},
-{f:2,t:3,n:'ES10a.GetEUICCInfo1',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'LPA requests basic eUICC capabilities for compatibility check.'},
-{f:3,t:2,n:'ES10a.GetEUICCInfo1 Response',a:[['svn','Supported spec version'],['euiccCiPKIdListForVerification','CI PKIDs the eUICC trusts for server cert verification'],['euiccCiPKIdListForSigning','CI PKIDs for eUICC signature']],d:'eUICC returns its capability information. The LPA uses this to populate the euiccInfo1 field in the next step (ES9+.InitiateAuthentication). This response determines which CI certificate chains the SM-DP+ must use.'},
+{f:2,t:3,n:'ES10b.GetEUICCInfo',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'LPA requests basic eUICC capabilities for compatibility check.'},
+{f:3,t:2,n:'ES10b.GetEUICCInfo Response',a:[['svn','Supported spec version'],['euiccCiPKIdListForVerification','CI PKIDs the eUICC trusts for server cert verification'],['euiccCiPKIdListForSigning','CI PKIDs for eUICC signature']],d:'eUICC returns its capability information. The LPA uses this to populate the euiccInfo1 field in the next step (ES9+.InitiateAuthentication). This response determines which CI certificate chains the SM-DP+ must use.'},
 {f:2,t:1,n:'ES9+.InitiateAuthentication',a:[['euiccChallenge','Random challenge from eUICC'],['euiccInfo1','eUICC capabilities and CI PKIDs'],['smdpAddress','From the Activation Code']],d:'LPA contacts SM-DP+ to begin mutual authentication.'},
 {f:1,t:2,n:'ES9+.InitiateAuthentication Response',a:[['serverSigned1','Server-signed data incl. transactionId'],['serverSignature1','SM-DP+ digital signature'],['serverCertificate','SM-DP+ certificate chain'],['ctxParams1','matchingId / AC token']],d:'SM-DP+ responds with its signed challenge and certificate for the eUICC to verify.'},
 {f:2,t:3,n:'ES10b.AuthenticateServer',a:[['serverSigned1','SM-DP+ signed data'],['serverSignature1','Signature to verify'],['serverCertificate','SM-DP+ cert chain'],['matchingId','From Activation Code']],d:'LPA passes SM-DP+ credentials to eUICC for server authentication.'},
@@ -561,8 +569,8 @@ const FL={
 
 'consumer-ds':{nodes:['SM-DP+|Data Preparation+','SM-DS|Discovery Server','LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'ES12.RegisterEvent',a:[['EID','Target eUICC (hashed)'],['RSP Server Address','SM-DP+ FQDN'],['eventId','Unique event identifier']],d:'SM-DP+ registers a pending download event at the SM-DS.'},
-{f:2,t:3,n:'ES10a.GetEUICCInfo1',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'LPA retrieves eUICC info for the SM-DS query.'},
-{f:3,t:2,n:'ES10a.GetEUICCInfo1 Response',a:[['svn','Supported spec version'],['euiccCiPKIdListForVerification','CI PKIDs trusted by eUICC'],['euiccCiPKIdListForSigning','CI PKIDs for eUICC signing']],d:'eUICC returns capabilities. LPA uses this for the SM-DS authentication.'},
+{f:2,t:3,n:'ES10b.GetEUICCInfo',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'LPA retrieves eUICC info for the SM-DS query.'},
+{f:3,t:2,n:'ES10b.GetEUICCInfo Response',a:[['svn','Supported spec version'],['euiccCiPKIdListForVerification','CI PKIDs trusted by eUICC'],['euiccCiPKIdListForSigning','CI PKIDs for eUICC signing']],d:'eUICC returns capabilities. LPA uses this for the SM-DS authentication.'},
 {f:2,t:1,n:'ES11.InitiateAuthentication',a:[['euiccChallenge','Challenge from eUICC'],['euiccInfo1','eUICC capabilities']],d:'LPA contacts the SM-DS to check for pending events.'},
 {f:1,t:2,n:'ES11.InitiateAuthentication Response',a:[['serverSigned1','SM-DS signed data'],['serverSignature1','SM-DS signature']],d:'SM-DS responds with authentication data for the eUICC to verify.'},
 {f:2,t:3,n:'ES10b.AuthenticateServer (SM-DS)',a:[['serverSigned1','SM-DS signed data'],['serverSignature1','SM-DS signature']],d:'LPA passes SM-DS authentication data to eUICC for server verification.'},
@@ -574,8 +582,8 @@ const FL={
 
 
 'consumer-default-smdp':{nodes:['Default SM-DP+|Configured RSP Server','LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','Operator|MNO / MVNO'],steps:[
-{f:1,t:2,n:'ES10a.GetEUICCInfo1',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'The LPA retrieves eUICC capabilities before contacting the configured Default SM-DP+. This is the same compatibility pre-check used by Activation Code and Discovery Server paths.'},
-{f:2,t:1,n:'ES10a.GetEUICCInfo1 Response',a:[['euiccInfo1','Basic capabilities'],['CI PKIDs','Trusted certificate issuers']],d:'The eUICC returns the information the LPA needs for the initial SM-DP+ authentication request.'},
+{f:1,t:2,n:'ES10b.GetEUICCInfo',a:[['svn','Spec version supported'],['euiccCiPKIdListForVerification','CI public key IDs']],d:'The LPA retrieves eUICC capabilities before contacting the configured Default SM-DP+. This is the same compatibility pre-check used by Activation Code and Discovery Server paths.'},
+{f:2,t:1,n:'ES10b.GetEUICCInfo Response',a:[['euiccInfo1','Basic capabilities'],['CI PKIDs','Trusted certificate issuers']],d:'The eUICC returns the information the LPA needs for the initial SM-DP+ authentication request.'},
 {f:1,t:0,n:'Default SM-DP+ Lookup / ES9+.InitiateAuthentication',a:[['defaultSmdpAddress','Preconfigured by OEM, carrier, enterprise policy, or device software'],['euiccChallenge','Challenge from eUICC'],['euiccInfo1','eUICC capabilities']],d:'Instead of scanning an Activation Code or querying SM-DS, the LPA contacts its configured Default SM-DP+ address and starts the normal ES9+ authentication sequence.'},
 {f:0,t:1,n:'ES9+.InitiateAuthentication Response',a:[['serverSigned1','Server-signed data'],['serverCertificate','Default SM-DP+ certificate chain'],['profile context','Profile availability if one is staged']],d:'The Default SM-DP+ authenticates as an SM-DP+ and indicates whether a profile is available for this eUICC. If no eligible profile is staged, the LPA stops cleanly and can retry later according to device policy.'},
 {f:1,t:2,n:'ES10b.AuthenticateServer',a:[['serverSigned1','SM-DP+ signed data'],['serverCertificate','Certificate chain']],d:'The LPA passes server authentication material to the eUICC for verification against its trusted CI list.'},
@@ -590,10 +598,10 @@ const FL={
 {f:0,t:2,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['Enable Notification','Sent to SM-DP+ of enabled profile'],['Disable Notification','Sent to SM-DP+ of previously active profile']],d:'LPA retrieves pending notifications from the eUICC, sends them to the respective SM-DP+ servers with ES9+.HandleNotification, and removes delivered notifications from the eUICC list. The SM-DP+ forwards them to Operators via ES2+.HandleNotification. The symmetric Disable operation follows the same pattern with ES10c.DisableProfile.'}
 ]},
 'consumer-disable':{nodes:['LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','SM-DP+|Data Preparation+'],steps:[
-{f:0,t:1,n:'ES10c.DisableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends the ES10c disable command for the currently enabled profile. If the profile\u2019s PPR includes pprDisableNotAllowed (bit 0), this operation will be rejected by the eUICC.'},
+{f:0,t:1,n:'ES10c.DisableProfile',a:[['ICCID or ISD-P AID','Target profile identifier'],['refreshFlag','Trigger REFRESH to modem']],d:'LPA sends the ES10c disable command for the currently enabled profile. If the profile\u2019s PPR includes PPR1, ppr1(bit 1) in PprIds: \u201cDisabling of this Profile is not allowed\u201d, this operation will be rejected by the eUICC.'},
 {f:1,t:1,n:'PPR Check & Profile Switch (Internal)',a:[['PPR validation','Check pprDisableNotAllowed flag'],['Disable target','Profile set to disabled state'],['REFRESH','Proactive command to modem']],d:'eUICC checks Profile Policy Rules. If pprDisableNotAllowed is set, the operation fails with an error. Otherwise, the profile is disabled and REFRESH notifies the baseband. The device loses network connectivity from this profile.'},
-{f:1,t:0,n:'ES10c.DisableProfile Result',a:[['resultCode','Success / error code']],d:'eUICC reports the result. On success, the profile is now in the disabled state. On failure, check for PPR restrictions (subjectCode=8.8, reasonCode=3.4).'},
-{f:0,t:2,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['Disable Notification','Sent to SM-DP+ of disabled profile'],['seqNumber','Notification sequence number']],d:'LPA retrieves the pending disable notification, sends it to the originating SM-DP+, and removes it from the eUICC list after successful delivery. The SM-DP+ forwards to the Operator via ES2+.HandleNotification. The Operator can use ES2+.UpdatePolicyRules to change PPR flags if needed.'}
+{f:1,t:0,n:'ES10c.DisableProfile Result',a:[['resultCode','Success / error code']],d:'eUICC reports the result. On success, the profile is now in the disabled state. On failure, check for PPR restrictions (subjectCode=8.2.8 \u201cPPR\u201d with reasonCode 1.2 \u201cNot Allowed\u201d).'},
+{f:0,t:2,n:'ES10b.RetrieveNotification + ES9+.HandleNotification',a:[['Disable Notification','Sent to SM-DP+ of disabled profile'],['seqNumber','Notification sequence number']],d:'LPA retrieves the pending disable notification, sends it to the originating SM-DP+, and removes it from the eUICC list after successful delivery. The SM-DP+ forwards to the Operator via ES2+.HandleNotification. To clear a PPR the Profile Owner uses ES6.UpdateMetadata (or the RPM “Update Metadata” command) — there is no ES2+ function for changing Policy Rules.'}
 ]},
 'consumer-delete':{nodes:['LPA (Device)|Local Profile Asst.','eUICC|Embedded SIM','SM-DP+|Data Preparation+'],steps:[
 {f:0,t:1,n:'ES10c.DeleteProfile',a:[['ICCID or ISD-P AID','Target profile to delete']],d:'LPA sends the ES10c delete command. Profile must be disabled. Deletion is irreversible.'},
@@ -616,53 +624,53 @@ const FL={
 /* ── IoT Flows ── */
 'iot-eim-config':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)','Operator|MNO / MVNO'],steps:[
 {f:3,t:0,n:'Authorize eIM for Device Fleet',a:[['EID list','Target eUICCs'],['eIM identifier','Remote manager identity'],['Policy','Which operations the eIM may trigger']],d:'Before SGP.32 lifecycle operations work, the deployment must establish which eIM is authorized to manage each eUICC. This may be done during manufacturing, bootstrap provisioning, or a controlled field update.'},
-{f:0,t:1,n:'ESeim.ConfigureEim Request',a:[['eIM configuration','eIM ID, endpoint, certificate/trust data'],['scope','Allowed operations and validity'],['transactionId','Configuration tracking']],d:'The eIM sends configuration data to the IPA over the selected transport. The transport and packaging are deployment-specific, but the purpose is to place trusted eIM configuration on the target eUICC.'},
+{f:0,t:1,n:'ESep.AddEim / ESep.UpdateEim Request',a:[['eIM configuration','eIM ID, endpoint, certificate/trust data'],['scope','Allowed operations and validity'],['transactionId','Configuration tracking']],d:'The eIM sends configuration data to the IPA over the selected transport. The transport and packaging are deployment-specific, but the purpose is to place trusted eIM configuration on the target eUICC.'},
 {f:1,t:2,n:'ES10b.LoadEuiccPackage (Configure eIM)',a:[['signed eUICC package','Configuration command set'],['eIM authorization','Signature / trust proof'],['replay protection','Fresh command instance']],d:'The IPA forwards the signed configuration package to the eUICC. The eUICC verifies authorization, target binding, and replay protection before storing the eIM configuration.'},
 {f:2,t:2,n:'Store eIM Configuration (Internal)',a:[['trusted eIM','Identifier and trust material'],['policy','Permitted profile lifecycle operations']],d:'The eUICC stores the authorized eIM configuration. Later Download, Enable, Disable, and Delete packages from unknown or unauthorized eIMs are rejected.'},
 {f:2,t:1,n:'ConfigureEim Result',a:[['resultCode','Success / failure'],['diagnostics','Reason if rejected']],d:'The eUICC returns the package execution result to the IPA.'},
-{f:1,t:0,n:'ESeim.ConfigureEim Result',a:[['resultCode','Configuration outcome'],['EID','Configured eUICC']],d:'The IPA reports the result to the eIM. A successful result is the prerequisite for the subsequent Direct or Indirect IoT profile-management flows.'}
+{f:1,t:0,n:'ESep.AddEim / ESep.UpdateEim Result',a:[['resultCode','Configuration outcome'],['EID','Configured eUICC']],d:'The IPA reports the result to the eIM. A successful result is the prerequisite for the subsequent Direct or Indirect IoT profile-management flows.'}
 ]},
 'iot-direct-download':{nodes:['Operator|MNO / MVNO','SM-DP+|Data Preparation+','eIM|IoT Remote Manager','IPAd|IPA in Device','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
 {f:0,t:1,n:'ES2+.DownloadOrder',a:[['EID','Target eUICC'],['Profile Data','Subscription credentials'],['Service Config','APN, QoS, network slice']],d:'Operator orders a profile from the SM-DP+ for the target eUICC, providing the EID and subscription data.'},
 {f:1,t:1,n:'BPP / eUICC Package Preparation',a:[['boundProfilePackage','Encrypted package for target EID'],['Profile Metadata','Operator, profile class']],d:'SM-DP+ prepares profile material protected for the target eUICC. In IoT RSP, delivery may be direct through the eIM or indirect through the IPA contacting SM-DP+; exact package wrapping depends on IPAd/IPAe mode and SGP.32 deployment choices.'},
 {f:1,t:2,n:'BPP Delivery to eIM',a:[['Profile Package','Pre-encrypted BPP for target eUICC'],['EID','Target eUICC identifier'],['eIM Session Context','Delivery tracking']],d:'SM-DP+ delivers the pre-encrypted BPP to the eIM. The eIM\u2019s role is orchestration and secure delivery, not profile creation or encryption.'},
-{f:2,t:3,n:'ESeim: Download Package Delivery',a:[['Encrypted Profile Package','Bound to target eUICC'],['profileMetadata','Profile type, operator info'],['eimTransactionId','Session tracking']],d:'eIM sends the protected profile/eUICC package to IPA via the supported transport profile (IP, CoAP, MQTT, SMS, or deployment-specific bearer).'},
+{f:2,t:3,n:'eUICC Package delivery (eIM \u2192 IPA)',a:[['Encrypted Profile Package','Bound to target eUICC'],['profileMetadata','Profile type, operator info'],['eimTransactionId','Session tracking']],d:'eIM sends the protected profile/eUICC package to IPA via the supported transport profile (IP, CoAP, MQTT, SMS, or deployment-specific bearer).'},
 {f:3,t:4,n:'ES10b.LoadEuiccPackage',a:[['eUICC Package','Download/install package'],['Signed command set','Verified by eUICC'],['Replay counter','Anti-replay protection']],d:'IPA forwards the eUICC package to the eUICC for verification and execution. The eUICC validates authorization, EID binding, and replay protection before installing the profile.'},
 {f:4,t:3,n:'Install Result',a:[['resultCode','Success / failure'],['ICCID','Installed profile']],d:'eUICC decrypts, verifies, installs, and reports the result.'},
-{f:3,t:2,n:'ESeim: DownloadProfile Result',a:[['resultCode','Installation result'],['eimTransactionId','Matching transaction']],d:'IPA reports the installation result back to the eIM.'},
+{f:3,t:2,n:'ESep: Profile download result',a:[['resultCode','Installation result'],['eimTransactionId','Matching transaction']],d:'IPA reports the installation result back to the eIM.'},
 {f:2,t:0,n:'Notification (out-of-band)',a:[['Status','Profile installed successfully'],['EID / ICCID','Identifiers']],d:'eIM notifies the Operator that the profile is installed.'}
 ]},
 'iot-indirect-download':{nodes:['Operator|MNO / MVNO','SM-DP+|Data Preparation+','eIM|IoT Remote Manager','IPAe (in eUICC)|Embedded IPA','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
 {f:0,t:1,n:'ES2+.DownloadOrder',a:[['EID','Target eUICC'],['ICCID','Profile identifier'],['profileType','Template reference']],d:'Operator orders a profile on SM-DP+ \u2014 same ES2+ interface as Consumer RSP.'},
 {f:0,t:1,n:'ES2+.ConfirmOrder',a:[['ICCID','Confirm profile'],['IMSI / Ki / credentials','Subscription data']],d:'Operator confirms and provides subscription credentials.'},
 {f:0,t:2,n:'Profile Ready Notification (ESop / out-of-band)',a:[['smdpAddress','SM-DP+ holding the profile'],['matchingId','Or EID for binding'],['ICCID','Profile identifier']],d:'Operator (or provisioning system) informs the eIM that a profile is ready on the SM-DP+ and provides the SM-DP+ address. This uses the ESop interface or an out-of-band mechanism. Without this, the eIM would not know which SM-DP+ to instruct the IPAe to contact.'},
-{f:2,t:3,n:'ESeim: DownloadTrigger',a:[['smdpAddress','SM-DP+ to contact'],['activationCode','Or matchingId for binding']],d:'eIM instructs IPAe to download a profile from the specified SM-DP+.'},
+{f:2,t:3,n:'ProfileDownloadTriggerRequest',a:[['smdpAddress','SM-DP+ to contact'],['activationCode','Or matchingId for binding']],d:'eIM instructs IPAe to download a profile from the specified SM-DP+.'},
 {f:3,t:1,n:'ESipa: InitiateAuthentication',a:[['euiccChallenge','From eUICC'],['euiccInfo1','eUICC capabilities']],d:'IPAe (within the eUICC) contacts SM-DP+ and initiates mutual authentication via ESipa.'},
 {f:1,t:3,n:'ESipa: Auth + BPP Delivery',a:[['boundProfilePackage','Encrypted profile'],['profileMetadata','Profile information']],d:'This step condenses a multi-message mutual authentication exchange identical to the Consumer ES9+ flow. The full protocol sequence is: ESipa.InitiateAuthentication \u2192 ESipa.AuthenticateClient \u2192 ESipa.GetBoundProfilePackage. For the detailed step-by-step breakdown, see the Consumer \u201cDownload \u2014 Activation Code\u201d flow (Steps 4\u201315). After successful authentication, SM-DP+ delivers the Bound Profile Package.',xref:true},
 {f:3,t:4,n:'Load BPP',a:[['boundProfilePackage','Encrypted BPP']],d:'IPAe passes the BPP to the eUICC\u2019s profile installation function.'},
 {f:4,t:3,n:'Install Result',a:[['resultCode','Success / failure'],['ICCID','Installed profile']],d:'eUICC installs the profile and reports the result to IPAe.'},
-{f:3,t:2,n:'ESeim: Result Notification',a:[['resultCode','Installation status']],d:'IPAe reports back to the eIM, which can then notify the Operator.'}
+{f:3,t:2,n:'ESipa: Result notification',a:[['resultCode','Installation status']],d:'IPAe reports back to the eIM, which can then notify the Operator.'}
 ]},
 'iot-enable':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
-{f:0,t:1,n:'ESeim: Enable Package Request',a:[['ICCID','Profile to enable'],['eimTransactionId','Transaction tracking'],['Replay counter','Fresh command instance']],d:'eIM sends an enable operation to the IPA. No end-user interaction is required, but the operation is still packaged and authorized for the target eUICC.'},
+{f:0,t:1,n:'ESep: Enable (eUICC Package)',a:[['ICCID','Profile to enable'],['eimTransactionId','Transaction tracking'],['Replay counter','Fresh command instance']],d:'eIM sends an enable operation to the IPA. No end-user interaction is required, but the operation is still packaged and authorized for the target eUICC.'},
 {f:1,t:2,n:'ES10b.LoadEuiccPackage (Enable)',a:[['Enable command','Contained in eUICC Package'],['EID','Target eUICC binding'],['eIM signature','Authorization proof']],d:'IPA forwards the signed eUICC Package to the eUICC. SGP.32 lifecycle operations are executed from package commands loaded through ES10b.LoadEuiccPackage, not as an unconstrained local APDU.'},
 {f:2,t:2,n:'Verify and Enable (Internal)',a:[['Signature','Authorized eIM verified'],['EID / replay counter','Checked by eUICC'],['Profile state','Target set enabled']],d:'eUICC verifies the package signature, EID, and replay counter, then enables the profile and performs any required refresh behavior.'},
 {f:2,t:1,n:'EnableResult',a:[['resultCode','Success / failure']],d:'eUICC reports the package execution result to the IPA.'},
-{f:1,t:0,n:'ESeim: EnableProfile Result',a:[['resultCode','Result status'],['eimTransactionId','Matching transaction']],d:'IPA confirms the operation to the eIM.'}
+{f:1,t:0,n:'ESep: Enable result',a:[['resultCode','Result status'],['eimTransactionId','Matching transaction']],d:'IPA confirms the operation to the eIM.'}
 ]},
 'iot-disable':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
-{f:0,t:1,n:'ESeim: Disable Package Request',a:[['ICCID','Profile to disable'],['eimTransactionId','Transaction tracking'],['Companion enable','Recommended replacement profile']],d:'eIM sends a disable operation to IPA. If the profile\u2019s PPR includes pprDisableNotAllowed, the eUICC rejects it. For field devices, a disable should normally be paired with an enable command for another profile in the same package so connectivity is not lost.'},
+{f:0,t:1,n:'ESep: Disable (eUICC Package)',a:[['ICCID','Profile to disable'],['eimTransactionId','Transaction tracking'],['Companion enable','Recommended replacement profile']],d:'eIM sends a disable operation to IPA. If the profile\u2019s PPR includes pprDisableNotAllowed, the eUICC rejects it. For field devices, a disable should normally be paired with an enable command for another profile in the same package so connectivity is not lost.'},
 {f:1,t:2,n:'ES10b.LoadEuiccPackage (Disable)',a:[['Disable command','Contained in eUICC Package'],['EID','Target eUICC binding'],['eIM signature','Authorization proof']],d:'IPA forwards the signed package to the eUICC for verification and execution.'},
 {f:2,t:2,n:'Verify, PPR Check & Disable (Internal)',a:[['Signature / replay','Validated'],['PPR validation','Check pprDisableNotAllowed flag'],['Profile state','Set to disabled if allowed']],d:'eUICC verifies authorization and replay protection, checks Profile Policy Rules, and disables the profile if allowed. If there is no companion enable command, the device may lose connectivity from this profile.'},
 {f:2,t:1,n:'DisableResult',a:[['resultCode','Success / failure']],d:'eUICC reports the disable result. Failure may indicate a PPR restriction.'},
-{f:1,t:0,n:'ESeim: DisableProfile Result',a:[['resultCode','Result status'],['eimTransactionId','Matching transaction']],d:'IPA confirms the operation to the eIM. The eIM can then notify the Operator. If the operation failed due to PPR, the Operator must update the PPR via ES2+.UpdatePolicyRules before retrying.'}
+{f:1,t:0,n:'ESep: Disable result',a:[['resultCode','Result status'],['eimTransactionId','Matching transaction']],d:'IPA confirms the operation to the eIM. The eIM can then notify the Operator. If the operation failed due to a PPR, the Profile Owner must clear it via ES6.UpdateMetadata (or the RPM “Update Metadata” command) before retrying.'}
 ]},
 'iot-delete':{nodes:['eIM|IoT Remote Manager','IPA (IPAd or IPAe)|IoT Profile Assistant','eUICC (IoT)|Embedded SIM (IoT)'],steps:[
-{f:0,t:1,n:'ESeim: Delete Package Request',a:[['ICCID','Profile to delete'],['eimTransactionId','Transaction tracking'],['Replay counter','Fresh command instance']],d:'eIM commands profile deletion. The profile must be disabled first and the command must be authorized for the target eUICC.'},
+{f:0,t:1,n:'ESep: Delete (eUICC Package)',a:[['ICCID','Profile to delete'],['eimTransactionId','Transaction tracking'],['Replay counter','Fresh command instance']],d:'eIM commands profile deletion. The profile must be disabled first and the command must be authorized for the target eUICC.'},
 {f:1,t:2,n:'ES10b.LoadEuiccPackage (Delete)',a:[['Delete command','Contained in eUICC Package'],['EID','Target eUICC binding'],['eIM signature','Authorization proof']],d:'IPA forwards the signed delete package to the eUICC.'},
 {f:2,t:2,n:'Verify and Delete (Internal)',a:[['Signature / replay','Validated'],['Profile state','Must be disabled'],['Memory reclaim','Profile removed']],d:'eUICC verifies authorization, confirms the profile can be deleted, permanently removes it, and reclaims memory.'},
 {f:2,t:1,n:'DeleteResult',a:[['resultCode','Success / failure']],d:'eUICC reports the package execution result.'},
-{f:1,t:0,n:'ESeim: DeleteProfile Result',a:[['resultCode','Result status']],d:'IPA confirms deletion to the eIM.'}
+{f:1,t:0,n:'ESep: Delete result',a:[['resultCode','Result status']],d:'IPA confirms deletion to the eIM.'}
 ]},
 
 /* ── IFPP Flows ── */
@@ -698,7 +706,7 @@ causes:['Activation Code expired or already used','matchingId mismatch between A
 flowStep:'Consumer AC flow, Step 4 (ES9+.InitiateAuthentication)',
 jumpTarget:{tab:'consumer',flow:'consumer-ac',step:4},
 checks:['Verify AC matches DownloadOrder output','Confirm ConfirmOrder was called with releaseFlag=true','Check EID on device matches EID in order','Test SM-DP+ connectivity (HTTPS to SM-DP+ FQDN on port 443)'],
-logs:['grep for: ES9+.AuthenticateClient status != 0','Look for: subjectCode=8.1, reasonCode=2.1 (not found)','APDU trace: check for SW=6A82 during LoadBPP','SM-DP+ log: "downloadOrder not found" or "EID not eligible"']},
+logs:['grep for: ES9+.AuthenticateClient status != 0','Look for: subjectCode=8.8.5 (Download order) or 8.1.1 (EID) with reasonCode 3.9 \u201cUnknown\u201d / 3.8 \u201cRefused\u201d','APDU trace: check for SW=6A82 during LoadBPP','SM-DP+ log: "downloadOrder not found" or "EID not eligible"']},
 {symptom:'Mutual authentication failure \u2014 "eUICC rejected server" or "SM-DP+ rejected eUICC"',
 causes:['CI certificate mismatch \u2014 eUICC and SM-DP+ use different Certificate Issuer PKI chains','eUICC certificate expired or revoked','SM-DP+ certificate chain incomplete','Clock skew causing certificate validation failure','eUICC spec version incompatible with SM-DP+ version'],
 flowStep:'Consumer AC flow, Steps 6\u20139 (AuthenticateServer / AuthenticateClient exchange)',
@@ -736,8 +744,8 @@ jumpTarget:{tab:'consumer',flow:'consumer-ds',step:1},
 checks:['Verify ES12.RegisterEvent was called on SM-DP+ side','Check EID hash matches','Confirm root SM-DS address in device settings','Check if event was already consumed in a previous attempt'],
 logs:['SM-DP+ log: ES12.RegisterEvent call with EID hash','SM-DS log: event lookup for EID hash','LPA log: ES11 response with empty eventEntries array']},
 {symptom:'IoT eIM commands rejected by eUICC',
-causes:['eIM not configured as trusted on the eUICC (missing ESeim.ConfigureEim)','eIM certificate/credentials expired','eUICC only accepts commands from the eIM that was configured during manufacturing','Transport issue \u2014 CoAP/MQTT/SMS message malformed or lost'],
-flowStep:'IoT Direct Mode, Step 3 (ESeim: DownloadProfile Command)',
+causes:['eIM not configured as trusted on the eUICC (missing ESep.AddEim / ESep.UpdateEim)','eIM certificate/credentials expired','eUICC only accepts commands from the eIM that was configured during manufacturing','Transport issue \u2014 CoAP/MQTT/SMS message malformed or lost'],
+flowStep:'IoT Direct Mode, Step 3 (ESep: DownloadProfile Command)',
 jumpTarget:{tab:'iot',flow:'iot-direct-download',step:3},
 checks:['Verify eIM is in the eUICC\u2019s authorized eIM list','Check eIM certificate validity','Confirm transport protocol compatibility with device','Check IPA logs for received vs. rejected messages'],
 logs:['IPA log: "eIM not authorized" or "unknown eIM identifier"','eUICC response: check for rejection reason code','eIM log: delivery confirmation or timeout']},
@@ -775,14 +783,14 @@ logs:['ES10b.ListNotification \u2014 check pending notification count','ES9+.Han
 causes:['eUICC CI PKI ID list does not include the CI used by the SM-DP+ certificate','SM-DP+ is using a test certificate but eUICC has only production CI','SM-DP+ certificate chain is incomplete \u2014 missing intermediate certificate','GSMA CI v1 vs CI v2 mismatch (different PKI generations)','Certificate has expired \u2014 check notBefore/notAfter dates','Certificate was revoked (CRL/OCSP) \u2014 though eUICC does not typically check revocation in real-time'],
 flowStep:'Consumer AC flow, Steps 6\u20139 (AuthenticateServer / AuthenticateClient)',
 jumpTarget:{tab:'consumer',flow:'consumer-ac',step:6},
-checks:['Extract the euiccCiPKIdListForVerification from ES10a.GetEUICCInfo1 \u2014 these are the CIs the eUICC trusts','Use the Certificate Viewer tool to examine the SM-DP+ certificate \u2014 find its issuer and CI PKID','Compare: is the SM-DP+ certificate\u2019s CI in the eUICC\u2019s trusted list?','Check for test vs production CI mismatch \u2014 common in lab/staging environments','Verify the full chain: Root CI \u2192 Intermediate (if any) \u2192 SM-DP+ leaf certificate','Check certificate validity dates using the Certificate Viewer tool','If CI mismatch: either re-certify the SM-DP+ under the correct CI, or update the eUICC CI list (requires EUM intervention)'],
-logs:['ES10a.GetEUICCInfo1 \u2192 euiccCiPKIdListForVerification (list of trusted CIs)','SM-DP+ cert: extract CI PKID using Certificate Viewer tool','Compare: is the SM-DP+ CI PKID in the eUICC trusted list?','OpenSSL: openssl x509 -in smdp_cert.pem -text -noout']},
+checks:['Extract the euiccCiPKIdListForVerification from ES10b.GetEUICCInfo \u2014 these are the CIs the eUICC trusts','Use the Certificate Viewer tool to examine the SM-DP+ certificate \u2014 find its issuer and CI PKID','Compare: is the SM-DP+ certificate\u2019s CI in the eUICC\u2019s trusted list?','Check for test vs production CI mismatch \u2014 common in lab/staging environments','Verify the full chain: Root CI \u2192 Intermediate (if any) \u2192 SM-DP+ leaf certificate','Check certificate validity dates using the Certificate Viewer tool','If CI mismatch: either re-certify the SM-DP+ under the correct CI, or update the eUICC CI list (requires EUM intervention)'],
+logs:['ES10b.GetEUICCInfo \u2192 euiccCiPKIdListForVerification (list of trusted CIs)','SM-DP+ cert: extract CI PKID using Certificate Viewer tool','Compare: is the SM-DP+ CI PKID in the eUICC trusted list?','OpenSSL: openssl x509 -in smdp_cert.pem -text -noout']},
 {symptom:'Profile operation blocked \u2014 Profile Policy Rules prevent enable/disable/delete',
 causes:['pprUpdateControl set \u2014 Operator consent required before changes','pprDisableNotAllowed flag set \u2014 profile cannot be disabled','pprDeleteNotAllowed flag set \u2014 profile cannot be deleted','Profile is the designated \u201cOperational Profile\u201d with enterprise lock','PPR set by Operator during profile creation and cannot be overridden locally'],
 flowStep:'Consumer Enable/Disable/Delete flows \u2014 ES10c operation returns error code 3.4 (PPR not allowed)',
 jumpTarget:{tab:'consumer',flow:'consumer-enable',step:1},
-checks:['Check profile PPR flags via ES10c.GetProfilesInfo \u2014 look at the profilePolicyRules field','Common PPR flags: bit 0 = disable not allowed, bit 1 = delete not allowed, bit 2 = delete on disable','If PPR blocks the operation, the Operator must update the profile\u2019s PPR via ES2+.UpdatePolicyRules (if supported)','Some PPRs are \u201cone-way\u201d \u2014 once set, they cannot be removed without deleting and re-downloading the profile','Refer to the Profile Policy Rules section of SGP.22 for the complete PPR flag definitions','Use the SGP.22 Error Code Decoder tool with subject 8.8, reason 3.4 for additional context'],
-logs:['ES10c.GetProfilesInfo \u2192 profilePolicyRules field','Error code: subjectCode=8.8, reasonCode=3.4','Check PPR bit flags: bit 0=disable-not-allowed, bit 1=delete-not-allowed, bit 2=delete-on-disable']}
+checks:['Check profile PPR flags via ES10c.GetProfilesInfo \u2014 look at the profilePolicyRules field','PprIds BIT STRING: bit 0 = pprUpdateControl (NOT a policy rule), bit 1 = ppr1 \u201cDisabling of this Profile is not allowed\u201d, bit 2 = ppr2 \u201cDeletion of this Profile is not allowed\u201d. Only these two PPRs exist in SGP.22','If a PPR blocks the operation, the Profile Owner clears it via ES6.UpdateMetadata or the RPM \u201cUpdate Metadata\u201d command \u2014 there is no ES2+.UpdatePolicyRules function','Some PPRs are \u201cone-way\u201d \u2014 once set, they cannot be removed without deleting and re-downloading the profile','Refer to the Profile Policy Rules section of SGP.22 for the complete PPR flag definitions','Use the SGP.22 Error Code Decoder tool with subject 8.2.8 (PPR) for additional context'],
+logs:['ES10c.GetProfilesInfo \u2192 profilePolicyRules field','Error code: subjectCode=8.2.8 (PPR); note 3.4 is NOT an SGP.22 reason code','PprIds bits: 0=pprUpdateControl (not a rule), 1=ppr1 disable-not-allowed, 2=ppr2 delete-not-allowed. \u201cDelete on disable\u201d is an SGP.02 M2M POL1 rule, not an SGP.22 PPR']}
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -820,7 +828,7 @@ const GLOSSARY=[
 {term:'RAT',def:'Rules Authorization Table \u2014 a table on the eUICC that controls which entity (SM-DP+, SM-DS, or Operator) is authorized to perform which operations on profiles.',spec:'SGP.22'},
 {term:'SCP80/SCP81',def:'Secure Channel Protocol 80/81 \u2014 GlobalPlatform secure channel protocols used for M2M remote communication. SCP80 uses Binary SMS, SCP81 uses HTTPS/CAT_TP. Both establish encrypted channels between SM-SR and eUICC.',spec:'SGP.02'},
 {term:'ES10d',def:'The LPA \u2194 eUICC interface for MEP (Multiple Enabled Profiles) port management, introduced in SGP.22 v3.x. Key operations: GetSIMSlotMapping (query current port-to-profile mapping) and SetSIMSlotMapping (change the mapping to enable profiles on specific eSIM ports).',spec:'SGP.22 v3.x'},
-{term:'euiccInfo1',def:'A data structure retrieved via ES10a.GetEUICCInfo1 before mutual authentication begins. Contains basic eUICC capabilities: supported spec version (svn), CI PKIDs trusted for verification and signing. Used by the LPA to initiate authentication with the correct parameters.',spec:'SGP.22'},
+{term:'euiccInfo1',def:'A data structure retrieved via ES10b.GetEUICCInfo before mutual authentication begins. Contains basic eUICC capabilities: supported spec version (svn), CI PKIDs trusted for verification and signing. Used by the LPA to initiate authentication with the correct parameters.',spec:'SGP.22'},
 {term:'euiccInfo2',def:'A data structure retrieved via ES10b during authentication (inside AuthenticateServer). Contains detailed eUICC information: free non-volatile memory, firmware version, installed profile count, PPR capabilities, extCardResource, and more. Richer than euiccInfo1 and only available after the authentication context is established.',spec:'SGP.22'},
 {term:'Factory System',def:'A controlled manufacturing environment that receives pre-generated Bound Profile Packages (BPPs) from the SM-DP+ and installs them onto eUICCs via a local wired interface during device production. Operates within a secure facility with physical and logical access controls.',spec:'SGP.41'},
 {term:'Profile Provider',def:'In the IFPP context, the entity (typically the SM-DP+) that prepares BPPs in advance and delivers them to the Factory System for local installation. The Profile Provider generates and cryptographically binds BPPs to target eUICCs before they are physically present on the production line.',spec:'SGP.41'},
@@ -1058,11 +1066,11 @@ function archIotIPAd(){
   s+=svgLine(190,83,310,83,'#2563EB','ES2+',false,'ES2+: Operator \u2192 SM-DP+');
   s+=svgLine(125,115,310,213,'#2563EB','ESop',false,'ESop: Operator \u2194 eIM');
   s+=svgLine(460,83,590,83,'#1E3A5F','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
-  s+=svgLine(385,245,540,350,'#0891B2','ESeim',false,'ESeim: eIM \u2192 IPAd (Direct mode)');
+  s+=svgLine(385,245,540,350,'#0891B2','ESep',false,'ESep: eIM \u2192 IPAd (Direct mode)');
   s+=svgLine(595,330,385,115,'#4F46E5','ESipa',true,'ESipa: IPAd \u2192 SM-DP+ (Indirect mode)');
   s+=svgLine(670,363,740,433,'#4F46E5','Local',false,'IPAd \u2194 eUICC (internal device interface)');
   s+='<text x="500" y="490" text-anchor="middle" fill="var(--tx3)" font-size="11" font-style="italic">IPAd = IPA in Device \u2014 software on the IoT device that mediates between eIM and eUICC</text>';
-  s+='<text x="500" y="508" text-anchor="middle" fill="var(--tx3)" font-size="10" font-style="italic">Both Direct (ESeim, solid) and Indirect (ESipa, dashed) paths shown for reference. A deployment typically uses one mode.</text>';
+  s+='<text x="500" y="508" text-anchor="middle" fill="var(--tx3)" font-size="10" font-style="italic">Both Direct (ESep, solid) and Indirect (ESipa, dashed) paths shown for reference. A deployment typically uses one mode.</text>';
   s+='</svg>';
   return s;
 }
@@ -1082,7 +1090,7 @@ function archIotIPAe(){
   s+=svgLine(190,83,310,83,'#2563EB','ES2+',false,'ES2+: Operator \u2192 SM-DP+');
   s+=svgLine(125,115,310,213,'#2563EB','ESop',false,'ESop: Operator \u2194 eIM');
   s+=svgLine(460,83,590,83,'#1E3A5F','ES12',false,'ES12: SM-DP+ \u2194 SM-DS');
-  s+=svgLine(385,245,540,340,'#0891B2','ESeim',false,'ESeim: eIM \u2192 eUICC (IPAe receives commands)');
+  s+=svgLine(385,245,540,340,'#0891B2','ESep',false,'ESep: eIM \u2192 eUICC (IPAe receives commands)');
   s+=svgLine(520,320,385,115,'#4F46E5','ESipa',true,'ESipa: eUICC (IPAe) \u2192 SM-DP+ (Indirect mode)');
   s+='<text x="500" y="455" text-anchor="middle" fill="var(--tx3)" font-size="11" font-style="italic">IPAe = IPA embedded in eUICC \u2014 the eUICC itself handles IPA functions internally for constrained devices</text>';
   s+='</svg>';
@@ -1529,12 +1537,12 @@ function qrHTML(){
   /* C2: CI PKID Reference Table */
   h+='<div class="asec"><h2>Certificate Issuer PKID Reference</h2>';
   h+='<div style="padding:10px 14px;background:rgba(30,58,95,0.06);border:1px solid var(--mag);border-radius:8px;margin-bottom:14px;font-size:13px;color:var(--tx1);line-height:1.7">';
-  h+='<b style="color:var(--mag)">Diagnosing mutual authentication failures:</b> Extract <code>euiccCiPKIdListForVerification</code> from ES10a.GetEUICCInfo1, then compare each PKID against this table. If the SM-DP+ certificate was issued by a CI whose PKID is NOT in the eUICC\u2019s trusted list, authentication will fail.';
+  h+='<b style="color:var(--mag)">Diagnosing mutual authentication failures:</b> Extract <code>euiccCiPKIdListForVerification</code> from ES10b.GetEUICCInfo, then compare each PKID against this table. If the SM-DP+ certificate was issued by a CI whose PKID is NOT in the eUICC\u2019s trusted list, authentication will fail.';
   h+='</div>';
-  h+='<p style="font-size:12px;color:#D97706;font-weight:600;margin-bottom:10px">\u26A0 PKID rows are illustrative placeholders \u2014 verify against GSMA PKI/CI registry before use.</p>';
+  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:10px">PKIDs are the SHA-1 Subject Key Identifiers of the CI root certificates, transcribed from the published GSMA CI material. New CIs are added over time \u2014 confirm against the GSMA CI registry (and SGP.26 for test material) for current values and expiry. <b style="color:#D97706">Never trust an SGP.26 test CI in production.</b></p>';
   h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>PKID (hex)</th><th>Generation</th><th>Usage</th><th>Status</th></tr></thead><tbody>';
   CI_PKIDS.forEach(function(c){
-    var sColor=c.status==='Unverified'?'#D97706':(c.status==='Active'?'#059669':'#D97706');
+    var sColor=c.status==='Test'?'#D97706':(c.status.indexOf('Production')===0?'#059669':'#6B7280');
     h+='<tr><td><code title="'+c.pkid+'" style="cursor:help">'+c.pkid.substring(0,16)+'\u2026</code></td><td>'+c.gen+'</td><td style="font-size:12px">'+c.usage+'</td><td><span style="display:inline-block;background:'+sColor+';color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:12px">'+c.status+'</span></td></tr>';
   });
   h+='</tbody></table></div></div>';
@@ -1599,7 +1607,7 @@ function qrHTML(){
   var checklists={
     consumer:['CI compatibility verified \u2014 SM-DP+ CI PKID is in target eUICC\u2019s trusted CI list','SM-DP+ HTTPS connectivity tested from device network (port 443, TLS 1.2+)','SM-DS event registration tested (if using Discovery Server path)','Activation Code format validated (1$address$matchingId)','Profile template tested on target eUICC form factor','eUICC available memory sufficient for profile size','Notification endpoint (SM-DP+ FQDN) reachable from device','PPR flags reviewed and documented for each profile type','LPA version supports required SGP.22 version (v2.x vs v3.x)','MEP port mapping tested (if SGP.22 v3.x with MEP)','Confirmation Code flow tested (if AC includes OID)','DNS resolution for SM-DP+ and SM-DS FQDNs verified'],
     m2m:['SM-SR connectivity to eUICC verified (SCP03t / SCP80 / SCP81 channel)','ISD-R key material matches between SM-SR and eUICC','EIS (eUICC Information Set) registered in SM-SR','ES4 interface credentials configured (Operator \u2192 SM-SR)','ES2 interface credentials configured (SM-DP \u2192 SM-SR)','Binary SMS transport tested (if using SCP80)','Profile template compatible with target eUICC OS version','SM-SR swap procedure documented (if ES6 will be used)','Bootstrap profile active and providing connectivity'],
-    iot:['eIM configured on eUICC (ESeim.ConfigureEim completed)','eIM trust anchor installed during eUICC manufacturing','IPAd firmware version supports SGP.32 (or IPAe available on eUICC)','ESeim transport selected and tested (CoAP/MQTT/SMS/HTTP)','SM-DP+ reachable from IPA (for Indirect Mode)','Bootstrap profile providing connectivity for ESeim channel','Direct vs Indirect mode decision documented with rationale','ESop interface configured (Operator \u2192 eIM notifications)','Profile enable/disable/delete tested end-to-end','Batch provisioning tested at target scale']
+    iot:['eIM configured on eUICC (ESep.AddEim / ESep.UpdateEim completed)','eIM trust anchor installed during eUICC manufacturing','IPAd firmware version supports SGP.32 (or IPAe available on eUICC)','ESep transport selected and tested (CoAP/MQTT/SMS/HTTP)','SM-DP+ reachable from IPA (for Indirect Mode)','Bootstrap profile providing connectivity for ESep channel','Direct vs Indirect mode decision documented with rationale','ESop interface configured (Operator \u2192 eIM notifications)','Profile enable/disable/delete tested end-to-end','Batch provisioning tested at target scale']
   };
   if(!window._checklistState)window._checklistState={};
   h+='<div id="checklist-container">';
@@ -1725,7 +1733,7 @@ function toolsIdHTML(){
 
   /* EID Analyzer (Decoder, Validator & SM-DS Pattern Match) — TOP */
   h+='<div class="asec"><h2>EID Analyzer (Decoder, Validator &amp; SM-DS Pattern Match)</h2>';
-  h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a 32-digit EID into its components (EUM prefix, manufacturer, country, platform, serial), validate the Mod97 checksum, and compare against illustrative Google SM-DS pattern examples.</p>';
+  h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a 32-digit EID and verify its MOD 97-10 check digits. For EIDs beginning “89”, fields are split per <b>ITU-T E.118</b> as profiled in <b>GSMA SGP.02 §2.2.2</b>; other EIDs use the <b>SGP.29</b> GSMA scheme, which has no fixed field widths.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="eid-input" class="ac-input" placeholder="Enter 32-digit EID \u2014 press Enter to decode" maxlength="40" />';
   h+='<button type="button" class="cbtn pri" id="eid-decode">Decode</button>';
   h+='<button type="button" class="cbtn" id="eid-clear">Clear</button></div>';
@@ -1797,22 +1805,29 @@ function toolsIdHTML(){
   h+='<div id="imsi-result" class="ac-result"></div></div></div>';
 
   /* Reference Databases — at bottom */
-  h+='<div class="asec"><h2>Device Pattern Database</h2>';
-  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">EID pattern examples can help identify likely Google SM-DS routing behavior, but this table is not authoritative. The patterns below are illustrative examples for the <b>Google Discovery Server (SM-DS)</b>. Digit positions are 1-indexed (i.e., "Digits 14-16" means the 14th through 16th characters of the 32-digit EID).</p>';
-  h+='<details class="ts-card"><summary>View All Patterns ('+DEVICE_PATTERNS.length+' total)</summary><div class="ts-body">';
-  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>Pattern Name</th><th>EUM Prefix</th><th>Digit Rules</th><th>Device</th></tr></thead><tbody>';
-  DEVICE_PATTERNS.forEach(function(p){
-    var rules=[];
-    for(var k in p.rules)rules.push('Digits '+k.replace('_','-')+': '+p.rules[k]);
-    h+='<tr><td><code>'+p.name+'</code></td><td><code>'+p.eum+'</code></td><td>'+rules.join('; ')+'</td><td><b>'+p.device+'</b></td></tr>';
+  h+='<div class="asec"><h2>SM-DS Addresses</h2>';
+  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">An SM-DS is identified by its <b>FQDN</b>, not by the EID. There is no published mapping from EID digits to a discovery server, so this tool does not attempt to infer one. (An earlier release matched EIDs against invented "Google SM-DS patterns"; that table has been removed.)</p>';
+  h+='<details class="ts-card"><summary>Known SM-DS addresses ('+SMDS_ADDRESSES.length+')</summary><div class="ts-body">';
+  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>FQDN</th><th>Role</th></tr></thead><tbody>';
+  SMDS_ADDRESSES.forEach(function(p){
+    h+='<tr><td><code>'+esc(p.fqdn)+'</code></td><td><b>'+esc(p.role)+'</b></td></tr>';
   });
   h+='</tbody></table></div></div></details></div>';
 
-  h+='<div class="asec"><h2>EUM Manufacturer Database</h2>';
-  h+='<details class="ts-card"><summary>View All EUM Mappings ('+Object.keys(EUM_TABLE).length+' total)</summary><div class="ts-body">';
-  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>EUM Prefix (8 digits)</th><th>Manufacturer</th></tr></thead><tbody>';
-  Object.keys(EUM_TABLE).forEach(function(prefix){
-    h+='<tr><td><code>'+prefix+'</code></td><td><b>'+EUM_TABLE[prefix]+'</b></td></tr>';
+  h+='<div class="asec"><h2>EUM Issuer Database</h2>';
+  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Names are the entity registered in the <b>ITU-T E.118 Issuer Identifier Number</b> registry for EIDs beginning “89”. The registry is not retroactively renamed when a business is acquired, so the present-day owner is given in parentheses where it differs. Rows marked <i>community-sourced</i> come from the euicc-manual EUM list and observed EUM certificates rather than the ITU registry.</p>';
+  h+='<details class="ts-card"><summary>ITU-T E.118 scheme — “89” prefixes ('+Object.keys(EUM_TABLE).length+')</summary><div class="ts-body">';
+  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>Prefix (8 digits)</th><th>Registered issuer</th><th>Source</th></tr></thead><tbody>';
+  Object.keys(EUM_TABLE).sort().forEach(function(prefix){
+    var r=EUM_TABLE[prefix];
+    h+='<tr><td><code>'+esc(prefix)+'</code></td><td><b>'+esc(r.name)+'</b></td><td>'+(r.src==='itu'?'ITU registry':'community-sourced')+'</td></tr>';
+  });
+  h+='</tbody></table></div></div></details>';
+  h+='<details class="ts-card"><summary>GSMA EID Scheme (SGP.29) — range holders ('+Object.keys(EIN_TABLE).length+')</summary><div class="ts-body">';
+  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:8px">The newer GSMA scheme does <b>not</b> use an “89” prefix. These 5-digit values are EIN range-holder identifiers.</p>';
+  h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>EIN prefix</th><th>Company</th></tr></thead><tbody>';
+  Object.keys(EIN_TABLE).sort().forEach(function(k){
+    h+='<tr><td><code>'+esc(k)+'</code></td><td><b>'+esc(EIN_TABLE[k])+'</b></td></tr>';
   });
   h+='</tbody></table></div></div></details></div>';
 
@@ -1846,7 +1861,7 @@ function toolsDbgHTML(){
   h+='<div class="sm-toggle"><button type="button" class="fbtn on" id="sm-consumer">Consumer (SGP.22)</button><button type="button" class="fbtn" id="sm-m2m">M2M (SGP.02)</button><button type="button" class="fbtn" id="sm-iot">IoT (SGP.32)</button></div>';
   h+='<div id="sm-svg">'+stateMachineSVG('consumer')+'</div>';
   h+='<div class="sm-detail" id="sm-detail"></div>';
-  h+='<p style="font-size:11px;color:var(--tx3);margin-top:10px;font-style:italic">States shown are conceptual and for single active profile mode. For Consumer MEP (v3.x), multiple profiles can be in Enabled state simultaneously on different eSIM ports. IoT (SGP.32) uses ESeim commands initiated by the eIM, not the end user.</p>';
+  h+='<p style="font-size:11px;color:var(--tx3);margin-top:10px;font-style:italic">States shown are conceptual and for single active profile mode. For Consumer MEP (v3.x), multiple profiles can be in Enabled state simultaneously on different eSIM ports. IoT (SGP.32) uses ESep commands initiated by the eIM, not the end user.</p>';
   h+='</div></div>';
 
   /* ASN.1 TLV Parser */
@@ -1964,14 +1979,14 @@ function appxHTML(){
   ['ES2+','Operator \u2194 SM-DP+','SGP.22','Profile order, download confirmation, notifications'],
   ['ES8+','SM-DP+ \u2194 eUICC (logical, via LPA)','SGP.22','Logical secure channel for profile binding, tunneled through ES9+ and ES10b'],
   ['ES9+','LPA \u2194 SM-DP+','SGP.22','Profile download: authentication, BPP delivery'],
-  ['ES10a','LPA \u2194 eUICC','SGP.22','eUICC info retrieval, challenge generation'],
-  ['ES10b','LPA \u2194 eUICC','SGP.22','Bound profile package loading, download preparation, detailed eUICC info, and notification list handling'],
+  ['ES10a','LPA \u2194 eUICC','SGP.22','LPA configuration data: GetEuiccConfiguredAddresses, SetDefaultDpAddress, VerifySmdsResponse'],
+  ['ES10b','LPA \u2194 eUICC','SGP.22','GetEUICCInfo, GetEUICCChallenge, bound profile package loading, download preparation, and notification list handling'],
   ['ES10c','LPA \u2194 eUICC','SGP.22','Local profile management: enable, disable, delete, profile info, EID, and memory reset operations'],
   ['ES10d','LPA \u2194 eUICC','SGP.22 v3.x','MEP port management (GetSIMSlotMapping, SetSIMSlotMapping)'],
   ['ES11','LPA \u2194 SM-DS','SGP.22','Event discovery / retrieval'],
   ['ES12','SM-DP+ \u2194 SM-DS','SGP.22','Event registration'],
-  ['ESeim','eIM \u2194 IPAd or IPAe','SGP.32','Direct mode profile management \u2014 eIM delivers commands to IPAd (IPA in device) or IPAe (IPA embedded in eUICC)'],
-  ['ESipa','IPA \u2194 SM-DP+','SGP.32','Indirect mode profile download (IoT)'],
+  ['ESep','eIM \u2194 eUICC','SGP.32','Profile State Management Operations (PSMOs) carried in signed eUICC Packages: Enable, Disable, Delete, ListProfileInfo, GetRAT, ConfigureImmediateEnable, AddEim, UpdateEim, DeleteEim, ListEim, SetDefaultDpAddress'],
+  ['ESipa','eIM \u2194 IPA','SGP.32','eIM-to-IPA transport: InitiateAuthentication, AuthenticateClient, GetBoundProfilePackage, HandleNotification, CancelSession, GetEimPackage, TransferEimPackage, ProvideEimPackageResult'],
   ['ESop','Operator \u2194 eIM','SGP.32','Operator-to-eIM profile ordering and lifecycle management interface'],
   ['ESdd','SM-DS \u2194 SM-DS','SGP.32','Root-to-Alternative SM-DS event cascade for IoT device discovery'],
   ['Default SM-DP+','LPA \u2194 SM-DP+','SGP.22','Configured SM-DP+ entry path before normal ES9+/ES10 download sequence']
@@ -1999,7 +2014,7 @@ function appxHTML(){
   ['ES10b.RetrieveNotification','ES10b','LPA \u2192 eUICC','Retrieve a specific notification for sending'],
   ['ES10b.RemoveNotificationFromList','ES10b','LPA \u2192 eUICC','Remove a sent notification from the eUICC list'],
   ['ES10c.GetProfilesInfo','ES10c','LPA \u2192 eUICC','Retrieve list of installed profiles with state, ICCID, PPR flags, and metadata'],
-  ['ES10a.GetEUICCInfo1','ES10a','LPA \u2192 eUICC','Retrieve basic eUICC capabilities (svn, CI PKIDs) before authentication'],
+  ['ES10b.GetEUICCInfo','ES10b','LPA \u2192 eUICC','Retrieve eUICC capabilities. EUICCInfo1 carries lowestSvn and euiccCiPKIdListForVerification/ForSigning; EUICCInfo2 adds euiccFirmwareVersion and extCardResource'],
   ['ES10b.GetEUICCInfo2','ES10b','LPA \u2192 eUICC','Retrieve detailed eUICC info during authentication (free memory, firmware version, PPR support)'],
   ['ES10c.GetEUICCChallenge','ES10c','LPA \u2192 eUICC','Generate a cryptographic challenge for initiating authentication'],
   ['ES10c.EuiccMemoryReset','ES10c','LPA \u2192 eUICC','Reset eUICC memory \u2014 delete all operational profiles and reset to factory state'],
@@ -2030,13 +2045,13 @@ function appxHTML(){
 
   /* IoT Messages */
   h+='<div class="asec"><h2>Key Messages \u2014 IoT RSP (SGP.32)</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Message</th><th>Interface</th><th>Direction</th><th>Purpose</th></tr></thead><tbody>';
-  [['ESeim.ConfigureEim','ESeim','eIM \u2192 IPA/eUICC','Register or update authorized eIM configuration on the eUICC'],
-  ['ESeim.DownloadProfile','ESeim','eIM \u2192 IPAd/IPAe','Direct mode: deliver protected profile/eUICC package to device'],
-  ['ESeim.EnableProfile','ESeim','eIM \u2192 IPAd/IPAe','Request enable package delivery to the eUICC'],
-  ['ESeim.DisableProfile','ESeim','eIM \u2192 IPAd/IPAe','Request disable package delivery to the eUICC'],
-  ['ESeim.DeleteProfile','ESeim','eIM \u2192 IPAd/IPAe','Request delete package delivery to the eUICC'],
+  [['ESep.AddEim / ESep.UpdateEim','ESep','eIM \u2192 IPA/eUICC','Register or update authorized eIM configuration on the eUICC'],
+  ['ProfileDownloadTriggerRequest','ESep','eIM \u2192 IPAd/IPAe','Direct mode: deliver protected profile/eUICC package to device'],
+  ['ESep.Enable','ESep','eIM \u2192 IPAd/IPAe','Request enable package delivery to the eUICC'],
+  ['ESep.Disable','ESep','eIM \u2192 IPAd/IPAe','Request disable package delivery to the eUICC'],
+  ['ESep.Delete','ESep','eIM \u2192 IPAd/IPAe','Request delete package delivery to the eUICC'],
   ['ES10b.LoadEuiccPackage','ES10b','IPA \u2192 eUICC','Load signed eUICC Package commands for download, enable, disable, or delete execution'],
-  ['ESeim.ConfigureEim','ESeim','eIM \u2192 eUICC','Register/update eIM configuration on eUICC'],
+  ['ESep.AddEim / ESep.UpdateEim','ESep','eIM \u2192 eUICC','Register/update eIM configuration on eUICC'],
   ['ESipa.InitiateAuthentication','ESipa','IPA \u2192 SM-DP+','Indirect mode: begin mutual authentication'],
   ['ESipa.AuthenticateClient','ESipa','IPA \u2192 SM-DP+','Indirect mode: send eUICC credentials for verification'],
   ['ESipa.GetBoundProfilePackage','ESipa','IPA \u2192 SM-DP+','Indirect mode: retrieve encrypted BPP']
@@ -2052,13 +2067,13 @@ function appxHTML(){
     ['Client auth','ES9+.AuthenticateClient','ES9+','ESipa.AuthenticateClient','ESipa','IoT uses IPA instead of LPA'],
     ['Get profile package','ES9+.GetBoundProfilePackage','ES9+','ESipa.GetBoundProfilePackage','ESipa','Identical BPP format'],
     ['Load profile','ES10b.LoadBoundProfilePackage','ES10b (LPA\u2192eUICC)','ES10b.LoadEuiccPackage','ES10b (IPA\u2192eUICC)','IoT executes signed eUICC Packages delivered by IPA'],
-    ['Enable profile','ES10c.EnableProfile','ES10c','ESeim.EnableProfile + ES10b.LoadEuiccPackage','ESeim then ES10b','IoT: eIM initiates; eUICC executes signed package command'],
-    ['Disable profile','ES10c.DisableProfile','ES10c','ESeim.DisableProfile + ES10b.LoadEuiccPackage','ESeim then ES10b','IoT should pair disable with enable where needed to preserve connectivity'],
-    ['Delete profile','ES10c.DeleteProfile','ES10c','ESeim.DeleteProfile + ES10b.LoadEuiccPackage','ESeim then ES10b','IoT delete is still packaged and signed by eIM'],
-    ['Discover events','ES11 (LPA\u2192SM-DS)','ES11','N/A (eIM manages)','ESop/ESeim','IoT: eIM knows SM-DP+ directly'],
-    ['Direct profile push','N/A','\u2014','ESeim.DownloadProfile','ESeim','IoT Direct Mode only \u2014 no Consumer equivalent'],
+    ['Enable profile','ES10c.EnableProfile','ES10c','ESep.Enable + ES10b.LoadEuiccPackage','ESep then ES10b','IoT: eIM initiates; eUICC executes signed package command'],
+    ['Disable profile','ES10c.DisableProfile','ES10c','ESep.Disable + ES10b.LoadEuiccPackage','ESep then ES10b','IoT should pair disable with enable where needed to preserve connectivity'],
+    ['Delete profile','ES10c.DeleteProfile','ES10c','ESep.Delete + ES10b.LoadEuiccPackage','ESep then ES10b','IoT delete is still packaged and signed by eIM'],
+    ['Discover events','ES11 (LPA\u2192SM-DS)','ES11','N/A (eIM manages)','ESipa','IoT: eIM knows SM-DP+ directly'],
+    ['Direct profile push','N/A','\u2014','ProfileDownloadTriggerRequest','ESep','IoT Direct Mode only \u2014 no Consumer equivalent'],
     ['Order profile','ES2+.DownloadOrder','ES2+','ES2+.DownloadOrder','ES2+','Identical \u2014 same SM-DP+ interface'],
-    ['Notification','ES9+.HandleNotification','ES9+','ESeim result notification','ESeim','IoT: IPA\u2192eIM, not LPA\u2192SM-DP+']
+    ['Notification','ES9+.HandleNotification','ES9+','ESipa result notification','ESep','IoT: IPA\u2192eIM, not LPA\u2192SM-DP+']
   ];
   eqRows.forEach(function(r){
     h+='<tr><td style="font-weight:600">'+r[0]+'</td><td><code>'+r[1]+'</code></td><td>'+r[2]+'</td><td><code>'+r[3]+'</code></td><td>'+r[4]+'</td><td style="font-size:12px;color:var(--tx2)">'+r[5]+'</td></tr>';
@@ -2290,33 +2305,52 @@ function bindGlossarySearch(){
 
 // ── 9. EUM Manufacturer Table ──
 // Format: '8-digit-prefix': 'Manufacturer Name' (reference subset; source-verification needed)
+// EUM identifiers for the ITU-T E.118 based scheme (EIDs starting '89').
+// Format: '8-digit prefix': {name:'...', src:'itu'|'osmocom'}
+//   src 'itu'     = present in the official ITU-T E.118 Issuer Identifier Number registry.
+//   src 'osmocom' = from the euicc-manual EUM list / observed EUM certificates; not found
+//                   in the ITU registry, so treat as community-sourced rather than official.
+// Names are the REGISTERED entity, with the present-day owner in parentheses where the
+// business has since moved. The registry is the source of truth and is not retroactively
+// renamed when a company is acquired or rebranded.
 var EUM_TABLE={
-  '89033023':'Thales','89033024':'IDEMIA','89033090':'Thales',
-  '89034011':'Valid','89043051':'NXP','89043052':'NXP',
-  '89044045':'Kigen','89044047':'Truphone',
-  '89049032':'G+D','89049038':'G+D',
-  '89082001':'Samsung Semiconductor','89082002':'Samsung Semiconductor',
-  '89039001':'STMicroelectronics','89043001':'Infineon',
-  '89086001':'Hengbao','89086029':'Wuhan Tianyu','89086030':'Eastcompeace',
-  '35060000':'HED','35840574':'Beijing Watchdata'
+  '89033023':{name:'Gemalto SA (now Thales)',src:'itu'},
+  '89033024':{name:'Oberthur Technologies (now IDEMIA)',src:'itu'},
+  '89033090':{name:'Thales SA',src:'itu'},
+  '89034011':{name:'Valid',src:'itu'},
+  '89041290':{name:'STMicroelectronics',src:'osmocom'},
+  '89043051':{name:'NXP Semiconductors (Austria)',src:'itu'},
+  '89043052':{name:'NXP Semiconductors (Austria)',src:'itu'},
+  '89044045':{name:'Kigen (UK)',src:'itu'},
+  '89044047':{name:'Truphone',src:'osmocom'},
+  '89049032':{name:'Giesecke & Devrient',src:'itu'},
+  '89049038':{name:'G+D Mobile Security',src:'itu'},
+  '89049041':{name:'NXP Semiconductors (Germany)',src:'itu'},
+  '89049044':{name:'sysmocom (test/development)',src:'osmocom'},
+  '89086001':{name:'Hengbao',src:'osmocom'},
+  '89086029':{name:'Wuhan Tianyu',src:'osmocom'},
+  '89086030':{name:'Eastcompeace',src:'osmocom'}
+};
+// GSMA EID Scheme (SGP.29) registered companies -- the NEW scheme, which does NOT use an
+// '89' prefix. Keyed by the 5-digit EIN/ERHI range-holder identifier.
+// Source: gsmaservices.com EID scheme registered companies list.
+var EIN_TABLE={
+  '35036':'Huwei','35060':'CEC Hauda','35203':'Redtea Mobile',
+  '35265':'NXP Semiconductors','35281':'Tongxi','35499':'NXP Semiconductors',
+  '35614':'Tsingteng','35767':'Card Centric','35797':'Workz',
+  '35840':'WatchData','35865':'XH Smart','35907':'Kigen'
 };
 
-// ── 10. Device Patterns (Google Discovery Server SM-DS) ──
-// Format: {name:'Pattern Name', eum:'8-digit-prefix', rules:{'startPos_endPos':'digits'}, device:'Device Name'} (illustrative; source-verification needed)
-// Rule keys use 1-indexed digit positions: '14_16' means digits at positions 14 through 16 (inclusive) of the 32-digit EID.
-// In code, these are converted to 0-indexed: substring(startPos-1, endPos).
-var DEVICE_PATTERNS=[
-  {name:'Illustrative Pattern 1',eum:'89043051',rules:{'14_16':'000'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 2',eum:'89043051',rules:{'14_16':'083'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 3',eum:'89033023',rules:{'14_18':'01001'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 4',eum:'89033023',rules:{'9_13':'42210','14_18':'00000'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 5',eum:'89033023',rules:{'14_18':'90091'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 6',eum:'89033023',rules:{'14_18':'90100'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 7',eum:'89033090',rules:{'14_18':'90100'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 8',eum:'89043051',rules:{'14_18':'90962'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 9',eum:'89034011',rules:{'14_18':'90000'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 10',eum:'89034011',rules:{'14_18':'90500'},device:'Source-verify device mapping'},
-  {name:'Illustrative Pattern 11',eum:'89049032',rules:{'13_18':'900913'},device:'Source-verify device mapping'}
+// ── 10. Known SM-DS addresses ──
+// Replaces an earlier "Google SM-DS EID pattern" table that has been REMOVED: there is no
+// published mapping from EID digits to a discovery server, and SM-DS is addressed by FQDN,
+// not derived from the EID. Any such pattern matching produced fabricated results.
+// Format: {fqdn:'...', role:'...'}
+var SMDS_ADDRESSES=[
+  {fqdn:'lpa.ds.gsma.com',role:'GSMA Root SM-DS'},
+  {fqdn:'prod.smds.rsp.goog',role:'Google SM-DS ("Stork")'},
+  {fqdn:'lpa.live.esimdiscovery.com',role:'Android production SM-DS'},
+  {fqdn:'lpads.vzw.otgeuicc.com',role:'Verizon SM-DS'}
 ];
 
 // ── 12. Country Codes ──
@@ -2350,8 +2384,8 @@ var APDU_SW={
   '6200':{cat:'Warning',msg:'No information given (state unchanged)'},
   '6281':{cat:'Warning',msg:'Part of returned data may be corrupted'},
   '6282':{cat:'Warning',msg:'End of file/record reached before reading expected bytes'},
-  '6283':{cat:'Warning',msg:'Selected file deactivated/invalidated'},
-  '6300':{cat:'Warning',msg:'Verification failed, no retries remaining'},
+  '6283':{cat:'Warning',msg:'Selected file invalidated (ETSI TS 102 221); in GlobalPlatform, Card Life Cycle State is CARD_LOCKED'},
+  '6300':{cat:'Warning',msg:'No information given (verification failed). ISO/IEC 7816-4; in GlobalPlatform, verification of the certificate failed. Note: "no retries remaining" is 63 C0; PIN blocked is 69 83'},
   '63C0':{cat:'Warning',msg:'Verification failed, 0 retries remaining'},
   '63C1':{cat:'Warning',msg:'Verification failed, 1 retry remaining'},
   '63C2':{cat:'Warning',msg:'Verification failed, 2 retries remaining'},
@@ -2381,37 +2415,85 @@ var APDU_SW={
   '6C00':{cat:'Error',msg:'Wrong Le field (exact length in SW2)'},
   '6D00':{cat:'Error',msg:'Instruction code not supported or invalid'},
   '6E00':{cat:'Error',msg:'Class not supported'},
-  '6F00':{cat:'Error',msg:'No precise diagnosis \u2014 technical problem with no info'},
-  '6F01':{cat:'Error',msg:'More data available'},
-  '6F02':{cat:'Error',msg:'eSIM - Triggered by profile policy rule violation'},
-  '9850':{cat:'Error',msg:'INCREASE \u2014 maximum value reached'}
+  '6F00':{cat:'Error',msg:'Technical problem, no precise diagnosis (ETSI TS 102 221). For 6F XX with SW2 \u2260 00 the meaning is command dependent \u2014 there is no standard interpretation'},
+  '9850':{cat:'Error',msg:'INCREASE cannot be performed, max value reached'},
+  /* Warnings used for command chaining -- these appear in ES10x / LoadBoundProfilePackage traces. */
+  '62F1':{cat:'Warning',msg:'More data available'},
+  '62F2':{cat:'Warning',msg:'More data available and proactive command pending'},
+  '62F3':{cat:'Warning',msg:'Response data available'},
+  '6285':{cat:'Warning',msg:'Selected file in termination state'},
+  '63F1':{cat:'Warning',msg:'More data expected'},
+  '6310':{cat:'Warning',msg:'More data available (GlobalPlatform \u2014 e.g. GET STATUS paging)'},
+  '6883':{cat:'Error',msg:'The last command of the chain was expected (GlobalPlatform) \u2014 relevant to BPP / certificate chain loading'},
+  '9484':{cat:'Error',msg:'Algorithm not supported (GlobalPlatform)'},
+  '9485':{cat:'Error',msg:'Invalid key check value (GlobalPlatform)'}
 };
 
 // ── 4. SGP.22 Error Codes ──
 // Format: 'X.X': 'Description'
+// Verbatim from SGP.22 v2.6 (20 Sept 2024) section 5.2.6.1. SGP.22 lists ONLY the subset
+// of codes it uses and inherits the rest from SGP.02. Note 8.2=Profile and 8.8=SM-DP+
+// (a very common transcription error reverses these). 8.3-8.7 are deliberately absent:
+// they exist only in SGP.02's M2M tree (ISD-P, ISD-R, ECASD, EIS, SM-SR) and carry
+// CONFLICTING meanings there, so the two trees must not be merged.
 var SGP22_SUBJECTS={
-  '8.1':'eUICC','8.2':'SM-DP+','8.3':'SM-DS','8.4':'Operator',
-  '8.5':'LPA','8.6':'CI','8.7':'ISD-R','8.8':'Profile'
+  '1':'Generic','1.1':'Function Requester','1.2':'Function Provider',
+  '1.3':'Protocol','1.3.1':'Protocol Format','1.3.2':'Protocol Version','1.6':'Function',
+  '8':'eUICC Remote Provisioning',
+  '8.1':'eUICC','8.1.1':'EID','8.1.2':'EUM Certificate','8.1.3':'eUICC Certificate',
+  '8.2':'Profile','8.2.1':'Profile ICCID','8.2.5':'Profile Type','8.2.6':'Matching ID',
+  '8.2.7':'Confirmation Code','8.2.8':'PPR','8.2.9':'Profile Metadata',
+  '8.2.10':'Bound Profile Package',
+  '8.8':'SM-DP+','8.8.1':'SM-DP+ Address','8.8.2':'Security configuration',
+  '8.8.3':'Specification Version Number (SVN)','8.8.4':'SM-DP+ Certificate',
+  '8.8.5':'Download order',
+  '8.9':'SM-DS','8.9.1':'SM-DS Address','8.9.2':'Security configuration',
+  '8.9.3':'Specification Version Number (SVN)','8.9.4':'SM-DS Certificate',
+  '8.9.5':'Event Record',
+  '8.10':'RSP Operation','8.10.1':'TransactionId',
+  '8.11':'GSMA CI','8.11.1':'Public Key (PK)'
 };
+// Verbatim from SGP.22 v2.6 section 5.2.6.2. These are GENERIC condition codes -- the
+// meaning of a failure comes from the subjectCode/reasonCode PAIR, not the reason alone.
+// Codes absent here (1.0, 3.2, 3.4, 3.5, 4.1, 4.4-4.7, 5.2-5.5) are NOT SGP.22 reason
+// codes; earlier versions of this tool invented plain-English meanings for them.
 var SGP22_REASONS={
-  '1.0':'General error \u2014 unknown reason',
-  '1.1':'Expired','1.2':'Not yet valid','2.1':'Not found',
-  '3.1':'Already installed','3.2':'Insufficient memory on eUICC',
-  '3.3':'Profile state error \u2014 wrong state for operation',
-  '3.4':'PPR not allowed \u2014 Profile Policy Rule blocks this operation',
-  '3.5':'Nothing to delete','3.7':'CAT busy',
-  '3.8':'Undefined error','3.9':'Incompatible profile (version mismatch)',
-  '3.10':'Profile not in disabled state',
-  '3.11':'Profile not in enabled state',
-  '4.1':'Matching ID mismatch','4.2':'Confirmation code mismatch',
-  '4.3':'CI public key not found on eUICC',
-  '4.4':'SM-DP+ certificate verification failed',
-  '4.5':'eUICC certificate verification failed',
-  '4.6':'Signature verification failed',
-  '4.7':'Transaction ID unknown','4.8':'Unsupported CiPKId',
-  '5.1':'Download order not found','5.2':'Download already in progress',
-  '5.3':'BPP install failed','5.4':'Notification error',
-  '5.5':'Profile download refused by eUICC'
+  '1':'Access Error',
+  '1.1':'Unknown (Identification or Authentication)',
+  '1.2':'Not Allowed (Authorisation)',
+  '2':'Format Error',
+  '2.1':'Invalid','2.2':'Mandatory Element Missing','2.3':'Conditional Element Missing',
+  '3':'Conditions of Use Not Satisfied',
+  '3.1':'Unsupported','3.3':'Already in Use (Uniqueness)','3.7':'Unavailable',
+  '3.8':'Refused','3.9':'Unknown','3.10':'Invalid Association','3.11':'Value has Changed',
+  '4':'Processing Error',
+  '4.2':'Execution Error','4.3':'Stopped on Warning','4.8':'Insufficient Memory',
+  '4.10':'Time to Live Expired',
+  '5':'Transport Error','5.1':'Inaccessible',
+  '6':'Security Error','6.1':'Verification Failed','6.3':'Expired',
+  '6.4':'Maximum number of retries exceeded'
+};
+// Real subject+reason PAIRS with the spec's own descriptions, extracted from the
+// per-function status-code tables of SGP.22 v2.6. Keyed 'subject|reason'.
+var SGP22_PAIRS={
+  '8.1|4.8':'eUICC does not have sufficient space for this Profile.',
+  '8.1|6.1':'eUICC signature is invalid, or the serverChallenge is invalid.',
+  '8.1.1|2.2':'The EID is missing in the context of this order.',
+  '8.1.1|3.8':'EID doesn\u2019t match the expected value.',
+  '8.1.1|3.10':'A different EID is already associated with this ICCID.',
+  '8.2|1.2':'Profile has not yet been released.',
+  '8.2|3.7':'BPP is not available for a new binding.',
+  '8.2.1|1.2':'Profile is not associated to this EID, or not in \u2018Installed\u2019 state.',
+  '8.2.5|3.7':'No more Profile available for the requested Profile Type.',
+  '8.2.5|4.3':'No eligible Profile for this eUICC/Device.',
+  '8.2.6|3.8':'MatchingID (AC_Token or EventID) is refused.',
+  '8.8|3.10':'The provided SM-DP+ OID is invalid.',
+  '8.9|4.2':'The cascade SM-DS registration has failed \u2014 Root SM-DS raised an error.',
+  '8.9|5.1':'The cascade SM-DS registration has failed \u2014 Root SM-DS was unavailable.',
+  '8.9.5|3.3':'The Event Record already exists in the SM-DS (EventID duplicated).',
+  '8.9.5|3.9':'No Event identified by the Event ID for the EID exists.',
+  '8.10.1|3.9':'The RSP session identified by the TransactionID is unknown.',
+  '8.11.1|3.9':'Unknown CI Public Key \u2014 the CI used by the EUM Certificate is not a trusted root for the SM-DP+/SM-DS.'
 };
 
 // ── 5. ICCID Issuers ──
@@ -2451,15 +2533,25 @@ var TLV_TAGS={
 
 // ── 7. Remote Push Instruction Codes ──
 // Format: 'HEXUPPER': 'Instruction Name'
+// INSTRUCTION bytes. IMPORTANT: INS is only meaningful together with CLA -- several values
+// mean different things in ETSI TS 102 221 (UICC) versus GlobalPlatform (CLA 8X/CX/EX).
+// Both readings are given where they collide.
 var REMOTE_INS={
-  'A4':'SELECT','B0':'READ BINARY','B2':'READ RECORD',
+  'A4':'SELECT / SELECT FILE','B0':'READ BINARY','B2':'READ RECORD',
   'D6':'UPDATE BINARY','DC':'UPDATE RECORD',
-  'E2':'STORE DATA','CA':'GET DATA','CB':'GET DATA (odd INS)',
-  'E6':'INSTALL','E8':'LOAD','F0':'SET STATUS',
-  'F2':'GET STATUS','C0':'GET RESPONSE','88':'AUTHENTICATE',
+  'E2':'STORE DATA','E4':'DELETE','E6':'INSTALL','E8':'LOAD',
+  'CA':'GET DATA','CB':'GET DATA (odd, GlobalPlatform) / RETRIEVE DATA (UICC)',
+  'F0':'SET STATUS (GlobalPlatform)',
+  'F2':'GET STATUS (GlobalPlatform) / STATUS (UICC)',
+  'C0':'GET RESPONSE','88':'INTERNAL AUTHENTICATE (GP) / AUTHENTICATE (UICC)',
+  '89':'AUTHENTICATE (UICC)',
   '20':'VERIFY','24':'CHANGE PIN','26':'DISABLE PIN',
   '28':'ENABLE PIN','2C':'UNBLOCK PIN','70':'MANAGE CHANNEL',
-  'DA':'PUT DATA'
+  'DA':'PUT DATA','D8':'PUT KEY','50':'INITIALIZE UPDATE',
+  '82':'EXTERNAL AUTHENTICATE','84':'GET CHALLENGE',
+  '22':'MANAGE SECURITY ENVIRONMENT','2A':'PERFORM SECURITY OPERATION',
+  '78':'END R-MAC SESSION (GP) / GET IDENTITY (UICC)',
+  '7A':'BEGIN R-MAC SESSION (GP) / EXCHANGE CAPABILITIES (UICC)'
 };
 
 // ── 8. MCC/MNC Operator Lookup ──
@@ -2523,8 +2615,27 @@ var MCC_MNC={
 };
 
 
+/* Escape user-supplied text before interpolating into innerHTML. */
+function esc(s){
+  return String(s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+/* EID check digits per SGP.02 v4.0 section 2.2.2 / SGP.29 section 10 (ISO 7064 MOD 97-10).
+   Verify: the full 32 digits read as an integer must be congruent to 1 mod 97. */
 function eidChecksumValid(digits){
   try { return BigInt(digits) % 97n === 1n; } catch(e){ return false; }
+}
+
+/* Compute the two check digits for a 30-digit EID body: place '00' in the check
+   positions, take the whole 32-digit value mod 97, then 98 minus that remainder. */
+function eidCheckDigits(body30){
+  try {
+    var rem = BigInt(body30 + '00') % 97n;
+    var cd = 98n - rem;
+    return (cd < 10n ? '0' : '') + cd.toString();
+  } catch(e){ return null; }
 }
 
 function bindEIDDecoder(){
@@ -2537,43 +2648,49 @@ function bindEIDDecoder(){
     if(!val){result.innerHTML='<div class="ac-error">Please enter an EID.</div>';return}
     if(!/^\d+$/.test(val)){result.innerHTML='<div class="ac-error">EID must contain only digits (0\u20139). Found non-digit characters.</div>';return}
     if(val.length!==32){result.innerHTML='<div class="ac-error">EID must be exactly 32 digits. You entered '+val.length+' digit'+(val.length!==1?'s':'')+'.</div>';return}
-    var prefix8=val.substring(0,8);
-    var platform=val.substring(8,11);
-    var serial=val.substring(11,30);
-    var chk=val.substring(30,32);
+    /* Two mutually exclusive EID schemes exist and they are NOT interchangeable:
+         '89\u2026'  -> ITU-T E.118 based scheme, fixed field widths per SGP.02 v4.0 s2.2.2.
+         other  -> GSMA EID Scheme (SGP.29): EIN + ESIN + 2 check digits. The EIN is
+                   VARIABLE length (concatenated ERHI values), so the internal field
+                   boundaries cannot be derived from the digits alone. SGP.29 AE.R02
+                   requires that these SHALL NOT start with '89'. */
     var mii=val.substring(0,2);
-    var reserved=val.substring(2,3);
-    var cc=val.substring(3,5);
-    var mfgCode=val.substring(5,8);
-    var checksumOk=eidChecksumValid(val);
     var stdMII=mii==='89';
-    var altMII=mii==='35';
-    var nonStdMII=!stdMII&&!altMII;
-    var eumName=EUM_TABLE[prefix8]||null;
-    var deviceMatch=null;
-    var patternName=null;
-    for(var i=0;i<DEVICE_PATTERNS.length;i++){
-      var p=DEVICE_PATTERNS[i];
-      if(prefix8!==p.eum)continue;
-      var match=true;
-      for(var rangeKey in p.rules){
-        var parts=rangeKey.split('_');
-        var start=parseInt(parts[0],10)-1;
-        var end=parseInt(parts[1],10);
-        if(val.substring(start,end)!==p.rules[rangeKey]){match=false;break}
-      }
-      if(match){deviceMatch=p.device;patternName=p.name;break}
+    var checksumOk=eidChecksumValid(val);
+    var chk=val.substring(30,32);
+    /* E.118 scheme fields (1-indexed digits): 1 MII='8', 2 ='9',
+       3-5 country code, 6-8 issuer id, 9-13 platform/OS, 14-18 issuer info,
+       19-30 individual identification number, 31-32 check digits. */
+    var cc=val.substring(2,5);
+    var mfgCode=val.substring(5,8);
+    var prefix8=val.substring(0,8);
+    var platform=val.substring(8,13);
+    var issuerInfo=val.substring(13,18);
+    var serial=val.substring(18,30);
+    var eumRec=stdMII?(EUM_TABLE[prefix8]||null):null;
+    var eumName=eumRec?eumRec.name:null;
+    var countryName=stdMII?(COUNTRY_CODES[cc.substring(1)]||COUNTRY_CODES[cc]||'Unknown ('+cc+')'):'N/A';
+    var seg;
+    if(stdMII){
+      seg=[
+        {label:'Country + Issuer',value:val.substring(0,8),color:'#1E3A5F'},
+        {label:'Platform / OS',value:platform,color:'#7C3AED'},
+        {label:'Issuer Info',value:issuerInfo,color:'#B45309'},
+        {label:'Individual ID',value:serial,color:'#0891B2'},
+        {label:'Check Digits',value:chk,color:checksumOk?'#059669':'#DC2626'}
+      ];
+    }else{
+      /* Field widths are not knowable for the GSMA scheme -- show only what is certain. */
+      seg=[
+        {label:'EIN + ESIN (widths not fixed)',value:val.substring(0,30),color:'#1E3A5F'},
+        {label:'Check Digits',value:chk,color:checksumOk?'#059669':'#DC2626'}
+      ];
     }
-    var countryName=stdMII?(COUNTRY_CODES[cc]||'Unknown ('+cc+')'):'N/A (non-standard MII)';
-    var seg=[
-      {label:'EUM Prefix',value:prefix8,color:'#1E3A5F'},
-      {label:'Platform/Product',value:platform,color:'#7C3AED'},
-      {label:'Serial Number',value:serial,color:'#0891B2'},
-      {label:'Check Digits',value:chk,color:checksumOk?'#059669':'#DC2626'}
-    ];
     var rh='';
-    if(nonStdMII)rh+='<div class="eid-warn">\u26A0 Non-standard MII: "'+mii+'" (expected "89" for telecom)</div>';
-    if(stdMII&&reserved!=='0')rh+='<div class="eid-warn">\u26A0 Reserved digit is "'+reserved+'" (expected "0" per SGP.29). Non-zero reserved digit may indicate a non-conformant EID.</div>';
+    if(!stdMII){
+      var ein5=val.substring(0,5),einName=EIN_TABLE[ein5]||null;
+      rh+='<div class="eid-warn" style="border-color:#D97706">\u2139\uFE0F This EID does not start with \u201C89\u201D, so it belongs to the <b>GSMA EID Scheme (SGP.29)</b>, not the ITU-T E.118 scheme. It is structured as EIN + ESIN + 2 check digits, where the <b>EIN is variable length</b> \u2014 there is no country code and no fixed platform/serial split, so those fields are not shown.'+(einName?' Leading 5 digits <code>'+esc(ein5)+'</code> match registered range holder <b>'+esc(einName)+'</b>.':'')+'</div>';
+    }
     var formatted=val.replace(/(.{4})/g,'$1 ').trim();
     rh+='<div class="eid-formatted">'+formatted+'</div>';
     rh+='<div class="ac-segments">';
@@ -2583,19 +2700,26 @@ function bindEIDDecoder(){
       rh+='<div class="ac-seg-value">'+s.value+'</div></div>';
     });
     rh+='</div>';
-    rh+='<div class="eid-subfields">';
-    rh+='EUM Prefix Breakdown: MII=<b>'+mii+'</b> | Reserved=<b>'+reserved+'</b> | Country=<b>'+cc+'</b> ('+countryName+') | Manufacturer=<b>'+mfgCode+'</b>';
-    if(eumName)rh+=' ('+eumName+')';
-    rh+='</div>';
+    if(stdMII){
+      rh+='<div class="eid-subfields">';
+      rh+='Field breakdown (SGP.02 \u00A72.2.2): MII=<b>'+esc(val.substring(0,2))+'</b> | Country=<b>'+esc(cc)+'</b> ('+esc(countryName)+') | Issuer=<b>'+esc(mfgCode)+'</b>';
+      if(eumName)rh+=' ('+esc(eumName)+')';
+      rh+=' | Platform/OS=<b>'+esc(platform)+'</b> | Issuer info=<b>'+esc(issuerInfo)+'</b>';
+      rh+='</div>';
+    }
     rh+='<div class="eid-info">';
-    rh+='<div class="eid-row"><b>EID Validation</b><span>'+(checksumOk?'\u2705 Valid':'\u274C Invalid')+'</span></div>';
-    rh+='<div class="eid-row"><b>MII</b><span>'+(stdMII?'Standard (89)':(altMII?'Alternative (35)':'Non-standard ('+mii+')'))+'</span></div>';
-    rh+='<div class="eid-row"><b>Country</b><span>'+countryName+'</span></div>';
-    rh+='<div class="eid-row"><b>EUM (Manufacturer)</b><span>'+(eumName||'Unknown EUM (prefix: '+prefix8+')')+'</span></div>';
-    rh+='<div class="eid-row"><b>Device</b><span>'+(deviceMatch?deviceMatch:'Not identified')+'</span></div>';
-    rh+='<div class="eid-row"><b>Google SM-DS Pattern</b><span>'+(patternName?patternName+' \u2014 illustrative Google SM-DS match':'No pattern matched')+'</span></div>';
+    var expect=eidCheckDigits(val.substring(0,30));
+    rh+='<div class="eid-row"><b>Check Digits (MOD 97-10)</b><span>'+(checksumOk?'\u2705 Valid':'\u274C Invalid \u2014 expected '+esc(expect||'?')+', found '+esc(chk))+'</span></div>';
+    rh+='<div class="eid-row"><b>Scheme</b><span>'+(stdMII?'ITU-T E.118 based (MII 89)':'GSMA EID Scheme / SGP.29 (non-89)')+'</span></div>';
+    if(stdMII){
+      rh+='<div class="eid-row"><b>Country</b><span>'+esc(countryName)+'</span></div>';
+      var eumTxt;
+      if(eumName)eumTxt=esc(eumName)+(eumRec.src==='itu'?' <span style="font-size:11px;color:var(--tx2)">(ITU E.118 registry)</span>':' <span style="font-size:11px;color:var(--tx2)">(community-sourced \u2014 not in ITU registry)</span>');
+      else eumTxt='Unverified \u2014 prefix '+esc(prefix8)+' is not in this tool\u2019s list';
+      rh+='<div class="eid-row"><b>EUM (Issuer)</b><span>'+eumTxt+'</span></div>';
+    }
     rh+='</div>';
-    rh+='<div class="eid-note">EID format and checksum are defined in GSMA SGP.29 (EID Definition and Assignment). EUM/device mappings here are reference examples and need source verification. Historical reference: SGP.02 Annex H.</div>';
+    rh+='<div class="eid-note">For EIDs beginning \u201C89\u201D, the structure and MOD 97-10 check digits are defined by <b>ITU-T E.118</b> as profiled in <b>GSMA SGP.02 \u00A72.2.2</b>. <b>SGP.29</b> defines a separate, newer EID scheme (EIN + ESIN) that must not begin with \u201C89\u201D and has no fixed internal field widths. EUM names are the entity in the ITU Issuer Identifier Number registry \u2014 the registry is not renamed when a business is acquired, so the present-day owner is shown in parentheses where it differs.</div>';
     result.innerHTML=rh;
   }
   btn.onclick=decode;
@@ -2606,8 +2730,8 @@ function bindEIDDecoder(){
 
 /* ── State Machine SVG ── */
 function stateMachineSVG(mode){
-  var cmd=mode==='m2m'?'ES1':mode==='iot'?'ESeim':'ES10b';
-  var loadCmd=mode==='iot'?'ESeim.DownloadProfile':cmd+'.LoadBPP';
+  var cmd=mode==='m2m'?'ES1':mode==='iot'?'ESep':'ES10b';
+  var loadCmd=mode==='iot'?'ProfileDownloadTriggerRequest':cmd+'.LoadBPP';
   var s='<svg viewBox="0 0 900 450" width="100%" style="max-width:900px;cursor:pointer" id="sm-svg-el">';
   var states=[
     {id:'nd',label:'Not Downloaded',x:50,y:180,w:160,h:55,color:'#6B7280'},
@@ -2658,9 +2782,11 @@ function bindAPDUDecoder(){
       var sw1=v.substring(0,2),sw2=v.substring(2,4);
       if(sw1==='61'){cat='Info';msg='Response bytes still available: 0x'+sw2+' ('+parseInt(sw2,16)+') bytes remaining'}
       else if(sw1==='6C'){cat='Info';msg='Wrong Le: correct length is 0x'+sw2+' ('+parseInt(sw2,16)+')'}
-      else if(sw1==='63'&&sw2[0]==='C'){cat='Warning';msg='Verification failed, '+sw2[1]+' retries remaining'}
-      else if(sw1==='91'){cat='Info';msg='Proactive command pending, 0x'+sw2+' ('+parseInt(sw2,16)+') bytes'}
-      else{cat='Unknown';msg='Status word not found in database'}
+      else if(sw1==='63'&&sw2[0]==='C'){cat='Warning';msg='Command successful after using an internal update retry routine '+parseInt(sw2[1],16)+' time(s); for VERIFY PIN, verification failed with '+parseInt(sw2[1],16)+' retries remaining'}
+      else if(sw1==='91'){cat='Info';msg='Normal ending, with a proactive command pending for the terminal — SW2 0x'+sw2+' ('+parseInt(sw2,16)+') is the response data length'}
+      else if(sw1==='92'){cat='Info';msg='Normal ending, with extra information — SW2 0x'+sw2+' ('+parseInt(sw2,16)+')'}
+      else if(sw1==='6F'){cat='Error';msg='6F XX with SW2 ≠ 00 is command dependent — no standard interpretation. Check the vendor/command documentation'}
+      else{cat='Unknown';msg='Status word not found in this tool’s table — it may be command dependent or vendor proprietary'}
     }
     var clr=cat==='Success'||cat==='Info'?'#059669':cat==='Warning'?'#D97706':'#DC2626';
     var rh='<div style="padding:12px;border-radius:8px;border:2px solid '+clr+';background:var(--bg2)"><div style="font-size:16px;font-weight:700;color:'+clr+';font-family:monospace">'+v+'</div><div style="font-size:13px;color:var(--tx1);margin-top:4px">'+msg+'</div><div style="font-size:11px;color:'+clr+';margin-top:4px;font-weight:600">Category: '+cat+'</div></div>';
@@ -2687,19 +2813,57 @@ function bindSGP22Decoder(){
   var btn=document.getElementById('sgp-decode'),s=document.getElementById('sgp-subj'),r=document.getElementById('sgp-reason'),res=document.getElementById('sgp-result');
   if(!btn||!s||!r||!res)return;
   function decode(){
-    var sv=s.value.trim(),rv=r.value.trim();
+    var sv=s.value.trim().replace(/\.$/,''),rv=r.value.trim().replace(/\.$/,'');
     if(!sv||!rv){res.innerHTML='<div class="ac-error">Enter both subject and reason codes.</div>';return}
-    var subj=SGP22_SUBJECTS[sv]||'Unknown subject',reas=SGP22_REASONS[rv]||'Unknown reason';
+    if(!/^\d+(\.\d+)*$/.test(sv)||!/^\d+(\.\d+)*$/.test(rv)){res.innerHTML='<div class="ac-error">Codes must be numeric and dot-separated (e.g. subject 8.1.1, reason 3.9).</div>';return}
+    /* Resolve a code, falling back to its parent prefix so an unlisted sub-code still
+       reports the family it belongs to instead of "Unknown". */
+    function resolve(tbl,code){
+      if(tbl[code])return{name:tbl[code],exact:true,via:code};
+      var parts=code.split('.');
+      /* Stop before the bare top-level family: reporting '8.3' as "eUICC Remote
+         Provisioning" would imply the code is defined when it is not. */
+      while(parts.length>2){
+        parts.pop();
+        var p=parts.join('.');
+        if(tbl[p])return{name:tbl[p],exact:false,via:p};
+      }
+      return{name:null,exact:false,via:null};
+    }
+    var sR=resolve(SGP22_SUBJECTS,sv),rR=resolve(SGP22_REASONS,rv);
+    var subj=sR.name?sR.name:'Not defined in SGP.22',reas=rR.name?rR.name:'Not defined in SGP.22';
     var clr=rv.charAt(0)==='1'||rv.charAt(0)==='2'?'#D97706':'#DC2626';
-    var rh='<div style="padding:12px;border-radius:8px;border:2px solid '+clr+';background:var(--bg2)"><div style="font-size:14px;color:var(--tx0)"><b style="color:var(--mag)">Subject:</b> '+subj+' ('+sv+')</div><div style="font-size:14px;color:var(--tx0);margin-top:6px"><b style="color:'+clr+'">Reason:</b> '+reas+' ('+rv+')</div></div>';
-    /* Related troubleshooting link */
+    var rh='<div style="padding:12px;border-radius:8px;border:2px solid '+clr+';background:var(--bg2)">';
+    rh+='<div style="font-size:14px;color:var(--tx0)"><b style="color:var(--mag)">Subject:</b> '+esc(subj)+' ('+esc(sv)+')';
+    if(sR.name&&!sR.exact)rh+=' <span style="font-size:12px;color:var(--tx2)">\u2014 '+esc(sv)+' is not listed individually; shown as its parent '+esc(sR.via)+'</span>';
+    rh+='</div>';
+    rh+='<div style="font-size:14px;color:var(--tx0);margin-top:6px"><b style="color:'+clr+'">Reason:</b> '+esc(reas)+' ('+esc(rv)+')';
+    if(rR.name&&!rR.exact)rh+=' <span style="font-size:12px;color:var(--tx2)">\u2014 '+esc(rv)+' is not listed individually; shown as its parent '+esc(rR.via)+'</span>';
+    rh+='</div>';
+    /* The spec's own description for this exact subject+reason pair, when it defines one. */
+    var pairKey=sv+'|'+rv,pairTxt=SGP22_PAIRS[pairKey];
+    if(pairTxt){
+      rh+='<div style="margin-top:10px;padding:8px 10px;border-radius:6px;background:rgba(0,0,0,0.04);font-size:13px;color:var(--tx0)">';
+      rh+='<b>SGP.22 description:</b> '+esc(pairTxt)+'</div>';
+    }
+    if(!sR.name||!rR.name){
+      rh+='<div style="margin-top:10px;font-size:12px;color:var(--tx2)">';
+      rh+='SGP.22 v2.6 \u00a75.2.6 lists only the codes this specification uses; the remainder are inherited from SGP.02. ';
+      rh+='Codes outside those lists may come from SGP.02 (M2M), SGP.32 (IoT), or be vendor-specific.</div>';
+    }
+    if(!pairTxt&&sR.name&&rR.name){
+      rh+='<div style="margin-top:10px;font-size:12px;color:var(--tx2)">';
+      rh+='Reason codes are generic conditions \u2014 meaning comes from the subject+reason pair. SGP.22 does not tabulate a description for this specific combination.</div>';
+    }
+    rh+='</div>';
+    /* Related troubleshooting link, keyed on real SGP.22 pairs and codes. */
     var tsLink=null;
-    if(rv==='3.2')tsLink={label:'eUICC Memory Full',tab:'troubleshoot'};
-    else if(rv==='3.3'||rv==='3.10'||rv==='3.11')tsLink={label:'Profile State Issue \u2192 Profile State Machine',tab:'tools-dbg'};
-    else if(rv==='3.4')tsLink={label:'PPR Blocking Operation',tab:'troubleshoot'};
-    else if(rv==='4.3'||rv==='4.4'||rv==='4.5'||rv==='4.6')tsLink={label:'Certificate Chain / Mutual Auth Failure',tab:'troubleshoot'};
-    else if(rv==='4.1')tsLink={label:'Activation Code Mismatch',tab:'troubleshoot'};
-    else if(rv==='4.2')tsLink={label:'Confirmation Code Mismatch',tab:'troubleshoot'};
+    if(rv==='4.8')tsLink={label:'eUICC Memory Full',tab:'troubleshoot'};
+    else if(sv.indexOf('8.2.8')===0)tsLink={label:'PPR Blocking Operation',tab:'troubleshoot'};
+    else if(rv==='3.3'||rv==='3.10'||rv==='3.11')tsLink={label:'Profile State / Association Issue \u2192 Profile State Machine',tab:'tools-dbg'};
+    else if(sv.indexOf('8.11')===0||sv==='8.1.2'||sv==='8.1.3'||sv==='8.8.4'||sv==='8.9.4'||rv==='6.1')tsLink={label:'Certificate Chain / Mutual Auth Failure',tab:'troubleshoot'};
+    else if(sv.indexOf('8.2.6')===0)tsLink={label:'Activation Code / Matching ID Mismatch',tab:'troubleshoot'};
+    else if(sv.indexOf('8.2.7')===0)tsLink={label:'Confirmation Code Mismatch',tab:'troubleshoot'};
     if(tsLink){
       rh+='<div style="margin-top:10px;padding:8px 12px;background:rgba(30,58,95,0.05);border-radius:6px;font-size:12px">';
       rh+='<b style="color:var(--mag)">Related:</b> <a href="#" onclick="curTab=\''+tsLink.tab+'\';document.querySelectorAll(\'.tbtn\').forEach(function(t){t.classList.toggle(\'on\',t.dataset.t===\''+tsLink.tab+'\');t.setAttribute(\'aria-selected\',String(t.dataset.t===\''+tsLink.tab+'\'))});document.querySelectorAll(\'.pane\').forEach(function(p){p.classList.toggle(\'on\',p.id===\'p-'+tsLink.tab+'\')});refreshPane(\''+tsLink.tab+'\');window.scrollTo(0,0);return false" style="color:var(--mag)">'+tsLink.label+'</a>';
@@ -2725,25 +2889,39 @@ function bindICCIDDecoder(){
   var btn=document.getElementById('iccid-decode'),inp=document.getElementById('iccid-input'),res=document.getElementById('iccid-result');
   if(!btn||!inp||!res)return;
   function decode(){
-    var v=inp.value.replace(/[\s\-]/g,'');
-    if(!v){res.innerHTML='<div class="ac-error">Enter an ICCID.</div>';return}
-    if(!/^\d+$/.test(v)){res.innerHTML='<div class="ac-error">ICCID must contain only digits.</div>';return}
-    if(v.length<19||v.length>20){res.innerHTML='<div class="ac-error">ICCID must be 19 or 20 digits per ITU-T E.118. You entered '+v.length+' digits.</div>';return}
+    var raw=inp.value.replace(/[\s\-]/g,'').toUpperCase();
+    if(!raw){res.innerHTML='<div class="ac-error">Enter an ICCID.</div>';return}
+    /* SGP.22 allows a 20th padding character 'F'; in some markets the ICCID may also
+       contain hexadecimal digits. Strip a single trailing F pad before numeric checks. */
+    var padded=(raw.length===20&&raw.charAt(19)==='F');
+    var v=padded?raw.substring(0,19):raw;
+    if(!/^[0-9A-F]+$/.test(v)){res.innerHTML='<div class="ac-error">ICCID must contain only digits (or hexadecimal digits in some markets).</div>';return}
+    if(raw.length<19||raw.length>20){res.innerHTML='<div class="ac-error">ICCID must be 19 or 20 digits per GSMA SGP.22 (ITU-T E.118 allows a maximum of 19). You entered '+raw.length+' character'+(raw.length!==1?'s':'')+'.</div>';return}
+    var isHex=/[A-F]/.test(v);
     var mii=v.substring(0,2),cc=v.substring(2,4),chkDigit=v.charAt(v.length-1);
     var countryName=COUNTRY_CODES[cc]||(cc==='00'?'Test/Internal':'Unknown (CC='+cc+')');
     var issuer='Unknown';
     for(var pl=6;pl>=4;pl--){var pfx=v.substring(0,pl);if(ICCID_ISSUERS[pfx]){issuer=ICCID_ISSUERS[pfx];break}}
-    var luhnOk=luhnCheck(v);
-    var fmt=v.replace(/(.{4})/g,'$1 ').trim();
+    /* Luhn is only meaningful on all-numeric values. Per SGP.22 the check digit MAY be
+       absent, so a failed Luhn is informational -- never an error. */
+    var luhnOk=isHex?null:luhnCheck(v);
+    var fmt=raw.replace(/(.{4})/g,'$1 ').trim();
     var rh='<div class="eid-formatted">'+fmt+'</div>';
     rh+='<div class="eid-info">';
     rh+='<div class="eid-row"><b>MII</b><span>'+mii+(mii==='89'?' (Telecom)':' (Non-standard)')+'</span></div>';
     rh+='<div class="eid-row"><b>Country Code</b><span>'+cc+' ('+countryName+')</span></div>';
     rh+='<div class="eid-row"><b>Issuer</b><span>'+issuer+'</span></div>';
-    rh+='<div class="eid-row"><b>Check Digit</b><span>'+chkDigit+(luhnOk?' \u2705 Valid':' \u274C Invalid')+'</span></div>';
-    rh+='<div class="eid-row"><b>Length</b><span>'+v.length+' digits</span></div>';
+    var chkTxt;
+    if(luhnOk===null)chkTxt=chkDigit+' \u2139\uFE0F Contains hexadecimal digits \u2014 Luhn not applicable';
+    else if(luhnOk)chkTxt=chkDigit+' \u2705 Luhn-consistent';
+    else chkTxt=chkDigit+' \u2139\uFE0F Not a Luhn check digit \u2014 permitted by SGP.22';
+    rh+='<div class="eid-row"><b>Check Digit</b><span>'+chkTxt+'</span></div>';
+    rh+='<div class="eid-row"><b>Length</b><span>'+raw.length+' '+(raw.length===1?'character':'characters')+(padded?' (19 digits + \u2018F\u2019 padding)':'')+'</span></div>';
     rh+='</div>';
-    rh+='<div class="eid-note">ICCID structure per ITU-T E.118. Issuer identification is prefix-based and may not cover all operators.</div>';
+    if(luhnOk===false){
+      rh+='<div class="eid-warn" style="border-color:#D97706">\u2139\uFE0F The final digit is not a valid Luhn check digit over the preceding digits. This is <b>not necessarily an error</b>: SGP.22 notes that in some markets the ICCID \u201Cmay include hexadecimal digits and may omit the check digit\u201D, and a 19-digit ICCID is inherently ambiguous \u2014 it may be an E.118 18+1 value or a 19-digit account number with no check digit.</div>';
+    }
+    rh+='<div class="eid-note">ICCID structure per ITU-T E.118 (max 19 digits); GSMA SGP.22 requires 19 or 20, where a 20th character MAY be the padding character \u2018F\u2019. A 19-digit ICCID with and without padding identifies the same Profile. Issuer identification is prefix-based and may not cover all operators.</div>';
     res.innerHTML=rh;
   }
   btn.onclick=decode;inp.onkeydown=function(e){if(e.key==='Enter')decode()};
@@ -2752,8 +2930,8 @@ function bindICCIDDecoder(){
 
 /* ── State Machine Interactivity ── */
 function getStateInfo(mode){
-  var cmd=mode==='m2m'?'ES1':mode==='iot'?'ESeim':'ES10b';
-  var loadCmd=mode==='iot'?'ESeim.DownloadProfile':cmd+'.LoadBoundProfilePackage';
+  var cmd=mode==='m2m'?'ES1':mode==='iot'?'ESep':'ES10b';
+  var loadCmd=mode==='iot'?'ProfileDownloadTriggerRequest':cmd+'.LoadBoundProfilePackage';
   var initiator=mode==='iot'?'eIM initiates operations, not the end user or SM-SR.':'';
   return {
     'nd':{title:'Not Downloaded',ops:['Download a profile ('+loadCmd+' / factory install)'],problems:['No profile available for this eUICC','EID not registered in SM-DP+ system'],ref:mode==='iot'?'IoT Direct Mode flow':mode==='m2m'?'M2M Download flow':'Consumer AC flow or IFPP Install flow',note:initiator},
@@ -3033,14 +3211,16 @@ function bindBatchValidator(){
       var v=line.replace(/[\s\-]/g,'');
       var fmt=v.replace(/(.{4})/g,'$1 ').trim();
       if(!/^\d{32}$/.test(v)){formatErr++;results.push({eid:v,fmt:fmt,valid:null,eum:'',dev:'',pn:'',error:'Format error ('+v.length+' digits)'});return}
-      var ok=eidChecksumValid(v),prefix8=v.substring(0,8),eum=EUM_TABLE[prefix8]||'Unknown';
-      var dev='Not identified',pn='';
-      for(var i=0;i<DEVICE_PATTERNS.length;i++){var p=DEVICE_PATTERNS[i];if(prefix8!==p.eum)continue;var match=true;for(var rk in p.rules){var pts=rk.split('_'),s=parseInt(pts[0],10)-1,e=parseInt(pts[1],10);if(v.substring(s,e)!==p.rules[rk]){match=false;break}}if(match){dev=p.device;pn=p.name;break}}
+      var ok=eidChecksumValid(v),prefix8=v.substring(0,8);
+      var isE118=v.substring(0,2)==='89';
+      var rec=isE118?EUM_TABLE[prefix8]:null;
+      var eum=rec?rec.name:(isE118?'Unverified':'GSMA scheme (SGP.29)');
+      var scheme=isE118?'ITU-T E.118':'GSMA SGP.29';
       if(ok)valid++;else invalid++;
-      results.push({eid:v,fmt:fmt,valid:ok,eum:eum,dev:dev,pn:pn,error:null});
+      results.push({eid:v,fmt:fmt,valid:ok,eum:eum,dev:scheme,pn:'',error:null});
     });
     var total=lines.length,showAll=total<=10,displayCount=showAll?total:10;
-    var rh='<div class="rtwrap"><table class="rtbl"><thead><tr><th>#</th><th>EID</th><th>EUM</th><th>Validation</th><th>Device Pattern</th></tr></thead><tbody>';
+    var rh='<div class="rtwrap"><table class="rtbl"><thead><tr><th>#</th><th>EID</th><th>EUM / Issuer</th><th>Check digits</th><th>Scheme</th></tr></thead><tbody>';
     for(var i=0;i<displayCount;i++){
       var r=results[i];
       if(r.error){rh+='<tr style="background:rgba(217,119,6,.08)"><td>'+(i+1)+'</td><td style="font-family:monospace;font-size:11px">'+r.fmt+'</td><td>\u2014</td><td>\u26A0 '+r.error+'</td><td>\u2014</td></tr>';continue}
@@ -3206,7 +3386,7 @@ function bindEuiccInfoDecoder(){
           if(typeof CI_PKIDS!=='undefined'){
             CI_PKIDS.forEach(function(ci){if(ci.pkid.toUpperCase()===pk.toUpperCase())ciMatch=ci});
           }
-          var badge=ciMatch?'<span style="display:inline-block;background:'+(ciMatch.status==='Active'?'#059669':'#D97706')+';color:#fff;font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;margin-left:8px">'+ciMatch.gen+'</span>':'';
+          var badge=ciMatch?'<span style="display:inline-block;background:'+(ciMatch.status==='Test'?'#D97706':(ciMatch.status.indexOf('Production')===0?'#059669':'#6B7280'))+';color:#fff;font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;margin-left:8px">'+ciMatch.gen+'</span>':'';
           ph+='<div style="font-size:12px;padding:4px 10px;background:var(--bg2);border:1px solid var(--bdr);border-radius:4px;margin-bottom:4px;font-family:monospace"><code title="'+pk+'">'+trunc+'</code>'+badge+'</div>';
         });
         ph+='</div>';
@@ -3347,7 +3527,7 @@ function buildSearchIndex(){
     {name:'Activation Code Parser',tab:'tools-id'},{name:'QR Code Generator',tab:'tools-id'},{name:'Activation Code QR',tab:'tools-id'},
     {name:'EID Analyzer',tab:'tools-id'},{name:'EID Decoder',tab:'tools-id'},{name:'EID Batch Validator',tab:'tools-id'},
     {name:'ICCID Decoder',tab:'tools-id'},{name:'IMSI Decoder',tab:'tools-id'},
-    {name:'Device Pattern Database',tab:'tools-id'},{name:'EUM Manufacturer Database',tab:'tools-id'},
+    {name:'SM-DS Addresses',tab:'tools-id'},{name:'EUM Issuer Database',tab:'tools-id'},
     {name:'APDU Status Word Decoder',tab:'tools-dbg'},{name:'SGP.22 Error Code Decoder',tab:'tools-dbg'},
     {name:'Profile State Machine',tab:'tools-dbg'},{name:'ASN.1 TLV Parser',tab:'tools-dbg'},
     {name:'Hex Base64 Converter',tab:'tools-dbg'},{name:'Certificate Viewer',tab:'tools-dbg'},
