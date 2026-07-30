@@ -129,9 +129,15 @@ w.addEventListener('load',()=>{
   ck('individual id 760130009214',/760130009214/.test(t),t.slice(0,300));
   // The old wrong 3-digit platform split produced "342" + a 19-digit serial.
   ck('no 19-digit serial 0110800760130009214',!/0110800760130009214/.test(t),t.slice(0,300));
-  // Vendor attribution: registry says Oberthur; IDEMIA is the present owner.
-  ck('EUM shows Oberthur',/Oberthur/.test(t),t.slice(0,400));
-  ck('EUM notes IDEMIA as current',/IDEMIA/.test(t),t.slice(0,400));
+  // Vendor attribution must LEAD with the live company. Oberthur Technologies was renamed
+  // IDEMIA in 2017, so a dissolved/superseded name must never be the primary answer.
+  {
+    const row=(t.match(/EUM \(Issuer\)([\s\S]{0,200})/)||['',''])[1];
+    ck('EUM row leads with IDEMIA',/^\s*IDEMIA/.test(row),row.slice(0,120));
+    ck('EUM row does not lead with Oberthur',!/^\s*Oberthur/i.test(row),row.slice(0,120));
+    // The superseded registrant string is still available for cross-reference, but marked.
+    ck('registry name shown as superseded',/superseded/i.test(row),row.slice(0,200));
+  }
   // Fabricated Google SM-DS pattern row must be gone.
   ck('no Google SM-DS Pattern row',!/Google SM-DS Pattern/.test(t),t.slice(0,400));
   ck('no "No pattern matched"',!/No pattern matched/.test(t),t.slice(0,400));
@@ -197,6 +203,19 @@ w.addEventListener('load',()=>{
   // An MCC with a 3-digit MNC must not be mis-split even when unknown to the operator table.
   t=imsi('311999123456789');
   ck('unknown 311 MNC still 3-digit',/999 \(3-digit\)/.test(t),t.slice(0,220));
+  // Mexico (334), Argentina (722) and Colombia (732) use 3-digit MNCs. A decoder assuming
+  // 2 mis-splits every IMSI from those countries.
+  t=imsi('334020123456789');
+  ck('Mexico 334 is 3-digit MNC',/020 \(3-digit\)/.test(t),t.slice(0,200));
+  ck('334020 is Telcel',/Telcel/.test(t),t.slice(0,200));
+  t=imsi('722310123456789');
+  ck('Argentina 722 is 3-digit MNC',/310 \(3-digit\)/.test(t),t.slice(0,200));
+  ck('722310 is Claro Argentina',/Claro \(Argentina\)/.test(t),t.slice(0,200));
+  t=imsi('732101123456789');
+  ck('Colombia 732 is 3-digit MNC',/101 \(3-digit\)/.test(t),t.slice(0,200));
+  // MCC 740 is Ecuador, not Argentina; 74007 was never an assigned code.
+  t=imsi('740011234567890');
+  ck('740 is Ecuador not Argentina',/Ecuador/.test(t)&&!/Argentina/.test(t),t.slice(0,200));
 
   /* ---------- 4. APDU status words ---------- */
   function apdu(v){
@@ -232,8 +251,17 @@ w.addEventListener('load',()=>{
   ['8.3','8.4','8.5','8.6','8.7'].forEach(c=>ck('SGP.02-only subject '+c+' absent',!Object.prototype.hasOwnProperty.call(S,c),String(S[c])));
   // EUM table shape
   // Table is keyed by the 6-digit ITU IIN; EIDs zero-pad to an 8-digit prefix.
-  ck('EUM IIN 893324 is Oberthur',/Oberthur/.test(w.EUM_TABLE['893324'].name));
-  ck('EUM IIN 893323 is Gemalto',/Gemalto/.test(w.EUM_TABLE['893323'].name));
+  // name = current vendor; regName = the stale ITU registrant string, kept separate.
+  ck('IIN 893324 name is IDEMIA',w.EUM_TABLE['893324'].name==='IDEMIA',w.EUM_TABLE['893324'].name);
+  ck('IIN 893323 name is Thales',w.EUM_TABLE['893323'].name==='Thales',w.EUM_TABLE['893323'].name);
+  ck('893324 regName keeps OBERTHUR for cross-ref',/OBERTHUR/i.test(w.EUM_TABLE['893324'].regName||''));
+  ck('893323 regName keeps GEMALTO for cross-ref',/GEMALTO/i.test(w.EUM_TABLE['893323'].regName||''));
+  // No `name` field may carry a superseded company as the primary label.
+  {
+    const dead=/oberthur|gemalto|morpho|safran identity/i;
+    const bad=Object.keys(w.EUM_TABLE).filter(k=>dead.test(w.EUM_TABLE[k].name));
+    ck('no defunct company in any name field',bad.length===0,bad.map(k=>k+'='+w.EUM_TABLE[k].name).join(', '));
+  }
   ck('eumIinFromEid maps 89033024 -> 893324',w.eumIinFromEid('89033024'+'0'.repeat(24))==='893324',String(w.eumIinFromEid('89033024'+'0'.repeat(24))));
   ck('eumIinFromEid rejects non-89',w.eumIinFromEid('35907'+'0'.repeat(27))===null);
   // Corrected codes found in the ITU registry during the second pass.
@@ -270,7 +298,7 @@ w.addEventListener('load',()=>{
   ck('no ES2+.UpdatePolicyRules as a real function',!/must update the profile.s PPR via ES2\+\.UpdatePolicyRules/i.test(body));
   ck('ES6.UpdateMetadata cited',/ES6\.UpdateMetadata/.test(body));
   ck('ESep replaces ESeim',/ESep/.test(body)&&!/ESeim/.test(body));
-  ck('version V8.0',/V8\.0/.test(body));
+  ck('version V8.1',/V8\.1/.test(body));
 
   // Every PPR bit mention anywhere in the page must use the correct assignment.
   const bitClaims=body.match(/bit\s*(\d)\s*=\s*([A-Za-z][A-Za-z0-9-]*)/g)||[];
@@ -295,6 +323,41 @@ w.addEventListener('load',()=>{
   // esc() must actually escape, so injected markup stays inert text.
   ck('esc escapes angle brackets',w.esc('<b>x</b>')==='&lt;b&gt;x&lt;/b&gt;',String(w.esc('<b>x</b>')));
   ck('esc escapes quotes',/&quot;/.test(w.esc('"q"')),String(w.esc('"q"')));
+
+  /* ---------- 6. Cross-table invariants ---------- */
+  {
+    const mm=Object.keys(w.MCC_MNC), len=w.MCC_MNC_LEN;
+    const by={};
+    mm.forEach(k=>{const m=k.slice(0,3);(by[m]=by[m]||new Set()).add(k.length-3)});
+    const mixed=Object.keys(by).filter(m=>by[m].size>1);
+    ck('no MCC mixes 2- and 3-digit MNC widths',mixed.length===0,mixed.join(','));
+    const undeclared=Object.keys(by).filter(m=>by[m].has(3)&&len[m]!==3);
+    ck('every 3-digit-MNC MCC is declared',undeclared.length===0,undeclared.join(','));
+    const over=Object.keys(len).filter(m=>len[m]===3&&by[m]&&!by[m].has(3));
+    ck('no MCC declared 3-digit with 2-digit data',over.length===0,over.join(','));
+  }
+  {
+    // Ecuador (MCC 740) has only MNCs 00-03 assigned. 74007 was in an earlier release,
+    // mislabelled "Claro Argentina" -- a code that does not exist anywhere.
+    const ec=Object.keys(w.MCC_MNC).filter(k=>k.startsWith('740'));
+    const bogus=ec.filter(k=>!['74000','74001','74002','74003'].includes(k));
+    ck('no unassigned Ecuador MNC',bogus.length===0,bogus.join(','));
+    ck('no Argentina label on an Ecuador code',!ec.some(k=>/Argentina/.test(w.MCC_MNC[k])),ec.map(k=>k+'='+w.MCC_MNC[k]).join(', '));
+  }
+  {
+    // ICCID = 89 + E.118 country + issuer. A prefix whose country digits are unknown is
+    // usually an MCC pasted in by mistake (e.g. 890262 from Germany's MCC 262).
+    const bad=Object.keys(w.ICCID_ISSUERS).filter(k=>!w.COUNTRY_CODES[k.slice(2,4)]);
+    ck('every ICCID prefix has a known E.118 country',bad.length===0,bad.join(','));
+  }
+  {
+    // Every SGP22_PAIRS key must reference codes that actually exist in both tables.
+    const bad=Object.keys(w.SGP22_PAIRS).filter(k=>{
+      const [a,b]=k.split('|');
+      return !w.SGP22_SUBJECTS[a]||!w.SGP22_REASONS[b];
+    });
+    ck('every spec pair references defined codes',bad.length===0,bad.join(','));
+  }
 
   ck('no runtime errors',errs.length===0,errs.join('; '));
 

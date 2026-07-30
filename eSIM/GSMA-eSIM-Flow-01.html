@@ -270,7 +270,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V8.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V8.1</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated July 2026 &middot; <span class="byline-name">Brought to you by Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -354,8 +354,8 @@ var CI_PKIDS=[
   {pkid:'D7A7D0C7C04EA76076E3F44FAEBDE8779E2948D4',gen:'GSM Association M2M31 Root CI2 (Cybertrust)',usage:'Production trust anchor for SGP.01/SGP.02 \u2014 M2M architecture, not Consumer RSP.',status:'Production (M2M)'},
   {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
   {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
-  {pkid:'34EECF13156518D48D30BDF06853404D115F955D',gen:'SGP.26 test CI (v3.0.1)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
-  {pkid:'2209F61CD9EC5C9C854E787341FF83ECF9776A5B',gen:'SGP.26 test CI (v3.0.1)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'}
+  {pkid:'34EECF13156518D48D30BDF06853404D115F955D',gen:'SGP.26 test CI (v3.0.x)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
+  {pkid:'2209F61CD9EC5C9C854E787341FF83ECF9776A5B',gen:'SGP.26 test CI (v3.0.x)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'}
 ];
 
 // ── 14. Error Flow Decision Tree ──
@@ -447,7 +447,7 @@ entities:['Operator','SM-DP+','SM-DS','LPA (Device)','eUICC'],
 flows:{'consumer-prep':'Profile Preparation (ES2+)','consumer-ac':'Download \u2014 Activation Code','consumer-ds':'Download \u2014 Discovery Server','consumer-default-smdp':'Download \u2014 Default SM-DP+','consumer-enable':'Enable','consumer-disable':'Disable','consumer-delete':'Profile Delete','consumer-mep':'MEP \u2014 Multi-Port Enable (v3.x)'}},
 
 iot:{badge:'SGP.31 '+SPEC_VERSIONS['SGP.31']+' / SGP.32 '+SPEC_VERSIONS['SGP.32'],title:'IoT eSIM Architecture',
-whatsNew:'GSMA public listings now show SGP.31 v1.3 and SGP.32 v1.3 active, published 22 May 2026. Use those listings for implementation planning and verify detailed technical behavior against the current GSMA documents.',
+whatsNew:'GSMA public listings now show SGP.31 v1.3 and SGP.32 v1.3 active, published 22 May 2026. Note that the newest published version and the version certification is issued against can differ \u2014 confirm the applicable certification baseline with GSMA before committing a product plan. Verify detailed technical behavior against the current GSMA documents.',
 overview:['SGP.31 and SGP.32 define the IoT RSP architecture for eSIM profile management across a broad range of IoT device categories, from capable connected vehicles to constrained sensors. This architecture is designed to address many operational challenges seen in M2M deployments, including bearer constraints, SM-SR complexity, and multi-hop latency, while supporting a wider IoT deployment spectrum.','The architecture introduces the <b>eIM (eSIM IoT Remote Manager)</b> \u2014 a management platform that acts on behalf of the device owner or IoT service provider. The eIM orchestrates profile lifecycle operations (download, enable, disable, delete) without requiring an LPA on the device. The device runs an <b>IPA (IoT Profile Assistant)</b> that handles local eUICC interaction. Two IPA variants exist: <b>IPAd</b> (IPA in Device) runs as software on the IoT device itself, and <b>IPAe</b> (IPA embedded in eUICC) is a software component within the eUICC that performs IPA functions internally for constrained devices.','<b>Direct Mode:</b> The eIM delivers pre-encrypted profiles directly to the IPA on the device via the ESep interface. The SM-DP+ generates and encrypts the BPP bound to the target eUICC, then delivers it to the eIM. The eIM stores and delivers it to the IPA when the device is reachable. This mode is suitable for capable devices where the eIM has direct connectivity.','<b>Indirect Mode:</b> Originally introduced to handle constrained devices, but now broadly favored for practical reasons. The IPA connects to the SM-DP+ (similar to the Consumer model) with the eIM orchestrating the operation. The eIM triggers the IPA to download from the SM-DP+, and the IPA performs the authentication and BPP retrieval directly with the SM-DP+. IPAe (embedded IPA in the eUICC) implementations typically use Indirect Mode, allowing the eUICC itself to handle the download without requiring device-side software complexity.','The architecture supports both IP and non-IP transport, and operations can be performed over protocols like CoAP, MQTT, or SMS. This flexibility allows SGP.32 to serve devices across the connectivity spectrum \u2014 from NB-IoT modules to LTE-M gateways to Wi-Fi connected industrial equipment.','<b>Prerequisite \u2014 eIM Configuration:</b> Before any eIM-based flow works, the eUICC must be configured to trust the eIM. This is done via <code>ESep.AddEim / ESep.UpdateEim</code>, typically during eUICC manufacturing or via an initial bootstrap process. The eUICC stores a list of authorized eIM identifiers and will reject commands from unrecognized eIMs. This trust bootstrap is a critical deployment step \u2014 without it, neither Direct nor Indirect mode operations will succeed.','<b>Deployment Examples (illustrative):</b> Candidate use cases include connected vehicles, smart meters and utilities, industrial equipment, asset trackers, smart agriculture, consumer IoT devices, and constrained sensors. The choice between Direct and Indirect mode depends on deployment requirements, device capabilities, certification status, and connectivity patterns rather than device \u201cconstrainedness\u201d alone.'],
 entities:['Operator','SM-DP+','SM-DS','eIM','IPAd','IPAe','eUICC (IoT)'],
 flows:{'iot-eim-config':'eIM Configuration Prerequisite','iot-direct-download':'Direct Mode \u2014 Download','iot-indirect-download':'Indirect Mode \u2014 Download','iot-enable':'Enable','iot-disable':'Disable','iot-delete':'Profile Delete'}},
@@ -1815,14 +1815,16 @@ function toolsIdHTML(){
   h+='</tbody></table></div></div></details></div>';
 
   h+='<div class="asec"><h2>EUM Issuer Database</h2>';
-  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Names are the entity registered in the <b>ITU-T E.118 Issuer Identifier Number</b> registry for EIDs beginning “89”. The registry is not retroactively renamed when a business is acquired, so the present-day owner is given in parentheses where it differs. Rows marked <i>community-sourced</i> come from the euicc-manual EUM list and observed EUM certificates rather than the ITU registry.</p>';
+  h+='<p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Names shown are the <b>current vendor</b> — who to contact, and whose profile OS and tooling an eUICC with this prefix carries. The <b>ITU-T E.118 Issuer Identifier Number</b> registry is frozen at position 31 December 2023 and is not updated when a registrant is renamed or acquired, so it still lists companies that no longer trade under that name (Oberthur Technologies was renamed IDEMIA in 2017; Gemalto was acquired by Thales in 2019). Where the registry string differs it is shown underneath, for cross-checking against the ITU PDF or an EUM certificate CN only. Rows marked <i>community-sourced</i> come from the euicc-manual EUM list and observed EUM certificates rather than the ITU registry.</p>';
   h+='<details class="ts-card"><summary>ITU-T E.118 scheme — “89” issuer identifiers ('+Object.keys(EUM_TABLE).length+')</summary><div class="ts-body">';
   h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:8px">Keyed by the 6-digit ITU IIN. An EID zero-pads the country and issuer fields to 3 digits each, so IIN <code>893324</code> appears in an EID as <code>89033024</code>.</p>';
   h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>IIN</th><th>As EID prefix</th><th>Registered issuer</th><th>Source</th></tr></thead><tbody>';
   Object.keys(EUM_TABLE).sort().forEach(function(prefix){
     var r=EUM_TABLE[prefix];
     var asEid='89'+'0'+prefix.substring(2,4)+'0'+prefix.substring(4,6);
-    h+='<tr><td><code>'+esc(prefix)+'</code></td><td><code>'+esc(asEid)+'</code></td><td><b>'+esc(r.name)+'</b></td><td>'+(r.src==='itu'?'ITU registry':'<span style="color:#D97706">community-sourced (unconfirmed)</span>')+'</td></tr>';
+    var nm='<b>'+esc(r.name)+'</b>';
+    if(r.regName)nm+='<div style="font-size:11px;color:var(--tx2)">ITU registry still lists: '+esc(r.regName)+'</div>';
+    h+='<tr><td><code>'+esc(prefix)+'</code></td><td><code>'+esc(asEid)+'</code></td><td>'+nm+'</td><td>'+(r.src==='itu'?'ITU registry':'<span style="color:#D97706">community-sourced (unconfirmed)</span>')+'</td></tr>';
   });
   h+='</tbody></table></div></div></details>';
   h+='<details class="ts-card"><summary>GSMA EID Scheme (SGP.29) — range holders ('+Object.keys(EIN_TABLE).length+')</summary><div class="ts-body">';
@@ -2315,11 +2317,17 @@ function bindGlossarySearch(){
 //   src 'itu'       = present in the official ITU-T E.118 IIN registry (2023 edition).
 //   src 'community' = from the euicc-manual EUM list / observed EUM certificates only;
 //                     NOT found in the ITU registry, so the attribution is unconfirmed.
-// Names are the REGISTERED entity, with the present-day owner in parentheses where the
-// business has moved. The registry is not renamed when a company is acquired.
+// `name`    = the CURRENT vendor an engineer should act on (who to contact, whose profile
+//              OS and tooling this is). Always lead with the live company.
+// `regName`  = the literal registrant string in the ITU list, shown only when it differs.
+//              The ITU list is frozen at position 31 December 2023 and is NOT updated when
+//              a registrant is renamed or acquired, so it still carries names that no
+//              living company uses. It is kept solely so that an engineer cross-checking
+//              this tool against the ITU PDF, or against an EUM certificate CN, does not
+//              conclude the tool is broken. Never present a superseded name as the answer.
 var EUM_TABLE={
-  '893323':{name:'Gemalto SA (now Thales)',src:'itu'},
-  '893324':{name:'Oberthur Technologies (now IDEMIA)',src:'itu'},
+  '893323':{name:'Thales',regName:'GEMALTO SA',src:'itu'},
+  '893324':{name:'IDEMIA',regName:'OBERTHUR TECHNOLOGIES',src:'itu'},
   '893390':{name:'Thales SA',src:'itu'},
   '893411':{name:'Valid',src:'itu'},
   '894130':{name:'STMicroelectronics International NV',src:'itu'},
@@ -2518,10 +2526,10 @@ var ICCID_ISSUERS={
   '890155':'Google Fi',
   '894410':'O2 UK','894415':'Vodafone UK',
   '894420':'3 UK','894430':'EE UK','894433':'EE UK',
-  '890149':'Deutsche Telekom',
-  '890262':'Deutsche Telekom (Germany)',
-  '890276':'Vodafone Germany',
-  '890133':'Orange France'
+  '894901':'Telekom Deutschland','894902':'Telekom Deutschland',
+  
+  '894920':'Vodafone Germany',
+  '893301':'Orange (registered as France Telecom)'
 };
 
 // ── 6. TLV Tag Names ──
@@ -2571,9 +2579,10 @@ var REMOTE_INS={
 var MCC_MNC_LEN={
   '302':3,'310':3,'311':3,'312':3,'313':3,'314':3,'315':3,'316':3,
   '330':3,'334':3,'338':3,'342':3,'344':3,'346':3,'348':3,'350':3,
+  '722':3,'732':3,
   '352':3,'354':3,'356':3,'358':3,'360':3,'362':3,'363':3,'364':3,
   '365':3,'366':3,'368':3,'370':3,'372':3,'374':3,'376':3,'708':3,
-  '710':3,'712':3,'714':3,'716':3,'722':3,'732':3,'738':3,'740':3,
+  '710':3,'712':3,'714':3,'738':3,
   '744':3,'746':3,'748':3
 };
 var MCC_MNC={
@@ -2602,8 +2611,8 @@ var MCC_MNC={
   '22801':'Swisscom','22802':'Sunrise (Switzerland)','22803':'Salt (Switzerland)',
   '23201':'A1 Austria','23203':'Magenta Austria','23205':'3 Austria',
   '72402':'TIM Brazil','72406':'Vivo Brazil','72410':'Claro Brazil',
-  '74001':'Movistar Argentina','74007':'Claro Argentina',
-  '33402':'Telcel Mexico','33403':'Movistar Mexico',
+  '74001':'Claro (Ecuador)','74000':'Movistar (Ecuador)','74002':'CNT (Ecuador)',
+  '334020':'Telcel Mexico','334030':'Movistar Mexico','334050':'AT&T Mexico','334090':'AT&T Mexico',
   '44010':'NTT Docomo (Japan)','44020':'SoftBank (Japan)','44050':'KDDI (Japan)',
   '45005':'SK Telecom (Korea)','45008':'KT (Korea)','45006':'LG U+ (Korea)',
   '46000':'China Mobile','46001':'China Unicom','46003':'China Telecom',
@@ -2622,9 +2631,10 @@ var MCC_MNC={
   '42402':'Etisalat (UAE)','42403':'du (UAE)','41701':'Ooredoo (Kuwait)',
   '42702':'Ooredoo (Qatar)','42701':'Vodafone Qatar',
   '43211':'TCI (Iran)','43235':'MTN Irancell',
-  '71610':'Claro (Peru)','71606':'Movistar (Peru)',
+  '71610':'Claro (Peru)','71606':'Movistar (Peru)','71617':'Entel (Peru)',
+  '722310':'Claro (Argentina)','722070':'Movistar (Argentina)','722340':'Personal (Argentina)',
   '73001':'Entel (Chile)','73002':'Movistar (Chile)','73003':'Claro (Chile)',
-  '73209':'Movistar (Colombia)','73201':'Comcel/Claro (Colombia)',
+  '732101':'Claro/Comcel (Colombia)','732123':'Movistar (Colombia)','732001':'Movistar (Colombia)','732103':'Tigo (Colombia)',
   '73404':'Digitel (Venezuela)','73401':'Movilnet (Venezuela)',
   '23801':'TDC (Denmark)','23802':'Telenor (Denmark)',
   '24201':'Telenor (Norway)','24202':'Telia (Norway)',
@@ -2735,12 +2745,18 @@ function bindEIDDecoder(){
     if(stdMII){
       rh+='<div class="eid-row"><b>Country</b><span>'+esc(countryName)+'</span></div>';
       var eumTxt;
-      if(eumName)eumTxt=esc(eumName)+' <span style="font-size:11px;color:var(--tx2)">(IIN '+esc(eumIin)+' \u2014 '+(eumRec.src==='itu'?'ITU E.118 registry':'community-sourced, UNCONFIRMED against the ITU registry')+')</span>';
+      if(eumName){
+        eumTxt=esc(eumName);
+        eumTxt+=' <span style="font-size:11px;color:var(--tx2)">(IIN '+esc(eumIin)+' \u2014 '+(eumRec.src==='itu'?'ITU E.118 registry':'community-sourced, UNCONFIRMED against the ITU registry')+')</span>';
+        /* Superseded registrant string, for cross-checking against the ITU PDF or an EUM
+           certificate CN. Never shown as the primary answer. */
+        if(eumRec.regName)eumTxt+='<div style="font-size:11px;color:var(--tx2);margin-top:2px">Listed in the ITU registry as \u201c'+esc(eumRec.regName)+'\u201d \u2014 superseded name, retained for cross-reference.</div>';
+      }
       else eumTxt='Unverified \u2014 IIN '+esc(eumIin||'?')+' is not in this tool\u2019s list';
       rh+='<div class="eid-row"><b>EUM (Issuer)</b><span>'+eumTxt+'</span></div>';
     }
     rh+='</div>';
-    rh+='<div class="eid-note">For EIDs beginning \u201C89\u201D, the structure and MOD 97-10 check digits are defined by <b>ITU-T E.118</b> as profiled in <b>GSMA SGP.02 \u00A72.2.2</b>. <b>SGP.29</b> defines a separate, newer EID scheme (EIN + ESIN) that must not begin with \u201C89\u201D and has no fixed internal field widths. EUM names are the entity in the ITU Issuer Identifier Number registry \u2014 the registry is not renamed when a business is acquired, so the present-day owner is shown in parentheses where it differs.</div>';
+    rh+='<div class="eid-note">For EIDs beginning \u201C89\u201D, the structure and MOD 97-10 check digits are defined by <b>ITU-T E.118</b> as profiled in <b>GSMA SGP.02 \u00A72.2.2</b>. <b>SGP.29</b> defines a separate, newer EID scheme (EIN + ESIN) that must not begin with \u201C89\u201D and has no fixed internal field widths. EUM names shown are the current vendor. The ITU Issuer Identifier Number registry is frozen at position 31 December 2023 and is not updated when a registrant is renamed or acquired, so where its string differs it is noted separately for cross-reference only.</div>';
     result.innerHTML=rh;
   }
   btn.onclick=decode;
