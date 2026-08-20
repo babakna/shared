@@ -298,7 +298,7 @@ w.addEventListener('load',()=>{
   ck('no ES2+.UpdatePolicyRules as a real function',!/must update the profile.s PPR via ES2\+\.UpdatePolicyRules/i.test(body));
   ck('ES6.UpdateMetadata cited',/ES6\.UpdateMetadata/.test(body));
   ck('ESep replaces ESeim',/ESep/.test(body)&&!/ESeim/.test(body));
-  ck('version V8.1',/V8\.1/.test(body));
+  ck('version V9.0',/V9\.0/.test(body));
 
   // Every PPR bit mention anywhere in the page must use the correct assignment.
   const bitClaims=body.match(/bit\s*(\d)\s*=\s*([A-Za-z][A-Za-z0-9-]*)/g)||[];

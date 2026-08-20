@@ -120,11 +120,11 @@ function checkPage(rel,extra){
      JSON chart blocks, JS string literals and per-module render functions -- i.e. the
      places page text alone cannot reach. */
   const src=fs.readFileSync(path.join(ROOT,rel),'utf8');
-  ck(rel+': source has no V7.0',!/\bV7\.0\b/.test(src));
-  ck(rel+': source has no VERSION 7.0',!/VERSION\s*=\s*['"]7\.0['"]/.test(src));
-  ck(rel+': source has no stale July-2026 release stamp',
-     !/(V7\.0 \(July 2026\)|Updated July 2026|as of July 2026|\(July 2026\))/i.test(src));
-  ck(rel+': source says August 2026 or is a fragment',/August 2026/.test(src)||src.length<4000);
+  ck(rel+': source has no V8.x release',!/\bV8\.[01]\b/.test(src));
+  ck(rel+': source has no VERSION 8.x',!/VERSION\s*=\s*['"]8\.[01]['"]/.test(src));
+  ck(rel+': source has no stale August-2026 release stamp',
+     !/(V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026|\((?:July|August) 2026\))/i.test(src));
+  ck(rel+': source says September 2026 or is a fragment',/September 2026/.test(src)||src.length<4000);
   // 3GPP document-type correctness, checked in source.
   ck(rel+': 38.843 is a TR not TS',!/TS ?38\.843/.test(src));
   ck(rel+': 23.288 is a TS not TR',!/TR ?23\.288/.test(src));
@@ -171,9 +171,9 @@ function checkPage(rel,extra){
       && !/(not|never|do not|don't|until|once|before|when|if|pending|awaiting|still|future|forthcoming|upcoming|remains)/i.test(x));
     ck(rel+': FN-DSA never called final in source',affirms.length===0,affirms[0]?affirms[0].slice(0,120):'');
   }
-  // Version and date must be the August 2026 release everywhere.
-  ck(rel+': no stale V7.0',!/\bV7\.0\b/.test(body()));
-  ck(rel+': no stale (July 2026)',!/\(July 2026\)/.test(body()));
+  // Version and date must be the September 2026 release everywhere.
+  ck(rel+': no stale V8.x',!/\bV8\.[01]\b/.test(body()));
+  ck(rel+': no stale old release date',!/(?:V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026|\((?:July|August) 2026\))/.test(body()));
   // Rendered text must not leak template/undefined artifacts.
   const t=body();
   ck(rel+': no undefined leak',!/\bundefined\b/.test(t));
@@ -238,8 +238,8 @@ pqcFiles.forEach(f=>checkPage('PQC/'+f,(w,d,t,rel)=>{
   const rawBadSlh=[...new Set((rawFile.match(/SLH-DSA-(?!SHA2|SHAKE)[A-Za-z0-9]+/g)||[]))];
   ck(rel+': SLH-DSA names in source include SHA2/SHAKE',rawBadSlh.length===0,rawBadSlh.join(','));
   // Version strings must be current in the SOURCE, not just the landing view.
-  ck(rel+': source has no V7.0',!/\bV7\.0\b/.test(rawFile));
-  ck(rel+': source has no July 2026',!/July 2026/.test(rawFile));
+  ck(rel+': source has no V8.x',!/\bV8\.[01]\b/.test(rawFile));
+  ck(rel+': source has no stale old release date',!/(?:V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026|\((?:July|August) 2026\))/.test(rawFile));
 
   // Named-algorithm sizes must be exactly right wherever stated.
   const EXPECT=[
@@ -322,8 +322,8 @@ aiFiles.forEach(f=>checkPage('AI/'+f,(w,d,t,rel)=>{
 /* ---------- Shared asset carries the runtime version ---------- */
 {
   const js=fs.readFileSync(path.join(ROOT,'PQC/assets/pqc.js'),'utf8');
-  ck('pqc.js VERSION is V8.0 (August 2026)',/V8\.0 \(August 2026\)/.test(js));
-  ck('pqc.js has no V7.0',!/\bV7\.0\b/.test(js));
+  ck('pqc.js VERSION is V9.0 (September 2026)',/V9\.0 \(September 2026\)/.test(js));
+  ck('pqc.js has no V8.x',!/\bV8\.[01]\b/.test(js));
 }
 
 console.log('PASS '+pass+'   FAIL '+fail);
