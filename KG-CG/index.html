@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Knowledge graphs and context graphs explained from first principles, plus an interactive fault-isolation demo. Self-paced, standalone, no tracking.">
+<title>Knowledge &amp; Context Graphs &mdash; Learn &middot; Reason &middot; Apply</title>
+<link rel="icon" href="data:,">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#FAFBFE;--card:#FFFFFF;--text:#0C1222;--text-sec:#4A5568;
+--text-muted:#8896AB;--border:#E4E9F2;
+--font:'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+
+.page-wrap{position:relative;min-height:100vh;overflow-x:hidden}
+.bg-glow{position:absolute;border-radius:50%;pointer-events:none;z-index:0}
+.bg-glow-1{width:500px;height:500px;top:-100px;right:-80px;background:radial-gradient(circle,rgba(37,99,235,0.12) 0%,transparent 70%)}
+.bg-glow-2{width:450px;height:450px;bottom:300px;left:-100px;background:radial-gradient(circle,rgba(13,148,136,0.10) 0%,transparent 70%)}
+.bg-glow-3{width:400px;height:400px;top:600px;right:-60px;background:radial-gradient(circle,rgba(124,58,237,0.09) 0%,transparent 70%)}
+
+.content{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:48px 24px 32px}
+
+header{text-align:center;margin-bottom:40px}
+.hero-logo{width:200px;height:auto;display:block;margin:0 auto 28px}
+.hero-title{font-size:clamp(26px,4vw,38px);font-weight:800;color:#1D3E6E;letter-spacing:-.03em;margin-bottom:4px;line-height:1.2}
+.hero-title span{color:#0D9488}
+.hero-byline{font-size:1rem;color:#4A5568;margin:12px auto 6px;text-align:center}
+.hero-byline-name{color:#2563EB;font-weight:700}
+.hero-version{font-size:.78rem;color:var(--text-muted);font-weight:700;letter-spacing:.04em;margin:0 auto 28px;text-align:center;text-transform:uppercase}
+.hero-desc{font-size:1.05rem;color:var(--text-sec);max-width:620px;margin:0 auto 12px;line-height:1.7}
+.hero-sub{font-size:.9rem;color:var(--text-muted);max-width:580px;margin:0 auto 24px;line-height:1.65}
+.stats-bar{display:inline-block;background:#EEF2F9;border-radius:20px;padding:8px 22px;font-size:.82rem;color:var(--text-sec);font-weight:500;letter-spacing:.01em}
+
+nav.progression{display:flex;align-items:center;justify-content:center;gap:0;margin:0 auto 36px;flex-wrap:wrap;padding:0 8px}
+.prog-pill{font-size:.78rem;font-weight:600;padding:5px 14px;border-radius:14px;background:#EEF2F9;color:var(--text-sec);white-space:nowrap}
+.prog-line{width:28px;height:2px;background:var(--border);flex-shrink:0}
+.prog-mobile{display:none;font-size:.82rem;color:var(--text-muted);font-weight:500;text-align:center;margin:0 auto 28px}
+
+.cards{display:flex;flex-direction:column;gap:14px;margin-bottom:48px}
+.card-link{text-decoration:none;color:inherit;display:block;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s ease,box-shadow .2s ease}
+.card-link:hover{transform:translateY(-2px)}
+.card{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;gap:18px;transition:box-shadow .2s ease}
+.card-illust{width:100px;min-width:100px;height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-illust svg{width:60px;height:60px}
+.card-body{flex:1;min-width:0}
+.card-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.badge{font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:6px;letter-spacing:.03em}
+.level-tag{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px}
+.card-title{font-size:1.08rem;font-weight:700;margin-bottom:4px;color:var(--text)}
+.card-desc{font-size:.88rem;color:var(--text-sec);line-height:1.55;margin-bottom:6px}
+.card-stats{font-size:.78rem;color:var(--text-muted);font-weight:500}
+.card-note{font-size:.76rem;color:var(--text-muted);font-weight:600;margin-top:5px}
+.card-arrow{font-size:1.3rem;color:var(--text-muted);flex-shrink:0;padding-left:8px;transition:color .2s ease}
+.card-link:hover .card-arrow{color:var(--text-sec)}
+
+.card-link.c1:hover .card{box-shadow:0 4px 16px rgba(37,99,235,0.12)}
+.card-link.c2:hover .card{box-shadow:0 4px 16px rgba(13,148,136,0.12)}
+.card-link.c1 .card-illust{background:linear-gradient(135deg,#E6F1FB,#B5D4F4)}
+.card-link.c2 .card-illust{background:linear-gradient(135deg,#DFF4F0,#95DED2)}
+.badge-101{color:#0C447C;background:#E6F1FB}
+.badge-demo{color:#0A5C54;background:#DFF4F0}
+.level-101{color:#1D4ED8;background:#DBEAFE}
+.level-demo{color:#0F766E;background:#CCFBF1}
+
+.card-soon{display:flex;align-items:center;background:var(--card);border:2px dashed var(--border);border-radius:14px;padding:20px;gap:18px}
+.soon-illust{width:100px;min-width:100px;height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#EEF2F9;flex-shrink:0;color:var(--text-muted)}
+.soon-body{flex:1;min-width:0}
+.soon-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.soon-badge{font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:6px;letter-spacing:.03em;color:var(--text-muted);background:#EEF2F9}
+.soon-title{font-size:1.08rem;font-weight:600;color:var(--text-muted);margin-bottom:4px}
+.soon-sub{font-size:.88rem;color:var(--text-muted);line-height:1.55}
+
+footer{text-align:center;padding:24px 0 32px;border-top:1px solid var(--border);font-size:.82rem;color:var(--text-muted)}
+
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(16px)}
+to{opacity:1;transform:translateY(0)}
+}
+.anim{animation:fadeUp .5s ease both}
+.anim-d0{animation-delay:0s}
+.anim-d05{animation-delay:.05s}
+.anim-d1{animation-delay:.1s}
+.anim-d15{animation-delay:.15s}
+.anim-d2{animation-delay:.2s}
+.anim-d25{animation-delay:.25s}
+.anim-d3{animation-delay:.3s}
+.anim-d35{animation-delay:.35s}
+.anim-d4{animation-delay:.4s}
+
+@media(prefers-reduced-motion:reduce){
+.anim{animation:none!important;opacity:1!important;transform:none!important}
+.card-link,.card-link:hover{transition:none!important;transform:none!important}
+.card,.card-link:hover .card{transition:none!important;box-shadow:none!important}
+.card-arrow{transition:none!important}
+}
+
+/* Tablet */
+@media(max-width:768px){
+.content{padding:40px 16px 28px}
+.hero-logo{width:160px}
+.card-illust{width:70px;min-width:70px;height:64px}
+.card-illust svg{width:45px;height:45px}
+.soon-illust{width:70px;min-width:70px;height:64px}
+.card{padding:16px;gap:14px}
+.card-soon{padding:16px;gap:14px}
+.card-stats{font-size:.74rem}
+.prog-pill{font-size:.72rem;padding:4px 10px}
+.prog-line{width:18px}
+}
+
+/* Phone */
+@media(max-width:480px){
+.content{padding:32px 12px 24px}
+.hero-logo{width:140px;margin-bottom:22px}
+.hero-desc{font-size:.875rem;line-height:1.65}
+.hero-sub{font-size:.8rem}
+.stats-bar{font-size:.75rem;padding:7px 16px}
+nav.progression{display:none}
+.prog-mobile{display:block}
+.cards{gap:10px;margin-bottom:36px}
+.card-illust{display:none}
+.soon-illust{display:none}
+.card{border-left:4px solid var(--border);padding:14px;gap:12px}
+.card-soon{border-left:4px dashed var(--border);padding:14px;gap:12px}
+.card-link.c1 .card{border-left-color:#378ADD}
+.card-link.c2 .card{border-left-color:#0D9488}
+.card-title{font-size:.9375rem}
+.card-desc{font-size:.8125rem;line-height:1.5}
+.card-stats{font-size:.6875rem}
+.card-arrow{font-size:1.1rem;padding-left:4px}
+footer{font-size:.75rem;padding:20px 0 24px}
+}
+
+/* Small phone */
+@media(max-width:360px){
+.content{padding:28px 10px 20px}
+.hero-logo{width:120px;margin-bottom:18px}
+.card{padding:12px}
+.card-soon{padding:12px}
+.card-top{flex-direction:column;align-items:flex-start;gap:4px}
+}
+
+@media print{
+.bg-glow{display:none!important}
+.card{border:1px solid #ccc!important;box-shadow:none!important;break-inside:avoid}
+.card-link,.card-link:hover{transform:none!important}
+body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<main class="content">
+
+<header>
+<img class="hero-logo anim anim-d0" src="./hero.png" alt="Knowledge and Context Graphs" width="200" height="200" loading="eager">
+<h1 class="hero-title anim anim-d05">Knowledge &amp; <span>Context</span> Graphs</h1>
+<p class="hero-byline anim anim-d1"><span class="hero-byline-name">Namiranian, Babak</span></p>
+<p class="hero-version anim anim-d1">V1.1 (August 2026)</p>
+<p class="hero-desc anim anim-d15">Two graphs, two jobs. A knowledge graph holds what is always true about a system; a context graph holds what is true about one thing, right now. Learn how each is built, how they bind together, and how that pairing turns a pile of alarms into a defensible answer.</p>
+<p class="hero-sub anim anim-d2">Built for engineers, architects, and analysts who keep hearing &ldquo;knowledge graph&rdquo; without ever being shown one. Start from zero &mdash; no graph database experience assumed.</p>
+<div class="anim anim-d25"><span class="stats-bar">9 Modules &middot; 8 Interactive Widgets &middot; 102 Glossary Terms &middot; 10-Scenario Demo</span></div>
+</header>
+
+<nav class="progression anim anim-d3" aria-label="Learning progression">
+<span class="prog-pill">Why graphs</span><span class="prog-line"></span>
+<span class="prog-pill">Knowledge</span><span class="prog-line"></span>
+<span class="prog-pill">Context</span><span class="prog-line"></span>
+<span class="prog-pill">Binding</span><span class="prog-line"></span>
+<span class="prog-pill">Reasoning</span><span class="prog-line"></span>
+<span class="prog-pill">Practice</span>
+</nav>
+<div class="prog-mobile anim anim-d3">Why graphs &rarr; Practice</div>
+
+<section class="cards" aria-label="Modules">
+
+<a href="KG-CG-101.html" target="_blank" rel="noopener noreferrer" class="card-link c1 anim anim-d35">
+<div class="card">
+<div class="card-illust">
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><line x1="24" y1="24" x2="9" y2="11" stroke="#378ADD" stroke-width="2"/><line x1="24" y1="24" x2="39" y2="11" stroke="#378ADD" stroke-width="2"/><line x1="24" y1="24" x2="9" y2="37" stroke="#378ADD" stroke-width="2"/><line x1="24" y1="24" x2="39" y2="37" stroke="#378ADD" stroke-width="2"/><circle cx="9" cy="11" r="4" fill="#85B7EB"/><circle cx="39" cy="11" r="4" fill="#85B7EB"/><circle cx="9" cy="37" r="4" fill="#85B7EB"/><circle cx="39" cy="37" r="4" fill="#85B7EB"/><circle cx="24" cy="24" r="7" fill="#2563EB"/></svg>
+</div>
+<div class="card-body">
+<div class="card-top"><span class="badge badge-101">101</span><span class="level-tag level-101">Foundations</span></div>
+<div class="card-title">Knowledge &amp; Context Graphs: Foundations</div>
+<p class="card-desc">Start at the beginning. Why relationships sometimes are the data, what turns a plain graph into a knowledge graph, what a context graph adds on top, and how the two combine to rank causes and justify a decision &mdash; or correctly refuse to make one.</p>
+<div class="card-stats">9 modules &middot; 8 interactive widgets &middot; 102 glossary terms &middot; quizzes throughout</div>
+</div>
+<span class="card-arrow" aria-hidden="true">&#8599;</span>
+</div>
+</a>
+
+<a href="KG-CG-Demo.html" target="_blank" rel="noopener noreferrer" class="card-link c2 anim anim-d4">
+<div class="card">
+<div class="card-illust">
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="4" y="7" width="40" height="28" rx="4" fill="#FFFFFF" stroke="#0D9488" stroke-width="2"/><line x1="13" y1="26" x2="21" y2="16" stroke="#5CC9BC" stroke-width="2"/><line x1="21" y1="16" x2="30" y2="24" stroke="#5CC9BC" stroke-width="2"/><circle cx="13" cy="26" r="3" fill="#5CC9BC"/><circle cx="21" cy="16" r="3" fill="#5CC9BC"/><circle cx="33" cy="26" r="6" fill="#0D9488"/><path d="M31.2 23.2l4.4 2.8-4.4 2.8z" fill="#FFFFFF"/><path d="M18 41h12" stroke="#0D9488" stroke-width="2.4" stroke-linecap="round"/><path d="M24 35v6" stroke="#0D9488" stroke-width="2.4" stroke-linecap="round"/></svg>
+</div>
+<div class="card-body">
+<div class="card-top"><span class="badge badge-demo">DEMO</span><span class="level-tag level-demo">Interactive</span></div>
+<div class="card-title">Charging Assurance Walkthrough</div>
+<p class="card-desc">The concepts running live. Step a real incident through seven stages and watch the candidate pool narrow from the full topology to a single located fault &mdash; with the evidence, the confidence scores, and the action gate shown at every stage.</p>
+<div class="card-stats">10 scenarios &middot; 7 stages each &middot; 5 end without automated action, by design</div>
+<div class="card-note">Best on a laptop or larger &mdash; dense diagram, not designed for phones</div>
+</div>
+<span class="card-arrow" aria-hidden="true">&#8599;</span>
+</div>
+</a>
+
+<div class="card-soon anim anim-d4">
+<div class="soon-illust"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+<div class="soon-body">
+<div class="soon-top"><span class="soon-badge">102</span></div>
+<p class="soon-title">Building and Operating the Pair &mdash; coming soon</p>
+<p class="soon-sub">Where the nodes actually come from, keeping a graph fresh without drowning in ingestion, schema evolution, identity resolution at scale, and the failure modes that quietly poison a graph long before anyone notices.</p>
+</div>
+</div>
+
+</section>
+
+<footer>Namiranian, Babak &mdash; Illustrative educational material; vendor-neutral and built on a generic operator model &middot; No external dependencies, runs entirely in your browser &middot; August 2026</footer>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Knowledge graphs and context graphs from first principles: structure, schema, provenance, overlays, hypothesis ranking, and where language models do and do not belong.">
+<title>Knowledge &amp; Context Graphs: Foundations</title>
+<link rel="icon" href="data:,">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#FAFBFE;--card:#FFFFFF;--card2:#F7F9FD;--text:#0C1222;--text-sec:#41506A;--text-muted:#77879F;
+--border:#DCE5F0;--soft:#EEF2F9;
+--blue:#2563EB;--teal:#0D9488;--violet:#7C3AED;--amber:#B45309;--green:#0A7C46;--red:#DC2626;
+--blue-s:#E6F1FB;--teal-s:#DFF4F0;--violet-s:#F1EBFE;--amber-s:#FBF0DC;--green-s:#E1F5EA;--red-s:#FDEAEA;
+--font:'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+--mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+--shadow:0 1px 2px rgba(16,32,64,.05),0 4px 14px rgba(16,32,64,.05);
+}
+html[data-theme="dark"]{
+--bg:#0A1120;--card:#131F33;--card2:#182740;--text:#EEF5FF;--text-sec:#B7C6DA;--text-muted:#8FA3BE;
+--border:#294059;--soft:#18273D;
+--blue:#78B9FF;--teal:#57D1C6;--violet:#B6A8FF;--amber:#F2C078;--green:#66D69C;--red:#FF9A90;
+--blue-s:#152B4A;--teal-s:#0F3330;--violet-s:#241C46;--amber-s:#33260F;--green-s:#0F3324;--red-s:#3A1B1B;
+--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.62;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:4px}
+
+/* ---------- header ---------- */
+.hdr{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 22px;background:var(--card);border-bottom:1px solid var(--border);flex-wrap:nowrap}
+.hdr-l{display:flex;align-items:center;gap:12px;min-width:0}
+.hdr-ico{width:38px;height:38px;min-width:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue-s),var(--teal-s));display:flex;align-items:center;justify-content:center}
+.hdr-ico svg{width:23px;height:23px}
+.hdr-t{font-size:1.03rem;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;flex-wrap:wrap;line-height:1.25}
+.hdr-v{font-size:.68rem;font-weight:800;color:var(--blue);background:var(--blue-s);border-radius:6px;padding:2px 7px;letter-spacing:.04em}
+.hdr-date{font-size:.68rem;font-weight:600;color:var(--text-muted);letter-spacing:.02em}
+.hdr-s{font-size:.775rem;color:var(--text-muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdr-s .by{color:var(--text-sec);font-weight:700}
+.hdr-r{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.hdr-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--card);color:var(--text-sec);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,color .15s}
+.hdr-btn:hover{border-color:var(--blue);color:var(--blue)}
+.hdr-btn svg{width:18px;height:18px}
+
+/* ---------- module trail ---------- */
+.trail-wrap{position:sticky;top:59px;z-index:55;background:var(--card);border-bottom:1px solid var(--border);padding:7px 22px;overflow-x:auto;scrollbar-width:none}
+.trail-wrap::-webkit-scrollbar{display:none}
+.trail{display:flex;align-items:center;gap:5px;min-width:min-content}
+.tstep{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text-sec);font-size:.775rem;font-weight:650;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tstep:hover{border-color:var(--blue);color:var(--blue)}
+.tstep .tnum{width:19px;height:19px;border-radius:50%;background:var(--soft);color:var(--text-muted);font-size:.66rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.tstep.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.tstep.on .tnum{background:rgba(255,255,255,.25);color:#fff}
+.tstep.done .tnum{background:var(--green);color:#fff}
+html[data-theme="dark"] .tstep.on{color:#0A1120}
+html[data-theme="dark"] .tstep.on .tnum{color:#0A1120}
+html[data-theme="dark"] .tstep.done .tnum{color:#0A1120}
+
+/* ---------- layout ---------- */
+.main{max-width:940px;margin:0 auto;padding:30px 22px 70px}
+.sec{display:none;animation:fade .3s ease both}
+.sec.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.mhead{margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.mkick{font-size:.71rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);margin-bottom:7px}
+.mtitle{font-size:clamp(1.5rem,3.2vw,2.05rem);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-bottom:9px}
+.mlede{font-size:1.03rem;color:var(--text-sec);max-width:66ch;line-height:1.68}
+.mmeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--soft);color:var(--text-muted)}
+
+h3.sub{font-size:1.16rem;font-weight:800;letter-spacing:-.02em;margin:30px 0 10px}
+h4.sub2{font-size:.98rem;font-weight:800;margin:20px 0 7px}
+p.body{font-size:.965rem;color:var(--text-sec);max-width:70ch;margin-bottom:13px;line-height:1.72}
+p.body strong{color:var(--text);font-weight:700}
+ul.body,ol.body{max-width:70ch;margin:0 0 14px 20px;color:var(--text-sec);font-size:.955rem;line-height:1.7}
+ul.body li,ol.body li{margin-bottom:7px}
+ul.body li strong,ol.body li strong{color:var(--text);font-weight:700}
+code{font-family:var(--mono);font-size:.87em;background:var(--soft);padding:1px 5px;border-radius:4px;color:var(--text);overflow-wrap:anywhere}
+pre{font-family:var(--mono);font-size:.82rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;overflow-x:auto;margin-bottom:14px;line-height:1.6;color:var(--text-sec)}
+pre b{color:var(--blue);font-weight:700}
+pre i{color:var(--teal);font-style:normal}
+
+/* ---------- panels ---------- */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:17px 19px;margin:18px 0;box-shadow:var(--shadow)}
+.panel-h{font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.panel-h .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0}
+
+.note{border-left:3px solid var(--blue);background:var(--blue-s);border-radius:0 10px 10px 0;padding:13px 16px;margin:16px 0;font-size:.925rem;color:var(--text-sec);max-width:72ch;line-height:1.68}
+.note b{color:var(--text)}
+.note.warn{border-left-color:var(--amber);background:var(--amber-s)}
+.note.good{border-left-color:var(--green);background:var(--green-s)}
+.note.stop{border-left-color:var(--red);background:var(--red-s)}
+.note .nlab{display:block;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;color:var(--blue)}
+.note.warn .nlab{color:var(--amber)}
+.note.good .nlab{color:var(--green)}
+.note.stop .nlab{color:var(--red)}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;margin:16px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.mini{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 15px}
+.mini-t{font-size:.87rem;font-weight:800;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.mini-t .sq{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.mini-d{font-size:.855rem;color:var(--text-sec);line-height:1.6}
+
+table.tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:.875rem;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+table.tbl th{background:var(--soft);text-align:left;padding:9px 12px;font-size:.71rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)}
+table.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-sec);vertical-align:top;line-height:1.55}
+table.tbl tr:last-child td{border-bottom:none}
+table.tbl td b{color:var(--text)}
+.tblwrap{overflow-x:auto;margin:16px 0}
+.tblwrap table.tbl{margin:0;min-width:520px}
+
+/* ---------- widgets ---------- */
+.widget{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0;margin:22px 0;overflow:hidden;box-shadow:var(--shadow)}
+.wg-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 17px;background:var(--card2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.wg-t{font-size:.85rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.wg-t svg{width:16px;height:16px;color:var(--blue)}
+.wg-tag{font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);background:var(--teal-s);padding:3px 8px;border-radius:6px}
+.wg-b{padding:16px 17px}
+.wg-hint{font-size:.8rem;color:var(--text-muted);margin-top:11px;line-height:1.55}
+
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:9px;padding:7px 13px;font:700 .83rem var(--font);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.pri:hover{filter:brightness(1.08);color:#fff}
+html[data-theme="dark"] .btn.pri{color:#0A1120}
+.btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-theme="dark"] .btn.on{color:#0A1120}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:.77rem}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.segs{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.segs button{border:none;background:var(--card);color:var(--text-sec);padding:7px 14px;font:700 .8rem var(--font);cursor:pointer;border-right:1px solid var(--border)}
+.segs button:last-child{border-right:none}
+.segs button.on{background:var(--blue);color:#fff}
+html[data-theme="dark"] .segs button.on{color:#0A1120}
+
+.slider{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.slider label{font-size:.8rem;font-weight:700;color:var(--text-sec);white-space:nowrap}
+.slider input[type=range]{flex:1;min-width:150px;accent-color:var(--blue)}
+.slider .val{font-family:var(--mono);font-size:.83rem;font-weight:700;color:var(--blue);min-width:52px;text-align:right}
+
+.swtch{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:.85rem;font-weight:650;color:var(--text-sec);user-select:none}
+.swtch input{width:17px;height:17px;accent-color:var(--blue);cursor:pointer}
+
+svg.canvas{display:block;width:100%;height:auto;background:var(--card2);border:1px solid var(--border);border-radius:11px}
+svg.canvas text{font-family:var(--font)}
+
+.kv{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.kvi{background:var(--soft);border-radius:8px;padding:6px 11px;font-size:.78rem;color:var(--text-sec)}
+.kvi b{color:var(--text);font-weight:800}
+
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.bar{display:grid;grid-template-columns:164px 1fr 54px;gap:11px;align-items:center;font-size:.83rem}
+.bar .bn{font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .bt{display:block;height:11px;border-radius:6px;background:var(--soft);overflow:hidden}
+.bar .bf{display:block;height:11px;border-radius:6px;transition:width .35s ease,background .25s}
+.bar .bv{font-family:var(--mono);font-weight:700;text-align:right;color:var(--text-sec)}
+.bar.out .bn,.bar.out .bv{opacity:.45}
+
+.verdict{margin-top:15px;border-radius:11px;padding:13px 15px;font-size:.9rem;font-weight:650;line-height:1.6;border:1px solid}
+.verdict.go{background:var(--green-s);border-color:var(--green);color:var(--text)}
+.verdict.no{background:var(--amber-s);border-color:var(--amber);color:var(--text)}
+.verdict .vh{display:block;font-size:.69rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.verdict.go .vh{color:var(--green)}
+.verdict.no .vh{color:var(--amber)}
+
+/* ---------- quiz ---------- */
+.quiz{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:19px;margin:30px 0 10px;box-shadow:var(--shadow)}
+.quiz-h{font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--violet);margin-bottom:14px}
+.q{margin-bottom:19px;padding-bottom:19px;border-bottom:1px solid var(--border)}
+.q:last-of-type{border-bottom:none;margin-bottom:9px}
+.qt{font-size:.94rem;font-weight:700;margin-bottom:10px;line-height:1.55}
+.qt .qn{color:var(--violet);margin-right:6px}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--border);background:var(--card);color:var(--text-sec);border-radius:9px;padding:9px 13px;font:600 .885rem var(--font);cursor:pointer;margin-bottom:7px;transition:all .15s;line-height:1.5}
+.opt:hover:not(:disabled){border-color:var(--violet);color:var(--text)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--green);background:var(--green-s);color:var(--text)}
+.opt.wrong{border-color:var(--red);background:var(--red-s);color:var(--text)}
+.qx{font-size:.855rem;color:var(--text-sec);background:var(--soft);border-radius:9px;padding:10px 13px;margin-top:8px;line-height:1.6;display:none}
+.qx.show{display:block}
+.qx b{color:var(--text)}
+.qscore{font-size:.88rem;font-weight:750;color:var(--text-sec);margin-top:6px}
+.qscore .pass{color:var(--green);font-weight:800}
+.qscore .fail{color:var(--amber);font-weight:800}
+
+/* ---------- nav buttons ---------- */
+.navb{display:flex;justify-content:space-between;gap:12px;margin-top:36px;padding-top:22px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* ---------- landing ---------- */
+.lhero{text-align:center;padding:14px 0 26px}
+.lh-t{font-size:clamp(1.7rem,4.2vw,2.5rem);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-bottom:12px}
+.lh-t .g{background:linear-gradient(120deg,var(--blue),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lh-d{font-size:1.02rem;color:var(--text-sec);max-width:63ch;margin:0 auto 16px;line-height:1.7}
+.lh-s{font-size:.85rem;color:var(--text-muted);max-width:58ch;margin:0 auto 18px}
+.prog{max-width:430px;margin:0 auto}
+.prog-t{font-size:.76rem;font-weight:750;color:var(--text-muted);margin-bottom:7px}
+.prog-bar{height:8px;border-radius:5px;background:var(--soft);overflow:hidden}
+.prog-f{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:5px;transition:width .4s ease}
+
+.mlist{display:flex;flex-direction:column;gap:11px;margin-top:26px}
+.mcard{display:flex;align-items:flex-start;gap:15px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px 18px;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;text-align:left;width:100%;font-family:var(--font)}
+.mcard:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--blue)}
+.mc-ico{width:44px;height:44px;min-width:44px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.mc-ico svg{width:23px;height:23px;fill:currentColor}
+.mc-b{flex:1;min-width:0}
+.mc-top{display:flex;align-items:center;gap:9px;margin-bottom:3px;flex-wrap:wrap}
+.mc-n{font-size:.68rem;font-weight:800;letter-spacing:.07em;color:var(--text-muted)}
+.mc-t{font-size:1.01rem;font-weight:800;letter-spacing:-.015em;color:var(--text)}
+.mc-time{font-size:.68rem;font-weight:700;color:var(--text-muted);background:var(--soft);padding:2px 8px;border-radius:999px}
+.mc-done{font-size:.68rem;font-weight:800;color:var(--green);background:var(--green-s);padding:2px 8px;border-radius:999px}
+.mc-d{font-size:.875rem;color:var(--text-sec);line-height:1.6}
+.mc-f{font-size:.775rem;color:var(--text-muted);margin-top:6px}
+
+/* ---------- glossary ---------- */
+.gtools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.gsearch{flex:1;min-width:200px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:9px 13px;font:600 .885rem var(--font)}
+.gsearch::placeholder{color:var(--text-muted);font-weight:500}
+.gcats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.gcat{border:1px solid var(--border);background:var(--card);color:var(--text-sec);border-radius:999px;padding:4px 12px;font:700 .755rem var(--font);cursor:pointer}
+.gcat:hover{border-color:var(--blue);color:var(--blue)}
+.gcat.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-theme="dark"] .gcat.on{color:#0A1120}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px}
+.gterm{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px 15px}
+.gt-t{font-size:.9rem;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gt-c{font-size:.63rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:var(--soft);color:var(--text-muted)}
+.gt-d{font-size:.85rem;color:var(--text-sec);line-height:1.6}
+.gcount{font-size:.8rem;color:var(--text-muted);margin-bottom:12px}
+.gempty{text-align:center;padding:34px;color:var(--text-muted);font-size:.9rem}
+
+/* ---------- help modal ---------- */
+.mbd{position:fixed;inset:0;background:rgba(8,14,26,.55);z-index:90;display:none}
+.mbd.on{display:block}
+.modal{position:fixed;z-index:91;top:50%;left:50%;transform:translate(-50%,-50%);width:min(660px,calc(100vw - 32px));max-height:min(80vh,700px);background:var(--card);border:1px solid var(--border);border-radius:15px;box-shadow:0 20px 60px rgba(8,14,26,.3);display:none;flex-direction:column}
+.modal.on{display:flex}
+.mo-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 19px;border-bottom:1px solid var(--border)}
+.mo-t{font-size:1.02rem;font-weight:800;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.mo-x{border:none;background:transparent;color:var(--text-muted);font-size:1.5rem;line-height:1;cursor:pointer;padding:0 4px}
+.mo-x:hover{color:var(--text)}
+.mo-b{padding:17px 19px;overflow-y:auto}
+.mo-b h4{font-size:.83rem;font-weight:800;margin:16px 0 6px;color:var(--text)}
+.mo-b h4:first-child{margin-top:0}
+.mo-b p,.mo-b li{font-size:.885rem;color:var(--text-sec);line-height:1.65}
+.mo-b ul{margin:0 0 4px 19px}
+.mo-b li{margin-bottom:5px}
+.mo-b kbd{font-family:var(--mono);font-size:.78rem;background:var(--soft);border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--text)}
+
+.totop{position:fixed;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text-sec);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow);z-index:50}
+.totop.on{display:flex}
+.totop:hover{border-color:var(--blue);color:var(--blue)}
+.totop svg{width:19px;height:19px}
+
+.foot{max-width:940px;margin:0 auto;padding:20px 22px 30px;border-top:1px solid var(--border);font-size:.79rem;color:var(--text-muted);text-align:center;line-height:1.6}
+
+@media(max-width:820px){
+.hdr{padding:9px 14px}
+.hdr-s{display:none}
+.trail-wrap{padding:6px 14px;top:55px}
+.main{padding:24px 15px 60px}
+.bar{grid-template-columns:104px 1fr 46px;gap:8px;font-size:.79rem}
+.foot{padding:18px 15px 26px}
+}
+@media(max-width:520px){
+.hdr-t{font-size:.93rem}
+.hdr-date{display:none}
+.mtitle{font-size:1.38rem}
+.glist{grid-template-columns:1fr}
+.bar{grid-template-columns:1fr;gap:3px}
+.bar .bv{text-align:left}
+.mcard{padding:13px 14px;gap:12px}
+.mc-ico{width:38px;height:38px;min-width:38px}
+}
+@media(prefers-reduced-motion:reduce){
+*{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+@media print{
+.hdr,.trail-wrap,.totop,.navb,.quiz{display:none!important}
+.sec{display:block!important}
+body{background:#fff}
+}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-ico">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><line x1="24" y1="24" x2="9" y2="11" stroke="#378ADD" stroke-width="2.4"/><line x1="24" y1="24" x2="39" y2="11" stroke="#378ADD" stroke-width="2.4"/><line x1="24" y1="24" x2="9" y2="37" stroke="#0D9488" stroke-width="2.4"/><line x1="24" y1="24" x2="39" y2="37" stroke="#0D9488" stroke-width="2.4"/><circle cx="9" cy="11" r="4.2" fill="#85B7EB"/><circle cx="39" cy="11" r="4.2" fill="#85B7EB"/><circle cx="9" cy="37" r="4.2" fill="#5CC9BC"/><circle cx="39" cy="37" r="4.2" fill="#0D9488"/><circle cx="24" cy="24" r="7.4" fill="#2563EB"/></svg>
+    </div>
+    <div>
+      <div class="hdr-t">Knowledge &amp; Context Graphs <span class="hdr-v" id="hdr-ver">V1.1</span><span class="hdr-date">Updated August 2026</span></div>
+      <div class="hdr-s">Foundations &mdash; structure, context, and grounded reasoning &middot; <span class="by">Namiranian, Babak</span></div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <button type="button" class="hdr-btn" id="btn-home" title="Course home" aria-label="Course home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg>
+    </button>
+    <button type="button" class="hdr-btn" id="btn-theme" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="theme-icon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <button type="button" class="hdr-btn" id="btn-help" title="Help" aria-label="Help">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="trail-wrap" aria-label="Module navigation"><div class="trail" id="trail"></div></nav>
+
+<main class="main" id="main"></main>
+
+<footer class="foot">
+  Namiranian, Babak &mdash; Knowledge &amp; Context Graphs: Foundations &middot; V1.1 (August 2026)<br>
+  Illustrative educational material built on a generic, vendor-neutral operator model. Verify standards references against current primary sources before relying on them for design decisions.
+</footer>
+
+<button type="button" class="totop" id="totop" title="Back to top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<div class="mbd" id="mbd"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mo-t">
+  <div class="mo-h">
+    <div class="mo-t" id="mo-t">Help <span class="hdr-v">V1.1</span><span class="hdr-date">August 2026</span></div>
+    <button type="button" class="mo-x" id="mo-x" aria-label="Close help">&times;</button>
+  </div>
+  <div class="mo-b">
+    <h4>What this course is</h4>
+    <p>A self-paced introduction to knowledge graphs and context graphs: what each one is, what makes them different, how they bind together, and how that pairing produces an answer you can defend rather than a guess you have to trust.</p>
+
+    <h4>How to move around</h4>
+    <ul>
+      <li>The bar under the header lists all nine modules. Click any one to jump straight to it &mdash; nothing is locked.</li>
+      <li><b>Previous</b> and <b>Next</b> at the bottom of each module walk the intended order.</li>
+      <li>The home icon returns to the course overview and your progress.</li>
+    </ul>
+
+    <h4>Keyboard</h4>
+    <ul>
+      <li><kbd>&larr;</kbd> and <kbd>&rarr;</kbd> move between modules.</li>
+      <li><kbd>Esc</kbd> closes this dialog.</li>
+    </ul>
+
+    <h4>Progress and quizzes</h4>
+    <ul>
+      <li>Each module ends with five questions. Every answer explains itself, including the wrong ones.</li>
+      <li>Four correct out of five marks a module complete. Progress is saved in this browser only &mdash; no account, no server, nothing leaves your machine.</li>
+      <li>Use <b>Reset course progress</b> below to clear it.</li>
+    </ul>
+
+    <h4>Interactive panels</h4>
+    <p>Every module except the glossary carries a hands-on panel &mdash; a sandbox, a slider, or a toggle. They are the point of the module, not decoration. Change the inputs and watch what the change does to the conclusion.</p>
+
+    <h4>Scope and accuracy</h4>
+    <p>Concepts here are deliberately durable. The telecom examples describe a generic operator and are illustrative, not a specification of any real network. Where a standard is named, treat it as a pointer for further reading and confirm against the current published document.</p>
+
+    <div class="btnrow" style="margin-top:16px">
+      <button type="button" class="btn" id="btn-reset">Reset course progress</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+var VERSION = "V1.1";
+var VDATE = "August 2026";
+var LSKEY = "kgcg101.v1";
+
+var ICONS = {
+  compare:'<svg viewBox="0 0 24 24"><path d="M4 5h7v2H4V5zm0 4h7v2H4V9zm0 4h7v2H4v-2zm0 4h7v2H4v-2zM17 3l4 5h-3v13h-2V8h-3l4-5z"/></svg>',
+  atom:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.6"/><circle cx="5" cy="6" r="1.7"/><circle cx="19" cy="6" r="1.7"/><circle cx="5" cy="18" r="1.7"/><circle cx="19" cy="18" r="1.7"/><path d="M11 11L6 7l1-1 5 4-1 1zm2 0l5-4 1 1-5 4-1-1zm-2 2l-5 4 1 1 5-4-1-1zm2 0l5 4-1 1-5-4 1-1z"/></svg>',
+  book:'<svg viewBox="0 0 24 24"><path d="M18 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zM9 4h2v5l-1-.9-1 .9V4zm9 16H6V4h1v9l3-2.7 3 2.7V4h5v16z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm1-13h-2v6l5 3 1-1.7-4-2.3V7z"/></svg>',
+  layers:'<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zm0 2.3L7.1 8 12 10.7 16.9 8 12 5.3zM3 12.6l9 5 9-5 1.6.9-10.6 5.9L1.4 13.5l1.6-.9zm0 4l9 5 9-5 1.6.9L12 23.4 1.4 17.5l1.6-.9z"/></svg>',
+  scale:'<svg viewBox="0 0 24 24"><path d="M11 2h2v2.3l6.3 1.6-.5 1.9L13 6.4V20h5v2H6v-2h5V6.4L5.2 7.8l-.5-1.9L11 4.3V2zM5.5 9.5L8 16H3l2.5-6.5zm13 0L21 16h-5l2.5-6.5z"/></svg>',
+  wrench:'<svg viewBox="0 0 24 24"><path d="M20.4 5.6a5.5 5.5 0 01-6.9 6.9l-7 7a2.1 2.1 0 01-3-3l7-7a5.5 5.5 0 016.9-6.9l-3.2 3.2 2.9 2.9 3.3-3.1zM5.5 19.5a1 1 0 100-2 1 1 0 000 2z"/></svg>',
+  chat:'<svg viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2zm0 14H5.2L4 17.2V4h16v12zM7 7h10v2H7V7zm0 4h7v2H7v-2z"/></svg>',
+  list:'<svg viewBox="0 0 24 24"><path d="M4 6h2v2H4V6zm4 0h12v2H8V6zM4 11h2v2H4v-2zm4 0h12v2H8v-2zM4 16h2v2H4v-2zm4 0h12v2H8v-2z"/></svg>'
+};
+
+var MODULES = [
+  {id:"why-graphs", n:"01", title:"Why Graphs at All", short:"Why graphs", icon:"compare", color:"#2563EB", soft:"var(--blue-s)", time:"~15 min",
+   lede:"Most data problems do not need a graph. Learning to recognise the ones that do is the whole first step.",
+   card:"When relationships stop being an attribute of the data and start being the data itself. Watch a question that stays cheap over a graph turn into a five-join monster over tables, and learn the three signals that tell you a graph is warranted.",
+   feat:"Interactive join-depth comparison \u00b7 5 quiz questions"},
+  {id:"anatomy", n:"02", title:"Anatomy of a Graph", short:"Anatomy", icon:"atom", color:"#0D9488", soft:"var(--teal-s)", time:"~15 min",
+   lede:"Nodes, edges, direction, properties, labels. Four ideas, and then two competing ways of writing them down.",
+   card:"Build a graph by hand and see the same facts expressed two ways \u2014 as a labelled property graph and as RDF triples \u2014 so the vocabulary stops being a barrier when you read anyone else's documentation.",
+   feat:"Click-to-build graph sandbox \u00b7 dual notation view \u00b7 5 quiz questions"},
+  {id:"knowledge", n:"03", title:"What Makes It Knowledge", short:"Knowledge", icon:"book", color:"#7C3AED", soft:"var(--violet-s)", time:"~20 min",
+   lede:"A graph becomes a knowledge graph when it knows what its own nodes mean, and where each fact came from.",
+   card:"Schema and ontology, identity resolution, constraints, and provenance. See exactly which questions become answerable the moment a graph gains a type system \u2014 and which answers you must refuse without provenance.",
+   feat:"Schema on/off comparison \u00b7 provenance inspector \u00b7 5 quiz questions"},
+  {id:"context", n:"04", title:"Context Graphs", short:"Context", icon:"clock", color:"#B45309", soft:"var(--amber-s)", time:"~20 min",
+   lede:"One entity, one moment, one question. A context graph is small, sharply scoped, and deliberately short-lived.",
+   card:"What a context graph adds that a knowledge graph must never absorb: observations, confidence, and an expiry date. Scrub an incident timeline and watch a context graph assemble itself and then correctly go stale.",
+   feat:"Incident timeline scrubber \u00b7 5 quiz questions"},
+  {id:"binding", n:"05", title:"How the Two Bind", short:"Binding", icon:"layers", color:"#2563EB", soft:"var(--blue-s)", time:"~20 min",
+   lede:"The context graph does not copy the topology. It anchors to it, and inherits everything already known.",
+   card:"Anchoring, inheritance, and blame propagation along edges. Toggle the context overlay on and off above a fixed knowledge graph and see why neither layer is useful alone.",
+   feat:"Overlay toggle over a live topology \u00b7 5 quiz questions"},
+  {id:"reasoning", n:"06", title:"Reasoning Over the Pair", short:"Reasoning", icon:"scale", color:"#0A7C46", soft:"var(--green-s)", time:"~20 min",
+   lede:"Ranking candidates is the easy half. Knowing when the evidence does not justify acting is the half that earns trust.",
+   card:"Hypothesis generation, evidence scoring, separation, and the action gate. Drag the confidence threshold and watch a confident recommendation turn into an honest refusal \u2014 the behaviour that makes the system safe to automate.",
+   feat:"Live hypothesis ranking with an action gate \u00b7 5 quiz questions"},
+  {id:"practice", n:"07", title:"Building One for Real", short:"Practice", icon:"wrench", color:"#B45309", soft:"var(--amber-s)", time:"~20 min",
+   lede:"Nobody hand-draws a graph of a production system. It is assembled from systems that already exist.",
+   card:"Where nodes and edges actually come from, what each source costs to ingest, how fresh it stays, and the four failure modes that quietly poison a graph long before anyone notices.",
+   feat:"Source-to-node mapping explorer \u00b7 freshness model \u00b7 5 quiz questions"},
+  {id:"llm", n:"08", title:"Where Language Models Fit", short:"LLMs", icon:"chat", color:"#7C3AED", soft:"var(--violet-s)", time:"~15 min",
+   lede:"The model is a narrator, a translator, and a librarian. It is not the thing that decides.",
+   card:"Retrieval and explanation versus reasoning and adjudication. Read the same question answered with the graph in hand and with it withheld, and see precisely what the graph was contributing.",
+   feat:"Grounded vs. ungrounded answer comparison \u00b7 5 quiz questions"},
+  {id:"glossary", n:"09", title:"Glossary", short:"Glossary", icon:"list", color:"#41506A", soft:"var(--soft)", time:"Reference",
+   lede:"Every term used in this course, in plain language, with the reason it matters.",
+   card:"All 102 terms spanning graph structure, semantics, context modelling, reasoning, and operations \u2014 searchable and filterable by category.",
+   feat:"Full-text search \u00b7 6 category filters"}
+];
+
+var CONTENT = {};
+
+/* ============================ 01 — WHY GRAPHS ============================ */
+CONTENT["why-graphs"] = `
+<p class="body">Nearly every system you have ever built stored its data in tables, and nearly every one of them was right to. Tables are superb at what they do: hold a great many rows of the same shape, filter them, and add them up. If your hardest question is <em>"how many prepaid subscribers in this market churned last month"</em>, a relational database will answer it faster and cheaper than any graph, and you should not read the rest of this course looking for permission to replace it.</p>
+
+<p class="body">Graphs earn their keep somewhere else entirely: when the <strong>connections between things carry as much meaning as the things themselves</strong>, and when you cannot say in advance how many connections a question will have to cross.</p>
+
+<h3 class="sub">The question that breaks the table</h3>
+
+<p class="body">Consider a question an assurance engineer asks constantly: <em>"this subscriber's session is failing &mdash; what else is affected by whatever is causing it?"</em></p>
+
+<p class="body">In a relational model, answering that means walking a chain. Subscriber to session, session to the user plane function carrying it, that function to the cell sites it serves, the cells to their transport links, the links to the charging function that meters them. Each hop is a join, and crucially <strong>you do not know how many hops you need until you have taken them</strong>. The cause might be one hop away or five. Writing a query that handles both means writing several queries, or a recursive one that grows harder to reason about with every level.</p>
+
+<p class="body">A graph turns that same question into a single traversal: start here, follow these edge types, stop when you reach something that explains the symptom. The depth is a parameter, not a rewrite.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg> Join depth &mdash; the same question, two models</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="slider">
+      <label for="w1-hops">Relationship depth</label>
+      <input type="range" id="w1-hops" min="1" max="6" step="1" value="2">
+      <span class="val" id="w1-val">2 hops</span>
+    </div>
+    <div class="grid2" style="margin-top:4px">
+      <div class="mini">
+        <div class="mini-t"><span class="sq" style="background:#B45309"></span>Relational</div>
+        <pre id="w1-sql" style="margin:8px 0 0;font-size:.76rem"></pre>
+        <div class="kv"><span class="kvi">Joins: <b id="w1-joins">2</b></span><span class="kvi">Query rewrite needed: <b id="w1-rw">no</b></span></div>
+      </div>
+      <div class="mini">
+        <div class="mini-t"><span class="sq" style="background:#0D9488"></span>Graph traversal</div>
+        <pre id="w1-cy" style="margin:8px 0 0;font-size:.76rem"></pre>
+        <div class="kv"><span class="kvi">Statement changes: <b>none</b></span><span class="kvi">Depth is: <b>a parameter</b></span></div>
+      </div>
+    </div>
+    <div class="wg-hint">Drag the slider. The relational statement grows a clause per hop and must be rewritten each time; the traversal keeps the same shape and only changes a number. This is a structural difference, not a performance claim &mdash; a well-indexed relational database can be very fast at a fixed, known depth.</div>
+  </div>
+</div>
+
+<h3 class="sub">Three signals that a graph is warranted</h3>
+
+<div class="grid3">
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#2563EB"></span>Variable depth</div>
+    <div class="mini-d">You cannot state up front how many relationships a question must cross. "Find the shared cause" and "who else is affected" are both open-ended by nature.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0D9488"></span>Edges carry data</div>
+    <div class="mini-d">The relationship itself has attributes &mdash; when it started, how much capacity it carries, how confident you are that it exists. A foreign key cannot hold any of that.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#7C3AED"></span>Shape keeps changing</div>
+    <div class="mini-d">New kinds of things and new kinds of connections arrive constantly. Adding a node type to a graph is additive; adding an entity to a normalised schema is a migration.</div>
+  </div>
+</div>
+
+<div class="note warn">
+  <span class="nlab">Where a graph is the wrong answer</span>
+  High-volume transactional writes, financial ledgers, anything needing strict tabular aggregation over millions of uniform rows, and any dataset whose relationships are genuinely fixed and shallow. A graph laid over a problem that did not need one buys you a second system to operate and no new answers. <b>Most production architectures end up with both</b>, each doing what it is good at.
+</div>
+
+<h3 class="sub">What this course builds toward</h3>
+
+<p class="body">Everything from here is one argument in eight parts. A plain graph gives you structure. Adding meaning and provenance turns it into a <strong>knowledge graph</strong> &mdash; a durable model of what is always true about a system. Adding a short-lived, tightly scoped overlay for one entity at one moment gives you a <strong>context graph</strong>. Put the two together and you can rank explanations for a problem, show your evidence, and &mdash; the part most demonstrations quietly skip &mdash; recognise when the evidence does not justify acting at all.</p>
+`;
+
+/* ============================ 02 — ANATOMY ============================ */
+CONTENT["anatomy"] = `
+<p class="body">A graph has exactly two kinds of thing in it. That is the entire data model, and everything else in this course is built from those two pieces plus the discipline you impose on them.</p>
+
+<div class="grid2">
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#2563EB"></span>Nodes</div>
+    <div class="mini-d">The things. A subscriber, a cell, a session, a charging function, an invoice. Each carries a <b>label</b> saying what kind of thing it is, a stable <b>identifier</b>, and any number of <b>properties</b> &mdash; ordinary key/value attributes.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0D9488"></span>Edges</div>
+    <div class="mini-d">The relationships. Always <b>typed</b> (<code>SERVED_BY</code>, not just "related to"), almost always <b>directed</b>, and &mdash; the part people miss &mdash; able to carry <b>properties of their own</b>.</div>
+  </div>
+</div>
+
+<h3 class="sub">Direction is a modelling decision, not a technicality</h3>
+
+<p class="body">An edge from a session to a user plane function typed <code>CARRIED_BY</code> means something different from the reverse edge typed <code>CARRIES</code>. In practice you store one and traverse it both ways, but which one you store shapes how naturally your queries read. Pick the direction that matches how the domain talks: a session <em>is carried by</em> a function; a function <em>serves</em> a cell.</p>
+
+<h3 class="sub">Properties on edges are where the value hides</h3>
+
+<p class="body">This is the single most under-used feature of graph modelling. A relational foreign key can only say "these two rows are related". An edge can say <em>when</em> the relationship started, <em>how much</em> traffic it carries, <em>which system</em> reported it, and <em>how confident</em> you are that it is still true. Once edges carry confidence and timestamps, a whole category of reasoning becomes possible that simply cannot be expressed with keys.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.5 8.5l7 7"/></svg> Build a graph, see it written two ways</div>
+    <span class="wg-tag">Sandbox</span>
+  </div>
+  <div class="wg-b">
+    <div class="btnrow" style="margin-bottom:12px">
+      <button type="button" class="btn sm" data-w2add="Subscriber">+ Subscriber</button>
+      <button type="button" class="btn sm" data-w2add="Session">+ Session</button>
+      <button type="button" class="btn sm" data-w2add="Cell">+ Cell</button>
+      <button type="button" class="btn sm" data-w2add="UPF">+ UPF</button>
+      <button type="button" class="btn sm" data-w2add="ChargingFn">+ Charging Fn</button>
+      <button type="button" class="btn sm" id="w2-clear" style="margin-left:auto">Clear</button>
+    </div>
+    <svg class="canvas" id="w2-svg" viewBox="0 0 620 250" role="img" aria-label="Graph sandbox canvas"></svg>
+    <div class="wg-hint" id="w2-status">Add a few nodes, then click one node and a second node to connect them.</div>
+    <div class="btnrow" style="margin-top:13px">
+      <div class="segs">
+        <button type="button" id="w2-pg" class="on">Property graph</button>
+        <button type="button" id="w2-rdf">RDF triples</button>
+      </div>
+    </div>
+    <pre id="w2-out" style="margin-top:11px;min-height:96px"></pre>
+  </div>
+</div>
+
+<h3 class="sub">Two notations, one idea</h3>
+
+<p class="body">You will meet two families of graph technology and the vocabulary difference makes them look further apart than they are.</p>
+
+<div class="tblwrap"><table class="tbl">
+<thead><tr><th>&nbsp;</th><th>Labelled property graph</th><th>RDF / triple store</th></tr></thead>
+<tbody>
+<tr><td><b>Unit of storage</b></td><td>Node or edge, each with a property bag</td><td>A triple: subject, predicate, object</td></tr>
+<tr><td><b>Attributes</b></td><td>Attached directly to nodes and edges</td><td>Expressed as further triples</td></tr>
+<tr><td><b>Identity</b></td><td>Local identifier, unique within the database</td><td>An IRI, globally unique by construction</td></tr>
+<tr><td><b>Typical query language</b></td><td>Cypher, Gremlin, GQL</td><td>SPARQL</td></tr>
+<tr><td><b>Natural strength</b></td><td>Fast traversal, ergonomic modelling, operational systems</td><td>Shared vocabularies, merging data across organisations, formal inference</td></tr>
+<tr><td><b>Usual friction</b></td><td>Vocabularies are yours alone unless you do extra work</td><td>Attributes on a relationship need extra machinery to express</td></tr>
+</tbody></table></div>
+
+<div class="note">
+  <span class="nlab">Which one should you pick</span>
+  For an internal operational system whose main job is traversal &mdash; the case this course is built around &mdash; a property graph is usually the shorter path. Reach for RDF when the graph must be <b>merged with data you do not control</b>, or when a formal, published vocabulary genuinely matters. <b>The concepts in the rest of this course apply identically to both.</b>
+</div>
+
+<h3 class="sub">Vocabulary you will keep meeting</h3>
+
+<ul class="body">
+  <li><strong>Traversal</strong> &mdash; moving from node to node along edges. The basic operation of a graph, the way a scan is the basic operation of a table.</li>
+  <li><strong>Path</strong> &mdash; the ordered sequence of nodes and edges a traversal actually crossed. Paths are results in their own right, and an explanation is very often just a path with labels on it.</li>
+  <li><strong>Degree</strong> &mdash; how many edges a node has. High-degree nodes ("supernodes") are both the most interesting and the most expensive parts of a graph.</li>
+  <li><strong>Neighbourhood</strong> &mdash; everything within <em>n</em> hops of a node. This is the usual unit of "give me the relevant part of the graph".</li>
+  <li><strong>Subgraph</strong> &mdash; any selected portion of the whole. A context graph, which arrives in module 4, is a particular disciplined kind of subgraph.</li>
+</ul>
+`;
+
+/* ============================ 03 — KNOWLEDGE ============================ */
+CONTENT["knowledge"] = `
+<p class="body">Everything in the last module was just a graph. Plenty of systems have one and get very little out of it. What separates a <strong>knowledge graph</strong> from a pile of connected records is that the graph knows what its own contents mean, insists that they stay coherent, and can tell you where every fact came from.</p>
+
+<p class="body">Four properties do that work.</p>
+
+<h3 class="sub">1. A schema, so the graph knows what it holds</h3>
+
+<p class="body">A schema (in the semantic-web world, an <strong>ontology</strong>) declares the node types that may exist, the edge types allowed between them, and which properties each is expected to carry. It is the difference between a node labelled <code>Cell</code> that is guaranteed to have a technology, a band, and exactly one parent, and a node labelled <code>Cell</code> that might have any of those, depending on which ingestion job created it and when.</p>
+
+<p class="body">Schema also unlocks a class of question that is otherwise unanswerable. Without types, "find every network function affected by this transport fault" cannot be evaluated, because nothing in the graph knows which nodes <em>are</em> network functions. The traversal has no idea what to stop at.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg> What a schema buys you</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <label class="swtch"><input type="checkbox" id="w3-schema"> <span>Turn the schema on</span></label>
+    <div id="w3-list" style="margin-top:14px"></div>
+    <div class="wg-hint">The facts in the graph are identical in both states. Only the declared meaning changes &mdash; and with it, which questions the graph can actually evaluate.</div>
+  </div>
+</div>
+
+<h3 class="sub">2. Identity, so one real thing is one node</h3>
+
+<p class="body">The same physical cell site may appear in the inventory system by an engineering identifier, in the configuration store by a vendor identifier, and in the performance feed by an entirely different numeric key. If the graph ingests all three without resolving them, it now contains three nodes for one cell, each holding a third of the truth, and every traversal through that cell silently returns an incomplete answer.</p>
+
+<p class="body"><strong>Identity resolution</strong> &mdash; deciding that these three records denote one entity and merging them behind a stable internal identifier &mdash; is unglamorous, never finished, and the most common reason a graph quietly gives wrong answers. Budget real effort for it.</p>
+
+<div class="note stop">
+  <span class="nlab">The failure to watch for</span>
+  Duplicate identity does not announce itself. The graph returns a result, the result looks reasonable, and it is missing whichever half of the evidence attached to the other copy of the node. <b>Nothing errors.</b> This is why identity resolution deserves monitoring, not just a migration script.
+</div>
+
+<h3 class="sub">3. Constraints, so contradictions cannot enter</h3>
+
+<p class="body">A constraint is a rule the graph refuses to violate: a cell must belong to exactly one parent; a session must reference a subscriber that exists; a charging record cannot predate the session it bills. Constraints are how a graph resists slow decay. Without them, ingestion bugs do not fail loudly &mdash; they accumulate quietly as impossible structures that make later reasoning subtly wrong.</p>
+
+<h3 class="sub">4. Provenance, so every fact can be challenged</h3>
+
+<p class="body">This is the property that matters most for the reasoning in module 6, and the one most often left out. <strong>Provenance</strong> records, for each fact, where it came from, when it was asserted, how it was derived, and how much it should be trusted.</p>
+
+<p class="body">The reason to care is simple: a conclusion drawn from a graph is only as defensible as the weakest fact underneath it. If someone challenges the answer &mdash; and for anything touching money or customer impact, someone will &mdash; provenance is the difference between "the system says so" and "this came from the configuration store, was confirmed at 14:02, and the topology edge it depends on was last verified three minutes earlier."</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg> Provenance inspector</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="btnrow" id="w3b-tabs" style="margin-bottom:13px"></div>
+    <div id="w3b-out"></div>
+    <div class="wg-hint">Click each fact. Two of these five should not be treated the same way as the others &mdash; the freshness and the derivation tell you which.</div>
+  </div>
+</div>
+
+<h3 class="sub">Knowledge graphs are deliberately slow-moving</h3>
+
+<p class="body">One last defining property, and it sets up the whole next module. A knowledge graph holds what is <strong>durably true</strong>: topology, ownership, entitlements, configuration, the shape of the system. It changes when the system changes &mdash; a cell is commissioned, a subscriber upgrades a plan, a link is re-homed.</p>
+
+<p class="body">It emphatically does not hold that a particular counter spiked ninety seconds ago. The moment you start writing live measurements into a knowledge graph, it stops being a stable reference and becomes an unusably churning event store. That transient material needs somewhere else to live, and that somewhere is the subject of module 4.</p>
+`;
+
+/* ============================ 04 — CONTEXT ============================ */
+CONTENT["context"] = `
+<p class="body">A knowledge graph answers "how is this system put together". It cannot answer "what is happening to this customer right now", and it should not try. That question needs a different structure with different rules, and that structure is the <strong>context graph</strong>.</p>
+
+<div class="tblwrap"><table class="tbl">
+<thead><tr><th>&nbsp;</th><th>Knowledge graph</th><th>Context graph</th></tr></thead>
+<tbody>
+<tr><td><b>Scope</b></td><td>The whole system</td><td>One entity, one question</td></tr>
+<tr><td><b>Lifetime</b></td><td>Years &mdash; changes when the system changes</td><td>Minutes to hours &mdash; then discarded or archived</td></tr>
+<tr><td><b>Contents</b></td><td>Durable facts: topology, ownership, entitlement, configuration</td><td>Observations, measurements, symptoms, hypotheses, confidence</td></tr>
+<tr><td><b>Size</b></td><td>Millions of nodes</td><td>Tens of nodes, occasionally hundreds</td></tr>
+<tr><td><b>Truth model</b></td><td>Asserted &mdash; something either is or is not so</td><td>Believed &mdash; every element carries a confidence and an expiry</td></tr>
+<tr><td><b>Written by</b></td><td>Inventory, provisioning, configuration, topology discovery</td><td>The investigation itself, as it runs</td></tr>
+</tbody></table></div>
+
+<h3 class="sub">Anchored, not copied</h3>
+
+<p class="body">The most important structural rule: a context graph does <strong>not duplicate the topology</strong>. It holds references &mdash; anchors &mdash; into the knowledge graph, and adds only what is new. If an investigation concerns one cell and one charging function, the context graph holds two anchors and whatever was observed about them, not a private copy of the network.</p>
+
+<p class="body">This keeps context graphs cheap enough to build one per incident, per customer, per query, and throw them away without a thought. It also means they inherit corrections automatically: fix a wrong edge in the knowledge graph and every context graph anchored to it is immediately right.</p>
+
+<h3 class="sub">Three things a context graph carries that a knowledge graph must not</h3>
+
+<div class="grid3">
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#B45309"></span>Observations</div>
+    <div class="mini-d">Measured values with a timestamp and a source. "Completeness fell to 94.1% at 13:58, reported by mediation." Facts about a moment, not about the system.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#7C3AED"></span>Confidence</div>
+    <div class="mini-d">How much to believe each element. A directly measured counter and an inferred correlation both belong here, but they must not be weighted the same.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#DC2626"></span>Expiry</div>
+    <div class="mini-d">When this stops being worth believing. Live measurements decay; an observation from forty minutes ago is not evidence about now, and the graph should say so itself.</div>
+  </div>
+</div>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> An incident, minute by minute</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="slider">
+      <label for="w4-t">Time</label>
+      <input type="range" id="w4-t" min="0" max="7" step="1" value="0">
+      <span class="val" id="w4-clock">13:52</span>
+    </div>
+    <svg class="canvas" id="w4-svg" viewBox="0 0 620 218" role="img" aria-label="Context graph forming over time"></svg>
+    <div id="w4-log" style="margin-top:12px"></div>
+    <div class="wg-hint">Scrub forward and back. Elements enter as they are observed, strengthen as corroborating evidence arrives, and fade as they age past their usefulness. Nothing here is written back into the knowledge graph.</div>
+  </div>
+</div>
+
+<h3 class="sub">Why decay has to be built in</h3>
+
+<p class="body">A context graph without expiry becomes a lie with a timestamp. Consider the failure: an investigation opens at 13:58, gathers evidence, and stalls waiting for a human. At 14:40 someone opens it and sees a confident diagnosis built entirely on measurements that are three-quarters of an hour old, from a network that has since been re-homed twice.</p>
+
+<p class="body">Nothing in the display is false &mdash; each observation was accurate when taken. The graph is still wrong, because it presents stale belief with the same weight as current belief. <strong>Decay is not housekeeping; it is part of the truth model.</strong></p>
+
+<div class="note good">
+  <span class="nlab">A useful way to hold this</span>
+  The knowledge graph is the map. The context graph is the pin, the note, and the timestamp on it. You keep the map for years. You throw the note away when the situation it described has passed &mdash; and you would never scribble the note onto the map itself.
+</div>
+`;
+
+/* ============================ 05 — BINDING ============================ */
+CONTENT["binding"] = `
+<p class="body">Separately, each graph is half a tool. The knowledge graph knows the shape of everything and the state of nothing. The context graph knows what just happened and has no idea what it is connected to. The value is entirely in the join between them.</p>
+
+<h3 class="sub">Anchoring</h3>
+
+<p class="body">An <strong>anchor</strong> is a reference from a context element to a node in the knowledge graph. When mediation reports a completeness drop, the observation is not free-floating &mdash; it anchors to the specific charging function node. That single link is what lets the investigation cross into the topology and ask what else touches that function.</p>
+
+<p class="body">The moment an observation is anchored, it inherits everything the knowledge graph already knows: which cells that function serves, which slice it belongs to, which subscribers are entitled to what, which transport links sit beneath it. <strong>None of that had to be gathered.</strong> It was already true, and the anchor made it available.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/></svg> Two layers, one picture</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="btnrow" style="margin-bottom:13px">
+      <label class="swtch"><input type="checkbox" id="w5-cg" checked> <span>Show context overlay</span></label>
+      <label class="swtch"><input type="checkbox" id="w5-prop"> <span>Propagate impact along edges</span></label>
+    </div>
+    <svg class="canvas" id="w5-svg" viewBox="0 0 620 292" role="img" aria-label="Knowledge graph with context overlay"></svg>
+    <div id="w5-read" style="margin-top:12px"></div>
+    <div class="wg-hint">With the overlay off you have a topology and no idea anything is wrong. With it on but no propagation you have two isolated symptoms. Only when impact travels the existing edges does a shared cause become visible.</div>
+  </div>
+</div>
+
+<h3 class="sub">Propagation: letting the topology do the work</h3>
+
+<p class="body">Once observations are anchored, blame can travel along edges that already exist. If two symptoms appear at different points in the network and both anchor to nodes that share an upstream dependency, that shared node becomes a candidate explanation &mdash; not because anyone wrote a rule about those two symptoms, but because the topology says they meet there.</p>
+
+<p class="body">This is the property that makes the pairing worth the effort. <strong>The system can propose explanations nobody encoded in advance</strong>, because the paths were already in the graph. A rules engine can only fire the rules someone thought to write. A graph traversal finds the intersection whether or not anyone anticipated it.</p>
+
+<h3 class="sub">Directionality matters here</h3>
+
+<p class="body">Impact does not travel symmetrically. A failed transport link degrades the cells above it; a degraded cell does not break the link beneath it. Encoding edge direction correctly is what stops propagation from spraying blame in every direction and nominating half the network as a candidate.</p>
+
+<div class="note warn">
+  <span class="nlab">The most common modelling mistake</span>
+  Treating every edge as bidirectional because it was easier at ingestion time. It costs nothing on day one and quietly destroys the value of propagation later &mdash; every traversal reaches everything, every candidate list is enormous, and confidence separation collapses. <b>Get direction right at ingestion.</b> Retrofitting it means re-deriving every edge you have.
+</div>
+
+<h3 class="sub">The read path, end to end</h3>
+
+<ol class="body">
+  <li>A symptom arrives &mdash; a threshold breach, a customer complaint, an alarm.</li>
+  <li>It is <strong>anchored</strong> to the knowledge-graph node it concerns.</li>
+  <li>The neighbourhood around that anchor is pulled in: a few hops of topology, entitlement, and configuration.</li>
+  <li>Other live observations touching that same neighbourhood are attached to the context graph.</li>
+  <li>Impact <strong>propagates</strong> along directed edges, and shared upstream nodes are collected as candidates.</li>
+  <li>Candidates are scored against the evidence &mdash; which is module 6.</li>
+</ol>
+
+<p class="body">Six steps, and only steps one and four involve anything live. Everything else was already sitting in the knowledge graph, waiting to be asked.</p>
+`;
+
+/* ============================ 06 — REASONING ============================ */
+CONTENT["reasoning"] = `
+<p class="body">Now the pairing has to produce an answer. This module is about how candidates get ranked, and then about the harder discipline that almost every demonstration skips: <strong>knowing when not to act</strong>.</p>
+
+<h3 class="sub">Generating candidates</h3>
+
+<p class="body">Propagation from module 5 hands you a set of nodes that could explain the symptoms. This set should be generated <em>structurally</em> &mdash; anything the topology says could be responsible &mdash; and deliberately kept wide. Narrowing too early is how you eliminate the true cause before you have looked at it.</p>
+
+<h3 class="sub">Scoring the evidence</h3>
+
+<p class="body">Each candidate is then scored against what the context graph actually observed. Four factors do most of the work.</p>
+
+<div class="grid2">
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#2563EB"></span>Coverage</div>
+    <div class="mini-d">How many of the observed symptoms this candidate would explain. A cause that accounts for all four beats one that accounts for two.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0D9488"></span>Specificity</div>
+    <div class="mini-d">How much this candidate explains that others do not. A node upstream of everything explains everything and therefore distinguishes nothing.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#7C3AED"></span>Temporal fit</div>
+    <div class="mini-d">Did the candidate's own change or degradation precede the symptoms? An effect that started first cannot have been caused by something that started later.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#B45309"></span>Evidence quality</div>
+    <div class="mini-d">The provenance from module 3, cashed in. A measured counter from a trusted feed outweighs an inferred correlation, and the score has to reflect that.</div>
+  </div>
+</div>
+
+<h3 class="sub">Separation matters more than the top score</h3>
+
+<p class="body">Here is the idea that changes how you read a ranked list. A top candidate at 0.82 with the runner-up at 0.79 is <strong>a worse result</strong> than a top candidate at 0.71 with the runner-up at 0.31. In the first case the system has two nearly equal explanations and no basis for choosing; in the second it has one clear leader. Confidence in the winner is not what licenses action &mdash; <strong>separation from the alternatives</strong> is.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8.2V20l-4-2.4v-5.4z"/></svg> The action gate</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="slider">
+      <label for="w6-th">Confidence threshold</label>
+      <input type="range" id="w6-th" min="40" max="95" step="1" value="70">
+      <span class="val" id="w6-thv">0.70</span>
+    </div>
+    <div class="slider">
+      <label for="w6-sep">Required separation</label>
+      <input type="range" id="w6-sep" min="0" max="40" step="1" value="15">
+      <span class="val" id="w6-sepv">0.15</span>
+    </div>
+    <div class="btnrow" style="margin-bottom:14px">
+      <div class="segs">
+        <button type="button" data-w6c="clear" class="on">Clear-cut case</button>
+        <button type="button" data-w6c="tie">Two rival causes</button>
+        <button type="button" data-w6c="weak">Thin evidence</button>
+      </div>
+    </div>
+    <div class="bars" id="w6-bars"></div>
+    <div id="w6-verdict"></div>
+    <div class="wg-hint">Try the tied case at any threshold you like. The leading score is high, and the system still should not act &mdash; because it cannot tell the top two apart. That refusal is the feature.</div>
+  </div>
+</div>
+
+<h3 class="sub">Refusal is a result</h3>
+
+<p class="body">A system that always produces an answer is not confident, it is <strong>uncalibrated</strong>. Real investigations end without a conclusion all the time: the evidence is thin, two causes fit equally well, the decisive measurement is missing, or the fault sits in a domain the graph does not model.</p>
+
+<p class="body">If the system emits a confident recommendation in those situations, it will be wrong often enough that operators stop trusting it &mdash; and once trust is gone, they stop trusting the correct answers too. A system that says <em>"two candidates, cannot separate them, here is the measurement that would decide it"</em> is more useful than one that guesses, and far more useful than one that guesses and is occasionally right.</p>
+
+<div class="note good">
+  <span class="nlab">What a good refusal contains</span>
+  Not just "insufficient confidence". It should name the candidates it could not separate, state what evidence it had, and &mdash; most valuable of all &mdash; <b>say which specific measurement would resolve it</b>. That turns a dead end into the next action.
+</div>
+
+<h3 class="sub">The gate is separate from the reasoning</h3>
+
+<p class="body">One architectural point worth stating plainly. Ranking candidates and deciding whether to act on the ranking are <strong>two different components</strong>, and they should stay that way. The gate applies policy: is confidence above threshold, is separation sufficient, is this action reversible, is the affected population within limits, is there a human approval requirement for this class of change?</p>
+
+<p class="body">Keeping them separate means you can tune how aggressive the automation is without touching how the reasoning works, and you can hold the gate to a different standard of review &mdash; which matters, because the gate is the part that can do damage.</p>
+`;
+
+/* ============================ 07 — PRACTICE ============================ */
+CONTENT["practice"] = `
+<p class="body">Nobody draws a production graph by hand. It is assembled, continuously, from systems that already exist and were never designed to feed it. This module is about where the material actually comes from and what goes wrong.</p>
+
+<h3 class="sub">Nodes come from systems of record</h3>
+
+<p class="body">Almost every node type you need already exists somewhere authoritative. The work is not inventing it &mdash; it is deciding which system owns each type, and refusing to let a second system create the same node behind your back.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16v4H4zM4 14h16v4H4z"/></svg> Where the graph comes from</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="btnrow" id="w7-tabs" style="margin-bottom:14px"></div>
+    <div id="w7-out"></div>
+    <div class="wg-hint">Notice the freshness column. A graph is only as current as its slowest meaningful feed, and mixing a daily source with a live one without saying so is how confident wrong answers get produced.</div>
+  </div>
+</div>
+
+<h3 class="sub">Edges are harder than nodes</h3>
+
+<p class="body">Node lists are usually exportable. Relationships frequently are not &mdash; they are implied by naming conventions, buried in configuration files, or exist only in an engineer's head. Deriving edges reliably is most of the build effort on any real graph project, and it is where the estimates go wrong.</p>
+
+<p class="body">Three practical sources, in descending order of trustworthiness: <strong>explicit configuration</strong> (a config file states the parent, so the edge is stated fact), <strong>observed traffic</strong> (these two elements demonstrably exchange traffic, so the relationship exists whether or not anyone documented it), and <strong>inference from convention</strong> (the identifiers share a prefix, so they are probably related). The third is legitimate and often necessary &mdash; but it must be recorded with lower confidence, and module 3's provenance is how you do that.</p>
+
+<h3 class="sub">Freshness is a property of the graph, not an afterthought</h3>
+
+<p class="body">Different feeds arrive at wildly different rates: inventory nightly, configuration on change, topology discovery hourly, performance counters every minute. A single traversal will routinely cross all four. If the graph does not carry per-edge freshness, a conclusion can rest on a topology edge that stopped being true nine hours ago, and nothing will flag it.</p>
+
+<div class="note warn">
+  <span class="nlab">Design rule</span>
+  Stamp every node and edge with <b>when it was last confirmed</b>, not just when it was created. Then let reasoning discount stale elements automatically. This is a small amount of work at ingestion and it removes an entire class of silent wrongness later.
+</div>
+
+<h3 class="sub">Four ways graphs quietly go bad</h3>
+
+<div class="grid2">
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#DC2626"></span>Split identity</div>
+    <div class="mini-d">One real thing arrives as two nodes from two feeds. Every traversal now returns half the evidence and no error is raised. Monitor for near-duplicate nodes continuously, not once at build time.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#DC2626"></span>Orphan accumulation</div>
+    <div class="mini-d">Things get decommissioned in the real world and stay in the graph forever, because deletion was never wired up. Candidate lists slowly fill with equipment that no longer exists.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#DC2626"></span>Silent schema drift</div>
+    <div class="mini-d">An upstream feed adds a field or renames one, ingestion keeps running, and a property everyone's queries depend on is quietly empty for a fortnight before anyone notices.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#DC2626"></span>Confidence laundering</div>
+    <div class="mini-d">An inferred, low-confidence edge is written once, read back later without its provenance, and treated from then on as established fact. Confidence must travel with the edge, permanently.</div>
+  </div>
+</div>
+
+<h3 class="sub">Start narrow</h3>
+
+<p class="body">The single most reliable way to fail at this is to model the whole estate first. It takes a year, and at the end nobody can name a question it answers better than the tools they already had.</p>
+
+<p class="body">The approach that works is the opposite: pick <strong>one question that is currently expensive to answer</strong> &mdash; genuinely expensive, the kind that consumes an engineer for half a day &mdash; and model only what is needed to answer it. That is typically four or five node types and half a dozen edge types. Get it answering, put it in front of the people who ask that question, and let the next question tell you what to add.</p>
+
+<div class="note good">
+  <span class="nlab">A reasonable first scope</span>
+  Five node types, six edge types, two source systems, one question. Everything in this course &mdash; anchoring, propagation, ranking, the action gate &mdash; works perfectly well at that size. <b>Scope grows on demand; it does not need to be right on day one.</b>
+</div>
+`;
+
+/* ============================ 08 — LLMs ============================ */
+CONTENT["llm"] = `
+<p class="body">Every graph project now gets asked where the language model goes. It is a fair question with a precise answer, and getting it wrong in either direction is costly &mdash; bolt the model onto the wrong stage and you either waste it or you poison the results.</p>
+
+<h3 class="sub">What a language model is genuinely good at here</h3>
+
+<div class="grid2">
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0A7C46"></span>Turning a question into a query</div>
+    <div class="mini-d">"Which customers on priority plans were affected this afternoon" becomes a traversal. The model translates; the graph answers. Real value, low risk, because a wrong translation produces an obviously wrong result rather than a plausible fabrication.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0A7C46"></span>Narrating a result</div>
+    <div class="mini-d">Turning a ranked candidate list and a path into a paragraph a duty manager can read at two in the morning. The facts are fixed before the model sees them; it is doing prose, not analysis.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0A7C46"></span>Summarising across incidents</div>
+    <div class="mini-d">"What did we see this week" over dozens of resolved cases. Genuinely tedious for a human, well within a model's competence, and low-stakes if slightly imprecise.</div>
+  </div>
+  <div class="mini">
+    <div class="mini-t"><span class="sq" style="background:#0A7C46"></span>Mapping vocabulary</div>
+    <div class="mini-d">Recognising that a customer complaint about "charged for data I never used" concerns the rating path. Fuzzy language matching is exactly what these models are for.</div>
+  </div>
+</div>
+
+<h3 class="sub">What it must not be allowed to do</h3>
+
+<p class="body">Rank the candidates. Decide the cause. Judge whether evidence is sufficient. Approve an action. Every one of those must stay deterministic, inspectable, and reproducible &mdash; because every one of them will eventually be audited, and <em>"the model was fairly sure"</em> is not a defence when the question is why a network change was applied at three in the morning.</p>
+
+<p class="body">There is a subtler reason too. A language model asked to reason over evidence will produce a fluent, confident, well-structured answer <strong>whether or not the evidence supports one</strong>. That is the opposite of the refusal behaviour module 6 spent its length arguing for. The graph knows when it cannot separate two candidates. The model, asked the same question, will pick one and explain it beautifully.</p>
+
+<div class="widget">
+  <div class="wg-h">
+    <div class="wg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2H4a2 2 0 00-2 2v16l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/></svg> The same question, with and without the graph</div>
+    <span class="wg-tag">Interactive</span>
+  </div>
+  <div class="wg-b">
+    <div class="btnrow" style="margin-bottom:13px">
+      <div class="segs">
+        <button type="button" id="w8-g" class="on">Grounded in the graph</button>
+        <button type="button" id="w8-u">Graph evidence withheld</button>
+      </div>
+    </div>
+    <div id="w8-out"></div>
+    <div class="wg-hint">Both answers are fluent and both sound authoritative. Only one of them can be checked. Read them for what is <em>missing</em> from the second, rather than for what is wrong with it &mdash; that absence is precisely what the graph contributes.</div>
+  </div>
+</div>
+
+<h3 class="sub">The division of labour</h3>
+
+<div class="tblwrap"><table class="tbl">
+<thead><tr><th>Stage</th><th>Owner</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Understand the question</td><td><b>Model</b></td><td>Natural language is what it is for</td></tr>
+<tr><td>Retrieve the relevant subgraph</td><td><b>Graph</b></td><td>Traversal is exact and repeatable</td></tr>
+<tr><td>Generate candidate causes</td><td><b>Graph</b></td><td>Must follow real topology, not plausibility</td></tr>
+<tr><td>Score and rank candidates</td><td><b>Deterministic scoring</b></td><td>Must be reproducible and auditable</td></tr>
+<tr><td>Decide whether to act</td><td><b>Policy gate</b></td><td>This is the part that can cause harm</td></tr>
+<tr><td>Explain the outcome</td><td><b>Model</b></td><td>Prose over fixed facts &mdash; nothing to invent</td></tr>
+</tbody></table></div>
+
+<p class="body">Read down the owner column and the pattern is clear: the model sits at <strong>both ends</strong> of the pipeline and nowhere in the middle. It takes language in, and it puts language out. Everything between is the graph and the scoring, and that is what makes the answer defensible.</p>
+
+<div class="note">
+  <span class="nlab">If you take one thing from this module</span>
+  The graph is not there to make the model smarter. It is there so that <b>the parts of the answer that must be true are produced by something that cannot make things up</b> &mdash; leaving the model to do the part where being articulate is the whole job.
+</div>
+
+<h3 class="sub">Where to go next</h3>
+
+<p class="body">The demo alongside this course puts all eight modules together on a single screen: a knowledge graph of a generic operator's charging path, a context graph assembled per incident, propagation, ranked candidates with evidence, and an action gate that refuses in half the scenarios. Watching the candidate pool narrow stage by stage is the fastest way to make the last six modules concrete.</p>
+`;
+
+var GCATS = ["Structure","Semantics","Context","Reasoning","Operations","Telecom"];
+
+var GLOSSARY = [
+/* ---- Structure ---- */
+{t:"Node",c:"Structure",d:"A thing in the graph \u2014 a subscriber, a cell, a session. Carries a label saying what kind of thing it is, a stable identifier, and any number of properties."},
+{t:"Edge",c:"Structure",d:"A typed, usually directed relationship between two nodes. Unlike a foreign key, an edge can carry properties of its own."},
+{t:"Label",c:"Structure",d:"The category a node belongs to, such as Cell or Subscriber. Labels are what let a traversal say \u201cstop when you reach a network function\u201d."},
+{t:"Property",c:"Structure",d:"A key/value attribute on a node or an edge. Properties on edges are the most under-used feature of graph modelling."},
+{t:"Directed edge",c:"Structure",d:"An edge with a from and a to. Direction is a modelling decision that determines how impact propagates, not a technical detail."},
+{t:"Traversal",c:"Structure",d:"Moving from node to node along edges. The fundamental graph operation, equivalent to a scan in a relational database."},
+{t:"Path",c:"Structure",d:"The ordered sequence of nodes and edges a traversal crossed. Paths are results in themselves \u2014 an explanation is often just a labelled path."},
+{t:"Hop",c:"Structure",d:"One edge crossed during a traversal. \u201cThree hops away\u201d means three relationships between the start and the end."},
+{t:"Degree",c:"Structure",d:"How many edges a node has. High-degree nodes are usually the most informative and the most expensive to traverse."},
+{t:"Supernode",c:"Structure",d:"A node with an extreme number of edges. Common in real topologies and a frequent cause of slow queries; often needs deliberate handling."},
+{t:"Neighbourhood",c:"Structure",d:"Everything within n hops of a node. The usual way to ask for \u201cthe relevant part of the graph\u201d without pulling all of it."},
+{t:"Subgraph",c:"Structure",d:"Any selected portion of a larger graph. A context graph is a disciplined, purpose-built kind of subgraph."},
+{t:"Adjacency",c:"Structure",d:"The property of two nodes being directly connected. Index-free adjacency \u2014 storing edges with their nodes \u2014 is why traversal stays cheap as a graph grows."},
+{t:"Cycle",c:"Structure",d:"A path that returns to where it started. Legitimate in many topologies, but traversal code must be written to terminate when it meets one."},
+{t:"Bipartite",c:"Structure",d:"A graph whose nodes split into two groups with edges only between groups, never within one. Subscribers-to-plans is a natural example."},
+{t:"Labelled property graph",c:"Structure",d:"The model where nodes and edges each carry labels and property bags. The usual choice for operational traversal systems."},
+{t:"Triple",c:"Structure",d:"Subject, predicate, object \u2014 the unit of storage in RDF. Every fact, including attributes, is expressed as a triple."},
+{t:"RDF",c:"Structure",d:"The W3C data model built on triples and globally unique identifiers. Strong when merging data across organisational boundaries."},
+{t:"IRI",c:"Structure",d:"A globally unique identifier used in RDF. Makes it possible to merge two datasets without accidentally conflating different things."},
+{t:"Cypher",c:"Structure",d:"A declarative query language for property graphs that expresses patterns visually, using arrow-like syntax for relationships."},
+{t:"SPARQL",c:"Structure",d:"The standard query language for RDF, matching triple patterns rather than paths."},
+{t:"GQL",c:"Structure",d:"An ISO-standard property-graph query language. Referenced here as a pointer \u2014 confirm the current published edition before citing it."},
+{t:"Graph database",c:"Structure",d:"A store whose primary access pattern is traversal rather than scan-and-join. Not automatically required \u2014 small graphs live perfectly well in a relational store."},
+
+/* ---- Semantics ---- */
+{t:"Knowledge graph",c:"Semantics",d:"A graph with declared meaning, enforced consistency, resolved identity, and recorded provenance, holding what is durably true about a system."},
+{t:"Schema",c:"Semantics",d:"The declaration of which node types, edge types, and properties are permitted. Turns a pile of records into something queryable by category."},
+{t:"Ontology",c:"Semantics",d:"A formal specification of concepts and their relationships. In practice a schema with more rigour and, usually, an inference story."},
+{t:"Taxonomy",c:"Semantics",d:"A hierarchical classification of types. A component of most ontologies rather than an alternative to one."},
+{t:"Class",c:"Semantics",d:"A declared kind of thing that nodes can be instances of. Classes are what make \u201cevery network function\u201d a computable set."},
+{t:"Instance",c:"Semantics",d:"A specific node belonging to a class. One physical cell is an instance of the Cell class."},
+{t:"Constraint",c:"Semantics",d:"A rule the graph refuses to violate, such as uniqueness or required parentage. How a graph resists slow corruption by buggy ingestion."},
+{t:"Cardinality",c:"Semantics",d:"How many of one thing may relate to another \u2014 one cell has exactly one parent, one subscriber may hold many sessions."},
+{t:"Identity resolution",c:"Semantics",d:"Deciding that records from different systems denote the same real entity, and merging them behind one stable identifier."},
+{t:"Entity resolution",c:"Semantics",d:"Another name for identity resolution, more common when the entities are people or accounts."},
+{t:"Split identity",c:"Semantics",d:"The failure where one real thing exists as two nodes. Traversals return partial evidence and nothing raises an error."},
+{t:"Provenance",c:"Semantics",d:"The record of where a fact came from, when it was asserted, how it was derived, and how much it should be trusted."},
+{t:"Assertion",c:"Semantics",d:"A stated fact in the graph, as opposed to one derived by inference. Assertions come from a source; inferences come from rules."},
+{t:"Inference",c:"Semantics",d:"A fact derived from other facts plus rules. Useful and dangerous in equal measure \u2014 inferred facts must never be stored as though they were measured."},
+{t:"Reasoner",c:"Semantics",d:"A component that applies ontology rules to derive implied facts. Powerful, and a common source of surprise when it derives more than expected."},
+{t:"Schema drift",c:"Semantics",d:"An upstream feed changes shape while ingestion keeps running. Properties quietly go empty and dependent queries silently degrade."},
+{t:"Vocabulary",c:"Semantics",d:"The agreed set of terms used for types and relationships. Shared vocabularies are the main reason to choose RDF over a property graph."},
+{t:"Semantic layer",c:"Semantics",d:"A mapping from business language to underlying technical structures, so a question can be asked in the words people actually use."},
+{t:"Canonical identifier",c:"Semantics",d:"The single internal identifier a resolved entity is known by, with source-system identifiers kept as aliases."},
+{t:"Reification",c:"Semantics",d:"Making a statement itself into a node so facts can be recorded about it. How RDF expresses what a property graph puts directly on an edge."},
+
+/* ---- Context ---- */
+{t:"Context graph",c:"Context",d:"A small, short-lived overlay covering one entity at one moment, holding observations, confidence, and expiry, anchored into the knowledge graph."},
+{t:"Anchor",c:"Context",d:"A reference from a context element to a knowledge-graph node. The join that lets an observation inherit everything already known."},
+{t:"Observation",c:"Context",d:"A measured value with a timestamp and a source. A fact about a moment, never a fact about the system."},
+{t:"Symptom",c:"Context",d:"An observation that indicates something is wrong. The starting point of an investigation, not its conclusion."},
+{t:"Confidence",c:"Context",d:"How strongly an element should be believed, usually on a zero-to-one scale. Must reflect provenance, not just signal strength."},
+{t:"Decay",c:"Context",d:"The scheduled reduction of confidence as an observation ages. Without it, a stalled investigation presents stale belief as current."},
+{t:"Expiry",c:"Context",d:"The point at which an element stops being worth believing at all. Part of the truth model, not housekeeping."},
+{t:"Time window",c:"Context",d:"The bounded period an investigation considers. Too narrow and the cause falls outside it; too wide and unrelated events look correlated."},
+{t:"Scope",c:"Context",d:"The entity and question a context graph is built for. Scope creep is what turns a cheap overlay into an unmanageable second graph."},
+{t:"Overlay",c:"Context",d:"The context graph viewed as a layer above the topology. Useful framing because the layer can be removed without touching what is underneath."},
+{t:"Snapshot",c:"Context",d:"A frozen copy of graph state at a moment, used so an investigation reasons over a stable picture while the live graph keeps changing."},
+{t:"Correlation window",c:"Context",d:"The tolerance within which two events are treated as related in time. Directly controls how many false shared causes appear."},
+{t:"Ephemeral state",c:"Context",d:"Data deliberately not persisted into the knowledge graph. Writing measurements into a knowledge graph destroys its stability."},
+{t:"Staleness",c:"Context",d:"How long ago an element was last confirmed. Should be carried on every node and edge and discounted automatically during reasoning."},
+
+/* ---- Reasoning ---- */
+{t:"Candidate",c:"Reasoning",d:"A node that could explain the observed symptoms. Generated structurally from topology and kept deliberately wide at first."},
+{t:"Hypothesis",c:"Reasoning",d:"A candidate together with the account of how it would produce the symptoms. A candidate with its reasoning attached."},
+{t:"Propagation",c:"Reasoning",d:"Following directed edges to see what else a fault would affect. How shared causes surface without anyone writing a rule for that pair of symptoms."},
+{t:"Blast radius",c:"Reasoning",d:"Everything a given fault would affect. Used both to rank candidates and to judge how urgent a fix is."},
+{t:"Coverage",c:"Reasoning",d:"The share of observed symptoms a candidate would explain. One of the four scoring factors."},
+{t:"Specificity",c:"Reasoning",d:"How much a candidate explains that rivals do not. A node upstream of everything explains everything and distinguishes nothing."},
+{t:"Temporal fit",c:"Reasoning",d:"Whether the candidate's own degradation preceded the symptoms. An effect starting first rules the candidate out."},
+{t:"Evidence quality",c:"Reasoning",d:"Provenance converted into weight. A measured counter from a trusted feed must outrank an inferred correlation."},
+{t:"Separation",c:"Reasoning",d:"The gap between the top candidate and the runner-up. More important than the top score: it is what licenses action."},
+{t:"Threshold",c:"Reasoning",d:"The confidence level below which no automated action is taken. Policy, deliberately kept outside the scoring logic."},
+{t:"Action gate",c:"Reasoning",d:"The component deciding whether a ranked result justifies acting. Separate from scoring so it can be tuned and audited independently."},
+{t:"Refusal",c:"Reasoning",d:"A deliberate no-decision outcome. A good refusal names the tied candidates and states which measurement would resolve them."},
+{t:"Calibration",c:"Reasoning",d:"Whether stated confidence matches observed accuracy. A system confident 90% of the time and right 60% is uncalibrated and will lose its users."},
+{t:"Elimination",c:"Reasoning",d:"Ruling a candidate out on evidence. Recording why something was eliminated is as valuable as recording why the winner won."},
+{t:"Root cause",c:"Reasoning",d:"The element whose failure explains the symptoms without itself needing explanation from within scope."},
+{t:"Contributing factor",c:"Reasoning",d:"Something that made the outcome worse without causing it. Distinguishing these from the root cause keeps candidate lists honest."},
+{t:"Explainability",c:"Reasoning",d:"Being able to show the path and evidence behind a conclusion. In graph reasoning this comes almost free, because the path is the explanation."},
+{t:"Determinism",c:"Reasoning",d:"The same inputs always producing the same output. Required for anything that will be audited."},
+{t:"False positive",c:"Reasoning",d:"Naming a cause that was not responsible. Cheap once, corrosive when repeated \u2014 it is how operator trust is lost."},
+{t:"Confidence laundering",c:"Reasoning",d:"An inferred low-confidence fact being read back later without its provenance and treated as established. Confidence must travel with the fact permanently."},
+
+/* ---- Operations ---- */
+{t:"Ingestion",c:"Operations",d:"The pipeline that turns source-system records into nodes and edges. Usually the largest part of the build effort."},
+{t:"System of record",c:"Operations",d:"The authoritative source for a given type of thing. Every node type should have exactly one, or identity conflicts follow."},
+{t:"Freshness",c:"Operations",d:"How recently an element was confirmed. Must be carried per element, because one traversal routinely crosses feeds of very different ages."},
+{t:"Derived edge",c:"Operations",d:"A relationship inferred rather than stated \u2014 from traffic observation or naming convention. Legitimate, but must be stored with lower confidence."},
+{t:"Orphan",c:"Operations",d:"A node whose real-world counterpart no longer exists, left behind because deletion was never wired up."},
+{t:"Reconciliation",c:"Operations",d:"Periodically comparing the graph against its sources to find drift. The only reliable defence against silent divergence."},
+{t:"Backfill",c:"Operations",d:"Loading historical data into a graph after the fact. Almost always harder than expected because historical identity is messier."},
+{t:"Cardinality explosion",c:"Operations",d:"A traversal reaching far more nodes than intended, usually via a supernode or a wrongly bidirectional edge."},
+{t:"Graph size",c:"Operations",d:"Node and edge counts. Less predictive of performance than degree distribution and traversal depth."},
+{t:"Materialisation",c:"Operations",d:"Precomputing and storing a derived result so it need not be traversed each time. Trades freshness for speed."},
+{t:"Access control",c:"Operations",d:"Restricting which parts of the graph a caller may traverse. Harder than in tables, because a path can leak the existence of nodes it crosses."},
+{t:"Audit trail",c:"Operations",d:"The record of what was concluded, on what evidence, and what action followed. The reason determinism matters."},
+{t:"Pilot scope",c:"Operations",d:"The deliberately small first model \u2014 roughly five node types, six edge types, two sources, one expensive question."},
+
+/* ---- Telecom ---- */
+{t:"Topology",c:"Telecom",d:"The physical and logical arrangement of network elements. The backbone of any telecom knowledge graph."},
+{t:"Network function",c:"Telecom",d:"A logical component performing a defined role in the core network. Nodes of this type are frequent candidates during fault isolation."},
+{t:"Charging function",c:"Telecom",d:"The element responsible for metering and authorising chargeable usage. Central to the assurance scenarios in the companion demo."},
+{t:"Mediation",c:"Telecom",d:"The stage that collects, normalises, and forwards usage records between the network and billing. A frequent place for records to go missing."},
+{t:"Usage record",c:"Telecom",d:"The detailed record of a chargeable event. Completeness of these records is the headline metric in charging assurance."},
+{t:"Completeness",c:"Telecom",d:"The proportion of expected usage records that actually arrived. A drop is a symptom, not a cause \u2014 the cause can be anywhere upstream."},
+{t:"Rating",c:"Telecom",d:"Applying pricing and entitlement rules to usage. Correct records rated against the wrong entitlement still produce a wrong bill."},
+{t:"Entitlement",c:"Telecom",d:"What a subscriber is permitted and at what price. Lives in the knowledge graph because it is durable, not observed."},
+{t:"Network slice",c:"Telecom",d:"A logical network with its own characteristics running over shared infrastructure. Adds a dimension that fault isolation must respect."},
+{t:"Session",c:"Telecom",d:"An active data connection for a subscriber. Short-lived, which is why sessions sit awkwardly between the two graph types."},
+{t:"Transport link",c:"Telecom",d:"Connectivity beneath the network functions. A frequent shared upstream dependency, and therefore a frequent shared cause."},
+{t:"Assurance",c:"Telecom",d:"The practice of detecting, isolating, and resolving service and revenue impact \u2014 the discipline this course's demo illustrates."}
+];
+
+var QUIZ = {
+"why-graphs":[
+ {q:"Which of these is the strongest signal that a problem genuinely needs a graph?",
+  o:["The dataset is very large","You cannot know in advance how many relationships a question must cross","The data arrives as JSON","There are more than ten tables in the current schema"],
+  a:1,
+  x:"Size alone says nothing \u2014 a billion uniform rows belong in a table. <b>Variable, unknown traversal depth</b> is the signal, because that is precisely what forces a relational query to be rewritten per depth."},
+ {q:"What can an edge do that a foreign key cannot?",
+  o:["Point at more than one row","Carry its own properties, such as when it was last confirmed","Be queried without an index","Guarantee referential integrity"],
+  a:1,
+  x:"A foreign key states only that two rows are related. An edge can carry <b>timestamps, confidence, capacity, and source</b> \u2014 and that capability is what makes later reasoning about staleness and trust possible."},
+ {q:"An analyst asks for monthly churn totals by market, over twenty million subscriber rows. What should you recommend?",
+  o:["Build a knowledge graph first","Keep it in the relational store","Load it into a triple store","Use a context graph per market"],
+  a:1,
+  x:"This is uniform aggregation over many rows with no traversal \u2014 exactly what relational databases are best at. <b>Recommending a graph here adds a system and answers nothing new.</b>"},
+ {q:"Why does the relational version of a variable-depth question tend to need rewriting?",
+  o:["Because SQL cannot express joins","Because each additional hop adds another join clause to the statement","Because relational databases cannot store relationships","Because indexes expire"],
+  a:1,
+  x:"Depth is baked into the text of the statement, so each extra hop changes the query. In a traversal, <b>depth is a parameter</b> and the statement keeps its shape."},
+ {q:"What is the most accurate description of how graphs and relational stores usually coexist in production?",
+  o:["The graph replaces the relational store","They are alternatives and you must choose one","Both are kept, each doing what it is good at","The relational store becomes a backup of the graph"],
+  a:2,
+  x:"Most real architectures run both. <b>Aggregate reporting stays relational; traversal and relationship-heavy reasoning move to the graph.</b>"}
+],
+"anatomy":[
+ {q:"What makes edge direction a modelling decision rather than a technicality?",
+  o:["Directed edges are faster to store","Direction determines how impact propagates during reasoning","Undirected edges are not supported by graph databases","Direction affects only how diagrams are drawn"],
+  a:1,
+  x:"A transport fault degrades the cells above it, not the reverse. <b>Direction is what stops propagation spraying blame everywhere</b> and nominating half the network."},
+ {q:"You need to record that a topology relationship was last confirmed at 14:02 and is only 60% trusted. Where does that belong?",
+  o:["As properties on the edge itself","In a separate audit table","As two extra nodes","In the query, at read time"],
+  a:0,
+  x:"This is exactly what edge properties exist for. Putting it elsewhere separates the confidence from the fact, which is how <b>confidence laundering</b> starts."},
+ {q:"Which is the fairest statement about property graphs versus RDF?",
+  o:["RDF is obsolete","Property graphs cannot express attributes","They differ mainly in identity and how attributes are expressed; the concepts here apply to both","RDF is faster for traversal"],
+  a:2,
+  x:"The vocabulary difference makes them look further apart than they are. RDF's strengths are <b>global identity and cross-organisation merging</b>; property graphs are usually more ergonomic for internal operational traversal."},
+ {q:"A node has an unusually large number of edges. What is it called and why does it matter?",
+  o:["A root node; it must be traversed first","A supernode; it is often informative but expensive to traverse","An orphan; it should be deleted","A canonical node; it holds the merged identity"],
+  a:1,
+  x:"Supernodes appear constantly in real topologies. They tend to be the most interesting parts of a graph and <b>the most common source of slow queries</b>."},
+ {q:"Why is a path a useful result in its own right, not just a means to an end?",
+  o:["Because paths compress well","Because a path with labels on it is very often the explanation","Because paths are always unique","Because paths can be cached"],
+  a:1,
+  x:"When you ask why the system reached a conclusion, <b>the path it traversed is the answer</b>. This is why explainability comes close to free in graph reasoning."}
+],
+"knowledge":[
+ {q:"Without a declared schema, which question becomes impossible to evaluate?",
+  o:["Show me this specific node","Find every network function affected by this fault","List all nodes created today","Count the edges"],
+  a:1,
+  x:"Without types, nothing in the graph knows which nodes <em>are</em> network functions, so <b>the traversal has no idea what to stop at</b>."},
+ {q:"One cell site arrives from three systems under three different identifiers and is never resolved. What happens?",
+  o:["Ingestion fails loudly","Three nodes exist and traversals silently return partial evidence","The graph refuses the duplicates automatically","Query performance degrades but answers stay correct"],
+  a:1,
+  x:"This is <b>split identity</b>, and its defining danger is that nothing errors. The result looks reasonable and is missing whatever attached to the other copies."},
+ {q:"Why does provenance matter most at the point a conclusion is challenged?",
+  o:["It proves the graph is fast","A conclusion is only as defensible as the weakest fact beneath it","It is required by graph databases","It reduces storage cost"],
+  a:1,
+  x:"Provenance is the difference between \u201cthe system says so\u201d and being able to name <b>the source, the time of assertion, and how the fact was derived</b>."},
+ {q:"Which belongs in a knowledge graph rather than a context graph?",
+  o:["A counter that spiked ninety seconds ago","A subscriber's plan entitlement","The current confidence in a hypothesis","An observation timestamped at 13:58"],
+  a:1,
+  x:"Entitlement is durable \u2014 it changes when the customer changes plan. <b>Writing live measurements into a knowledge graph turns a stable reference into a churning event store.</b>"},
+ {q:"What is the purpose of a constraint in a knowledge graph?",
+  o:["To speed up traversal","To stop contradictory or impossible structures from entering","To compress storage","To define access control"],
+  a:1,
+  x:"Constraints are how a graph resists slow decay. Without them, ingestion bugs <b>accumulate quietly as impossible structures</b> rather than failing loudly."}
+],
+"context":[
+ {q:"What is the defining structural rule of a context graph?",
+  o:["It copies the relevant topology so it can be queried offline","It anchors into the knowledge graph rather than duplicating it","It must contain fewer than fifty nodes","It replaces the knowledge graph during an incident"],
+  a:1,
+  x:"Anchoring keeps context graphs cheap enough to build per incident and throw away. It also means <b>fixing an edge in the knowledge graph immediately corrects every context graph anchored to it</b>."},
+ {q:"An investigation stalls at 13:58 and is reopened at 14:40. Without decay, what is wrong with what the reviewer sees?",
+  o:["The observations are false","Stale belief is presented with the same weight as current belief","The context graph will have been deleted","The anchors will have broken"],
+  a:1,
+  x:"Each observation was accurate when taken, so nothing is factually false. The graph is still wrong because <b>it fails to distinguish current evidence from expired evidence</b>."},
+ {q:"Which trio does a context graph carry that a knowledge graph should not?",
+  o:["Labels, properties, identifiers","Observations, confidence, expiry","Nodes, edges, paths","Schema, constraints, provenance"],
+  a:1,
+  x:"Those three are what make context transient and believable-with-doubt, as opposed to durable and asserted."},
+ {q:"What is the typical size difference between the two graphs?",
+  o:["Both hold millions of nodes","The context graph holds tens of nodes against the knowledge graph's millions","The context graph is usually larger, because it includes measurements","They are similar in size"],
+  a:1,
+  x:"Because it anchors instead of copying, a context graph stays tiny \u2014 <b>tens of nodes, occasionally hundreds</b> \u2014 which is what makes one-per-incident affordable."},
+ {q:"What is the truth model of a context graph?",
+  o:["Asserted \u2014 something either is or is not so","Believed \u2014 every element carries confidence and an expiry","Inferred \u2014 all elements are derived","Provisional \u2014 nothing is stored"],
+  a:1,
+  x:"The knowledge graph asserts. The context graph <b>believes, with a stated strength and a shelf life</b>."}
+],
+"binding":[
+ {q:"What does an observation gain the moment it is anchored?",
+  o:["A timestamp","Everything the knowledge graph already knows about that node","A higher confidence score","Permanent storage"],
+  a:1,
+  x:"Cells served, slice membership, entitlements, transport beneath \u2014 <b>none of it had to be gathered</b>. It was already true and the anchor made it reachable."},
+ {q:"Why can graph propagation propose explanations nobody encoded?",
+  o:["Because it uses machine learning","Because the paths already exist in the topology, so intersections are found whether or not anyone anticipated them","Because it tries every combination","Because rules are generated automatically"],
+  a:1,
+  x:"A rules engine fires only rules someone wrote. <b>A traversal finds the shared upstream node because the topology says the two symptoms meet there.</b>"},
+ {q:"What goes wrong if every edge is made bidirectional at ingestion for convenience?",
+  o:["Storage doubles","Every traversal reaches everything, candidate lists explode, and separation collapses","Queries fail with errors","Provenance is lost"],
+  a:1,
+  x:"It costs nothing on day one and destroys propagation later. Worse, <b>retrofitting direction means re-deriving every edge you have</b>."},
+ {q:"In the six-step read path, how many steps involve live data?",
+  o:["All six","Two \u2014 receiving the symptom and attaching other live observations","Four","None"],
+  a:1,
+  x:"Everything else \u2014 anchoring, neighbourhood retrieval, propagation, candidate collection \u2014 <b>was already sitting in the knowledge graph waiting to be asked</b>."},
+ {q:"With the context overlay switched off, what does the knowledge graph tell you about the incident?",
+  o:["The root cause","Nothing \u2014 it knows the shape of everything and the state of nothing","The affected subscribers","The confidence scores"],
+  a:1,
+  x:"That is the point of the pairing. <b>Each graph alone is half a tool</b>; the value is entirely in the join."}
+],
+"reasoning":[
+ {q:"Which result is stronger?",
+  o:["Top candidate 0.82, runner-up 0.79","Top candidate 0.71, runner-up 0.31","They are equally strong","Whichever has more evidence attached"],
+  a:1,
+  x:"The second has a clear leader. In the first, the system has <b>two nearly equal explanations and no basis for choosing</b> \u2014 separation, not the top score, is what licenses action."},
+ {q:"A candidate sits upstream of the entire network and would explain every symptom. What does its score suffer from?",
+  o:["Poor coverage","Poor specificity","Poor temporal fit","Poor evidence quality"],
+  a:1,
+  x:"It explains everything and therefore <b>distinguishes nothing</b>. Coverage is high; specificity is close to worthless."},
+ {q:"A candidate's own degradation began after the symptoms appeared. What does that tell you?",
+  o:["Its confidence should increase","It can be ruled out \u2014 an effect cannot precede its cause","It is a contributing factor","Nothing without more evidence"],
+  a:1,
+  x:"This is <b>temporal fit</b>, and it is one of the cheapest and most decisive eliminations available."},
+ {q:"What does a good refusal contain, beyond the fact that confidence was insufficient?",
+  o:["An apology and a ticket number","The tied candidates, the evidence held, and which measurement would resolve it","The full graph dump","A best guess, clearly labelled"],
+  a:1,
+  x:"Naming the deciding measurement <b>turns a dead end into the next action</b>, which is what makes refusal useful rather than merely honest."},
+ {q:"Why keep scoring and the action gate as separate components?",
+  o:["It performs better","So automation aggressiveness can be tuned without touching the reasoning, and the gate can be audited to a higher standard","Because they run on different servers","So the gate can be skipped when urgent"],
+  a:1,
+  x:"The gate is <b>the part that can do damage</b>, so it deserves its own policy, its own tuning, and its own review."}
+],
+"practice":[
+ {q:"Which part of building a real graph usually consumes the most effort?",
+  o:["Choosing a database","Deriving edges reliably","Drawing the schema","Writing queries"],
+  a:1,
+  x:"Node lists are usually exportable. <b>Relationships are implied by conventions, buried in configuration, or exist only in an engineer's head</b> \u2014 and that is where estimates go wrong."},
+ {q:"Rank these edge sources from most to least trustworthy.",
+  o:["Naming convention, observed traffic, explicit configuration","Explicit configuration, observed traffic, naming convention","Observed traffic, explicit configuration, naming convention","They are equally trustworthy"],
+  a:1,
+  x:"Configuration states the relationship as fact; observed traffic demonstrates it; a shared identifier prefix only suggests it. <b>The third is legitimate but must be stored with lower confidence.</b>"},
+ {q:"Why must freshness be recorded per element rather than per graph?",
+  o:["To speed up ingestion","Because a single traversal routinely crosses feeds that update at wildly different rates","Because storage requires it","To support deletion"],
+  a:1,
+  x:"Inventory nightly, configuration on change, counters every minute \u2014 <b>without per-element freshness a conclusion can rest on topology that expired nine hours ago</b>."},
+ {q:"Which failure describes an inferred edge later being treated as established fact?",
+  o:["Orphan accumulation","Schema drift","Confidence laundering","Split identity"],
+  a:2,
+  x:"It is written once with low confidence, read back without its provenance, and trusted from then on. <b>Confidence has to travel with the edge permanently.</b>"},
+ {q:"What is the recommended first scope for a graph project?",
+  o:["The full estate, modelled correctly up front","One expensive question, roughly five node types and six edge types","Every node type, no edges initially","Whatever the source systems export most easily"],
+  a:1,
+  x:"Modelling the estate first takes a year and answers nothing better than existing tools. <b>Scope grows on demand.</b>"}
+],
+"llm":[
+ {q:"Which task is a language model well suited to in this architecture?",
+  o:["Ranking candidate causes","Deciding whether to act","Turning a ranked result into readable prose","Judging whether evidence is sufficient"],
+  a:2,
+  x:"The facts are fixed before the model sees them, so it is <b>doing prose, not analysis</b> \u2014 and there is nothing left to invent."},
+ {q:"What does a language model do when asked to reason over evidence that does not support a conclusion?",
+  o:["It refuses","It produces a fluent, confident answer anyway","It returns an error","It requests more data"],
+  a:1,
+  x:"This is the precise opposite of the refusal behaviour that makes the system trustworthy. <b>The graph knows it cannot separate two candidates; the model will pick one and explain it beautifully.</b>"},
+ {q:"Reading down the ownership table, where does the model sit in the pipeline?",
+  o:["In the middle, coordinating the stages","At both ends \u2014 language in, language out \u2014 and nowhere between","Only at the start","Only at the end"],
+  a:1,
+  x:"Everything between the two ends is graph traversal and deterministic scoring, and <b>that is what makes the answer defensible</b>."},
+ {q:"Why is natural-language-to-query translation a comparatively low-risk use of a model?",
+  o:["Because queries are short","Because a wrong translation produces an obviously wrong result rather than a plausible fabrication","Because the model is deterministic here","Because the graph validates the model"],
+  a:1,
+  x:"The failure mode is visible. Contrast that with a fabricated causal explanation, which <b>looks exactly like a correct one</b>."},
+ {q:"What is the graph actually contributing to a grounded answer?",
+  o:["Better writing","The parts that must be true, produced by something that cannot make them up","Faster responses","Lower cost"],
+  a:1,
+  x:"The graph is not there to make the model smarter. It is there so the checkable parts are <b>generated by a component incapable of invention</b>."}
+]
+};
+
+/* ============================ state ============================ */
+var state = {cur:"home", done:{}, theme:"light"};
+
+function load(){
+  try{
+    var raw = localStorage.getItem(LSKEY);
+    if(raw){ var o = JSON.parse(raw); if(o && typeof o === "object"){ state.done = o.done || {}; state.theme = o.theme === "dark" ? "dark" : "light"; } }
+  }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem(LSKEY, JSON.stringify({done:state.done, theme:state.theme})); }catch(e){}
+}
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function modIndex(id){ for(var i=0;i<MODULES.length;i++){ if(MODULES[i].id===id) return i; } return -1; }
+
+/* ============================ theme ============================ */
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme", state.theme);
+  var ic = el("theme-icon");
+  if(state.theme === "dark"){
+    ic.innerHTML = '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  } else {
+    ic.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+  }
+}
+
+/* ============================ trail ============================ */
+function renderTrail(){
+  var h = "";
+  for(var i=0;i<MODULES.length;i++){
+    var m = MODULES[i];
+    var cls = "tstep" + (state.cur === m.id ? " on" : "") + (state.done[m.id] ? " done" : "");
+    h += '<button type="button" class="'+cls+'" data-go="'+m.id+'"><span class="tnum">'+(state.done[m.id] ? "\u2713" : m.n.replace(/^0/,""))+'</span>'+esc(m.short)+'</button>';
+  }
+  el("trail").innerHTML = h;
+}
+
+/* ============================ landing ============================ */
+function renderHome(){
+  var doneCount = 0;
+  for(var i=0;i<MODULES.length;i++){ if(state.done[MODULES[i].id]) doneCount++; }
+  var pct = Math.round((doneCount / MODULES.length) * 100);
+
+  var h = '<section class="sec on">';
+  h += '<div class="lhero">';
+  h += '<h1 class="lh-t">Knowledge &amp; <span class="g">Context</span> Graphs</h1>';
+  h += '<p class="lh-d">A knowledge graph holds what is always true about a system. A context graph holds what is true about one thing, right now. Neither is much use alone. Together they can rank the causes of a problem, show their evidence, and \u2014 the part that earns trust \u2014 recognise when the evidence does not justify acting at all.</p>';
+  h += '<p class="lh-s">Nine modules, each with something to take apart. No graph database experience assumed, and nothing to install.</p>';
+  h += '<div class="prog"><div class="prog-t">'+doneCount+' of '+MODULES.length+' modules complete</div><div class="prog-bar"><div class="prog-f" style="width:'+pct+'%"></div></div></div>';
+  h += '</div>';
+
+  h += '<div class="mlist">';
+  for(var j=0;j<MODULES.length;j++){
+    var m = MODULES[j];
+    h += '<button type="button" class="mcard" data-go="'+m.id+'">';
+    h += '<span class="mc-ico" style="background:'+m.soft+';color:'+m.color+'">'+ICONS[m.icon]+'</span>';
+    h += '<span class="mc-b">';
+    h += '<span class="mc-top"><span class="mc-n">'+m.n+'</span><span class="mc-t">'+esc(m.title)+'</span><span class="mc-time">'+esc(m.time)+'</span>'+(state.done[m.id]?'<span class="mc-done">Complete</span>':'')+'</span>';
+    h += '<span class="mc-d">'+esc(m.card)+'</span>';
+    h += '<span class="mc-f">'+esc(m.feat)+'</span>';
+    h += '</span></button>';
+  }
+  h += '</div>';
+
+  h += '<div class="note" style="margin-top:26px"><span class="nlab">Companion demo</span>Once module 6 makes sense, open the <b>Charging Assurance Walkthrough</b> from the section landing page. It runs all of this on one screen against a generic operator model \u2014 ten scenarios, and five of them deliberately end without an automated action.</div>';
+  h += '</section>';
+  el("main").innerHTML = h;
+}
+
+/* ============================ module render ============================ */
+function renderModule(id){
+  var i = modIndex(id), m = MODULES[i];
+  var h = '<section class="sec on">';
+  h += '<div class="mhead"><div class="mkick">Module '+m.n+' of 09</div><h1 class="mtitle">'+esc(m.title)+'</h1><p class="mlede">'+esc(m.lede)+'</p>';
+  h += '<div class="mmeta"><span class="chip">'+esc(m.time)+'</span><span class="chip">'+esc(m.feat)+'</span></div></div>';
+  h += (id === "glossary") ? glossaryMarkup() : CONTENT[id];
+  if(QUIZ[id]) h += quizMarkup(id);
+  h += '<div class="navb">';
+  h += i > 0 ? '<button type="button" class="btn" data-go="'+MODULES[i-1].id+'">&larr; '+esc(MODULES[i-1].short)+'</button>' : '<button type="button" class="btn" data-go="home">&larr; Course home</button>';
+  h += i < MODULES.length-1 ? '<button type="button" class="btn pri" data-go="'+MODULES[i+1].id+'">'+esc(MODULES[i+1].short)+' &rarr;</button>' : '<button type="button" class="btn pri" data-go="home">Finish &rarr;</button>';
+  h += '</div></section>';
+  el("main").innerHTML = h;
+  if(QUIZ[id]) wireQuiz(id);
+  if(WIDGETS[id]) WIDGETS[id]();
+}
+
+function go(id){
+  state.cur = id;
+  if(id === "home") renderHome(); else renderModule(id);
+  renderTrail();
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* ============================ quiz ============================ */
+function quizMarkup(id){
+  var qs = QUIZ[id], h = '<div class="quiz" data-quiz="'+id+'"><div class="quiz-h">Check your understanding \u2014 '+qs.length+' questions</div>';
+  for(var i=0;i<qs.length;i++){
+    var q = qs[i];
+    h += '<div class="q" data-qi="'+i+'"><div class="qt"><span class="qn">'+(i+1)+'.</span>'+esc(q.q)+'</div>';
+    for(var j=0;j<q.o.length;j++){
+      h += '<button type="button" class="opt" data-qi="'+i+'" data-oi="'+j+'">'+esc(q.o[j])+'</button>';
+    }
+    h += '<div class="qx" data-qx="'+i+'">'+q.x+'</div></div>';
+  }
+  h += '<div class="qscore" id="qscore">Answer all '+qs.length+' to record this module.</div></div>';
+  return h;
+}
+
+function wireQuiz(id){
+  var qs = QUIZ[id], answered = {}, correct = 0;
+  var wrap = document.querySelector('[data-quiz="'+id+'"]');
+  if(!wrap) return;
+  wrap.addEventListener("click", function(ev){
+    var b = ev.target.closest(".opt");
+    if(!b) return;
+    var qi = +b.getAttribute("data-qi"), oi = +b.getAttribute("data-oi");
+    if(answered[qi]) return;
+    answered[qi] = true;
+    var right = qs[qi].a;
+    var opts = wrap.querySelectorAll('.opt[data-qi="'+qi+'"]');
+    for(var k=0;k<opts.length;k++){
+      opts[k].disabled = true;
+      if(k === right) opts[k].classList.add("right");
+      else if(k === oi) opts[k].classList.add("wrong");
+    }
+    if(oi === right) correct++;
+    wrap.querySelector('[data-qx="'+qi+'"]').classList.add("show");
+    var n = Object.keys(answered).length;
+    var sc = el("qscore");
+    if(n < qs.length){
+      sc.innerHTML = n+" of "+qs.length+" answered \u2014 "+correct+" correct so far.";
+    } else {
+      var pass = correct >= 4;
+      sc.innerHTML = "Final score: "+correct+" of "+qs.length+" \u2014 " + (pass ? '<span class="pass">module complete</span>' : '<span class="fail">four correct marks this module complete</span>');
+      if(pass && !state.done[id]){ state.done[id] = true; save(); renderTrail(); }
+    }
+  });
+}
+
+/* ============================ glossary ============================ */
+var gState = {q:"", cat:"All"};
+function glossaryMarkup(){
+  var h = '<div class="gtools"><input type="text" class="gsearch" id="g-q" placeholder="Search terms and definitions\u2026" aria-label="Search glossary"></div>';
+  h += '<div class="gcats" id="g-cats"></div><div class="gcount" id="g-count"></div><div class="glist" id="g-list"></div>';
+  return h;
+}
+function renderGloss(){
+  var cats = ["All"].concat(GCATS), ch = "";
+  for(var i=0;i<cats.length;i++){
+    ch += '<button type="button" class="gcat'+(gState.cat===cats[i]?" on":"")+'" data-gcat="'+cats[i]+'">'+cats[i]+'</button>';
+  }
+  el("g-cats").innerHTML = ch;
+  var q = gState.q.toLowerCase(), out = [];
+  for(var j=0;j<GLOSSARY.length;j++){
+    var g = GLOSSARY[j];
+    if(gState.cat !== "All" && g.c !== gState.cat) continue;
+    if(q && (g.t+" "+g.d).toLowerCase().indexOf(q) === -1) continue;
+    out.push(g);
+  }
+  out.sort(function(a,b){ return a.t.localeCompare(b.t); });
+  el("g-count").textContent = out.length + " of " + GLOSSARY.length + " terms";
+  if(!out.length){ el("g-list").innerHTML = '<div class="gempty">Nothing matches that search.</div>'; return; }
+  var lh = "";
+  for(var k=0;k<out.length;k++){
+    lh += '<div class="gterm"><div class="gt-t">'+esc(out[k].t)+'<span class="gt-c">'+esc(out[k].c)+'</span></div><div class="gt-d">'+esc(out[k].d)+'</div></div>';
+  }
+  el("g-list").innerHTML = lh;
+}
+
+/* ============================ widgets ============================ */
+var WIDGETS = {};
+
+/* --- 01 join depth --- */
+WIDGETS["why-graphs"] = function(){
+  var CHAIN = [
+    {t:"session",  on:"s.id = x1.subscriber_id"},
+    {t:"upf",      on:"x1.upf_id = x2.id"},
+    {t:"cell",     on:"x2.id = x3.upf_id"},
+    {t:"transport_link", on:"x3.link_id = x4.id"},
+    {t:"charging_fn", on:"x4.chf_id = x5.id"},
+    {t:"account",  on:"x5.account_id = x6.id"}
+  ];
+  function draw(){
+    var n = +el("w1-hops").value;
+    el("w1-val").textContent = n + (n===1 ? " hop" : " hops");
+    var sql = "SELECT x"+n+".*\nFROM   subscriber s";
+    for(var i=0;i<n;i++){
+      sql += "\n<b>JOIN</b>   " + CHAIN[i].t + " x" + (i+1) + "\n  ON   " + CHAIN[i].on;
+    }
+    sql += "\nWHERE  s.id = :id;";
+    el("w1-sql").innerHTML = sql;
+    el("w1-cy").innerHTML = "MATCH p = (s:Subscriber)\n        -[:USES|SERVED_BY|DEPENDS_ON*1..<i>"+n+"</i>]->\n        (cause)\nWHERE s.id = $id\nRETURN p;";
+    el("w1-joins").textContent = n;
+    el("w1-rw").textContent = n > 1 ? "yes, every hop" : "not yet";
+  }
+  el("w1-hops").addEventListener("input", draw);
+  draw();
+};
+
+/* --- 02 sandbox --- */
+WIDGETS["anatomy"] = function(){
+  var COL = {Subscriber:"#2563EB", Session:"#7C3AED", Cell:"#0D9488", UPF:"#B45309", ChargingFn:"#0A7C46"};
+  var EDGE = {
+    "Subscriber>Session":"HOLDS", "Session>UPF":"CARRIED_BY", "Session>Cell":"ANCHORED_AT",
+    "Cell>UPF":"SERVED_BY", "UPF>ChargingFn":"METERED_BY", "Session>ChargingFn":"CHARGED_VIA",
+    "Subscriber>ChargingFn":"BILLED_BY", "Cell>ChargingFn":"REPORTS_TO"
+  };
+  var SLOTS = [[110,62],[310,52],[510,72],[130,182],[330,190],[512,178]];
+  var nodes = [], edges = [], sel = null, seq = 0, mode = "pg";
+
+  function etype(a,b){ return EDGE[a.type+">"+b.type] || EDGE[b.type+">"+a.type] || "RELATED_TO"; }
+
+  function draw(){
+    var s = "";
+    for(var i=0;i<edges.length;i++){
+      var e = edges[i], A = nodes[e.a], B = nodes[e.b];
+      var mx = (A.x+B.x)/2, my = (A.y+B.y)/2;
+      s += '<line x1="'+A.x+'" y1="'+A.y+'" x2="'+B.x+'" y2="'+B.y+'" stroke="var(--text-muted)" stroke-width="1.6" opacity=".65"/>';
+      s += '<rect x="'+(mx-e.t.length*3.3-5)+'" y="'+(my-9)+'" width="'+(e.t.length*6.6+10)+'" height="16" rx="8" fill="var(--card)" stroke="var(--border)"/>';
+      s += '<text x="'+mx+'" y="'+(my+2.5)+'" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--text-sec)">'+e.t+'</text>';
+    }
+    for(var j=0;j<nodes.length;j++){
+      var n = nodes[j], on = (sel === j);
+      s += '<g class="w2n" data-i="'+j+'" style="cursor:pointer">';
+      s += '<circle cx="'+n.x+'" cy="'+n.y+'" r="'+(on?23:20)+'" fill="'+COL[n.type]+'" opacity="'+(on?1:.9)+'"/>';
+      if(on) s += '<circle cx="'+n.x+'" cy="'+n.y+'" r="27" fill="none" stroke="'+COL[n.type]+'" stroke-width="2" opacity=".45"/>';
+      s += '<text x="'+n.x+'" y="'+(n.y+4)+'" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">'+n.short+'</text>';
+      s += '<text x="'+n.x+'" y="'+(n.y+36)+'" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-sec)">'+n.id+'</text>';
+      s += '</g>';
+    }
+    if(!nodes.length) s += '<text x="310" y="130" text-anchor="middle" font-size="13" fill="var(--text-muted)">Add a node to begin</text>';
+    el("w2-svg").innerHTML = s;
+    var gs = el("w2-svg").querySelectorAll(".w2n");
+    for(var k=0;k<gs.length;k++) gs[k].addEventListener("click", pick);
+    out();
+  }
+  function pick(ev){
+    var i = +ev.currentTarget.getAttribute("data-i");
+    if(sel === null){ sel = i; el("w2-status").textContent = "Selected " + nodes[i].id + " \u2014 now click a second node to connect them, or click it again to cancel."; }
+    else if(sel === i){ sel = null; el("w2-status").textContent = "Selection cleared."; }
+    else {
+      var dup = false;
+      for(var q=0;q<edges.length;q++){ if((edges[q].a===sel&&edges[q].b===i)||(edges[q].a===i&&edges[q].b===sel)) dup = true; }
+      if(!dup){ var t = etype(nodes[sel], nodes[i]); edges.push({a:sel,b:i,t:t}); el("w2-status").textContent = "Created " + nodes[sel].id + " \u2014[" + t + "]\u2192 " + nodes[i].id + "."; }
+      else el("w2-status").textContent = "Those two are already connected.";
+      sel = null;
+    }
+    draw();
+  }
+  function out(){
+    var s = "";
+    if(!nodes.length){ el("w2-out").textContent = "Nothing built yet."; return; }
+    if(mode === "pg"){
+      s = "<b>// nodes</b>\n";
+      for(var i=0;i<nodes.length;i++){
+        s += '(' + nodes[i].id + ':<i>' + nodes[i].type + '</i> {id:"' + nodes[i].id + '", confirmedAt:"14:02"})\n';
+      }
+      s += "\n<b>// relationships</b>\n";
+      if(!edges.length) s += "// none yet\n";
+      for(var j=0;j<edges.length;j++){
+        s += '(' + nodes[edges[j].a].id + ')-[:<i>' + edges[j].t + '</i> {source:"config", confidence:0.95}]->(' + nodes[edges[j].b].id + ')\n';
+      }
+    } else {
+      s = "<b>@prefix</b> net: &lt;https://example.org/net#&gt; .\n\n";
+      for(var k=0;k<nodes.length;k++){
+        s += 'net:' + nodes[k].id + '  a  net:<i>' + nodes[k].type + '</i> .\n';
+      }
+      if(edges.length) s += "\n";
+      for(var l=0;l<edges.length;l++){
+        s += 'net:' + nodes[edges[l].a].id + '  net:<i>' + edges[l].t.toLowerCase() + '</i>  net:' + nodes[edges[l].b].id + ' .\n';
+      }
+      s += "\n<b>// note</b> confidence on a relationship needs an extra\n<b>//</b> statement node in RDF \u2014 a property graph puts it\n<b>//</b> directly on the edge.\n";
+    }
+    el("w2-out").innerHTML = s;
+  }
+  var btns = document.querySelectorAll("[data-w2add]");
+  for(var b=0;b<btns.length;b++){
+    btns[b].addEventListener("click", function(ev){
+      if(nodes.length >= SLOTS.length){ el("w2-status").textContent = "Canvas is full \u2014 clear it to start again."; return; }
+      var t = ev.currentTarget.getAttribute("data-w2add");
+      seq++;
+      nodes.push({type:t, id:t.toLowerCase().slice(0,3) + seq, short:t.slice(0,3).toUpperCase(), x:SLOTS[nodes.length][0], y:SLOTS[nodes.length][1]});
+      el("w2-status").textContent = "Added a " + t + " node. Click two nodes to connect them.";
+      draw();
+    });
+  }
+  el("w2-clear").addEventListener("click", function(){ nodes = []; edges = []; sel = null; seq = 0; el("w2-status").textContent = "Cleared. Add a few nodes, then click one node and a second node to connect them."; draw(); });
+  el("w2-pg").addEventListener("click", function(){ mode="pg"; el("w2-pg").classList.add("on"); el("w2-rdf").classList.remove("on"); out(); });
+  el("w2-rdf").addEventListener("click", function(){ mode="rdf"; el("w2-rdf").classList.add("on"); el("w2-pg").classList.remove("on"); out(); });
+  draw();
+};
+
+/* --- 03 schema + provenance --- */
+WIDGETS["knowledge"] = function(){
+  var QS = [
+    {q:"Show me the node with identifier c-4471", both:true, why:"Direct lookup needs no types at all."},
+    {q:"Find every network function affected by this transport fault", both:false, why:"Requires knowing which nodes <em>are</em> network functions."},
+    {q:"List anything that has been connected in the last hour", both:true, why:"A property comparison, no type reasoning involved."},
+    {q:"Which subscribers on a priority entitlement are downstream of this cell?", both:false, why:"Needs both a Subscriber type and a declared entitlement relationship."},
+    {q:"Count the edges leaving this node", both:true, why:"Pure structure \u2014 meaning is irrelevant."},
+    {q:"Is this topology valid, or did ingestion create an impossible parent?", both:false, why:"Validity is only definable against declared cardinality rules."}
+  ];
+  var FACTS = [
+    {n:"Cell c-4471 belongs to site s-118", src:"Configuration store", at:"07:14 today", how:"Stated in configuration", conf:"0.98", fresh:"7 hours", ok:true,
+     note:"Explicit configuration, recently confirmed. Safe to reason on directly."},
+    {n:"UPF u-09 serves cell c-4471", src:"Traffic observation", at:"13:59", how:"Observed traffic exchange", conf:"0.93", fresh:"3 minutes", ok:true,
+     note:"Not documented anywhere, but demonstrated by actual traffic and very fresh. Strong evidence."},
+    {n:"Charging fn chf-2 meters UPF u-09", src:"Naming convention", at:"02:00 (nightly job)", how:"Inferred from a shared identifier prefix", conf:"0.55", fresh:"12 hours", ok:false,
+     note:"Inferred, not stated, and half a day old. Usable as a lead \u2014 must not carry a conclusion on its own."},
+    {n:"Subscriber sub-88 holds a priority entitlement", src:"Provisioning system", at:"3 days ago", how:"Stated at provisioning", conf:"0.99", fresh:"3 days", ok:true,
+     note:"Old, but entitlement is durable by nature. Age is not staleness when the fact does not change hourly."},
+    {n:"Transport link t-31 is degraded", src:"Derived correlation", at:"13:47", how:"Inferred from two correlated counters", conf:"0.61", fresh:"15 minutes", ok:false,
+     note:"A derived belief presented as a fact. This is exactly what must never be written back as an assertion."}
+  ];
+  function drawQs(){
+    var on = el("w3-schema").checked, h = "";
+    for(var i=0;i<QS.length;i++){
+      var ok = QS[i].both || on;
+      h += '<div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">';
+      h += '<span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:'+(ok?"var(--green-s)":"var(--red-s)")+';color:'+(ok?"var(--green)":"var(--red)")+'">'+(ok?"\u2713":"\u2715")+'</span>';
+      h += '<span><span style="font-size:.9rem;font-weight:650;color:var(--text)">'+QS[i].q+'</span>';
+      if(!QS[i].both) h += '<span style="display:block;font-size:.8rem;color:var(--text-muted);margin-top:2px">'+QS[i].why+'</span>';
+      h += '</span></div>';
+    }
+    var n = 0; for(var j=0;j<QS.length;j++){ if(QS[j].both || on) n++; }
+    h += '<div class="kv"><span class="kvi">Answerable: <b>'+n+' of '+QS.length+'</b></span><span class="kvi">Facts stored: <b>identical</b></span></div>';
+    el("w3-list").innerHTML = h;
+  }
+  el("w3-schema").addEventListener("change", drawQs);
+  drawQs();
+
+  var th = "";
+  for(var f=0;f<FACTS.length;f++) th += '<button type="button" class="btn sm'+(f===0?" on":"")+'" data-w3f="'+f+'">Fact '+(f+1)+'</button>';
+  el("w3b-tabs").innerHTML = th;
+  function drawFact(i){
+    var F = FACTS[i];
+    var h = '<div class="mini"><div class="mini-t"><span class="sq" style="background:'+(F.ok?"#0A7C46":"#B45309")+'"></span>'+F.n+'</div>';
+    h += '<div class="kv" style="margin-top:9px"><span class="kvi">Source: <b>'+F.src+'</b></span><span class="kvi">Asserted: <b>'+F.at+'</b></span><span class="kvi">Method: <b>'+F.how+'</b></span><span class="kvi">Confidence: <b>'+F.conf+'</b></span><span class="kvi">Age: <b>'+F.fresh+'</b></span></div>';
+    h += '<div class="mini-d" style="margin-top:10px">'+F.note+'</div></div>';
+    el("w3b-out").innerHTML = h;
+    var bs = el("w3b-tabs").querySelectorAll("[data-w3f]");
+    for(var k=0;k<bs.length;k++) bs[k].classList.toggle("on", +bs[k].getAttribute("data-w3f") === i);
+  }
+  el("w3b-tabs").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-w3f]"); if(!b) return; drawFact(+b.getAttribute("data-w3f"));
+  });
+  drawFact(0);
+};
+
+/* --- 04 incident timeline --- */
+WIDGETS["context"] = function(){
+  var TIMES = ["13:52","13:55","13:58","14:01","14:06","14:14","14:29","14:47"];
+  var ANCH = [{x:130,y:56,l:"CHF-2",s:"anchor"},{x:330,y:56,l:"UPF-09",s:"anchor"},{x:512,y:56,l:"LINK-31",s:"anchor"}];
+  var OBS = [
+    {x:130,y:150,l:"Completeness 94.1%",from:2,peak:0.92,fade:6},
+    {x:330,y:150,l:"Nchf errors +340%",from:2,peak:0.88,fade:6},
+    {x:512,y:150,l:"Link errored secs",from:4,peak:0.74,fade:7}
+  ];
+  var LOG = [
+    "Nothing observed. The knowledge graph knows the topology; no context graph exists yet.",
+    "Nothing observed. The knowledge graph knows the topology; no context graph exists yet.",
+    "Two symptoms arrive within seconds of each other. A context graph is created and anchored to the two elements they concern.",
+    "Corroboration raises confidence in both observations. Still no cause \u2014 only symptoms and their anchors.",
+    "A third observation attaches to the transport link. All three anchors now sit above a shared upstream dependency.",
+    "Peak confidence. This is the window in which the investigation is worth acting on.",
+    "Confidence decaying. The measurements are now old enough that the network may have changed beneath them.",
+    "Expired. Presenting this as current belief would be wrong even though every observation was accurate when taken."
+  ];
+  function conf(o, t){
+    if(t < o.from) return 0;
+    if(t <= o.fade) return Math.min(o.peak, o.peak * (0.55 + 0.225*(t - o.from)));
+    return Math.max(0, o.peak - 0.34*(t - o.fade));
+  }
+  function draw(){
+    var t = +el("w4-t").value;
+    el("w4-clock").textContent = TIMES[t];
+    var s = '<text x="14" y="20" font-size="10.5" font-weight="800" fill="var(--text-muted)" letter-spacing="1">KNOWLEDGE GRAPH</text>';
+    s += '<text x="14" y="116" font-size="10.5" font-weight="800" fill="var(--text-muted)" letter-spacing="1">CONTEXT GRAPH</text>';
+    s += '<line x1="14" y1="98" x2="606" y2="98" stroke="var(--border)" stroke-dasharray="4 4"/>';
+    for(var a=0;a<ANCH.length;a++){
+      var A = ANCH[a];
+      s += '<rect x="'+(A.x-52)+'" y="'+(A.y-16)+'" width="104" height="32" rx="8" fill="var(--blue-s)" stroke="#2563EB" stroke-width="1.4"/>';
+      s += '<text x="'+A.x+'" y="'+(A.y+5)+'" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2563EB">'+A.l+'</text>';
+    }
+    var any = false;
+    for(var i=0;i<OBS.length;i++){
+      var o = OBS[i], c = conf(o, t);
+      if(c <= 0.02) continue;
+      any = true;
+      s += '<line x1="'+o.x+'" y1="'+(o.y-22)+'" x2="'+ANCH[i].x+'" y2="'+(ANCH[i].y+18)+'" stroke="#B45309" stroke-width="1.5" stroke-dasharray="3 3" opacity="'+(c*0.9).toFixed(2)+'"/>';
+      s += '<g opacity="'+c.toFixed(2)+'">';
+      s += '<rect x="'+(o.x-72)+'" y="'+(o.y-21)+'" width="144" height="42" rx="9" fill="var(--amber-s)" stroke="#B45309" stroke-width="1.4"/>';
+      s += '<text x="'+o.x+'" y="'+(o.y-3)+'" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--text)">'+o.l+'</text>';
+      s += '<text x="'+o.x+'" y="'+(o.y+13)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#B45309">confidence '+c.toFixed(2)+'</text>';
+      s += '</g>';
+    }
+    if(!any) s += '<text x="310" y="158" text-anchor="middle" font-size="12.5" fill="var(--text-muted)">No context graph yet \u2014 nothing has been observed</text>';
+    el("w4-svg").innerHTML = s;
+    var cls = t >= 7 ? "stop" : (t >= 6 ? "warn" : (t >= 2 ? "good" : ""));
+    el("w4-log").innerHTML = '<div class="note '+cls+'" style="margin:0"><span class="nlab">'+TIMES[t]+'</span>'+LOG[t]+'</div>';
+  }
+  el("w4-t").addEventListener("input", draw);
+  draw();
+};
+
+/* --- 05 overlay + propagation --- */
+WIDGETS["binding"] = function(){
+  var N = {
+    link:{x:310,y:44,l:"TRANSPORT LINK t-31",w:150},
+    upf:{x:180,y:132,l:"UPF u-09",w:104},
+    chf:{x:452,y:132,l:"CHARGING FN chf-2",w:140},
+    c1:{x:96,y:228,l:"CELL c-4471",w:104},
+    c2:{x:250,y:228,l:"CELL c-4472",w:104},
+    sess:{x:404,y:228,l:"SESSION s-771",w:110},
+    acct:{x:544,y:228,l:"ACCOUNT a-12",w:104}
+  };
+  var E = [["link","upf"],["link","chf"],["upf","c1"],["upf","c2"],["chf","sess"],["chf","acct"]];
+  function draw(){
+    var cg = el("w5-cg").checked, pr = el("w5-prop").checked;
+    var hot = {};
+    if(cg && pr){ hot = {link:1, upf:1, chf:1, c1:1, sess:1}; }
+    var s = "";
+    for(var i=0;i<E.length;i++){
+      var A = N[E[i][0]], B = N[E[i][1]];
+      var live = cg && pr && hot[E[i][0]] && hot[E[i][1]];
+      s += '<line x1="'+A.x+'" y1="'+(A.y+16)+'" x2="'+B.x+'" y2="'+(B.y-16)+'" stroke="'+(live?"#DC2626":"var(--text-muted)")+'" stroke-width="'+(live?2.6:1.4)+'" opacity="'+(live?0.9:0.5)+'"/>';
+    }
+    for(var k in N){
+      var n = N[k], h2 = 32, warm = cg && pr && hot[k];
+      var fill = warm ? "var(--red-s)" : "var(--card)";
+      var stroke = warm ? "#DC2626" : "var(--border)";
+      s += '<rect x="'+(n.x-n.w/2)+'" y="'+(n.y-h2/2)+'" width="'+n.w+'" height="'+h2+'" rx="8" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.5"/>';
+      s += '<text x="'+n.x+'" y="'+(n.y+4.5)+'" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--text)">'+n.l+'</text>';
+    }
+    if(cg){
+      var badges = [{k:"c1",t:"completeness 94.1%"},{k:"sess",t:"Nchf errors +340%"}];
+      for(var b=0;b<badges.length;b++){
+        var t = N[badges[b].k];
+        s += '<rect x="'+(t.x-70)+'" y="'+(t.y+24)+'" width="140" height="24" rx="7" fill="var(--amber-s)" stroke="#B45309" stroke-width="1.3"/>';
+        s += '<text x="'+t.x+'" y="'+(t.y+40)+'" text-anchor="middle" font-size="10" font-weight="800" fill="#B45309">'+badges[b].t+'</text>';
+      }
+    }
+    el("w5-svg").innerHTML = s;
+    var msg, cls;
+    if(!cg){ cls=""; msg = "A topology and nothing else. Every element looks exactly as healthy as every other. <b>The knowledge graph knows the shape of everything and the state of nothing.</b>"; }
+    else if(!pr){ cls="warn"; msg = "Two symptoms, anchored to two elements at opposite ends of the network. Nothing yet connects them \u2014 to a human this reads as two unrelated tickets."; }
+    else { cls="good"; msg = "Impact travels the edges that were already there. Both symptoms trace upward to <b>transport link t-31</b>, the only element both depend on. Nobody wrote a rule pairing these two symptoms \u2014 the topology produced the candidate."; }
+    el("w5-read").innerHTML = '<div class="note '+cls+'" style="margin:0">'+msg+'</div>';
+  }
+  el("w5-cg").addEventListener("change", draw);
+  el("w5-prop").addEventListener("change", draw);
+  draw();
+};
+
+/* --- 06 action gate --- */
+WIDGETS["reasoning"] = function(){
+  var CASES = {
+    clear:{lab:"Clear-cut case", c:[["Transport link t-31",0.79],["Charging fn chf-2",0.34],["UPF u-09",0.22],["Cell c-4471",0.11]],
+      note:"One candidate explains all four symptoms; the rest explain at most one."},
+    tie:{lab:"Two rival causes", c:[["Charging fn chf-2",0.82],["Mediation feed m-04",0.79],["UPF u-09",0.25],["Cell c-4472",0.14]],
+      note:"Both leaders explain the same symptoms equally well. High confidence, no separation."},
+    weak:{lab:"Thin evidence", c:[["UPF u-09",0.48],["Transport link t-31",0.41],["Charging fn chf-2",0.37],["Cell c-4471",0.30]],
+      note:"Only two observations arrived, and one is an inferred correlation. Nothing rises."}
+  };
+  var cur = "clear";
+  function draw(){
+    var th = +el("w6-th").value / 100, sep = +el("w6-sep").value / 100;
+    el("w6-thv").textContent = th.toFixed(2);
+    el("w6-sepv").textContent = sep.toFixed(2);
+    var C = CASES[cur], list = C.c;
+    var gap = list[0][1] - list[1][1];
+    var passTh = list[0][1] >= th, passSep = gap >= sep;
+    var h = "";
+    for(var i=0;i<list.length;i++){
+      var v = list[i][1], top = (i === 0);
+      var col = top ? ((passTh && passSep) ? "#0A7C46" : "#B45309") : "var(--text-muted)";
+      h += '<div class="bar'+(top?"":" out")+'"><span class="bn">'+list[i][0]+'</span><span class="bt"><span class="bf" style="width:'+(v*100)+'%;background:'+col+'"></span></span><span class="bv">'+v.toFixed(2)+'</span></div>';
+    }
+    el("w6-bars").innerHTML = h;
+    var v;
+    if(passTh && passSep){
+      v = '<div class="verdict go"><span class="vh">Action permitted</span><b>'+list[0][0]+'</b> at '+list[0][1].toFixed(2)+', clear of the runner-up by '+gap.toFixed(2)+'. Both gate conditions are met, so a reversible remediation may proceed automatically.</div>';
+    } else {
+      var why = [];
+      if(!passTh) why.push("top confidence "+list[0][1].toFixed(2)+" is below the "+th.toFixed(2)+" threshold");
+      if(!passSep) why.push("separation of "+gap.toFixed(2)+" is under the required "+sep.toFixed(2));
+      var fix = (!passSep && passTh)
+        ? "The system cannot tell <b>"+list[0][0]+"</b> and <b>"+list[1][0]+"</b> apart. It should say so, and name the measurement that would separate them \u2014 here, a per-element record count either side of mediation."
+        : "Evidence is too thin to nominate anything. The useful output is the list of observations that are missing, not a guess.";
+      var reason = why.join(", and ");
+      reason = reason.charAt(0).toUpperCase() + reason.slice(1);
+      v = '<div class="verdict no"><span class="vh">No automated action</span>'+reason+'. '+fix+'</div>';
+    }
+    el("w6-verdict").innerHTML = v + '<div class="wg-hint" style="margin-top:9px">'+C.note+'</div>';
+  }
+  var bs = document.querySelectorAll("[data-w6c]");
+  for(var b=0;b<bs.length;b++){
+    bs[b].addEventListener("click", function(ev){
+      cur = ev.currentTarget.getAttribute("data-w6c");
+      var all = document.querySelectorAll("[data-w6c]");
+      for(var k=0;k<all.length;k++) all[k].classList.toggle("on", all[k] === ev.currentTarget);
+      draw();
+    });
+  }
+  el("w6-th").addEventListener("input", draw);
+  el("w6-sep").addEventListener("input", draw);
+  draw();
+};
+
+/* --- 07 sources --- */
+WIDGETS["practice"] = function(){
+  var SRC = [
+    {n:"Inventory", nodes:"Cell, Site, Equipment", edges:"Cell \u2192 Site (belongs to)", fresh:"Nightly", trust:"High",
+     note:"Authoritative for what physically exists. Rarely authoritative for how anything is currently configured \u2014 do not let it own logical relationships."},
+    {n:"Configuration store", nodes:"UPF, Charging function, Slice", edges:"Cell \u2192 UPF, UPF \u2192 Charging function", fresh:"On change", trust:"High",
+     note:"The best edge source you have, because relationships are stated rather than guessed. Usually needs parsing rather than querying."},
+    {n:"Provisioning", nodes:"Subscriber, Plan, Entitlement", edges:"Subscriber \u2192 Entitlement", fresh:"On change", trust:"High",
+     note:"Durable by nature, so a three-day-old assertion is not stale. Age and staleness are not the same thing."},
+    {n:"Topology discovery", nodes:"Transport link", edges:"Link \u2192 UPF, Link \u2192 Charging function", fresh:"Hourly", trust:"Medium",
+     note:"Fills the gaps configuration does not cover. Derived, so it must be written with lower confidence than stated configuration."},
+    {n:"Performance counters", nodes:"\u2014 none \u2014", edges:"\u2014 none \u2014", fresh:"Per minute", trust:"High",
+     note:"Feeds the <b>context</b> graph only. Writing per-minute measurements into the knowledge graph is the fastest way to destroy it."},
+    {n:"Naming convention", nodes:"\u2014 none \u2014", edges:"Inferred association", fresh:"Nightly", trust:"Low",
+     note:"A shared prefix suggests a relationship. Legitimate as a lead, never as the sole basis for a conclusion \u2014 and it must never lose its provenance."}
+  ];
+  var th = "";
+  for(var i=0;i<SRC.length;i++) th += '<button type="button" class="btn sm'+(i===0?" on":"")+'" data-w7="'+i+'">'+SRC[i].n+'</button>';
+  el("w7-tabs").innerHTML = th;
+  function drawS(i){
+    var S = SRC[i];
+    var tcol = S.trust === "High" ? "#0A7C46" : (S.trust === "Medium" ? "#B45309" : "#DC2626");
+    var h = '<div class="mini"><div class="mini-t"><span class="sq" style="background:'+tcol+'"></span>'+S.n+'</div>';
+    h += '<div class="kv" style="margin-top:9px"><span class="kvi">Produces nodes: <b>'+S.nodes+'</b></span><span class="kvi">Produces edges: <b>'+S.edges+'</b></span><span class="kvi">Freshness: <b>'+S.fresh+'</b></span><span class="kvi">Trust: <b>'+S.trust+'</b></span></div>';
+    h += '<div class="mini-d" style="margin-top:10px">'+S.note+'</div></div>';
+    el("w7-out").innerHTML = h;
+    var bs = el("w7-tabs").querySelectorAll("[data-w7]");
+    for(var k=0;k<bs.length;k++) bs[k].classList.toggle("on", +bs[k].getAttribute("data-w7") === i);
+  }
+  el("w7-tabs").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-w7]"); if(!b) return; drawS(+b.getAttribute("data-w7"));
+  });
+  drawS(0);
+};
+
+/* --- 08 grounded vs ungrounded --- */
+WIDGETS["llm"] = function(){
+  var G = '<div class="mini"><div class="mini-t"><span class="sq" style="background:#0A7C46"></span>Answer with the graph in hand</div><div class="mini-d">'
+   + '<p style="margin-bottom:9px">Charging completeness for market M01 fell to <b>94.1%</b> at 13:58, against a 99.5% target. Two symptoms were observed within nine seconds of each other: the completeness drop at <b>cell c-4471</b> and a 340% rise in Nchf errors on <b>session s-771</b>.</p>'
+   + '<p style="margin-bottom:9px">Both anchors depend on <b>transport link t-31</b>, which is the only shared element on their paths. Link t-31 showed errored seconds beginning at 13:51, seven minutes <em>before</em> the first symptom, which is consistent with cause rather than consequence.</p>'
+   + '<p style="margin-bottom:9px">Confidence <b>0.79</b>; runner-up (charging function chf-2) <b>0.34</b>. Separation 0.45, above the 0.15 policy minimum, so the gate permits a reversible action.</p>'
+   + '<p style="margin:0"><b>Evidence:</b> completeness counter (mediation feed, 13:58, measured); Nchf error rate (charging feed, 13:58, measured); errored seconds (transport feed, 13:51, measured); topology edges from the configuration store, last confirmed 07:14.</p>'
+   + '</div></div>';
+  var U = '<div class="mini"><div class="mini-t"><span class="sq" style="background:#DC2626"></span>Answer with the graph withheld</div><div class="mini-d">'
+   + '<p style="margin-bottom:9px">A drop in charging completeness of this kind is most commonly caused by an issue in the mediation layer, where usage records are collected and normalised before reaching billing. Transient failures there frequently produce exactly this pattern.</p>'
+   + '<p style="margin-bottom:9px">A rise in Nchf errors alongside it suggests the charging function may be under pressure, possibly from a capacity constraint or a recent configuration change. It would be worth checking recent change records and the health of the mediation pipeline.</p>'
+   + '<p style="margin:0">Recommended next steps: review mediation logs for the affected window, confirm charging function resource utilisation, and verify that no configuration was deployed in the preceding hour.</p>'
+   + '</div></div>';
+  var NG = '<div class="note good" style="margin:15px 0 0"><span class="nlab">What changed</span>The first answer names <b>specific elements</b>, gives <b>timings that establish ordering</b>, quotes <b>scores and a separation</b>, and closes with <b>where every fact came from</b>. Every clause can be checked.</div>';
+  var NU = '<div class="note stop" style="margin:15px 0 0"><span class="nlab">What is missing</span>Nothing here is false, and none of it is <em>about this incident</em>. It is a competent description of how such faults usually go \u2014 generic, unfalsifiable, and identical for any completeness drop anywhere. <b>No element is named, no time is given, nothing can be verified, and it reads exactly as confidently as the grounded answer.</b> That last point is the danger.</div>';
+  function drawL(g){
+    el("w8-out").innerHTML = g ? (G + NG) : (U + NU);
+    el("w8-g").classList.toggle("on", g);
+    el("w8-u").classList.toggle("on", !g);
+  }
+  el("w8-g").addEventListener("click", function(){ drawL(true); });
+  el("w8-u").addEventListener("click", function(){ drawL(false); });
+  drawL(true);
+};
+
+WIDGETS["glossary"] = function(){
+  renderGloss();
+  el("g-q").addEventListener("input", function(){ gState.q = this.value; renderGloss(); });
+  el("g-cats").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-gcat]"); if(!b) return;
+    gState.cat = b.getAttribute("data-gcat"); renderGloss();
+  });
+};
+
+/* ============================ modal ============================ */
+function openHelp(){ el("mbd").classList.add("on"); el("modal").classList.add("on"); el("mo-x").focus(); }
+function closeHelp(){ el("mbd").classList.remove("on"); el("modal").classList.remove("on"); }
+
+/* ============================ wiring ============================ */
+document.addEventListener("click", function(ev){
+  var g = ev.target.closest("[data-go]");
+  if(g){ go(g.getAttribute("data-go")); return; }
+});
+el("btn-home").addEventListener("click", function(){ go("home"); });
+el("btn-help").addEventListener("click", openHelp);
+el("mo-x").addEventListener("click", closeHelp);
+el("mbd").addEventListener("click", closeHelp);
+el("btn-theme").addEventListener("click", function(){
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  applyTheme(); save();
+  if(state.cur !== "home" && WIDGETS[state.cur]) WIDGETS[state.cur]();
+});
+el("btn-reset").addEventListener("click", function(){
+  state.done = {}; save(); renderTrail();
+  if(state.cur === "home") renderHome();
+  this.textContent = "Progress cleared";
+  var b = this;
+  setTimeout(function(){ b.textContent = "Reset course progress"; }, 1600);
+});
+document.addEventListener("keydown", function(ev){
+  if(ev.key === "Escape"){ closeHelp(); return; }
+  if(el("modal").classList.contains("on")) return;
+  var tag = (ev.target.tagName || "").toLowerCase();
+  if(tag === "input" || tag === "textarea") return;
+  var i = modIndex(state.cur);
+  if(ev.key === "ArrowRight"){
+    if(state.cur === "home") go(MODULES[0].id);
+    else if(i < MODULES.length - 1) go(MODULES[i+1].id);
+  } else if(ev.key === "ArrowLeft"){
+    if(i > 0) go(MODULES[i-1].id);
+    else if(i === 0) go("home");
+  }
+});
+window.addEventListener("scroll", function(){
+  el("totop").classList.toggle("on", window.scrollY > 460);
+});
+el("totop").addEventListener("click", function(){ window.scrollTo({top:0, behavior:"smooth"}); });
+
+/* ============================ init ============================ */
+load();
+applyTheme();
+el("hdr-ver").textContent = VERSION;
+renderTrail();
+renderHome();
+</script>
+</body>
+</html>

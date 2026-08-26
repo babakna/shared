@@ -12,5 +12,8 @@ Interactive educational tools for technical professionals.
 ## Post-Quantum Cryptography
 - [PQC Learning Lab](PQC/index.html) - Post-quantum cryptography foundations, standards, migration tools, and roadmap
 
+## Knowledge & Context Graphs
+- [Knowledge & Context Graphs](KG-CG/index.html) - Foundations course plus an interactive fault-isolation demo
+
 ## Author
 Brought to you by Babak

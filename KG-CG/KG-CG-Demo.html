@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Knowledge Graph &amp; Context Graph — Charging Assurance Demo</title>
+<style>
+  :root {
+    --bg: #f4f6f8; --panel: #ffffff; --panel-2: #fafbfc; --border: #e2e6ea;
+    --text: #171a1d; --muted: #6b7280;
+    --accent: #2563eb; --accent-soft: #e8effd;
+    --alert: #6d28d9; --alert-soft: #f1ebfd;
+    --danger: #dc2626; --danger-soft: #fdeaea;
+    --ok: #059669; --ok-soft: #e7f6f0;
+    --warn: #b45309; --warn-soft: #fdf3e3;
+    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 4px 12px rgba(16,24,40,.06);
+  }
+  html[data-theme="dark"] {
+    --bg: #0e1013; --panel: #16191e; --panel-2: #1b1f25; --border: #272c33;
+    --text: #e7eaee; --muted: #98a1ae;
+    --accent: #5b8cff; --accent-soft: #1c2740;
+    --alert: #a78bfa; --alert-soft: #2a1f45;
+    --danger: #f16d6d; --danger-soft: #381f21;
+    --ok: #34d399; --ok-soft: #12281f;
+    --warn: #fbbf24; --warn-soft: #2e2410;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15.5px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, select, input, textarea { font: inherit; color: inherit; }
+  .spacer { flex: 1 1 auto; }
+
+  .btn {
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+    padding: 7px 13px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+    transition: background .12s, border-color .12s, transform .06s;
+  }
+  .btn:hover:not(:disabled) { background: var(--panel-2); border-color: var(--accent); }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover:not(:disabled) { filter: brightness(1.06); }
+  .btn.danger { color: var(--danger); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  select, input[type=text], input[type=password] {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px;
+  }
+  select:disabled, input:disabled { opacity: .45; cursor: not-allowed; }
+  select:focus, input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  header.top {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 9px 16px 10px; background: var(--panel); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 40;
+  }
+  .brand { display: flex; align-items: baseline; gap: 9px; }
+  .brand h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: -.01em; white-space: nowrap; }
+  .ver {
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; padding: 2px 9px; border-radius: 999px;
+    background: var(--alert-soft); color: var(--alert);
+  }
+  .ctl { display: flex; align-items: center; gap: 7px; min-width: 0; flex-wrap: wrap; }
+  .ctl > label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+  select, input[type=text] { max-width: 100%; }
+
+  .scenbar {
+    order: 2; flex: 1 1 100%; display: flex; align-items: center; gap: 9px;
+    padding-top: 9px; border-top: 1px solid var(--border); min-width: 0;
+  }
+  .scenbar .lbl {
+    font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 6px; white-space: nowrap;
+  }
+  #scenario {
+    flex: 1 1 auto; min-width: 0; max-width: 720px;
+    font-size: 16px; font-weight: 650; padding: 8px 11px;
+    background: var(--panel); border: 2px solid var(--accent); border-radius: 9px; cursor: pointer;
+  }
+  .scenbar .nav { padding: 7px 12px; font-size: 17px; line-height: 1; font-weight: 700; }
+  .scenbar .of { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  @media (max-width: 560px) { .brand h1 { font-size: 14px; } .scenbar .of { display: none; } }
+
+  main {
+    display: grid; grid-template-columns: calc(var(--split, 58) * 1%) 16px minmax(0, 1fr);
+    padding: 13px 16px 30px; align-items: start;
+  }
+  main.wide { grid-template-columns: minmax(0, 1fr); }
+  main.wide #divider, main.wide .rightcol { display: none; }
+
+  #divider {
+    align-self: stretch; min-height: 240px; cursor: col-resize; position: relative;
+    touch-action: none; border: 0; background: transparent; padding: 0;
+  }
+  #divider::before {
+    content: ""; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px;
+    background: var(--border); border-radius: 2px; transition: background .12s, width .12s;
+  }
+  #divider::after {
+    content: "⋮"; position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+    text-align: center; color: var(--muted); font-size: 15px; line-height: 1;
+  }
+  #divider:hover::before, #divider.drag::before, #divider:focus-visible::before { background: var(--accent); width: 4px; left: 6px; }
+  #divider:focus-visible { outline: none; }
+
+  .leftcol { min-width: 0; display: flex; flex-direction: column; gap: 13px; }
+  /* Multi-column flow rather than a grid: cards pack against each other instead of
+     leaving a hole under every short card. */
+  .rightcol { min-width: 0; columns: 330px; column-gap: 13px; }
+  .rightcol > .card { break-inside: avoid; margin: 0 0 13px; }
+
+  @media (max-width: 1180px) {
+    main { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+    #divider { display: none; }
+    .rightcol { columns: 1; }
+  }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; }
+  .card > h2 {
+    margin: 0; padding: 11px 14px; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+  }
+  .card .body { padding: 12px 14px; }
+  .card.dim { opacity: .62; }
+
+  /* Anchor and transport share one row so the diagram keeps the vertical space. */
+  .topbar { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 9px; }
+  .anchor {
+    border-left: 3px solid var(--alert); background: var(--alert-soft);
+    border-radius: 6px; padding: 6px 11px; flex: 2 1 480px; min-width: 0;
+  }
+  .anchor .hd { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+  .anchor .sev { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--alert); white-space: nowrap; }
+  .anchor .at { font-size: 16.5px; font-weight: 650; }
+  .anchor .ad { font-size: 13px; color: var(--muted); }
+
+  .player { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 560px; }
+  .stagenow { font-size: 13px; color: var(--muted); }
+  .stagenow strong { color: var(--text); }
+  #zoomRange { width: 110px; accent-color: var(--accent); }
+  #zoomVal { font-variant-numeric: tabular-nums; min-width: 42px; display: inline-block; }
+
+  /* Capped so the narrowing rail below it is never pushed off screen. */
+  .graphwrap {
+    overflow: auto; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--panel-2); padding: 6px;
+    max-height: max(260px, calc(100vh - 430px));
+  }
+  svg.graph { display: block; margin: 0 auto; }
+  .nlabel { font-size: 13px; font-weight: 650; }
+  .nsub { font-size: 10px; }
+  .nsrc { font-size: 9.5px; }
+  .colhdr { font-size: 11px; letter-spacing: .1em; font-weight: 600; }
+
+  .railhdr { display: flex; align-items: baseline; gap: 9px; margin-top: 11px; }
+  .railhdr .rt { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .rail { display: grid; gap: 6px; margin-top: 8px; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
+  .rseg {
+    border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); color: inherit;
+    padding: 7px 8px 8px; cursor: pointer; text-align: left; overflow: hidden;
+    transition: border-color .12s, background .12s, opacity .12s;
+  }
+  .rseg:hover:not(:disabled) { border-color: var(--accent); }
+  .rseg.active { background: var(--accent-soft); border-color: var(--accent); }
+  .rseg.done { opacity: .5; }
+  .rseg.ghost { border-style: dashed; background: transparent; cursor: default; }
+  .rseg .rtop { display: flex; align-items: baseline; gap: 6px; }
+  .rseg .ridx { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .rseg .rcnt { font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .rseg .runit { font-size: 10px; color: var(--muted); display: block; }
+  .rseg .rlbl {
+    font-size: 12px; line-height: 1.3; margin-top: 4px; color: var(--muted);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .rseg.active .rlbl { color: var(--text); }
+  .rseg .rbar { height: 3px; border-radius: 2px; background: var(--accent); margin-top: 5px; }
+  .rseg.done .rbar { background: var(--muted); }
+  .rseg.ghost .rcnt, .rseg.ghost .runit, .rseg.ghost .rlbl, .rseg.ghost .rbar { visibility: hidden; }
+
+  .cgwrap { max-height: 360px; overflow: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .cgcard { border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; background: var(--panel-2); animation: pop .22s ease-out; }
+  .cgcard:hover { border-color: var(--warn); }
+  @keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .cgtop { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; }
+  .b-incident { background: var(--alert-soft); color: var(--alert); }
+  .b-observation { background: var(--accent-soft); color: var(--accent); }
+  .b-evidence { background: var(--ok-soft); color: var(--ok); }
+  .b-hypothesis { background: var(--warn-soft); color: var(--warn); }
+  .b-action { background: var(--accent); color: #fff; }
+  .b-outcome { background: var(--ok); color: #fff; }
+  .src { font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 6px; }
+  .conf { margin-left: auto; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cgtext { font-size: 13.5px; }
+  .empty { color: var(--muted); font-size: 13.5px; padding: 18px 6px; text-align: center; }
+
+  table.sig { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.sig td { padding: 5px 3px; border-bottom: 1px dashed var(--border); vertical-align: top; }
+  table.sig tr:last-child td { border-bottom: 0; }
+  table.sig .st { width: 8px; }
+  table.sig .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .d-anomalous { background: var(--danger); }
+  .d-degraded { background: var(--warn); }
+  .d-baseline { background: var(--ok); }
+  .d-missing { background: var(--muted); }
+  table.sig { table-layout: fixed; }
+  table.sig .cn {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  table.sig .vv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ctrl { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+  .ctrl:last-child { border-bottom: 0; }
+  .ctrl.missing { color: var(--warn); }
+
+  .hyp { border: 1px solid var(--border); border-radius: 9px; padding: 7px 9px; margin-bottom: 7px; background: var(--panel-2); }
+  .hyp:last-child { margin-bottom: 0; }
+  .hyp.lead { border-color: var(--ok); background: var(--ok-soft); }
+  .hyp.hold { border-color: var(--warn); background: var(--warn-soft); }
+  .htop { display: flex; align-items: center; gap: 7px; }
+  .hrank { font-size: 11.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hname { font-size: 14.5px; font-weight: 620; }
+  .hscore { margin-left: auto; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hbar { height: 4px; border-radius: 2px; background: var(--border); margin: 5px 0 4px; overflow: hidden; }
+  .hbar span { display: block; height: 100%; background: var(--muted); }
+  .hyp.lead .hbar span { background: var(--ok); }
+  .hyp.hold .hbar span { background: var(--warn); }
+  .hev { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .hev b { color: var(--text); font-weight: 620; }
+  .verd { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; }
+  .v-eligible { background: var(--ok); color: #fff; }
+  .v-investigate { background: var(--warn); color: #fff; }
+  .v-dismissed { background: var(--border); color: var(--muted); }
+  .thresh { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+
+  .chk { display: flex; gap: 8px; font-size: 13px; padding: 4px 0; }
+  .chk .m { font-weight: 700; width: 13px; }
+  .chk.pass .m { color: var(--ok); }
+  .chk.fail .m { color: var(--danger); }
+  .blocked { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .blocked .bt { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--danger); margin-bottom: 5px; }
+  .blocked div.bi { font-size: 12.5px; color: var(--muted); padding: 3px 0; }
+  .outcome { border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-top: 10px; }
+  .o-verified { background: var(--ok-soft); border: 1px solid var(--ok); }
+  .o-manual { background: var(--warn-soft); border: 1px solid var(--warn); }
+  .o-blocked { background: var(--danger-soft); border: 1px solid var(--danger); }
+
+  .soon {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn);
+  }
+  .askrow { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+  .askrow input[type=text] { flex: 1 1 260px; }
+  .asknote { font-size: 13px; color: var(--muted); margin-top: 9px; }
+
+  dialog {
+    border: 1px solid var(--border); border-radius: 14px; background: var(--panel); color: var(--text);
+    padding: 0; max-width: 820px; width: calc(100% - 32px); box-shadow: var(--shadow);
+  }
+  dialog::backdrop { background: rgba(10,12,15,.45); }
+  .dlghdr { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-bottom: 1px solid var(--border); }
+  .dlghdr h3 { margin: 0; font-size: 15px; }
+  .dlgbody { padding: 15px; max-height: 70vh; overflow: auto; }
+  .dlgbody h4 { margin: 16px 0 6px; font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .dlgbody h4:first-child { margin-top: 0; }
+  .dlgbody p { margin: 6px 0; font-size: 14px; }
+  .rngrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
+  @media (max-width: 700px) { .rngrid { grid-template-columns: 1fr; } }
+  .rnrow { display: grid; grid-template-columns: 138px 1fr; align-items: center; gap: 8px; }
+  .rnrow code { font-size: 11.5px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; }
+  .rnrow input { width: 100%; }
+  .note { font-size: 13px; color: var(--muted); border-left: 3px solid var(--border); padding-left: 11px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>Knowledge Graph &amp; Context Graph</h1>
+    <span class="ver" id="verLabel">V1.0</span>
+  </div>
+
+  <div class="spacer"></div>
+  <button class="btn" id="btnExpand" title="Hide the detail panels and give the topology the full width">Expand</button>
+  <button class="btn" id="btnSettings">Settings</button>
+  <button class="btn" id="btnHelp">Help</button>
+  <button class="btn" id="btnTheme">Dark</button>
+
+  <div class="scenbar">
+    <label class="lbl" for="scenario">Pick a scenario</label>
+    <button class="btn nav" id="scPrev" title="Previous scenario" aria-label="Previous scenario">&#8249;</button>
+    <select id="scenario"></select>
+    <button class="btn nav" id="scNext" title="Next scenario" aria-label="Next scenario">&#8250;</button>
+    <span class="of" id="scOf"></span>
+  </div>
+</header>
+
+<main id="main">
+  <section class="leftcol">
+    <div class="card">
+      <h2>
+        Knowledge graph — durable topology
+        <span class="spacer"></span>
+        <span class="stagenow" id="stageNow"></span>
+      </h2>
+      <div class="body">
+        <div class="topbar">
+        <div class="anchor" id="anchorBox"></div>
+
+        <div class="player">
+          <button class="btn primary" id="btnPlay">Play</button>
+          <button class="btn" id="btnStep">Step</button>
+          <button class="btn" id="btnBack">Back</button>
+          <button class="btn danger" id="btnReset">Reset</button>
+          <span class="ctl">
+            <label for="speed">Speed</label>
+            <select id="speed">
+              <option value="6000">Very slow · 6s</option>
+              <option value="4000">Slow · 4s</option>
+              <option value="2500">Steady · 2.5s</option>
+              <option value="1500">Brisk · 1.5s</option>
+              <option value="800">Fast · 0.8s</option>
+            </select>
+          </span>
+          <span class="ctl">
+            <label for="zoomRange">Zoom</label>
+            <input type="range" id="zoomRange" min="70" max="220" step="5" />
+            <span class="stagenow" id="zoomVal"></span>
+            <button class="btn" id="btnFitW" title="Fill the available width">Fit width</button>
+            <button class="btn" id="btnFitAll" title="Fit the whole diagram, no scrolling">Fit all</button>
+          </span>
+        </div>
+        </div>
+
+        <div class="graphwrap" id="graphWrap">
+          <svg class="graph" id="graph" viewBox="0 0 1080 434" role="img"
+               aria-label="Charging-assurance knowledge graph from agency account through slice, RAN, core and charging to mediation and billing"></svg>
+        </div>
+
+        <div id="belowGraph">
+          <div class="railhdr">
+            <span class="rt">Solution pool — narrowing</span>
+            <span class="spacer"></span>
+            <span class="stagenow" id="railHint">click a revealed stage to jump</span>
+          </div>
+          <div class="rail" id="rail"></div>
+          <div id="outcomeStrip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Ask the case file <span class="soon">pre-written answers · live AI coming soon</span></h2>
+      <div class="body">
+        <div id="askChips" class="chips"></div>
+        <div id="askAnswer"></div>
+
+        <label class="barechk" id="bareWrap">
+          <input type="checkbox" id="askBare" />
+          <span>Answer the same question with the graph evidence withheld</span>
+        </label>
+
+        <div class="askrow askdim">
+          <span class="ctl">
+            <label for="provider">Provider</label>
+            <select id="provider" disabled>
+              <option>Mistral</option><option>Ollama Local</option>
+              <option>DeepSeek</option><option>OpenRouter</option>
+            </select>
+          </span>
+          <span class="ctl">
+            <label for="model">Model</label>
+            <select id="model" disabled><option>mistral-large-latest</option></select>
+          </span>
+          <span class="ctl">
+            <label for="keyref">Key</label>
+            <select id="keyref" disabled><option>Primary</option><option>Backup</option></select>
+          </span>
+          <input type="text" id="askInput" placeholder="Free-text questions need the model — coming soon" disabled />
+          <button class="btn primary" id="btnAsk" disabled>Ask</button>
+        </div>
+        <div class="asknote">
+          The answers above are pre-written, not generated. Free-text questions and the provider and
+          model selectors arrive with the live model. Nothing on the rest of this page depends on it:
+          the ranking, the control comparisons and the action gate are all deterministic.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="divider" role="separator" aria-orientation="vertical" tabindex="0"
+       aria-label="Resize the topology pane. Arrow keys adjust, double-click resets."></div>
+
+  <section class="rightcol">
+    <div class="card">
+      <h2>Context graph — this incident only</h2>
+      <div class="cgwrap" id="cg"></div>
+    </div>
+
+    <div class="card" id="signalCard">
+      <h2>Live overlay &amp; control groups</h2>
+      <div class="body" id="signals"></div>
+    </div>
+
+    <div class="card" id="hypCard">
+      <h2>Ranked candidates</h2>
+      <div class="body" id="hyps"></div>
+    </div>
+
+    <div class="card" id="gateCard">
+      <h2>Action gate</h2>
+      <div class="body" id="gate"></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="dlgSettings">
+  <div class="dlghdr"><h3>Settings</h3><span class="spacer"></span><button class="btn" data-close>Close</button></div>
+  <div class="dlgbody">
+    <h4>Rename entities</h4>
+    <p class="note">Names below replace the labels shown on the graph, in the context graph, in the evidence text and in the candidate list. Stored in this browser only. Leave a field blank to keep the default.</p>
+    <div style="margin:11px 0;"><button class="btn" id="btnResetNames">Reset all names to default</button></div>
+    <div class="rngrid" id="renameGrid"></div>
+  </div>
+</dialog>
+
+<dialog id="dlgHelp">
+  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V1.0</span><span class="spacer"></span><button class="btn" data-close>Close</button></div>
+  <div class="dlgbody">
+    <h4>What this shows</h4>
+    <p><b>Knowledge graph</b> — the durable model: agency account, Priority Responder plan and SLA, slice and sessions, cells, SMF and UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
+    <p><b>Context graph</b> — what the system knows about <i>this</i> incident: observations, evidence pointing back at knowledge-graph entities, hypotheses and proposed actions, each with a source and a confidence. Created when the anchor fires, discarded on Reset.</p>
+    <h4>Driving the demo</h4>
+    <p>Pick a <b>scenario</b> from the blue selector in the header, or step through them with <b>‹</b> and <b>›</b>. Then <b>Play</b> to walk the stages, or <b>Step</b> to advance while you narrate. <b>Speed</b> sets the dwell time. Arrow keys step, space plays and pauses.</p>
+    <h4>Sizing it for your display</h4>
+    <p><b>Drag the vertical handle</b> between the topology and the detail panels to rebalance them. Double-click the handle to reset it, or focus it and use the arrow keys. The detail panels reflow into two columns once you give them the room.</p>
+    <p><b>Zoom</b> scales the diagram in real pixels, so the labels never shrink below a readable size — the pane scrolls instead. <b>Fit width</b> fills the pane and keeps tracking it as you drag the handle or resize the window. <b>Fit all</b> shows the whole diagram with no scrolling, which will make it smaller. <b>+</b> and <b>−</b> zoom. <b>Expand</b> hides the detail panels entirely.</p>
+    <p>Un-reached stages in the narrowing rail stay blank until you get to them. The right-hand panels appear as the case file earns them: the live overlay, then the ranked candidates, then the action gate.</p>
+    <h4>Reading the graph</h4>
+    <p>Blue is the current candidate set. Faded entities were ruled out by an earlier stage but stay on screen so the narrowing is visible. Violet is the located root cause. Amber dashed boxes along the bottom are change records, linked to the entities they targeted.</p>
+    <h4>Scores</h4>
+    <p>Candidate scores are <b>evidence-match scores against SME-authored failure fingerprints, not probabilities</b>. A candidate is action-eligible only above threshold and only after the guardrail checks pass. Three actions are permanently blocked from automation in every scenario: customer credit posting, direct billing-state writes, and RAN firmware rollback on cells serving an active public-safety response.</p>
+    <h4>Ask the case file</h4>
+    <p><b>Coming soon.</b> Natural-language questions over the case file, answered by a selectable provider and model. Deliberately disabled in V1.0: every ranking, control comparison and gate decision on screen is deterministic, so the demo is complete without it.</p>
+    <h4>Renaming entities</h4>
+    <p><b>Settings → Rename entities</b> replaces any entity label with your own, everywhere it appears including the evidence prose. Stored in this browser only.</p>
+    <h4>Scope</h4>
+    <p>Illustrative and vendor-neutral. The operator is generic: PLMN 001-01 is the 3GPP test network, the market code and every element name are invented, and vendors are deliberately unnamed. All identifiers, counters, agency names, thresholds, timestamps and change records are fictional and represent no real network, product, customer or operational data. Charging-plane roles and interfaces follow 3GPP TS 32.240, 32.255, 32.290 and 32.291.</p>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+
+  var VERSION = "V1.0";
+  var LS = "kgcg.demo.v1";
+
+  /* ============================ knowledge graph ============================ */
+
+  var VBW = 1080, VBH = 434;
+
+  var COLUMNS = [
+    { x: 92,  label: "Commercial" },
+    { x: 268, label: "Slice / session" },
+    { x: 444, label: "RAN" },
+    { x: 620, label: "5G core" },
+    { x: 796, label: "Charging" },
+    { x: 972, label: "Mediation / BSS" }
+  ];
+
+  var NODES = [
+    { id: "acct",  col: 0, y: 76,  label: "ACCT-PR-7821",  sub: "agency · 1,840 lines", src: "CRM" },
+    { id: "plan",  col: 0, y: 154, label: "PLAN-PRI-01",  sub: "Priority Responder plan",      src: "BSS" },
+    { id: "sla",   col: 0, y: 232, label: "SLA-CDR-9995",  sub: "≥ 99.95% complete",    src: "BSS" },
+
+    { id: "slice", col: 1, y: 76,  label: "SLICE-PRI",    sub: "S-NSSAI 1 · 0x000A21", src: "NSSF" },
+    { id: "dnn",   col: 1, y: 154, label: "DNN-PRI",      sub: "priority.example",       src: "SMF" },
+    { id: "sess",  col: 1, y: 232, label: "PDU-SESS-M01",  sub: "1,612 active",         src: "SMF" },
+
+    { id: "cell1", col: 2, y: 76,  label: "C-M01-7711",    sub: "n78 · 001-01",        src: "ENM" },
+    { id: "cell2", col: 2, y: 154, label: "C-M01-7712",    sub: "n78 · 001-01",        src: "ENM" },
+    { id: "cell3", col: 2, y: 232, label: "C-M01-7713",    sub: "n28 · 001-01",        src: "ENM" },
+
+    { id: "smf4",  col: 3, y: 76,  label: "smf-m01-04",    sub: "Core Vendor A",        src: "EMS" },
+    { id: "smf5",  col: 3, y: 154, label: "smf-m01-05",    sub: "Core Vendor A",        src: "EMS" },
+    { id: "upf9",  col: 3, y: 232, label: "upf-m01-edge-09", sub: "N3 / N6 anchor",     src: "NRF" },
+
+    { id: "rtA",   col: 4, y: 76,  label: "CHF-ROUTE-A",   sub: "Nchf route",           src: "EMS" },
+    { id: "poolA", col: 4, y: 154, label: "CHF-POOL-A",    sub: "Charging Vendor B",    src: "EMS" },
+    { id: "rtB",   col: 4, y: 232, label: "CHF-ROUTE-B",   sub: "Nchf route",           src: "EMS" },
+    { id: "poolB", col: 4, y: 310, label: "CHF-POOL-B",    sub: "Charging Vendor B",    src: "EMS" },
+
+    { id: "med",   col: 5, y: 76,  label: "MED-M01-01",    sub: "mediation",            src: "MED" },
+    { id: "store", col: 5, y: 154, label: "CDR-STORE-M01", sub: "CDR store",            src: "MED" },
+    { id: "rate",  col: 5, y: 232, label: "RATE-ENG-01",   sub: "rating engine",        src: "BSS" },
+    { id: "bill",  col: 5, y: 310, label: "BILL-CYCLE-05", sub: "billing cycle",        src: "BSS" },
+
+    { id: "chg007", x: 300, y: 396, label: "CHG-2026-05-18-007", sub: "watermark 80→92%",     src: "ITSM", lane: "chg" },
+    { id: "chg022", x: 620, y: 396, label: "CHG-2026-05-19-022", sub: "RAN fw 24.1.3→24.1.4", src: "ITSM", lane: "chg" },
+    { id: "chg014", x: 940, y: 396, label: "CHG-2026-05-15-014", sub: "UPF 12→16 vCPU",       src: "ITSM", lane: "chg" }
+  ];
+
+  var EDGES = [
+    ["acct", "plan"], ["plan", "sla"], ["plan", "slice"], ["slice", "dnn"], ["slice", "sess"],
+    ["sess", "cell1"], ["sess", "cell2"], ["sess", "cell3"],
+    ["cell1", "smf4"], ["cell2", "smf4"], ["cell3", "smf4"],
+    ["smf4", "upf9"], ["smf4", "rtA"], ["smf5", "rtB"],
+    ["rtA", "poolA"], ["rtB", "poolB"],
+    ["poolA", "med"], ["poolB", "med"], ["med", "store"], ["store", "rate"], ["rate", "bill"]
+  ];
+
+  var CHG_EDGES = [
+    ["chg007", "poolA"], ["chg022", "cell1"], ["chg022", "cell2"], ["chg022", "cell3"], ["chg014", "upf9"]
+  ];
+
+  var STAGE_LABELS = [
+    "Baseline — no active anchor",
+    "Anchor fires",
+    "Scoped to slice, market, window",
+    "Path isolated by topology",
+    "Live overlay and control groups applied",
+    "Threshold and guardrails applied",
+    "Executed and verified"
+  ];
+  var STAGE_UNITS = [
+    "no incident", "catalogued failure modes", "plausible modes", "plausible modes",
+    "ranked candidates", "action-eligible", "confirmed cause"
+  ];
+
+  var BLOCKED = [
+    "Customer credit posting",
+    "Direct billing-state writes",
+    "RAN firmware rollback on cells serving an active public-safety response"
+  ];
+
+  /* ============================== scenarios =============================== */
+
+  var SCENARIOS = [
+    {
+      id: "chf-capacity",
+      name: "1 · CHF pool capacity after watermark change",
+      sev: "P2",
+      title: "CDR-completeness breach + Nchf error spike",
+      detail: "{{slice}} in market M01 · 20:05–20:17 PDT · completeness 91.4% against a 99.97% baseline · user plane near normal",
+      counts: [0, 62, 31, 12, 5, 1, 1],
+      root: "poolA",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["slice", "sess", "cell1", "cell2", "cell3", "smf4"],
+        ["smf4", "rtA", "poolA", "med", "store"],
+        ["smf4", "rtA", "poolA", "med", "store", "chg007", "rtB", "poolB"],
+        ["rtA", "poolA", "rtB", "poolB"],
+        ["rtB", "poolB", "med", "store"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4471 · charging-plane assurance breach on {{slice}}, market M01.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "1,612 active sessions in scope on {{plan}}; {{sla}} credit trigger fires at 99.5% over 15 minutes.", source: "traversal", conf: 0.94 },
+        { type: "Evidence", text: "All abnormal counters sit on {{rtA}} and {{poolA}}. {{rtB}} and {{poolB}} are clean.", source: "traversal", conf: 0.93 },
+        { type: "Hypothesis", text: "{{poolA}} is saturating. {{chg007}} raised its queue high-watermark from 80% to 92% two days earlier, removing the headroom that used to absorb this load.", source: "traversal", conf: 0.91 },
+        { type: "Action", text: "Fail {{smf4}} charging traffic over to {{rtB}} and {{poolB}}. Reversible in one step, blast radius one route.", source: "traversal", conf: 0.89 },
+        { type: "Outcome", text: "Failover verified: Nchf failures and queue depth back to baseline, CDR arrival lag clearing. New route written back with a validity window; old route retained in history.", source: "traversal", conf: 0.97 }
+      ],
+      signals: [
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.062 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "4.7 s", base: "0.18 s", state: "anomalous", on: "{{poolA}}" },
+        { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "180 s rising", base: "5–15 s", state: "degraded", on: "{{med}}" },
+        { label: "Alternate route failures", counter: "nchf_request_failure_count", value: "0.0004 /s", base: "0.0003 /s", state: "baseline", on: "{{rtB}}" },
+        { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+0.4 pp", base: "±0.5 pp", state: "baseline", on: "3 cells" },
+        { label: "GTP packet drop", counter: "gtp_packet_drop_rate", value: "unchanged", base: "unchanged", state: "baseline", on: "{{upf9}}" }
+      ],
+      controls: [
+        { label: "Same cells, sessions not on the Priority Responder slice", result: "healthy", note: "argues against a cell-level cause" },
+        { label: "Alternate SMF and CHF route ({{smf5}} → {{rtB}})", result: "healthy", note: "points back at the affected charging path" },
+        { label: "Priority Responder sessions in other markets", result: "healthy", note: "argues against a plan or SLA-mapping cause" },
+        { label: "Same SMF over an alternate CHF route", result: "missing", note: "not configured in this topology — stated, not hidden" }
+      ],
+      hyps: [
+        { name: "CHF route / pool capacity", score: 88, verdict: "eligible",
+          for: "errors, queueing and CDR lag all on one route; watermark change targets {{poolA}}", against: "none material" },
+        { name: "SMF / CTF charging-event generation", score: 61, verdict: "investigate",
+          for: "consistent with the same observable signature", against: "the discriminating control is unavailable" },
+        { name: "Mediation or CDR-store delay", score: 24, verdict: "dismissed",
+          for: "arrival lag is real", against: "lag begins after the Nchf errors, so it reads as a symptom" },
+        { name: "Plan or SLA mapping drift", score: 11, verdict: "dismissed",
+          for: "none", against: "no mapping change in the window; would not produce interface errors" },
+        { name: "RAN firmware regression", score: 6, verdict: "dismissed",
+          for: "{{chg022}} is inside the window", against: "radio counters at baseline; impact follows the SMF, not cell boundaries" }
+      ],
+      gate: { checks: [
+        { label: "Alternate capacity available on {{poolB}}", pass: true },
+        { label: "Action pre-approved for this incident class", pass: true },
+        { label: "Blast radius limited to one Nchf route", pass: true },
+        { label: "Single-step rollback available", pass: true },
+        { label: "CDR reconciliation remains auditable", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "verified", text: "Operator approved. Nchf failure rate 0.0004/s, queue depth p95 0.21 s, arrival lag clearing. Marked verified and written back to the knowledge graph." }
+    },
+
+    {
+      id: "ambiguous",
+      name: "2 · Borderline drop — no high-confidence cause",
+      sev: "P3",
+      title: "CDR-completeness drop, borderline",
+      detail: "{{slice}} in market M01 · completeness 99.78% against a 99.95% target · Nchf errors at 10× baseline · queue depth slightly elevated on both pools",
+      counts: [0, 62, 34, 18, 5, 0, 0],
+      labels: { 5: "No candidate above threshold", 6: "Manual investigation opened" },
+      units: { 5: "action-eligible", 6: "open findings" },
+      root: null,
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["slice", "sess", "smf4", "smf5"],
+        ["smf4", "smf5", "rtA", "poolA", "rtB", "poolB"],
+        ["smf4", "smf5", "rtA", "poolA", "rtB", "poolB", "med", "chg007", "chg022"],
+        ["poolA", "poolB"],
+        ["poolA", "poolB", "med", "rate"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4519 · borderline completeness drop, above the credit trigger and below target.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Drop is real but shallow. No single route, SMF cluster or plan separates from the others.", source: "traversal", conf: 0.86 },
+        { type: "Evidence", text: "Both {{poolA}} and {{poolB}} show mildly elevated queue depth. Nchf elevation is 10× baseline, not the 200× seen in the route-localised case.", source: "traversal", conf: 0.9 },
+        { type: "Hypothesis", text: "Top candidate scores 38 against a surface threshold of 60. Two recent changes overlap the window and neither fingerprint matches.", source: "traversal", conf: 0.38 },
+        { type: "Observation", text: "No candidate is action-eligible. Forcing a top-one answer here would be a guess presented as a finding.", source: "traversal", conf: 0.95 },
+        { type: "Outcome", text: "Filed as no high-confidence cause with an explicit manual-investigation list. Outcome written back so this pattern is recognisable next time.", source: "traversal", conf: 0.95 }
+      ],
+      signals: [
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.003 /s", base: "0.0003 /s", state: "degraded", on: "both routes" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.41 s", base: "0.18 s", state: "degraded", on: "{{poolA}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.38 s", base: "0.18 s", state: "degraded", on: "{{poolB}}" },
+        { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "18 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
+        { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "±0.2 pp", base: "±0.5 pp", state: "baseline", on: "3 cells" }
+      ],
+      controls: [
+        { label: "One route against the other", result: "missing", note: "both elevated — no separation" },
+        { label: "One SMF cluster against the other", result: "missing", note: "both elevated — no separation" },
+        { label: "Priority Responder against other plans on the same pools", result: "missing", note: "no plan-level separation" },
+        { label: "Other markets", result: "healthy", note: "localises to M01 but not below market level" }
+      ],
+      hyps: [
+        { name: "CHF capacity regression (either pool)", score: 38, verdict: "dismissed",
+          for: "both pools elevated", against: "controls do not isolate one route from the other" },
+        { name: "SMF / CTF charging-event generation", score: 22, verdict: "dismissed",
+          for: "errors present on both clusters", against: "not concentrated on a single SMF cluster" },
+        { name: "Mediation / CDR-store delay", score: 17, verdict: "dismissed",
+          for: "could explain part of the gap", against: "would not produce the Nchf elevation" },
+        { name: "BSS / SLA-mapping drift", score: 9, verdict: "dismissed",
+          for: "none", against: "no mapping change in the window" },
+        { name: "RAN firmware regression", score: 6, verdict: "dismissed",
+          for: "change present in window", against: "fingerprint absent" }
+      ],
+      gate: { checks: [
+        { label: "A candidate above the surface threshold of 60", pass: false },
+        { label: "Control groups isolate one path", pass: false },
+        { label: "Action pre-approved for this incident class", pass: true },
+        { label: "Single-step rollback available", pass: true },
+        { label: "Verification KPIs defined before execution", pass: false }
+      ] },
+      outcome: { state: "manual", text: "No action proposed. Manual investigation: run synthetic charging tests on both pools to verify pool-level health independently of live traffic; check mediation pipeline timing across the full window; review SLA mapping for any unrecorded change in the prior 7 days." }
+    },
+
+    {
+      id: "smf-ctf",
+      name: "3 · SMF / CTF fails to generate charging events",
+      sev: "P2",
+      title: "Charging events never created",
+      detail: "{{slice}} in market M01 · completeness 94.2% · Nchf request volume down 31% while sessions are flat · no interface errors",
+      counts: [0, 62, 29, 11, 5, 0, 0],
+      labels: { 5: "Held for a pre-approved test", 6: "Synthetic charging test queued" },
+      units: { 5: "action-eligible", 6: "queued checks" },
+      root: "smf4",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["slice", "sess", "smf4", "smf5"],
+        ["smf4", "rtA", "poolA"],
+        ["smf4", "rtA", "poolA", "smf5", "rtB", "poolB", "med"],
+        ["smf4", "rtA", "rtB"],
+        ["smf4", "rtB", "poolB"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4602 · charging events missing rather than failing in transit.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Session count on {{smf4}} is flat while its Nchf request volume is down 31%. Records are not being generated.", source: "traversal", conf: 0.92 },
+        { type: "Evidence", text: "No Nchf errors and no queueing anywhere. {{poolA}} is healthy — it is simply being asked for less.", source: "traversal", conf: 0.94 },
+        { type: "Hypothesis", text: "Charging-trigger generation on {{smf4}} is dropping a subset of events. A route-side cause would show errors; there are none.", source: "traversal", conf: 0.74 },
+        { type: "Observation", text: "The discriminating control — {{smf4}} over an alternate route — does not exist in this topology, so route-side and trigger-side causes cannot be separated from live traffic alone.", source: "traversal", conf: 0.96 },
+        { type: "Outcome", text: "No failover proposed: moving route would not distinguish the two. A pre-approved synthetic charging test on {{smf4}} over {{rtB}} is queued instead, with no billing or credit impact." }
+      ],
+      signals: [
+        { label: "Nchf request volume", counter: "nchf_request_count", value: "−31%", base: "flat", state: "anomalous", on: "{{smf4}}" },
+        { label: "Active sessions", counter: "pdu_session_count", value: "1,608", base: "1,612", state: "baseline", on: "{{smf4}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.17 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
+        { label: "Nchf request volume", counter: "nchf_request_count", value: "flat", base: "flat", state: "baseline", on: "{{smf5}}" }
+      ],
+      controls: [
+        { label: "Alternate SMF cluster ({{smf5}})", result: "healthy", note: "request volume flat — isolates to {{smf4}}" },
+        { label: "Same pool, traffic from other SMFs", result: "healthy", note: "{{poolA}} serves other traffic normally" },
+        { label: "Other markets on the same plan", result: "healthy", note: "argues against a plan-level cause" },
+        { label: "{{smf4}} over an alternate CHF route", result: "missing", note: "not configured — the one control that would separate trigger-side from route-side" }
+      ],
+      hyps: [
+        { name: "SMF / CTF charging-event generation", score: 71, verdict: "investigate",
+          for: "request volume down with sessions flat; no errors and no queueing", against: "cannot be confirmed without the missing control" },
+        { name: "CHF route / pool capacity", score: 34, verdict: "dismissed",
+          for: "same observable completeness gap", against: "a saturating pool produces errors and queueing; neither is present" },
+        { name: "Mediation rejection upstream", score: 19, verdict: "dismissed",
+          for: "none", against: "mediation accept rate unchanged" },
+        { name: "Plan or SLA mapping drift", score: 8, verdict: "dismissed",
+          for: "none", against: "no mapping change in the window" },
+        { name: "RAN firmware regression", score: 5, verdict: "dismissed",
+          for: "change present in window", against: "fingerprint absent; radio counters at baseline" }
+      ],
+      gate: { checks: [
+        { label: "A candidate above the surface threshold of 60", pass: true },
+        { label: "Control groups isolate the cause", pass: false },
+        { label: "Failover would change the observable outcome", pass: false },
+        { label: "Pre-approved diagnostic available instead", pass: true },
+        { label: "Diagnostic touches no billing or credit state", pass: true }
+      ] },
+      outcome: { state: "manual", text: "Synthetic charging test queued on {{smf4}} over {{rtB}}. If events appear, the trigger side is exonerated and the route becomes the candidate; if they do not, the trigger side is confirmed. Either way the missing control gets created." }
+    },
+
+    {
+      id: "mediation-reject",
+      name: "4 · Mediation accepts, billing rejects",
+      sev: "P2",
+      title: "Reconciliation gap downstream of mediation",
+      detail: "{{slice}} in market M01 · completeness 99.96% at mediation · 4.1% of accepted records rejected at rating · no charging-plane anomaly",
+      counts: [0, 58, 27, 9, 4, 1, 1],
+      root: "rate",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["poolA", "poolB", "med", "store"],
+        ["med", "store", "rate", "bill"],
+        ["med", "store", "rate", "bill", "poolA", "poolB"],
+        ["store", "rate", "bill"],
+        ["store", "rate", "bill"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4655 · records complete at mediation but failing downstream at rating.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Completeness at {{med}} is 99.96% — within SLA. The loss is after acceptance, which the completeness KPI alone cannot see.", source: "traversal", conf: 0.95 },
+        { type: "Evidence", text: "{{rate}} rejects 4.1% of accepted records with a field-validation error on the Priority Responder entitlement code.", source: "traversal", conf: 0.93 },
+        { type: "Hypothesis", text: "A schema expectation at {{rate}} no longer matches what {{store}} emits for this plan. Charging plane is not involved.", source: "traversal", conf: 0.87 },
+        { type: "Action", text: "Re-drive the rejected batch through {{rate}} after the mapping correction. Records are retained, so nothing is lost.", source: "traversal", conf: 0.85 },
+        { type: "Outcome", text: "Batch re-driven, rejection rate back to 0.02%. Reconciliation gap closed and the mapping recorded as a change." }
+      ],
+      signals: [
+        { label: "Completeness at mediation", counter: "cdr_completeness", value: "99.96%", base: "99.97%", state: "baseline", on: "{{med}}" },
+        { label: "Rating rejection rate", counter: "rating_reject_rate", value: "4.1%", base: "0.02%", state: "anomalous", on: "{{rate}}" },
+        { label: "Rejection reason", counter: "reject_code_top1", value: "ENTITLEMENT_FIELD", base: "n/a", state: "anomalous", on: "{{rate}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.18 s", base: "0.18 s", state: "baseline", on: "both pools" }
+      ],
+      controls: [
+        { label: "Other plans through the same rating engine", result: "healthy", note: "isolates to the Priority Responder entitlement code" },
+        { label: "Same plan in other markets", result: "anomalous", note: "also rejecting — this is not market-specific" },
+        { label: "Charging plane end to end", result: "healthy", note: "rules out CHF, route and mediation" },
+        { label: "Prior billing cycle for the same plan", result: "healthy", note: "dates the onset to this cycle" }
+      ],
+      hyps: [
+        { name: "Rating-engine field expectation drift", score: 84, verdict: "eligible",
+          for: "single reject code, one plan, all markets, onset at cycle boundary", against: "none material" },
+        { name: "Mediation transformation defect", score: 29, verdict: "dismissed",
+          for: "mediation is upstream of the failure", against: "mediation output unchanged against the prior cycle" },
+        { name: "CHF record-format change", score: 14, verdict: "dismissed",
+          for: "none", against: "no CHF change in the window; other plans unaffected" },
+        { name: "Charging-plane loss", score: 4, verdict: "dismissed",
+          for: "none", against: "completeness at mediation is within SLA" }
+      ],
+      gate: { checks: [
+        { label: "Rejected records retained and re-drivable", pass: true },
+        { label: "Action pre-approved for this incident class", pass: true },
+        { label: "Blast radius limited to one rejected batch", pass: true },
+        { label: "No direct billing-state write required", pass: true },
+        { label: "Reconciliation remains auditable", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "verified", text: "Rejection rate 0.02% after re-drive. No records lost, no credit exposure. Mapping correction recorded as a change so the next incident sees it." }
+    },
+
+    {
+      id: "duplicate-cdr",
+      name: "5 · CDR duplication — over-count, not loss",
+      sev: "P2",
+      title: "Completeness above target while records duplicate",
+      detail: "{{slice}} in market M01 · completeness reported 100.8% · duplicate rate 0.9% at {{store}} · double-rating exposure on an active response",
+      counts: [0, 58, 24, 8, 4, 1, 1],
+      root: "med",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["poolA", "poolB", "med", "store"],
+        ["poolA", "med", "store"],
+        ["poolA", "med", "store", "rate", "bill", "poolB"],
+        ["med", "store", "rate"],
+        ["med", "store", "rate", "bill"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4708 · completeness above 100%, which is a defect rather than good news.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Accepted record count exceeds expected charging events by 0.9%. A completeness KPI alone reads this as healthy.", source: "traversal", conf: 0.96 },
+        { type: "Evidence", text: "Duplicates share a mediation batch identifier and arrive 40–70 s apart, consistent with a retry that is not de-duplicating.", source: "traversal", conf: 0.92 },
+        { type: "Hypothesis", text: "{{med}} retried a batch after a transient write timeout at {{store}} without idempotency on the batch key.", source: "traversal", conf: 0.88 },
+        { type: "Action", text: "Quarantine the duplicated batch before {{rate}} consumes it. Rating has not yet run for this window.", source: "traversal", conf: 0.9 },
+        { type: "Outcome", text: "Duplicates quarantined ahead of rating. No double-rating reached billing, so no customer credit is required — which is exactly why the credit path stays out of automation." }
+      ],
+      signals: [
+        { label: "Reported completeness", counter: "cdr_completeness", value: "100.8%", base: "99.97%", state: "anomalous", on: "{{store}}" },
+        { label: "Duplicate record rate", counter: "cdr_duplicate_rate", value: "0.9%", base: "0.00%", state: "anomalous", on: "{{store}}" },
+        { label: "Mediation retry count", counter: "med_batch_retry", value: "3", base: "0", state: "anomalous", on: "{{med}}" },
+        { label: "Store write latency p95", counter: "store_write_latency_ms", value: "2,400 ms", base: "180 ms", state: "degraded", on: "{{store}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" }
+      ],
+      controls: [
+        { label: "Other plans in the same mediation batch", result: "anomalous", note: "also duplicated — batch-level, not plan-level" },
+        { label: "Charging plane end to end", result: "healthy", note: "CHF emitted each event once" },
+        { label: "Prior batches in the same window", result: "healthy", note: "dates onset to the retry" },
+        { label: "Rating output for the window", result: "missing", note: "rating has not run yet — this is why the action is time-critical" }
+      ],
+      hyps: [
+        { name: "Mediation retry without idempotency", score: 86, verdict: "eligible",
+          for: "shared batch key, 40–70 s spacing, three retries against a slow store", against: "none material" },
+        { name: "CHF duplicate emission", score: 21, verdict: "dismissed",
+          for: "would also duplicate", against: "CHF emission count matches expected events exactly" },
+        { name: "Store replication read-back", score: 16, verdict: "dismissed",
+          for: "write latency elevated", against: "duplicates carry distinct ingest timestamps, not replica reads" },
+        { name: "Session-level double counting at the SMF", score: 7, verdict: "dismissed",
+          for: "none", against: "session count and event count agree at the SMF" }
+      ],
+      gate: { checks: [
+        { label: "Rating has not yet consumed the window", pass: true },
+        { label: "Quarantine is pre-approved for this incident class", pass: true },
+        { label: "Blast radius limited to one mediation batch", pass: true },
+        { label: "Single-step restore from quarantine available", pass: true },
+        { label: "No customer credit or billing write required", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "verified", text: "Duplicate rate 0.00% after quarantine, completeness back to 99.97%. Nothing reached rating, so no credit exposure — and no automated credit was ever an option." }
+    },
+
+    {
+      id: "rating-drift",
+      name: "6 · Entitlement mapping drift — no network fault",
+      sev: "P3",
+      title: "Records complete and on time, rated against the wrong entitlement",
+      detail: "{{slice}} in market M01 · completeness 99.97% · arrival lag normal · 1,840 lines rated against a superseded entitlement",
+      counts: [0, 55, 22, 7, 4, 1, 1],
+      root: "plan",
+      nodes: [
+        [],
+        ["acct", "plan", "sla"],
+        ["acct", "plan", "sla", "rate", "bill"],
+        ["plan", "rate", "bill"],
+        ["plan", "sla", "rate", "bill", "med", "store"],
+        ["plan", "rate"],
+        ["plan", "rate", "bill"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4740 · no network anomaly anywhere; the fault is entirely in the commercial layer.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Completeness, arrival lag and Nchf counters are all at baseline. Nothing in the charging plane is wrong.", source: "traversal", conf: 0.97 },
+        { type: "Evidence", text: "{{rate}} is applying entitlement PRI-2025-B to all 1,840 lines on {{acct}}, superseded by PRI-2026-A at the last catalogue refresh.", source: "traversal", conf: 0.94 },
+        { type: "Hypothesis", text: "{{plan}} points at a stale entitlement version. The plan-to-entitlement edge was never revalidated after the catalogue refresh.", source: "traversal", conf: 0.91 },
+        { type: "Action", text: "Refresh the plan-to-entitlement edge from the BSS catalogue and re-rate the affected window.", source: "traversal", conf: 0.88 },
+        { type: "Outcome", text: "Edge refreshed, window re-rated, all 1,840 lines on the current entitlement. Any resulting adjustment goes to a human — automated credit posting is permanently blocked." }
+      ],
+      signals: [
+        { label: "Completeness", counter: "cdr_completeness", value: "99.97%", base: "99.97%", state: "baseline", on: "{{med}}" },
+        { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "8 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" },
+        { label: "Entitlement version in use", counter: "rating_entitlement_id", value: "PRI-2025-B", base: "PRI-2026-A", state: "anomalous", on: "{{rate}}" },
+        { label: "Plan catalogue refresh age", counter: "plan_edge_age_hours", value: "38 h", base: "≤ 1 h", state: "degraded", on: "{{plan}}" }
+      ],
+      controls: [
+        { label: "Other plans through the same rating engine", result: "healthy", note: "on current entitlements — isolates to this plan" },
+        { label: "Charging plane end to end", result: "healthy", note: "no network cause at all" },
+        { label: "Same plan in other markets", result: "anomalous", note: "also on the stale entitlement — plan-level, not market-level" },
+        { label: "Prior cycle for the same plan", result: "healthy", note: "onset is the catalogue refresh" }
+      ],
+      hyps: [
+        { name: "Plan-to-entitlement mapping drift", score: 90, verdict: "eligible",
+          for: "one plan, all markets, stale edge age 38 h against a 1 h expectation", against: "none material" },
+        { name: "Rating-engine defect", score: 22, verdict: "dismissed",
+          for: "rating is where the wrong value is applied", against: "other plans rate correctly on the same engine" },
+        { name: "Mediation transformation", score: 11, verdict: "dismissed",
+          for: "none", against: "mediation output matches CHF emission" },
+        { name: "Charging-plane loss", score: 3, verdict: "dismissed",
+          for: "none", against: "every charging counter is at baseline" }
+      ],
+      gate: { checks: [
+        { label: "Catalogue is reachable and current", pass: true },
+        { label: "Edge refresh pre-approved for this incident class", pass: true },
+        { label: "Blast radius limited to one plan edge", pass: true },
+        { label: "Re-rate is reversible for the affected window", pass: true },
+        { label: "No automated credit posting required", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "verified", text: "Entitlement PRI-2026-A applied, window re-rated, edge age back under one hour. Financial adjustment referred to a human owner rather than posted automatically." }
+    },
+
+    {
+      id: "stale-topology",
+      name: "7 · Action blocked — stale topology",
+      sev: "P2",
+      title: "Confident candidate, refused action",
+      detail: "{{slice}} in market M01 · completeness 92.6% · candidate scores 83 · required topology edge last refreshed 41 minutes ago against a 60-second expectation",
+      counts: [0, 62, 31, 12, 5, 0, 0],
+      labels: { 5: "Action blocked — stale topology", 6: "Refresh requested, action re-queued" },
+      units: { 5: "action-eligible", 6: "open findings" },
+      root: "poolA",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["slice", "sess", "smf4"],
+        ["smf4", "rtA", "poolA", "med"],
+        ["smf4", "rtA", "poolA", "med", "rtB", "poolB", "chg007"],
+        ["rtA", "poolA", "rtB", "poolB"],
+        ["rtB", "poolB"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4771 · same fingerprint as the capacity case, different data-freshness posture.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Route-localised errors and queueing on {{rtA}} and {{poolA}}. Candidate scores 83, comfortably above threshold.", source: "traversal", conf: 0.93 },
+        { type: "Evidence", text: "The {{smf4}} → {{rtB}} capacity edge was last refreshed 41 minutes ago. Its validity window expects a 60-second refresh, so it is out of window.", source: "traversal", conf: 0.99 },
+        { type: "Hypothesis", text: "Failover target capacity cannot be trusted. Acting on a stale edge risks moving traffic onto a pool that is itself saturated.", source: "traversal", conf: 0.95 },
+        { type: "Observation", text: "Eligibility denied by the stale-topology guardrail. The recommendation is retained, not discarded.", source: "traversal", conf: 0.98 },
+        { type: "Outcome", text: "Refresh requested from the charging EMS. The action re-queues automatically once the edge is inside its validity window; it does not silently proceed." }
+      ],
+      signals: [
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.048 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "3.9 s", base: "0.18 s", state: "anomalous", on: "{{poolA}}" },
+        { label: "Failover-target edge age", counter: "edge_age_seconds", value: "2,460 s", base: "≤ 60 s", state: "anomalous", on: "{{rtB}}" },
+        { label: "Target pool capacity", counter: "pool_headroom_pct", value: "unknown", base: "≥ 25%", state: "missing", on: "{{poolB}}" },
+        { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "120 s rising", base: "5–15 s", state: "degraded", on: "{{med}}" }
+      ],
+      controls: [
+        { label: "Alternate route error rate", result: "healthy", note: "{{rtB}} errors at baseline" },
+        { label: "Same cells, other slices", result: "healthy", note: "argues against a radio cause" },
+        { label: "Other markets", result: "healthy", note: "localises to M01" },
+        { label: "Live headroom on the failover target", result: "missing", note: "stale edge — the reason the action is refused" }
+      ],
+      hyps: [
+        { name: "CHF route / pool capacity", score: 83, verdict: "investigate",
+          for: "route-localised errors, queueing and arrival lag", against: "action blocked on data freshness, not on evidence" },
+        { name: "SMF / CTF charging-event generation", score: 44, verdict: "dismissed",
+          for: "same completeness gap", against: "errors and queueing present, which trigger-side loss would not produce" },
+        { name: "Mediation delay", score: 20, verdict: "dismissed",
+          for: "arrival lag real", against: "lag follows the Nchf errors" },
+        { name: "Plan or SLA mapping drift", score: 9, verdict: "dismissed",
+          for: "none", against: "no mapping change in the window" },
+        { name: "RAN firmware regression", score: 6, verdict: "dismissed",
+          for: "change in window", against: "fingerprint absent" }
+      ],
+      gate: { checks: [
+        { label: "A candidate above the surface threshold of 60", pass: true },
+        { label: "Action pre-approved for this incident class", pass: true },
+        { label: "Required topology edges inside their validity window", pass: false },
+        { label: "Alternate capacity verified on {{poolB}}", pass: false },
+        { label: "Single-step rollback available", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "blocked", text: "Action refused by the stale-topology guardrail with the reason shown to the operator. Refresh requested; the recommendation is held and re-queued rather than dropped or silently executed." }
+    },
+
+    {
+      id: "ran-firmware",
+      name: "8 · RAN firmware genuinely is the cause",
+      sev: "P2",
+      title: "Charging symptoms, radio cause",
+      detail: "{{slice}} in market M01 · completeness 96.1% · session drops elevated on 3 cells · Nchf errors follow the drops rather than leading them",
+      counts: [0, 62, 33, 15, 5, 1, 1],
+      labels: { 5: "Threshold passed, automation refused", 6: "Executed by a human owner and verified" },
+      units: { 5: "human-approval only", 6: "confirmed cause" },
+      root: "cell1",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["slice", "sess", "cell1", "cell2", "cell3", "smf4"],
+        ["cell1", "cell2", "cell3", "smf4", "upf9"],
+        ["cell1", "cell2", "cell3", "smf4", "upf9", "chg022", "rtA", "poolA"],
+        ["cell1", "cell2", "cell3", "chg022"],
+        ["cell1", "cell2", "cell3"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4803 · presented as a charging incident; the evidence points away from charging.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Impact follows cell boundaries, not the SMF or the charging route. All three affected cells carry {{chg022}}.", source: "traversal", conf: 0.92 },
+        { type: "Evidence", text: "Radio counters are genuinely abnormal this time: session drop rate 6.2× baseline and GTP packet drop elevated on {{upf9}} for those cells only.", source: "traversal", conf: 0.95 },
+        { type: "Hypothesis", text: "Firmware 24.1.4 regressed session retention on n78 sectors. Charging records are incomplete because sessions are ending abnormally — the charging plane is behaving correctly.", source: "traversal", conf: 0.9 },
+        { type: "Action", text: "Rollback is the indicated fix but is permanently blocked from automation on cells serving an active public-safety response. Routed to the RAN duty owner with the evidence attached.", source: "traversal", conf: 0.93 },
+        { type: "Outcome", text: "Human-approved rollback executed by the RAN team. Drop rate and completeness recovered. Charging was never the cause and is recorded as exonerated." }
+      ],
+      signals: [
+        { label: "Session drop rate", counter: "pdu_session_drop_rate", value: "6.2× baseline", base: "1.0×", state: "anomalous", on: "3 cells" },
+        { label: "GTP packet drop", counter: "gtp_packet_drop_rate", value: "+2.8 pp", base: "±0.2 pp", state: "anomalous", on: "{{upf9}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0006 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.19 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
+        { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+3.1 pp", base: "±0.5 pp", state: "anomalous", on: "3 cells" }
+      ],
+      controls: [
+        { label: "Cells on the prior firmware in the same market", result: "healthy", note: "isolates to 24.1.4" },
+        { label: "Same SMF, sessions on unaffected cells", result: "healthy", note: "rules out the SMF" },
+        { label: "Charging plane end to end", result: "healthy", note: "CHF, route and mediation all normal" },
+        { label: "Other slices on the affected cells", result: "anomalous", note: "also degraded — consistent with a cell-level cause" }
+      ],
+      hyps: [
+        { name: "RAN firmware regression", score: 87, verdict: "eligible",
+          for: "impact follows cell boundaries; radio and user-plane counters abnormal; all affected cells carry {{chg022}}", against: "none material" },
+        { name: "UPF capacity", score: 33, verdict: "dismissed",
+          for: "GTP drop elevated", against: "drop is confined to three cells; {{chg014}} raised capacity rather than reducing it" },
+        { name: "CHF route / pool capacity", score: 12, verdict: "dismissed",
+          for: "none", against: "no Nchf errors and no queueing" },
+        { name: "SMF / CTF charging-event generation", score: 9, verdict: "dismissed",
+          for: "none", against: "request volume tracks the reduced session count exactly" },
+        { name: "Mediation delay", score: 5, verdict: "dismissed",
+          for: "none", against: "arrival lag at baseline" }
+      ],
+      gate: { checks: [
+        { label: "A candidate above the surface threshold of 60", pass: true },
+        { label: "Control groups isolate the cause", pass: true },
+        { label: "Indicated action is automatable", pass: false },
+        { label: "Cells serve an active public-safety response", pass: false },
+        { label: "Evidence package routed to the accountable owner", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "blocked", text: "Automation refused: RAN firmware rollback on cells serving an active public-safety response is one of the three permanent blocks. Evidence handed to the RAN duty owner, who approved and executed the rollback manually. Recovery verified afterwards." }
+    },
+
+    {
+      id: "quota",
+      name: "9 · Online-charging quota exhaustion",
+      sev: "P2",
+      title: "Quota management failure on an active response",
+      detail: "{{slice}} in market M01 · 214 sessions denied continuation · CHF returning no quota rather than failing · completeness 97.3%",
+      counts: [0, 60, 28, 10, 5, 1, 1],
+      root: "poolA",
+      nodes: [
+        [],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["slice", "sess", "smf4", "rtA", "poolA"],
+        ["smf4", "rtA", "poolA"],
+        ["smf4", "rtA", "poolA", "rtB", "poolB", "med", "plan"],
+        ["poolA", "plan", "rate"],
+        ["poolA", "plan", "sess"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4832 · sessions denied continuation on a public-safety slice during an active response.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "{{poolA}} is answering successfully but granting zero quota to 214 sessions. This is a correct-looking interface with a wrong answer.", source: "traversal", conf: 0.94 },
+        { type: "Evidence", text: "Quota pool for the Priority Responder entitlement is exhausted at {{poolA}}; the top-up job that normally replenishes it last ran 6 hours ago.", source: "traversal", conf: 0.96 },
+        { type: "Hypothesis", text: "Quota replenishment for {{plan}} has stalled. Denials are the charging plane doing exactly what it was told, on stale entitlement state.", source: "traversal", conf: 0.92 },
+        { type: "Action", text: "Re-run the pre-approved quota replenishment for the Priority Responder entitlement. Reversible and scoped to one entitlement.", source: "traversal", conf: 0.9 },
+        { type: "Outcome", text: "Quota restored, denials stopped, sessions continued. Replenishment schedule failure raised separately as the underlying problem." }
+      ],
+      signals: [
+        { label: "Sessions denied continuation", counter: "quota_denial_count", value: "214", base: "0", state: "anomalous", on: "{{poolA}}" },
+        { label: "Granted quota units", counter: "quota_granted_units", value: "0", base: "> 0", state: "anomalous", on: "{{poolA}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
+        { label: "Replenishment job age", counter: "quota_topup_age_hours", value: "6.1 h", base: "≤ 1 h", state: "anomalous", on: "{{plan}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.18 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" }
+      ],
+      controls: [
+        { label: "Other entitlements on the same pool", result: "healthy", note: "quota granted normally — isolates to the Priority Responder entitlement" },
+        { label: "Alternate pool for the same entitlement", result: "anomalous", note: "also exhausted — entitlement-level, not pool-level" },
+        { label: "Interface health end to end", result: "healthy", note: "no errors; the interface is working correctly" },
+        { label: "Prior 24 hours for the same entitlement", result: "healthy", note: "dates onset to the missed replenishment" }
+      ],
+      hyps: [
+        { name: "Quota replenishment stalled", score: 89, verdict: "eligible",
+          for: "zero grants with healthy interface; job age 6.1 h against a 1 h expectation; both pools affected for one entitlement", against: "none material" },
+        { name: "CHF route / pool capacity", score: 18, verdict: "dismissed",
+          for: "none", against: "no errors, no queueing; requests are answered successfully" },
+        { name: "Entitlement mapping drift", score: 26, verdict: "dismissed",
+          for: "entitlement-scoped impact", against: "mapping is current; the pool is empty rather than wrong" },
+        { name: "SMF / CTF charging-event generation", score: 8, verdict: "dismissed",
+          for: "none", against: "events are generated and answered" },
+        { name: "RAN firmware regression", score: 4, verdict: "dismissed",
+          for: "change in window", against: "radio counters at baseline" }
+      ],
+      gate: { checks: [
+        { label: "Replenishment is pre-approved for this incident class", pass: true },
+        { label: "Blast radius limited to one entitlement", pass: true },
+        { label: "Reversible in a single step", pass: true },
+        { label: "No direct billing-state write required", pass: true },
+        { label: "Reconciliation remains auditable", pass: true },
+        { label: "Verification KPIs defined before execution", pass: true }
+      ] },
+      outcome: { state: "verified", text: "Quota restored, denial count 0, sessions continued without re-establishment. The stalled replenishment schedule is raised as a separate problem record rather than treated as fixed." }
+    },
+
+    {
+      id: "id-mismatch",
+      name: "10 · Multi-vendor identifier mismatch",
+      sev: "P3",
+      title: "The case file cannot complete the join",
+      detail: "{{slice}} in market M01 · completeness cannot be computed · 38% of {{store}} records will not resolve to a session at {{smf4}}",
+      counts: [0, 57, 26, 13, 4, 0, 0],
+      labels: { 5: "Join incomplete — no ranking offered", 6: "Reconciliation task raised" },
+      units: { 5: "action-eligible", 6: "open findings" },
+      root: null,
+      nodes: [
+        [],
+        ["acct", "plan", "slice", "sess"],
+        ["sess", "smf4", "rtA", "poolA"],
+        ["smf4", "poolA", "med", "store"],
+        ["smf4", "poolA", "med", "store", "rate"],
+        ["store", "smf4"],
+        ["store", "smf4", "med"]
+      ],
+      cg: [
+        { type: "Incident", text: "INC-4866 · the anchor cannot be evaluated because the evidence cannot be joined.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "38% of records at {{store}} carry a session identifier that does not resolve to any session known to {{smf4}}.", source: "traversal", conf: 0.97 },
+        { type: "Evidence", text: "Unresolved records use a vendor-native session key; resolved ones use the canonical form. Both appear after the last {{poolA}} software update.", source: "traversal", conf: 0.93 },
+        { type: "Hypothesis", text: "Identifier resolution is broken for a subset of records, so completeness for this window is unknown rather than bad. Any ranking built on it would be built on a partial join.", source: "traversal", conf: 0.89 },
+        { type: "Observation", text: "No candidate ranking offered. Presenting one would imply the evidence set is complete when 38% of it is unjoinable.", source: "traversal", conf: 0.98 },
+        { type: "Outcome", text: "Reconciliation task raised against the identifier contract. Completeness for this window is reported as not computable, not as a breach." }
+      ],
+      signals: [
+        { label: "Unresolved record share", counter: "identity_resolution_miss_rate", value: "38%", base: "< 0.1%", state: "anomalous", on: "{{store}}" },
+        { label: "Completeness", counter: "cdr_completeness", value: "not computable", base: "99.97%", state: "missing", on: "{{med}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
+        { label: "Session key format", counter: "session_key_format", value: "2 formats present", base: "1 canonical", state: "anomalous", on: "{{store}}" },
+        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.18 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" }
+      ],
+      controls: [
+        { label: "Records from the alternate pool", result: "healthy", note: "single canonical key format — isolates to {{poolA}}" },
+        { label: "Prior window before the pool update", result: "healthy", note: "dates onset to the update" },
+        { label: "Completeness by session", result: "missing", note: "cannot be computed for unresolved records" },
+        { label: "Any control requiring the session join", result: "missing", note: "the join is the thing that is broken" }
+      ],
+      hyps: [
+        { name: "Identifier contract regression at {{poolA}}", score: 74, verdict: "investigate",
+          for: "two key formats present, onset at the pool update, alternate pool clean", against: "cannot be confirmed while the join is incomplete" },
+        { name: "Charging-plane record loss", score: 0, verdict: "dismissed",
+          for: "none", against: "cannot be assessed — completeness is not computable" },
+        { name: "Mediation transformation defect", score: 21, verdict: "dismissed",
+          for: "mediation handles the key", against: "mediation passes through what it receives; format originates upstream" },
+        { name: "Plan or SLA mapping drift", score: 6, verdict: "dismissed",
+          for: "none", against: "no mapping change in the window" }
+      ],
+      gate: { checks: [
+        { label: "Evidence set is complete enough to rank", pass: false },
+        { label: "Completeness KPI is computable for the window", pass: false },
+        { label: "Control groups requiring the session join are available", pass: false },
+        { label: "Reconciliation task can be raised without production change", pass: true },
+        { label: "Verification KPIs defined before execution", pass: false }
+      ] },
+      outcome: { state: "manual", text: "No ranking and no action. Reconciliation task raised against the identifier contract for {{poolA}}, and completeness for this window is reported as not computable so nobody treats it as an SLA breach." }
+    }
+  ];
+
+  /* ================================ state ================================= */
+
+  var state = {
+    scenario: 0,
+    stage: 0,
+    playing: false,
+    timer: null,
+    speed: 4000,
+    zoom: 100,
+    zoomAuto: true,
+    split: 58,
+    wide: false,
+    theme: "light",
+    names: {}
+  };
+
+  var el = function (id) { return document.getElementById(id); };
+  var nodeById = {};
+  NODES.forEach(function (n) { nodeById[n.id] = n; });
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(LS);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s.theme) state.theme = s.theme;
+      if (s.speed) state.speed = Number(s.speed);
+      if (s.zoom) { state.zoom = Number(s.zoom); }
+      if (typeof s.zoomAuto === "boolean") state.zoomAuto = s.zoomAuto;
+      if (s.split) state.split = Number(s.split);
+      if (typeof s.wide === "boolean") state.wide = s.wide;
+      if (s.names) state.names = s.names;
+      if (typeof s.scenario === "number" && SCENARIOS[s.scenario]) state.scenario = s.scenario;
+    } catch (e) { /* first run or unreadable storage */ }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(LS, JSON.stringify({
+        theme: state.theme, speed: state.speed, zoom: state.zoom, zoomAuto: state.zoomAuto,
+        split: state.split, wide: state.wide, names: state.names, scenario: state.scenario
+      }));
+    } catch (e) { /* storage unavailable */ }
+  }
+
+  function sc() { return SCENARIOS[state.scenario]; }
+  function stageCount() { return sc().counts.length; }
+
+  function nlabel(id) {
+    if (state.names[id] && state.names[id].trim()) return state.names[id].trim();
+    var n = nodeById[id];
+    return n ? n.label : id;
+  }
+
+  function tx(s) {
+    if (!s) return "";
+    return String(s).replace(/\{\{([a-z0-9]+)\}\}/gi, function (m, id) { return nlabel(id); });
+  }
+
+  function stageLabel(i) {
+    var o = sc().labels || {};
+    return o[i] || STAGE_LABELS[i];
+  }
+  function stageUnit(i) {
+    var o = sc().units || {};
+    return o[i] || STAGE_UNITS[i];
+  }
+
+  /* ================================ graph ================================= */
+
+  var NW = 164, NH = 48;
+
+  function nodeX(n) { return typeof n.x === "number" ? n.x : COLUMNS[n.col].x; }
+
+  function nodeState(id) {
+    var s = sc();
+    if (s.root === id && state.stage >= 3) return "root";
+    if (s.nodes[state.stage].indexOf(id) !== -1) return "active";
+    for (var i = state.stage - 1; i >= 1; i--) {
+      if (s.nodes[i].indexOf(id) !== -1) return "eliminated";
+    }
+    return "idle";
+  }
+
+  function isDark() { return document.documentElement.getAttribute("data-theme") === "dark"; }
+
+  function palette(st) {
+    var d = isDark();
+    if (st === "root") return { fill: d ? "#2a1f45" : "#f1ebfd", stroke: d ? "#a78bfa" : "#6d28d9", text: d ? "#ddd0ff" : "#4c1d95", op: 1, w: 1.9 };
+    if (st === "active") return { fill: d ? "#1c2740" : "#e8effd", stroke: d ? "#5b8cff" : "#2563eb", text: d ? "#dce7ff" : "#1e3a8a", op: 1, w: 1.8 };
+    if (st === "eliminated") return { fill: d ? "#191d23" : "#f3f4f6", stroke: d ? "#333a44" : "#cdd3da", text: d ? "#8a929e" : "#868e99", op: .7, w: 1.2 };
+    return { fill: d ? "#15181d" : "#fbfcfd", stroke: d ? "#23272d" : "#eceff2", text: d ? "#5c636e" : "#aab1ba", op: .4, w: 1 };
+  }
+
+  function svgEl(name, attrs) {
+    var e = document.createElementNS("http://www.w3.org/2000/svg", name);
+    Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+
+  function drawGraph() {
+    var svg = el("graph");
+    svg.innerHTML = "";
+    svg.setAttribute("width", Math.round(VBW * state.zoom / 100));
+    svg.setAttribute("height", Math.round(VBH * state.zoom / 100));
+    var d = isDark();
+
+    var gh = svgEl("g", {});
+    COLUMNS.forEach(function (c) {
+      var t = svgEl("text", { x: c.x, y: 20, "text-anchor": "middle", class: "colhdr", fill: d ? "#67707c" : "#98a1ac" });
+      t.textContent = c.label.toUpperCase();
+      gh.appendChild(t);
+    });
+    var ct = svgEl("text", { x: 24, y: 366, "text-anchor": "start", class: "colhdr", fill: d ? "#67707c" : "#98a1ac" });
+    ct.textContent = "CHANGE RECORDS";
+    gh.appendChild(ct);
+    svg.appendChild(gh);
+
+    var ge = svgEl("g", {});
+    EDGES.forEach(function (e) {
+      var a = nodeById[e[0]], b = nodeById[e[1]];
+      var sa = nodeState(a.id), sb = nodeState(b.id);
+      var live = (sa === "active" || sa === "root") && (sb === "active" || sb === "root");
+      var past = sa === "eliminated" || sb === "eliminated";
+      var x1 = nodeX(a) + NW / 2, y1 = a.y, x2 = nodeX(b) - NW / 2, y2 = b.y;
+      var mx = (x1 + x2) / 2;
+      ge.appendChild(svgEl("path", {
+        d: "M" + x1 + "," + y1 + " C" + mx + "," + y1 + " " + mx + "," + y2 + " " + x2 + "," + y2,
+        fill: "none",
+        stroke: live ? (d ? "#5b8cff" : "#2563eb") : (d ? "#252a31" : "#e4e8ec"),
+        "stroke-width": live ? 2 : 1.2,
+        opacity: live ? .95 : (past ? .28 : .5)
+      }));
+    });
+    CHG_EDGES.forEach(function (e) {
+      var a = nodeById[e[0]], b = nodeById[e[1]];
+      var sa = nodeState(a.id), sb = nodeState(b.id);
+      var live = (sa === "active" || sa === "root") && (sb === "active" || sb === "root");
+      var x1 = nodeX(a), y1 = a.y - NH / 2, x2 = nodeX(b), y2 = b.y + NH / 2;
+      var my = (y1 + y2) / 2;
+      ge.appendChild(svgEl("path", {
+        d: "M" + x1 + "," + y1 + " C" + x1 + "," + my + " " + x2 + "," + my + " " + x2 + "," + y2,
+        fill: "none",
+        stroke: live ? (d ? "#fbbf24" : "#b45309") : (d ? "#2e2a1a" : "#efe4cf"),
+        "stroke-width": live ? 1.7 : 1.1,
+        "stroke-dasharray": "4 3",
+        opacity: live ? .95 : .45
+      }));
+    });
+    svg.appendChild(ge);
+
+    var gn = svgEl("g", {});
+    NODES.forEach(function (n) {
+      var st = nodeState(n.id);
+      var p = palette(st);
+      var cx = nodeX(n), x = cx - NW / 2, y = n.y - NH / 2;
+      var g = svgEl("g", { opacity: p.op });
+      g.setAttribute("data-node", n.id);
+
+      var rect = svgEl("rect", {
+        x: x, y: y, width: NW, height: NH, rx: 8,
+        fill: p.fill, stroke: p.stroke, "stroke-width": p.w
+      });
+      if (n.lane === "chg") rect.setAttribute("stroke-dasharray", "5 3");
+      g.appendChild(rect);
+
+      var lt = svgEl("text", { x: cx, y: n.y - 3, "text-anchor": "middle", class: "nlabel", fill: p.text });
+      lt.textContent = nlabel(n.id);
+      g.appendChild(lt);
+
+      var sb = svgEl("text", { x: cx, y: n.y + 13, "text-anchor": "middle", class: "nsub", fill: p.text, opacity: .82 });
+      sb.textContent = n.sub;
+      g.appendChild(sb);
+
+      var bd = svgEl("text", { x: x + NW - 3, y: y - 4, "text-anchor": "end", class: "nsrc", fill: d ? "#5c636e" : "#aab1ba" });
+      bd.textContent = n.src;
+      g.appendChild(bd);
+
+      gn.appendChild(g);
+    });
+    svg.appendChild(gn);
+  }
+
+  function flashRefs(ids) {
+    if (!ids || !ids.length) return;
+    var svg = el("graph");
+    ids.forEach(function (id) {
+      var r = svg.querySelector('[data-node="' + id + '"] rect');
+      if (r) { r.setAttribute("stroke", "#b45309"); r.setAttribute("stroke-width", "2.6"); }
+    });
+  }
+
+  function refsInText(s) {
+    var out = [], m, re = /\{\{([a-z0-9]+)\}\}/gi;
+    while ((m = re.exec(String(s))) !== null) { if (out.indexOf(m[1]) === -1) out.push(m[1]); }
+    return out;
+  }
+
+  /* ================================= rail ================================= */
+
+  var tween = null;
+
+  function renderRail() {
+    var wrap = el("rail");
+    wrap.innerHTML = "";
+    wrap.style.gridTemplateColumns = "repeat(" + stageCount() + ", minmax(0, 1fr))";
+    var counts = sc().counts;
+    var max = Math.log10(Math.max.apply(null, counts) + 1) || 1;
+
+    counts.forEach(function (c, i) {
+      var ghost = i > state.stage;
+      var seg = document.createElement("button");
+      seg.type = "button";
+      seg.className = "rseg" + (i === state.stage ? " active" : "") + (i < state.stage ? " done" : "") + (ghost ? " ghost" : "");
+      seg.disabled = ghost;
+      if (!ghost) seg.title = i + " · " + stageLabel(i) + " — " + c.toLocaleString() + " " + stageUnit(i);
+
+      var top = document.createElement("div");
+      top.className = "rtop";
+      var idx = document.createElement("span");
+      idx.className = "ridx";
+      idx.textContent = i;
+      var cnt = document.createElement("span");
+      cnt.className = "rcnt";
+      cnt.setAttribute("data-count", i);
+      cnt.textContent = i === 0 ? "—" : c.toLocaleString();
+      top.appendChild(idx);
+      top.appendChild(cnt);
+
+      var unit = document.createElement("span");
+      unit.className = "runit";
+      unit.textContent = stageUnit(i);
+
+      var lbl = document.createElement("div");
+      lbl.className = "rlbl";
+      lbl.textContent = stageLabel(i);
+
+      var bar = document.createElement("div");
+      bar.className = "rbar";
+      bar.style.width = Math.max(6, Math.round(100 * Math.log10(c + 1) / max)) + "%";
+
+      seg.appendChild(top); seg.appendChild(unit); seg.appendChild(lbl); seg.appendChild(bar);
+      seg.addEventListener("click", function () { if (!ghost) goTo(i); });
+      wrap.appendChild(seg);
+    });
+  }
+
+  function animateCount(from, to, i) {
+    if (tween) { cancelAnimationFrame(tween); tween = null; }
+    var node = el("rail").querySelector('[data-count="' + i + '"]');
+    if (!node || i === 0) return;
+    var t0 = performance.now(), dur = 420;
+    function frame(now) {
+      var k = Math.min(1, (now - t0) / dur);
+      var eased = 1 - Math.pow(1 - k, 3);
+      node.textContent = Math.round(from + (to - from) * eased).toLocaleString();
+      if (k < 1) tween = requestAnimationFrame(frame);
+      else { node.textContent = to.toLocaleString(); tween = null; }
+    }
+    tween = requestAnimationFrame(frame);
+  }
+
+  /* ============================== side panels ============================== */
+
+  function renderContext() {
+    var wrap = el("cg");
+    wrap.innerHTML = "";
+    if (state.stage === 0) {
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "No active anchor. Press Play or Step to assemble the case file.";
+      wrap.appendChild(e);
+      return;
+    }
+    for (var i = 0; i < state.stage; i++) {
+      var c = sc().cg[i];
+      if (c) wrap.appendChild(cgCard(c));
+    }
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function cgCard(c) {
+    var d = document.createElement("div");
+    d.className = "cgcard";
+    var top = document.createElement("div");
+    top.className = "cgtop";
+
+    var b = document.createElement("span");
+    b.className = "badge b-" + c.type.toLowerCase();
+    b.textContent = c.type;
+    top.appendChild(b);
+
+    var s = document.createElement("span");
+    s.className = "src";
+    s.textContent = c.source || "traversal";
+    top.appendChild(s);
+
+    if (typeof c.conf === "number") {
+      var cf = document.createElement("span");
+      cf.className = "conf";
+      cf.textContent = "conf " + c.conf.toFixed(2);
+      top.appendChild(cf);
+    }
+
+    var t = document.createElement("div");
+    t.className = "cgtext";
+    t.textContent = tx(c.text);
+
+    d.appendChild(top);
+    d.appendChild(t);
+
+    var refs = refsInText(c.text);
+    d.addEventListener("mouseenter", function () { drawGraph(); flashRefs(refs); });
+    d.addEventListener("mouseleave", function () { drawGraph(); });
+    return d;
+  }
+
+  function renderSignals() {
+    var card = el("signalCard"), host = el("signals");
+    host.innerHTML = "";
+    if (state.stage < 4) { card.style.display = "none"; return; }
+    card.style.display = "";
+
+    var tbl = document.createElement("table");
+    tbl.className = "sig";
+    sc().signals.forEach(function (s) {
+      var tr = document.createElement("tr");
+
+      var td0 = document.createElement("td");
+      td0.className = "st";
+      var dot = document.createElement("span");
+      dot.className = "dot d-" + s.state;
+      td0.appendChild(dot);
+
+      var td1 = document.createElement("td");
+      var nm = document.createElement("div");
+      nm.textContent = s.label;
+      var cn = document.createElement("div");
+      cn.className = "cn";
+      cn.textContent = s.counter + " · " + tx(s.on);
+      td1.appendChild(nm); td1.appendChild(cn);
+
+      var td2 = document.createElement("td");
+      td2.className = "vv";
+      var v = document.createElement("div");
+      v.textContent = s.value;
+      var bl = document.createElement("div");
+      bl.className = "cn";
+      bl.textContent = "base " + s.base;
+      td2.appendChild(v); td2.appendChild(bl);
+
+      tr.appendChild(td0); tr.appendChild(td1); tr.appendChild(td2);
+      tbl.appendChild(tr);
+    });
+    host.appendChild(tbl);
+
+    var h = document.createElement("div");
+    h.style.cssText = "margin-top:10px;padding-top:9px;border-top:1px solid var(--border);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);";
+    h.textContent = "Control groups";
+    host.appendChild(h);
+
+    sc().controls.forEach(function (c) {
+      var row = document.createElement("div");
+      row.className = "ctrl" + (c.result === "missing" ? " missing" : "");
+      var dot = document.createElement("span");
+      dot.className = "dot d-" + (c.result === "healthy" ? "baseline" : c.result === "missing" ? "missing" : "anomalous");
+      dot.style.marginTop = "5px";
+      var txt = document.createElement("div");
+      var l = document.createElement("div");
+      l.textContent = tx(c.label);
+      var n = document.createElement("div");
+      n.style.cssText = "font-size:10.5px;color:var(--muted);";
+      n.textContent = (c.result === "missing" ? "MISSING — " : "") + tx(c.note);
+      txt.appendChild(l); txt.appendChild(n);
+      row.appendChild(dot); row.appendChild(txt);
+      host.appendChild(row);
+    });
+  }
+
+  function renderHyps() {
+    var card = el("hypCard"), host = el("hyps");
+    host.innerHTML = "";
+    if (state.stage < 5) { card.style.display = "none"; return; }
+    card.style.display = "";
+
+    var th = document.createElement("div");
+    th.className = "thresh";
+    th.textContent = "Evidence-match score against SME-authored fingerprints — not a probability. Surface threshold 60.";
+    host.appendChild(th);
+
+    sc().hyps.slice().sort(function (a, b) { return b.score - a.score; }).forEach(function (h, i) {
+      var d = document.createElement("div");
+      d.className = "hyp" + (h.verdict === "eligible" ? " lead" : h.verdict === "investigate" ? " hold" : "");
+
+      var top = document.createElement("div");
+      top.className = "htop";
+      var r = document.createElement("span");
+      r.className = "hrank";
+      r.textContent = "#" + (i + 1);
+      var n = document.createElement("span");
+      n.className = "hname";
+      n.textContent = tx(h.name);
+      var v = document.createElement("span");
+      v.className = "verd v-" + h.verdict;
+      v.textContent = h.verdict;
+      var s = document.createElement("span");
+      s.className = "hscore";
+      s.textContent = h.score;
+      top.appendChild(r); top.appendChild(n); top.appendChild(v); top.appendChild(s);
+
+      var bar = document.createElement("div");
+      bar.className = "hbar";
+      var fill = document.createElement("span");
+      fill.style.width = h.score + "%";
+      bar.appendChild(fill);
+
+      var f = document.createElement("div");
+      f.className = "hev";
+      f.innerHTML = "<b>For</b> ";
+      f.appendChild(document.createTextNode(tx(h.for)));
+      var a = document.createElement("div");
+      a.className = "hev";
+      a.innerHTML = "<b>Against</b> ";
+      a.appendChild(document.createTextNode(tx(h.against)));
+
+      d.appendChild(top); d.appendChild(bar); d.appendChild(f); d.appendChild(a);
+
+      var refs = refsInText(h.name + " " + h.for + " " + h.against);
+      d.addEventListener("mouseenter", function () { drawGraph(); flashRefs(refs); });
+      d.addEventListener("mouseleave", function () { drawGraph(); });
+      host.appendChild(d);
+    });
+  }
+
+  function renderOutcomeStrip() {
+    var host = el("outcomeStrip");
+    host.innerHTML = "";
+    if (state.stage < stageCount() - 1) return;
+    var o = sc().outcome;
+    var d = document.createElement("div");
+    d.className = "outcome o-" + o.state;
+    var t = document.createElement("span");
+    t.style.cssText = "font-weight:700;margin-right:7px;";
+    t.textContent = o.state === "verified" ? "VERIFIED —"
+      : o.state === "blocked" ? "ACTION BLOCKED —" : "NO ACTION —";
+    d.appendChild(t);
+    d.appendChild(document.createTextNode(tx(o.text)));
+    host.appendChild(d);
+  }
+
+  function renderGate() {
+    var card = el("gateCard"), host = el("gate");
+    host.innerHTML = "";
+    if (state.stage < 6) { card.style.display = "none"; return; }
+    card.style.display = "";
+
+    sc().gate.checks.forEach(function (c) {
+      var row = document.createElement("div");
+      row.className = "chk " + (c.pass ? "pass" : "fail");
+      var m = document.createElement("span");
+      m.className = "m";
+      m.textContent = c.pass ? "✓" : "✕";
+      var l = document.createElement("span");
+      l.textContent = tx(c.label);
+      row.appendChild(m); row.appendChild(l);
+      host.appendChild(row);
+    });
+
+    var b = document.createElement("div");
+    b.className = "blocked";
+    var bt = document.createElement("div");
+    bt.className = "bt";
+    bt.textContent = "Permanently blocked from automation";
+    b.appendChild(bt);
+    BLOCKED.forEach(function (x) {
+      var i = document.createElement("div");
+      i.className = "bi";
+      i.textContent = "✕ " + x;
+      b.appendChild(i);
+    });
+    host.appendChild(b);
+
+    var o = sc().outcome;
+    var ob = document.createElement("div");
+    ob.className = "outcome o-" + o.state;
+    var ot = document.createElement("div");
+    ot.style.cssText = "font-weight:650;margin-bottom:3px;";
+    ot.textContent = o.state === "verified" ? "Verified and written back"
+      : o.state === "blocked" ? "Action blocked" : "No action — manual path";
+    ob.appendChild(ot);
+    ob.appendChild(document.createTextNode(tx(o.text)));
+    host.appendChild(ob);
+  }
+
+  /* ============================= orchestration ============================= */
+
+  function renderAnchor() {
+    var s = sc();
+    var box = el("anchorBox");
+    box.innerHTML = "";
+    var hd = document.createElement("div");
+    hd.className = "hd";
+    var sev = document.createElement("span");
+    sev.className = "sev";
+    sev.textContent = "ANCHOR · " + s.sev + (state.stage === 0 ? " · not yet fired" : "");
+    var t = document.createElement("span");
+    t.className = "at";
+    t.textContent = tx(s.title);
+    hd.appendChild(sev); hd.appendChild(t);
+    var dd = document.createElement("div");
+    dd.className = "ad";
+    dd.textContent = tx(s.detail);
+    box.appendChild(hd); box.appendChild(dd);
+    box.style.opacity = state.stage === 0 ? ".6" : "1";
+  }
+
+  function clampZoom(z) { return Math.max(70, Math.min(220, Math.round(z / 5) * 5)); }
+
+  function paneBox() {
+    var w = el("graphWrap");
+    var cs = getComputedStyle(w);
+    var pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4;
+    var padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + 4;
+    return { w: Math.max(160, w.clientWidth - pad), h: Math.max(160, w.clientHeight - padY) };
+  }
+
+  // Fill the available width. The 75% floor is the point where node labels stop
+  // being readable from across a room; below it the pane scrolls instead.
+  function fitWidthZoom() {
+    var b = paneBox();
+    return clampZoom(Math.max(75, Math.floor((b.w / VBW) * 20) * 5));
+  }
+
+  // The whole diagram inside the capped pane, so nothing scrolls and the rail
+  // below stays on screen. Floored at 75% for the same legibility reason.
+  // Height the diagram may occupy without pushing the narrowing rail or the outcome
+  // banner off screen. Measured, not guessed, and independent of the current zoom.
+  // The reserve keeps the budget stable across stages so the graph does not resize
+  // when the outcome banner appears.
+  function graphBudget() {
+    var wrap = el("graphWrap");
+    var below = el("belowGraph");
+    var docTop = wrap.getBoundingClientRect().top + (window.scrollY || 0);
+    var belowH = below ? below.offsetHeight : 150;
+    if (!el("outcomeStrip").firstChild) belowH += 52;
+    return Math.max(260, (window.innerHeight || 900) - docTop - belowH - 28);
+  }
+
+  function applyGraphBudget() {
+    el("graphWrap").style.maxHeight = graphBudget() + "px";
+  }
+
+  function fitAllZoom() {
+    var avail = Math.max(200, graphBudget() - 18);
+    var b = paneBox();
+    return clampZoom(Math.max(75, Math.floor(Math.min((b.w / VBW), (avail / VBH)) * 20) * 5));
+  }
+
+  function applyZoom() {
+    applyGraphBudget();
+    el("zoomVal").textContent = state.zoom + "%";
+    el("zoomRange").value = String(state.zoom);
+    drawGraph();
+  }
+
+  function autoZoom() {
+    applyGraphBudget();
+    if (!state.zoomAuto) return;
+    var z = fitAllZoom();
+    if (z !== state.zoom) { state.zoom = z; applyZoom(); }
+    else { el("zoomVal").textContent = state.zoom + "%"; el("zoomRange").value = String(state.zoom); }
+  }
+
+  function applySplit() {
+    document.documentElement.style.setProperty("--split", String(state.split));
+  }
+
+  function renderAll(prevStage) {
+    el("stageNow").innerHTML = "Stage " + state.stage + " of " + (stageCount() - 1) +
+      " · <strong>" + stageLabel(state.stage) + "</strong>";
+    el("btnBack").disabled = state.stage === 0;
+    el("btnStep").disabled = state.stage === stageCount() - 1;
+    renderAnchor();
+    drawGraph();
+    renderRail();
+    renderOutcomeStrip();
+    renderContext();
+    renderSignals();
+    renderHyps();
+    renderGate();
+    if (typeof prevStage === "number" && prevStage !== state.stage) {
+      animateCount(sc().counts[prevStage] || 0, sc().counts[state.stage], state.stage);
+    }
+  }
+
+  function goTo(i) {
+    var prev = state.stage;
+    state.stage = Math.max(0, Math.min(stageCount() - 1, i));
+    renderAll(prev);
+  }
+
+  function step() {
+    if (state.stage < stageCount() - 1) goTo(state.stage + 1);
+    else stop();
+  }
+
+  function play() {
+    if (state.playing) return;
+    if (state.stage === stageCount() - 1) goTo(0);
+    state.playing = true;
+    el("btnPlay").textContent = "Pause";
+    state.timer = setInterval(step, state.speed);
+  }
+
+  function stop() {
+    state.playing = false;
+    el("btnPlay").textContent = "Play";
+    if (state.timer) { clearInterval(state.timer); state.timer = null; }
+  }
+
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", state.theme);
+    el("btnTheme").textContent = state.theme === "light" ? "Dark" : "Light";
+  }
+
+  function applyWide() {
+    el("main").classList.toggle("wide", state.wide);
+    el("btnExpand").textContent = state.wide ? "Restore panels" : "Expand";
+  }
+
+  /* ============================== rename UI =============================== */
+
+  function renderRenameGrid() {
+    var host = el("renameGrid");
+    host.innerHTML = "";
+    NODES.forEach(function (n) {
+      var row = document.createElement("div");
+      row.className = "rnrow";
+      var c = document.createElement("code");
+      c.textContent = n.label;
+      var inp = document.createElement("input");
+      inp.type = "text";
+      inp.value = state.names[n.id] || "";
+      inp.placeholder = n.label;
+      inp.setAttribute("aria-label", "Rename " + n.label);
+      inp.addEventListener("input", function () {
+        if (inp.value.trim()) state.names[n.id] = inp.value;
+        else delete state.names[n.id];
+        save();
+        renderAll();
+      });
+      row.appendChild(c); row.appendChild(inp);
+      host.appendChild(row);
+    });
+  }
+
+  /* =============================== wiring ================================ */
+
+  function renderScenarioSelect() {
+    var sel = el("scenario");
+    sel.innerHTML = "";
+    SCENARIOS.forEach(function (s, i) {
+      var o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = s.name;
+      sel.appendChild(o);
+    });
+    sel.value = String(state.scenario);
+    el("scOf").textContent = (state.scenario + 1) + " of " + SCENARIOS.length;
+    el("scPrev").disabled = state.scenario === 0;
+    el("scNext").disabled = state.scenario === SCENARIOS.length - 1;
+  }
+
+  function setScenario(i) {
+    if (i < 0 || i >= SCENARIOS.length) return;
+    stop();
+    state.scenario = i;
+    state.stage = 0;
+    el("scenario").value = String(i);
+    renderScenarioSelect();
+    save();
+    renderAll();
+  }
+
+  function wire() {
+    el("scenario").addEventListener("change", function (e) { setScenario(Number(e.target.value)); });
+    el("scPrev").addEventListener("click", function () { setScenario(state.scenario - 1); });
+    el("scNext").addEventListener("click", function () { setScenario(state.scenario + 1); });
+
+    el("btnPlay").addEventListener("click", function () { if (state.playing) stop(); else play(); });
+    el("btnStep").addEventListener("click", function () { stop(); step(); });
+    el("btnBack").addEventListener("click", function () { stop(); goTo(state.stage - 1); });
+    el("btnReset").addEventListener("click", function () { stop(); goTo(0); });
+
+    el("speed").value = String(state.speed);
+    el("speed").addEventListener("change", function (e) {
+      state.speed = Number(e.target.value);
+      save();
+      if (state.playing) { clearInterval(state.timer); state.timer = setInterval(step, state.speed); }
+    });
+
+    el("zoomRange").addEventListener("input", function (e) {
+      state.zoom = clampZoom(Number(e.target.value));
+      state.zoomAuto = false;
+      applyZoom();
+      save();
+    });
+    el("btnFitW").addEventListener("click", function () {
+      state.zoomAuto = false;
+      state.zoom = fitWidthZoom();
+      applyZoom();
+      save();
+    });
+    el("btnFitAll").addEventListener("click", function () {
+      state.zoomAuto = true;
+      state.zoom = fitAllZoom();
+      applyZoom();
+      save();
+    });
+
+    el("btnExpand").addEventListener("click", function () {
+      state.wide = !state.wide;
+      applyWide();
+      requestAnimationFrame(function () { autoZoom(); });
+      save();
+    });
+
+    var div = el("divider"), dragging = false;
+    function setSplitFromX(clientX) {
+      var m = el("main").getBoundingClientRect();
+      var cs = getComputedStyle(el("main"));
+      var padL = parseFloat(cs.paddingLeft), padR = parseFloat(cs.paddingRight);
+      var usable = m.width - padL - padR;
+      var pct = ((clientX - m.left - padL) / usable) * 100;
+      state.split = Math.max(28, Math.min(84, Math.round(pct)));
+      applySplit();
+    }
+    div.addEventListener("pointerdown", function (e) {
+      dragging = true;
+      div.classList.add("drag");
+      div.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    div.addEventListener("pointermove", function (e) { if (dragging) setSplitFromX(e.clientX); });
+    div.addEventListener("pointerup", function (e) {
+      if (!dragging) return;
+      dragging = false;
+      div.classList.remove("drag");
+      try { div.releasePointerCapture(e.pointerId); } catch (err) { /* already released */ }
+      autoZoom();
+      save();
+    });
+    div.addEventListener("dblclick", function () {
+      state.split = 58;
+      applySplit();
+      autoZoom();
+      save();
+    });
+    div.addEventListener("keydown", function (e) {
+      var d = e.key === "ArrowLeft" ? -2 : e.key === "ArrowRight" ? 2 : 0;
+      if (!d) return;
+      e.preventDefault();
+      state.split = Math.max(28, Math.min(84, state.split + d));
+      applySplit();
+      autoZoom();
+      save();
+    });
+
+    var rt = null;
+    window.addEventListener("resize", function () {
+      if (rt) clearTimeout(rt);
+      rt = setTimeout(function () { autoZoom(); }, 140);
+    });
+
+    el("btnTheme").addEventListener("click", function () {
+      state.theme = state.theme === "light" ? "dark" : "light";
+      applyTheme();
+      save();
+      drawGraph();
+    });
+
+    el("btnSettings").addEventListener("click", function () {
+      renderRenameGrid();
+      el("dlgSettings").showModal();
+    });
+    el("btnHelp").addEventListener("click", function () { el("dlgHelp").showModal(); });
+
+    el("btnResetNames").addEventListener("click", function () {
+      state.names = {};
+      save();
+      renderRenameGrid();
+      renderAll();
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll("[data-close]"), function (b) {
+      b.addEventListener("click", function () {
+        var d = b.closest("dialog");
+        if (d) d.close();
+      });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+      if (document.querySelector("dialog[open]")) return;
+      if (e.key === "ArrowRight") { stop(); step(); }
+      else if (e.key === "ArrowLeft") { stop(); goTo(state.stage - 1); }
+      else if (e.key === " ") { e.preventDefault(); if (state.playing) stop(); else play(); }
+      else if (e.key === "+" || e.key === "=") { state.zoom = clampZoom(state.zoom + 10); state.zoomAuto = false; applyZoom(); save(); }
+      else if (e.key === "-" || e.key === "_") { state.zoom = clampZoom(state.zoom - 10); state.zoomAuto = false; applyZoom(); save(); }
+    });
+  }
+
+  load();
+  el("verLabel").textContent = VERSION;
+  el("verLabel2").textContent = VERSION;
+  applyTheme();
+  applySplit();
+  applyWide();
+  renderScenarioSelect();
+  wire();
+  applyZoom();
+  renderAll();
+  requestAnimationFrame(function () { autoZoom(); });
+})();
+</script>
+</body>
+</html>
