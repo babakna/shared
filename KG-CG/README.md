@@ -1,6 +1,6 @@
 # Knowledge &amp; Context Graphs
 
-V2.2 (August 2026)
+V2.3 (August 2026)
 
 A self-paced introduction to knowledge graphs and context graphs, plus an interactive fault-isolation demo that puts the concepts on one screen. Static HTML with no build step, no server, and no external dependencies &mdash; open `index.html` in any modern browser.
 
@@ -47,6 +47,36 @@ The telecom material describes a **generic, vendor-neutral operator**. Element n
 ## Changelog
 
 All three files share one version number, so a single label tells you whether anything in the section changed.
+
+### V2.3 (August 2026)
+
+A reference-verification pass, prompted by a fair complaint: ten of the twenty-three
+citations carried a *confirm* badge, meaning their title and date had never been read
+from the publisher.
+
+- **Nine of those ten are now verified.** The seven 3GPP entries linked to the bare
+  `portal.3gpp.org` home page because that host exposes specifications only by numeric
+  id and offers no way to search for one. The id map already existed in this repo's
+  5G-6G section; it seeded a lookup that resolved the rest against the portal, so
+  TS 23.501, 28.541, 28.552, 28.554, 32.255, 32.290 and 32.291 now deep-link to their
+  own specification pages with the publisher's own titles.
+- **ETSI ZSM** pointed at a technology overview page that redirects to a generic
+  landing page. It now opens **ETSI GS ZSM 002, Reference Architecture, V1.1.1
+  (2019-08)** &mdash; the specification itself, with the title and version read off its
+  cover page.
+- **TM Forum** pointed at the site root and now points at the Open Digital
+  Architecture page. This is the one entry still linking a page rather than a document:
+  every TM Forum specification URL returns a bot challenge, which the entry now says
+  outright.
+- **ISO/IEC 39075 (GQL) remains the single unverified entry.** `iso.org` returns 403 to
+  the network this was checked on. The link is correct and resolves normally elsewhere;
+  only the title-and-date confirmation is missing, and the badge says so.
+- The badge legend no longer claims that unreachable publishers are linked by portal
+  &mdash; every entry now points at a document &mdash; and it reads correctly in the
+  singular.
+- **Demo:** three entities named in the panels but never drawn (a UPF and an alternate
+  SMF in the capacity scenario, the slice in the entitlement-drift scenario) now appear
+  at the stage where they are first named.
 
 ### V2.2 (August 2026)
 
