@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Knowledge Graph &amp; Context Graph — Charging Assurance Demo</title>
 <style>
   :root {
-    --bg: #f4f6f8; --panel: #ffffff; --panel-2: #fafbfc; --border: #e2e6ea;
-    --text: #171a1d; --muted: #6b7280;
+    --bg: #f2f5f9; --panel: #ffffff; --panel-2: #f7f9fc; --border: #dfe5ee; --border-2: #eaeff6;
+    --text: #101828; --muted: #667085;
     --accent: #2563eb; --accent-soft: #e8effd;
     --alert: #6d28d9; --alert-soft: #f1ebfd;
     --danger: #dc2626; --danger-soft: #fdeaea;
     --ok: #059669; --ok-soft: #e7f6f0;
     --warn: #b45309; --warn-soft: #fdf3e3;
-    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 4px 12px rgba(16,24,40,.06);
+    --btn: #f1f5fb; --btn-hi: #e6edf8; --btn-bd: #d5deeb;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 6px 18px rgba(16,24,40,.06);
+    --shadow-sm: 0 1px 1.5px rgba(16,24,40,.06);
+    --shadow-pop: 0 10px 30px rgba(16,24,40,.14);
+    --r: 12px;
   }
   html[data-theme="dark"] {
-    --bg: #0e1013; --panel: #16191e; --panel-2: #1b1f25; --border: #272c33;
-    --text: #e7eaee; --muted: #98a1ae;
-    --accent: #5b8cff; --accent-soft: #1c2740;
+    --bg: #0b0e13; --panel: #14181f; --panel-2: #1a1f27; --border: #2a313b; --border-2: #222932;
+    --text: #e9edf3; --muted: #97a2b1;
+    --accent: #6d9bff; --accent-soft: #1a2540;
     --alert: #a78bfa; --alert-soft: #2a1f45;
     --danger: #f16d6d; --danger-soft: #381f21;
     --ok: #34d399; --ok-soft: #12281f;
     --warn: #fbbf24; --warn-soft: #2e2410;
+    --btn: #212832; --btn-hi: #2a323e; --btn-bd: #333c48;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-sm: 0 1px 1.5px rgba(0,0,0,.35);
+    --shadow-pop: 0 14px 40px rgba(0,0,0,.55);
   }
   * { box-sizing: border-box; }
   body {
@@ -35,21 +42,35 @@
   .spacer { flex: 1 1 auto; }
 
   .btn {
-    border: 1px solid var(--border); background: var(--panel); color: var(--text);
-    padding: 7px 13px; border-radius: 8px; cursor: pointer; white-space: nowrap;
-    transition: background .12s, border-color .12s, transform .06s;
+    border: 1px solid var(--btn-bd); background: var(--btn); color: var(--text);
+    padding: 7px 14px; border-radius: 9px; cursor: pointer; white-space: nowrap;
+    font-weight: 600; font-size: 14px; box-shadow: var(--shadow-sm);
+    transition: background .13s, border-color .13s, box-shadow .13s, transform .08s;
   }
-  .btn:hover:not(:disabled) { background: var(--panel-2); border-color: var(--accent); }
-  .btn:active:not(:disabled) { transform: translateY(1px); }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn.primary:hover:not(:disabled) { filter: brightness(1.06); }
-  .btn.danger { color: var(--danger); }
-  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn:hover:not(:disabled) { background: var(--btn-hi); border-color: var(--accent); color: var(--accent); }
+  .btn:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+  .btn.primary {
+    background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 86%, #000));
+    border-color: color-mix(in srgb, var(--accent) 70%, #000); color: #fff;
+    box-shadow: 0 1px 2px rgba(16,24,40,.16);
+  }
+  .btn.primary:hover:not(:disabled) { filter: brightness(1.07); color: #fff; border-color: color-mix(in srgb, var(--accent) 60%, #000); }
+  .btn.danger { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 26%, transparent); }
+  .btn.danger:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
   select, input[type=text], input[type=password] {
-    background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px;
+    background: var(--panel); border: 1px solid var(--btn-bd); border-radius: 9px; padding: 7px 10px;
+    box-shadow: var(--shadow-sm);
   }
-  select:disabled, input:disabled { opacity: .45; cursor: not-allowed; }
+  select {
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+    padding-right: 30px; font-weight: 600;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center; background-size: 15px;
+  }
+  select:hover:not(:disabled) { border-color: var(--accent); }
+  select:disabled, input:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
   select:focus, input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
   header.top {
@@ -77,10 +98,14 @@
   }
   #scenario {
     flex: 1 1 auto; min-width: 0; max-width: 720px;
-    font-size: 16px; font-weight: 650; padding: 8px 11px;
-    background: var(--panel); border: 2px solid var(--accent); border-radius: 9px; cursor: pointer;
+    font-size: 15.5px; font-weight: 650; padding: 9px 34px 9px 13px;
+    background-color: var(--accent-soft); color: var(--text);
+    border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent); border-radius: 10px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-position: right 11px center; background-size: 16px;
   }
-  .scenbar .nav { padding: 7px 12px; font-size: 17px; line-height: 1; font-weight: 700; }
+  #scenario:hover { border-color: var(--accent); }
+  .scenbar .nav { padding: 8px 13px; font-size: 16px; line-height: 1; font-weight: 700; }
   .scenbar .of { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
   @media (max-width: 560px) { .brand h1 { font-size: 14px; } .scenbar .of { display: none; } }
 
@@ -118,12 +143,17 @@
     .rightcol { columns: 1; }
   }
 
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); min-width: 0; overflow: hidden; }
   .card > h2 {
-    margin: 0; padding: 11px 14px; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--muted); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+    margin: 0; padding: 11px 15px; font-size: 12px; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; color: var(--muted); background: var(--panel-2);
+    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 9px;
   }
-  .card .body { padding: 12px 14px; }
+  .card > h2::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    flex: 0 0 auto; opacity: .8;
+  }
+  .card .body { padding: 13px 15px; }
   .card.dim { opacity: .62; }
 
   /* Anchor and transport share one row so the diagram keeps the vertical space. */
@@ -138,8 +168,8 @@
   .anchor .ad { font-size: 13px; color: var(--muted); }
 
   .player { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 560px; }
-  .stagenow { font-size: 13px; color: var(--muted); }
-  .stagenow strong { color: var(--text); }
+  .stagenow { font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .stagenow strong { color: var(--accent); font-weight: 750; }
   #zoomRange { width: 110px; accent-color: var(--accent); }
   #zoomVal { font-variant-numeric: tabular-nums; min-width: 42px; display: inline-block; }
 
@@ -159,17 +189,29 @@
   .railhdr .rt { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .rail { display: grid; gap: 6px; margin-top: 8px; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
   .rseg {
-    border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); color: inherit;
-    padding: 7px 8px 8px; cursor: pointer; text-align: left; overflow: hidden;
-    transition: border-color .12s, background .12s, opacity .12s;
+    border: 1px solid var(--btn-bd); border-radius: 10px; background: var(--btn); color: inherit;
+    padding: 8px 9px 9px; cursor: pointer; text-align: left; overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .13s, background .13s, opacity .13s, box-shadow .13s;
   }
-  .rseg:hover:not(:disabled) { border-color: var(--accent); }
-  .rseg.active { background: var(--accent-soft); border-color: var(--accent); }
-  .rseg.done { opacity: .5; }
-  .rseg.ghost { border-style: dashed; background: transparent; cursor: default; }
+  .rseg:hover:not(:disabled) { border-color: var(--accent); background: var(--btn-hi); }
+  .rseg.active { background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
+  .rseg.done { opacity: .58; }
+  .rseg.ghost {
+    border-style: dashed; border-color: var(--border); background: transparent;
+    cursor: default; box-shadow: none; position: relative;
+  }
+  .rseg.ghost::after {
+    content: "not yet revealed"; position: absolute; left: 9px; right: 9px; top: 50%;
+    transform: translateY(-50%); font-size: 10.5px; letter-spacing: .03em;
+    color: var(--muted); opacity: .7;
+  }
   .rseg .rtop { display: flex; align-items: baseline; gap: 6px; }
   .rseg .ridx { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .rseg .rcnt { font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .rseg .rcnt { font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; color: var(--text); }
+  .rseg.done .rcnt { color: var(--muted); }
+  .rseg.active .rcnt { color: var(--accent); font-size: 24px; letter-spacing: -.02em; }
+  .rseg.active .runit { color: var(--accent); font-weight: 700; }
   .rseg .runit { font-size: 10px; color: var(--muted); display: block; }
   .rseg .rlbl {
     font-size: 12px; line-height: 1.3; margin-top: 4px; color: var(--muted);
@@ -194,11 +236,38 @@
   .b-outcome { background: var(--ok); color: #fff; }
   .src { font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 6px; }
   .conf { margin-left: auto; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .cgtext { font-size: 13.5px; }
+  .cgtext { font-size: 13.6px; line-height: 1.55; }
+  /* The claim types are not equal — the hypothesis and the action are the ones
+     a reader is looking for, so they carry more weight than the observations. */
+  .cgcard.k-hypothesis, .cgcard.k-action, .cgcard.k-outcome { border-left: 3px solid var(--border); }
+  .cgcard.k-hypothesis { border-left-color: var(--warn); background: var(--panel); }
+  .cgcard.k-action { border-left-color: var(--accent); background: var(--panel); }
+  .cgcard.k-outcome { border-left-color: var(--ok); background: var(--panel); }
+  .cgcard.k-hypothesis .cgtext, .cgcard.k-action .cgtext, .cgcard.k-outcome .cgtext {
+    font-size: 14px; font-weight: 560;
+  }
+  .cgcard.k-observation .cgtext { color: var(--muted); }
+  .cgcard.k-observation .cgtext .ent, .cgcard.k-observation .cgtext .num { color: var(--text); }
+  .cgcard.k-observation .cgtext .ent { color: var(--accent); }
   .empty { color: var(--muted); font-size: 13.5px; padding: 18px 6px; text-align: center; }
 
+  /* ---- emphasis channels -------------------------------------------------
+     Two only, so they stay meaningful: entity references are accent-coloured,
+     figures are heavier and darker than the prose around them.               */
+  .ent { font-weight: 660; color: var(--accent); }
+  .num { font-weight: 680; color: var(--text); font-variant-numeric: tabular-nums; }
+  .cn .num, .cnote .num, .hev .num, .prov .num, .ad .num { color: var(--text); }
+
   table.sig { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table.sig td { padding: 5px 3px; border-bottom: 1px dashed var(--border); vertical-align: top; }
+  table.sig td { padding: 6px 3px; border-bottom: 1px dashed var(--border); vertical-align: top; }
+  table.sig .sl { font-weight: 620; font-size: 13.5px; }
+  table.sig .vnum { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  table.sig tr.s-anomalous .vnum { color: var(--danger); }
+  table.sig tr.s-degraded .vnum { color: var(--warn); }
+  table.sig tr.s-missing .vnum { color: var(--muted); }
+  table.sig tr.s-baseline .sl { font-weight: 560; color: var(--muted); }
+  table.sig tr.s-baseline .vnum { font-weight: 620; font-size: 13.5px; color: var(--muted); }
+  table.sig tr.s-anomalous .sl, table.sig tr.s-degraded .sl { color: var(--text); }
   table.sig tr:last-child td { border-bottom: 0; }
   table.sig .st { width: 8px; }
   table.sig .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
@@ -212,9 +281,19 @@
     overflow-wrap: anywhere;
   }
   table.sig .vv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .ctrl { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+  .ctrl { display: flex; gap: 9px; align-items: flex-start; padding: 7px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
   .ctrl:last-child { border-bottom: 0; }
-  .ctrl.missing { color: var(--warn); }
+  .ctrl .ctxt { min-width: 0; }
+  .ctrl .cl { font-weight: 600; font-size: 13.5px; }
+  .ctrl .cnote { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+  .ctag {
+    flex: 0 0 auto; margin-top: 1px; font-size: 9.5px; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 5px; min-width: 58px; text-align: center;
+  }
+  .t-healthy { background: var(--ok-soft); color: var(--ok); }
+  .t-missing { background: var(--warn-soft); color: var(--warn); }
+  .t-anomalous { background: var(--danger-soft); color: var(--danger); }
+  .ctrl.missing .cl { color: var(--warn); }
 
   .hyp { border: 1px solid var(--border); border-radius: 9px; padding: 7px 9px; margin-bottom: 7px; background: var(--panel-2); }
   .hyp:last-child { margin-bottom: 0; }
@@ -224,6 +303,16 @@
   .hrank { font-size: 11.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
   .hname { font-size: 14.5px; font-weight: 620; }
   .hscore { margin-left: auto; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* The leader is the finding; the dismissed rows are the audit trail behind it. */
+  .hyp.lead .hname { font-size: 15.5px; font-weight: 720; }
+  .hyp.lead .hscore { font-size: 21px; color: var(--ok); }
+  .hyp.hold .hscore { color: var(--warn); }
+  .hyp:not(.lead):not(.hold) .hname { font-weight: 580; color: var(--muted); }
+  .hyp:not(.lead):not(.hold) .hscore { font-size: 15px; color: var(--muted); }
+  .hyp:not(.lead):not(.hold) .hev { opacity: .82; }
+  .evfor { color: var(--ok); }
+  .evag { color: var(--danger); }
+  .hev .evfor, .hev .evag { font-weight: 750; letter-spacing: .02em; }
   .hbar { height: 4px; border-radius: 2px; background: var(--border); margin: 5px 0 4px; overflow: hidden; }
   .hbar span { display: block; height: 100%; background: var(--muted); }
   .hyp.lead .hbar span { background: var(--ok); }
@@ -234,6 +323,7 @@
   .v-eligible { background: var(--ok); color: #fff; }
   .v-investigate { background: var(--warn); color: #fff; }
   .v-dismissed { background: var(--border); color: var(--muted); }
+  .v-unscorable { background: transparent; color: var(--muted); border: 1px dashed var(--muted); }
   .thresh { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
 
   .chk { display: flex; gap: 8px; font-size: 13px; padding: 4px 0; }
@@ -243,18 +333,84 @@
   .blocked { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--border); }
   .blocked .bt { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--danger); margin-bottom: 5px; }
   .blocked div.bi { font-size: 12.5px; color: var(--muted); padding: 3px 0; }
-  .outcome { border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-top: 10px; }
+  .outcome { border-radius: 10px; padding: 11px 13px; font-size: 13.6px; line-height: 1.55; margin-top: 10px; }
   .o-verified { background: var(--ok-soft); border: 1px solid var(--ok); }
   .o-manual { background: var(--warn-soft); border: 1px solid var(--warn); }
   .o-blocked { background: var(--danger-soft); border: 1px solid var(--danger); }
+  .otag {
+    display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .07em;
+    padding: 3px 8px; border-radius: 5px; margin-right: 9px; vertical-align: 1px; color: #fff;
+  }
+  .o-verified .otag { background: var(--ok); }
+  .o-manual .otag { background: var(--warn); }
+  .o-blocked .otag { background: var(--danger); }
+  .o-verified .otext, .o-manual .otext, .o-blocked .otext { color: var(--text); }
 
   .soon {
     font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
     padding: 2px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn);
   }
   .askrow { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
-  .askrow input[type=text] { flex: 1 1 260px; }
-  .asknote { font-size: 13px; color: var(--muted); margin-top: 9px; }
+  .askfree { display: flex; gap: 9px; align-items: center; flex: 1 1 300px; min-width: 0; }
+  .askrow input[type=text] { flex: 1 1 auto; min-width: 0; }
+  .asknote { font-size: 12.5px; color: var(--muted); margin-top: 11px; line-height: 1.5; }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip {
+    border: 1px solid var(--btn-bd); background: var(--btn); color: var(--text);
+    border-radius: 999px; padding: 7px 14px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; box-shadow: var(--shadow-sm); text-align: left;
+    transition: background .13s, border-color .13s, color .13s;
+  }
+  .chip:hover { background: var(--btn-hi); border-color: var(--accent); color: var(--accent); }
+  .chip.on {
+    background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent);
+  }
+  .chip.lock {
+    background: transparent; border-style: dashed; border-color: var(--border);
+    color: var(--muted); cursor: not-allowed; box-shadow: none; opacity: .8;
+  }
+  .chip.lock::before {
+    content: ""; display: inline-block; width: 11px; height: 12px; margin-right: 7px;
+    vertical-align: -1px; opacity: .75;
+    background: no-repeat center / contain
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='11' width='16' height='10' rx='2'/><path d='M8 11V8a4 4 0 0 1 8 0v3'/></svg>");
+  }
+  .chip.lock:hover { background: transparent; border-color: var(--border); color: var(--muted); }
+
+  .ans { border: 1px solid var(--border); border-radius: 11px; background: var(--panel-2); padding: 12px 14px; }
+  .ans.bare { border-color: color-mix(in srgb, var(--warn) 42%, transparent); background: var(--warn-soft); }
+  .ans .ahd {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--ok); margin-bottom: 7px; display: flex; align-items: center; gap: 7px;
+  }
+  .ans.bare .ahd { color: var(--warn); }
+  .ans p { margin: 0 0 9px; font-size: 13.8px; line-height: 1.62; color: var(--muted); }
+  .ans p.lead { font-size: 14.8px; line-height: 1.55; color: var(--text); }
+  .ans p b { color: var(--text); }
+  .ans p:last-child { margin-bottom: 0; }
+  .ans b { font-weight: 650; }
+  .ans .prov {
+    margin-top: 10px; padding-top: 9px; border-top: 1px dashed var(--border);
+    font-size: 11.5px; color: var(--muted); line-height: 1.5;
+  }
+  .barechk {
+    display: flex; align-items: center; gap: 9px; margin: 12px 0 4px;
+    font-size: 13px; color: var(--muted); cursor: pointer; user-select: none;
+  }
+  .barechk input { width: 16px; height: 16px; accent-color: var(--warn); cursor: pointer; }
+  .askdim { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); opacity: .72; }
+
+  .totop {
+    position: fixed; right: 18px; bottom: 18px; width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid var(--btn-bd); background: var(--panel); color: var(--muted);
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-pop); z-index: 45; padding: 0;
+  }
+  .totop.on { display: flex; }
+  .totop:hover { color: var(--accent); border-color: var(--accent); }
+  .totop svg { width: 20px; height: 20px; }
 
   dialog {
     border: 1px solid var(--border); border-radius: 14px; background: var(--panel); color: var(--text);
@@ -266,6 +422,8 @@
   .dlgbody { padding: 15px; max-height: 70vh; overflow: auto; }
   .dlgbody h4 { margin: 16px 0 6px; font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
   .dlgbody h4:first-child { margin-top: 0; }
+  /* Version labels render verbatim, so they opt out of the heading uppercase. */
+  .dlgbody h4 .verbatim { text-transform: none; letter-spacing: normal; }
   .dlgbody p { margin: 6px 0; font-size: 14px; }
   .rngrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
   @media (max-width: 700px) { .rngrid { grid-template-columns: 1fr; } }
@@ -280,20 +438,20 @@
 <header class="top">
   <div class="brand">
     <h1>Knowledge Graph &amp; Context Graph</h1>
-    <span class="ver" id="verLabel">V1.0</span>
+    <span class="ver" id="verLabel">V2.1 (August 2026)</span>
   </div>
 
   <div class="spacer"></div>
-  <button class="btn" id="btnExpand" title="Hide the detail panels and give the topology the full width">Expand</button>
-  <button class="btn" id="btnSettings">Settings</button>
-  <button class="btn" id="btnHelp">Help</button>
-  <button class="btn" id="btnTheme">Dark</button>
+  <button type="button" class="btn" id="btnExpand" title="Hide the detail panels and give the topology the full width">Expand</button>
+  <button type="button" class="btn" id="btnSettings">Settings</button>
+  <button type="button" class="btn" id="btnHelp">Help</button>
+  <button type="button" class="btn" id="btnTheme">Dark</button>
 
   <div class="scenbar">
     <label class="lbl" for="scenario">Pick a scenario</label>
-    <button class="btn nav" id="scPrev" title="Previous scenario" aria-label="Previous scenario">&#8249;</button>
+    <button type="button" class="btn nav" id="scPrev" title="Previous scenario" aria-label="Previous scenario">&#8249;</button>
     <select id="scenario"></select>
-    <button class="btn nav" id="scNext" title="Next scenario" aria-label="Next scenario">&#8250;</button>
+    <button type="button" class="btn nav" id="scNext" title="Next scenario" aria-label="Next scenario">&#8250;</button>
     <span class="of" id="scOf"></span>
   </div>
 </header>
@@ -311,10 +469,10 @@
         <div class="anchor" id="anchorBox"></div>
 
         <div class="player">
-          <button class="btn primary" id="btnPlay">Play</button>
-          <button class="btn" id="btnStep">Step</button>
-          <button class="btn" id="btnBack">Back</button>
-          <button class="btn danger" id="btnReset">Reset</button>
+          <button type="button" class="btn primary" id="btnPlay">Play</button>
+          <button type="button" class="btn" id="btnStep">Step</button>
+          <button type="button" class="btn" id="btnBack">Back</button>
+          <button type="button" class="btn danger" id="btnReset">Reset</button>
           <span class="ctl">
             <label for="speed">Speed</label>
             <select id="speed">
@@ -327,10 +485,10 @@
           </span>
           <span class="ctl">
             <label for="zoomRange">Zoom</label>
-            <input type="range" id="zoomRange" min="70" max="220" step="5" />
+            <input type="range" id="zoomRange" min="70" max="220" step="5">
             <span class="stagenow" id="zoomVal"></span>
-            <button class="btn" id="btnFitW" title="Fill the available width">Fit width</button>
-            <button class="btn" id="btnFitAll" title="Fit the whole diagram, no scrolling">Fit all</button>
+            <button type="button" class="btn" id="btnFitW" title="Fill the available width">Fit width</button>
+            <button type="button" class="btn" id="btnFitAll" title="Fit the whole diagram, no scrolling">Fit all</button>
           </span>
         </div>
         </div>
@@ -359,7 +517,7 @@
         <div id="askAnswer"></div>
 
         <label class="barechk" id="bareWrap">
-          <input type="checkbox" id="askBare" />
+          <input type="checkbox" id="askBare">
           <span>Answer the same question with the graph evidence withheld</span>
         </label>
 
@@ -379,13 +537,16 @@
             <label for="keyref">Key</label>
             <select id="keyref" disabled><option>Primary</option><option>Backup</option></select>
           </span>
-          <input type="text" id="askInput" placeholder="Free-text questions need the model — coming soon" disabled />
-          <button class="btn primary" id="btnAsk" disabled>Ask</button>
+          <span class="askfree">
+            <input type="text" id="askInput" placeholder="Free-text questions need the model — coming soon" disabled>
+            <button type="button" class="btn primary" id="btnAsk" disabled>Ask</button>
+          </span>
         </div>
         <div class="asknote">
-          The answers above are pre-written, not generated. Free-text questions and the provider and
-          model selectors arrive with the live model. Nothing on the rest of this page depends on it:
-          the ranking, the control comparisons and the action gate are all deterministic.
+          These answers are written in advance, not generated &mdash; every figure in them is read from the
+          same case file the panels above are built from. Free-text questions and the provider and model
+          selectors arrive with the live model. Nothing on the rest of this page depends on it: the ranking,
+          the control comparisons and the action gate are all deterministic.
         </div>
       </div>
     </div>
@@ -417,21 +578,28 @@
   </section>
 </main>
 
+<button class="totop" id="toTop" type="button" title="Back to top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="12" y1="19" x2="12" y2="6"/><polyline points="6 12 12 6 18 12"/>
+  </svg>
+</button>
+
 <dialog id="dlgSettings">
-  <div class="dlghdr"><h3>Settings</h3><span class="spacer"></span><button class="btn" data-close>Close</button></div>
+  <div class="dlghdr"><h3>Settings</h3><span class="spacer"></span><button type="button" class="btn" data-close>Close</button></div>
   <div class="dlgbody">
     <h4>Rename entities</h4>
     <p class="note">Names below replace the labels shown on the graph, in the context graph, in the evidence text and in the candidate list. Stored in this browser only. Leave a field blank to keep the default.</p>
-    <div style="margin:11px 0;"><button class="btn" id="btnResetNames">Reset all names to default</button></div>
+    <div style="margin:11px 0;"><button type="button" class="btn" id="btnResetNames">Reset all names to default</button></div>
     <div class="rngrid" id="renameGrid"></div>
   </div>
 </dialog>
 
 <dialog id="dlgHelp">
-  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V1.0</span><span class="spacer"></span><button class="btn" data-close>Close</button></div>
+  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V2.1 (August 2026)</span><span class="spacer"></span><button type="button" class="btn" data-close>Close</button></div>
   <div class="dlgbody">
     <h4>What this shows</h4>
-    <p><b>Knowledge graph</b> — the durable model: agency account, Priority Responder plan and SLA, slice and sessions, cells, SMF and UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
+    <p><b>Knowledge graph</b> — the durable model: agency account, Priority Responder plan and SLA, slice, data network name and sessions, cells, SMF and UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
+    <p>Two different time spans appear in the scenarios and it is worth keeping them apart. The <b>measurement window</b> is the few minutes of counter data the incident is scoped to. The <b>change lookback</b> is the seven days of change records searched for a plausible trigger, so a change dated a day or two before the incident can still be a candidate.</p>
     <p><b>Context graph</b> — what the system knows about <i>this</i> incident: observations, evidence pointing back at knowledge-graph entities, hypotheses and proposed actions, each with a source and a confidence. Created when the anchor fires, discarded on Reset.</p>
     <h4>Driving the demo</h4>
     <p>Pick a <b>scenario</b> from the blue selector in the header, or step through them with <b>‹</b> and <b>›</b>. Then <b>Play</b> to walk the stages, or <b>Step</b> to advance while you narrate. <b>Speed</b> sets the dwell time. Arrow keys step, space plays and pauses.</p>
@@ -440,11 +608,19 @@
     <p><b>Zoom</b> scales the diagram in real pixels, so the labels never shrink below a readable size — the pane scrolls instead. <b>Fit width</b> fills the pane and keeps tracking it as you drag the handle or resize the window. <b>Fit all</b> shows the whole diagram with no scrolling, which will make it smaller. <b>+</b> and <b>−</b> zoom. <b>Expand</b> hides the detail panels entirely.</p>
     <p>Un-reached stages in the narrowing rail stay blank until you get to them. The right-hand panels appear as the case file earns them: the live overlay, then the ranked candidates, then the action gate.</p>
     <h4>Reading the graph</h4>
-    <p>Blue is the current candidate set. Faded entities were ruled out by an earlier stage but stay on screen so the narrowing is visible. Violet is the located root cause. Amber dashed boxes along the bottom are change records, linked to the entities they targeted.</p>
+    <p>Blue is the current candidate set. Faded entities were ruled out by an earlier stage but stay on screen so the narrowing is visible. Violet marks a located cause, and covers more than one entity where the cause genuinely spans several &mdash; a firmware build across three sectors, for instance. It appears only once the candidates have been ranked, so the diagram never gives the answer away early, and in the scenarios that never establish a cause nothing turns violet at all. Amber dashed boxes along the bottom are change records, linked to the entities they targeted.</p>
     <h4>Scores</h4>
-    <p>Candidate scores are <b>evidence-match scores against SME-authored failure fingerprints, not probabilities</b>. A candidate is action-eligible only above threshold and only after the guardrail checks pass. Three actions are permanently blocked from automation in every scenario: customer credit posting, direct billing-state writes, and RAN firmware rollback on cells serving an active public-safety response.</p>
+    <p>Candidate scores are <b>evidence-match scores against SME-authored failure fingerprints, not probabilities</b>. A candidate is action-eligible only above threshold and only after the guardrail checks pass. A candidate marked <b>unscorable</b> and shown with a dash carries no number at all, because the measurement it would be scored against is itself unavailable &mdash; scoring it zero would claim an elimination the data cannot support. Three actions are permanently blocked from automation in every scenario: customer credit posting, direct billing-state writes, and RAN firmware rollback on cells serving an active public-safety response.</p>
     <h4>Ask the case file</h4>
-    <p><b>Coming soon.</b> Natural-language questions over the case file, answered by a selectable provider and model. Deliberately disabled in V1.0: every ranking, control comparison and gate decision on screen is deterministic, so the demo is complete without it.</p>
+    <p><b>Three pre-written questions per scenario</b>, answered from the case file. Every figure quoted in an answer also appears in the panels above it, so the two can be checked against each other, and each answer carries the source and confidence it was drawn from.</p>
+    <p>Tick <b>&ldquo;answer the same question with the graph evidence withheld&rdquo;</b> to see the same question answered from the incident description alone. Those answers are vague where the grounded one is specific, and in several scenarios they are confidently wrong &mdash; which is the comparison the panel exists to make.</p>
+    <p><b>Free-text questions are coming soon</b>, with a selectable provider and model. Nothing else on the page depends on them: every ranking, control comparison and gate decision on screen is deterministic.</p>
+    <h4>What changed in <span class="verbatim">V2.1 (August 2026)</span></h4>
+    <p>A word-by-word accuracy pass over every scenario. The firmware scenario now shows the small, lagging Nchf elevation it always described rather than reporting it as baseline, and the candidate that dismissed charging capacity on the grounds of &ldquo;no errors&rdquo; now dismisses it on the grounds that matter: the elevation is 2&times; rather than 200&times;, queueing is flat, and the onset trails the session drops by 90 seconds.</p>
+    <p>A located cause may now cover <b>more than one entity</b>, so a firmware regression across three sectors marks all three violet instead of arbitrarily picking one. In the identifier-mismatch scenario the candidate that cannot be scored is marked <b>unscorable</b> and shown with a dash, because scoring it zero would claim an elimination the broken join cannot support. The <b>measurement window</b> and the seven-day <b>change lookback</b> are now named separately wherever both appear.</p>
+    <h4>What changed in <span class="verbatim">V2.0 (August 2026)</span></h4>
+    <p>Pre-written questions and answers went live in <b>Ask the case file</b>, including the evidence-withheld comparison, with each question locked until the run reaches the stage that can answer it &mdash; the first two at stage 5 with the ranked candidates, the third at stage 6 with the action gate.</p>
+    <p>The panels were given a visible hierarchy: entity names picked out in colour, figures weighted against the prose, abnormal signal values sized and coloured by state while baseline rows recede, and control groups tagged pass or missing. Controls were restyled for legibility, un-reached stages in the narrowing rail say so rather than sitting empty, and a <b>back-to-top button</b> appears bottom-right once you scroll.</p>
     <h4>Renaming entities</h4>
     <p><b>Settings → Rename entities</b> replaces any entity label with your own, everywhere it appears including the evidence prose. Stored in this browser only.</p>
     <h4>Scope</h4>
@@ -456,7 +632,7 @@
 (function () {
   "use strict";
 
-  var VERSION = "V1.0";
+  var VERSION = "V2.1 (August 2026)";
   var LS = "kgcg.demo.v1";
 
   /* ============================ knowledge graph ============================ */
@@ -485,9 +661,9 @@
     { id: "cell2", col: 2, y: 154, label: "C-M01-7712",    sub: "n78 · 001-01",        src: "ENM" },
     { id: "cell3", col: 2, y: 232, label: "C-M01-7713",    sub: "n28 · 001-01",        src: "ENM" },
 
-    { id: "smf4",  col: 3, y: 76,  label: "smf-m01-04",    sub: "Core Vendor A",        src: "EMS" },
-    { id: "smf5",  col: 3, y: 154, label: "smf-m01-05",    sub: "Core Vendor A",        src: "EMS" },
-    { id: "upf9",  col: 3, y: 232, label: "upf-m01-edge-09", sub: "N3 / N6 anchor",     src: "NRF" },
+    { id: "smf4",  col: 3, y: 76,  label: "SMF-M01-04",    sub: "Core Vendor A",        src: "EMS" },
+    { id: "smf5",  col: 3, y: 154, label: "SMF-M01-05",    sub: "Core Vendor A",        src: "EMS" },
+    { id: "upf9",  col: 3, y: 232, label: "UPF-M01-EDGE-09", sub: "N3 / N6 anchor",     src: "NRF" },
 
     { id: "rtA",   col: 4, y: 76,  label: "CHF-ROUTE-A",   sub: "Nchf route",           src: "EMS" },
     { id: "poolA", col: 4, y: 154, label: "CHF-POOL-A",    sub: "Charging Vendor B",    src: "EMS" },
@@ -527,8 +703,8 @@
     "Executed and verified"
   ];
   var STAGE_UNITS = [
-    "no incident", "catalogued failure modes", "plausible modes", "plausible modes",
-    "ranked candidates", "action-eligible", "confirmed cause"
+    "no incident", "catalogued failure modes", "plausible modes", "modes on the isolated path",
+    "candidates under test", "action-eligible", "confirmed cause"
   ];
 
   var BLOCKED = [
@@ -587,9 +763,9 @@
         { name: "Mediation or CDR-store delay", score: 24, verdict: "dismissed",
           for: "arrival lag is real", against: "lag begins after the Nchf errors, so it reads as a symptom" },
         { name: "Plan or SLA mapping drift", score: 11, verdict: "dismissed",
-          for: "none", against: "no mapping change in the window; would not produce interface errors" },
+          for: "none", against: "no mapping change in the lookback; would not produce interface errors" },
         { name: "RAN firmware regression", score: 6, verdict: "dismissed",
-          for: "{{chg022}} is inside the window", against: "radio counters at baseline; impact follows the SMF, not cell boundaries" }
+          for: "{{chg022}} falls inside the change lookback", against: "radio counters at baseline; impact follows the SMF, not cell boundaries" }
       ],
       gate: { checks: [
         { label: "Alternate capacity available on {{poolB}}", pass: true },
@@ -625,7 +801,7 @@
         { type: "Incident", text: "INC-4519 · borderline completeness drop, above the credit trigger and below target.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Drop is real but shallow. No single route, SMF cluster or plan separates from the others.", source: "traversal", conf: 0.86 },
         { type: "Evidence", text: "Both {{poolA}} and {{poolB}} show mildly elevated queue depth. Nchf elevation is 10× baseline, not the 200× seen in the route-localised case.", source: "traversal", conf: 0.9 },
-        { type: "Hypothesis", text: "Top candidate scores 38 against a surface threshold of 60. Two recent changes overlap the window and neither fingerprint matches.", source: "traversal", conf: 0.38 },
+        { type: "Hypothesis", text: "Top candidate scores 38 against a surface threshold of 60. Two recent changes fall inside the change lookback and neither fingerprint matches.", source: "traversal", conf: 0.38 },
         { type: "Observation", text: "No candidate is action-eligible. Forcing a top-one answer here would be a guess presented as a finding.", source: "traversal", conf: 0.95 },
         { type: "Outcome", text: "Filed as no high-confidence cause with an explicit manual-investigation list. Outcome written back so this pattern is recognisable next time.", source: "traversal", conf: 0.95 }
       ],
@@ -650,9 +826,9 @@
         { name: "Mediation / CDR-store delay", score: 17, verdict: "dismissed",
           for: "could explain part of the gap", against: "would not produce the Nchf elevation" },
         { name: "BSS / SLA-mapping drift", score: 9, verdict: "dismissed",
-          for: "none", against: "no mapping change in the window" },
+          for: "none", against: "no mapping change in the lookback" },
         { name: "RAN firmware regression", score: 6, verdict: "dismissed",
-          for: "change present in window", against: "fingerprint absent" }
+          for: "change present in the lookback", against: "fingerprint absent" }
       ],
       gate: { checks: [
         { label: "A candidate above the surface threshold of 60", pass: false },
@@ -673,7 +849,7 @@
       counts: [0, 62, 29, 11, 5, 0, 0],
       labels: { 5: "Held for a pre-approved test", 6: "Synthetic charging test queued" },
       units: { 5: "action-eligible", 6: "queued checks" },
-      root: "smf4",
+      root: null,
       nodes: [
         [],
         ["acct", "plan", "sla", "slice", "sess"],
@@ -689,7 +865,7 @@
         { type: "Evidence", text: "No Nchf errors and no queueing anywhere. {{poolA}} is healthy — it is simply being asked for less.", source: "traversal", conf: 0.94 },
         { type: "Hypothesis", text: "Charging-trigger generation on {{smf4}} is dropping a subset of events. A route-side cause would show errors; there are none.", source: "traversal", conf: 0.74 },
         { type: "Observation", text: "The discriminating control — {{smf4}} over an alternate route — does not exist in this topology, so route-side and trigger-side causes cannot be separated from live traffic alone.", source: "traversal", conf: 0.96 },
-        { type: "Outcome", text: "No failover proposed: moving route would not distinguish the two. A pre-approved synthetic charging test on {{smf4}} over {{rtB}} is queued instead, with no billing or credit impact." }
+        { type: "Outcome", text: "No failover proposed: moving route would not distinguish the two. A pre-approved synthetic charging test on {{smf4}} over {{rtB}} is queued instead, with no billing or credit impact.", source: "traversal", conf: 0.96 }
       ],
       signals: [
         { label: "Nchf request volume", counter: "nchf_request_count", value: "−31%", base: "flat", state: "anomalous", on: "{{smf4}}" },
@@ -712,9 +888,9 @@
         { name: "Mediation rejection upstream", score: 19, verdict: "dismissed",
           for: "none", against: "mediation accept rate unchanged" },
         { name: "Plan or SLA mapping drift", score: 8, verdict: "dismissed",
-          for: "none", against: "no mapping change in the window" },
+          for: "none", against: "no mapping change in the lookback" },
         { name: "RAN firmware regression", score: 5, verdict: "dismissed",
-          for: "change present in window", against: "fingerprint absent; radio counters at baseline" }
+          for: "change present in the lookback", against: "fingerprint absent; radio counters at baseline" }
       ],
       gate: { checks: [
         { label: "A candidate above the surface threshold of 60", pass: true },
@@ -749,7 +925,7 @@
         { type: "Evidence", text: "{{rate}} rejects 4.1% of accepted records with a field-validation error on the Priority Responder entitlement code.", source: "traversal", conf: 0.93 },
         { type: "Hypothesis", text: "A schema expectation at {{rate}} no longer matches what {{store}} emits for this plan. Charging plane is not involved.", source: "traversal", conf: 0.87 },
         { type: "Action", text: "Re-drive the rejected batch through {{rate}} after the mapping correction. Records are retained, so nothing is lost.", source: "traversal", conf: 0.85 },
-        { type: "Outcome", text: "Batch re-driven, rejection rate back to 0.02%. Reconciliation gap closed and the mapping recorded as a change." }
+        { type: "Outcome", text: "Batch re-driven, rejection rate back to 0.02%. Reconciliation gap closed and the mapping recorded as a change.", source: "traversal", conf: 0.94 }
       ],
       signals: [
         { label: "Completeness at mediation", counter: "cdr_completeness", value: "99.96%", base: "99.97%", state: "baseline", on: "{{med}}" },
@@ -770,7 +946,7 @@
         { name: "Mediation transformation defect", score: 29, verdict: "dismissed",
           for: "mediation is upstream of the failure", against: "mediation output unchanged against the prior cycle" },
         { name: "CHF record-format change", score: 14, verdict: "dismissed",
-          for: "none", against: "no CHF change in the window; other plans unaffected" },
+          for: "none", against: "no CHF change in the lookback; other plans unaffected" },
         { name: "Charging-plane loss", score: 4, verdict: "dismissed",
           for: "none", against: "completeness at mediation is within SLA" }
       ],
@@ -808,7 +984,7 @@
         { type: "Evidence", text: "Duplicates share a mediation batch identifier and arrive 40–70 s apart, consistent with a retry that is not de-duplicating.", source: "traversal", conf: 0.92 },
         { type: "Hypothesis", text: "{{med}} retried a batch after a transient write timeout at {{store}} without idempotency on the batch key.", source: "traversal", conf: 0.88 },
         { type: "Action", text: "Quarantine the duplicated batch before {{rate}} consumes it. Rating has not yet run for this window.", source: "traversal", conf: 0.9 },
-        { type: "Outcome", text: "Duplicates quarantined ahead of rating. No double-rating reached billing, so no customer credit is required — which is exactly why the credit path stays out of automation." }
+        { type: "Outcome", text: "Duplicates quarantined ahead of rating. No double-rating reached billing, so no customer credit is required — which is exactly why the credit path stays out of automation.", source: "traversal", conf: 0.95 }
       ],
       signals: [
         { label: "Reported completeness", counter: "cdr_completeness", value: "100.8%", base: "99.97%", state: "anomalous", on: "{{store}}" },
@@ -867,7 +1043,7 @@
         { type: "Evidence", text: "{{rate}} is applying entitlement PRI-2025-B to all 1,840 lines on {{acct}}, superseded by PRI-2026-A at the last catalogue refresh.", source: "traversal", conf: 0.94 },
         { type: "Hypothesis", text: "{{plan}} points at a stale entitlement version. The plan-to-entitlement edge was never revalidated after the catalogue refresh.", source: "traversal", conf: 0.91 },
         { type: "Action", text: "Refresh the plan-to-entitlement edge from the BSS catalogue and re-rate the affected window.", source: "traversal", conf: 0.88 },
-        { type: "Outcome", text: "Edge refreshed, window re-rated, all 1,840 lines on the current entitlement. Any resulting adjustment goes to a human — automated credit posting is permanently blocked." }
+        { type: "Outcome", text: "Edge refreshed, window re-rated, all 1,840 lines on the current entitlement. Any resulting adjustment goes to a human — automated credit posting is permanently blocked.", source: "traversal", conf: 0.93 }
       ],
       signals: [
         { label: "Completeness", counter: "cdr_completeness", value: "99.97%", base: "99.97%", state: "baseline", on: "{{med}}" },
@@ -928,7 +1104,7 @@
         { type: "Evidence", text: "The {{smf4}} → {{rtB}} capacity edge was last refreshed 41 minutes ago. Its validity window expects a 60-second refresh, so it is out of window.", source: "traversal", conf: 0.99 },
         { type: "Hypothesis", text: "Failover target capacity cannot be trusted. Acting on a stale edge risks moving traffic onto a pool that is itself saturated.", source: "traversal", conf: 0.95 },
         { type: "Observation", text: "Eligibility denied by the stale-topology guardrail. The recommendation is retained, not discarded.", source: "traversal", conf: 0.98 },
-        { type: "Outcome", text: "Refresh requested from the charging EMS. The action re-queues automatically once the edge is inside its validity window; it does not silently proceed." }
+        { type: "Outcome", text: "Refresh requested from the charging EMS. The action re-queues automatically once the edge is inside its validity window; it does not silently proceed.", source: "traversal", conf: 0.97 }
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.048 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
@@ -951,9 +1127,9 @@
         { name: "Mediation delay", score: 20, verdict: "dismissed",
           for: "arrival lag real", against: "lag follows the Nchf errors" },
         { name: "Plan or SLA mapping drift", score: 9, verdict: "dismissed",
-          for: "none", against: "no mapping change in the window" },
+          for: "none", against: "no mapping change in the lookback" },
         { name: "RAN firmware regression", score: 6, verdict: "dismissed",
-          for: "change in window", against: "fingerprint absent" }
+          for: "change in the lookback", against: "fingerprint absent" }
       ],
       gate: { checks: [
         { label: "A candidate above the surface threshold of 60", pass: true },
@@ -975,7 +1151,7 @@
       counts: [0, 62, 33, 15, 5, 1, 1],
       labels: { 5: "Threshold passed, automation refused", 6: "Executed by a human owner and verified" },
       units: { 5: "human-approval only", 6: "confirmed cause" },
-      root: "cell1",
+      root: ["cell1", "cell2", "cell3"],
       nodes: [
         [],
         ["acct", "plan", "sla", "slice", "sess"],
@@ -989,14 +1165,14 @@
         { type: "Incident", text: "INC-4803 · presented as a charging incident; the evidence points away from charging.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Impact follows cell boundaries, not the SMF or the charging route. All three affected cells carry {{chg022}}.", source: "traversal", conf: 0.92 },
         { type: "Evidence", text: "Radio counters are genuinely abnormal this time: session drop rate 6.2× baseline and GTP packet drop elevated on {{upf9}} for those cells only.", source: "traversal", conf: 0.95 },
-        { type: "Hypothesis", text: "Firmware 24.1.4 regressed session retention on n78 sectors. Charging records are incomplete because sessions are ending abnormally — the charging plane is behaving correctly.", source: "traversal", conf: 0.9 },
+        { type: "Hypothesis", text: "Firmware 24.1.4 regressed session retention on every sector carrying the build, across both bands in scope. Charging records are incomplete because sessions are ending abnormally — the charging plane is behaving correctly.", source: "traversal", conf: 0.9 },
         { type: "Action", text: "Rollback is the indicated fix but is permanently blocked from automation on cells serving an active public-safety response. Routed to the RAN duty owner with the evidence attached.", source: "traversal", conf: 0.93 },
-        { type: "Outcome", text: "Human-approved rollback executed by the RAN team. Drop rate and completeness recovered. Charging was never the cause and is recorded as exonerated." }
+        { type: "Outcome", text: "Human-approved rollback executed by the RAN team. Drop rate and completeness recovered. Charging was never the cause and is recorded as exonerated.", source: "traversal", conf: 0.94 }
       ],
       signals: [
         { label: "Session drop rate", counter: "pdu_session_drop_rate", value: "6.2× baseline", base: "1.0×", state: "anomalous", on: "3 cells" },
         { label: "GTP packet drop", counter: "gtp_packet_drop_rate", value: "+2.8 pp", base: "±0.2 pp", state: "anomalous", on: "{{upf9}}" },
-        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0006 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
+        { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0006 /s, onset +90 s", base: "0.0003 /s", state: "degraded", on: "{{rtA}}" },
         { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.19 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
         { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+3.1 pp", base: "±0.5 pp", state: "anomalous", on: "3 cells" }
       ],
@@ -1012,7 +1188,7 @@
         { name: "UPF capacity", score: 33, verdict: "dismissed",
           for: "GTP drop elevated", against: "drop is confined to three cells; {{chg014}} raised capacity rather than reducing it" },
         { name: "CHF route / pool capacity", score: 12, verdict: "dismissed",
-          for: "none", against: "no Nchf errors and no queueing" },
+          for: "Nchf failures are mildly elevated", against: "elevation is 2× rather than 200×, queueing is at baseline, and the onset is 90 s after the session drops — the profile of a consequence" },
         { name: "SMF / CTF charging-event generation", score: 9, verdict: "dismissed",
           for: "none", against: "request volume tracks the reduced session count exactly" },
         { name: "Mediation delay", score: 5, verdict: "dismissed",
@@ -1036,7 +1212,7 @@
       title: "Quota management failure on an active response",
       detail: "{{slice}} in market M01 · 214 sessions denied continuation · CHF returning no quota rather than failing · completeness 97.3%",
       counts: [0, 60, 28, 10, 5, 1, 1],
-      root: "poolA",
+      root: "plan",
       nodes: [
         [],
         ["acct", "plan", "sla", "slice", "sess"],
@@ -1052,7 +1228,7 @@
         { type: "Evidence", text: "Quota pool for the Priority Responder entitlement is exhausted at {{poolA}}; the top-up job that normally replenishes it last ran 6 hours ago.", source: "traversal", conf: 0.96 },
         { type: "Hypothesis", text: "Quota replenishment for {{plan}} has stalled. Denials are the charging plane doing exactly what it was told, on stale entitlement state.", source: "traversal", conf: 0.92 },
         { type: "Action", text: "Re-run the pre-approved quota replenishment for the Priority Responder entitlement. Reversible and scoped to one entitlement.", source: "traversal", conf: 0.9 },
-        { type: "Outcome", text: "Quota restored, denials stopped, sessions continued. Replenishment schedule failure raised separately as the underlying problem." }
+        { type: "Outcome", text: "Quota restored, denials stopped, sessions continued. Replenishment schedule failure raised separately as the underlying problem.", source: "traversal", conf: 0.95 }
       ],
       signals: [
         { label: "Sessions denied continuation", counter: "quota_denial_count", value: "214", base: "0", state: "anomalous", on: "{{poolA}}" },
@@ -1077,7 +1253,7 @@
         { name: "SMF / CTF charging-event generation", score: 8, verdict: "dismissed",
           for: "none", against: "events are generated and answered" },
         { name: "RAN firmware regression", score: 4, verdict: "dismissed",
-          for: "change in window", against: "radio counters at baseline" }
+          for: "change in the lookback", against: "radio counters at baseline" }
       ],
       gate: { checks: [
         { label: "Replenishment is pre-approved for this incident class", pass: true },
@@ -1097,7 +1273,7 @@
       title: "The case file cannot complete the join",
       detail: "{{slice}} in market M01 · completeness cannot be computed · 38% of {{store}} records will not resolve to a session at {{smf4}}",
       counts: [0, 57, 26, 13, 4, 0, 0],
-      labels: { 5: "Join incomplete — no ranking offered", 6: "Reconciliation task raised" },
+      labels: { 5: "Join incomplete — no decision-grade ranking", 6: "Reconciliation task raised" },
       units: { 5: "action-eligible", 6: "open findings" },
       root: null,
       nodes: [
@@ -1114,8 +1290,8 @@
         { type: "Observation", text: "38% of records at {{store}} carry a session identifier that does not resolve to any session known to {{smf4}}.", source: "traversal", conf: 0.97 },
         { type: "Evidence", text: "Unresolved records use a vendor-native session key; resolved ones use the canonical form. Both appear after the last {{poolA}} software update.", source: "traversal", conf: 0.93 },
         { type: "Hypothesis", text: "Identifier resolution is broken for a subset of records, so completeness for this window is unknown rather than bad. Any ranking built on it would be built on a partial join.", source: "traversal", conf: 0.89 },
-        { type: "Observation", text: "No candidate ranking offered. Presenting one would imply the evidence set is complete when 38% of it is unjoinable.", source: "traversal", conf: 0.98 },
-        { type: "Outcome", text: "Reconciliation task raised against the identifier contract. Completeness for this window is reported as not computable, not as a breach." }
+        { type: "Observation", text: "Candidates are listed for orientation only — none is decision-grade. Treating this order as a finding would imply the evidence set is complete when 38% of it is unjoinable.", source: "traversal", conf: 0.98 },
+        { type: "Outcome", text: "Reconciliation task raised against the identifier contract. Completeness for this window is reported as not computable, not as a breach.", source: "traversal", conf: 0.97 }
       ],
       signals: [
         { label: "Unresolved record share", counter: "identity_resolution_miss_rate", value: "38%", base: "< 0.1%", state: "anomalous", on: "{{store}}" },
@@ -1133,12 +1309,12 @@
       hyps: [
         { name: "Identifier contract regression at {{poolA}}", score: 74, verdict: "investigate",
           for: "two key formats present, onset at the pool update, alternate pool clean", against: "cannot be confirmed while the join is incomplete" },
-        { name: "Charging-plane record loss", score: 0, verdict: "dismissed",
-          for: "none", against: "cannot be assessed — completeness is not computable" },
+        { name: "Charging-plane record loss", score: 0, verdict: "unscorable",
+          for: "would be the obvious reading of a completeness gap", against: "cannot be scored at all: the measurement it would be scored against is the one that is not computable. Listed last and shown without a score, because there is no defensible number — not because it has been ruled out" },
         { name: "Mediation transformation defect", score: 21, verdict: "dismissed",
           for: "mediation handles the key", against: "mediation passes through what it receives; format originates upstream" },
         { name: "Plan or SLA mapping drift", score: 6, verdict: "dismissed",
-          for: "none", against: "no mapping change in the window" }
+          for: "none", against: "no mapping change in the lookback" }
       ],
       gate: { checks: [
         { label: "Evidence set is complete enough to rank", pass: false },
@@ -1147,9 +1323,247 @@
         { label: "Reconciliation task can be raised without production change", pass: true },
         { label: "Verification KPIs defined before execution", pass: false }
       ] },
-      outcome: { state: "manual", text: "No ranking and no action. Reconciliation task raised against the identifier contract for {{poolA}}, and completeness for this window is reported as not computable so nobody treats it as an SLA breach." }
+      outcome: { state: "manual", text: "No decision-grade ranking and no action. Reconciliation task raised against the identifier contract for {{poolA}}, and completeness for this window is reported as not computable so nobody treats it as an SLA breach." }
     }
   ];
+
+  /* ========================= pre-written question set =====================
+     Three questions per scenario. Every figure quoted in a grounded answer is
+     also on the page above it, so the two can be checked against each other.
+     `bare` is the same question answered from the incident text alone, with the
+     graph withheld — that is the comparison the panel exists to make.        */
+
+  var QA = {
+    "chf-capacity": [
+      { q: "What caused this?",
+        a: ["<b>{{poolA}} is running out of queue headroom.</b> Every abnormal counter in the window sits on one charging route: Nchf failures at 0.062/s against a 0.0003/s baseline, and queue depth p95 at 4.7 s against 0.18 s.",
+            "{{chg007}} raised that pool's queue high-watermark from 80% to 92% two days before the incident. That removed the spare capacity which used to absorb exactly this load pattern. The candidate scores <b>88</b>."],
+        prov: "Counters from EMS via traversal · change record from ITSM · confidence 0.91",
+        bare: ["A CDR-completeness breach with elevated Nchf errors on a priority slice is most commonly caused by charging-function capacity, mediation backlog, or a session-management fault. I would start by checking CHF utilisation and mediation queue depth.",
+               "Without the topology I cannot tell you which pool, which route, or whether a recent change is involved — so I cannot rank those three against each other."] },
+      { q: "What rules out the other explanations?",
+        a: ["<b>Three control groups, and the one that is missing is stated rather than hidden.</b> Sessions on the same cells but off the priority slice are healthy, which argues against a cell-level cause. {{smf5}} over {{rtB}} is healthy, which points back at the affected charging path. Priority sessions in other markets are healthy, which argues against plan or SLA-mapping drift.",
+            "{{chg022}}, the RAN firmware change, falls inside the seven-day change lookback — but radio counters are at baseline and the impact follows the SMF rather than cell boundaries, so it scores 6.",
+            "The control that would separate trigger-side from route-side — the same SMF over an alternate CHF route — <b>is not configured in this topology</b>. That is why the SMF/CTF candidate stays at 61 and is marked for investigation instead of being dismissed."],
+        prov: "Control comparisons from traversal · 3 healthy, 1 unavailable · confidence 0.93",
+        bare: ["I can offer the usual eliminations: if the user plane is normal the fault is likely charging-specific, and if voice is unaffected it is unlikely to be radio.",
+               "That is reasoning from the shape of the description, not from measurement. I have no control groups, so nothing here is actually ruled out."] },
+      { q: "Why was automated action allowed here?",
+        a: ["<b>All six gate conditions passed.</b> Alternate capacity exists on {{poolB}}, the action is pre-approved for this incident class, the blast radius is one Nchf route, rollback is a single step, CDR reconciliation stays auditable, and the verification KPIs were defined before execution.",
+            "The action itself is deliberately small: fail {{smf4}} charging traffic over to {{rtB}} and {{poolB}}. It does not touch the suspected pool, credit the customer, or write billing state — the last two are permanent blocks regardless of confidence.",
+            "Outcome: failures back to 0.0004/s, queue depth p95 to 0.21 s, arrival lag clearing. Verified and written back to the knowledge graph."],
+        prov: "Gate evaluation and outcome from traversal · confidence 0.89 at proposal, 0.97 after verification",
+        bare: ["Failing charging traffic to a standby pool would be a reasonable mitigation if a pool were confirmed saturated.",
+               "I cannot confirm alternate capacity exists, that the action is pre-approved, or that it can be rolled back — so recommending it would be advice, not a decision anything should execute."] }
+    ],
+    "ambiguous": [
+      { q: "What caused this?",
+        a: ["<b>Nothing is identified.</b> The drop is real — completeness 99.78% against a 99.95% target — but the top candidate scores <b>38 against a surface threshold of 60</b>.",
+            "Both {{poolA}} and {{poolB}} show mildly elevated queue depth, 0.41 s and 0.38 s against a 0.18 s baseline. Nchf elevation is 10× baseline, not the 200× seen when a single route is at fault. Two recent changes fall inside the change lookback and neither fingerprint matches.",
+            "This is the honest answer, not a gap in the method: <b>no cause has been established.</b>"],
+        prov: "Traversal over the incident window · top candidate confidence 0.38",
+        bare: ["A small completeness drop with mildly raised Nchf errors would usually point to intermittent charging-function pressure, and CHF capacity would be the first thing I would look at.",
+               "Note what happened there: given a weak signal I still produced a confident-sounding cause. That is the failure mode this comparison is here to show."] },
+      { q: "Why did nothing separate?",
+        a: ["<b>Every discriminating comparison came back inconclusive.</b> One route against the other: both elevated. One SMF cluster against the other: both elevated. Priority Responder against other plans on the same pools: no plan-level separation.",
+            "Only the cross-market comparison returned anything, and it localises the problem to market M01 without narrowing it below market level.",
+            "With no separation there is no evidence that distinguishes the candidates, so their scores stay clustered and low."],
+        prov: "Control comparisons from traversal · 3 inconclusive, 1 healthy · confidence 0.86",
+        bare: ["I have no control groups to compare, so I cannot answer this question at all.",
+               "I would have to fall back on which cause is most common in general, which tells you about the population and not about this incident."] },
+      { q: "So what actually happens now?",
+        a: ["<b>It is filed as no high-confidence cause, with a named list of manual work.</b> Run synthetic charging tests on both pools to check pool health independently of live traffic; check mediation pipeline timing across the full window; review SLA mapping for any unrecorded change in the prior seven days.",
+            "The gate blocks action for a specific reason: no candidate above threshold, no control isolation, no verification KPIs definable. Pre-approval and rollback were both satisfied — they were simply not enough.",
+            "The outcome is written back, so the next incident with this signature is recognisable as a known-ambiguous pattern rather than starting from zero."],
+        prov: "Gate evaluation and outcome from traversal · confidence 0.95",
+        bare: ["I would suggest monitoring and escalating if it worsens.",
+               "That is generic advice. It contains no test that would settle the question, because I have nothing to test against."] }
+    ],
+    "smf-ctf": [
+      { q: "What caused this?",
+        a: ["<b>The charging events are never being created.</b> Nchf request volume is down 31% while session count is flat, and there are <b>no interface errors at all</b> — the requests that would fail are not being made.",
+            "That signature points at the trigger side on {{smf4}} rather than anything downstream. Completeness is 94.2%.",
+            "The candidate leads, but it is <b>not confirmed</b>: the control that would prove it does not exist in this topology."],
+        prov: "Counters from EMS via traversal · volume delta against flat session count",
+        bare: ["Reduced charging volume with no errors suggests either a session-management problem or a configuration change on the charging trigger.",
+               "I cannot distinguish those, and I cannot see that session count is flat, which is the observation that makes this case interesting rather than routine."] },
+      { q: "Why is missing evidence more useful than errors here?",
+        a: ["<b>Because absence has a different fingerprint from failure.</b> A route or pool fault produces errors, retries and queueing. This produces silence: fewer requests, normal latency, clean interfaces.",
+            "A monitoring approach keyed on error rates sees nothing wrong. The completeness gap is only visible because the case file compares Nchf volume against the session count it should track.",
+            "That comparison exists because the topology links sessions to the charging path — it is a traversal, not a threshold."],
+        prov: "Traversal across session and charging-plane counters",
+        bare: ["Missing data is generally harder to detect than errors, which is true in general and tells you nothing about this window.",
+               "I cannot make the volume-against-sessions comparison, because I do not have either series."] },
+      { q: "Why no automated action?",
+        a: ["<b>Because the discriminating control is unavailable, so the leading candidate cannot be separated from the alternative.</b> Trigger-side failure and route-side failure both fit what is observed.",
+            "Instead of acting, a synthetic charging test is queued on {{smf4}} over {{rtB}}. If events appear, the trigger side is exonerated and the route becomes the candidate. If they do not, the trigger side is confirmed.",
+            "Either way the test creates the missing control, so the next occurrence of this signature is decidable. <b>The gap gets closed rather than worked around.</b>"],
+        prov: "Gate evaluation and outcome from traversal · action withheld pending the test",
+        bare: ["Restarting or reconfiguring the charging trigger would be the usual next step.",
+               "That risks acting on the wrong half of the problem. Without the control I cannot tell whether the trigger or the route is at fault."] }
+    ],
+    "mediation-reject": [
+      { q: "What caused this?",
+        a: ["<b>The problem is downstream of mediation, at rating.</b> Completeness at mediation is 99.96% — records are arriving complete and on time — but <b>4.1% of accepted records are rejected at {{rate}}</b>.",
+            "There is no charging-plane anomaly at all. The Nchf path, the pools and the routes are clean.",
+            "The reconciliation gap opens between mediation acceptance and rating acceptance, which is a mapping problem rather than a network fault."],
+        prov: "Acceptance and rejection counts from MED and BSS via traversal",
+        bare: ["A completeness or reconciliation gap on a priority slice would usually be caused by charging-function or mediation problems.",
+               "That answer points upstream, and upstream is measurably healthy here. Without the per-stage acceptance counts I would send the investigation to the wrong team."] },
+      { q: "Why did the charging plane look healthy?",
+        a: ["<b>Because it was healthy.</b> The failure is one stage further along, and the two stages are measured separately.",
+            "This is the case where a single end-to-end completeness figure misleads: measured at mediation it looks fine, and the loss only appears when mediation acceptance is compared against rating acceptance.",
+            "The graph carries both stages and the edge between them, so the gap is locatable rather than merely detectable."],
+        prov: "Per-stage traversal from {{med}} through {{store}} to {{rate}}",
+        bare: ["It is possible for one part of a pipeline to be healthy while another is not.",
+               "True, and unhelpful. I cannot say which stage, because I do not have the per-stage numbers."] },
+      { q: "What was done about it?",
+        a: ["<b>The mapping was corrected and the rejected records re-driven.</b> Rejection rate fell to 0.02%.",
+            "No records were lost and there was no credit exposure, because the records existed throughout — they were simply refused at the rating stage.",
+            "The correction is recorded as a change, so the next incident that traverses this path sees it as history rather than rediscovering it."],
+        prov: "Outcome verified after re-drive · written back to the knowledge graph",
+        bare: ["Rejected records normally need investigation and reprocessing.",
+               "I cannot tell you what to correct or confirm the rejection cleared, so nothing here is verifiable."] }
+    ],
+    "duplicate-cdr": [
+      { q: "What caused this?",
+        a: ["<b>{{med}} is duplicating records.</b> Reported completeness is <b>100.8%</b> — above 100%, which is the tell — and the duplicate rate at {{store}} is 0.9%.",
+            "This is over-count, not loss. Every record that should exist does exist; some exist twice.",
+            "The exposure is double-rating on an active response, which is a financial risk rather than an assurance gap."],
+        prov: "Duplicate detection at {{store}} · completeness computed by traversal",
+        bare: ["Completeness above 100% suggests a measurement or counting error in the assurance pipeline.",
+               "That reads it as a reporting artefact. It is a real duplication with real double-rating exposure, and the difference matters."] },
+      { q: "Why does a completeness target miss this?",
+        a: ["<b>Because the target is a floor, and this breaks the ceiling.</b> An SLA written as \"≥ 99.95% complete\" is satisfied by 100.8%; nothing alerts.",
+            "Duplication is only visible when record identity is checked rather than record count. The case file can do that because {{store}} records resolve to sessions through the topology.",
+            "The same structure that finds missing records finds surplus ones."],
+        prov: "Traversal from {{store}} back to {{sess}} · duplicate rate 0.9%",
+        bare: ["A completeness metric measures presence rather than uniqueness, so duplicates could go unnoticed.",
+               "Correct as a general statement. I cannot tell you whether duplicates are present here."] },
+      { q: "What was done, and what was deliberately not done?",
+        a: ["<b>Done:</b> the duplicates were quarantined before they reached rating. Duplicate rate 0.00%, completeness back to 99.97%.",
+            "<b>Not done:</b> no customer credit was posted, and none was ever available. Customer credit posting is one of the three permanent blocks, so it stays with a human owner no matter how clear the evidence is.",
+            "Because nothing reached rating, there was no credit exposure to settle in the first place."],
+        prov: "Outcome verified after quarantine · credit posting permanently blocked",
+        bare: ["Duplicate records should be removed or quarantined before billing.",
+               "The right instinct, but I cannot confirm they were caught in time, and I have no notion of which actions are off-limits."] }
+    ],
+    "rating-drift": [
+      { q: "What caused this?",
+        a: ["<b>An entitlement mapping on {{plan}} is stale — there is no network fault.</b> Completeness is 99.97%, arrival lag is normal, and every charging-plane counter is at baseline.",
+            "1,840 lines are being rated against a <b>superseded entitlement</b>. The records are correct; the price applied to them is not.",
+            "Nothing in the network is broken, which is why the network-facing candidates all score low."],
+        prov: "Entitlement version from BSS · counters at baseline via traversal",
+        bare: ["Charging discrepancies on a priority plan are usually caused by network or mediation faults, so I would check the charging path first.",
+               "That is exactly the wrong direction here. The charging path is clean and the fault is in a BSS mapping."] },
+      { q: "How is this distinguished from a fault?",
+        a: ["<b>By what is normal, not by what is wrong.</b> Complete records, normal timing, clean interfaces — no fault signature anywhere in the charging plane.",
+            "What is abnormal is a version: the entitlement in force does not match the entitlement the plan resolves to. That is a comparison between a record and a catalogue, not a threshold on a counter.",
+            "A system that only watches counters cannot see this at all, because no counter is out of range."],
+        prov: "Traversal from {{acct}} through {{plan}} to the entitlement catalogue",
+        bare: ["Configuration and rating errors can occur without any network fault.",
+               "General and correct. I cannot check an entitlement version, so I cannot tell you whether this is one."] },
+      { q: "What was done about it?",
+        a: ["<b>Entitlement PRI-2026-A was applied and the window re-rated.</b> Edge age is back under one hour.",
+            "The financial adjustment was <b>referred to a human owner rather than posted automatically</b>. Applying the correct entitlement going forward is a configuration action; adjusting what a customer is charged for the past is not.",
+            "That split is the point: the automation fixes the mapping, a person settles the money."],
+        prov: "Outcome verified · financial adjustment referred, not posted",
+        bare: ["The correct entitlement should be applied and affected charges reviewed.",
+               "Reasonable, but I cannot name the entitlement, and I have no way to distinguish a configuration fix from a financial one."] }
+    ],
+    "stale-topology": [
+      { q: "What caused this?",
+        a: ["<b>The leading candidate is charging-pool capacity on {{poolA}}, scoring 83.</b> Completeness is 92.6% and the evidence pattern matches a route-localised capacity problem.",
+            "That is a confident candidate by any normal reading — well above the surface threshold.",
+            "<b>It was still refused.</b> The finding stands; the action does not."],
+        prov: "Traversal over the incident window · candidate confidence 0.83",
+        bare: ["A completeness breach of this depth with a route-localised error pattern would point to charging-function capacity.",
+               "Coincidentally close to the graph-grounded answer. It is also missing the reason this case exists, which is not about the cause at all."] },
+      { q: "Why was the action refused if confidence was high?",
+        a: ["<b>Because a topology edge the decision depends on was last refreshed 41 minutes ago, against a 60-second expectation.</b>",
+            "Confidence in the cause is not the same as confidence in the map. If the route-to-pool relationship has changed in those 41 minutes, a failover computed from the stale edge could move traffic to the wrong place.",
+            "The guardrail is about <b>freshness of the inputs</b>, not strength of the conclusion, and it fires independently of the score."],
+        prov: "Edge age from the topology store · 41 minutes against a 60-second expectation",
+        bare: ["A high-confidence diagnosis would normally justify a mitigation, so I would proceed.",
+               "That is the whole failure being demonstrated. Confidence in the cause says nothing about whether the data underpinning the action is current."] },
+      { q: "What happens to the recommendation?",
+        a: ["<b>It is held and re-queued, not dropped and not silently executed.</b> A topology refresh was requested; when the edge is current the recommendation is re-evaluated.",
+            "The operator sees the refusal <b>and the reason for it</b> — stale topology, 41 minutes, 60-second expectation — so the block is actionable rather than opaque.",
+            "A refusal with a stated reason is a better outcome than either acting on a stale map or discarding good analysis."],
+        prov: "Gate evaluation and outcome from traversal · refusal reason surfaced to the operator",
+        bare: ["If a system blocks an action the operator would normally review it manually.",
+               "I cannot say what was blocked or why, so there is nothing for the operator to review."] }
+    ],
+    "ran-firmware": [
+      { q: "What caused this?",
+        a: ["<b>RAN firmware on the cells — a radio cause presenting as charging symptoms.</b> Completeness is 96.1% and session drops are elevated on three cells.",
+            "The ordering is decisive: <b>Nchf errors follow the drops rather than leading them</b>. Sessions fail, and the charging errors are the consequence.",
+            "The charging plane is the symptom. Every charging-side candidate scores lower than {{cell1}}."],
+        prov: "Counter ordering from EMS and ENM via traversal · firmware change from ITSM",
+        bare: ["Reduced completeness with elevated Nchf errors on a priority slice most likely indicates a charging-path problem.",
+               "Wrong team, wrong plane. Without the timing order I cannot tell that the charging errors are downstream of session drops."] },
+      { q: "How was the direction established?",
+        a: ["<b>By sequence, which is the one thing a snapshot cannot show.</b> The drops start first; the Nchf errors track them afterwards.",
+            "In the pool-capacity case the ordering runs the other way — the Nchf errors come first and the mediation arrival lag follows them, which is why the lag there reads as a symptom rather than a cause.",
+            "The same evidence types support opposite findings depending on ordering, so <b>time is part of the evidence</b>, not context around it."],
+        prov: "Time-ordered traversal across radio and charging counters",
+        bare: ["Correlated failures across radio and charging can point either way, and I would look at timing to decide.",
+               "The right method, named without being able to apply it. I do not have the series."] },
+      { q: "Why did automation refuse a correct diagnosis?",
+        a: ["<b>Because RAN firmware rollback on cells serving an active public-safety response is one of the three permanent blocks.</b> No confidence level lifts it.",
+            "The evidence went to the RAN duty owner, who approved and executed the rollback manually. Recovery was verified afterwards.",
+            "This is the distinction the demo is built around: <b>the system was right and still did not act.</b> Being correct is not the same as being authorised."],
+        prov: "Gate evaluation and outcome from traversal · permanent block, manual execution",
+        bare: ["A confirmed firmware regression would normally justify a rollback.",
+               "Operationally true and organisationally wrong. I have no model of what is permanently off-limits regardless of evidence."] }
+    ],
+    "quota": [
+      { q: "What caused this?",
+        a: ["<b>Quota replenishment for {{plan}} has stalled.</b> {{poolA}} is returning no quota rather than failing, and 214 sessions were denied continuation.",
+            "Completeness is 97.3%, so this is not primarily a record-loss problem. Sessions in progress could not get authorisation to continue.",
+            "The pool is answering correctly and answering <i>no</i>, which is why an error-rate view sees a healthy interface. The empty pool is where the denials surface; the entitlement whose top-up never ran is the cause — the alternate pool is exhausted for this entitlement too."],
+        prov: "Denial counts and quota responses from EMS via traversal",
+        bare: ["Session continuation failures on a priority slice would usually point to session management or charging-function availability.",
+               "The charging function is available. It is refusing quota, which is a different failure needing a different fix."] },
+      { q: "Why is this worse than dropped records?",
+        a: ["<b>Because it is live service denial on an active response, not a billing artefact.</b> Dropped records cost money and can be reconciled afterwards; denied continuation means a session in progress stops.",
+            "The user-visible effect is immediate. Reconciling records later does not give back a call that ended.",
+            "This is why it is a P2 with 97.3% completeness while scenario 2 is a P3 at 99.78% — <b>severity follows impact, not the completeness number.</b>"],
+        prov: "Session and account traversal from {{sess}} to {{acct}} · 214 denials",
+        bare: ["Service-affecting failures are generally more urgent than billing discrepancies.",
+               "Correct in the abstract. I cannot tell which of the two this is."] },
+      { q: "What was done about it?",
+        a: ["<b>Quota was restored. Denial count 0, and sessions continued without needing re-establishment.</b>",
+            "The stalled replenishment schedule that caused it is raised as a <b>separate problem record</b>, not marked fixed. Restoring quota clears the incident; it does not repair the mechanism that stopped replenishing.",
+            "Closing both as one item would hide a recurrence waiting to happen."],
+        prov: "Outcome verified · replenishment raised as a separate problem record",
+        bare: ["Quota would need to be replenished and the cause investigated.",
+               "The right shape of answer. I cannot confirm sessions survived, which is the part that mattered."] }
+    ],
+    "id-mismatch": [
+      { q: "What caused this?",
+        a: ["<b>No cause is offered, because completeness cannot be computed.</b> 38% of {{store}} records will not resolve to a session at {{smf4}}.",
+            "The identifier contract between the two vendors does not hold, so the join underpinning every completeness figure fails for more than a third of the data.",
+            "The candidates below are listed for orientation, not as a finding. <b>A ranking built on a broken join would be arithmetic on the wrong denominator.</b>"],
+        prov: "Join failure rate measured across {{store}} and {{smf4}} · completeness not computable",
+        bare: ["A completeness figure that cannot be produced usually indicates a data-collection or reporting problem, possibly in mediation.",
+               "It guesses at a cause. The correct answer is that the question cannot be answered from this data yet."] },
+      { q: "Why not estimate from the 62% that does join?",
+        a: ["<b>Because the unjoined 38% is not known to be a random sample.</b> If the records that fail to resolve are concentrated on one vendor, route or session type, the joinable 62% is systematically unrepresentative.",
+            "An estimate from it would carry a confidence figure it has not earned, and that figure would then be used as though the join were sound.",
+            "Reporting <b>not computable</b> is a stronger result than a number nobody should rely on."],
+        prov: "Traversal cannot establish independence of the unjoined subset",
+        bare: ["Extrapolating from the portion that resolves would give an approximate figure.",
+               "And it would be presented as a completeness percentage, which is precisely the trap."] },
+      { q: "What happens instead?",
+        a: ["<b>A reconciliation task is raised against the identifier contract for {{poolA}}, and completeness for this window is reported as not computable.</b>",
+            "That label matters operationally: <b>nobody treats the window as an SLA breach</b>, because no breach has been established. An unmeasurable window is not a failed one.",
+            "No ranking, no action, and no fabricated number. The gap is recorded as a data-contract defect so it is fixed rather than worked around."],
+        prov: "Outcome from traversal · reported as not computable, not as a breach",
+        bare: ["The data quality issue should be investigated and the metric recalculated once resolved.",
+               "Sensible and unactionable. I cannot name the contract, the vendors, or the affected window."] }
+    ]
+  };
 
   /* ================================ state ================================= */
 
@@ -1164,7 +1578,8 @@
     split: 58,
     wide: false,
     theme: "light",
-    names: {}
+    names: {},
+    askIndex: 0
   };
 
   var el = function (id) { return document.getElementById(id); };
@@ -1210,6 +1625,41 @@
     return String(s).replace(/\{\{([a-z0-9]+)\}\}/gi, function (m, id) { return nlabel(id); });
   }
 
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, function (m) {
+      return m === "&" ? "&amp;" : m === "<" ? "&lt;" : "&gt;";
+    });
+  }
+
+  /* Same substitution as tx(), but every entity reference comes back wrapped so
+     it is picked out from the surrounding prose. Escapes first, so scenario text
+     and user-supplied names can never inject markup.                          */
+  function txh(s) {
+    if (!s) return "";
+    return esc(s).replace(/\{\{([a-z0-9]+)\}\}/gi, function (m, id) {
+      return '<span class="ent">' + esc(nlabel(id)) + "</span>";
+    });
+  }
+
+  /* Figures carry the argument in this material, so they get picked out too.
+     Numbers are wrapped before the entity tokens are expanded — element names
+     contain digits, and nesting one emphasis inside the other reads as noise. */
+  var NUM = /(\d[\d,]*\.?\d*\s?(?:%|pp|s\b|\/s\b|×)|\b\d{1,3}(?:,\d{3})+\b|\b\d+\.\d+\b)/g;
+  var TOK = /\{\{([a-z0-9]+)\}\}/gi;
+  var entSpan = function (m, id) { return '<span class="ent">' + esc(nlabel(id)) + "</span>"; };
+
+  function txn(s) {
+    if (!s) return "";
+    return esc(s).replace(NUM, '<span class="num">$1</span>').replace(TOK, entSpan);
+  }
+
+  /* For the authored answer prose, which carries its own <b> and <i> and so
+     must not be escaped.                                                     */
+  function txq(s) {
+    if (!s) return "";
+    return String(s).replace(NUM, '<span class="num">$1</span>').replace(TOK, entSpan);
+  }
+
   function stageLabel(i) {
     var o = sc().labels || {};
     return o[i] || STAGE_LABELS[i];
@@ -1227,7 +1677,8 @@
 
   function nodeState(id) {
     var s = sc();
-    if (s.root === id && state.stage >= 3) return "root";
+    /* root may be a single id or a list, since a cause can span several elements. */
+    if (s.root && (Array.isArray(s.root) ? s.root.indexOf(id) >= 0 : s.root === id) && state.stage >= 5) return "root";
     if (s.nodes[state.stage].indexOf(id) !== -1) return "active";
     for (var i = state.stage - 1; i >= 1; i--) {
       if (s.nodes[i].indexOf(id) !== -1) return "eliminated";
@@ -1434,7 +1885,7 @@
 
   function cgCard(c) {
     var d = document.createElement("div");
-    d.className = "cgcard";
+    d.className = "cgcard k-" + c.type.toLowerCase();
     var top = document.createElement("div");
     top.className = "cgtop";
 
@@ -1457,7 +1908,7 @@
 
     var t = document.createElement("div");
     t.className = "cgtext";
-    t.textContent = tx(c.text);
+    t.innerHTML = txn(c.text);
 
     d.appendChild(top);
     d.appendChild(t);
@@ -1478,6 +1929,9 @@
     tbl.className = "sig";
     sc().signals.forEach(function (s) {
       var tr = document.createElement("tr");
+      /* Baseline rows are context, not findings — they recede so the abnormal
+         values are what the eye lands on first.                              */
+      tr.className = "s-" + s.state;
 
       var td0 = document.createElement("td");
       td0.className = "st";
@@ -1487,15 +1941,17 @@
 
       var td1 = document.createElement("td");
       var nm = document.createElement("div");
+      nm.className = "sl";
       nm.textContent = s.label;
       var cn = document.createElement("div");
       cn.className = "cn";
-      cn.textContent = s.counter + " · " + tx(s.on);
+      cn.innerHTML = esc(s.counter) + " · " + txh(s.on);
       td1.appendChild(nm); td1.appendChild(cn);
 
       var td2 = document.createElement("td");
       td2.className = "vv";
       var v = document.createElement("div");
+      v.className = "vnum";
       v.textContent = s.value;
       var bl = document.createElement("div");
       bl.className = "cn";
@@ -1515,17 +1971,19 @@
     sc().controls.forEach(function (c) {
       var row = document.createElement("div");
       row.className = "ctrl" + (c.result === "missing" ? " missing" : "");
-      var dot = document.createElement("span");
-      dot.className = "dot d-" + (c.result === "healthy" ? "baseline" : c.result === "missing" ? "missing" : "anomalous");
-      dot.style.marginTop = "5px";
+      var tag = document.createElement("span");
+      tag.className = "ctag t-" + c.result;
+      tag.textContent = c.result;
       var txt = document.createElement("div");
+      txt.className = "ctxt";
       var l = document.createElement("div");
-      l.textContent = tx(c.label);
+      l.className = "cl";
+      l.innerHTML = txh(c.label);
       var n = document.createElement("div");
-      n.style.cssText = "font-size:10.5px;color:var(--muted);";
-      n.textContent = (c.result === "missing" ? "MISSING — " : "") + tx(c.note);
+      n.className = "cnote";
+      n.innerHTML = txn(c.note);
       txt.appendChild(l); txt.appendChild(n);
-      row.appendChild(dot); row.appendChild(txt);
+      row.appendChild(tag); row.appendChild(txt);
       host.appendChild(row);
     });
   }
@@ -1552,13 +2010,13 @@
       r.textContent = "#" + (i + 1);
       var n = document.createElement("span");
       n.className = "hname";
-      n.textContent = tx(h.name);
+      n.innerHTML = txh(h.name);
       var v = document.createElement("span");
       v.className = "verd v-" + h.verdict;
       v.textContent = h.verdict;
       var s = document.createElement("span");
       s.className = "hscore";
-      s.textContent = h.score;
+      s.textContent = h.verdict === "unscorable" ? "—" : h.score;
       top.appendChild(r); top.appendChild(n); top.appendChild(v); top.appendChild(s);
 
       var bar = document.createElement("div");
@@ -1569,12 +2027,10 @@
 
       var f = document.createElement("div");
       f.className = "hev";
-      f.innerHTML = "<b>For</b> ";
-      f.appendChild(document.createTextNode(tx(h.for)));
+      f.innerHTML = '<b class="evfor">For</b> ' + txn(h.for);
       var a = document.createElement("div");
       a.className = "hev";
-      a.innerHTML = "<b>Against</b> ";
-      a.appendChild(document.createTextNode(tx(h.against)));
+      a.innerHTML = '<b class="evag">Against</b> ' + txn(h.against);
 
       d.appendChild(top); d.appendChild(bar); d.appendChild(f); d.appendChild(a);
 
@@ -1593,11 +2049,14 @@
     var d = document.createElement("div");
     d.className = "outcome o-" + o.state;
     var t = document.createElement("span");
-    t.style.cssText = "font-weight:700;margin-right:7px;";
-    t.textContent = o.state === "verified" ? "VERIFIED —"
-      : o.state === "blocked" ? "ACTION BLOCKED —" : "NO ACTION —";
+    t.className = "otag";
+    t.textContent = o.state === "verified" ? "VERIFIED"
+      : o.state === "blocked" ? "ACTION BLOCKED" : "NO ACTION";
     d.appendChild(t);
-    d.appendChild(document.createTextNode(tx(o.text)));
+    var ot = document.createElement("span");
+    ot.className = "otext";
+    ot.innerHTML = txn(o.text);
+    d.appendChild(ot);
     host.appendChild(d);
   }
 
@@ -1614,7 +2073,7 @@
       m.className = "m";
       m.textContent = c.pass ? "✓" : "✕";
       var l = document.createElement("span");
-      l.textContent = tx(c.label);
+      l.innerHTML = txh(c.label);
       row.appendChild(m); row.appendChild(l);
       host.appendChild(row);
     });
@@ -1641,7 +2100,9 @@
     ot.textContent = o.state === "verified" ? "Verified and written back"
       : o.state === "blocked" ? "Action blocked" : "No action — manual path";
     ob.appendChild(ot);
-    ob.appendChild(document.createTextNode(tx(o.text)));
+    var obt = document.createElement("span");
+    obt.innerHTML = txn(o.text);
+    ob.appendChild(obt);
     host.appendChild(ob);
   }
 
@@ -1662,7 +2123,7 @@
     hd.appendChild(sev); hd.appendChild(t);
     var dd = document.createElement("div");
     dd.className = "ad";
-    dd.textContent = tx(s.detail);
+    dd.innerHTML = txn(s.detail);
     box.appendChild(hd); box.appendChild(dd);
     box.style.opacity = state.stage === 0 ? ".6" : "1";
   }
@@ -1728,6 +2189,80 @@
     document.documentElement.style.setProperty("--split", String(state.split));
   }
 
+  /* ============================ ask the case file ==========================
+     The questions are fixed per scenario. `bare` is the same question answered
+     without the graph, which is the comparison the panel is for.             */
+
+  function askSet() { return QA[sc().id] || []; }
+
+  /* A question cannot be asked before the case file can answer it. These match
+     the stages the panels themselves appear at: ranked candidates at 5, action
+     gate at 6. Question 1 and 2 quote scores, question 3 quotes the gate.     */
+  var ASK_FROM = [5, 5, 6];
+  var ASK_WHY = {
+    5: "unlocks at stage 5, once the candidates are ranked",
+    6: "unlocks at stage 6, once the action gate resolves"
+  };
+
+  function renderAsk() {
+    var set = askSet();
+    var chips = el("askChips");
+    var host = el("askAnswer");
+    chips.innerHTML = "";
+    host.innerHTML = "";
+    if (!set.length) { host.innerHTML = '<div class="empty">No questions for this scenario.</div>'; return; }
+    if (state.askIndex >= set.length) state.askIndex = 0;
+
+    var unlocked = function (i) { return state.stage >= (ASK_FROM[i] || 0); };
+
+    set.forEach(function (item, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      var open = unlocked(i);
+      b.className = "chip" + (open && i === state.askIndex ? " on" : "") + (open ? "" : " lock");
+      b.textContent = item.q;
+      b.disabled = !open;
+      if (!open) b.title = ASK_WHY[ASK_FROM[i]] || "not available yet";
+      b.setAttribute("aria-pressed", open && i === state.askIndex ? "true" : "false");
+      b.addEventListener("click", function () { state.askIndex = i; renderAsk(); });
+      chips.appendChild(b);
+    });
+
+    /* The evidence-withheld comparison needs an answer to compare against. */
+    var live = unlocked(state.askIndex);
+    el("askBare").disabled = !live;
+    el("bareWrap").style.opacity = live ? "" : ".45";
+
+    /* Nothing is answerable yet — say so rather than showing a conclusion the
+       run has not reached.                                                    */
+    if (!unlocked(0)) {
+      host.innerHTML = '<div class="empty">Nothing to answer yet. These questions are answered from the case file, ' +
+        'and it is still being assembled &mdash; press <b>Play</b> or <b>Step</b> to stage&nbsp;5.</div>';
+      return;
+    }
+    if (!unlocked(state.askIndex)) {
+      host.innerHTML = '<div class="empty">This one ' + (ASK_WHY[ASK_FROM[state.askIndex]] || "is not available yet") +
+        '. Keep stepping, or pick another question.</div>';
+      return;
+    }
+
+    var item = set[state.askIndex];
+    var bare = el("askBare").checked;
+    var paras = bare ? item.bare : item.a;
+    var div = document.createElement("div");
+    div.className = "ans" + (bare ? " bare" : "");
+    var head = bare ? "Answered without the graph" : "Answered from the case file";
+    var html = '<div class="ahd">' + head + "</div>";
+    paras.forEach(function (p, i) {
+      html += '<p' + (i === 0 ? ' class="lead"' : "") + ">" + txq(p) + "</p>";
+    });
+    html += '<div class="prov">' + (bare
+      ? "No traversal, no counters, no change records &mdash; the incident text alone."
+      : txn(item.prov)) + "</div>";
+    div.innerHTML = html;
+    host.appendChild(div);
+  }
+
   function renderAll(prevStage) {
     el("stageNow").innerHTML = "Stage " + state.stage + " of " + (stageCount() - 1) +
       " · <strong>" + stageLabel(state.stage) + "</strong>";
@@ -1741,6 +2276,7 @@
     renderSignals();
     renderHyps();
     renderGate();
+    renderAsk();
     if (typeof prevStage === "number" && prevStage !== state.stage) {
       animateCount(sc().counts[prevStage] || 0, sc().counts[state.stage], state.stage);
     }
@@ -1829,6 +2365,7 @@
     stop();
     state.scenario = i;
     state.stage = 0;
+    state.askIndex = 0;
     el("scenario").value = String(i);
     renderScenarioSelect();
     save();
@@ -1844,6 +2381,13 @@
     el("btnStep").addEventListener("click", function () { stop(); step(); });
     el("btnBack").addEventListener("click", function () { stop(); goTo(state.stage - 1); });
     el("btnReset").addEventListener("click", function () { stop(); goTo(0); });
+    el("askBare").addEventListener("change", renderAsk);
+
+    var toTop = el("toTop");
+    toTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+    var onScroll = function () { toTop.classList.toggle("on", window.scrollY > 260); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     el("speed").value = String(state.speed);
     el("speed").addEventListener("change", function (e) {
