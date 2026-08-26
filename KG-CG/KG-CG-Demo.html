@@ -438,7 +438,7 @@
 <header class="top">
   <div class="brand">
     <h1>Knowledge Graph &amp; Context Graph</h1>
-    <span class="ver" id="verLabel">V2.1 (August 2026)</span>
+    <span class="ver" id="verLabel">V2.2 (August 2026)</span>
   </div>
 
   <div class="spacer"></div>
@@ -595,26 +595,30 @@
 </dialog>
 
 <dialog id="dlgHelp">
-  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V2.1 (August 2026)</span><span class="spacer"></span><button type="button" class="btn" data-close>Close</button></div>
+  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V2.2 (August 2026)</span><span class="spacer"></span><button type="button" class="btn" data-close>Close</button></div>
   <div class="dlgbody">
     <h4>What this shows</h4>
-    <p><b>Knowledge graph</b> — the durable model: agency account, Priority Responder plan and SLA, slice, data network name and sessions, cells, SMF and UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
+    <p><b>Knowledge graph</b> — the durable model: the agency account, its priority plan and the SLA written against it, the slice, data network name and sessions, cells, both SMFs and the UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
     <p>Two different time spans appear in the scenarios and it is worth keeping them apart. The <b>measurement window</b> is the few minutes of counter data the incident is scoped to. The <b>change lookback</b> is the seven days of change records searched for a plausible trigger, so a change dated a day or two before the incident can still be a candidate.</p>
     <p><b>Context graph</b> — what the system knows about <i>this</i> incident: observations, evidence pointing back at knowledge-graph entities, hypotheses and proposed actions, each with a source and a confidence. Created when the anchor fires, discarded on Reset.</p>
     <h4>Driving the demo</h4>
     <p>Pick a <b>scenario</b> from the blue selector in the header, or step through them with <b>‹</b> and <b>›</b>. Then <b>Play</b> to walk the stages, or <b>Step</b> to advance while you narrate. <b>Speed</b> sets the dwell time. Arrow keys step, space plays and pauses.</p>
     <h4>Sizing it for your display</h4>
     <p><b>Drag the vertical handle</b> between the topology and the detail panels to rebalance them. Double-click the handle to reset it, or focus it and use the arrow keys. The detail panels reflow into two columns once you give them the room.</p>
-    <p><b>Zoom</b> scales the diagram in real pixels, so the labels never shrink below a readable size — the pane scrolls instead. <b>Fit width</b> fills the pane and keeps tracking it as you drag the handle or resize the window. <b>Fit all</b> shows the whole diagram with no scrolling, which will make it smaller. <b>+</b> and <b>−</b> zoom. <b>Expand</b> hides the detail panels entirely.</p>
-    <p>Un-reached stages in the narrowing rail stay blank until you get to them. The right-hand panels appear as the case file earns them: the live overlay, then the ranked candidates, then the action gate.</p>
+    <p><b>Zoom</b> scales the diagram in real pixels, so the labels never shrink below a readable size — the pane scrolls instead. <b>Fit width</b> fills the pane once, and stops tracking after that. <b>Fit all</b> shows the whole diagram with no scrolling, which makes it smaller, and keeps tracking as you drag the handle or resize the window. <b>+</b> and <b>−</b> zoom. <b>Expand</b> hides the detail panels entirely.</p>
+    <p>Un-reached stages in the narrowing rail read &ldquo;not yet revealed&rdquo; rather than sitting empty. The right-hand panels appear as the case file earns them: the live overlay, then the ranked candidates, then the action gate.</p>
     <h4>Reading the graph</h4>
-    <p>Blue is the current candidate set. Faded entities were ruled out by an earlier stage but stay on screen so the narrowing is visible. Violet marks a located cause, and covers more than one entity where the cause genuinely spans several &mdash; a firmware build across three sectors, for instance. It appears only once the candidates have been ranked, so the diagram never gives the answer away early, and in the scenarios that never establish a cause nothing turns violet at all. Amber dashed boxes along the bottom are change records, linked to the entities they targeted.</p>
+    <p>Blue is the current candidate set. Faded entities were ruled out by an earlier stage but stay on screen so the narrowing is visible; entities that never entered scope at all are fainter still. Violet marks a located cause, and covers more than one entity where the cause genuinely spans several &mdash; a firmware build across three sectors, for instance. It appears only once the candidates have been ranked, so the diagram never gives the answer away early, and in the scenarios that never establish a cause nothing turns violet at all. Amber dashed boxes along the bottom are change records, linked to the entities they targeted.</p>
     <h4>Scores</h4>
     <p>Candidate scores are <b>evidence-match scores against SME-authored failure fingerprints, not probabilities</b>. A candidate is action-eligible only above threshold and only after the guardrail checks pass. A candidate marked <b>unscorable</b> and shown with a dash carries no number at all, because the measurement it would be scored against is itself unavailable &mdash; scoring it zero would claim an elimination the data cannot support. Three actions are permanently blocked from automation in every scenario: customer credit posting, direct billing-state writes, and RAN firmware rollback on cells serving an active public-safety response.</p>
     <h4>Ask the case file</h4>
-    <p><b>Three pre-written questions per scenario</b>, answered from the case file. Every figure quoted in an answer also appears in the panels above it, so the two can be checked against each other, and each answer carries the source and confidence it was drawn from.</p>
+    <p><b>Three pre-written questions per scenario</b>, answered from the case file. Every figure quoted in an answer also appears in the panels above it, so the two can be checked against each other, and each answer names the source it was drawn from.</p>
     <p>Tick <b>&ldquo;answer the same question with the graph evidence withheld&rdquo;</b> to see the same question answered from the incident description alone. Those answers are vague where the grounded one is specific, and in several scenarios they are confidently wrong &mdash; which is the comparison the panel exists to make.</p>
     <p><b>Free-text questions are coming soon</b>, with a selectable provider and model. Nothing else on the page depends on them: every ranking, control comparison and gate decision on screen is deterministic.</p>
+    <h4>What changed in <span class="verbatim">V2.2 (August 2026)</span></h4>
+    <p>A second accuracy pass, this time over the reasoning rather than the wording. The capacity scenario no longer approves a failover along a route it also calls unconfigured, and no longer holds a trigger-side candidate open on a signature it does not share: charging events that are never generated show a <i>fall</i> in Nchf request volume and no errors, which is the opposite of what that scenario measures. The trigger-side scenario stops claiming in one card that route-side causes are excluded and in the next that they cannot be separated &mdash; the request count is taken at the sender, so a shortfall there is requests never sent.</p>
+    <p>Four scenarios reported <b>zero</b> at the final stage while naming concrete open items in the same panel; they now count them. The stage-one failure catalogue is one number across every scenario, because a catalogue does not change with the incident. The queue counter is measured in seconds, so it is named <b>queue wait</b> rather than queue depth. Duplicate rate and reported completeness now reconcile, the incident window covers the 15-minute credit trigger it quotes, and the S-NSSAI is split into the SST and SD it is actually made of.</p>
+    <p>Four interaction defects went with them: an arrow key on the focused split handle both resized the pane and stepped the run; the space bar could not activate a focused rail segment; the evidence-withheld toggle survived a scenario change; and the narrowing rail forced seven columns on a phone, overriding its own responsive rule. The anchor line no longer shows the incident figures while its header still reads &ldquo;not yet fired&rdquo;.</p>
     <h4>What changed in <span class="verbatim">V2.1 (August 2026)</span></h4>
     <p>A word-by-word accuracy pass over every scenario. The firmware scenario now shows the small, lagging Nchf elevation it always described rather than reporting it as baseline, and the candidate that dismissed charging capacity on the grounds of &ldquo;no errors&rdquo; now dismisses it on the grounds that matter: the elevation is 2&times; rather than 200&times;, queueing is flat, and the onset trails the session drops by 90 seconds.</p>
     <p>A located cause may now cover <b>more than one entity</b>, so a firmware regression across three sectors marks all three violet instead of arbitrarily picking one. In the identifier-mismatch scenario the candidate that cannot be scored is marked <b>unscorable</b> and shown with a dash, because scoring it zero would claim an elimination the broken join cannot support. The <b>measurement window</b> and the seven-day <b>change lookback</b> are now named separately wherever both appear.</p>
@@ -632,7 +636,7 @@
 (function () {
   "use strict";
 
-  var VERSION = "V2.1 (August 2026)";
+  var VERSION = "V2.2 (August 2026)";
   var LS = "kgcg.demo.v1";
 
   /* ============================ knowledge graph ============================ */
@@ -653,7 +657,7 @@
     { id: "plan",  col: 0, y: 154, label: "PLAN-PRI-01",  sub: "Priority Responder plan",      src: "BSS" },
     { id: "sla",   col: 0, y: 232, label: "SLA-CDR-9995",  sub: "≥ 99.95% complete",    src: "BSS" },
 
-    { id: "slice", col: 1, y: 76,  label: "SLICE-PRI",    sub: "S-NSSAI 1 · 0x000A21", src: "NSSF" },
+    { id: "slice", col: 1, y: 76,  label: "SLICE-PRI",    sub: "SST 1 · SD 0x000A21", src: "NSSF" },
     { id: "dnn",   col: 1, y: 154, label: "DNN-PRI",      sub: "priority.example",       src: "SMF" },
     { id: "sess",  col: 1, y: 232, label: "PDU-SESS-M01",  sub: "1,612 active",         src: "SMF" },
 
@@ -675,16 +679,16 @@
     { id: "rate",  col: 5, y: 232, label: "RATE-ENG-01",   sub: "rating engine",        src: "BSS" },
     { id: "bill",  col: 5, y: 310, label: "BILL-CYCLE-05", sub: "billing cycle",        src: "BSS" },
 
-    { id: "chg007", x: 300, y: 396, label: "CHG-2026-05-18-007", sub: "watermark 80→92%",     src: "ITSM", lane: "chg" },
-    { id: "chg022", x: 620, y: 396, label: "CHG-2026-05-19-022", sub: "RAN fw 24.1.3→24.1.4", src: "ITSM", lane: "chg" },
-    { id: "chg014", x: 940, y: 396, label: "CHG-2026-05-15-014", sub: "UPF 12→16 vCPU",       src: "ITSM", lane: "chg" }
+    { id: "chg022", x: 300, y: 396, label: "CHG-2026-05-19-022", sub: "RAN fw 24.1.3→24.1.4", src: "ITSM", lane: "chg" },
+    { id: "chg014", x: 620, y: 396, label: "CHG-2026-05-15-014", sub: "UPF 12→16 vCPU",       src: "ITSM", lane: "chg" },
+    { id: "chg007", x: 940, y: 396, label: "CHG-2026-05-18-007", sub: "watermark 80→92%",     src: "ITSM", lane: "chg" }
   ];
 
   var EDGES = [
     ["acct", "plan"], ["plan", "sla"], ["plan", "slice"], ["slice", "dnn"], ["slice", "sess"],
     ["sess", "cell1"], ["sess", "cell2"], ["sess", "cell3"],
-    ["cell1", "smf4"], ["cell2", "smf4"], ["cell3", "smf4"],
-    ["smf4", "upf9"], ["smf4", "rtA"], ["smf5", "rtB"],
+    ["cell1", "smf4"], ["cell2", "smf4"], ["cell3", "smf4"], ["cell3", "smf5"],
+    ["smf4", "upf9"], ["smf5", "upf9"], ["smf4", "rtA"], ["smf5", "rtB"],
     ["rtA", "poolA"], ["rtB", "poolB"],
     ["poolA", "med"], ["poolB", "med"], ["med", "store"], ["store", "rate"], ["rate", "bill"]
   ];
@@ -721,15 +725,15 @@
       name: "1 · CHF pool capacity after watermark change",
       sev: "P2",
       title: "CDR-completeness breach + Nchf error spike",
-      detail: "{{slice}} in market M01 · 20:05–20:17 PDT · completeness 91.4% against a 99.97% baseline · user plane near normal",
+      detail: "{{slice}} in market M01 · 20:02–20:17 PDT · completeness 91.4% against a 99.97% baseline · user plane near normal",
       counts: [0, 62, 31, 12, 5, 1, 1],
       root: "poolA",
       nodes: [
         [],
-        ["acct", "plan", "sla", "slice", "sess"],
-        ["slice", "sess", "cell1", "cell2", "cell3", "smf4"],
+        ["acct", "plan", "sla", "slice", "dnn", "sess"],
+        ["slice", "dnn", "sess", "cell1", "cell2", "cell3", "smf4"],
         ["smf4", "rtA", "poolA", "med", "store"],
-        ["smf4", "rtA", "poolA", "med", "store", "chg007", "rtB", "poolB"],
+        ["smf4", "smf5", "upf9", "rtA", "poolA", "med", "store", "chg007", "chg022", "rtB", "poolB"],
         ["rtA", "poolA", "rtB", "poolB"],
         ["rtB", "poolB", "med", "store"]
       ],
@@ -739,33 +743,33 @@
         { type: "Evidence", text: "All abnormal counters sit on {{rtA}} and {{poolA}}. {{rtB}} and {{poolB}} are clean.", source: "traversal", conf: 0.93 },
         { type: "Hypothesis", text: "{{poolA}} is saturating. {{chg007}} raised its queue high-watermark from 80% to 92% two days earlier, removing the headroom that used to absorb this load.", source: "traversal", conf: 0.91 },
         { type: "Action", text: "Fail {{smf4}} charging traffic over to {{rtB}} and {{poolB}}. Reversible in one step, blast radius one route.", source: "traversal", conf: 0.89 },
-        { type: "Outcome", text: "Failover verified: Nchf failures and queue depth back to baseline, CDR arrival lag clearing. New route written back with a validity window; old route retained in history.", source: "traversal", conf: 0.97 }
+        { type: "Outcome", text: "Failover verified: Nchf failures and queue wait back to baseline, CDR arrival lag clearing. New route written back with a validity window; old route retained in history.", source: "traversal", conf: 0.97 }
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.062 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "4.7 s", base: "0.18 s", state: "anomalous", on: "{{poolA}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "4.7 s", base: "0.18 s", state: "anomalous", on: "{{poolA}}" },
         { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "180 s rising", base: "5–15 s", state: "degraded", on: "{{med}}" },
         { label: "Alternate route failures", counter: "nchf_request_failure_count", value: "0.0004 /s", base: "0.0003 /s", state: "baseline", on: "{{rtB}}" },
         { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+0.4 pp", base: "±0.5 pp", state: "baseline", on: "3 cells" },
-        { label: "GTP packet drop", counter: "gtp_packet_drop_rate", value: "unchanged", base: "unchanged", state: "baseline", on: "{{upf9}}" }
+        { label: "GTP packet drop", counter: "gtp_packet_drop_rate", value: "+0.1 pp", base: "±0.2 pp", state: "baseline", on: "{{upf9}}" }
       ],
       controls: [
-        { label: "Same cells, sessions not on the Priority Responder slice", result: "healthy", note: "argues against a cell-level cause" },
+        { label: "Same cells, sessions not on {{slice}}", result: "healthy", note: "argues against a cell-level cause" },
         { label: "Alternate SMF and CHF route ({{smf5}} → {{rtB}})", result: "healthy", note: "points back at the affected charging path" },
-        { label: "Priority Responder sessions in other markets", result: "healthy", note: "argues against a plan or SLA-mapping cause" },
-        { label: "Same SMF over an alternate CHF route", result: "missing", note: "not configured in this topology — stated, not hidden" }
+        { label: "{{plan}} sessions in other markets", result: "healthy", note: "argues against a plan or SLA-mapping cause" },
+        { label: "Same SMF over an alternate CHF route", result: "missing", note: "no live traffic runs this pairing, so there is no observational control — the failover path itself is configurable" }
       ],
       hyps: [
         { name: "CHF route / pool capacity", score: 88, verdict: "eligible",
           for: "errors, queueing and CDR lag all on one route; watermark change targets {{poolA}}", against: "none material" },
-        { name: "SMF / CTF charging-event generation", score: 61, verdict: "investigate",
-          for: "consistent with the same observable signature", against: "the discriminating control is unavailable" },
+        { name: "SMF / CTF charging-event generation", score: 34, verdict: "dismissed",
+          for: "would also open a completeness gap", against: "trigger-side loss shows reduced request volume with no errors; here failures run 200× baseline and the queue is deep" },
         { name: "Mediation or CDR-store delay", score: 24, verdict: "dismissed",
           for: "arrival lag is real", against: "lag begins after the Nchf errors, so it reads as a symptom" },
         { name: "Plan or SLA mapping drift", score: 11, verdict: "dismissed",
           for: "none", against: "no mapping change in the lookback; would not produce interface errors" },
         { name: "RAN firmware regression", score: 6, verdict: "dismissed",
-          for: "{{chg022}} falls inside the change lookback", against: "radio counters at baseline; impact follows the SMF, not cell boundaries" }
+          for: "{{chg022}} falls inside the change lookback", against: "radio and user-plane counters are at baseline, and every abnormal counter sits on one charging route" }
       ],
       gate: { checks: [
         { label: "Alternate capacity available on {{poolB}}", pass: true },
@@ -775,7 +779,7 @@
         { label: "CDR reconciliation remains auditable", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "verified", text: "Operator approved. Nchf failure rate 0.0004/s, queue depth p95 0.21 s, arrival lag clearing. Marked verified and written back to the knowledge graph." }
+      outcome: { state: "verified", text: "Operator approved. Nchf failure rate 0.0004/s, queue wait p95 0.21 s, arrival lag clearing. Marked verified and written back to the knowledge graph." }
     },
 
     {
@@ -783,8 +787,8 @@
       name: "2 · Borderline drop — no high-confidence cause",
       sev: "P3",
       title: "CDR-completeness drop, borderline",
-      detail: "{{slice}} in market M01 · completeness 99.78% against a 99.95% target · Nchf errors at 10× baseline · queue depth slightly elevated on both pools",
-      counts: [0, 62, 34, 18, 5, 0, 0],
+      detail: "{{slice}} in market M01 · completeness 99.78% against a 99.95% target · Nchf errors at 10× baseline · queue wait slightly elevated on both pools",
+      counts: [0, 62, 34, 18, 5, 0, 3],
       labels: { 5: "No candidate above threshold", 6: "Manual investigation opened" },
       units: { 5: "action-eligible", 6: "open findings" },
       root: null,
@@ -800,22 +804,22 @@
       cg: [
         { type: "Incident", text: "INC-4519 · borderline completeness drop, above the credit trigger and below target.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Drop is real but shallow. No single route, SMF cluster or plan separates from the others.", source: "traversal", conf: 0.86 },
-        { type: "Evidence", text: "Both {{poolA}} and {{poolB}} show mildly elevated queue depth. Nchf elevation is 10× baseline, not the 200× seen in the route-localised case.", source: "traversal", conf: 0.9 },
+        { type: "Evidence", text: "Both {{poolA}} and {{poolB}} show mildly elevated queue wait. Nchf elevation is 10× baseline, not the roughly 200× seen in the route-localised case.", source: "traversal", conf: 0.9 },
         { type: "Hypothesis", text: "Top candidate scores 38 against a surface threshold of 60. Two recent changes fall inside the change lookback and neither fingerprint matches.", source: "traversal", conf: 0.38 },
         { type: "Observation", text: "No candidate is action-eligible. Forcing a top-one answer here would be a guess presented as a finding.", source: "traversal", conf: 0.95 },
         { type: "Outcome", text: "Filed as no high-confidence cause with an explicit manual-investigation list. Outcome written back so this pattern is recognisable next time.", source: "traversal", conf: 0.95 }
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.003 /s", base: "0.0003 /s", state: "degraded", on: "both routes" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.41 s", base: "0.18 s", state: "degraded", on: "{{poolA}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.38 s", base: "0.18 s", state: "degraded", on: "{{poolB}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.41 s", base: "0.18 s", state: "degraded", on: "{{poolA}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.38 s", base: "0.18 s", state: "degraded", on: "{{poolB}}" },
         { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "18 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
-        { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "±0.2 pp", base: "±0.5 pp", state: "baseline", on: "3 cells" }
+        { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+0.2 pp", base: "±0.5 pp", state: "baseline", on: "3 cells" }
       ],
       controls: [
         { label: "One route against the other", result: "missing", note: "both elevated — no separation" },
         { label: "One SMF cluster against the other", result: "missing", note: "both elevated — no separation" },
-        { label: "Priority Responder against other plans on the same pools", result: "missing", note: "no plan-level separation" },
+        { label: "{{plan}} against other plans on the same pools", result: "missing", note: "no plan-level separation" },
         { label: "Other markets", result: "healthy", note: "localises to M01 but not below market level" }
       ],
       hyps: [
@@ -845,15 +849,15 @@
       name: "3 · SMF / CTF fails to generate charging events",
       sev: "P2",
       title: "Charging events never created",
-      detail: "{{slice}} in market M01 · completeness 94.2% · Nchf request volume down 31% while sessions are flat · no interface errors",
-      counts: [0, 62, 29, 11, 5, 0, 0],
+      detail: "{{slice}} in market M01 · completeness 94.2% · Nchf request volume down 31%, concentrated on interim update triggers, while sessions are flat · no interface errors",
+      counts: [0, 62, 29, 11, 5, 0, 1],
       labels: { 5: "Held for a pre-approved test", 6: "Synthetic charging test queued" },
       units: { 5: "action-eligible", 6: "queued checks" },
       root: null,
       nodes: [
         [],
-        ["acct", "plan", "sla", "slice", "sess"],
-        ["slice", "sess", "smf4", "smf5"],
+        ["acct", "plan", "sla", "slice", "dnn", "sess"],
+        ["slice", "dnn", "sess", "smf4", "smf5"],
         ["smf4", "rtA", "poolA"],
         ["smf4", "rtA", "poolA", "smf5", "rtB", "poolB", "med"],
         ["smf4", "rtA", "rtB"],
@@ -863,28 +867,28 @@
         { type: "Incident", text: "INC-4602 · charging events missing rather than failing in transit.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Session count on {{smf4}} is flat while its Nchf request volume is down 31%. Records are not being generated.", source: "traversal", conf: 0.92 },
         { type: "Evidence", text: "No Nchf errors and no queueing anywhere. {{poolA}} is healthy — it is simply being asked for less.", source: "traversal", conf: 0.94 },
-        { type: "Hypothesis", text: "Charging-trigger generation on {{smf4}} is dropping a subset of events. A route-side cause would show errors; there are none.", source: "traversal", conf: 0.74 },
-        { type: "Observation", text: "The discriminating control — {{smf4}} over an alternate route — does not exist in this topology, so route-side and trigger-side causes cannot be separated from live traffic alone.", source: "traversal", conf: 0.96 },
+        { type: "Hypothesis", text: "Charging-trigger generation on {{smf4}} is dropping a subset of events. The request count is measured at {{smf4}} itself, so the shortfall is in requests never sent — which no route-side fault could cause.", source: "traversal", conf: 0.74 },
+        { type: "Observation", text: "The confirming control — {{smf4}} over an alternate route — does not exist in this topology, so the trigger side is inferred from the request count rather than demonstrated.", source: "traversal", conf: 0.96 },
         { type: "Outcome", text: "No failover proposed: moving route would not distinguish the two. A pre-approved synthetic charging test on {{smf4}} over {{rtB}} is queued instead, with no billing or credit impact.", source: "traversal", conf: 0.96 }
       ],
       signals: [
         { label: "Nchf request volume", counter: "nchf_request_count", value: "−31%", base: "flat", state: "anomalous", on: "{{smf4}}" },
         { label: "Active sessions", counter: "pdu_session_count", value: "1,608", base: "1,612", state: "baseline", on: "{{smf4}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.17 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.17 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
         { label: "Nchf request volume", counter: "nchf_request_count", value: "flat", base: "flat", state: "baseline", on: "{{smf5}}" }
       ],
       controls: [
         { label: "Alternate SMF cluster ({{smf5}})", result: "healthy", note: "request volume flat — isolates to {{smf4}}" },
         { label: "Same pool, traffic from other SMFs", result: "healthy", note: "{{poolA}} serves other traffic normally" },
         { label: "Other markets on the same plan", result: "healthy", note: "argues against a plan-level cause" },
-        { label: "{{smf4}} over an alternate CHF route", result: "missing", note: "not configured — the one control that would separate trigger-side from route-side" }
+        { label: "{{smf4}} over an alternate CHF route", result: "missing", note: "not configured — the one control that would demonstrate the trigger side rather than infer it" }
       ],
       hyps: [
         { name: "SMF / CTF charging-event generation", score: 71, verdict: "investigate",
           for: "request volume down with sessions flat; no errors and no queueing", against: "cannot be confirmed without the missing control" },
-        { name: "CHF route / pool capacity", score: 34, verdict: "dismissed",
-          for: "same observable completeness gap", against: "a saturating pool produces errors and queueing; neither is present" },
+        { name: "CHF route / pool saturation", score: 34, verdict: "dismissed",
+          for: "same observable completeness gap", against: "a saturating pool produces errors and queueing; neither is present, and requests are down at the sender" },
         { name: "Mediation rejection upstream", score: 19, verdict: "dismissed",
           for: "none", against: "mediation accept rate unchanged" },
         { name: "Plan or SLA mapping drift", score: 8, verdict: "dismissed",
@@ -904,25 +908,25 @@
 
     {
       id: "mediation-reject",
-      name: "4 · Mediation accepts, billing rejects",
+      name: "4 · Mediation accepts, rating rejects",
       sev: "P2",
       title: "Reconciliation gap downstream of mediation",
       detail: "{{slice}} in market M01 · completeness 99.96% at mediation · 4.1% of accepted records rejected at rating · no charging-plane anomaly",
-      counts: [0, 58, 27, 9, 4, 1, 1],
+      counts: [0, 62, 27, 9, 4, 1, 1],
       root: "rate",
       nodes: [
         [],
         ["acct", "plan", "sla", "slice", "sess"],
-        ["poolA", "poolB", "med", "store"],
-        ["med", "store", "rate", "bill"],
-        ["med", "store", "rate", "bill", "poolA", "poolB"],
-        ["store", "rate", "bill"],
-        ["store", "rate", "bill"]
+        ["plan", "poolA", "poolB", "med", "store"],
+        ["plan", "med", "store", "rate", "bill"],
+        ["plan", "med", "store", "rate", "bill", "poolA", "poolB"],
+        ["plan", "store", "rate", "bill"],
+        ["plan", "store", "rate", "bill"]
       ],
       cg: [
         { type: "Incident", text: "INC-4655 · records complete at mediation but failing downstream at rating.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Completeness at {{med}} is 99.96% — within SLA. The loss is after acceptance, which the completeness KPI alone cannot see.", source: "traversal", conf: 0.95 },
-        { type: "Evidence", text: "{{rate}} rejects 4.1% of accepted records with a field-validation error on the Priority Responder entitlement code.", source: "traversal", conf: 0.93 },
+        { type: "Evidence", text: "{{rate}} rejects 4.1% of accepted records with a field-validation error on the {{plan}} entitlement code.", source: "traversal", conf: 0.93 },
         { type: "Hypothesis", text: "A schema expectation at {{rate}} no longer matches what {{store}} emits for this plan. Charging plane is not involved.", source: "traversal", conf: 0.87 },
         { type: "Action", text: "Re-drive the rejected batch through {{rate}} after the mapping correction. Records are retained, so nothing is lost.", source: "traversal", conf: 0.85 },
         { type: "Outcome", text: "Batch re-driven, rejection rate back to 0.02%. Reconciliation gap closed and the mapping recorded as a change.", source: "traversal", conf: 0.94 }
@@ -930,12 +934,12 @@
       signals: [
         { label: "Completeness at mediation", counter: "cdr_completeness", value: "99.96%", base: "99.97%", state: "baseline", on: "{{med}}" },
         { label: "Rating rejection rate", counter: "rating_reject_rate", value: "4.1%", base: "0.02%", state: "anomalous", on: "{{rate}}" },
-        { label: "Rejection reason", counter: "reject_code_top1", value: "ENTITLEMENT_FIELD", base: "n/a", state: "anomalous", on: "{{rate}}" },
+        { label: "Rejection reason", counter: "reject_code_top1 (attribute)", value: "ENTITLEMENT_FIELD", base: "n/a", state: "anomalous", on: "{{rate}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.18 s", base: "0.18 s", state: "baseline", on: "both pools" }
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.18 s", base: "0.18 s", state: "baseline", on: "both pools" }
       ],
       controls: [
-        { label: "Other plans through the same rating engine", result: "healthy", note: "isolates to the Priority Responder entitlement code" },
+        { label: "Other plans through the same rating engine", result: "healthy", note: "isolates to the {{plan}} entitlement code" },
         { label: "Same plan in other markets", result: "anomalous", note: "also rejecting — this is not market-specific" },
         { label: "Charging plane end to end", result: "healthy", note: "rules out CHF, route and mediation" },
         { label: "Prior billing cycle for the same plan", result: "healthy", note: "dates the onset to this cycle" }
@@ -966,8 +970,8 @@
       name: "5 · CDR duplication — over-count, not loss",
       sev: "P2",
       title: "Completeness above target while records duplicate",
-      detail: "{{slice}} in market M01 · completeness reported 100.8% · duplicate rate 0.9% at {{store}} · double-rating exposure on an active response",
-      counts: [0, 58, 24, 8, 4, 1, 1],
+      detail: "{{slice}} in market M01 · completeness reported 100.8% · duplicate rate 0.8% at {{store}} · double-rating exposure on an active response",
+      counts: [0, 62, 24, 8, 4, 1, 1],
       root: "med",
       nodes: [
         [],
@@ -980,7 +984,7 @@
       ],
       cg: [
         { type: "Incident", text: "INC-4708 · completeness above 100%, which is a defect rather than good news.", source: "traversal", conf: 1.0 },
-        { type: "Observation", text: "Accepted record count exceeds expected charging events by 0.9%. A completeness KPI alone reads this as healthy.", source: "traversal", conf: 0.96 },
+        { type: "Observation", text: "Accepted record count exceeds expected charging events by 0.8%. A completeness KPI alone reads this as healthy.", source: "traversal", conf: 0.96 },
         { type: "Evidence", text: "Duplicates share a mediation batch identifier and arrive 40–70 s apart, consistent with a retry that is not de-duplicating.", source: "traversal", conf: 0.92 },
         { type: "Hypothesis", text: "{{med}} retried a batch after a transient write timeout at {{store}} without idempotency on the batch key.", source: "traversal", conf: 0.88 },
         { type: "Action", text: "Quarantine the duplicated batch before {{rate}} consumes it. Rating has not yet run for this window.", source: "traversal", conf: 0.9 },
@@ -988,7 +992,7 @@
       ],
       signals: [
         { label: "Reported completeness", counter: "cdr_completeness", value: "100.8%", base: "99.97%", state: "anomalous", on: "{{store}}" },
-        { label: "Duplicate record rate", counter: "cdr_duplicate_rate", value: "0.9%", base: "0.00%", state: "anomalous", on: "{{store}}" },
+        { label: "Duplicate record rate", counter: "cdr_duplicate_rate", value: "0.8%", base: "0.00%", state: "anomalous", on: "{{store}}" },
         { label: "Mediation retry count", counter: "med_batch_retry", value: "3", base: "0", state: "anomalous", on: "{{med}}" },
         { label: "Store write latency p95", counter: "store_write_latency_ms", value: "2,400 ms", base: "180 ms", state: "degraded", on: "{{store}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" }
@@ -1026,12 +1030,12 @@
       sev: "P3",
       title: "Records complete and on time, rated against the wrong entitlement",
       detail: "{{slice}} in market M01 · completeness 99.97% · arrival lag normal · 1,840 lines rated against a superseded entitlement",
-      counts: [0, 55, 22, 7, 4, 1, 1],
+      counts: [0, 62, 22, 7, 4, 1, 1],
       root: "plan",
       nodes: [
         [],
-        ["acct", "plan", "sla"],
-        ["acct", "plan", "sla", "rate", "bill"],
+        ["acct", "plan", "sla", "slice"],
+        ["acct", "plan", "sla", "slice", "rate", "bill"],
         ["plan", "rate", "bill"],
         ["plan", "sla", "rate", "bill", "med", "store"],
         ["plan", "rate"],
@@ -1050,7 +1054,7 @@
         { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "8 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" },
         { label: "Entitlement version in use", counter: "rating_entitlement_id", value: "PRI-2025-B", base: "PRI-2026-A", state: "anomalous", on: "{{rate}}" },
-        { label: "Plan catalogue refresh age", counter: "plan_edge_age_hours", value: "38 h", base: "≤ 1 h", state: "degraded", on: "{{plan}}" }
+        { label: "Plan catalogue refresh age", counter: "plan_edge_age_hours", value: "38 h", base: "≤ 1 h", state: "anomalous", on: "{{plan}}" }
       ],
       controls: [
         { label: "Other plans through the same rating engine", result: "healthy", note: "on current entitlements — isolates to this plan" },
@@ -1084,8 +1088,8 @@
       name: "7 · Action blocked — stale topology",
       sev: "P2",
       title: "Confident candidate, refused action",
-      detail: "{{slice}} in market M01 · completeness 92.6% · candidate scores 83 · required topology edge last refreshed 41 minutes ago against a 60-second expectation",
-      counts: [0, 62, 31, 12, 5, 0, 0],
+      detail: "{{slice}} in market M01 · completeness 92.6% · required topology edge last refreshed 41 minutes ago against a 60-second expectation",
+      counts: [0, 62, 31, 12, 5, 0, 1],
       labels: { 5: "Action blocked — stale topology", 6: "Refresh requested, action re-queued" },
       units: { 5: "action-eligible", 6: "open findings" },
       root: "poolA",
@@ -1108,7 +1112,7 @@
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.048 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "3.9 s", base: "0.18 s", state: "anomalous", on: "{{poolA}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "3.9 s", base: "0.18 s", state: "anomalous", on: "{{poolA}}" },
         { label: "Failover-target edge age", counter: "edge_age_seconds", value: "2,460 s", base: "≤ 60 s", state: "anomalous", on: "{{rtB}}" },
         { label: "Target pool capacity", counter: "pool_headroom_pct", value: "unknown", base: "≥ 25%", state: "missing", on: "{{poolB}}" },
         { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "120 s rising", base: "5–15 s", state: "degraded", on: "{{med}}" }
@@ -1149,7 +1153,7 @@
       title: "Charging symptoms, radio cause",
       detail: "{{slice}} in market M01 · completeness 96.1% · session drops elevated on 3 cells · Nchf errors follow the drops rather than leading them",
       counts: [0, 62, 33, 15, 5, 1, 1],
-      labels: { 5: "Threshold passed, automation refused", 6: "Executed by a human owner and verified" },
+      labels: { 5: "Threshold passed, automation refused", 6: "Automation refused — executed by a human owner" },
       units: { 5: "human-approval only", 6: "confirmed cause" },
       root: ["cell1", "cell2", "cell3"],
       nodes: [
@@ -1157,7 +1161,7 @@
         ["acct", "plan", "sla", "slice", "sess"],
         ["slice", "sess", "cell1", "cell2", "cell3", "smf4"],
         ["cell1", "cell2", "cell3", "smf4", "upf9"],
-        ["cell1", "cell2", "cell3", "smf4", "upf9", "chg022", "rtA", "poolA"],
+        ["cell1", "cell2", "cell3", "smf4", "upf9", "chg022", "chg014", "rtA", "poolA"],
         ["cell1", "cell2", "cell3", "chg022"],
         ["cell1", "cell2", "cell3"]
       ],
@@ -1170,15 +1174,15 @@
         { type: "Outcome", text: "Human-approved rollback executed by the RAN team. Drop rate and completeness recovered. Charging was never the cause and is recorded as exonerated.", source: "traversal", conf: 0.94 }
       ],
       signals: [
-        { label: "Session drop rate", counter: "pdu_session_drop_rate", value: "6.2× baseline", base: "1.0×", state: "anomalous", on: "3 cells" },
+        { label: "Session drop rate", counter: "pdu_session_drop_rate", value: "6.2× baseline", base: "1.0×", state: "anomalous", on: "{{smf4}} · 3 cells" },
         { label: "GTP packet drop", counter: "gtp_packet_drop_rate", value: "+2.8 pp", base: "±0.2 pp", state: "anomalous", on: "{{upf9}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0006 /s, onset +90 s", base: "0.0003 /s", state: "degraded", on: "{{rtA}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.19 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.19 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" },
         { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+3.1 pp", base: "±0.5 pp", state: "anomalous", on: "3 cells" }
       ],
       controls: [
         { label: "Cells on the prior firmware in the same market", result: "healthy", note: "isolates to 24.1.4" },
-        { label: "Same SMF, sessions on unaffected cells", result: "healthy", note: "rules out the SMF" },
+        { label: "{{smf4}} sessions on sectors still on 24.1.3", result: "healthy", note: "same SMF, healthy sessions — rules out the SMF" },
         { label: "Charging plane end to end", result: "healthy", note: "CHF, route and mediation all normal" },
         { label: "Other slices on the affected cells", result: "anomalous", note: "also degraded — consistent with a cell-level cause" }
       ],
@@ -1198,7 +1202,7 @@
         { label: "A candidate above the surface threshold of 60", pass: true },
         { label: "Control groups isolate the cause", pass: true },
         { label: "Indicated action is automatable", pass: false },
-        { label: "Cells serve an active public-safety response", pass: false },
+        { label: "Cells are clear of any active public-safety response", pass: false },
         { label: "Evidence package routed to the accountable owner", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
@@ -1211,7 +1215,7 @@
       sev: "P2",
       title: "Quota management failure on an active response",
       detail: "{{slice}} in market M01 · 214 sessions denied continuation · CHF returning no quota rather than failing · completeness 97.3%",
-      counts: [0, 60, 28, 10, 5, 1, 1],
+      counts: [0, 62, 28, 10, 5, 1, 1],
       root: "plan",
       nodes: [
         [],
@@ -1225,9 +1229,9 @@
       cg: [
         { type: "Incident", text: "INC-4832 · sessions denied continuation on a public-safety slice during an active response.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "{{poolA}} is answering successfully but granting zero quota to 214 sessions. This is a correct-looking interface with a wrong answer.", source: "traversal", conf: 0.94 },
-        { type: "Evidence", text: "Quota pool for the Priority Responder entitlement is exhausted at {{poolA}}; the top-up job that normally replenishes it last ran 6 hours ago.", source: "traversal", conf: 0.96 },
+        { type: "Evidence", text: "Quota pool for the {{plan}} entitlement is exhausted at {{poolA}}; the top-up job that normally replenishes it last ran 6 hours ago.", source: "traversal", conf: 0.96 },
         { type: "Hypothesis", text: "Quota replenishment for {{plan}} has stalled. Denials are the charging plane doing exactly what it was told, on stale entitlement state.", source: "traversal", conf: 0.92 },
-        { type: "Action", text: "Re-run the pre-approved quota replenishment for the Priority Responder entitlement. Reversible and scoped to one entitlement.", source: "traversal", conf: 0.9 },
+        { type: "Action", text: "Re-run the pre-approved quota replenishment for the {{plan}} entitlement. Reversible and scoped to one entitlement.", source: "traversal", conf: 0.9 },
         { type: "Outcome", text: "Quota restored, denials stopped, sessions continued. Replenishment schedule failure raised separately as the underlying problem.", source: "traversal", conf: 0.95 }
       ],
       signals: [
@@ -1235,10 +1239,10 @@
         { label: "Granted quota units", counter: "quota_granted_units", value: "0", base: "> 0", state: "anomalous", on: "{{poolA}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
         { label: "Replenishment job age", counter: "quota_topup_age_hours", value: "6.1 h", base: "≤ 1 h", state: "anomalous", on: "{{plan}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.18 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" }
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.18 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" }
       ],
       controls: [
-        { label: "Other entitlements on the same pool", result: "healthy", note: "quota granted normally — isolates to the Priority Responder entitlement" },
+        { label: "Other entitlements on the same pool", result: "healthy", note: "quota granted normally — isolates to the {{plan}} entitlement" },
         { label: "Alternate pool for the same entitlement", result: "anomalous", note: "also exhausted — entitlement-level, not pool-level" },
         { label: "Interface health end to end", result: "healthy", note: "no errors; the interface is working correctly" },
         { label: "Prior 24 hours for the same entitlement", result: "healthy", note: "dates onset to the missed replenishment" }
@@ -1253,7 +1257,7 @@
         { name: "SMF / CTF charging-event generation", score: 8, verdict: "dismissed",
           for: "none", against: "events are generated and answered" },
         { name: "RAN firmware regression", score: 4, verdict: "dismissed",
-          for: "change in the lookback", against: "radio counters at baseline" }
+          for: "none", against: "radio counters at baseline; no radio change in the lookback" }
       ],
       gate: { checks: [
         { label: "Replenishment is pre-approved for this incident class", pass: true },
@@ -1272,14 +1276,14 @@
       sev: "P3",
       title: "The case file cannot complete the join",
       detail: "{{slice}} in market M01 · completeness cannot be computed · 38% of {{store}} records will not resolve to a session at {{smf4}}",
-      counts: [0, 57, 26, 13, 4, 0, 0],
+      counts: [0, 62, 26, 13, 4, 0, 1],
       labels: { 5: "Join incomplete — no decision-grade ranking", 6: "Reconciliation task raised" },
       units: { 5: "action-eligible", 6: "open findings" },
       root: null,
       nodes: [
         [],
-        ["acct", "plan", "slice", "sess"],
-        ["sess", "smf4", "rtA", "poolA"],
+        ["acct", "plan", "sla", "slice", "sess"],
+        ["sla", "sess", "smf4", "rtA", "poolA"],
         ["smf4", "poolA", "med", "store"],
         ["smf4", "poolA", "med", "store", "rate"],
         ["store", "smf4"],
@@ -1297,8 +1301,8 @@
         { label: "Unresolved record share", counter: "identity_resolution_miss_rate", value: "38%", base: "< 0.1%", state: "anomalous", on: "{{store}}" },
         { label: "Completeness", counter: "cdr_completeness", value: "not computable", base: "99.97%", state: "missing", on: "{{med}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "{{rtA}}" },
-        { label: "Session key format", counter: "session_key_format", value: "2 formats present", base: "1 canonical", state: "anomalous", on: "{{store}}" },
-        { label: "CHF queue depth p95", counter: "queue_depth_seconds", value: "0.18 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" }
+        { label: "Session key format", counter: "session_key_format (attribute)", value: "2 formats present", base: "1 canonical", state: "anomalous", on: "{{store}}" },
+        { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.18 s", base: "0.18 s", state: "baseline", on: "{{poolA}}" }
       ],
       controls: [
         { label: "Records from the alternate pool", result: "healthy", note: "single canonical key format — isolates to {{poolA}}" },
@@ -1336,22 +1340,22 @@
   var QA = {
     "chf-capacity": [
       { q: "What caused this?",
-        a: ["<b>{{poolA}} is running out of queue headroom.</b> Every abnormal counter in the window sits on one charging route: Nchf failures at 0.062/s against a 0.0003/s baseline, and queue depth p95 at 4.7 s against 0.18 s.",
+        a: ["<b>{{poolA}} is running out of queue headroom.</b> Every abnormal counter in the window sits on one charging route: Nchf failures at 0.062/s against a 0.0003/s baseline, and queue wait p95 at 4.7 s against 0.18 s.",
             "{{chg007}} raised that pool's queue high-watermark from 80% to 92% two days before the incident. That removed the spare capacity which used to absorb exactly this load pattern. The candidate scores <b>88</b>."],
         prov: "Counters from EMS via traversal · change record from ITSM · confidence 0.91",
         bare: ["A CDR-completeness breach with elevated Nchf errors on a priority slice is most commonly caused by charging-function capacity, mediation backlog, or a session-management fault. I would start by checking CHF utilisation and mediation queue depth.",
                "Without the topology I cannot tell you which pool, which route, or whether a recent change is involved — so I cannot rank those three against each other."] },
       { q: "What rules out the other explanations?",
-        a: ["<b>Three control groups, and the one that is missing is stated rather than hidden.</b> Sessions on the same cells but off the priority slice are healthy, which argues against a cell-level cause. {{smf5}} over {{rtB}} is healthy, which points back at the affected charging path. Priority sessions in other markets are healthy, which argues against plan or SLA-mapping drift.",
-            "{{chg022}}, the RAN firmware change, falls inside the seven-day change lookback — but radio counters are at baseline and the impact follows the SMF rather than cell boundaries, so it scores 6.",
-            "The control that would separate trigger-side from route-side — the same SMF over an alternate CHF route — <b>is not configured in this topology</b>. That is why the SMF/CTF candidate stays at 61 and is marked for investigation instead of being dismissed."],
+        a: ["<b>Three control groups, and the one that is missing is stated rather than hidden.</b> Sessions on the same cells but off the priority slice are healthy, which argues against a cell-level cause. {{smf5}} over {{rtB}} is healthy, which points back at the affected charging path. {{plan}} sessions in other markets are healthy, which argues against plan or SLA-mapping drift.",
+            "{{chg022}}, the RAN firmware change, falls inside the seven-day change lookback — but the radio and user-plane counters are at baseline and every abnormal counter sits on one charging route, so it scores 6.",
+            "The trigger side is dismissed on its fingerprint rather than on a control: charging events that are never generated show a <i>fall</i> in Nchf request volume and no errors at all, and here the failures run roughly 200× baseline with a 4.7 s queue wait behind them. The one control that is missing — the same SMF over an alternate CHF route — is stated rather than hidden, because no live traffic runs that pairing."],
         prov: "Control comparisons from traversal · 3 healthy, 1 unavailable · confidence 0.93",
         bare: ["I can offer the usual eliminations: if the user plane is normal the fault is likely charging-specific, and if voice is unaffected it is unlikely to be radio.",
                "That is reasoning from the shape of the description, not from measurement. I have no control groups, so nothing here is actually ruled out."] },
       { q: "Why was automated action allowed here?",
         a: ["<b>All six gate conditions passed.</b> Alternate capacity exists on {{poolB}}, the action is pre-approved for this incident class, the blast radius is one Nchf route, rollback is a single step, CDR reconciliation stays auditable, and the verification KPIs were defined before execution.",
             "The action itself is deliberately small: fail {{smf4}} charging traffic over to {{rtB}} and {{poolB}}. It does not touch the suspected pool, credit the customer, or write billing state — the last two are permanent blocks regardless of confidence.",
-            "Outcome: failures back to 0.0004/s, queue depth p95 to 0.21 s, arrival lag clearing. Verified and written back to the knowledge graph."],
+            "Outcome: failures back to 0.0004/s, queue wait p95 to 0.21 s, arrival lag clearing. Verified and written back to the knowledge graph."],
         prov: "Gate evaluation and outcome from traversal · confidence 0.89 at proposal, 0.97 after verification",
         bare: ["Failing charging traffic to a standby pool would be a reasonable mitigation if a pool were confirmed saturated.",
                "I cannot confirm alternate capacity exists, that the action is pre-approved, or that it can be rolled back — so recommending it would be advice, not a decision anything should execute."] }
@@ -1359,13 +1363,13 @@
     "ambiguous": [
       { q: "What caused this?",
         a: ["<b>Nothing is identified.</b> The drop is real — completeness 99.78% against a 99.95% target — but the top candidate scores <b>38 against a surface threshold of 60</b>.",
-            "Both {{poolA}} and {{poolB}} show mildly elevated queue depth, 0.41 s and 0.38 s against a 0.18 s baseline. Nchf elevation is 10× baseline, not the 200× seen when a single route is at fault. Two recent changes fall inside the change lookback and neither fingerprint matches.",
+            "Both {{poolA}} and {{poolB}} show mildly elevated queue wait, 0.41 s and 0.38 s against a 0.18 s baseline. Nchf elevation is 10× baseline, not the roughly 200× seen when a single route is at fault. Two recent changes fall inside the change lookback and neither fingerprint matches.",
             "This is the honest answer, not a gap in the method: <b>no cause has been established.</b>"],
         prov: "Traversal over the incident window · top candidate confidence 0.38",
         bare: ["A small completeness drop with mildly raised Nchf errors would usually point to intermittent charging-function pressure, and CHF capacity would be the first thing I would look at.",
                "Note what happened there: given a weak signal I still produced a confident-sounding cause. That is the failure mode this comparison is here to show."] },
       { q: "Why did nothing separate?",
-        a: ["<b>Every discriminating comparison came back inconclusive.</b> One route against the other: both elevated. One SMF cluster against the other: both elevated. Priority Responder against other plans on the same pools: no plan-level separation.",
+        a: ["<b>Every discriminating comparison came back inconclusive.</b> One route against the other: both elevated. One SMF cluster against the other: both elevated. {{plan}} against other plans on the same pools: no plan-level separation.",
             "Only the cross-market comparison returned anything, and it localises the problem to market M01 without narrowing it below market level.",
             "With no separation there is no evidence that distinguishes the candidates, so their scores stay clustered and low."],
         prov: "Control comparisons from traversal · 3 inconclusive, 1 healthy · confidence 0.86",
@@ -1395,9 +1399,9 @@
         bare: ["Missing data is generally harder to detect than errors, which is true in general and tells you nothing about this window.",
                "I cannot make the volume-against-sessions comparison, because I do not have either series."] },
       { q: "Why no automated action?",
-        a: ["<b>Because the discriminating control is unavailable, so the leading candidate cannot be separated from the alternative.</b> Trigger-side failure and route-side failure both fit what is observed.",
-            "Instead of acting, a synthetic charging test is queued on {{smf4}} over {{rtB}}. If events appear, the trigger side is exonerated and the route becomes the candidate. If they do not, the trigger side is confirmed.",
-            "Either way the test creates the missing control, so the next occurrence of this signature is decidable. <b>The gap gets closed rather than worked around.</b>"],
+        a: ["<b>Because the candidate is inferred rather than demonstrated.</b> The shortfall is in requests never sent, which no route-side fault could cause — but nothing yet <i>shows</i> the trigger recovering, and acting on an inference is what the gate exists to prevent.",
+            "Instead of acting, a synthetic charging test is queued on {{smf4}} over {{rtB}}. If events appear over a route the live topology never exercises, the trigger is working and the fault lies in the pairing itself. If they do not, the trigger side is confirmed outright.",
+            "Either way the test creates the missing control, so the next occurrence of this signature is demonstrable rather than inferred. <b>The gap gets closed rather than worked around.</b>"],
         prov: "Gate evaluation and outcome from traversal · action withheld pending the test",
         bare: ["Restarting or reconfiguring the charging trigger would be the usual next step.",
                "That risks acting on the wrong half of the problem. Without the control I cannot tell whether the trigger or the route is at fault."] }
@@ -1427,17 +1431,17 @@
     ],
     "duplicate-cdr": [
       { q: "What caused this?",
-        a: ["<b>{{med}} is duplicating records.</b> Reported completeness is <b>100.8%</b> — above 100%, which is the tell — and the duplicate rate at {{store}} is 0.9%.",
+        a: ["<b>{{med}} is duplicating records.</b> Reported completeness is <b>100.8%</b> — above 100%, which is the tell — and the duplicate rate at {{store}} is 0.8%.",
             "This is over-count, not loss. Every record that should exist does exist; some exist twice.",
             "The exposure is double-rating on an active response, which is a financial risk rather than an assurance gap."],
         prov: "Duplicate detection at {{store}} · completeness computed by traversal",
         bare: ["Completeness above 100% suggests a measurement or counting error in the assurance pipeline.",
                "That reads it as a reporting artefact. It is a real duplication with real double-rating exposure, and the difference matters."] },
       { q: "Why does a completeness target miss this?",
-        a: ["<b>Because the target is a floor, and this breaks the ceiling.</b> An SLA written as \"≥ 99.95% complete\" is satisfied by 100.8%; nothing alerts.",
+        a: ["<b>Because the target is a floor, and this breaks the ceiling.</b> An SLA written as &ldquo;≥ 99.95% complete&rdquo; is satisfied by 100.8%; nothing alerts.",
             "Duplication is only visible when record identity is checked rather than record count. The case file can do that because {{store}} records resolve to sessions through the topology.",
             "The same structure that finds missing records finds surplus ones."],
-        prov: "Traversal from {{store}} back to {{sess}} · duplicate rate 0.9%",
+        prov: "Traversal from {{store}} back to {{sess}} · duplicate rate 0.8%",
         bare: ["A completeness metric measures presence rather than uniqueness, so duplicates could go unnoticed.",
                "Correct as a general statement. I cannot tell you whether duplicates are present here."] },
       { q: "What was done, and what was deliberately not done?",
@@ -1476,7 +1480,7 @@
         a: ["<b>The leading candidate is charging-pool capacity on {{poolA}}, scoring 83.</b> Completeness is 92.6% and the evidence pattern matches a route-localised capacity problem.",
             "That is a confident candidate by any normal reading — well above the surface threshold.",
             "<b>It was still refused.</b> The finding stands; the action does not."],
-        prov: "Traversal over the incident window · candidate confidence 0.83",
+        prov: "Traversal over the incident window · evidence-match score 83 against a surface threshold of 60",
         bare: ["A completeness breach of this depth with a route-localised error pattern would point to charging-function capacity.",
                "Coincidentally close to the graph-grounded answer. It is also missing the reason this case exists, which is not about the cause at all."] },
       { q: "Why was the action refused if confidence was high?",
@@ -1498,7 +1502,7 @@
       { q: "What caused this?",
         a: ["<b>RAN firmware on the cells — a radio cause presenting as charging symptoms.</b> Completeness is 96.1% and session drops are elevated on three cells.",
             "The ordering is decisive: <b>Nchf errors follow the drops rather than leading them</b>. Sessions fail, and the charging errors are the consequence.",
-            "The charging plane is the symptom. Every charging-side candidate scores lower than {{cell1}}."],
+            "The charging plane is the symptom. Every charging-side candidate scores lower than the RAN firmware candidate."],
         prov: "Counter ordering from EMS and ENM via traversal · firmware change from ITSM",
         bare: ["Reduced completeness with elevated Nchf errors on a priority slice most likely indicates a charging-path problem.",
                "Wrong team, wrong plane. Without the timing order I cannot tell that the charging errors are downstream of session drops."] },
@@ -1807,7 +1811,9 @@
   function renderRail() {
     var wrap = el("rail");
     wrap.innerHTML = "";
-    wrap.style.gridTemplateColumns = "repeat(" + stageCount() + ", minmax(0, 1fr))";
+    /* Left to the stylesheet: auto-fit lets the rail wrap rather than crush
+       seven segments into slivers on a narrow screen.                     */
+    wrap.style.removeProperty("grid-template-columns");
     var counts = sc().counts;
     var max = Math.log10(Math.max.apply(null, counts) + 1) || 1;
 
@@ -2007,7 +2013,7 @@
       top.className = "htop";
       var r = document.createElement("span");
       r.className = "hrank";
-      r.textContent = "#" + (i + 1);
+      r.textContent = h.verdict === "unscorable" ? "—" : "#" + (i + 1);
       var n = document.createElement("span");
       n.className = "hname";
       n.innerHTML = txh(h.name);
@@ -2123,7 +2129,8 @@
     hd.appendChild(sev); hd.appendChild(t);
     var dd = document.createElement("div");
     dd.className = "ad";
-    dd.innerHTML = txn(s.detail);
+    if (state.stage === 0) dd.textContent = "Scope and figures appear once the anchor fires.";
+    else dd.innerHTML = txn(s.detail);
     box.appendChild(hd); box.appendChild(dd);
     box.style.opacity = state.stage === 0 ? ".6" : "1";
   }
@@ -2366,6 +2373,7 @@
     state.scenario = i;
     state.stage = 0;
     state.askIndex = 0;
+    el("askBare").checked = false;
     el("scenario").value = String(i);
     renderScenarioSelect();
     save();
@@ -2457,6 +2465,7 @@
       var d = e.key === "ArrowLeft" ? -2 : e.key === "ArrowRight" ? 2 : 0;
       if (!d) return;
       e.preventDefault();
+      e.stopPropagation();
       state.split = Math.max(28, Math.min(84, state.split + d));
       applySplit();
       autoZoom();
@@ -2501,7 +2510,11 @@
       if (document.querySelector("dialog[open]")) return;
       if (e.key === "ArrowRight") { stop(); step(); }
       else if (e.key === "ArrowLeft") { stop(); goTo(state.stage - 1); }
-      else if (e.key === " ") { e.preventDefault(); if (state.playing) stop(); else play(); }
+      else if (e.key === " ") {
+        if (e.target && e.target.tagName === "BUTTON") return;
+        e.preventDefault();
+        if (state.playing) stop(); else play();
+      }
       else if (e.key === "+" || e.key === "=") { state.zoom = clampZoom(state.zoom + 10); state.zoomAuto = false; applyZoom(); save(); }
       else if (e.key === "-" || e.key === "_") { state.zoom = clampZoom(state.zoom - 10); state.zoomAuto = false; applyZoom(); save(); }
     });

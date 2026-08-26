@@ -1,6 +1,6 @@
 # Knowledge &amp; Context Graphs
 
-V2.1 (August 2026)
+V2.2 (August 2026)
 
 A self-paced introduction to knowledge graphs and context graphs, plus an interactive fault-isolation demo that puts the concepts on one screen. Static HTML with no build step, no server, and no external dependencies &mdash; open `index.html` in any modern browser.
 
@@ -9,7 +9,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 | File | What it is |
 |------|------------|
 | `index.html` | Section landing page with the module cards |
-| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 105 glossary terms, 23 cited sources |
+| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 111 glossary terms, 23 cited sources |
 | `KG-CG-Demo.html` | Charging assurance walkthrough &mdash; ten scenarios, seven stages each |
 | `hero.png` | Landing-page hero image |
 
@@ -25,7 +25,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 6. **Reasoning Over the Pair** &mdash; scoring, separation, and the action gate. Threshold sliders that turn a recommendation into a refusal.
 7. **Building One for Real** &mdash; where nodes and edges come from, freshness, and four ways graphs quietly go bad.
 8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld.
-9. **Glossary** &mdash; 105 terms across six categories, searchable and filterable.
+9. **Glossary** &mdash; 111 terms across six categories, searchable and filterable.
 10. **References** &mdash; 23 primary sources grouped by topic, each with a verification badge and a note on what it settles.
 
 Each of the eight teaching modules ends with five questions; the glossary and the reference list are not graded. Four correct marks a module complete, and the completion bar is measured against those eight. Progress and theme choice are kept in `localStorage` in the visitor's own browser; nothing is sent anywhere.
@@ -47,6 +47,47 @@ The telecom material describes a **generic, vendor-neutral operator**. Element n
 ## Changelog
 
 All three files share one version number, so a single label tells you whether anything in the section changed.
+
+### V2.2 (August 2026)
+
+A second accuracy pass. V2.1 reviewed the wording; this one reviewed the reasoning, the telecom model and the interactions. Two independent read-only reviews were run against the files and every finding was triaged against the current state before anything was changed.
+
+**Course &mdash; telecom model**
+
+- **The 5G charging path was wrong in four places.** Usage reaches the CHF via the SMF over Nchf; the CHF never meters a UPF and has no interface to one. The module 7 source table, the module 3 provenance fact and the module 1 join chain all routed it directly. The module 4 timeline anchored a rise in Nchf failures to a UPF, which has no Nchf reference point at all &mdash; it now anchors to an SMF, which is the interface's consumer.
+- **Module 5 was redrawn.** The prose, the glossary and the module itself all describe transport as sitting *beneath* the network functions with impact travelling up; the widget drew the link on top and then said symptoms trace "upward" to it. The link is now at the bottom, an SMF was added so the Nchf symptom has somewhere legitimate to sit, and the completeness symptom moved from a cell to the charging function &mdash; charging completeness is not a property of a radio cell, which is what the module 5 prose already said.
+- **Sandbox relationship types.** `ANCHORED_AT` collides with the 3GPP PDU Session Anchor, which is a UPF role rather than a cell one; cells are not served by UPFs; and the CHF does not bill anyone. Replaced with `USES_CELL` and `CHARGED_BY`, and the cell-to-UPF edge was dropped.
+- **The charging function no longer "meters".** Metering happens in the charging trigger function inside the SMF, on usage the UPF reports; the CHF authorises quota and accounts for it.
+
+**Course &mdash; claims and counts**
+
+- **Glossary: 111 terms, up from 105.** Added Gremlin, OWL, SHACL, PROV-O, RAG and GraphRAG &mdash; all six were named in the modules with no entry to look up. Expanded RDF, SPARQL and GQL, which were defined by acronym in a glossary whose stated purpose is plain language. Corrected Node (a node may carry several labels), Triple (RDF 1.1 datasets and quads), Degree and Ingestion, the last of which claimed to be the largest part of the build effort while module 7 and its own quiz both award that to edge derivation.
+- **Overclaims removed.** GQL is a query-language standard and does not define the property-graph model; SHACL is an alternative to misusing OWL as a constraint language, not to inference; TS 28.554 defines KPIs, not SLAs; charging is a domain spanning both planes, not a third plane. The glossary lede no longer claims to hold every term the course uses.
+- **Two quiz distractors were arguably true** &mdash; "be queried without an index" is what the glossary's own index-free adjacency entry describes, and doubling edge storage really is a consequence of bidirectional edges. One was replaced, the other's stem now asks for the *most damaging* consequence.
+- **Reference honesty.** Seven entries link to a publisher portal rather than a document, which the intro now says. "The publisher refuses this network" became the accurate "was not reachable from this network".
+
+**Demo &mdash; reasoning**
+
+- **Scenario 1 approved a failover along a route it also called unconfigured.** The missing control is observational &mdash; no live traffic runs that pairing &mdash; which is not the same as the path being unavailable. It also held a trigger-side candidate open at 61 on "the same observable signature": charging events that are never generated show a *fall* in request volume and no errors, which is the opposite of this scenario's 200&times; failures and 4.7 s queue. Now dismissed on its fingerprint at 34.
+- **Scenario 3 said both things at once** &mdash; that a route-side cause would show errors and there are none, and that route-side and trigger-side cannot be separated. The request count is measured at the sender, so the shortfall is in requests never sent. The candidate is now inferred rather than demonstrated, and the queued test confirms it rather than separating two live possibilities.
+- **Four scenarios reported zero at the final stage** while naming concrete open items in the same panel. They now count them. The stage-one failure catalogue is one number across all ten scenarios, because a catalogue does not vary with the incident.
+- **Arithmetic and units.** A p95 measured in seconds is a wait, not a depth, so the counter is renamed `queue_wait_seconds_p95`. A 0.9% duplicate rate on a 99.97% baseline reports as 100.9%, not the 100.8% shown. Scenario 1's window was 12 minutes while quoting a 15-minute credit trigger. `S-NSSAI 1 &middot; 0x000A21` is an SST and an SD. A 38-hour-old edge against a one-hour expectation is as anomalous as scenario 9's 6.1 hours, not merely degraded.
+- **Model gaps closed.** The second SMF had no session-bearing path, so every cross-SMF control was unsupported by the graph; the data network name was modelled and never used; two scenarios cited change records they never revealed; and scenario 8 offered "sessions on unaffected cells" of an SMF whose every cell was affected.
+- **Hard-coded plan names** in eleven places now use the rename token, so renaming the plan no longer leaves stale copies in the evidence prose.
+- **Three entities were named in prose but never drawn.** Scenario 1 cited a UPF in its signal table and an alternate SMF in its control comparison, and scenario 6 scoped the incident to a slice; none of the three appeared at any stage, so the reader was asked to weigh evidence about elements that were not on screen. All three are now revealed at the stage where they are first named.
+
+**Demo &mdash; interaction**
+
+- An arrow key on the focused split handle both resized the pane and stepped the run, because the document handler saw the same event.
+- The space bar could not activate a focused rail segment or toolbar button: it was suppressed for every non-input target.
+- The evidence-withheld toggle survived a scenario change, so the next scenario opened on the ungrounded answer.
+- The narrowing rail set seven inline columns, overriding its own responsive auto-fit rule and crushing the segments on a phone.
+- The anchor panel showed the incident figures &mdash; and in one scenario a stage-5 candidate score &mdash; while its header still read "not yet fired".
+- A candidate shown without a score is no longer also given a rank number.
+
+**Help text corrected**
+
+- "Fit width" and "Fit all" had their tracking behaviour described the wrong way round. The graph has two faded levels, not one. Only some answers carry a confidence figure, so the claim that all of them do was dropped.
 
 ### V2.1 (August 2026)
 
