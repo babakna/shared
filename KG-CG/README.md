@@ -1,6 +1,6 @@
 # Knowledge &amp; Context Graphs
 
-V2.3 (August 2026)
+V3.0 (September 2026)
 
 A self-paced introduction to knowledge graphs and context graphs, plus an interactive fault-isolation demo that puts the concepts on one screen. Static HTML with no build step, no server, and no external dependencies &mdash; open `index.html` in any modern browser.
 
@@ -9,7 +9,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 | File | What it is |
 |------|------------|
 | `index.html` | Section landing page with the module cards |
-| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 111 glossary terms, 23 cited sources |
+| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 17 diagrams, 43 formal definitions, 132 glossary terms, 23 cited sources |
 | `KG-CG-Demo.html` | Charging assurance walkthrough &mdash; ten scenarios, seven stages each |
 | `hero.png` | Landing-page hero image |
 
@@ -17,18 +17,18 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 
 `KG-CG-101.html` builds one argument in eight parts, then adds a glossary and a cited reference list.
 
-1. **Why Graphs at All** &mdash; when relationships are the data, and the three signals that justify a graph. Interactive join-depth comparison.
-2. **Anatomy of a Graph** &mdash; nodes, edges, direction, properties. Click-to-build sandbox showing the same facts as a property graph and as RDF triples.
-3. **What Makes It Knowledge** &mdash; schema, identity resolution, constraints, provenance. Schema on/off comparison and a provenance inspector.
-4. **Context Graphs** &mdash; observations, confidence, expiry. An incident timeline you can scrub forward and back.
-5. **How the Two Bind** &mdash; anchoring, inheritance, blame propagation. Overlay toggle above a fixed topology.
-6. **Reasoning Over the Pair** &mdash; scoring, separation, and the action gate. Threshold sliders that turn a recommendation into a refusal.
-7. **Building One for Real** &mdash; where nodes and edges come from, freshness, and four ways graphs quietly go bad.
-8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld.
-9. **Glossary** &mdash; 111 terms across six categories, searchable and filterable.
+1. **Why Graphs at All** &mdash; when relationships are the data, and the three signals that justify a graph. Graph, node, edge and traversal defined formally; the same five-hop question drawn as joins and as a traversal; SQL and Cypher written out side by side; a relational/property-graph/RDF comparison; the traversal cost model and why supernodes break it. Interactive join-depth comparison.
+2. **Anatomy of a Graph** &mdash; nodes, edges, direction, properties. Label, property, directed edge, triple, IRI and reification defined; one annotated node and edge; multigraphs and why a relationship that changed needs two edges; one qualified fact written in Cypher, Turtle with reification, TriG named graphs and RDF 1.2 triple terms. Click-to-build sandbox.
+3. **What Makes It Knowledge** &mdash; schema, identity resolution, constraints, provenance. Three levels of schema commitment; SHACL against OWL 2 and why an OWL cardinality does not reject anything; the same rule as a database constraint, a SHACL shape and an OWL axiom; the identity-resolution pipeline and its asymmetric failure modes; provenance in PROV-O. Schema on/off comparison and a provenance inspector.
+4. **Context Graphs** &mdash; observations, confidence, expiry. Anchors, half-life and TTL defined; anchored against copied, side by side; the decay formula with its curves plotted from the formula; half-lives per evidence class; the five-state lifecycle including refusal; a complete context graph in JSON, mid-investigation. An incident timeline you can scrub.
+5. **How the Two Bind** &mdash; anchoring, inheritance, blame propagation. What one anchor makes available for free; the propagation algorithm written out with attenuation and degree normalisation; a confluence score computed step by step; propagation compared with rules engines and statistical correlation. Overlay toggle above a fixed topology.
+6. **Reasoning Over the Pair** &mdash; scoring, separation, and the action gate. Abduction and why the output is a ranking, not a probability; the scoring function with its weights and its temporal veto; why 0.82 over 0.79 is worse than 0.71 over 0.31; the coverage-versus-specificity trap; five distinct reasons to refuse and what each must say; a refusal written out in full. Threshold sliders that turn a recommendation into a refusal.
+7. **Building One for Real** &mdash; where nodes and edges come from, freshness, and four ways graphs quietly go bad. The six ingestion stages and which failure each one introduces, with the cheapest detector for each; edge sources ranked by trust with confidence bands; one edge ingested properly, and the MERGE trap; one traversal crossing four feeds of different ages; a first scope named concretely.
+8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld. Grounding, RAG, GraphRAG and hallucination defined; vector retrieval against graph retrieval on the same question; four boundaries that have to be enforced and the failure each prevents; a grounded narration prompt in full, including how to check its output mechanically.
+9. **Glossary** &mdash; 132 terms across six categories, searchable and filterable.
 10. **References** &mdash; 23 primary sources grouped by topic, each with a verification badge and a note on what it settles.
 
-Each of the eight teaching modules ends with five questions; the glossary and the reference list are not graded. Four correct marks a module complete, and the completion bar is measured against those eight. Progress and theme choice are kept in `localStorage` in the visitor's own browser; nothing is sent anywhere.
+Each module closes with an **onward-reading** block naming specific clauses or sections rather than whole documents, each with the reason to open it. Each of the eight teaching modules then ends with five questions; the glossary and the reference list are not graded. Four correct marks a module complete, and the completion bar is measured against those eight. Progress and theme choice are kept in `localStorage` in the visitor's own browser; nothing is sent anywhere.
 
 ## The demo
 
@@ -47,6 +47,83 @@ The telecom material describes a **generic, vendor-neutral operator**. Element n
 ## Changelog
 
 All three files share one version number, so a single label tells you whether anything in the section changed.
+
+### V3.0 (September 2026)
+
+A content pass across all eight modules, prompted by a fair complaint: the modules were
+too thin for the audience they are written for. Someone who wants a paragraph can use a
+search engine; this is meant to be enough to work from. The written material roughly
+doubled, to about 17,900 words across the eight modules, and the additions are
+structural rather than more prose.
+
+- **43 formal definitions**, one block near the top of each module. Every term is given
+  three ways &mdash; the formal statement, the plain-language reading, and the instance
+  used in the running telecom example &mdash; so a reader can take whichever they need.
+  Several also carry an *honest* or *caveat* line: `context graph` says outright that it
+  is not a standardised term, `confidence` says the scale is ordinal rather than
+  probabilistic, and `GraphRAG` says it is an umbrella for several distinct techniques.
+- **17 numbered diagrams**, up from none. Each is drawn to carry an argument the prose
+  cannot, and each caption states that argument rather than describing what is already
+  visible. Two are drawn from their own formulas rather than sketched: the decay curves
+  in module 4 are plotted from 2^(&minus;&Delta;t/t&#189;) at the stated half-lives, and
+  the confluence score in module 5 is the arithmetic worked out on the page.
+- **12 comparison tables**, including relational against property graph against RDF,
+  SHACL against OWL 2, half-lives per evidence class, propagation against rules engines
+  and statistical correlation, the five reasons to refuse, edge sources ranked by trust,
+  and the four boundaries around a language model.
+- **16 worked fragments** in Cypher, SQL, Turtle, TriG, SHACL, OWL, PROV-O and JSON &mdash;
+  including one qualified fact written four ways, the same constraint written three ways,
+  a complete context graph mid-investigation, a full refusal, and a grounded prompt.
+- **Onward reading per module.** Eight blocks pointing at specific clauses or sections
+  &mdash; SPARQL 1.1 &sect;9, OWL 2 Primer, SHACL &sect;2&ndash;4, PROV-O &sect;2, RFC 8345
+  &sect;4, the 3GPP NRM classes, ETSI ZSM's closed-loop clauses &mdash; each with the
+  reason to open it and roughly what it costs to read.
+
+Things that were previously asserted and are now made precise: the traversal cost model
+and its dependence on **degree** rather than dataset size, with index-free adjacency
+correctly described as an implementation choice rather than a property of the model; why
+an `owl:cardinality` of one **does not reject** a second value under open-world semantics
+but instead concludes the two values are the same thing; the decay model's separation of
+a **base** from source trust and a **freshness factor** from age, and the difference
+between decay and a hard TTL; propagation's **attenuation** and **degree normalisation**,
+and what goes wrong when either is omitted; the scoring function's weights and its
+**temporal veto**, which is a veto rather than a penalty because an effect preceding its
+cause is impossible rather than unlikely; and the difference between *"I do not know what
+is wrong"* and *"I know and am not allowed to fix it"*, which are separate refusals with
+separate next actions.
+
+Glossary: **132 terms, up from 111.** Twenty-one additions, all of them terms the expanded
+modules now use: abduction, entailment, the closed- and open-world assumptions,
+descriptive and prescriptive schema, multigraph, named graph, triple term, half-life,
+TTL, confluence, attenuation, degree normalisation, dependency direction, upsert,
+ingestion pipeline, blocking, grounding and hallucination.
+
+Also: per-module time estimates were recomputed from actual length, so the course now
+reads as roughly 3 hours 35 minutes rather than the 2 hours 25 minutes it claimed.
+
+Rendering defects found and fixed while drawing the figures, all of them caught by
+screenshotting each diagram rather than by reading its markup:
+
+- An HTML `<b>` element inside an SVG `<text>`, which broke out of the drawing and dumped
+  a line of markup into the page.
+- Three text overflows past a diagram's own edge, in modules 4 and 5.
+- Four places where a line crossed a label instead of pointing at it &mdash; the leader
+  lines in Figure 2.1, the anchor label in Figure 4.1, the separation arrow in Figure 6.1,
+  the candidate labels and arc in Figure 6.2, and the axis gridlines in Figure 7.2, which
+  were painting over the pills they were meant to sit behind.
+- **Figures were illegible on a phone.** An SVG scaled to a 358px column rendered its
+  7.5-unit labels at about 4.3 CSS pixels. Each figure now sits in its own labelled,
+  keyboard-focusable scroll region and holds a 720px minimum width below 820px, so a
+  narrow screen scrolls the diagram sideways instead of shrinking it past reading.
+  Printing restores the full width. Verified at 390, 520, 768, 1024 and 1440 pixels:
+  no figure overflows the page at any of them, and no figure label falls below 6.5px.
+  Making the diagrams focusable introduced a second bug in the same pass &mdash; the
+  global left/right arrow handler was moving between modules while a diagram had focus,
+  so the arrows could not scroll it. The handler now yields to a focused diagram, and
+  both behaviours are asserted.
+
+**The demo is unchanged in V3.0**; its version moved only to keep the section's three
+files in step.
 
 ### V2.3 (August 2026)
 
