@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-005 · How Markets and Brokers Work — Investing Learning Lab</title>
+<meta name="description" content="What happens when you click Buy: brokers, exchanges, the bid-ask spread, order types, settlement, SIPC and FDIC protection, margin and short selling — with an order-type simulator.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-005">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-005</span><span class="ttl">How Markets and Brokers Work</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 1 · Foundations</span><span class="chip teal">Beginner</span><span class="chip gray">About 50 minutes</span><span class="chip gray">Order-type simulator</span></div>
+    <h1>How Markets and Brokers Work</h1>
+    <p class="sub">When you press "Buy," a chain of firms and rules moves your order, finds a seller, transfers the shares and holds them safely for you. Knowing that chain helps you pay less to trade, choose the right kind of order, and understand exactly what is protected if a firm fails.</p>
+    <p class="q"><span>The question this module answers</span>What actually happens to my money and my shares, and who protects them?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <g font-family="Segoe UI, system-ui, sans-serif" font-size="11" font-weight="700">
+      <rect x="30" y="96" width="62" height="46" rx="10" fill="#fff" stroke="#1F5FD1" stroke-width="2.5"/><text x="61" y="124" text-anchor="middle" fill="#16345C">You</text>
+      <rect x="112" y="96" width="62" height="46" rx="10" fill="#fff" stroke="#0B8A7E" stroke-width="2.5"/><text x="143" y="124" text-anchor="middle" fill="#16345C">Broker</text>
+      <rect x="194" y="96" width="62" height="46" rx="10" fill="#fff" stroke="#C77A0A" stroke-width="2.5"/><text x="225" y="124" text-anchor="middle" fill="#16345C">Market</text>
+      <rect x="276" y="96" width="62" height="46" rx="10" fill="#fff" stroke="#8A4FD6" stroke-width="2.5"/><text x="307" y="124" text-anchor="middle" fill="#16345C">Clearing</text>
+      <path d="M92 119 H108 M174 119 H190 M256 119 H272" stroke="#16345C" stroke-width="2.5"/></g>
+      <text x="32" y="44" class="svg-t" font-size="13" font-weight="800">From click to shares</text><text x="32" y="186" class="svg-s" font-size="11.5">settles one business day later (T+1)</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A marketplace, not a store</h2>
+  <p class="lede">In a store, the price is on the tag and the store is the seller. A stock market is different: it is a marketplace where buyers and sellers meet, and the price is simply wherever the most recent buyer and seller agreed to trade.</p>
+  <p>You cannot walk onto a trading floor yourself. Instead, a licensed firm called a <span class="term" data-term="broker-dealer">broker</span> carries your order to the market, a trading venue matches it with someone on the other side, and a clearinghouse makes sure both sides deliver. Figure 5.1 shows the full path.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.1 &mdash; What happens when you click "Buy"</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 230" role="img" aria-label="Order path: you, broker, trading venue, clearinghouse, custodian; with settlement one business day later">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" style="fill:var(--text2)"/></marker></defs>
+      <g font-size="13" font-weight="800" text-anchor="middle">
+        <rect x="10" y="40" width="120" height="70" rx="12" style="fill:var(--blue-soft)"/><text x="70" y="72" class="svg-t">1. You</text><text x="70" y="92" class="svg-s" font-size="11" font-weight="400">place an order</text>
+        <rect x="155" y="40" width="120" height="70" rx="12" style="fill:var(--teal-soft)"/><text x="215" y="72" class="svg-t">2. Broker</text><text x="215" y="92" class="svg-s" font-size="11" font-weight="400">checks and routes it</text>
+        <rect x="300" y="40" width="120" height="70" rx="12" style="fill:var(--amber-soft)"/><text x="360" y="72" class="svg-t">3. Venue</text><text x="360" y="92" class="svg-s" font-size="11" font-weight="400">matches a seller</text>
+        <rect x="445" y="40" width="120" height="70" rx="12" style="fill:var(--violet-soft)"/><text x="505" y="72" class="svg-t">4. Clearing</text><text x="505" y="92" class="svg-s" font-size="11" font-weight="400">guarantees the trade</text>
+        <rect x="590" y="40" width="120" height="70" rx="12" style="fill:var(--green-soft)"/><text x="650" y="72" class="svg-t">5. Custody</text><text x="650" y="92" class="svg-s" font-size="11" font-weight="400">shares held for you</text>
+      </g>
+      <path d="M130 75 H151 M275 75 H296 M420 75 H441 M565 75 H586" style="stroke:var(--text2)" stroke-width="2" marker-end="url(#a5)"/>
+      <g class="svg-s" font-size="11.5"><text x="70" y="140" text-anchor="middle">Market or limit,</text><text x="70" y="156" text-anchor="middle">shares or dollars</text>
+      <text x="215" y="140" text-anchor="middle">Sends to an exchange,</text><text x="215" y="156" text-anchor="middle">or a wholesaler</text>
+      <text x="360" y="140" text-anchor="middle">NYSE, Nasdaq, other</text><text x="360" y="156" text-anchor="middle">exchanges, market makers</text>
+      <text x="505" y="140" text-anchor="middle">Nets trades, holds</text><text x="505" y="156" text-anchor="middle">deposits from brokers</text>
+      <text x="650" y="140" text-anchor="middle">Recorded in your</text><text x="650" y="156" text-anchor="middle">account, in your name</text></g>
+      <rect x="10" y="182" width="700" height="34" rx="10" style="fill:var(--card2)"/><text x="360" y="204" text-anchor="middle" class="svg-t" font-size="12.5" font-weight="700">Steps 1&ndash;3 take under a second. Cash and shares actually change hands one business day later (T+1).</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Several firms, one transaction.</b> Each link has a job and a rulebook. Knowing them explains why prices differ slightly by broker, why trades "settle" later, and what protection applies when something breaks.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol><li>Where new shares come from, and where you buy existing ones.</li><li>Brokers and account types.</li><li>How prices form: bid, ask and spread.</li><li>Order types, with a simulator.</li><li>Trading hours, settlement and circuit breakers.</li><li>What SIPC and FDIC protect &mdash; and what they do not.</li><li>Margin and short selling: borrowing to invest, and its dangers.</li></ol>
+</section>
+
+<section class="panel" data-tab="Primary and secondary">
+  <p class="kicker">Where shares come from</p>
+  <h2>New issues and the market for used shares</h2>
+  <p>A company raises money by selling new shares or bonds to investors. That first sale happens once, in the <b>primary market</b> &mdash; for stocks, often through an initial public offering (IPO). After that, investors trade those same shares with each other in the <b>secondary market</b>. Almost every trade an individual makes is secondary: the company is not involved and receives nothing.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.2 &mdash; Primary versus secondary markets</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 210" role="img" aria-label="Primary market: company sells new shares to investors for cash. Secondary market: investors trade existing shares with each other">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="0" y="0" width="350" height="210" rx="12" style="fill:var(--blue-soft)"/><rect x="370" y="0" width="350" height="210" rx="12" style="fill:var(--teal-soft)"/>
+      <text x="175" y="28" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Primary market (once)</text><text x="545" y="28" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Secondary market (every day)</text>
+      <g font-size="12.5" font-weight="700" text-anchor="middle"><rect x="30" y="60" width="110" height="50" rx="10" style="fill:var(--card)"/><text x="85" y="90" class="svg-t">Company</text><rect x="210" y="60" width="110" height="50" rx="10" style="fill:var(--card)"/><text x="265" y="90" class="svg-t">Investors</text>
+      <rect x="400" y="60" width="110" height="50" rx="10" style="fill:var(--card)"/><text x="455" y="90" class="svg-t">Seller</text><rect x="580" y="60" width="110" height="50" rx="10" style="fill:var(--card)"/><text x="635" y="90" class="svg-t">Buyer</text></g>
+      <g class="svg-s" font-size="11.5" text-anchor="middle"><text x="175" y="76">new shares &#8594;</text><text x="175" y="104">&#8592; cash to the company</text><text x="545" y="76">existing shares &#8594;</text><text x="545" y="104">&#8592; cash to the seller</text>
+      <text x="175" y="150">IPOs, new bond issues,</text><text x="175" y="166">follow-on offerings</text><text x="545" y="150">Exchanges and other venues;</text><text x="545" y="166">the company receives nothing</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>The secondary market is what makes stocks liquid.</b> Because you can sell to another investor any trading day, you do not need the company to buy your shares back. That liquidity is one reason investors accept stock ownership at all.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>IPOs for individual investors</summary><div class="layer-b">
+    <p>Most IPO shares are allocated to large institutional clients of the underwriting banks. Individuals usually buy on the first trading day in the secondary market, often after the price has already jumped. Academic research over several decades (for example, work by Jay Ritter on long-run IPO performance) has found that newly public companies have, on average, lagged comparable established companies over the following years. Buying popular IPOs on day one is closer to speculation than investing.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Brokers and accounts">
+  <p class="kicker">Your gateway</p>
+  <h2>Brokers and the account types they hold</h2>
+  <div class="def"><div class="def-h"><b>Brokerage account</b></div>
+    <div class="def-r"><div>What it is</div><div>An account at a broker-dealer registered with the Securities and Exchange Commission (SEC) and a member of FINRA (the Financial Industry Regulatory Authority), through which you buy, sell and hold investments.</div></div>
+    <div class="def-r"><div>Used for</div><div>Holding stocks, bonds, funds and cash; the same firm can hold several account types for you.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The <i>account type</i> decides the tax treatment; the <i>investments inside</i> decide the risk. An IRA is not an investment &mdash; it is a tax wrapper you put investments into.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.3 &mdash; Common account types, grouped by tax treatment</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 220" role="img" aria-label="Account types grouped: taxable, tax-deferred, tax-free, education and custodial">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="165" height="200" rx="12" style="fill:var(--card2)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Taxable</text><text x="14" y="52" class="svg-s" font-size="12">Individual</text><text x="14" y="70" class="svg-s" font-size="12">Joint</text><text x="14" y="88" class="svg-s" font-size="12">Trust</text><text x="14" y="140" class="svg-m" font-size="11">Taxed each year on</text><text x="14" y="156" class="svg-m" font-size="11">dividends, interest and</text><text x="14" y="172" class="svg-m" font-size="11">realized gains</text></g>
+      <g transform="translate(187,10)"><rect width="165" height="200" rx="12" style="fill:var(--blue-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Tax-deferred</text><text x="14" y="52" class="svg-s" font-size="12">Traditional 401(k), 403(b)</text><text x="14" y="70" class="svg-s" font-size="12">Traditional IRA</text><text x="14" y="88" class="svg-s" font-size="12">SEP, SIMPLE</text><text x="14" y="140" class="svg-m" font-size="11">Deduct now; taxed as</text><text x="14" y="156" class="svg-m" font-size="11">income when withdrawn</text></g>
+      <g transform="translate(364,10)"><rect width="165" height="200" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Tax-free</text><text x="14" y="52" class="svg-s" font-size="12">Roth IRA</text><text x="14" y="70" class="svg-s" font-size="12">Roth 401(k)</text><text x="14" y="88" class="svg-s" font-size="12">HSA (for medical use)</text><text x="14" y="140" class="svg-m" font-size="11">No deduction now;</text><text x="14" y="156" class="svg-m" font-size="11">qualified withdrawals</text><text x="14" y="172" class="svg-m" font-size="11">tax-free</text></g>
+      <g transform="translate(541,10)"><rect width="169" height="200" rx="12" style="fill:var(--violet-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">For someone else</text><text x="14" y="52" class="svg-s" font-size="12">529 college plan</text><text x="14" y="70" class="svg-s" font-size="12">Custodial (UTMA/UGMA)</text><text x="14" y="88" class="svg-s" font-size="12">ABLE account</text><text x="14" y="140" class="svg-m" font-size="11">Rules depend on the</text><text x="14" y="156" class="svg-m" font-size="11">purpose and beneficiary</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Same investments, different tax rules.</b> An S&amp;P 500 index fund can sit in any of these. Stage 5 covers each account's rules, limits and best uses in detail.</figcaption>
+  </figure>
+  <h3>What brokers charge now</h3>
+  <p>Since 2019, most large US brokerages have charged no commission for online trades of US stocks and ETFs, and many offer <b>fractional shares</b>, letting you invest by the dollar rather than the share. "No commission" does not mean "no cost," though: brokers can earn from the bid-ask spread, from <span class="term" data-term="payment for order flow">payment for order flow</span>, from lending out securities, and from the interest on your uninvested cash.</p>
+  <div class="callout warn"><div class="ic">&#128176;</div><div><p><b>Check your cash.</b> Uninvested cash in many brokerage accounts is "swept" into a bank deposit or money market fund. Some sweep programs pay far less than a money market fund you could choose yourself. Look up your account's sweep rate; on a large cash balance the difference can be hundreds or thousands of dollars a year.</p></div></div>
+</section>
+
+<section class="panel" data-tab="Bid, ask and spread">
+  <p class="kicker">How prices form</p>
+  <h2>Every stock has two prices at once</h2>
+  <p>At any moment there is a highest price someone is willing to pay (the <b>bid</b>) and a lowest price someone is willing to accept (the <b>ask</b>, or offer). Buy immediately and you pay the ask; sell immediately and you receive the bid. The gap between them is the <span class="term" data-term="bid-ask spread">bid-ask spread</span> &mdash; a small cost you pay on every round trip.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.4 &mdash; An order book for a fictional stock, LKSD</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 260" role="img" aria-label="Order book ladder showing asks above and bids below, with a four-cent spread">
+      <g font-family="Segoe UI, system-ui, sans-serif" font-size="12.5">
+      <text x="200" y="22" text-anchor="middle" class="svg-m" font-weight="700">Shares offered</text><text x="360" y="22" text-anchor="middle" class="svg-m" font-weight="700">Price</text><text x="520" y="22" text-anchor="middle" class="svg-m" font-weight="700">Shares wanted</text>
+      <g><rect x="120" y="32" width="160" height="26" rx="5" style="fill:var(--red-soft)"/><text x="270" y="50" text-anchor="end" class="svg-t">1,200</text><text x="360" y="50" text-anchor="middle" class="svg-t" font-weight="700">$40.06</text></g>
+      <g><rect x="170" y="62" width="110" height="26" rx="5" style="fill:var(--red-soft)"/><text x="270" y="80" text-anchor="end" class="svg-t">800</text><text x="360" y="80" text-anchor="middle" class="svg-t" font-weight="700">$40.04</text></g>
+      <g><rect x="210" y="92" width="70" height="26" rx="5" style="fill:var(--red)" opacity=".85"/><text x="270" y="110" text-anchor="end" fill="#fff" font-weight="700">300</text><text x="360" y="110" text-anchor="middle" class="svg-t" font-weight="800">$40.02 ASK</text></g>
+      <rect x="300" y="122" width="120" height="16" rx="4" style="fill:var(--card2)"/><text x="360" y="134" text-anchor="middle" class="svg-m" font-size="11" font-weight="700">spread $0.04</text>
+      <g><rect x="440" y="142" width="90" height="26" rx="5" style="fill:var(--green)" opacity=".85"/><text x="450" y="160" fill="#fff" font-weight="700">500</text><text x="360" y="160" text-anchor="middle" class="svg-t" font-weight="800">$39.98 BID</text></g>
+      <g><rect x="440" y="172" width="140" height="26" rx="5" style="fill:var(--green-soft)"/><text x="450" y="190" class="svg-t">900</text><text x="360" y="190" text-anchor="middle" class="svg-t" font-weight="700">$39.96</text></g>
+      <g><rect x="440" y="202" width="190" height="26" rx="5" style="fill:var(--green-soft)"/><text x="450" y="220" class="svg-t">1,500</text><text x="360" y="220" text-anchor="middle" class="svg-t" font-weight="700">$39.94</text></g>
+      <text x="360" y="252" text-anchor="middle" class="svg-s" font-size="11.5">A market order to buy 500 shares takes 300 at $40.02 and 200 at $40.04.</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Big orders "walk the book."</b> The best ask only covers 300 shares, so a larger market order fills at progressively worse prices. In heavily traded stocks and ETFs, the book is deep and the spread is often a cent or two; in thinly traded ones it can be much wider.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Liquidity</b></div>
+    <div class="def-r"><div>What it is</div><div>How easily something can be bought or sold quickly, in size, without moving its price. Liquid markets have narrow spreads and deep order books.</div></div>
+    <div class="def-r"><div>Used for</div><div>Judging trading costs, and how quickly you could raise cash from an investment.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Large, popular index funds and big-company stocks are extremely liquid. Small stocks, some bonds, real estate and private investments are not &mdash; you may wait, or accept a discount, to sell.</div></div></div>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Market makers, wholesalers and payment for order flow</summary><div class="layer-b">
+    <p>Many retail orders never reach an exchange. Brokers route them to <b>wholesale market makers</b>, which fill them from their own inventory, often at a price slightly better than the best displayed bid or ask ("price improvement"), and pay the broker a small fee per order &mdash; <b>payment for order flow</b>. Supporters point to zero commissions and price improvement; critics point to the conflict of interest in routing. The SEC has studied the practice repeatedly, including in its October 2021 staff report on early-2021 market events. Brokers must disclose their routing practices in quarterly reports under SEC Rule 606.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Order types">
+  <p class="kicker">Tell the broker what you want</p>
+  <h2>Market, limit, stop and stop-limit orders</h2>
+  <p>An order tells your broker what to do and under what conditions. The trade-off is always the same: <b>certainty of getting filled</b> versus <b>certainty of price</b>. Run each order type through the simulated trading day below.</p>
+  <div data-tool="orders"></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Order</th><th>What it does</th><th>Guarantees</th><th>Main risk</th></tr></thead><tbody>
+    <tr><td><b>Market</b></td><td>Buy or sell now at the best available price.</td><td>A fill (in liquid securities)</td><td>The price, especially in fast markets or thin stocks</td></tr>
+    <tr><td><b>Limit</b></td><td>Buy at or below, or sell at or above, a price you set.</td><td>Your price or better</td><td>No fill at all if the price never reaches your limit</td></tr>
+    <tr><td><b>Stop (stop-loss)</b></td><td>Becomes a market order once the price reaches the stop.</td><td>That the order is triggered</td><td>A fill well below the stop in a sudden drop ("gap")</td></tr>
+    <tr><td><b>Stop-limit</b></td><td>Becomes a limit order once the stop is reached.</td><td>No fill worse than the limit</td><td>No fill if the price falls straight through the limit</td></tr>
+  </tbody></table></div>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>A practical default.</b> For a long-term investor buying a broad ETF during regular hours, a market order and a limit order set slightly above the ask usually end up nearly identical. Limit orders matter most for thinly traded securities, large orders, volatile moments and anything traded outside regular hours.</p></div></div>
+</section>
+
+<section class="panel" data-tab="The trading day">
+  <p class="kicker">When and how trades complete</p>
+  <h2>Hours, settlement and circuit breakers</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.5 &mdash; A US trading day (Eastern Time)</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 150" role="img" aria-label="Timeline: pre-market, regular session 9:30 to 4:00, after hours; mutual funds price once at the close">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="20" y="50" width="160" height="30" rx="6" style="fill:var(--amber-soft)"/><rect x="180" y="50" width="390" height="30" rx="6" style="fill:var(--blue)"/><rect x="570" y="50" width="130" height="30" rx="6" style="fill:var(--amber-soft)"/>
+      <g font-size="12" font-weight="700" text-anchor="middle"><text x="100" y="70" class="svg-t">Pre-market</text><text x="375" y="70" fill="#fff">Regular session: 9:30 a.m. &ndash; 4:00 p.m.</text><text x="635" y="70" class="svg-t">After hours</text></g>
+      <g class="svg-m" font-size="11" text-anchor="middle"><text x="180" y="100">9:30 open</text><text x="570" y="100">4:00 close</text></g>
+      <path d="M570 84 V120" style="stroke:var(--violet)" stroke-width="2"/><text x="570" y="136" text-anchor="middle" class="svg-t" font-size="11.5" font-weight="700">Mutual funds priced once, at net asset value (NAV)</text>
+      <text x="100" y="30" text-anchor="middle" class="svg-s" font-size="11">thinner trading, wider spreads</text><text x="635" y="30" text-anchor="middle" class="svg-s" font-size="11">thinner trading, wider spreads</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Stocks and ETFs trade all session; mutual funds trade once a day.</b> Orders for a mutual fund placed before the cut-off are filled at that day's closing net asset value. Extended-hours trading is available at many brokers, but with fewer participants, wider spreads and sharper price moves.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Settlement (T+1)</b></div>
+    <div class="def-r"><div>What it is</div><div>The actual exchange of cash and securities after a trade. Since May 28, 2024, the standard US settlement cycle for most securities is <b>T+1</b>: one business day after the trade date, down from two.</div></div>
+    <div class="def-r"><div>Used for</div><div>Knowing when sale proceeds are truly available, and when you legally own purchased shares.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Sell on a Monday and the cash settles Tuesday. In a cash account, buying and then selling with unsettled funds can trigger trading restrictions; your broker's rules explain the details.</div></div></div>
+  <div class="def"><div class="def-h"><b>Market-wide circuit breakers</b></div>
+    <div class="def-r"><div>What it is</div><div>Automatic trading halts across all US stock markets when the S&amp;P 500 falls sharply from the prior day's close: <b>7%</b> (Level 1) or <b>13%</b> (Level 2) halts trading for 15 minutes if hit before 3:25 p.m.; <b>20%</b> (Level 3) halts trading for the rest of the day.</div></div>
+    <div class="def-r"><div>Used for</div><div>Giving investors time to absorb information during extreme panics.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>In March 2020, Level 1 halts were triggered on four days: March 9, 12, 16 and 18. A halt is not a sign to act; it is a pause for everyone.</div></div></div>
+</section>
+
+<section class="panel" data-tab="What is protected">
+  <p class="kicker">If a firm fails</p>
+  <h2>SIPC and FDIC protect different things</h2>
+  <p>Two federal-backed protections are often confused. <b>FDIC</b> insurance protects bank deposits if a bank fails. <b>SIPC</b> protection restores missing securities and cash if a brokerage fails. <i>Neither</i> protects you from investments losing value.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.6 &mdash; FDIC versus SIPC</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 230" role="img" aria-label="Comparison of FDIC and SIPC coverage">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="0" y="0" width="352" height="230" rx="12" style="fill:var(--green-soft)"/><rect x="368" y="0" width="352" height="230" rx="12" style="fill:var(--blue-soft)"/>
+      <text x="176" y="30" text-anchor="middle" class="svg-t" font-size="16" font-weight="800">FDIC</text><text x="544" y="30" text-anchor="middle" class="svg-t" font-size="16" font-weight="800">SIPC</text>
+      <g class="svg-t" font-size="12.5">
+        <text x="20" y="62"><tspan font-weight="700">Protects:</tspan> deposits if a bank fails</text><text x="20" y="84">Checking, savings, CDs, money</text><text x="20" y="102">market <tspan font-style="italic">deposit</tspan> accounts</text>
+        <text x="20" y="132"><tspan font-weight="700">Limit:</tspan> $250,000 per depositor, per</text><text x="20" y="150">bank, per ownership category</text>
+        <text x="20" y="180"><tspan font-weight="700">Not covered:</tspan> stocks, bonds, mutual</text><text x="20" y="198">funds, annuities, crypto, Treasuries</text>
+        <text x="388" y="62"><tspan font-weight="700">Protects:</tspan> missing customer assets</text><text x="388" y="84">if a SIPC-member brokerage fails</text>
+        <text x="388" y="132"><tspan font-weight="700">Limit:</tspan> $500,000 per customer,</text><text x="388" y="150">including up to $250,000 of cash</text>
+        <text x="388" y="180"><tspan font-weight="700">Not covered:</tspan> market losses, bad</text><text x="388" y="198">advice, most crypto, commodities</text>
+      </g></g></svg></div>
+    <figcaption class="cap"><b>Protection against firm failure, not against investment loss.</b> Sources: FDIC, "Understanding Deposit Insurance"; SIPC, "What SIPC Protects." Many brokerages also buy private "excess SIPC" insurance above these limits.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study</span><b>Lehman Brothers Inc., 2008&ndash;2022</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>When Lehman Brothers collapsed in September 2008, its US brokerage, Lehman Brothers Inc., entered a SIPC liquidation. Within days, about 110,000 mostly retail customer accounts, worth $92.3 billion, were transferred intact to other firms. When the liquidation closed in 2022, customers had received 100% of their property: $105.7 billion to more than 111,000 customers.</div></div>
+    <div class="row"><div>What it teaches</div><div>Customer securities at a US broker-dealer are held separately from the firm's own assets. When a large broker fails, the usual outcome is a transfer of accounts, not a loss. The market value of what you own is still your risk.</div></div>
+    <div class="row"><div>Source</div><div class="src">SIPC, "Lehman Brothers Inc.'s 14-year liquidation successfully concludes" (news release, September 28, 2022).</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="Margin and shorting">
+  <p class="kicker">Borrowing to invest</p>
+  <h2>Margin multiplies gains and losses</h2>
+  <p>A <span class="term" data-term="margin">margin account</span> lets you borrow from your broker using your investments as collateral. Under the Federal Reserve's Regulation T, you can generally borrow up to 50% of the purchase price of eligible stocks. FINRA's rules then require your equity to stay at least 25% of the account's value; many brokers set higher "house" requirements. Fall below it and you face a <b>margin call</b>: deposit cash or have positions sold, often at the worst moment.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.7 &mdash; $10,000 of your money, with and without $10,000 borrowed</div>
+    <div id="f57"></div>
+    <figcaption class="cap"><b>Leverage doubles the percentage move &mdash; in both directions.</b> Your equity after a range of stock price changes, with no borrowing and with a 50% margin loan (interest ignored). At a 33% price fall, the leveraged account reaches FINRA's 25% maintenance minimum and a margin call begins. At a 50% fall, the leveraged investor's $10,000 is gone.</figcaption>
+  </figure>
+  <div class="formula">margin call when: (value &minus; loan) &divide; value &lt; maintenance &nbsp;&rarr;&nbsp; value &lt; loan &divide; (1 &minus; maintenance) &nbsp;&nbsp; e.g. $10,000 &divide; 0.75 = $13,333</div>
+  <div class="def"><div class="def-h"><b>Short selling</b></div>
+    <div class="def-r"><div>What it is</div><div>Borrowing shares and selling them, hoping to buy them back later at a lower price and return them.</div></div>
+    <div class="def-r"><div>Used for</div><div>Betting on a decline, or hedging another position.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A buyer's loss is limited to what they paid; a short seller's loss has <b>no upper limit</b>, because a price can keep rising. January 2021's GameStop episode, when heavily shorted shares rose many times over in days, showed how fast that can happen.</div></div></div>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history</p>
+  <h2>When the plumbing made the news</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>January 2021: when brokers restricted buying</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Coordinated buying on social media drove GameStop and a handful of other heavily shorted stocks up by many multiples in days. At the end of January, several retail brokers temporarily prohibited customers from buying certain of those stocks and options.</div></div>
+    <div class="row"><div>Why</div><div>The SEC's staff report identified, among other things, the "forces that may cause a brokerage to restrict trading" &mdash; in particular the collateral that brokers must post with the clearinghouse, which rises with volatility and concentrated trading.</div></div>
+    <div class="row"><div>What it teaches</div><div>Your broker's relationship with the clearing system can, in extreme conditions, affect what you are allowed to do. It is one more reason not to rely on being able to trade a speculative position at the exact moment you want.</div></div>
+    <div class="row"><div>Source</div><div class="src">U.S. SEC (October 2021), <i>Staff report on equity and options market structure conditions in early 2021</i>; SEC press release 2021-212.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>March 2020: four circuit breakers in eight trading days</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>As COVID-19 spread, the S&amp;P 500 fell 7% early in the session on March 9, 12, 16 and 18, 2020, each triggering a 15-minute market-wide halt. Markets reopened each time through an auction.</div></div>
+    <div class="row"><div>What it teaches</div><div>The system worked as designed: trading paused, resumed, and markets stayed open. Stocks ended 2020 up 18.0% for the year. Investors who sold during those March days locked in some of the year's lowest prices.</div></div>
+    <div class="row"><div>Source</div><div class="src">NYSE, "Assessing NYSE model performance during 2020 crash"; Investor.gov, "Stock market circuit breakers"; Damodaran, NYU Stern (2020 return).</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.8 &mdash; 2020: a fast crash inside a positive year</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 170" role="img" aria-label="Illustration of 2020: sharp fall in March with four halts, then recovery to an 18 percent gain for the year">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <path d="M30 70 L110 60 L150 64 L185 130 L205 150 L230 120 L300 95 L380 80 L470 70 L560 52 L690 36" fill="none" stroke="#1F5FD1" stroke-width="3.5" stroke-linejoin="round"/>
+      <g fill="#C2332B"><circle cx="170" cy="108" r="6"/><circle cx="180" cy="122" r="6"/><circle cx="192" cy="138" r="6"/><circle cx="200" cy="146" r="6"/></g>
+      <text x="210" y="166" class="svg-s" font-size="11.5">four Level 1 halts (March 9, 12, 16, 18)</text>
+      <text x="600" y="30" class="svg-t" font-size="12.5" font-weight="700">+18.0% for 2020</text><text x="30" y="52" class="svg-m" font-size="11">Jan 2020</text><text x="660" y="60" class="svg-m" font-size="11">Dec 2020</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Schematic, not to scale.</b> The dots mark the four days with a 7% intraday fall that triggered a halt. The full-year total return is from Damodaran, NYU Stern.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Put the plumbing to work</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.9 &mdash; The cost of a round trip at different spreads</div>
+    <div id="f59"></div>
+    <figcaption class="cap"><b>Spreads are small per trade and large for frequent traders.</b> Cost of buying and then selling $10,000 of a security, by spread as a percentage of price. Computed: $10,000 &times; spread.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; Maya opens her first brokerage account</div>
+    <p class="dq">Maya wants to invest $200 a month outside her 401(k), in a broad index ETF. One app advertises free trades and a "free stock" for signing up; a large brokerage offers free trades and fractional shares. How should she choose?</p>
+    <div class="opts"><button class="opt">Pick the app with the free stock.</button><button class="opt">Compare what matters for her: fractional shares and automatic investing, the cash sweep rate, the funds available and their costs, and the firm's SIPC membership.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>The free stock</b>A one-time bonus worth a few dollars matters far less than the ongoing features. Apps that make trading feel like a game can also encourage the frequent trading that research links to lower returns (INV-060).</div>
+      <div class="oc"><b>Compare what matters</b>Right. For a $200-a-month index investor, automatic recurring purchases and fractional shares do most of the work. Check that the firm is a SIPC member (sipc.org has a member list) and that FINRA BrokerCheck shows no serious problems.</div>
+      <div class="verdict"><b>The principle:</b> choose a broker for the next 30 years, not for the sign-up bonus.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Jordan and margin</div>
+    <p class="dq">Jordan's brokerage offers margin at 11% interest. Jordan is confident a particular stock will rise and wants to borrow $20,000 to buy more. What are the risks?</p>
+    <div class="opts"><button class="opt">Low &mdash; the broker would not lend if it were risky.</button><button class="opt">High: the stock must beat 11% a year just to break even, a fall can trigger a margin call and forced selling, and losses can exceed the original investment.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Low risk</b>The broker is protected by your collateral and its right to sell it; you are not. That is why the broker can lend readily.</div>
+      <div class="oc"><b>High risk</b>Right. Borrowing to buy a single stock combines leverage with concentration, the two ingredients most associated with permanent losses. As a single parent with one income, Jordan has little room for a forced sale.</div>
+      <div class="verdict"><b>The principle:</b> leverage turns a temporary fall into a permanent one, because it can force you to sell.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about trading</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.10 &mdash; Where a "commission-free" broker can earn money</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 130" role="img" aria-label="Revenue sources: spread and order flow, interest on cash, securities lending, margin interest, premium services">
+      <g font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+      <rect x="10" y="30" width="130" height="70" rx="12" style="fill:var(--blue-soft)"/><text x="75" y="62" class="svg-t">Order flow</text><text x="75" y="80" class="svg-s" font-weight="400">&amp; spreads</text>
+      <rect x="152" y="30" width="130" height="70" rx="12" style="fill:var(--teal-soft)"/><text x="217" y="62" class="svg-t">Interest on</text><text x="217" y="80" class="svg-s" font-weight="400">your idle cash</text>
+      <rect x="294" y="30" width="130" height="70" rx="12" style="fill:var(--amber-soft)"/><text x="359" y="62" class="svg-t">Margin</text><text x="359" y="80" class="svg-s" font-weight="400">loan interest</text>
+      <rect x="436" y="30" width="130" height="70" rx="12" style="fill:var(--violet-soft)"/><text x="501" y="62" class="svg-t">Securities</text><text x="501" y="80" class="svg-s" font-weight="400">lending</text>
+      <rect x="578" y="30" width="132" height="70" rx="12" style="fill:var(--card2)"/><text x="644" y="62" class="svg-t">Funds and</text><text x="644" y="80" class="svg-s" font-weight="400">premium services</text>
+      </g></svg></div>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Commission-free trading is free."</div><div class="ma"><b>Myth.</b> You still pay the bid-ask spread, and the broker may earn from order flow, your cash balance and lending your securities. For long-term index investors these costs are usually small; for frequent traders they add up.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"SIPC protects me if my stocks fall."</div><div class="ma"><b>Myth.</b> SIPC restores missing securities and cash when a member brokerage fails, up to $500,000 including $250,000 of cash. It does not cover market losses or bad advice.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A stop-loss order guarantees I won't lose more than my stop."</div><div class="ma"><b>Myth.</b> A stop becomes a market order when triggered. If the price gaps down overnight or in a fast market, the fill can be well below the stop.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Buying on day one of an IPO gets me in early."</div><div class="ma"><b>Mostly myth.</b> Most IPO shares go to institutions at the offer price; individuals typically buy after the first-day jump. Research has found newly public companies, on average, lagging comparable firms over the following years.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"When I sell, I can spend the cash immediately."</div><div class="ma"><b>Nearly.</b> Trades settle one business day later (T+1, since May 2024). Many brokers let you reuse proceeds sooner inside the account, but withdrawal of settled cash follows settlement.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Short selling is just the opposite of buying."</div><div class="ma"><b>Myth.</b> The risk is asymmetric. A buyer can lose at most 100%. A short seller's loss is unlimited, and they pay any dividends and borrowing fees while short.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.11 &mdash; SIPC's $500,000 limit against each household's investments</div>
+    <div id="f511"></div>
+    <figcaption class="cap"><b>Large balances can exceed the per-customer limit.</b> SIPC coverage applies per customer per "separate capacity" (for example, individual, joint and IRA accounts are counted separately), and many brokers carry excess coverage. Illustrative balances from each household's profile.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Automate it.</b> Recurring purchases and fractional shares let Maya invest small amounts without thinking about order types. A market order in a large ETF during regular hours is fine.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Check the sweep.</b> The Riveras' surplus cash sitting in a brokerage sweep may be earning very little. Moving it to a money market fund could add meaningful interest.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Avoid margin.</b> With one income and concentration in employer stock, leverage is the risk Jordan can least afford.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Use limit orders for large trades.</b> Selling concentrated stock positions in size is where limit orders and trading during the regular session matter. Their balance also means understanding SIPC and excess coverage.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Know what is protected, and where.</b> Ruth's IRA at a brokerage is SIPC-protected against firm failure; her bank CDs are FDIC-insured. Keeping each within limits, and a list of accounts for her heirs, is part of good housekeeping (INV-059).</div></div>
+  </div>
+  <div class="ws" data-ws="inv005" data-title="INV-005 worksheet: my accounts and protections">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w5a">Each account I have: firm, type (taxable, IRA, 401(k)...), approximate balance</label><textarea id="w5a" data-key="accounts"></textarea></div>
+      <div><label for="w5b">Is each broker a SIPC member? Each bank FDIC-insured?</label><textarea id="w5b" data-key="protect"></textarea></div>
+      <div><label for="w5c">What my uninvested cash earns in each account</label><textarea id="w5c" data-key="sweep"></textarea></div>
+      <div><label for="w5d">Do I use margin? Should I?</label><textarea id="w5d" data-key="margin"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.12 &mdash; Margin call price by maintenance requirement</div>
+    <div id="f512"></div>
+    <figcaption class="cap"><b>Higher house requirements mean earlier margin calls.</b> For a purchase made with 50% borrowed, the price fall that triggers a call: 1 &minus; 0.5 &divide; (1 &minus; m). At FINRA's 25% minimum it is 33%; at a 40% house requirement, about 17%.</figcaption>
+  </figure>
+  <div class="ex" data-answer="20" data-tol="0.01" data-ok="200 shares &times; $0.10 = $20.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">A stock's bid is $49.95 and its ask is $50.05. You buy 200 shares and immediately sell them. Ignoring commissions, what did the round trip cost, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">You pay 200 &times; $50.05 = $10,010 and receive 200 &times; $49.95 = $9,990: a cost of <b>$20</b>, the spread times the shares.</div></div>
+  <div class="ex" data-answer="13333" data-tol="0.01" data-ok="$10,000 &divide; 0.75 = $13,333.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">You buy $20,000 of stock with $10,000 of your own money and a $10,000 margin loan. With a 25% maintenance requirement, below what account value does a margin call begin, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Equity must be at least 25% of value: V &minus; 10,000 &ge; 0.25V, so V &ge; 10,000 &divide; 0.75 = <b>$13,333</b> &mdash; a fall of one-third from $20,000.</div></div>
+  <div class="ex" data-answer="-40" data-tol="0.02" data-ok="A 20% fall on $20,000 is $4,000, which is 40% of your $10,000.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">In that same margin account, the stock falls 20%. What percentage of your own $10,000 have you lost? (Ignore interest.)</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$20,000 &times; 20% = $4,000 lost. Your equity falls from $10,000 to $6,000: <b>&minus;40%</b>. Leverage doubled the loss.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.13 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: route, price, settle, protect">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Route</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">broker to venue</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Price</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">bid, ask, order type</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Settle</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">T+1</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Protect</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">SIPC / FDIC limits</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"When you buy shares of a large company through your broker, who usually receives your money?","choices":["The company","Another investor selling those shares","The SEC","The clearinghouse keeps it"],"answer":1,"explain":"Almost all trades are in the secondary market, between investors."},
+    {"q":"You place a market order to buy. At what price are you most likely to be filled?","choices":["The bid","The ask","The previous day's close","Any price you choose"],"answer":1,"explain":"Buyers pay the ask; sellers receive the bid."},
+    {"q":"Which order guarantees your price but not a fill?","choices":["Market order","Limit order","Stop order","None of them"],"answer":1,"explain":"A limit order fills only at your price or better."},
+    {"q":"Since May 28, 2024, the standard US settlement cycle for most stock trades is:","choices":["Same day","T+1","T+2","T+3"],"answer":1,"explain":"The SEC's rule change moved settlement from two business days to one."},
+    {"q":"What does SIPC protect?","choices":["Against stock market losses","Missing customer securities and cash if a member brokerage fails, up to $500,000 including $250,000 cash","Bank deposits up to $250,000","Bad investment advice"],"answer":1,"explain":"SIPC restores missing assets; FDIC covers bank deposits; neither covers market losses."},
+    {"q":"You buy $20,000 of stock using $10,000 of margin. The stock falls 25%. Your own equity falls by:","choices":["25%","50%","75%","100%"],"answer":1,"explain":"$5,000 loss on $10,000 of equity is 50%."},
+    {"q":"A Level 1 market-wide circuit breaker is triggered by an S&amp;P 500 decline of:","choices":["3%","7%","13%","20%"],"answer":1,"explain":"7% halts trading for 15 minutes if hit before 3:25 p.m. Eastern."},
+    {"q":"Why can a short seller's loss be unlimited?","choices":["Because shares can fall below zero","Because there is no limit to how high a price can rise","Because brokers charge unlimited fees","It cannot be"],"answer":1,"explain":"The short seller must buy the shares back, at whatever price they reach."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 5.14 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-006</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Reading a company</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-012</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Funds and ETFs</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-104</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Choosing a platform</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-005"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>U.S. Securities and Exchange Commission. (2024). <i>Statement on the implementation of T+1</i> (press release 2024-62). <a href="https://www.sec.gov/newsroom/press-releases/2024-62">sec.gov</a></li>
+    <li>Securities Investor Protection Corporation. <i>What SIPC protects</i>. <a href="https://www.sipc.org/for-investors/what-sipc-protects">sipc.org</a></li>
+    <li>Securities Investor Protection Corporation. (2022, September 28). <i>Lehman Brothers Inc.'s 14-year liquidation successfully concludes</i>. <a href="https://www.sipc.org/news-and-media/news-releases/20220928">sipc.org</a></li>
+    <li>Federal Deposit Insurance Corporation. <i>Understanding deposit insurance</i>. <a href="https://www.fdic.gov/resources/deposit-insurance/understanding-deposit-insurance">fdic.gov</a></li>
+    <li>FINRA. <i>Margin accounts</i> and Rule 4210. <a href="https://www.finra.org/investors/investing/investment-accounts/brokerage-accounts/margin-accounts">finra.org</a></li>
+    <li>U.S. Securities and Exchange Commission. (2021). <i>Staff report on equity and options market structure conditions in early 2021</i> (press release 2021-212). <a href="https://www.sec.gov/newsroom/press-releases/2021-212">sec.gov</a></li>
+    <li>Investor.gov. <i>Stock market circuit breakers</i>. <a href="https://www.investor.gov/introduction-investing/investing-basics/glossary/stock-market-circuit-breakers">investor.gov</a>; NYSE, <i>Assessing NYSE model performance during 2020 crash</i>. <a href="https://www.nyse.com/article/assessing-nyse-model-performance">nyse.com</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Broker features, fees and rules change; confirm current terms with your broker and with FINRA, the SEC and SIPC.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script>
+INV.ready(function () {
+  var pc = function (v) { return Math.round(v) + "%"; };
+  var none = [], lev = [];
+  for (var c = -60; c <= 60; c += 5) { none.push([c, 10000 * (1 + c / 100)]); lev.push([c, Math.max(0, 20000 * (1 + c / 100) - 10000)]); }
+  INV.lineChart(document.getElementById("f57"), { label: "Leverage", height: 250, xTitle: "Change in stock price (%)", xFmt: function (v) { return v + "%"; }, yFmt: INV.moneyShort,
+    series: [{ name: "No borrowing", color: "var(--s2)", data: none }, { name: "50% margin loan", color: "var(--s5)", data: lev }], marks: [{ x: -33.3, label: "margin call" }] });
+  INV.barChart(document.getElementById("f59"), { label: "Round-trip spread cost", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return INV.money(v, 0); }, xTitle: "Bid-ask spread as % of price",
+    data: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2].map(function (s) { return { label: s + "%", y: 10000 * s / 100, color: s >= 0.5 ? "var(--s5)" : "var(--s2)" }; }) });
+  INV.barChart(document.getElementById("f511"), { label: "Balances vs SIPC limit", height: 220, allLabels: true, valueLabels: true, yFmt: INV.moneyShort,
+    data: [["Maya", 3000, "var(--s1)"], ["Riveras", 62000, "var(--s2)"], ["Jordan", 140000, "var(--s3)"], ["SIPC limit", 500000, "var(--s6)"], ["Ruth", 780000, "var(--s5)"], ["Harpers", 1100000, "var(--s4)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  INV.barChart(document.getElementById("f512"), { label: "Margin call trigger", height: 220, allLabels: true, valueLabels: true, yFmt: pc, xTitle: "Maintenance requirement",
+    data: [25, 30, 35, 40, 45].map(function (m) { return { label: m + "%", y: (1 - 0.5 / (1 - m / 100)) * 100, color: "var(--s3)" }; }) });
+});
+</script>
+</body>
+</html>

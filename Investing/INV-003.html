@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-003 · Risk and Return — Investing Learning Lab</title>
+<meta name="description" content="What investment risk really is, how it is measured, how holding period changes it, and what crashes actually looked like — explored with 98 years of US data.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-003">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-003</span><span class="ttl">Risk and Return</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 1 · Foundations</span><span class="chip teal">Beginner to intermediate</span><span class="chip gray">About 55 minutes</span><span class="chip gray">2 historical explorers</span></div>
+    <h1>Risk and Return</h1>
+    <p class="sub">Every investment trades some certainty for some expected reward. This module defines risk precisely, shows how much of it disappears &mdash; and how much does not &mdash; as the holding period lengthens, and lets you replay the worst markets of the last century with your own money in them.</p>
+    <p class="q"><span>The question this module answers</span>What does "risky" actually mean, and how much of it can I live with?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <g><rect x="40" y="180" width="16" height="16" rx="3" fill="#C2332B" opacity=".8"/><rect x="60" y="168" width="16" height="28" rx="3" fill="#C2332B" opacity=".8"/><rect x="80" y="150" width="16" height="46" rx="3" fill="#C2332B" opacity=".8"/><rect x="100" y="120" width="16" height="76" rx="3" fill="#0B8A7E"/><rect x="120" y="88" width="16" height="108" rx="3" fill="#0B8A7E"/><rect x="140" y="70" width="16" height="126" rx="3" fill="#0B8A7E"/><rect x="160" y="84" width="16" height="112" rx="3" fill="#0B8A7E"/><rect x="180" y="114" width="16" height="82" rx="3" fill="#0B8A7E"/><rect x="200" y="150" width="16" height="46" rx="3" fill="#0B8A7E" opacity=".8"/><rect x="220" y="176" width="16" height="20" rx="3" fill="#0B8A7E" opacity=".7"/><rect x="240" y="188" width="16" height="8" rx="3" fill="#0B8A7E" opacity=".6"/></g>
+      <line x1="30" y1="196" x2="330" y2="196" style="stroke:var(--border2)" stroke-width="2"/><text x="40" y="44" class="svg-t" font-size="13" font-weight="800">The spread of outcomes</text><text x="40" y="62" class="svg-s" font-size="11.5">98 years of stock returns</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>You already manage risk every day</h2>
+  <p class="lede">You check the weather before a long drive, you buy insurance on a car, you do not keep all your cash in your wallet. Each of those is a small decision about uncertainty: what could go wrong, how likely it is, and how bad it would be.</p>
+  <p>Investment risk is the same idea applied to money. When people say stocks are "risky," they mean something specific: the result over any particular year is very uncertain, and it includes a real chance of losing a large amount. When they say Treasury bills are "safe," they mean the dollar result is almost certain &mdash; not that it is a good result.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.1 &mdash; 98 years of US stock returns, sorted into bins</div>
+    <div id="f31"></div>
+    <figcaption class="cap"><b>The average year does not exist.</b> The average annual return was about 12%, yet only 21 of 98 years landed between +10% and +20%. Returns spread from &minus;44% (1931) to +53% (1954). 36 years gained more than 20%; 26 years lost money. S&amp;P 500 with dividends, 1928&ndash;2025. Source: Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>A working definition of risk, and the two numbers used to measure it: <b>volatility</b> and <b>drawdown</b>.</li>
+    <li>How the <b>holding period</b> changes the odds &mdash; with every rolling window since 1928.</li>
+    <li>A <b>crash replay</b>: put your own amount into 1929, 1973, 2000, 2008 or 2022.</li>
+    <li>Why a loss needs a bigger gain to recover, and why that makes averages misleading.</li>
+    <li>The many kinds of risk beyond price swings, including inflation and running out of money.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Measuring risk">
+  <p class="kicker">Two numbers</p>
+  <h2>Volatility and drawdown</h2>
+  <div class="def"><div class="def-h"><b>Risk (in investing)</b></div>
+    <div class="def-r"><div>What it is</div><div>The chance that an investment's actual result differs from what you expected &mdash; and especially that it falls short when you need the money.</div></div>
+    <div class="def-r"><div>Used for</div><div>Choosing how much of your money to put in each type of investment, and knowing what to expect in bad years.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The risk that matters most is personal: being forced to sell at a low point, or reaching your goal date without enough. Price swings are only dangerous if they coincide with a need.</div></div></div>
+  <div class="def"><div class="def-h"><b>Volatility (standard deviation)</b></div>
+    <div class="def-r"><div>What it is</div><div>How widely returns spread around their average, measured as the <span class="term" data-term="standard deviation">standard deviation</span>. For a roughly bell-shaped spread, about two years in three fall within one standard deviation of the average, and about 19 in 20 within two.</div></div>
+    <div class="def-r"><div>Used for</div><div>Comparing how bumpy different investments are, and building portfolios (INV-004).</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>US stocks' annual standard deviation was about 19% around an average of about 12%. So a year anywhere from roughly &minus;8% to +31% was "ordinary" &mdash; 65 of 98 years were in that range.</div></div></div>
+  <div class="def"><div class="def-h"><b>Drawdown</b></div>
+    <div class="def-r"><div>What it is</div><div>The fall from a previous peak to a later low, in percent. The <b>maximum drawdown</b> is the worst such fall over a period; the <b>recovery time</b> is how long it took to regain the old peak.</div></div>
+    <div class="def-r"><div>Used for</div><div>Understanding the worst experience you could have had, which is often what determines whether investors stay the course.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Measured at year-ends, US stocks' deepest fall was about 65% (end of 1928 to end of 1932). Inside those years, the decline was deeper still.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.2 &mdash; Every calendar year of US stock returns, 1928&ndash;2025</div>
+    <div id="f32"></div>
+    <figcaption class="cap"><b>Losses cluster; so do gains.</b> Hover over any bar for the year. The early 1930s, 1973&ndash;74, 2000&ndash;02, 2008 and 2022 stand out. Source: Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why volatility is an incomplete measure</summary><div class="layer-b">
+    <p>Standard deviation treats a surprise gain exactly like a surprise loss, and it assumes returns roughly follow a bell curve. Real markets have "fat tails": extreme years such as 1931 (&minus;44%) happen more often than a bell curve predicts. That is why this course pairs volatility with drawdown, holding-period results and actual crash histories.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Computing it</summary><div class="layer-b">
+    <p>Sample standard deviation s = &radic;[&Sigma;(r<sub>i</sub> &minus; r&#772;)&sup2; &divide; (n &minus; 1)]. Annual volatility from monthly data is usually scaled by &radic;12, which assumes months are independent &mdash; an approximation. Downside measures such as semideviation and the Sortino ratio, and tail measures such as value at risk and conditional value at risk, address the asymmetry; INV-057 covers risk-adjusted performance.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Holding period">
+  <p class="kicker">Time changes the odds</p>
+  <h2>How often did investors lose money?</h2>
+  <p>A single year of stock returns is close to a coin flip with a thumb on the scale. Over longer periods, good and bad years start to offset. The explorer below computes every rolling window since 1928. Try 1 year, then 5, 10, 15 and 20.</p>
+  <div data-tool="holding"></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Holding period (US stocks)</th><th class="r">Windows</th><th class="r">Lost money</th><th class="r">Lost money after inflation</th><th class="r">Worst, per year</th><th class="r">Median, per year</th></tr></thead>
+  <tbody>
+    <tr><td>1 year</td><td class="r">98</td><td class="r">27%</td><td class="r">32%</td><td class="r neg-t">&minus;43.8%</td><td class="r">15.2%</td></tr>
+    <tr><td>5 years</td><td class="r">94</td><td class="r">12%</td><td class="r">23%</td><td class="r neg-t">&minus;12.7%</td><td class="r">12.6%</td></tr>
+    <tr><td>10 years</td><td class="r">89</td><td class="r">6%</td><td class="r">12%</td><td class="r neg-t">&minus;1.7%</td><td class="r">11.0%</td></tr>
+    <tr><td>15 years</td><td class="r">84</td><td class="r">1%</td><td class="r">6%</td><td class="r neg-t">&minus;0.2%</td><td class="r">10.4%</td></tr>
+    <tr><td>20 years</td><td class="r">79</td><td class="r">0%</td><td class="r">0%</td><td class="r">+2.4%</td><td class="r">10.9%</td></tr>
+    <tr><td>30 years</td><td class="r">69</td><td class="r">0%</td><td class="r">0%</td><td class="r">+8.0%</td><td class="r">10.8%</td></tr>
+  </tbody></table></div>
+  <p class="src">Rolling windows of calendar years, 1928&ndash;2025, S&amp;P 500 with dividends. "Per year" is the compound annual return over the window. Computed from Damodaran, NYU Stern.</p>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>Longer is safer, but not safe.</b> The windows overlap, so 79 twenty-year windows contain far fewer than 79 independent observations. After inflation, the worst ten-year stretch (1999&ndash;2008) still lost 3.8% a year, and the worst fifteen-year stretch lost money too. Other countries' markets have had much longer droughts. Long holding periods shrink the chance of loss; they do not remove it.</p></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>The spread of <i>ending wealth</i> widens with time</summary><div class="layer-b">
+    <p>The range of <i>annual average</i> returns narrows as the period lengthens, which is what the table shows. But the range of <i>ending dollar amounts</i> widens: over 30 years, the difference between a 6% and a 10% average is the difference between 5.7 and 17.4 times your money. Time reduces the chance of losing money, while increasing how different the good and bad outcomes are in dollars. Both statements are true, and planners argue about which matters more.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Crash replay">
+  <p class="kicker">Live through it</p>
+  <h2>Replay a market crash</h2>
+  <p>Numbers like "&minus;37%" are easy to read and hard to feel. Pick an episode, enter an amount that means something to you, and choose a mix of stocks and bonds. Then watch what happened, year by year, until it recovered.</p>
+  <div data-tool="replay"></div>
+  <div class="three">
+    <div class="callout"><div class="ic">1929</div><div><p>$100,000 in stocks at the start of 1929 was worth about $35,000 four years later. It regained $100,000 at the start of 1937 &mdash; then fell 35% again that year.</p></div></div>
+    <div class="callout"><div class="ic">2000</div><div><p>Stocks lost money in 2000, 2001 and 2002. Just as they recovered, 2008 cut them by 37%. After inflation, money invested at the start of 2000 was still below its starting value at the end of 2012.</p></div></div>
+    <div class="callout"><div class="ic">2008</div><div><p>In 2008 stocks fell 36.6% while 10-year Treasuries <i>gained</i> 20.1%. A 60/40 mix fell 13.9%. That is diversification doing its job (INV-004).</p></div></div>
+  </div>
+  <p class="src">All figures are from calendar-year data (Damodaran, NYU Stern). Peak-to-trough declines within each year were deeper than year-end figures show.</p>
+</section>
+
+<section class="panel" data-tab="Losses and averages">
+  <p class="kicker">The asymmetry of losses</p>
+  <h2>A 50% loss needs a 100% gain</h2>
+  <p>Lose 50% and $100 becomes $50. To get back to $100, the $50 must double &mdash; a 100% gain. Losses and gains are not symmetrical, and the gap grows with the size of the loss.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.3 &mdash; The gain needed to recover from a loss</div>
+    <div id="f33"></div>
+    <figcaption class="cap"><b>Small losses are easy to recover from; large ones are not.</b> Required gain = 1 &divide; (1 &minus; loss) &minus; 1. A 10% loss needs 11%; a 33% loss needs 50%; a 65% loss (US stocks, 1929&ndash;1932 at year-ends) needs 186%.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Average return versus compound return</b></div>
+    <div class="def-r"><div>What it is</div><div>The <b>arithmetic average</b> adds the yearly returns and divides by the number of years. The <b>compound (geometric) return</b> is the steady yearly rate that would produce the same ending wealth.</div></div>
+    <div class="def-r"><div>Used for</div><div>The compound return describes what an investor actually experienced; the arithmetic average is used to estimate a single future year.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>+50% then &minus;50% averages 0%, yet leaves you with 75% of your money. When someone quotes an "average return," ask which kind. For US stocks, 1928&ndash;2025: arithmetic 11.9%, compound 10.0%.</div></div></div>
+  <div class="formula">compound return &asymp; arithmetic average &minus; &frac12; &times; (standard deviation)&sup2; &nbsp;&nbsp;&nbsp; 11.9% &minus; &frac12;(19.4%)&sup2; &asymp; 10.0%</div>
+  <p>This gap is sometimes called <b>volatility drag</b>. It is one reason a steadier portfolio can end up closer to a volatile one than their average returns suggest: a 60/40 mix of stocks and 10-year Treasuries had an annual volatility of 12.1% and a compound return of 8.3% over 1928&ndash;2025, against stocks' 19.4% and 10.0%.</p>
+  <div class="ex" data-answer="25" data-tol="0.02" data-ok="1 &divide; 0.8 &minus; 1 = 25%.">
+    <div class="ex-tag">Quick exercise</div><p class="ex-q">A portfolio falls 20%. What percentage gain does it need to get back to where it started?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">After a 20% loss, $100 is $80. It needs to grow by $20, which is 20 &divide; 80 = <b>25%</b>.</div></div>
+</section>
+
+<section class="panel" data-tab="Risk and reward">
+  <p class="kicker">The trade-off</p>
+  <h2>More risk has usually meant more return &mdash; but not always</h2>
+  <p>Plot each asset's volatility against its compound return and a rough pattern appears: the bumpier assets have mostly paid more. That is the risk premium from INV-001 showing up in the data.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.4 &mdash; Volatility versus compound return, 1928&ndash;2025</div>
+    <div id="f34"></div>
+    <figcaption class="cap"><b>Gold is the exception that proves the rule.</b> It was as volatile as stocks but returned about half as much, because it produces no income. Risk is rewarded only when it comes attached to an engine of return &mdash; profits, interest or rent. Home prices exclude rent. Source: Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>Compensated and uncompensated risk.</b> The market as a whole pays a premium for bearing risk that cannot be diversified away. Risk that <i>can</i> be diversified away &mdash; betting on one company, one sector or one collectible &mdash; has no reason to be rewarded, because other investors will not pay you for a risk they can avoid for free. INV-004 shows how.</p></div></div>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>The Sharpe ratio, briefly</summary><div class="layer-b">
+    <p>The Sharpe ratio divides an investment's return above the risk-free rate by its volatility: (R &minus; R<sub>f</sub>) &divide; &sigma;. Using the arithmetic means and standard deviations over 1928&ndash;2025, stocks score about (11.9 &minus; 3.4) &divide; 19.4 &asymp; 0.43, and gold about (7.4 &minus; 3.4) &divide; 21.5 &asymp; 0.18. It is a useful comparison of reward per unit of volatility, with all of volatility's limitations; INV-057 covers it and its alternatives.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Kinds of risk">
+  <p class="kicker">Beyond price swings</p>
+  <h2>Nine risks every plan has to face</h2>
+  <p>Price volatility gets the attention, but it is only one of several risks, and for many households not the largest. The "safest" choice for one risk is often the riskiest for another.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.5 &mdash; No asset is safe from every risk</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 250" role="img" aria-label="Grid showing exposure of cash, bonds and stocks to market, inflation, interest-rate, credit and longevity risk">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g class="svg-s" font-size="12.5" font-weight="700"><text x="170" y="30" text-anchor="middle">Market</text><text x="280" y="30" text-anchor="middle">Inflation</text><text x="390" y="30" text-anchor="middle">Interest rate</text><text x="500" y="30" text-anchor="middle">Credit</text><text x="620" y="30" text-anchor="middle">Outliving money</text></g>
+      <g class="svg-t" font-size="13" font-weight="800"><text x="16" y="78">Cash / T-bills</text><text x="16" y="138">Bonds</text><text x="16" y="198">Stocks</text></g>
+      <g font-size="12" font-weight="700" text-anchor="middle">
+        <rect x="120" y="52" width="100" height="40" rx="8" style="fill:var(--green-soft)"/><text x="170" y="77" style="fill:var(--green)">Low</text>
+        <rect x="230" y="52" width="100" height="40" rx="8" style="fill:var(--red-soft)"/><text x="280" y="77" style="fill:var(--red)">High</text>
+        <rect x="340" y="52" width="100" height="40" rx="8" style="fill:var(--green-soft)"/><text x="390" y="77" style="fill:var(--green)">Low</text>
+        <rect x="450" y="52" width="100" height="40" rx="8" style="fill:var(--green-soft)"/><text x="500" y="77" style="fill:var(--green)">Low*</text>
+        <rect x="560" y="52" width="120" height="40" rx="8" style="fill:var(--red-soft)"/><text x="620" y="77" style="fill:var(--red)">High</text>
+        <rect x="120" y="112" width="100" height="40" rx="8" style="fill:var(--amber-soft)"/><text x="170" y="137" style="fill:var(--amber)">Moderate</text>
+        <rect x="230" y="112" width="100" height="40" rx="8" style="fill:var(--red-soft)"/><text x="280" y="137" style="fill:var(--red)">High</text>
+        <rect x="340" y="112" width="100" height="40" rx="8" style="fill:var(--red-soft)"/><text x="390" y="137" style="fill:var(--red)">High</text>
+        <rect x="450" y="112" width="100" height="40" rx="8" style="fill:var(--amber-soft)"/><text x="500" y="137" style="fill:var(--amber)">Varies</text>
+        <rect x="560" y="112" width="120" height="40" rx="8" style="fill:var(--amber-soft)"/><text x="620" y="137" style="fill:var(--amber)">Moderate</text>
+        <rect x="120" y="172" width="100" height="40" rx="8" style="fill:var(--red-soft)"/><text x="170" y="197" style="fill:var(--red)">High</text>
+        <rect x="230" y="172" width="100" height="40" rx="8" style="fill:var(--amber-soft)"/><text x="280" y="197" style="fill:var(--amber)">Moderate</text>
+        <rect x="340" y="172" width="100" height="40" rx="8" style="fill:var(--amber-soft)"/><text x="390" y="197" style="fill:var(--amber)">Moderate</text>
+        <rect x="450" y="172" width="100" height="40" rx="8" style="fill:var(--card2)"/><text x="500" y="197" class="svg-m">n/a</text>
+        <rect x="560" y="172" width="120" height="40" rx="8" style="fill:var(--green-soft)"/><text x="620" y="197" style="fill:var(--green)">Lower</text>
+      </g>
+      <text x="16" y="238" class="svg-m" font-size="11">*Within FDIC/SIPC limits and for US Treasuries. Long-horizon view; over a single year, stocks' market risk dominates.</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Choosing an asset is choosing which risks to carry.</b> Cash removes market risk and maximizes inflation and longevity risk. Stocks do the reverse. Mixing them spreads the exposure.</figcaption>
+  </figure>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Risk</th><th>What it is</th><th>Where it bites</th><th>Covered in</th></tr></thead><tbody>
+    <tr><td><b>Market</b></td><td>Prices of whole asset classes fall together.</td><td>2008, 2022</td><td>INV-004, INV-049</td></tr>
+    <tr><td><b>Inflation</b></td><td>Rising prices erode fixed dollars.</td><td>1973&ndash;1982, 2021&ndash;22</td><td>INV-001, INV-008</td></tr>
+    <tr><td><b>Interest-rate</b></td><td>Existing bonds fall in price when rates rise.</td><td>2022: 10-year Treasuries &minus;17.8%</td><td>INV-009</td></tr>
+    <tr><td><b>Credit (default)</b></td><td>A borrower fails to pay.</td><td>Corporate and municipal bonds, private loans</td><td>INV-010</td></tr>
+    <tr><td><b>Liquidity</b></td><td>You cannot sell quickly at a fair price.</td><td>Real estate, private funds, small stocks</td><td>INV-014, Stage 9</td></tr>
+    <tr><td><b>Concentration</b></td><td>Too much in one company, sector or property.</td><td>Employer stock (Enron)</td><td>INV-004</td></tr>
+    <tr><td><b>Sequence of returns</b></td><td>Bad returns arrive just as withdrawals begin.</td><td>Retirement in 1929, 1973, 2000</td><td>INV-077</td></tr>
+    <tr><td><b>Longevity</b></td><td>Living longer than the money lasts.</td><td>Very conservative retirees</td><td>INV-075, INV-082</td></tr>
+    <tr><td><b>Behavioral</b></td><td>Selling in panic or chasing performance.</td><td>Every crash and bubble</td><td>INV-060, INV-061</td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history</p>
+  <h2>Three stress tests</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>1929&ndash;1937: the Depression and the false recovery</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Calendar-year stock returns: 1929 &minus;8.3%, 1930 &minus;25.1%, 1931 &minus;43.8%, 1932 &minus;8.6%. A dollar at the start of 1929 was worth 35 cents at the start of 1933. Strong years in 1933&ndash;1936 brought it back above $1 by the start of 1937 &mdash; and 1937 then fell 35.3%.</div></div>
+    <div class="row"><div>What it teaches</div><div>Recovery can be interrupted. Investors who needed to sell in 1932, or who gave up after 1937, locked in the loss. Meanwhile 10-year Treasuries rose in every one of 1929&ndash;1933 except 1931 &mdash; the diversification that saved balanced investors.</div></div>
+    <div class="row"><div>Source</div><div class="src">Damodaran, NYU Stern, annual returns.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>2008: when bonds did their job</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>The global financial crisis: stocks &minus;36.6%, home prices &minus;12.0%, Baa corporate bonds &minus;3.4% &mdash; and 10-year Treasuries +20.1% as investors fled to safety and interest rates fell.</div></div>
+    <div class="row"><div>What it teaches</div><div>A 60/40 portfolio fell 13.9%, well under half of stocks' loss. Investors who rebalanced &mdash; selling some of the bonds that had risen to buy stocks that had fallen &mdash; bought at unusually low prices. Stocks returned 25.9% in 2009 and 14.8% in 2010.</div></div>
+    <div class="row"><div>Source</div><div class="src">Damodaran, NYU Stern.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>2022: when bonds did not</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>With inflation at 6.5% and interest rates rising fast, stocks fell 18.0% and 10-year Treasuries fell 17.8% &mdash; their worst year in the dataset. A 60/40 mix fell about 18%, nearly as much as stocks alone.</div></div>
+    <div class="row"><div>What it teaches</div><div>Bonds protect best against recessions and deflationary scares, when rates fall. They protect poorly against an inflation shock, when rates rise. Treasuries fell alongside stocks in only five calendar years since 1928 (1931, 1941, 1969, 2018 and 2022) &mdash; rare, but real.</div></div>
+    <div class="row"><div>Source</div><div class="src">Damodaran, NYU Stern.</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.6 &mdash; Stocks and 10-year Treasuries in the stress years</div>
+    <div id="f36"></div>
+    <figcaption class="cap"><b>The cushion usually works, but not always.</b> In 1931, 1974 and 2022 bonds offered little or no protection; in 2002 and 2008 they rose sharply. Source: Damodaran, NYU Stern.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions under stress</p>
+  <h2>Your portfolio just fell. Now what?</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.7 &mdash; What selling at the bottom of 2008 cost</div>
+    <div id="f37"></div>
+    <figcaption class="cap"><b>Selling turns a temporary fall into a permanent one.</b> $100,000 in stocks at the start of 2008, held, versus sold at the end of 2008 and moved to T-bills. The investor who held had about $224,000 by the start of 2018; the investor who sold had about $65,000. Calendar-year data, before taxes and fees.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Harpers, late 2008 (a rewind)</div>
+    <p class="dq">Imagine the Harpers were 57 and 55 at the end of 2008, their portfolio of 80% stocks and 20% Treasuries down about 25% for the year. Tom wants to "get out until things settle down." What should they do?</p>
+    <div class="opts"><button class="opt">Sell everything now to stop the bleeding.</button><button class="opt">Hold, rebalance back to their target mix, and review whether that target was right for their horizon.</button><button class="opt">Put all their bonds into stocks while prices are low.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Sell everything</b>This locks in the loss and requires getting two decisions right &mdash; when to leave and when to return. Historically, some of the best days and years have come soon after the worst, and most sellers return late or never.</div>
+      <div class="oc"><b>Hold and rebalance</b>The disciplined response: selling some bonds to buy stocks keeps the risk level where they chose it. The honest follow-up question is whether 80% stocks was right with retirement under a decade away &mdash; which is a question to settle calmly, not in the middle of a crash (INV-025).</div>
+      <div class="oc"><b>All in on stocks</b>It might have worked in hindsight, but it is a bet sized by emotion. It would leave them with nothing to spend from if the next few years were bad, which is exactly the risk that matters close to retirement.</div>
+      <div class="verdict"><b>The principle:</b> decide your risk level before the crash, and let the crash test your plan rather than rewrite it.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Maya</div>
+    <p class="dq">A market drop of 25% happens two years into Maya's career. Her 401(k) balance falls from $12,000 to $9,000. How should she feel about it?</p>
+    <div class="opts"><button class="opt">Terrible &mdash; she has lost a quarter of her retirement.</button><button class="opt">Mostly indifferent, maybe even glad &mdash; she will be buying shares at lower prices for decades.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Terrible</b>Understandable, but the loss is $3,000 on paper, and her future contributions over 40 years will be many times her current balance.</div>
+      <div class="oc"><b>Indifferent or glad</b>For a young net buyer of stocks, lower prices mean each month's contribution buys more shares. What matters to her is the price she pays over decades, not this year's balance.</div>
+      <div class="verdict"><b>The principle:</b> whether a fall hurts depends on whether you are mostly buying or mostly selling in the years that follow.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about risk</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.8 &mdash; Share of rolling periods that lost money after inflation</div>
+    <div id="f38"></div>
+    <figcaption class="cap"><b>Stocks' chance of real loss fell with time; bonds' did not.</b> After inflation, 10-year Treasuries lost money in about a third of all 20-year windows, while stocks lost in none. Rolling windows, 1928&ndash;2025.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Bonds are risk-free."</div><div class="ma"><b>Myth.</b> Ten-year Treasuries have almost no default risk, but they fell 17.8% in 2022, and after inflation they lost money in about a third of all 20-year windows since 1928.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"More risk always means more return."</div><div class="ma"><b>Myth.</b> Only risk you cannot diversify away is rewarded on average. Gold was as volatile as stocks with about half the return; a single stock is far more volatile than the market with no higher expected return.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Stocks are riskless if you hold them 20 years."</div><div class="ma"><b>Too strong.</b> In US data since 1928, no 20-year window lost money even after inflation. But the worst real 20-year result was only +0.6% a year, the sample is small and overlapping, and other countries have had 20-year real losses.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"An average return of 10% means I will earn 10%."</div><div class="ma"><b>Myth.</b> The arithmetic average (11.9%) overstates the compound growth investors actually got (10.0%), and any particular 10- or 20-year period can differ widely from either.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Safe investments are the low-risk choice for retirees."</div><div class="ma"><b>Half true.</b> They are low in market risk and high in inflation and longevity risk. Over a 30-year retirement, too little growth can be as dangerous as too much volatility.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A crash is when you lose money."</div><div class="ma"><b>Only if you sell.</b> A fall in price is a loss in value that becomes permanent when you sell or are forced to. Keeping an emergency fund and near-term cash is what prevents forced selling.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.9 &mdash; A 30% fall, in dollars, for each household's investments</div>
+    <div id="f39"></div>
+    <figcaption class="cap"><b>The same percentage feels completely different at different balances.</b> A 30% fall applied to each household's savings and investments (approximate, from their profiles; Maya's is her $3,000 of savings, if it were invested). What matters is not the size of the number but whether the household will need to sell while it is down.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Volatility is her friend.</b> As a net buyer for 40 years, Maya benefits from lower prices. Her real risk is not saving enough, or panicking out of the market the first time it falls.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Separate the goals.</b> Retirement money can ride out a crash; college money for a 7-year-old cannot, entirely. Their mix should differ by goal (INV-096).</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>One income raises the stakes.</b> Jordan's emergency fund is what lets their retirement money stay invested through a job loss. Building it is part of managing investment risk.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>The danger window is opening.</b> A 30% fall at 60 is harder to recover from than at 40, because withdrawals may start before recovery. This is the sequence risk they must plan for (INV-077).</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Both risks at once.</b> Ruth needs enough safety to avoid selling in a crash and enough growth to outpace inflation into her 90s. A few years of withdrawals in safe assets does the first; the rest invested does the second.</div></div>
+  </div>
+  <div class="ws" data-ws="inv003" data-title="INV-003 worksheet: my risk reality check">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w3a">My invested balance, and what a 30% fall would be in dollars</label><textarea id="w3a" data-key="fall"></textarea></div>
+      <div><label for="w3b">When will I first need to sell some of it?</label><textarea id="w3b" data-key="need"></textarea></div>
+      <div><label for="w3c">How I would honestly react to that fall</label><textarea id="w3c" data-key="react"></textarea></div>
+      <div><label for="w3d">What would stop me being forced to sell (cash, income, cushion)?</label><textarea id="w3d" data-key="buffer"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.10 &mdash; Up 50%, down 50%: why order does not save you</div>
+    <div id="f310"></div>
+    <figcaption class="cap"><b>Gain-then-loss and loss-then-gain end in the same place: 75%.</b> Multiplication is commutative &mdash; 1.5 &times; 0.5 = 0.5 &times; 1.5 = 0.75. The arithmetic average of the two years is 0%.</figcaption>
+  </figure>
+  <div class="ex" data-answer="100" data-tol="0.01" data-ok="1 &divide; 0.5 &minus; 1 = 100%.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">An investment falls 50%. What gain, in percent, is needed to recover?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$100 becomes $50; to reach $100 it must double: <b>100%</b>.</div></div>
+  <div class="ex" data-answer="-1" data-tol="0.02" data-ok="Right: (1.10 &times; 0.90)<sup>1/2</sup> &minus; 1 &asymp; &minus;0.5% a year, and total &minus;1%.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">A fund gains 10% one year and loses 10% the next. What is the total change over the two years, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">1.10 &times; 0.90 = 0.99, a total change of <b>&minus;1%</b>. The arithmetic average of +10% and &minus;10% is 0%, but you lost money.</div></div>
+  <div class="ex" data-answer="31" data-tol="0.04" data-ok="12 + 19 = 31%.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">An asset averages 12% a year with a standard deviation of 19%. Roughly what return marks the top of the "one standard deviation" range, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">12% + 19% = <b>31%</b>; the bottom is 12% &minus; 19% = &minus;7%. About two years in three fall in that range for a bell-shaped spread.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.11 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: volatility, drawdown, holding period, and the many kinds of risk">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Volatility</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">how bumpy</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--red-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Drawdown</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">how deep, how long</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Horizon</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">time changes the odds</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Many risks</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">pick which to carry</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"What does a standard deviation of 19% tell you about stock returns?","choices":["Stocks lose 19% every year","About two years in three fall within 19 points of the average","Stocks gain 19% on average","The worst possible year is &minus;19%"],"answer":1,"explain":"Standard deviation measures spread around the average. About two-thirds of outcomes lie within one standard deviation."},
+    {"q":"A portfolio falls 40%. What gain restores it?","choices":["40%","50%","67%","80%"],"answer":2,"explain":"1 &divide; 0.6 &minus; 1 &asymp; 66.7%."},
+    {"q":"In US data since 1928, how often did a 10-year holding of stocks lose money, before inflation?","choices":["Never","About 6% of windows","About 27% of windows","About half the time"],"answer":1,"explain":"5 of 89 rolling 10-year windows lost money (6%); after inflation it was 12%."},
+    {"q":"What happened to 10-year Treasuries in 2008?","choices":["They fell with stocks","They gained about 20% while stocks fell about 37%","They were unchanged","They defaulted"],"answer":1,"explain":"Falling rates and a flight to safety lifted Treasuries 20.1% in 2008."},
+    {"q":"Why did bonds fail to cushion stocks in 2022?","choices":["Bonds always fall with stocks","Rising interest rates, driven by inflation, lowered bond prices as stocks fell","The government defaulted","Bond funds were closed"],"answer":1,"explain":"Bond prices fall when rates rise. In an inflation shock, rates rise and both assets can fall."},
+    {"q":"Why was gold's high volatility not rewarded with a high return?","choices":["Gold is illegal to own","Gold produces no income; risk is rewarded only when attached to an engine of return","Gold is less volatile than cash","It was rewarded more than stocks"],"answer":1,"explain":"Gold was about as volatile as stocks (21.5% vs 19.4%) but compounded 5.6% vs 10.0%."},
+    {"q":"Which risk is highest for a retiree who holds only cash?","choices":["Market risk","Credit risk","Inflation and longevity risk","Liquidity risk"],"answer":2,"explain":"Cash avoids price falls but loses purchasing power over a long retirement."},
+    {"q":"For a young worker who will invest monthly for 40 years, a market fall early in their career is:","choices":["A disaster","Mostly an opportunity: future contributions buy at lower prices","Irrelevant because balances never fall","A sign to stop contributing"],"answer":1,"explain":"Net buyers benefit from lower prices; what matters is the average price paid over decades."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 3.12 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-004</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Diversification</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-025</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Risk tolerance and capacity</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-077</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Sequence risk</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-003"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">pages.stern.nyu.edu</a></li>
+    <li>Sharpe, W. F. (1966). Mutual fund performance. <i>The Journal of Business, 39</i>(1), 119&ndash;138.</li>
+    <li>Dimson, E., Marsh, P., &amp; Staunton, M. (2002). <i>Triumph of the optimists: 101 years of global investment returns</i>. Princeton University Press.</li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Historical returns are calendar-year, before taxes and fees, and do not predict future results.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script>
+INV.ready(function () {
+  var h = INV.hist(), R = h.rows, yr = function (v) { return String(Math.round(v)); }, pc = function (v) { return Math.round(v) + "%"; };
+  var bins = []; for (var lo = -50; lo <= 50; lo += 10) bins.push({ lo: lo, n: 0 });
+  R.forEach(function (r) { var k = Math.floor(r[1] / 10) * 10; var b = bins.find(function (x) { return x.lo === k; }); if (b) b.n++; });
+  INV.barChart(document.getElementById("f31"), { label: "Distribution of annual returns", height: 240, allLabels: true, valueLabels: true, xTitle: "Annual return range", yFmt: function (v) { return Math.round(v); }, tipFmt: function (v) { return v + " years"; },
+    data: bins.map(function (b) { return { label: b.lo + " to " + (b.lo + 10), tip: b.lo + "% to " + (b.lo + 10) + "%", y: b.n, color: b.lo < 0 ? "var(--s5)" : "var(--s2)" }; }) });
+  INV.barChart(document.getElementById("f32"), { label: "Annual stock returns", height: 250, maxLabels: 10, yFmt: pc, tipFmt: function (v) { return INV.pct(v, 1); }, data: R.map(function (r) { return { label: String(r[0]), y: r[1] }; }) });
+  var L = []; for (var l = 0; l <= 80; l += 5) L.push({ label: l + "%", tip: "A " + l + "% loss", y: (1 / (1 - l / 100) - 1) * 100, color: l >= 50 ? "var(--s5)" : l >= 30 ? "var(--s3)" : "var(--s2)" });
+  INV.barChart(document.getElementById("f33"), { label: "Gain needed to recover", height: 250, allLabels: true, xTitle: "Loss", yFmt: pc, tipFmt: function (v) { return "needs +" + v.toFixed(0) + "%"; }, data: L });
+  function sd(a) { var m = a.reduce(function (x, y) { return x + y; }, 0) / a.length; return Math.sqrt(a.reduce(function (s, x) { return s + (x - m) * (x - m); }, 0) / (a.length - 1)); }
+  var cols = window.INV_RETURNS.cols;
+  var pts = [["tbill", "T-bills", "var(--s6)"], ["home", "Home prices", "var(--s3)"], ["tbond", "10-yr Treasuries", "var(--s2)"], ["baa", "Baa corporate bonds", "var(--s4)"], ["gold", "Gold", "var(--s7)"], ["stocks", "Stocks", "var(--s1)"]].map(function (k) {
+    var a = R.map(function (r) { return r[cols.indexOf(k[0])]; }); return { x: sd(a), y: INV.cagr(a), label: k[1], color: k[2] }; });
+  var mix = R.map(function (r) { return 0.6 * r[1] + 0.4 * r[3]; }); pts.push({ x: sd(mix), y: INV.cagr(mix), label: "60/40", color: "var(--s5)" });
+  INV.lineChart(document.getElementById("f34"), { label: "Risk versus return", height: 280, zeroBase: false, xMin: 0, xMax: 24, yMin: 2, yMax: 11, legend: false, xTitle: "Volatility (standard deviation, %)", yTitle: "Compound return (%)",
+    xFmt: function (v) { return v + "%"; }, yFmt: function (v) { return v + "%"; }, series: [{ name: "", color: "transparent", data: [[0, 2], [24, 2]] }],
+    dots: pts.map(function (p) { var left = p.label === "Gold" || p.label === "Home prices"; return { x: p.x, y: p.y, label: p.label, color: p.color, r: 7, dx: left ? -10 : 9, anchor: left ? "end" : null, dy: p.label === "Baa corporate bonds" || p.label === "10-yr Treasuries" ? 18 : -8 }; }) });
+  var yrs = [1931, 1937, 1974, 2002, 2008, 2022], d6 = [];
+  yrs.forEach(function (y) { var r = R[y - h.first]; d6.push({ label: String(y), tip: y + " stocks", y: r[1], color: "var(--s1)" }); d6.push({ label: "", tip: y + " Treasuries", y: r[3], color: "var(--s2)" }); });
+  INV.barChart(document.getElementById("f36"), { label: "Stress years", height: 240, allLabels: true, valueLabels: true, yFmt: pc, tipFmt: function (v) { return INV.pct(v, 1); }, data: d6 });
+  var hold = [[2008, 100000]], sold = [[2008, 100000]], v1 = 100000, v2 = 100000;
+  for (var y = 2008; y <= 2017; y++) { var r = R[y - h.first]; v1 *= 1 + r[1] / 100; v2 *= y === 2008 ? 1 + r[1] / 100 : 1 + r[2] / 100; hold.push([y + 1, v1]); sold.push([y + 1, v2]); }
+  INV.lineChart(document.getElementById("f37"), { label: "Held versus sold", height: 240, xFmt: yr, yFmt: INV.moneyShort, zeroBase: false,
+    series: [{ name: "Held stocks", color: "var(--s1)", data: hold }, { name: "Sold at end of 2008, into T-bills", color: "var(--s5)", data: sold }], marks: [{ x: 2009, label: "sold here" }] });
+  function realNeg(ix, n) { var c = 0, t = 0; for (var s = 0; s + n <= R.length; s++) { var g = 1; for (var k = s; k < s + n; k++) g *= (1 + R[k][ix] / 100) / (1 + R[k][7] / 100); t++; if (g < 1) c++; } return c / t * 100; }
+  var d8 = []; [1, 5, 10, 15, 20].forEach(function (n) { d8.push({ label: n + " yr", tip: n + "-year windows, stocks", y: realNeg(1, n), color: "var(--s1)" }); d8.push({ label: "", tip: n + "-year windows, Treasuries", y: realNeg(3, n), color: "var(--s2)" }); });
+  INV.barChart(document.getElementById("f38"), { label: "Real loss frequency", height: 230, allLabels: true, valueLabels: true, yFmt: pc, tipFmt: function (v) { return v.toFixed(0) + "% of windows"; }, data: d8 });
+  INV.barChart(document.getElementById("f39"), { label: "30% fall in dollars", height: 220, allLabels: true, valueLabels: true, yFmt: INV.moneyShort,
+    data: [["Maya", 3000, "var(--s1)"], ["Riveras", 62000, "var(--s2)"], ["Jordan", 140000, "var(--s3)"], ["Harpers", 1100000, "var(--s4)"], ["Ruth", 780000, "var(--s5)"]].map(function (x) { return { label: x[0], tip: x[0] + ": 30% of " + INV.money(x[1]), y: -0.3 * x[1], color: x[2] }; }) });
+  INV.lineChart(document.getElementById("f310"), { label: "Up then down", height: 200, xTicks: [0, 1, 2], xFmt: function (v) { return ["Start", "Year 1", "Year 2"][v]; }, yFmt: function (v) { return "$" + v; }, zeroBase: false, yMin: 40, yMax: 160,
+    series: [{ name: "+50% then −50%", color: "var(--s1)", data: [[0, 100], [1, 150], [2, 75]] }, { name: "−50% then +50%", color: "var(--s5)", data: [[0, 100], [1, 50], [2, 75]] }] });
+});
+</script>
+</body>
+</html>

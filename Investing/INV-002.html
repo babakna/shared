@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-002 · Compounding and the Time Value of Money — Investing Learning Lab</title>
+<meta name="description" content="How compounding works, why starting early matters, the Rule of 72, present value, and how compounding works against you in debt — with live calculators.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-002">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-002</span><span class="ttl">Compounding and the Time Value of Money</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 1 · Foundations</span><span class="chip teal">Beginner</span><span class="chip gray">About 50 minutes</span><span class="chip gray">4 calculators</span></div>
+    <h1>Compounding and the Time Value of Money</h1>
+    <p class="sub">Compounding is growth on top of growth. It is the reason small amounts saved early can outgrow large amounts saved late, the reason debt snowballs, and the reason a dollar today is worth more than a dollar next year. This module makes all three concrete.</p>
+    <p class="q"><span>The question this module answers</span>How much does time really matter &mdash; and how do I compare money now with money later?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <g fill="#1F5FD1"><rect x="40" y="186" width="18" height="20" rx="3" opacity=".35"/><rect x="66" y="182" width="18" height="24" rx="3" opacity=".4"/><rect x="92" y="177" width="18" height="29" rx="3" opacity=".45"/><rect x="118" y="170" width="18" height="36" rx="3" opacity=".5"/><rect x="144" y="162" width="18" height="44" rx="3" opacity=".55"/><rect x="170" y="152" width="18" height="54" rx="3" opacity=".6"/><rect x="196" y="139" width="18" height="67" rx="3" opacity=".68"/><rect x="222" y="123" width="18" height="83" rx="3" opacity=".75"/><rect x="248" y="103" width="18" height="103" rx="3" opacity=".82"/><rect x="274" y="78" width="18" height="128" rx="3" opacity=".9"/><rect x="300" y="46" width="18" height="160" rx="3"/></g>
+      <path d="M40 184 L318 150" stroke="#B45309" stroke-width="3" stroke-dasharray="6 5"/>
+      <text x="44" y="40" class="svg-t" font-size="13" font-weight="800">Growth on growth</text><text x="190" y="176" class="svg-s" font-size="11.5">simple interest</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>Interest that earns interest</h2>
+  <p class="lede">If you have ever had a savings account, you have seen interest: the bank pays you a small percentage for holding your money. Compounding is what happens when that interest is left in the account, so that next year's interest is paid on this year's interest too.</p>
+  <p>It sounds like a technicality. Over short periods it almost is: in the first year, compound and simple interest are identical. The difference appears slowly and then, after a decade or two, overwhelmingly. Figure 2.1 shows $10,000 growing at 7% a year for 40 years, once with <b>simple interest</b> (interest paid only on the original $10,000) and once with <b>compound interest</b>.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.1 &mdash; $10,000 at 7% a year: simple versus compound interest</div>
+    <div id="f21"></div>
+    <figcaption class="cap"><b>For ten years the two lines look alike; after 40 they are four times apart.</b> Simple interest adds the same $700 every year, ending at $38,000. Compounding adds 7% of an ever-larger balance, ending at $149,745. Computed: 10,000 &times; (1 + 0.07 &times; t) versus 10,000 &times; 1.07<sup>t</sup>.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>The compound growth formula, and a calculator that includes monthly saving.</li>
+    <li>Why the <b>start date</b> can matter more than the amount &mdash; and when it does not.</li>
+    <li>The <b>Rule of 72</b>, a mental shortcut you will use for the rest of your life.</li>
+    <li><b>Present value</b>: compounding run backwards, for comparing money now and money later.</li>
+    <li>How compounding works <b>against</b> you in debt and fees.</li>
+  </ol>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>The one idea.</b> Growth is proportional to what you already have. That is why the curve bends upward, why time is so valuable, and why every percentage point of return &mdash; or of cost &mdash; matters more than it looks.</p></div></div>
+</section>
+
+<section class="panel" data-tab="The formula">
+  <p class="kicker">How it works</p>
+  <h2>Compound growth, one step at a time</h2>
+  <p>Start with $1,000 at 5%. After one year you have $1,000 &times; 1.05 = $1,050. After two years you have $1,050 &times; 1.05 = $1,102.50 &mdash; the extra $2.50 is interest on the first year's interest. After <i>n</i> years you have $1,000 &times; 1.05 &times; 1.05 &times; &hellip; <i>n</i> times.</p>
+  <div class="def"><div class="def-h"><b>Future value (FV)</b><span>what money grows to</span></div>
+    <div class="def-r"><div>What it is</div><div>The amount a sum grows to after a number of periods at a given rate of return, with each period's growth added to the balance.</div></div>
+    <div class="def-r"><div>Used for</div><div>Projecting savings, retirement balances and college funds; showing the cost of waiting.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Every projection you will ever see from a bank, a retirement plan or an advisor is this formula with assumptions plugged in. Knowing the formula lets you question the assumptions.</div></div></div>
+  <div class="formula">FV = PV &times; (1 + r)<sup>n</sup> &nbsp;&nbsp; PV = starting amount &middot; r = rate per period &middot; n = number of periods</div>
+  <p>With regular saving added each period, the formula gains a second part: the future value of a series of equal payments, called an <span class="term" data-term="annuity">annuity</span> in finance (the same word as the insurance product, with a narrower meaning here).</p>
+  <div class="formula">FV = PV &times; (1 + r)<sup>n</sup> + PMT &times; [(1 + r)<sup>n</sup> &minus; 1] &divide; r</div>
+  <div data-tool="compound"></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>APR versus APY, and how often interest compounds</summary><div class="layer-b">
+    <p>Banks quote savings accounts in <b>APY</b> (annual percentage yield), which already includes compounding. Loans are quoted in <b>APR</b> (annual percentage rate), which usually does not. The same 12% APR compounded monthly is an APY of 12.68%; compounded daily it is 12.75%.</p>
+    <div class="formula">APY = (1 + APR &divide; m)<sup>m</sup> &minus; 1 &nbsp;&nbsp; m = compounding periods per year</div>
+    <p>For savers, compare APYs. For borrowers, remember that a credit card's quoted APR understates what the balance actually grows at: a 22% APR compounded monthly grows a balance at about 24.4% a year.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Continuous compounding and effective rates</summary><div class="layer-b">
+    <p>As compounding becomes more frequent, the result approaches a limit: FV = PV &times; e<sup>rt</sup>, where e &asymp; 2.71828. At 12% the continuous APY is e<sup>0.12</sup> &minus; 1 = 12.75%, barely above daily compounding. Continuous compounding is mostly a mathematical convenience: log returns (ln(1 + r)) add across periods, which is why analysts use them for multi-period statistics.</p>
+    <p>The calculator above converts the annual rate to a monthly one as (1 + r)<sup>1/12</sup> &minus; 1, so a "7% a year" input really does produce 7% growth over a year. Dividing by 12 instead (0.583% a month) would overstate the annual result slightly, at 7.23%.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Time">
+  <p class="kicker">The biggest lever</p>
+  <h2>Starting early: the famous comparison, honestly told</h2>
+  <p>A classic illustration: Saver A invests $6,000 a year from 25 to 34 and then stops for good. Saver B invests $6,000 a year from 35 until 65. Saver B puts in three times as much money. Who ends up with more?</p>
+  <div data-tool="earlylate"></div>
+  <p>At 7% a year, Saver A &mdash; who invested $60,000 &mdash; ends with about <b>$675,000</b>, ahead of Saver B's <b>$606,000</b> from $180,000 of contributions. That is the version usually told. Now move the return slider to 6%: <b>Saver B wins</b>, $503,000 to $481,000. At 5% Saver B wins comfortably.</p>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>The honest lesson.</b> "Ten years early beats thirty years late" is not a law; it depends on the assumed return. What <i>is</i> true at every return: each dollar invested early does far more work than a dollar invested late, and the best result by a wide margin is to start early <i>and</i> keep going. Try setting Saver A to invest for 40 years.</p></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.2 &mdash; What $1 invested at each age grows to by 65, at 7%</div>
+    <div id="f22"></div>
+    <figcaption class="cap"><b>A dollar invested at 25 becomes about $15 by 65; a dollar invested at 55 becomes about $2.</b> After inflation, at a 7% nominal return and 2.5% inflation, the 25-year-old's dollar is still worth about $5.60 in today's money. Computed: 1.07<sup>(65 &minus; age)</sup>.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">What would you do? &middot; Maya</div>
+    <p class="dq">Maya's employer matches 50% of what she contributes to her 401(k), up to 6% of her $62,000 salary. She is thinking of contributing 3% for now and "catching up later." What does waiting cost?</p>
+    <div class="opts"><button class="opt">3% now; increase it in a few years.</button><button class="opt">6% now, to capture the full match.</button><button class="opt">Nothing yet &mdash; the loans come first.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>3% now</b>She leaves half the match unclaimed: 1.5% of salary, about $930 in the first year, that her employer would have paid. Projected over 41 years at 7% with 3% annual raises, contributing 3% instead of 6% leaves her with roughly half the balance &mdash; about $0.9M versus $1.8M in future dollars.</div>
+      <div class="oc"><b>6% now</b>The standard advice, for a reason: the match is an immediate 50% return on those dollars, which no investment reliably matches. On her salary, 6% is $310 a month before tax; because it comes out pre-tax, her take-home falls by less.</div>
+      <div class="oc"><b>Nothing yet</b>Her 6.8% loan is real, but skipping the match to repay it trades a guaranteed 50% return for a guaranteed 6.8% one. Most planners would capture the match first, then direct extra money to the loan (INV-020 works through the order in detail).</div>
+      <div class="verdict"><b>The principle:</b> an employer match is the closest thing to free money in personal finance, and early dollars compound the longest.</div>
+    </div>
+  </div>
+  <p class="src">Maya's projection assumes contributions each month, a 7% annual return, 3% yearly raises, and the plan's match formula unchanged. Illustrative, before taxes; real plans vary.</p>
+</section>
+
+<section class="panel" data-tab="Rule of 72">
+  <p class="kicker">A shortcut worth memorizing</p>
+  <h2>How long until money doubles?</h2>
+  <p>Divide 72 by the annual percentage rate. The answer is approximately how many years it takes for money to double. At 8%, about 9 years; at 6%, about 12; at 3% inflation, prices double in about 24.</p>
+  <div class="def"><div class="def-h"><b>Rule of 72</b><span>years to double &asymp; 72 &divide; rate</span></div>
+    <div class="def-r"><div>What it is</div><div>A mental approximation of the doubling time for anything that compounds at a steady rate.</div></div>
+    <div class="def-r"><div>Used for</div><div>Quickly judging growth rates, inflation, fees and debt without a calculator.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>At 7%, money doubles about every 10 years. A 25-year-old's savings can double four times before 65 &mdash; that is 16 times the original. A 55-year-old's can double once.</div></div></div>
+  <div data-tool="rule72"></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Rate</th><th class="r">Exact years to double</th><th class="r">Rule of 72</th><th class="r">Rule of 69.3</th></tr></thead>
+  <tbody><tr><td>2%</td><td class="r">35.0</td><td class="r">36.0</td><td class="r">34.7</td></tr><tr><td>4%</td><td class="r">17.7</td><td class="r">18.0</td><td class="r">17.3</td></tr><tr><td>6%</td><td class="r">11.9</td><td class="r">12.0</td><td class="r">11.6</td></tr><tr><td>8%</td><td class="r">9.0</td><td class="r">9.0</td><td class="r">8.7</td></tr><tr><td>10%</td><td class="r">7.3</td><td class="r">7.2</td><td class="r">6.9</td></tr><tr><td>12%</td><td class="r">6.1</td><td class="r">6.0</td><td class="r">5.8</td></tr><tr><td>24%</td><td class="r">3.2</td><td class="r">3.0</td><td class="r">2.9</td></tr></tbody></table></div>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Why 72 works</summary><div class="layer-b">
+    <p>Doubling means (1 + r)<sup>n</sup> = 2, so n = ln 2 &divide; ln(1 + r). For small r, ln(1 + r) &asymp; r, giving n &asymp; 0.693 &divide; r, the "Rule of 69.3" &mdash; exact for continuous compounding. Annual compounding makes the true answer a little longer, and 72 compensates while being divisible by 2, 3, 4, 6, 8, 9 and 12. The rule is most accurate near 8%.</p>
+    <p>The same logic gives a <b>Rule of 114</b> for tripling (ln 3 &asymp; 1.10) and a <b>Rule of 144</b> for quadrupling (two doublings).</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Present value">
+  <p class="kicker">Compounding in reverse</p>
+  <h2>Why a dollar today is worth more than a dollar later</h2>
+  <p>If you can earn 5% a year, $100 today becomes $105 next year. Turn that around: a promise of $105 next year is worth only $100 today. That backwards step is called <b>discounting</b>, and the result is the <span class="term" data-term="present value">present value</span>.</p>
+  <div class="def"><div class="def-h"><b>Present value (PV) and discount rate</b></div>
+    <div class="def-r"><div>What it is</div><div>The value today of money received in the future, found by dividing by (1 + r) for each year of delay. The rate r used is the <b>discount rate</b>: what you could earn on the money elsewhere at similar risk.</div></div>
+    <div class="def-r"><div>Used for</div><div>Lump sum versus payments (pensions, lottery wins, legal settlements), comparing job offers, valuing bonds and businesses, deciding whether to prepay a loan.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>You cannot compare dollars at different dates directly. Present value converts them all to today's dollars first, and the discount rate you choose can change the answer.</div></div></div>
+  <div class="formula">PV = FV &divide; (1 + r)<sup>n</sup> &nbsp;&nbsp;&nbsp; PV of n equal yearly payments = PMT &times; [1 &minus; (1 + r)<sup>&minus;n</sup>] &divide; r</div>
+  <div data-tool="pv"></div>
+  <div class="decide">
+    <div class="dq-tag">What would you do? &middot; A pension choice</div>
+    <p class="dq">A retiring worker is offered either a $250,000 lump sum today or $18,000 a year for 20 years. Using the calculator's second mode, which is worth more?</p>
+    <div class="opts"><button class="opt">The payments: $18,000 &times; 20 = $360,000, far more than $250,000.</button><button class="opt">It depends on the discount rate.</button><button class="opt">The lump sum, always &mdash; money now beats money later.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>The payments, because $360,000 &gt; $250,000</b>Adding future dollars as if they were today's ignores the time value of money. At 5%, those payments are worth about $224,000 today &mdash; less than the lump sum.</div>
+      <div class="oc"><b>It depends on the rate</b>Right. The break-even is about 3.8%: below it the payments are worth more, above it the lump sum is. And real pensions add questions the calculator leaves out &mdash; life expectancy (payments may last longer than 20 years), inflation adjustments, survivor benefits and the payer's financial strength. INV-080 covers the full decision.</div>
+      <div class="oc"><b>Always the lump sum</b>Not always. If the payments are generous relative to the lump sum, or you are likely to live long, or you would not invest the lump sum well, the payments can win.</div>
+      <div class="verdict"><b>The principle:</b> never compare amounts at different dates without discounting them to the same date.</div>
+    </div>
+  </div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Choosing a discount rate</summary><div class="layer-b">
+    <p>The discount rate should reflect what the money could earn elsewhere <i>at similar risk</i>. A guaranteed pension payment is closer to a high-quality bond than to stocks, so it is usually discounted near bond yields. Using an expected stock return as the discount rate makes guaranteed payments look artificially cheap, because it compares a certain stream with an uncertain one.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Saving vs growth">
+  <p class="kicker">What drives the balance</p>
+  <h2>Early on, your saving does the work. Later, growth does.</h2>
+  <p>Save $500 a month at 7%. After ten years you have about $85,500, of which $60,000 is your own money and $25,500 is growth. By year 19, the growth has overtaken everything you have put in. By year 40, growth is about 80% of a $1.24 million balance.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.3 &mdash; $500 a month at 7%: where the balance comes from</div>
+    <div id="f23"></div>
+    <figcaption class="cap"><b>The two stages of wealth-building.</b> In the first decade, how much you save matters far more than your return. Later, the return on the pile you have built dominates. Computed with monthly contributions and monthly compounding at the equivalent of 7% a year.</figcaption>
+  </figure>
+  <div class="two">
+    <div class="callout good"><div class="ic">&#127793;</div><div><p><b>If you are starting out</b>, focus on your <b>savings rate</b>: raising it from 5% to 10% of pay doubles your progress. Searching for a slightly better fund changes little yet.</p></div></div>
+    <div class="callout key"><div class="ic">&#127795;</div><div><p><b>If you have built a large balance</b>, costs, taxes and your investment mix now move more dollars each year than your contributions do. That is why Stages 5 and 7 matter most to people like the Harpers.</p></div></div>
+  </div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why "a 1% better return" is worth more than it sounds</summary><div class="layer-b">
+    <p>Over 40 years of $500 a month, the ending balance is about $1.24 million at 7% and about $0.95 million at 6%. One percentage point of return &mdash; or of fees, which is the same thing in reverse &mdash; changes the outcome by almost a quarter. INV-007 shows the fee version with its own calculator.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="When it works against you">
+  <p class="kicker">Debt and fees</p>
+  <h2>Compounding does not care whose side it is on</h2>
+  <p>The same arithmetic that grows savings also grows debt. A credit card balance left unpaid grows at the card's rate; the Federal Reserve reports that the average interest rate on credit card accounts being charged interest was about 22% in 2025. At that rate, compounded monthly, an unpaid balance doubles in a little over three years.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.4 &mdash; Paying off $5,000 of credit card debt at 22% APR</div>
+    <div id="f24"></div>
+    <figcaption class="cap"><b>Minimum payments stretch a two-year debt into nineteen years.</b> Paying $250 a month clears the balance in 26 months with about $1,290 of interest. A typical minimum payment &mdash; assumed here as 1% of the balance plus that month's interest, at least $25 &mdash; takes about 19 years and costs about $8,100 in interest. Card formulas vary; check your statement's minimum-payment warning.</figcaption>
+  </figure>
+  <div class="callout bad"><div class="ic">&#9888;&#65039;</div><div><p><b>The math of paying off high-rate debt.</b> Paying off a 22% card is a guaranteed, tax-free 22% return. No mainstream investment reliably beats that, which is why high-interest debt usually comes before investing beyond an employer match.</p></div></div>
+  <p>Fees compound against you in the same way, just more quietly: a 1% annual fee is taken from the whole balance every year, and the dollars removed lose all their future growth. INV-007 measures it.</p>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history</p>
+  <h2>Two stories of time doing the heavy lifting</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>Benjamin Franklin's 200-year experiment</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>When Benjamin Franklin died in 1790, his will left &pound;1,000 each to Boston and Philadelphia, to be lent to young tradesmen at interest and largely left to grow for up to 200 years. When the trusts ended around 1990, Boston's had grown to about $4.5 million and Philadelphia's to about $2 million, with part of the money spent on public works at the 100-year mark along the way.</div></div>
+    <div class="row"><div>What it teaches</div><div>Compounding over very long periods produces results that seem out of proportion to the starting sum &mdash; even at modest rates and with money withdrawn midway. It also shows the difference that the rate makes: the two identical gifts ended far apart.</div></div>
+    <div class="row"><div>Source</div><div class="src">The Franklin Institute, "Benjamin Franklin's Donor Story" (fi.edu).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Ronald Read: the $8 million janitor</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Ronald Read worked as a gas station attendant and later a part-time janitor in Brattleboro, Vermont. He lived frugally, bought shares of established dividend-paying companies and held them for decades. When he died in 2014 at 92, his estate was worth almost $8 million; he left $4.8 million to Brattleboro Memorial Hospital and $1.2 million to Brooks Memorial Library. Almost no one had known.</div></div>
+    <div class="row"><div>What it teaches</div><div>A modest income, a high savings rate, very low costs, patience and a long life can compound into a fortune. It is a story about time and behavior, not about brilliant stock picks.</div></div>
+    <div class="row"><div>The caution</div><div>Stories like this are memorable precisely because they are rare. Many patient individual-stock investors did far worse, and a single-company portfolio carries risks that a diversified fund does not (INV-004).</div></div>
+    <div class="row"><div>Source</div><div class="src">The Washington Post, "The remarkable life and lessons of the $8 million janitor" (April 2015); CNBC (August 2016).</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.5 &mdash; Time versus rate: $10,000 compounded at 3%, 5% and 7%</div>
+    <div id="f25"></div>
+    <figcaption class="cap"><b>Rate and time multiply.</b> After 60 years, the 7% line is near $580,000 and the 3% line under $60,000 &mdash; a tenfold gap from a four-point difference in rate. Computed: 10,000 &times; (1 + r)<sup>t</sup>.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Put the time value of money to work</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.6 &mdash; The same $42,000 of college saving, two schedules</div>
+    <div id="f26"></div>
+    <figcaption class="cap"><b>Same dollars, earlier start, $13,000 more.</b> $250 a month for 14 years versus $500 a month for the last 7 years, both at 6%. Both contribute $42,000; the early saver ends with about $64,800 and the late saver with about $51,700.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Riveras</div>
+    <p class="dq">The Riveras' younger child is 4. They could start $250 a month for college now, or wait until their mortgage is smaller and put in $500 a month for the last seven years. Which should they do?</p>
+    <div class="opts"><button class="opt">Wait and save $500 a month later &mdash; same total, less strain now.</button><button class="opt">Start $250 a month now.</button><button class="opt">Skip college saving and focus on retirement.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Wait</b>The same $42,000 ends up about $13,000 smaller, because the money has half as long to compound (Figure 2.6). Waiting also bets that their budget will really have room later.</div>
+      <div class="oc"><b>Start now</b>Usually better, if the cash flow allows it. A 529 plan (INV-034) adds tax-free growth for education and, in many states, a state tax deduction.</div>
+      <div class="oc"><b>Retirement first</b>A reasonable priority many planners share: students can borrow for college; nobody lends for retirement. The best answer may be both, in proportion &mdash; but not retirement at zero.</div>
+      <div class="verdict"><b>The principle:</b> for a fixed total, earlier dollars do more work.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; The Harpers</div>
+    <p class="dq">The Harpers are 57 and 55. Tom says that with only about eight working years left, compounding "doesn't really apply" to them anymore, so extra saving is pointless. Is he right?</p>
+    <div class="opts"><button class="opt">Yes &mdash; compounding needs decades.</button><button class="opt">No &mdash; much of their money will stay invested for 30 years or more.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Yes</b>This mistakes the retirement date for the end of the investment horizon. Money saved at 57 may not be spent until their 80s.</div>
+      <div class="oc"><b>No</b>Right. Their portfolio will keep compounding throughout retirement, and savers aged 50 or older can make additional "catch-up" contributions to workplace plans and IRAs (INV-031). Late saving still counts &mdash; it just works for fewer doublings.</div>
+      <div class="verdict"><b>The principle:</b> your horizon is when the money is spent, not when you stop working.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Five things people say about compounding</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.7 &mdash; Doublings before 65, at 7% (about one every ten years)</div>
+    <div id="f27"></div>
+    <figcaption class="cap"><b>Each decade of delay removes one doubling.</b> Money invested at 25 doubles about four times by 65 (16&times;); at 45, twice (4&times;). Computed: 1.07<sup>(65 &minus; age)</sup>.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Compounding makes you rich quickly."</div><div class="ma"><b>Myth.</b> Compounding is slow at first by its nature: in Figure 2.1 it took more than a decade for compound interest to pull clearly away from simple interest. Its power is almost entirely in long periods.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"It is too late to start at 50."</div><div class="ma"><b>Myth.</b> Money saved at 50 may be invested for 30+ years, until the late stages of retirement. Catch-up contribution limits exist precisely because late saving still matters.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Saving 10 years early always beats saving 30 years late."</div><div class="ma"><b>Myth.</b> It depends on the return. At 7% the early saver wins; at 6% or below, the late saver who invests three times as much wins. The reliable lesson is that early dollars are more powerful, not that later saving is pointless.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A 1% difference in return does not matter much."</div><div class="ma"><b>Myth.</b> Over 40 years of $500 a month, 6% instead of 7% cuts the result by almost a quarter, from $1.24 million to $0.95 million. That is exactly why fees matter (INV-007).</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The minimum payment is a sensible way to repay a card."</div><div class="ma"><b>Myth.</b> On $5,000 at 22%, a 1%-plus-interest minimum payment takes about 19 years and roughly $8,100 of interest to repay. $250 a month clears it in about two years.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What compounding means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.8 &mdash; Years of compounding ahead, by household</div>
+    <div id="f28"></div>
+    <figcaption class="cap"><b>Everyone still has compounding ahead of them.</b> Years until age 90 &mdash; a reasonable planning horizon for a long retirement &mdash; for the youngest adult in each household.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Capture the match now.</b> Maya has the most doublings ahead of her. Every dollar she invests at 24 is worth roughly 15 dollars at 65 at a 7% return. Starting at 6% instead of 3% roughly doubles her projected balance.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Start the college fund now, even small.</b> For the same total, starting at the younger child's age of 4 instead of 11 is worth about $13,000 more at 6%.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Raise the savings rate.</b> At 45, Jordan's contributions still matter more than returns for the next few years. Each 1% of pay saved now has about two doublings ahead of it before 65, and more beyond.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Late saving still compounds.</b> With high income, catch-up contributions, and money that will stay invested into their 80s, the Harpers' next eight years of saving are far from pointless.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Compounding in reverse is her tool now.</b> Present value helps Ruth compare annuity offers, pension-style payouts and when to spend. Inflation, compounding against her at about 3%, is the force she must plan around.</div></div>
+  </div>
+  <div class="ws" data-ws="inv002" data-title="INV-002 worksheet: my compounding plan">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <p><b>Run your own numbers</b> in the calculator on the "The formula" tab and record them here.</p>
+    <div class="ws-grid">
+      <div><label for="w2a">What I have invested now, and what I add each month</label><textarea id="w2a" data-key="now"></textarea></div>
+      <div><label for="w2b">Projected balance at my target age (and the return I assumed)</label><textarea id="w2b" data-key="proj"></textarea></div>
+      <div><label for="w2c">What happens if I add 1% more of my pay?</label><textarea id="w2c" data-key="plus1"></textarea></div>
+      <div><label for="w2d">Any match I am not capturing? Any debt above 8%?</label><textarea id="w2d" data-key="gaps"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.9 &mdash; The formulas on one card</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 170" role="img" aria-label="Formula card: future value, present value, doubling time, APY">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="10" width="340" height="70" rx="12" style="fill:var(--blue-soft)"/><text x="26" y="38" class="svg-t" font-size="13" font-weight="800">Grow it forward</text><text x="26" y="62" class="svg-t" font-size="14" font-family="Menlo, monospace">FV = PV &#215; (1 + r)^n</text>
+      <rect x="370" y="10" width="340" height="70" rx="12" style="fill:var(--teal-soft)"/><text x="386" y="38" class="svg-t" font-size="13" font-weight="800">Bring it back</text><text x="386" y="62" class="svg-t" font-size="14" font-family="Menlo, monospace">PV = FV &#247; (1 + r)^n</text>
+      <rect x="10" y="90" width="340" height="70" rx="12" style="fill:var(--amber-soft)"/><text x="26" y="118" class="svg-t" font-size="13" font-weight="800">Doubling time</text><text x="26" y="142" class="svg-t" font-size="14" font-family="Menlo, monospace">years &#8776; 72 &#247; rate%</text>
+      <rect x="370" y="90" width="340" height="70" rx="12" style="fill:var(--violet-soft)"/><text x="386" y="118" class="svg-t" font-size="13" font-weight="800">Quoted rate to real growth</text><text x="386" y="142" class="svg-t" font-size="14" font-family="Menlo, monospace">APY = (1 + APR/m)^m &#8722; 1</text>
+      </g></svg></div>
+  </figure>
+  <div class="ex" data-answer="19672" data-tol="0.01" data-ok="$10,000 &times; 1.07<sup>10</sup> = $19,672.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">$10,000 grows at 7% a year for 10 years. What is it worth at the end?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">FV = 10,000 &times; 1.07<sup>10</sup> = 10,000 &times; 1.9672 = <b>$19,672</b> &mdash; almost exactly double, as the Rule of 72 predicts (72 &divide; 7 &asymp; 10.3 years).</div></div>
+  <div class="ex" data-answer="12" data-tol="0.05" data-ok="72 &divide; 6 = 12 years.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">Using the Rule of 72, about how many years does money take to double at 6%?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in years" placeholder="years"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">72 &divide; 6 = <b>12 years</b> (exact: 11.9).</div></div>
+  <div class="ex" data-answer="61391" data-tol="0.01" data-ok="$100,000 &divide; 1.05<sup>10</sup> = $61,391.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">You will receive $100,000 in 10 years. At a 5% discount rate, what is it worth today?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">PV = 100,000 &divide; 1.05<sup>10</sup> = 100,000 &divide; 1.6289 = <b>$61,391</b>.</div></div>
+  <div class="ex" data-answer="12.68" data-tol="0.01" data-ok="(1 + 0.12/12)<sup>12</sup> &minus; 1 = 12.68%.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">A loan charges 12% APR compounded monthly. What is its effective annual rate (APY), in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">(1 + 0.01)<sup>12</sup> &minus; 1 = 1.1268 &minus; 1 = <b>12.68%</b>.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.10 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: rate times time equals growth; discounting reverses it; debt and fees run it backwards">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="54" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Rate &#215; time</text><text x="120" y="76" text-anchor="middle" class="svg-s" font-size="12">growth on growth</text>
+      <rect x="250" y="20" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="54" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Discounting</text><text x="360" y="76" text-anchor="middle" class="svg-s" font-size="12">compare money across time</text>
+      <rect x="490" y="20" width="220" height="80" rx="12" style="fill:var(--red-soft)"/><text x="600" y="54" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Debt and fees</text><text x="600" y="76" text-anchor="middle" class="svg-s" font-size="12">compounding against you</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"What makes compound interest different from simple interest?","choices":["It is paid more often","Interest is earned on previously earned interest, not just the original amount","It is only available on stocks","It is always a higher rate"],"answer":1,"explain":"Compounding adds each period's growth to the base, so growth is earned on growth."},
+    {"q":"By the Rule of 72, how long does money take to double at 9%?","choices":["About 4 years","About 8 years","About 12 years","About 18 years"],"answer":1,"explain":"72 &divide; 9 = 8 years."},
+    {"q":"Saver A invests for 10 years early then stops; Saver B invests three times as much, later. Which statement is true?","choices":["A always ends with more","B always ends with more","The result depends on the rate of return, but early dollars always do more work","Timing does not matter, only the total contributed"],"answer":2,"explain":"At 7% A wins; at 6% B wins. At every rate, an early dollar grows more than a late one."},
+    {"q":"What is the present value of $50,000 received in 10 years at a 5% discount rate?","choices":["About $30,700","About $47,500","About $50,000","About $81,400"],"answer":0,"explain":"50,000 &divide; 1.05<sup>10</sup> &asymp; $30,696."},
+    {"q":"A credit card charges 22% APR, compounded monthly. The balance actually grows at about:","choices":["22% a year","20% a year","24.4% a year","44% a year"],"answer":2,"explain":"(1 + 0.22/12)<sup>12</sup> &minus; 1 &asymp; 24.4%."},
+    {"q":"Early in a saving career, what drives the balance most?","choices":["Investment returns","How much you contribute","The choice of brokerage","Market timing"],"answer":1,"explain":"With a small balance, contributions dominate. Growth overtakes contributions only after many years (year 19 at $500/month and 7%)."},
+    {"q":"A pension offers $250,000 now or $18,000 a year for 20 years. What should you do before choosing?","choices":["Pick the larger total, $360,000","Discount the payments to today at a suitable rate and compare","Always take the lump sum","Always take the payments"],"answer":1,"explain":"At 5% the payments are worth about $224,000 today; the break-even rate is about 3.8%. Longevity, inflation and survivor terms matter too."},
+    {"q":"Why does paying off a 22% credit card usually come before investing (after any employer match)?","choices":["Because debt is illegal to carry","Because it is a guaranteed 22% return that no mainstream investment reliably beats","Because credit cards lower your taxes","It does not; investing should always come first"],"answer":1,"explain":"Each dollar repaid stops 22% compounding against you &mdash; a certain, tax-free return."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 2.11 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-003</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Risk and return</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--red-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-007</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">The cost of investing</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-020</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Debt versus investing</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-002"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Board of Governors of the Federal Reserve System. (2026, September 8). <i>Consumer credit &mdash; G.19</i>. Terms of credit: commercial bank interest rate on credit card plans, accounts assessed interest. <a href="https://www.federalreserve.gov/releases/g19/current/default.htm">federalreserve.gov</a></li>
+    <li>The Franklin Institute. <i>Benjamin Franklin's donor story</i>. <a href="https://fi.edu/en/support/benjamin-franklins-donor-story">fi.edu</a></li>
+    <li>The Washington Post. (2015, April 24). <i>The remarkable life and lessons of the $8 million janitor</i>. <a href="https://www.washingtonpost.com/business/get-there/the-remarkable-life-and-lessons-of-ronald-read/2015/04/24/7c12a26a-e944-11e4-9a6a-c1ab95a0600b_story.html">washingtonpost.com</a></li>
+    <li>CNBC. (2016, August 29). <i>A janitor secretly amassed an $8 million fortune and left most of it to his library and hospital</i>. <a href="https://www.cnbc.com/2016/08/29/janitor-secretly-amassed-an-8-million-fortune.html">cnbc.com</a></li>
+    <li>U.S. Securities and Exchange Commission, Investor.gov. <i>Compound interest calculator</i>. <a href="https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator">investor.gov</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Projections use constant assumed returns for illustration; real returns vary from year to year and are not guaranteed. Before taxes and fees unless stated.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script>
+INV.ready(function () {
+  var yr = function (v) { return String(Math.round(v)); }, ms = INV.moneyShort;
+  var s = [], c = [];
+  for (var t = 0; t <= 40; t++) { s.push([t, 10000 * (1 + 0.07 * t)]); c.push([t, 10000 * Math.pow(1.07, t)]); }
+  INV.lineChart(document.getElementById("f21"), { label: "Simple versus compound", height: 260, xTitle: "Years", xFmt: yr, yFmt: ms,
+    series: [{ name: "Compound interest", color: "var(--s1)", data: c, area: true }, { name: "Simple interest", color: "var(--s3)", data: s, dash: "5 4" }] });
+  var d = []; for (var a = 20; a <= 64; a++) d.push({ label: String(a), tip: "Invested at " + a, y: Math.pow(1.07, 65 - a), color: [25, 35, 45, 55].indexOf(a) > -1 ? "var(--s1)" : "var(--s6)" });
+  INV.barChart(document.getElementById("f22"), { label: "Growth of $1 by age invested", height: 240, yFmt: function (v) { return INV.money(v, 0); }, tipFmt: function (v) { return "$" + v.toFixed(2) + " at 65"; }, data: d, maxLabels: 12, xTitle: "Age when the dollar is invested" });
+  var rm = Math.pow(1.07, 1 / 12) - 1, b = 0, cc = 0, pb = [[0, 0]], pc = [[0, 0]];
+  for (var m = 1; m <= 480; m++) { b = b * (1 + rm) + 500; cc += 500; if (m % 12 === 0) { pb.push([m / 12, b]); pc.push([m / 12, cc]); } }
+  INV.lineChart(document.getElementById("f23"), { label: "Balance versus contributions", height: 270, xTitle: "Years", xFmt: yr, yFmt: ms,
+    series: [{ name: "Balance", color: "var(--s1)", data: pb, area: true }, { name: "Your contributions", color: "var(--s3)", data: pc, area: true, areaOpacity: 0.25 }], marks: [{ x: 19, label: "growth > contributions" }] });
+  function cardPath(fn) { var bal = 5000, r = 0.22 / 12, out = [[0, 5000]], mo = 0; while (bal > 0.005 && mo < 400) { var i = bal * r, p = Math.min(fn(bal, i), bal + i); bal = bal + i - p; mo++; out.push([mo / 12, Math.max(0, bal)]); } return out; }
+  INV.lineChart(document.getElementById("f24"), { label: "Credit card payoff", height: 250, xTitle: "Years", xFmt: yr, yFmt: ms,
+    series: [{ name: "Minimum payment (1% + interest, $25 floor)", color: "var(--s5)", data: cardPath(function (bal, i) { return Math.max(bal * 0.01 + i, 25); }) },
+      { name: "$250 a month", color: "var(--s2)", data: cardPath(function () { return 250; }) }] });
+  var ser = [[3, "var(--s3)"], [5, "var(--s2)"], [7, "var(--s1)"]].map(function (k) { var dd = []; for (var t2 = 0; t2 <= 60; t2++) dd.push([t2, 10000 * Math.pow(1 + k[0] / 100, t2)]); return { name: k[0] + "% a year", color: k[1], data: dd }; });
+  INV.lineChart(document.getElementById("f25"), { label: "Rate and time", height: 250, xTitle: "Years", xFmt: yr, yFmt: ms, series: ser });
+  function acc(pm, start, yrs) { var r2 = Math.pow(1.06, 1 / 12) - 1, bb = 0, out = []; for (var mm = 0; mm <= 168; mm++) { if (mm % 12 === 0) out.push([mm / 12 + 4, bb]); if (mm >= start * 12 && mm < (start + yrs) * 12) bb = bb * (1 + r2) + pm; else bb = bb * (1 + r2); } return out; }
+  INV.lineChart(document.getElementById("f26"), { label: "College saving schedules", height: 240, xTitle: "Child's age", xFmt: yr, yFmt: ms,
+    series: [{ name: "$250/month from age 4", color: "var(--s2)", data: acc(250, 0, 14) }, { name: "$500/month from age 11", color: "var(--s3)", data: acc(500, 7, 7) }] });
+  INV.barChart(document.getElementById("f27"), { label: "Growth multiple by 65", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + "×"; }, tipFmt: function (v) { return v.toFixed(1) + " times"; },
+    data: [25, 35, 45, 55].map(function (a) { return { label: "Age " + a, y: Math.pow(1.07, 65 - a), color: "var(--s1)" }; }) });
+  INV.barChart(document.getElementById("f28"), { label: "Years to age 90", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + " yrs"; },
+    data: [["Maya", 24, "var(--s1)"], ["Riveras", 34, "var(--s2)"], ["Jordan", 45, "var(--s3)"], ["Harpers", 55, "var(--s4)"], ["Ruth", 68, "var(--s5)"]].map(function (h) { return { label: h[0], y: 90 - h[1], color: h[2] }; }) });
+});
+</script>
+</body>
+</html>

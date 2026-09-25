@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resource Library — Investing Learning Lab</title>
+<meta name="description" content="Curated investing resources: YouTube channels, podcasts, books, official tools, data and research, each with a note on why it is worth your time.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+<style>
+.rs-tools{display:grid;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.rs-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rs-row input[type=search]{flex:1;min-width:220px;font:600 1rem var(--font);padding:10px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--card);color:var(--text)}
+.rs-row select{font:600 .9rem var(--font);padding:9px 10px;border-radius:10px;border:1px solid var(--border2);background:var(--card);color:var(--text)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font:700 .76rem var(--font);padding:5px 11px;border-radius:999px;border:1px solid var(--border2);background:var(--card);color:var(--text2);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--navy);color:var(--card);border-color:var(--navy)}
+.rs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px}
+@media (max-width:560px){.rs-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">Resources</span><span class="ttl">Investing Learning Lab</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Resource library</span><span class="chip teal">Curated and verified</span></div>
+    <h1>Keep learning</h1>
+    <p class="sub">YouTube channels, podcasts, books, official sources, data and research, each with a note on why it is worth your time and who it suits. Every YouTube channel here was checked to resolve to the named creator in September 2026.</p>
+    <p class="q"><span>How to use them</span>Videos and podcasts are for learning and perspective. For facts that drive a decision &mdash; tax rules, benefit amounts, limits &mdash; go to the official sources, which this course cites throughout.</p>
+  </div>
+  <div class="art" aria-hidden="true"><svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/><g><rect x="40" y="60" width="44" height="140" rx="6" fill="#1F5FD1"/><rect x="90" y="80" width="40" height="120" rx="6" fill="#0B8A7E"/><rect x="136" y="50" width="48" height="150" rx="6" fill="#C77A0A"/><rect x="190" y="90" width="38" height="110" rx="6" fill="#8A4FD6"/></g><g transform="translate(250,70)"><rect width="84" height="60" rx="12" fill="#C2332B"/><path d="M34 18 L56 30 L34 42Z" fill="#fff"/></g></svg></div>
+</section>
+<section class="rs-tools" aria-label="Filter resources">
+  <div class="rs-row"><label class="sr-only" for="rq">Search</label><input type="search" id="rq" placeholder="Search by name, creator or topic" autocomplete="off">
+    <label class="sr-only" for="rl">Level</label><select id="rl"><option value="">All levels</option><option value="1">New to investing</option><option value="2">Some experience</option><option value="3">Advanced</option></select>
+    <label class="sr-only" for="rst">Stage</label><select id="rst"><option value="">All stages</option></select>
+    <span class="src" id="rcount" aria-live="polite"></span></div>
+  <div class="chips" id="rk" role="group" aria-label="Kind"></div>
+</section>
+<section class="rs-grid" id="rlist" aria-live="polite"></section>
+<p class="disclaim"><b>Independence note.</b> No resource here paid to be included, and inclusion is not an endorsement of every view a creator expresses. Creators' content changes over time.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script>
+INV.ready(function () {
+  var R = window.INV_RESOURCES || [], kind = "";
+  var order = ["babak", "video", "podcast", "course", "official", "tool", "data", "book", "research"];
+  var rk = document.getElementById("rk");
+  rk.innerHTML = '<button type="button" data-k="" aria-pressed="true">All (' + R.length + ")</button>" + order.filter(function (k) { return R.some(function (r) { return r.k === k; }); }).map(function (k) {
+    return '<button type="button" data-k="' + k + '" aria-pressed="false">' + INV.kinds[k][0] + " " + INV.esc(INV.kinds[k][1]) + " (" + R.filter(function (r) { return r.k === k; }).length + ")</button>"; }).join("");
+  rk.querySelectorAll("button").forEach(function (b) { b.addEventListener("click", function () { kind = b.getAttribute("data-k"); rk.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); render(); }); });
+  var rst = document.getElementById("rst");
+  INV.stages.forEach(function (s) { var o = document.createElement("option"); o.value = s.n; o.textContent = "Stage " + s.n + ": " + s.name; rst.appendChild(o); });
+  function render() {
+    var q = document.getElementById("rq").value.trim().toLowerCase(), l = document.getElementById("rl").value, st = rst.value;
+    var list = R.filter(function (r) {
+      if (kind && r.k !== kind) return false; if (l && String(r.lv) !== l) return false; if (st && (r.st || []).indexOf(Number(st)) < 0) return false;
+      return !q || (r.n + " " + (r.by || "") + " " + r.why).toLowerCase().indexOf(q) > -1;
+    }).sort(function (a, b) { return order.indexOf(a.k) - order.indexOf(b.k) || a.lv - b.lv || a.n.localeCompare(b.n); });
+    document.getElementById("rlist").innerHTML = list.map(INV.resourceCard).join("") || '<p class="src">No resources match these filters.</p>';
+    document.getElementById("rcount").textContent = list.length + " of " + R.length;
+  }
+  ["rq", "rl", "rst"].forEach(function (id) { document.getElementById(id).addEventListener("input", render); document.getElementById(id).addEventListener("change", render); });
+  render();
+});
+</script>
+</body>
+</html>

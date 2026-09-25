@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glossary — Investing Learning Lab</title>
+<meta name="description" content="Investing glossary: every term with what it is, what it is used for, and what it means for you. Searchable and filterable by topic and level.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+<style>
+.gl-tools{display:grid;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);position:sticky;top:58px;z-index:20}
+.gl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.gl-row input[type=search]{flex:1;min-width:220px;font:600 1rem var(--font);padding:10px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--card);color:var(--text)}
+.gl-row select{font:600 .9rem var(--font);padding:9px 10px;border-radius:10px;border:1px solid var(--border2);background:var(--card);color:var(--text)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font:700 .76rem var(--font);padding:5px 11px;border-radius:999px;border:1px solid var(--border2);background:var(--card);color:var(--text2);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--navy);color:var(--card);border-color:var(--navy)}
+.az{display:flex;gap:3px;flex-wrap:wrap}
+.az a{font:700 .78rem var(--font);text-decoration:none;padding:3px 7px;border-radius:6px;color:var(--text2)}
+.az a:hover{background:var(--card2)}
+.az a.off{opacity:.3;pointer-events:none}
+.gl-count{font-size:.84rem;color:var(--muted)}
+.gl-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-top:14px}
+.g{border:1px solid var(--border);border-radius:14px;background:var(--card);overflow:hidden;scroll-margin-top:210px}
+.g:target{outline:3px solid var(--teal)}
+.g-h{padding:10px 14px;background:var(--blue-soft);display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.g-h b{color:var(--navy);font-size:1.02rem}
+.g-h .meta{display:flex;gap:5px;flex-wrap:wrap}
+.g-r{display:grid;grid-template-columns:112px 1fr;border-top:1px solid var(--border)}
+.g-r>div:first-child{padding:8px 12px;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:var(--teal);background:var(--card2)}
+.g-r>div:last-child{padding:8px 12px;font-size:.9rem}
+.g-r.you>div:first-child{color:var(--violet)}
+.g-f{padding:7px 12px;border-top:1px solid var(--border);font-size:.78rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.g-f a{font-weight:700}
+.letter{grid-column:1/-1;font-size:1.2rem;font-weight:800;color:var(--navy);margin:10px 0 -2px;scroll-margin-top:210px}
+.hero-mini{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:14px;box-shadow:var(--shadow)}
+.hero-mini h1{color:var(--navy);font-size:clamp(1.5rem,3vw,2rem)}
+@media (max-width:560px){.gl-list{grid-template-columns:1fr}.g-r{grid-template-columns:1fr}.g-r>div:first-child{padding:6px 12px 2px}.gl-tools{position:static}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">Glossary</span><span class="ttl">Investing Learning Lab</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+<main class="wrap">
+  <section class="hero-mini">
+    <p class="kicker" style="font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--teal);font-weight:800">Reference</p>
+    <h1>Investing glossary</h1>
+    <p class="sub" style="color:var(--text2)">Every term has three parts: <b>what it is</b>, <b>what it is used for</b>, and <b>what it means for you</b>. The level tag tells you where it fits: <span class="chip">Start here</span> <span class="chip teal">Going further</span> <span class="chip violet">Practitioner</span>. The glossary covers the whole curriculum, including stages still in development, and grows as modules are added. Yearly dollar limits are deliberately left out; check the IRS or SSA for current figures.</p>
+  </section>
+  <section class="gl-tools" aria-label="Search and filter">
+    <div class="gl-row"><label class="sr-only" for="q">Search terms</label><input type="search" id="q" placeholder="Search terms and definitions (e.g. Roth, basis, cap rate)" autocomplete="off">
+      <label class="sr-only" for="lv">Level</label><select id="lv"><option value="">All levels</option><option value="1">Start here</option><option value="2">Going further</option><option value="3">Practitioner</option></select>
+      <span class="gl-count" id="count" aria-live="polite"></span></div>
+    <div class="chips" id="cats" role="group" aria-label="Topic"></div>
+    <nav class="az" id="az" aria-label="Jump to letter"></nav>
+  </section>
+  <section class="gl-list" id="list" aria-live="polite"></section>
+  <p class="disclaim"><b>Educational material, not advice.</b> Definitions summarize general rules; the law has details and exceptions. Confirm current rules with primary sources.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv.js"></script>
+<script>
+INV.ready(function () {
+  var G = window.INV_GLOSSARY || [], esc = INV.esc, slug = INV.slug;
+  var CATS = []; G.forEach(function (g) { if (CATS.indexOf(g.c) < 0) CATS.push(g.c); }); CATS.sort();
+  var LVN = { 1: ["Start here", ""], 2: ["Going further", "teal"], 3: ["Practitioner", "violet"] };
+  var cat = "", q = document.getElementById("q"), lv = document.getElementById("lv");
+  var cats = document.getElementById("cats");
+  cats.innerHTML = '<button type="button" data-c="" aria-pressed="true">All topics</button>' + CATS.map(function (c) { var n = G.filter(function (g) { return g.c === c; }).length; return '<button type="button" data-c="' + esc(c) + '" aria-pressed="false">' + esc(c) + " (" + n + ")</button>"; }).join("");
+  cats.querySelectorAll("button").forEach(function (b) { b.addEventListener("click", function () { cat = b.getAttribute("data-c"); cats.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); render(); }); });
+  var modTitle = {}; INV.course.forEach(function (m) { modTitle[m.id] = m; });
+  function card(g) {
+    var L = LVN[g.l] || LVN[1], m = g.mod && modTitle[g.mod];
+    return '<article class="g" id="' + slug(g.t) + '"><div class="g-h"><b>' + esc(g.t) + '</b><span class="meta"><span class="chip ' + L[1] + '">' + L[0] + '</span><span class="chip gray">' + esc(g.c) + "</span></span></div>" +
+      '<div class="g-r"><div>What it is</div><div>' + esc(g.d) + "</div></div>" +
+      '<div class="g-r"><div>Used for</div><div>' + esc(g.u) + "</div></div>" +
+      '<div class="g-r you"><div>What it means for you</div><div>' + esc(g.m) + "</div></div>" +
+      '<div class="g-f"><span>' + (g.a && g.a.length ? "Also: " + esc(g.a.join(", ")) : "") + "</span>" +
+      (m ? (m.live ? '<a href="' + m.id + '.html">Taught in ' + m.id + " →</a>" : "<span>Covered in " + m.id + " (in development)</span>") : "") + "</div></article>";
+  }
+  function render() {
+    var term = q.value.trim().toLowerCase(), level = lv.value;
+    var list = G.filter(function (g) {
+      if (cat && g.c !== cat) return false;
+      if (level && String(g.l) !== level) return false;
+      if (!term) return true;
+      return (g.t + " " + (g.a || []).join(" ") + " " + g.d + " " + g.u + " " + g.m).toLowerCase().indexOf(term) > -1;
+    });
+    var html = "", last = "", letters = {};
+    list.forEach(function (g) { var L = g.t.charAt(0).toUpperCase(); if (!/[A-Z]/.test(L)) L = "#"; if (L !== last) { html += '<h2 class="letter" id="L-' + L + '">' + L + "</h2>"; last = L; letters[L] = 1; } html += card(g); });
+    document.getElementById("list").innerHTML = html || '<p class="src">No terms match. Try a shorter search or clear the filters.</p>';
+    document.getElementById("count").textContent = list.length + " of " + G.length + " terms";
+    document.getElementById("az").innerHTML = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(function (L) { return '<a href="#L-' + L + '" class="' + (letters[L] ? "" : "off") + '">' + L + "</a>"; }).join("");
+  }
+  q.addEventListener("input", render); lv.addEventListener("change", render);
+  render();
+  if (location.hash.length > 1) { var t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(function () { t.scrollIntoView(); }, 50); }
+});
+</script>
+</body>
+</html>
