@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-080 · Pensions: Lump Sum vs Annuity — Investing Learning Lab</title>
+<meta name="description" content="How to value a pension, how plans compute lump sums under IRC 417(e), what PBGC guarantees in 2026, how joint-and-survivor options work, and a step-by-step framework for the lump sum versus annuity decision.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-080">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-080</span><span class="ttl">Pensions: Lump Sum vs Annuity</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 11 · Retirement</span><span class="chip teal">Intermediate</span><span class="chip gray">About 60 minutes</span><span class="chip gray">2 calculators</span></div>
+    <h1>Pensions: Lump Sum vs Annuity</h1>
+    <p class="sub">A pension check for life and a single large payment can be worth exactly the same on paper and very different in your life. This module shows how to put a price on a pension, how plans compute the lump sum they offer, what the federal insurer guarantees, and how to choose.</p>
+    <p class="q"><span>The question this module answers</span>If my plan offers me a lump sum instead of a monthly pension, how do I know which is worth more to me?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <rect x="40" y="70" width="90" height="130" rx="10" fill="#1F5FD1" opacity=".85"/>
+      <g fill="#0B8A7E"><rect x="160" y="170" width="14" height="30" rx="3"/><rect x="180" y="170" width="14" height="30" rx="3"/><rect x="200" y="170" width="14" height="30" rx="3"/><rect x="220" y="172" width="14" height="28" rx="3" opacity=".85"/><rect x="240" y="176" width="14" height="24" rx="3" opacity=".7"/><rect x="260" y="182" width="14" height="18" rx="3" opacity=".55"/><rect x="280" y="188" width="14" height="12" rx="3" opacity=".4"/><rect x="300" y="194" width="14" height="6" rx="3" opacity=".25"/></g>
+      <text x="85" y="140" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">Lump</text>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">One check now, or checks for life?</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A paycheck you cannot outlive, or a pile you control</h2>
+  <p class="lede">You already understand the two choices, because you make a smaller version of them every time you compare a monthly payment with a price paid up front. A pension that pays $2,000 a month for life and a single payment of $285,000 are two ways of receiving the same promise. The question is which one is worth more, and to whom.</p>
+  <p>The lifetime pension protects you against <span class="term" data-term="Longevity risk">longevity risk</span>, the chance of outliving your money. For most people the ordinary answer is simple: take whichever the plan's rules make more valuable, and if the numbers are close, take the one that fits your life. A person in poor health with no spouse often does better with the lump sum. A healthy person, especially a woman or anyone with a younger spouse, often does better with the lifetime income. What makes the decision hard is that "more valuable" depends on three things you have to estimate: <b>how long you will live</b>, <b>what the lump sum could safely earn</b>, and <b>how the plan converted one into the other</b>.</p>
+  <p>The first of those is the one people get most wrong. Nobody knows their own lifespan, and the average hides a wide spread. Figure 80.1 shows it using the Social Security Administration's (SSA) latest period life table.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.1 &mdash; Share of 65-year-olds still alive at each later age</div>
+    <div id="f801"></div>
+    <figcaption class="cap"><b>A pension pays longest to exactly the people who would otherwise run out.</b> Of 65-year-old men, about half live past 83.8 and about a quarter past 89.8; for women the same points are 86.7 and 92.3. About 24% of men and 35% of women aged 65 reach 90. Computed from the SSA 2023 period life table used in the 2026 Trustees Report; period tables do not include future improvements in mortality, so actual lifespans are likely to run somewhat longer.</figcaption>
+  </figure>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>The core idea.</b> A lump sum shifts two risks onto you: that your investments do badly, and that you live a long time. A lifetime pension keeps both risks with the plan. The price of that insurance is hidden inside the conversion rate the plan uses, and this module shows you how to find it.</p></div></div>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>How to value a pension: present value, weighted by the chance you are alive.</li>
+    <li>Life expectancy, survivor options and the spousal-consent rule.</li>
+    <li>How plans compute the lump sum under Internal Revenue Code section 417(e), and why it moves with interest rates.</li>
+    <li>What the Pension Benefit Guaranty Corporation (PBGC) guarantees in 2026.</li>
+    <li>Taxes on each choice, and a step-by-step decision framework.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Valuing a pension">
+  <p class="kicker">Put a price on it</p>
+  <h2>A pension is a stream of payments with a question mark on each one</h2>
+  <p>In INV-002 you learned that money received in the future is worth less than money today, because today's money could be earning interest in the meantime. That idea, <span class="term" data-term="Present value">present value</span>, is the tool for comparing a pension with a lump sum. A pension adds one twist: every payment is conditional. You receive the check for month 300 only if you are alive in month 300.</p>
+  <p>Formally, what you are weighing is a <span class="term" data-term="Pension">pension</span>, one of the oldest forms of lifetime income.</p>
+  <div class="def"><div class="def-h"><b>Defined benefit pension</b><span>a promise of income, not an account</span></div>
+    <div class="def-r"><div>What it is</div><div>An employer plan that promises a monthly benefit, usually set by a formula such as 1.5% of final average pay for each year worked. The employer invests the plan's money and bears the investment risk. You have no account balance, only a promised benefit.</div></div>
+    <div class="def-r"><div>Used for</div><div>Providing retirement income that lasts for life, often with a survivor benefit for a spouse. Many plans also let you swap the promise for a single payment: the <b>lump-sum option</b>.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The monthly amount on your benefit statement is only half of the picture. To compare it with a lump sum, you need its present value, which depends on your age, your health and interest rates.</div></div></div>
+  <div class="def"><div class="def-h"><b>Discount rate</b><span>the rate that turns future money into today's money</span></div>
+    <div class="def-r"><div>What it is</div><div>The yearly return you use to shrink future payments into their value today. A higher rate makes future payments worth less.</div></div>
+    <div class="def-r"><div>Used for</div><div>Comparing a stream of payments with a lump sum. The fair rate to use is what the lump sum could earn <i>with similar safety</i>: high-quality bonds, not the stock market.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>If you value a guaranteed pension using a stock-market return, the lump sum will almost always look better. That is comparing a guarantee with a gamble.</div></div></div>
+  <div class="formula">Value of pension = &Sigma; (monthly benefit) &times; (chance you are alive to receive it) &divide; (1 + r)<sup>t</sup></div>
+  <p>Start with the calculator you already know. The present value tool below, in its "Lump sum vs payments" mode, treats the payments as certain for a fixed number of years. That is a useful first check, and it shows how strongly the discount rate matters. Its limitation is that a pension does not last a fixed number of years; it lasts a lifetime of unknown length.</p>
+  <div data-tool="pv"></div>
+  <p>The pension calculator below fixes that. It weights every monthly check by the probability that you (and, for a survivor option, your spouse) are alive to receive it. You can value with the IRS's 2026 mortality table for pension-plan participants, the table pension actuaries use, or with the SSA table for the general population; plan participants live longer on average. At its default settings, a 65-year-old man with a $2,000-a-month single-life pension is offered $285,000, close to what the IRS rules produced with May 2026 rates (tab 4). Discounted at 5% with the pension-participant table, the pension is worth about <b>$292,600</b>. The rate that makes the two equal is about <b>5.3%</b>: if he can earn more than 5.3% a year with the safety of the pension, the lump sum wins; if not, the pension does. Switch to the general-population table and the break-even rate falls to about 4.3%, because an average man is expected to collect for fewer years.</p>
+  <div data-tool="s11bPension"></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why "break-even age" is the wrong question</summary><div class="layer-b">
+    <p>A common shortcut divides the lump sum by the yearly pension: $285,000 &divide; $24,000 = 11.9 years, so "the pension wins if you live past about 77." That ignores interest. Money taken as a lump sum keeps earning while the pension checks trickle in, so the true break-even is later. It also treats your lifespan as a single guess. The expected-value method in the calculator uses the whole distribution of lifespans in Figure 80.1, which is what an insurer does.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>The actuarial formula</summary><div class="layer-b">
+    <p>For monthly payments B starting after a deferral of d years: PV = 12B &middot; &Sigma;<sub>m&gt;12d</sub> (<sub>m/12</sub>p<sub>x</sub>) v<sup>m/12</sup> / 12, where <sub>t</sub>p<sub>x</sub> is the probability a person aged x survives t years and v = 1/(1 + r). The calculator builds <sub>t</sub>p<sub>x</sub> from one-year death probabilities q<sub>x</sub> (IRS Notice 2025-40 tables or the SSA table), assuming a constant force of mortality within each year, pays at the end of each month, and applies any cost-of-living raise once a year. For a joint-and-survivor annuity with survivor fraction s: PV = B<sub>j</sub>[a<sub>x</sub> + s(a<sub>y</sub> &minus; a<sub>xy</sub>)], where a<sub>xy</sub> uses the probability that both are alive, assuming independent lifetimes.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Survivor options">
+  <p class="kicker">Married retirees</p>
+  <h2>Single life, or joint and survivor?</h2>
+  <p>Social Security already pays a <span class="term" data-term="Survivor benefit">survivor benefit</span> to a widowed spouse, but a private pension does so only if you choose it. A pension that stops when you die can leave a surviving spouse with a sudden drop in income. Federal law therefore makes the survivor option the default for married participants in most private pension plans.</p>
+  <div class="def"><div class="def-h"><b>Qualified joint and survivor annuity</b><span>QJSA, the default for married participants</span></div>
+    <div class="def-r"><div>What it is</div><div>A pension paid for your life, then to your surviving spouse for their life at a set fraction of your benefit. The law requires the survivor fraction to be at least 50% and no more than 100% (26 U.S.C. &sect;417(b)).</div></div>
+    <div class="def-r"><div>Used for</div><div>Protecting a spouse's income. In exchange, your own monthly check is usually reduced, because the plan expects to pay for longer.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>You cannot quietly waive it. Your spouse must consent in writing, the consent must acknowledge its effect, and it must be witnessed by a plan representative or a notary public (&sect;417(a)(2)). Plans must also offer a <b>qualified optional survivor annuity</b> at a second level: 75% if the default is below 75%, or 50% if the default is 75% or more (&sect;417(g)).</div></div></div>
+  <p>The survivor option is priced by the same arithmetic as everything else in this module: the plan cuts your check by enough to pay for the expected extra years of payments to your spouse. How big a cut is fair depends mostly on how long your spouse is likely to outlive you. Figure 80.2 compares two couples.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.2 &mdash; The actuarially fair cut to your check for each survivor option</div>
+    <div id="f802"></div>
+    <figcaption class="cap"><b>Survivor protection costs most when the survivor is likely to live much longer.</b> A 65-year-old man with a 63-year-old wife would need about an 11.9% cut for a 50% survivor benefit and 21.3% for 100%. A 65-year-old woman with a 67-year-old husband, who is statistically likely to die first, needs only about 5.6% and 10.5%. Computed at a 5% discount rate from the SSA 2023 period life table, assuming independent lifetimes. Actual plan reductions follow each plan's own factors.</figcaption>
+  </figure>
+  <p>For the first couple, the chance that the wife outlives the husband is about 63%, and there is about a 57% chance that at least one of them is still alive when he would be 90. That is why the survivor option is so often worth its price for a husband with a younger wife. Some plans <b>subsidize</b> the survivor option by cutting the check by less than the fair amount; if yours does, the survivor option is a bargain you should rarely give up.</p>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>"Pension maximization" pitches.</b> A salesperson may suggest taking the higher single-life pension and buying life insurance to protect your spouse instead. That can work, but only if the policy is priced well, stays in force for as long as needed, and pays enough to replace the lost income. Compare the insurance premium with the cost of the survivor cut, using the calculator, before agreeing.</p></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Other forms plans may offer</summary><div class="layer-b">
+    <p>Besides single life and joint and survivor, plans often offer a <b>period certain</b> option (for example, life with 10 years guaranteed, so a beneficiary receives the rest of the 10 years if you die early) and sometimes a "pop-up" joint annuity, where your check rises back to the single-life amount if your spouse dies first. Each option is priced so it is roughly equivalent in value under the plan's assumptions. The one that is worth most <i>to you</i> depends on your own health and your spouse's.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="How lump sums are set">
+  <p class="kicker">Section 417(e)</p>
+  <h2>The formula behind the offer</h2>
+  <p>A plan cannot pick any lump-sum number it likes. Internal Revenue Code section 417(e)(3) sets a floor: the lump sum must be at least the present value of your benefit calculated with an IRS-specified mortality table and an IRS-specified set of interest rates. Plans may pay more than that minimum, but not less.</p>
+  <div class="def"><div class="def-h"><b>Segment rates</b><span>the interest rates in 417(e)</span></div>
+    <div class="def-r"><div>What it is</div><div>Three interest rates the IRS publishes each month, based on yields of high-quality corporate bonds. The <b>first segment rate</b> reflects bonds maturing within 5 years, the <b>second</b> bonds maturing in years 5 to 20, and the <b>third</b> bonds maturing after 20 years (26 U.S.C. &sect;430(h)(2)). For 417(e), they are monthly rates, not the 24-month averages used for plan funding (&sect;417(e)(3)(D)).</div></div>
+    <div class="def-r"><div>Used for</div><div>Discounting each future pension payment: payments due in the first five years use the first segment rate, and so on. The IRS posts the rates on its "Minimum present value segment rates" page.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>When corporate bond yields rise, your lump sum falls, sometimes by a quarter or more, even though your pension did not change. Your plan document says which month's rates it uses (the <b>lookback month</b>) and for how long they apply (the <b>stability period</b>).</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.3 &mdash; IRS 417(e) segment rates, January 2020 to May 2026</div>
+    <div id="f803"></div>
+    <figcaption class="cap"><b>Rates roughly tripled in two years, and lump sums moved the other way.</b> In December 2021 the three segment rates were 1.16%, 2.72% and 3.10%; by October 2023 they were 5.77%, 6.14% and 6.19%. For May 2026 they were 4.42%, 5.47% and 6.31%. Source: Internal Revenue Service, <i>Minimum present value segment rates</i>.</figcaption>
+  </figure>
+  <p>The mortality part of the formula uses a table the IRS publishes each year. For distributions with annuity starting dates in stability periods beginning in 2026, it is the "Unisex" table in IRS Notice 2025-40, derived from the tables for pension-plan participants under section 430(h)(3). It is a single table for men and women combined, and that detail matters: because women live longer on average, a unisex table undervalues a woman's pension and overvalues a man's. Other things equal, the lump sum is a better deal for a man and a worse deal for a woman.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.4 &mdash; The same $2,000-a-month pension at 65, converted with each month's rates</div>
+    <div id="f804"></div>
+    <figcaption class="cap"><b>The same promise ranged from about $272,000 to $388,000.</b> Estimated minimum lump sum for a $2,000-a-month single-life pension starting at 65, using each month's IRS segment rates and, to isolate the effect of rates, the IRS 2026 unisex table throughout. Highest: August 2020 rates, about $387,916. Lowest: October 2023 rates, about $272,042. May 2026 rates: about $285,286, or $11.89 for each $1 of yearly pension.</figcaption>
+  </figure>
+  <p>Switch the pension calculator (tab 2) to "How the plan sets the lump sum" to run this for your own benefit. If you are younger than the plan's normal retirement age, set "Years until payments start": the lump sum then values a deferred pension, and a larger share of the payments falls into the higher-rate second and third segments, which makes the lump sum even more sensitive to rates.</p>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Lookback months, stability periods and timing</summary><div class="layer-b">
+    <p>Section 417(e)(3)(C) sets the rate as the segment rates "for the month before the date of the distribution or such other time as the Secretary may by regulations prescribe." That is why plan documents fix a lookback month and a stability period, and why IRS Notice 2025-40 describes its 2026 table as applying to annuity starting dates "during stability periods beginning in 2026." If one month's rates apply for a whole plan year, the lump sum is predictable within that year, and a rise in rates during the year shows you in advance that next year's lump sum will be smaller. Before you choose, your plan must give you a written explanation of the terms and conditions of the survivor annuity forms (&sect;417(a)(3)); ask for the value of each form compared with the single-life annuity.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="PBGC protection">
+  <p class="kicker">If the plan fails</p>
+  <h2>What the Pension Benefit Guaranty Corporation guarantees</h2>
+  <div class="def"><div class="def-h"><b>PBGC</b><span>Pension Benefit Guaranty Corporation</span></div>
+    <div class="def-r"><div>What it is</div><div>A federal corporation created by the Employee Retirement Income Security Act of 1974 (ERISA) to insure private-sector defined benefit pensions. PBGC says it protects the retirement security of about 30 million workers.</div></div>
+    <div class="def-r"><div>Used for</div><div>Paying pensions, up to limits set by federal law, when a plan ends without enough money. It does not cover government pensions, and multiemployer (union) plans have a separate, lower guarantee.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Most pensions are well below the limit. If yours is large, or you retire early, check the table: the part above the guarantee could be lost if the plan fails.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.5 &mdash; PBGC maximum monthly guarantee for single-employer plans ending in 2026</div>
+    <div id="f805"></div>
+    <figcaption class="cap"><b>The guarantee is generous at 65 and shrinks sharply for early retirement.</b> Straight-life annuity maximums: $3,505.40 a month at 55, $5,063.35 at 60, $6,153.92 at 62, $7,789.77 at 65 ($93,477 a year), $12,931.02 at 70. Joint and 50% survivor maximums are lower, for example $7,010.79 at 65 when both spouses are the same age. Source: PBGC, <i>Maximum monthly guarantee tables</i> (2026 table).</figcaption>
+  </figure>
+  <p>PBGC's own guidance explains how to read the table: use the table for the year the plan terminates (or the year the employer entered bankruptcy, if the plan ends during a bankruptcy), and generally the age at which you first receive benefits. Lower amounts apply at younger ages because younger retirees are expected to receive more monthly checks, and lower amounts apply to survivor forms. PBGC also notes that most benefits in PBGC-trusteed plans are below the maximum.</p>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>Where plan risk enters the decision.</b> A lump sum removes you from the plan entirely, so plan failure no longer matters to you. For a benefit well under the PBGC limit from a financially healthy plan sponsor, that is a small advantage. For an early retiree with a large benefit from a weak sponsor, it can be decisive. Your plan's annual funding notice shows how well funded it is.</p></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>When your pension is moved to an insurance company</summary><div class="layer-b">
+    <p>Some employers transfer pension obligations to an insurer by buying a group annuity, a <b>pension risk transfer</b>. Your checks then come from the insurer. Protection behind an insurer comes from state life and health insurance guaranty associations, with limits set by each state for the present value of annuity benefits; in Pennsylvania, for example, individual annuity benefits are protected up to $250,000 in present value. INV-082 explains insurer strength and guaranty limits.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Taxes and the decision">
+  <p class="kicker">Keep more of it</p>
+  <h2>How each choice is taxed, and a framework for deciding</h2>
+  <p>Pension checks are taxed as ordinary income in the year you receive them (minus any after-tax contributions you made). A lump sum is also ordinary income &mdash; all of it, in one year &mdash; unless you roll it into an <span class="term" data-term="Individual retirement account">individual retirement account (IRA)</span> or another employer plan, where it keeps growing tax-deferred until you withdraw it.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>If you&hellip;</th><th>What happens (IRS Topic 413)</th></tr></thead><tbody>
+    <tr><td><b>Take the monthly pension</b></td><td>Each check is taxable income when paid. Nothing to roll over.</td></tr>
+    <tr><td><b>Direct rollover</b> of the lump sum to an IRA</td><td>The plan sends the money straight to the IRA. No tax now and no mandatory withholding.</td></tr>
+    <tr><td><b>Take the check yourself</b>, then roll over</td><td>The plan must withhold 20% for federal tax. To roll over the full amount within 60 days you must replace the withheld 20% from other money, or that part becomes taxable.</td></tr>
+    <tr><td><b>Keep the cash</b></td><td>The whole taxable amount is income this year, often pushing much of it into high brackets. Before 59&frac12;, a 10% additional tax may also apply unless an exception fits, such as leaving the employer in or after the year you turn 55 (IRC &sect;72(t)(2)(A)(v)).</td></tr>
+  </tbody></table></div>
+  <p>A rolled-over lump sum becomes part of your IRA for required minimum distributions at 73 or 75 (INV-081). A pension already in payment counts as its own distribution and needs no separate calculation.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.6 &mdash; A six-question framework for lump sum versus annuity</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 330" role="img" aria-label="Six questions to decide between a lump sum and a pension">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="146" rx="12" style="fill:var(--blue-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">1. Is the offer fair?</text><text x="14" y="52" class="svg-s" font-size="12">Find the rate that makes</text><text x="14" y="68" class="svg-s" font-size="12">them equal. Compare with</text><text x="14" y="84" class="svg-s" font-size="12">safe bond yields today.</text><text x="14" y="128" class="svg-m" font-size="11">Tab 2 calculator</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="146" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">2. Your health</text><text x="14" y="52" class="svg-s" font-size="12">Shorter expected life</text><text x="14" y="68" class="svg-s" font-size="12">favors the lump sum;</text><text x="14" y="84" class="svg-s" font-size="12">long-lived family, the</text><text x="14" y="100" class="svg-s" font-size="12">pension.</text><text x="14" y="128" class="svg-m" font-size="11">Figure 80.1</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="146" rx="12" style="fill:var(--violet-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">3. Your spouse</text><text x="14" y="52" class="svg-s" font-size="12">A younger or healthier</text><text x="14" y="68" class="svg-s" font-size="12">spouse makes survivor</text><text x="14" y="84" class="svg-s" font-size="12">income more valuable.</text><text x="14" y="128" class="svg-m" font-size="11">Figure 80.2</text></g>
+      <g transform="translate(10,172)"><rect width="226" height="146" rx="12" style="fill:var(--amber-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">4. Income floor</text><text x="14" y="52" class="svg-s" font-size="12">Do Social Security and</text><text x="14" y="68" class="svg-s" font-size="12">the pension cover your</text><text x="14" y="84" class="svg-s" font-size="12">essential bills? If not,</text><text x="14" y="100" class="svg-s" font-size="12">the pension is valuable.</text><text x="14" y="128" class="svg-m" font-size="11">INV-082</text></g>
+      <g transform="translate(247,172)"><rect width="226" height="146" rx="12" style="fill:var(--red-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">5. Plan safety</text><text x="14" y="52" class="svg-s" font-size="12">Is your benefit under</text><text x="14" y="68" class="svg-s" font-size="12">the PBGC limit? Is the</text><text x="14" y="84" class="svg-s" font-size="12">plan well funded?</text><text x="14" y="128" class="svg-m" font-size="11">Figure 80.5</text></g>
+      <g transform="translate(484,172)"><rect width="226" height="146" rx="12" style="fill:var(--green-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">6. You and the money</text><text x="14" y="52" class="svg-s" font-size="12">Will you invest a lump</text><text x="14" y="68" class="svg-s" font-size="12">sum calmly and spend it</text><text x="14" y="84" class="svg-s" font-size="12">slowly? Do you want</text><text x="14" y="100" class="svg-s" font-size="12">to leave money to heirs?</text><text x="14" y="128" class="svg-m" font-size="11">INV-076, INV-060</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Question 1 is arithmetic; questions 2 to 6 are about you.</b> If the offer is clearly unfair in one direction, that usually settles it. If it is close, the personal questions decide.</figcaption>
+  </figure>
+  <p>Two further points belong in every decision. First, most private pensions have <b>no cost-of-living adjustment</b>. At 3% inflation, a fixed $2,000 check buys about what $1,100 does today after 20 years (2,000 &divide; 1.03<sup>20</sup> = $1,107). Second, you can often combine the choices: take the pension if it is the better deal and invest other savings for growth, or take the lump sum and use part of it to buy an income annuity (INV-082) if an insurer offers more income per dollar than your plan does.</p>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real rules and real rates</p>
+  <h2>Three stories that shaped the lump-sum decision</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.7 &mdash; Timeline of the three stories</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 150" role="img" aria-label="Timeline 2015 to 2026: IRS notices, rate rise, PBGC 2026 table">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <line x1="30" y1="70" x2="690" y2="70" style="stroke:var(--border2)" stroke-width="3"/>
+      <g class="svg-t" font-size="12" font-weight="800" text-anchor="middle"><text x="60" y="100">2015</text><text x="250" y="100">2019</text><text x="400" y="100">2021</text><text x="520" y="100">2023</text><text x="660" y="100">2026</text></g>
+      <g><circle cx="60" cy="70" r="8" fill="#1F5FD1"/><circle cx="250" cy="70" r="8" fill="#1F5FD1"/><circle cx="400" cy="70" r="8" fill="#0B8A7E"/><circle cx="520" cy="70" r="8" fill="#C2332B"/><circle cx="660" cy="70" r="8" fill="#8A4FD6"/></g>
+      <g class="svg-s" font-size="11.5"><text x="30" y="40">Notice 2015-49:</text><text x="30" y="55">plan to bar windows</text>
+      <text x="200" y="40">Notice 2019-18:</text><text x="200" y="55">plan dropped</text>
+      <text x="355" y="124">Dec 2021: rates</text><text x="355" y="139">near record lows</text>
+      <text x="470" y="40">Oct 2023: rates</text><text x="470" y="55">about 6%</text>
+      <text x="596" y="124">2026 PBGC</text><text x="596" y="139">table</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Rules, rates and guarantees all changed within a decade.</b> Each dot is one of the case studies below: the IRS notices on retiree lump-sum windows, the 2021&ndash;2023 rise in 417(e) rates, and the 2026 PBGC maximum guarantee table.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>The IRS tries to stop retiree lump-sum windows, then reverses (2015&ndash;2019)</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Some employers offered retirees <i>already receiving</i> pension checks a temporary window to swap their remaining payments for a lump sum. On July 9, 2015, in Notice 2015-49, the Treasury and IRS announced they intended to amend the required minimum distribution regulations so that plans generally could not replace an annuity already being paid with a lump sum. In Notice 2019-18 they announced they no longer intended to make that change, and Notice 2015-49 was superseded.</div></div>
+    <div class="row"><div>What it teaches</div><div>Lump-sum windows for retirees remain possible. If you receive such an offer, the analysis is the same as in this module, with one extra fact: you already know how the plan's monthly checks have fit your life. Offers are voluntary; declining keeps your pension exactly as it is.</div></div>
+    <div class="row"><div>Source</div><div class="src">Internal Revenue Service, Notice 2015-49 (2015) and Notice 2019-18 (2019).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Rising rates shrank lump sums by about a quarter (2021&ndash;2023)</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>As interest rates rose in 2022, the IRS 417(e) segment rates rose from 1.16%, 2.72% and 3.10% (December 2021) to 5.77%, 6.14% and 6.19% (October 2023). For a $2,000-a-month single-life pension at 65, our estimate of the minimum lump sum (holding the 2026 IRS table constant) fell from about $372,980 to about $272,042, a drop of 27%. The monthly pension itself did not change at all.</div></div>
+    <div class="row"><div>What it teaches</div><div>A lump sum is a bond-like asset priced at today's rates. When rates are high, the lump sum is smaller, but it can also be reinvested at those higher rates, so the trade-off is less dramatic than the headline number suggests. Compare the offer with what the same money would buy from an insurer at the same time, not with last year's offer.</div></div>
+    <div class="row"><div>Source</div><div class="src">IRS, <i>Minimum present value segment rates</i>; IRS Notice 2025-40; lump sums computed in this module (illustrative).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>What the PBGC limit means for an early retiree (2026 table)</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Federal law caps what PBGC can pay. For single-employer plans ending in 2026, the maximum straight-life guarantee is $7,789.77 a month at 65 but $3,505.40 at 55. A participant who retired at 55 with a $5,000 monthly pension from a plan that later failed could therefore see the guaranteed part fall to about $3,505 a month, depending on the special rules for plan termination and bankruptcy dates.</div></div>
+    <div class="row"><div>What it teaches</div><div>The guarantee protects the great majority of pensions in full, but its steep age scale means early retirees with large benefits carry real plan risk. For them, the health of the sponsor is part of the lump-sum decision.</div></div>
+    <div class="row"><div>Source</div><div class="src">PBGC, <i>Maximum monthly guarantee tables</i>, 2026 table and FAQs.</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Rachel Harper's frozen pension</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.8 &mdash; Rachel's two choices, valued at different discount rates</div>
+    <div id="f807"></div>
+    <figcaption class="cap"><b>At any safe rate below about 6.1%, the pension is worth more to Rachel than the lump sum.</b> Estimated minimum lump sum at May 2026 segment rates with the IRS 2026 unisex table: about $109,230. The same $1,450-a-month pension starting at 65, valued for a 55-year-old woman with the IRS 2026 female pension-participant table: about $160,535 at 4%, $132,669 at 5% and $110,386 at 6%. Illustrative; Rachel's plan uses its own lookback month.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; Rachel Harper, 55</div>
+    <p class="dq">Rachel left a hospital system years ago with a frozen pension of $1,450 a month payable at 65, with no cost-of-living raise. The plan now offers her a lump sum of about $109,200 (May 2026 rates). She and Tom have $1.1 million saved and plan to retire around 62&ndash;63. What should she do?</p>
+    <div class="opts"><button class="opt">Take the lump sum as cash to pay down the mortgage.</button><button class="opt">Keep the pension: at safe rates the lump sum is below its value to her, and it adds to the household's guaranteed income.</button><button class="opt">Take the lump sum by direct rollover to her IRA and invest it for growth.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Cash for the mortgage</b>The whole $109,200 would be taxable income in one year, on top of a $260,000 household income, much of it in the 24% bracket or higher; and she is under 59&frac12;, having left that employer before 55, so a 10% additional tax would likely apply too. Paying off a mortgage that has only $90,000 left is not worth that tax bill.</div>
+      <div class="oc"><b>Keep the pension</b>A strong choice. The unisex table undervalues a woman's pension, and her implied return from keeping it is about 6.1% a year, guaranteed, which safe bonds do not currently offer. It also provides a floor alongside Social Security. The main risks: no inflation protection, and plan failure, although $1,450 is far below the PBGC limit at 65.</div>
+      <div class="oc"><b>Direct rollover and invest</b>Reasonable if she wants control, flexibility or money for heirs, and it avoids tax now. But she must beat about 6.1% a year to come out ahead in expectation, which means taking stock-market risk to replace a guarantee. The Harpers already have $1.1 million exposed to markets.</div>
+      <div class="verdict"><b>The principle:</b> when the lump sum is below the value of the pension at safe interest rates, you are being paid to keep the pension.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Rachel at 65, choosing a form</div>
+    <p class="dq">Ten years later Rachel starts the pension. Tom is 67. The plan offers single life at $1,450, or joint and 50% survivor at a 6% reduction. Tom has his own 401(k)s and Social Security. Which form?</p>
+    <div class="opts"><button class="opt">Single life: Tom is likely to die first, so survivor protection is worth little.</button><button class="opt">Joint and 50%: it costs little, and it protects Tom if she dies first.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Single life</b>Defensible. Figure 80.2 shows the fair cut for a 50% survivor benefit for this couple is only about 5.6%, so a 6% cut is roughly fair, not a subsidy. If Tom's own income is ample, the extra $87 a month now may be more useful to them. Tom would need to sign a notarized consent.</div>
+      <div class="oc"><b>Joint and 50%</b>Also defensible. The cost is small because Tom is older, and it hedges the chance (roughly one in three) that he outlives her. It matters most if Tom's own income would be thin without hers.</div>
+      <div class="verdict"><b>The principle:</b> price survivor protection like insurance, against how long the survivor is likely to need it and what else they will have.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about pension lump sums</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.9 &mdash; One pension, three prices</div>
+    <div id="f808"></div>
+    <figcaption class="cap"><b>The lump sum is a price, and prices move.</b> Estimated minimum lump sum for a $2,000-a-month single-life pension at 65 under December 2021, October 2023 and May 2026 IRS segment rates. Computed in this module.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A lump sum is always better because I can invest it."</div><div class="ma"><b>Myth.</b> Investing in stocks can beat the pension's implied return, but only by taking risk the pension does not have. Compare the offer with safe yields; the lump sum wins on its merits only if its implied rate is below what safe bonds pay.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"If rates go up, my lump sum goes down."</div><div class="ma"><b>Fact.</b> The 417(e) lump sum discounts your payments at IRS segment rates based on corporate bond yields. Higher rates mean a smaller lump sum, as Figure 80.9 shows.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"I can choose single life without telling my spouse."</div><div class="ma"><b>Myth.</b> For most private plans, waiving the joint and survivor annuity requires your spouse's written consent, witnessed by a notary or plan representative (26 U.S.C. &sect;417(a)(2)).</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"If my company goes bankrupt, I lose my pension."</div><div class="ma"><b>Mostly myth.</b> PBGC insures private-sector defined benefit plans up to legal limits; for plans ending in 2026 the maximum is $7,789.77 a month at 65. Most pensions are below the limit. Government plans are not PBGC-insured.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The lump sum treats men and women the same, so it is fair to both."</div><div class="ma"><b>Half true.</b> The 417(e) table is unisex, so men and women get the same lump sum for the same pension. Because women live longer on average, that same number is worth relatively less to a woman than to a man.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Taking the check and rolling it over later is the same as a direct rollover."</div><div class="ma"><b>Myth.</b> If the plan pays you, it must withhold 20%. You have 60 days to deposit the full amount, including the withheld 20% from other funds, or that part is taxed. A direct rollover avoids the problem.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What pensions mean for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.10 &mdash; Monthly guaranteed income today and when retired, by household</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="Which households have pension-like guaranteed income">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="130" height="180" rx="12" style="fill:var(--blue-soft)"/><text x="65" y="30" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Maya</text><text x="65" y="60" text-anchor="middle" class="svg-s" font-size="12">No pension;</text><text x="65" y="76" text-anchor="middle" class="svg-s" font-size="12">401(k) match</text><text x="65" y="92" text-anchor="middle" class="svg-s" font-size="12">instead</text><text x="65" y="160" text-anchor="middle" class="svg-m" font-size="11">Future SS only</text></g>
+      <g transform="translate(152,10)"><rect width="130" height="180" rx="12" style="fill:var(--teal-soft)"/><text x="65" y="30" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Riveras</text><text x="65" y="60" text-anchor="middle" class="svg-s" font-size="12">Two 401(k)s;</text><text x="65" y="76" text-anchor="middle" class="svg-s" font-size="12">survivor income</text><text x="65" y="92" text-anchor="middle" class="svg-s" font-size="12">from SS</text><text x="65" y="160" text-anchor="middle" class="svg-m" font-size="11">Future SS only</text></g>
+      <g transform="translate(294,10)"><rect width="130" height="180" rx="12" style="fill:var(--amber-soft)"/><text x="65" y="30" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Jordan</text><text x="65" y="60" text-anchor="middle" class="svg-s" font-size="12">401(k) and</text><text x="65" y="76" text-anchor="middle" class="svg-s" font-size="12">employer stock;</text><text x="65" y="92" text-anchor="middle" class="svg-s" font-size="12">no pension</text><text x="65" y="160" text-anchor="middle" class="svg-m" font-size="11">Future SS only</text></g>
+      <g transform="translate(436,10)"><rect width="130" height="180" rx="12" style="fill:var(--violet-soft)"/><text x="65" y="30" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Harpers</text><text x="65" y="60" text-anchor="middle" class="svg-s" font-size="12">Rachel's frozen</text><text x="65" y="76" text-anchor="middle" class="svg-s" font-size="12">pension, $1,450</text><text x="65" y="92" text-anchor="middle" class="svg-s" font-size="12">a month at 65</text><text x="65" y="160" text-anchor="middle" class="svg-m" font-size="11">Plus two SS</text></g>
+      <g transform="translate(578,10)"><rect width="132" height="180" rx="12" style="fill:var(--red-soft)"/><text x="66" y="30" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Ruth</text><text x="66" y="60" text-anchor="middle" class="svg-s" font-size="12">SS survivor</text><text x="66" y="76" text-anchor="middle" class="svg-s" font-size="12">benefit, $2,900</text><text x="66" y="92" text-anchor="middle" class="svg-s" font-size="12">a month</text><text x="66" y="160" text-anchor="middle" class="svg-m" font-size="11">Already in pay</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Only one household has a traditional pension, but every household relies on one kind of lifetime income: Social Security.</b> The same survivor and inflation questions apply to it (INV-078).</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Her "pension" is the match.</b> Maya's employer offers a 401(k) match rather than a pension. If a future employer offers a pension, she should learn its vesting schedule; a lump sum of a small benefit after a job change should be rolled directly to an IRA, never cashed.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Survivor protection comes from elsewhere.</b> Without pensions, the Riveras' survivor income rests on Social Security survivor benefits for Sofia, Leo and the surviving parent, plus life insurance (INV-023).</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Build the floor yourself.</b> As a single parent with no pension, Jordan will depend on Social Security and savings. Delaying Social Security later is the cheapest way to buy more lifetime, inflation-adjusted income (INV-078).</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Keep Rachel's pension, probably.</b> At May 2026 rates, the offered lump sum is below the pension's value to her at any safe rate under about 6.1%. At 65, the survivor choice costs little because Tom is older.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>She is living the survivor option.</b> When Walter died, Ruth kept the higher of their two Social Security benefits, $2,900 a month: a joint and survivor annuity in all but name. If she wants more guaranteed income, INV-082 shows how an income annuity compares.</div></div>
+  </div>
+  <div class="ws" data-ws="inv080" data-title="INV-080 worksheet: my pension decision">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w80a">My monthly pension, start age, and whether it has a COLA</label><textarea id="w80a" data-key="benefit"></textarea></div>
+      <div><label for="w80b">Lump sum offered, and the month's rates the plan used</label><textarea id="w80b" data-key="offer"></textarea></div>
+      <div><label for="w80c">Rate that makes them equal (from the calculator) vs. today's safe yields</label><textarea id="w80c" data-key="rate"></textarea></div>
+      <div><label for="w80d">Survivor options and their cuts; what my spouse would have without it</label><textarea id="w80d" data-key="survivor"></textarea></div>
+      <div><label for="w80e">Is my benefit under the PBGC limit for my age? Plan funding level?</label><textarea id="w80e" data-key="pbgc"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.11 &mdash; $18,000 a year for 20 years, valued today at different rates</div>
+    <div id="f8010"></div>
+    <figcaption class="cap"><b>The discount rate does most of the work.</b> Present value of 20 yearly payments of $18,000: PV = 18,000 &times; [1 &minus; (1 + r)<sup>&minus;20</sup>] &divide; r. At 5% it is $224,320.</figcaption>
+  </figure>
+  <div class="ex" data-answer="224320" data-tol="0.002" data-ok="18,000 &times; [1 &minus; 1.05<sup>&minus;20</sup>] &divide; 0.05 &asymp; $224,320.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">Ignoring mortality, what is the present value of $1,500 a month ($18,000 a year, paid at year-end) for 20 years at a 5% discount rate, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">1.05<sup>20</sup> = 2.6533, so 1.05<sup>&minus;20</sup> = 0.3769. PV = 18,000 &times; (1 &minus; 0.3769) &divide; 0.05 = 18,000 &times; 12.462 = <b>$224,320</b>.</div></div>
+  <div class="ex" data-answer="12.5" data-tol="0.01" data-ok="$300,000 &divide; $24,000 = 12.5 years.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">A plan offers $300,000 or $2,000 a month. Using the simple (no-interest) shortcut, after how many years of checks does the pension pay back the lump sum?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in years" placeholder="years"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$2,000 &times; 12 = $24,000 a year; $300,000 &divide; $24,000 = <b>12.5 years</b>. With interest, the true break-even is later, because the lump sum would keep earning in the meantime.</div></div>
+  <div class="ex" data-answer="1210.23" data-tol="0.001" data-ok="$9,000 &minus; $7,789.77 = $1,210.23.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">A 65-year-old's single-employer plan fails in 2026. The plan promised a straight-life pension of $9,000 a month. Using the 2026 PBGC maximum at 65, how much of the monthly benefit is above the guarantee, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">The 2026 maximum straight-life guarantee at 65 is $7,789.77 a month. $9,000 &minus; $7,789.77 = <b>$1,210.23</b> a month is above the limit and could be lost.</div></div>
+  <div class="ex" data-answer="50000" data-tol="0.001" data-ok="20% of $250,000 = $50,000.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">A plan pays a $250,000 lump sum directly to you instead of by direct rollover. How much must it withhold for federal tax, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Mandatory withholding is 20%: $250,000 &times; 0.20 = <b>$50,000</b>. You receive $200,000; to roll over the full $250,000 within 60 days, you must add $50,000 from other money.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.12 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: value it, check the rates, protect the survivor, check the guarantee">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Value it</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">PV weighted by survival</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Check the rates</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">417(e) moves the offer</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Protect</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">price the survivor option</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Guarantee</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">PBGC limits by age</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q": "When valuing a guaranteed pension against a lump sum, the fairest discount rate is:", "choices": ["The yield on high-quality bonds, which have similar safety", "The long-run stock market return", "Zero", "The inflation rate"], "answer": 0, "explain": "Compare a guarantee with what the money could earn with similar safety."},
+    {"q": "If IRS 417(e) segment rates rise, a plan's minimum lump sum for the same pension:", "choices": ["Rises", "Falls", "Stays the same", "Doubles"], "answer": 1, "explain": "Higher discount rates shrink the present value of future payments."},
+    {"q": "Under 26 U.S.C. &sect;417, the survivor benefit in a qualified joint and survivor annuity must be:", "choices": ["Exactly 50%", "At least 25%", "Chosen by the plan without limits", "Between 50% and 100% of the joint benefit"], "answer": 3, "explain": "&sect;417(b) sets the survivor annuity at not less than 50% and not more than 100%."},
+    {"q": "To waive the joint and survivor form, a married participant generally needs:", "choices": ["Nothing", "A phone call to the plan", "The spouse's written consent, witnessed by a notary or plan representative", "IRS approval"], "answer": 2, "explain": "&sect;417(a)(2) requires written, witnessed spousal consent."},
+    {"q": "The 2026 PBGC maximum straight-life guarantee at age 65 for single-employer plans is about:", "choices": ["$3,505 a month", "$6,154 a month", "$7,790 a month", "$12,931 a month"], "answer": 2, "explain": "$7,789.77 a month; $3,505.40 is the figure at 55 and $12,931.02 at 70."},
+    {"q": "A plan pays your $100,000 lump sum to you rather than by direct rollover. It must withhold:", "choices": ["20%", "Nothing", "10%", "37%"], "answer": 0, "explain": "Eligible rollover distributions paid to you carry mandatory 20% withholding (IRS Topic 413)."},
+    {"q": "Because the 417(e) mortality table is unisex, the lump sum tends to be a relatively better deal for:", "choices": ["Women", "Men", "Both equally", "Neither"], "answer": 1, "explain": "Men live shorter lives on average, so a unisex value overstates the value of their pension payments."},
+    {"q": "Which fact most favors keeping the lifetime pension?", "choices": ["Serious health problems", "No spouse and large other savings", "A lump sum offer well above the pension's value at safe rates", "Long-lived family, a younger spouse, and essential bills not covered by Social Security"], "answer": 3, "explain": "Longevity and an uncovered income floor make lifetime income valuable."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 80.13 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-081</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">RMDs and retirement taxes</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-082</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Annuities for retirement income</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-078</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Social Security</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-080"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Internal Revenue Service. (2025). <i>Notice 2025-40: Updated static mortality tables for defined benefit pension plans for 2026</i> (includes the unisex 417(e) table). <a href="https://www.irs.gov/pub/irs-drop/n-25-40.pdf">irs.gov</a></li>
+    <li>Social Security Administration, Office of the Chief Actuary. (2026). <i>Actuarial life table: Period life table, 2023, as used in the 2026 Trustees Report</i>. <a href="https://www.ssa.gov/oact/STATS/table4c6.html">ssa.gov</a></li>
+    <li>Internal Revenue Service. (2026). <i>Minimum present value segment rates</i>. <a href="https://www.irs.gov/retirement-plans/minimum-present-value-segment-rates">irs.gov</a></li>
+    <li>26 U.S.C. &sect;417 (definitions and special rules for joint and survivor annuities; &sect;417(e) present value) and &sect;430(h)(2) (segment rates). Legal Information Institute. <a href="https://www.law.cornell.edu/uscode/text/26/417">law.cornell.edu</a></li>
+    <li>Pension Benefit Guaranty Corporation. (2025). <i>Maximum monthly guarantee tables</i> (2026 table). <a href="https://www.pbgc.gov/workers-retirees/learn/guaranteed-benefits/monthly-maximum">pbgc.gov</a>; and <i>Who we are</i>. <a href="https://www.pbgc.gov/about/who-we-are">pbgc.gov</a></li>
+    <li>Internal Revenue Service. <i>Topic no. 413, Rollovers from retirement plans</i>. <a href="https://www.irs.gov/taxtopics/tc413">irs.gov</a></li>
+    <li>Internal Revenue Service. <i>Retirement topics &mdash; Exceptions to tax on early distributions</i>. <a href="https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-exceptions-to-tax-on-early-distributions">irs.gov</a></li>
+    <li>Internal Revenue Service. (2015). <i>Notice 2015-49</i>. <a href="https://www.irs.gov/pub/irs-drop/n-15-49.pdf">irs.gov</a>; and (2019). <i>Notice 2019-18</i>. <a href="https://www.irs.gov/pub/irs-drop/n-19-18.pdf">irs.gov</a></li>
+    <li>Pennsylvania Life and Health Insurance Guaranty Association. <i>Notice of protection provided by the Pennsylvania Life and Health Insurance Guaranty Association</i>. <a href="https://www.palifega.org/AdditionalInfo/Open/909/PLHIGASummary002">palifega.org</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Lump sums and survivor reductions in this module are estimates from public tables; your plan's figures come from its own document and the IRS table it must use. Get your plan's written explanation of your payment options before choosing.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s11b.js"></script>
+<script>
+INV.ready(function () {
+  var X = INV.s11b, ms = INV.moneyShort, ag = function (v) { return String(Math.round(v)); };
+  var pc = function (v) { return Math.round(v) + "%"; };
+  function surv(sx) { var S = X.survival(sx, 65), d = []; for (var m = 0; m < S.length && 65 + m / 12 <= 110; m += 12) d.push([65 + m / 12, S[m] * 100]); return d; }
+  INV.lineChart(document.getElementById("f801"), { label: "Survival from 65", height: 250, xTitle: "Age", yTitle: "Still alive (%)", xFmt: ag, yFmt: pc, tipFmt: function (v) { return v.toFixed(1) + "%"; },
+    series: [{ name: "Men aged 65", color: "var(--s1)", data: surv("m") }, { name: "Women aged 65", color: "var(--s5)", data: surv("f") }], marks: [{ x: 90, label: "90" }] });
+  function fair(sx, ax, sy, ay, sv) { var Sx = X.survival(sx, ax), Sy = X.survival(sy, ay), j = X.jointFactors(Sx, Sy, 0.05, 0, 0), s1 = X.annFactor(Sx, 0.05, 0, 0); return (1 - s1 / (j.ax + sv * (j.ay - j.axy))) * 100; }
+  var d2 = [];
+  [[0.5, "50%"], [0.75, "75%"], [1, "100%"]].forEach(function (k) { d2.push({ label: "He 65, she 63: " + k[1], y: fair("m", 65, "f", 63, k[0]), color: "var(--s1)" }); });
+  [[0.5, "50%"], [0.75, "75%"], [1, "100%"]].forEach(function (k) { d2.push({ label: "She 65, he 67: " + k[1], y: fair("f", 65, "m", 67, k[0]), color: "var(--s5)" }); });
+  INV.barChart(document.getElementById("f802"), { label: "Fair survivor reduction", height: 240, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; }, data: d2 });
+  var SEG = X.SEG, idx = function (v) { var s = SEG[Math.max(0, Math.min(SEG.length - 1, Math.round(v)))]; return s ? s[0] : ""; }, ticks = [0, 12, 24, 36, 48, 60, 72];
+  INV.lineChart(document.getElementById("f803"), { label: "IRS segment rates", height: 250, xTicks: ticks, xFmt: idx, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "%"; }, xTitle: "Month",
+    series: [{ name: "First segment (0-5 years)", color: "var(--s3)", data: SEG.map(function (s, i) { return [i, s[1]]; }) }, { name: "Second (5-20 years)", color: "var(--s1)", data: SEG.map(function (s, i) { return [i, s[2]]; }) }, { name: "Third (20+ years)", color: "var(--s2)", data: SEG.map(function (s, i) { return [i, s[3]]; }) }] });
+  var Su = X.survival("u", 65), lump = function (s) { return 24000 * X.annFactor(Su, 0, 0, 0, X.segRateFn(s[1], s[2], s[3])); };
+  INV.lineChart(document.getElementById("f804"), { label: "Lump sum by month", height: 240, xTicks: ticks, xFmt: idx, yFmt: ms, tipFmt: function (v) { return INV.money(v); }, zeroBase: false, xTitle: "IRS segment-rate month",
+    series: [{ name: "Minimum lump sum, $2,000 a month at 65", color: "var(--s1)", data: SEG.map(function (s, i) { return [i, lump(s)]; }) }] });
+  var pb = [[55, 3505.40, 3154.86], [60, 5063.35, 4557.02], [62, 6153.92, 5538.53], [65, 7789.77, 7010.79], [67, 9425.62, 8483.06], [70, 12931.02, 11637.92]], d5 = [];
+  pb.forEach(function (p) { d5.push({ label: "Age " + p[0], y: p[1], color: "var(--s1)", tip: "Age " + p[0] + ", straight life" }); });
+  INV.barChart(document.getElementById("f805"), { label: "PBGC 2026 maximums", height: 240, allLabels: true, valueLabels: true, yFmt: function (v) { return "$" + Math.round(v).toLocaleString(); }, data: d5 });
+  var Sr = X.survival("pf", 55), Sru = X.survival("u", 55), rl = 17400 * X.annFactor(Sru, 0, 10, 0, X.segRateFn(4.42, 5.47, 6.31));
+  INV.barChart(document.getElementById("f807"), { label: "Rachel's options", height: 240, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return INV.money(v); },
+    data: [{ label: "Lump sum offered", y: rl, color: "var(--s3)" }, { label: "Pension at 4%", y: 17400 * X.annFactor(Sr, 0.04, 10, 0), color: "var(--s2)" }, { label: "Pension at 5%", y: 17400 * X.annFactor(Sr, 0.05, 10, 0), color: "var(--s2)" }, { label: "Pension at 6%", y: 17400 * X.annFactor(Sr, 0.06, 10, 0), color: "var(--s2)" }] });
+  var pick = function (m) { for (var i = 0; i < SEG.length; i++) if (SEG[i][0] === m) return SEG[i]; return SEG[SEG.length - 1]; };
+  INV.barChart(document.getElementById("f808"), { label: "One pension three prices", height: 230, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return INV.money(v); },
+    data: [{ label: "December 2021 rates", y: lump(pick("Dec-21")), color: "var(--s2)" }, { label: "October 2023 rates", y: lump(pick("Oct-23")), color: "var(--s5)" }, { label: "May 2026 rates", y: lump(pick("May-26")), color: "var(--s1)" }] });
+  var e = []; for (var r = 1; r <= 10; r += 0.5) e.push([r, 18000 * (1 - Math.pow(1 + r / 100, -20)) / (r / 100)]);
+  INV.lineChart(document.getElementById("f8010"), { label: "PV of 20 payments", height: 230, xTitle: "Discount rate (%)", xFmt: function (v) { return v + "%"; }, yFmt: ms, tipFmt: function (v) { return INV.money(v); }, zeroBase: false,
+    series: [{ name: "Present value", color: "var(--s1)", data: e }], dots: [{ x: 5, y: 224319.79, label: "$224,320 at 5%", color: "var(--s1)" }] });
+});
+</script>
+</body>
+</html>

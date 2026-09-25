@@ -337,7 +337,7 @@
       rng(u + "-c", "Average correlation between stocks", 0, 0.9, 0.05, 0.3) +
       rng(u + "-n", "Stocks in the portfolio", 1, 100, 1, 20) +
       '<p class="hint" style="font-size:.76rem;color:var(--muted)">Equal-weighted portfolio of stocks with identical volatility σ and pairwise correlation ρ: portfolio σₚ = σ √(1/n + (1 − 1/n)ρ). An idealized model, not a forecast.</p>',
-      '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
+      '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function sp(sig, rho, n) { return sig * Math.sqrt(1 / n + (1 - 1 / n) * rho); }
     function run() {
       var sig = Number(self(el, "v").value), rho = Number(self(el, "c").value), n = Number(self(el, "n").value);
@@ -345,7 +345,7 @@
       self(el, "k").innerHTML = kpi("One stock", pct(one, 0)) + kpi(n + " stocks", pct(now, 1)) + kpi("Floor (∞ stocks)", pct(floor, 1)) +
         kpi("Risk removed", pct(one > floor ? (one - now) / (one - floor) * 100 : 100, 0), "good");
       var pts = [], fl = []; for (var k = 1; k <= 100; k++) { pts.push([k, sp(sig, rho, k)]); fl.push([k, floor]); }
-      INV.lineChart(self(el, "c"), { label: "Portfolio volatility by number of stocks", height: 240, xTitle: "Number of stocks", yTitle: "Portfolio volatility (%)",
+      INV.lineChart(self(el, "ch"), { label: "Portfolio volatility by number of stocks", height: 240, xTitle: "Number of stocks", yTitle: "Portfolio volatility (%)",
         xFmt: yearFmt, yFmt: function (v) { return v + "%"; }, series: [{ name: "Portfolio volatility", color: "var(--s1)", data: pts, area: true }, { name: "Market-risk floor", color: "var(--s5)", data: fl, dash: "5 4" }],
         dots: [{ x: n, y: now, label: pct(now, 1), color: "var(--s1)" }] });
       self(el, "n2").innerHTML = "The part that disappears is <b>company-specific</b> risk. What remains — the floor, σ√ρ = " + pct(floor, 1) + " — is <b>market</b> risk that more stocks of the same kind cannot remove. Adding assets that are less correlated (bonds, other countries) lowers the floor itself.";
@@ -400,7 +400,7 @@
       numf(u + "-p", "Starting amount ($)", 100000, 1000) + numf(u + "-c", "Added each year ($)", 6000, 500) +
       rng(u + "-r", "Return before fees", 1, 12, 0.5, 7, "pct") + rng(u + "-n", "Years", 1, 50, 1, 30, "yr") +
       rng(u + "-a", "Fee A (e.g. index fund)", 0, 3, 0.01, 0.05, "pct") + rng(u + "-b", "Fee B (e.g. advisor + funds)", 0, 3, 0.01, 1.25, "pct"),
-      '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
+      '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function grow(P, C, r, f, n) { var b = P, pts = [[0, P]], paid = 0; for (var y = 1; y <= n; y++) { b += C; var fee = b * (1 + r) * f; b = b * (1 + r) - fee; paid += fee; pts.push([y, b]); } return { b: b, pts: pts, paid: paid }; }
     function run() {
       var P = Number(self(el, "p").value) || 0, C = Number(self(el, "c").value) || 0, r = Number(self(el, "r").value) / 100, n = Number(self(el, "n").value),
@@ -408,7 +408,7 @@
       var A = grow(P, C, r, fa, n), B = grow(P, C, r, fb, n), Z = grow(P, C, r, 0, n);
       var gap = A.b - B.b;
       self(el, "k").innerHTML = kpi("With fee A", money(A.b)) + kpi("With fee B", money(B.b)) + kpi("Difference", money(gap), "bad") + kpi("Share of no-fee result lost to B", pct(Z.b ? (1 - B.b / Z.b) * 100 : 0, 0), "bad");
-      INV.lineChart(self(el, "c"), { label: "Balance with two fee levels", height: 260, xTitle: "Years", yFmt: ms, xFmt: yearFmt,
+      INV.lineChart(self(el, "ch"), { label: "Balance with two fee levels", height: 260, xTitle: "Years", yFmt: ms, xFmt: yearFmt,
         series: [{ name: "Fee A " + pct(fa * 100, 2), color: "var(--s2)", data: A.pts }, { name: "Fee B " + pct(fb * 100, 2), color: "var(--s5)", data: B.pts }, { name: "No fees", color: "var(--s6)", data: Z.pts, dash: "4 4", width: 1.4 }] });
       self(el, "n2").innerHTML = "Fee B's " + pct(fb * 100, 2) + " a year looks small, but it is charged on the <i>whole balance</i> every year, and the money taken can no longer compound. After " + n +
         " years it leaves you with <b>" + money(gap) + "</b> less than fee A — more than the " + money(B.paid) + " actually deducted, because the deducted dollars also lost their future growth.";

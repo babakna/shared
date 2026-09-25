@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-077 · Sequence Risk and Monte Carlo — Investing Learning Lab</title>
+<meta name="description" content="Why the order of returns matters once you start withdrawing, what happened to retirees in 1966 and 1982, and how a Monte Carlo simulation with bootstrapped history works, and where it misleads.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-077">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-077</span><span class="ttl">Sequence Risk and Monte Carlo</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 11 · Retirement</span><span class="chip teal">Intermediate to advanced</span><span class="chip gray">About 65 minutes</span><span class="chip gray">2 simulators</span></div>
+    <h1>Sequence Risk and Monte Carlo</h1>
+    <p class="sub">While you are saving, a bad year early and a good year late come out the same as the reverse. Once you start withdrawing, they do not. This module shows why, replays the 1966 and 1982 retirements from the data, and builds a Monte Carlo simulator from 98 years of history, including an honest list of what such simulations cannot tell you.</p>
+    <p class="q"><span>The question this module answers</span>How much does the luck of my first retirement years matter, and how should I read a "probability of success"?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <path d="M30 190 C90 180 130 120 200 100 S300 60 330 40" fill="none" stroke="#1F5FD1" stroke-width="2" opacity=".35"/>
+      <path d="M30 190 C90 170 150 150 200 130 S300 110 330 90" fill="none" stroke="#1F5FD1" stroke-width="2" opacity=".35"/>
+      <path d="M30 190 C90 195 150 185 200 175 S300 165 330 160" fill="none" stroke="#1F5FD1" stroke-width="2" opacity=".35"/>
+      <path d="M30 190 C80 200 130 210 180 215 S260 218 300 219" fill="none" stroke="#C2332B" stroke-width="3"/>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Many paths, one retirement</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>Multiplication does not care about order. Withdrawals do.</h2>
+  <p class="lede">If you invest $100 and earn +50% one year and &minus;50% the next, you end with $75. Reverse the years and you still end with $75, because 1.5 &times; 0.5 = 0.5 &times; 1.5. For someone who is only saving, the order of good and bad years does not change where they end up.</p>
+  <p>That is exactly why the idea in this module, <span class="term" data-term="Sequence-of-returns risk">sequence-of-returns risk</span>, surprises people. The moment money starts coming <i>out</i>, order matters a great deal. Take the real (after-inflation) returns of a 60/40 portfolio in the 30 years from 1966 to 1995. Left alone, $1 million grows to about $3.3 million in 1966 dollars whether the years run forward or backward. Now withdraw $40,000 a year in real terms. Run forward, the portfolio is empty in its 26th year. Run backward, with every single yearly return identical, it ends with about $1.65 million.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.1 &mdash; The same 30 years of returns, forward and reversed, with $40,000 a year withdrawn</div>
+    <div id="f771"></div>
+    <figcaption class="cap"><b>Identical returns, opposite outcomes.</b> 60/40 real returns for 1966&ndash;1995, withdrawals of $40,000 (4% of $1 million) at the start of each year, in 1966 dollars. Both orders average 4.83% a year and compound at 4.06% a year. Forward, the bad 1970s came first and the money ran out in year 26; reversed, the strong 1980s and 1990s came first. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li><b>Sequence-of-returns risk</b>: why the first decade of retirement carries so much weight.</li>
+    <li>The <b>1966 and 1982</b> retirees, side by side.</li>
+    <li><b>Monte Carlo simulation</b>: seeded random numbers, bootstrapping historical years, and percentile bands.</li>
+    <li>How to read a <b>"probability of success"</b>, and six limits of any simulation.</li>
+    <li>Practical ways to manage sequence risk.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Sequence risk">
+  <p class="kicker">The fragile decade</p>
+  <h2>Why early losses do lasting damage</h2>
+  <div class="def"><div class="def-h"><b>Sequence-of-returns risk</b><span>sequence risk</span></div>
+    <div class="def-r"><div>What it is</div><div>The risk that poor returns arrive early in retirement, while withdrawals are being taken, so that money sold at low prices is gone before the recovery comes.</div></div>
+    <div class="def-r"><div>Used for</div><div>Explaining why two retirees with the same average return can have completely different outcomes, and why the years just before and after retirement deserve special care.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Your plan's weakest point is roughly the five years before and ten years after you stop working. The average return over thirty years matters less than the returns in that window.</div></div></div>
+  <p>The mechanism is simple arithmetic. A $40,000 withdrawal from a $1 million portfolio is 4%. If the portfolio falls to $700,000, the same withdrawal is 5.7% of what is left, and every dollar withdrawn is a dollar that cannot participate in the recovery. Losses early in retirement are therefore "locked in" by the withdrawals that follow them; the same losses late in retirement fall on a smaller balance that has already done most of its job.</p>
+  <div data-tool="s11aOrder"></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.2 &mdash; Real return in the first ten years of each retirement, 60/40</div>
+    <div id="f772"></div>
+    <figcaption class="cap"><b>Every 4% failure had a negative first decade.</b> Compound real return of a 60/40 portfolio over the first ten years of each retirement starting 1928&ndash;1996. Red bars are the four start years whose 4% fixed real withdrawal ran out within 30 years: 1965, 1966, 1968 and 1969. Across all 69 starts, the first-decade return had a correlation of 0.70 with the ending balance. Computed from Damodaran's data.</figcaption>
+  </figure>
+  <p>The first-decade return is not the whole story. Several retirements starting in 1970&ndash;1973 also had negative first decades and survived, because the strong 1980s arrived soon enough. But no retirement in the record failed at 4% without a poor first decade.</p>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Why order matters mathematically</summary><div class="layer-b">
+    <div class="formula">B<sub>N</sub> = B<sub>0</sub>&middot;&prod;(1 + r<sub>t</sub>) &minus; W&middot;&sum;<sub>k=1..N</sub> &prod;<sub>t=k..N</sub>(1 + r<sub>t</sub>)</div>
+    <p>With withdrawals W taken at the start of each year, the ending balance is the starting balance grown by all the returns, minus each withdrawal grown by the returns <i>after</i> it was taken. The first term does not depend on order. The second does: a withdrawal taken just before a run of strong years loses all that growth. Poor early returns make the subtracted term large relative to the first. That is also why, as Bengen observed, "excess returns" early in retirement are best not spent: they may be needed to offset weaker returns later.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="1966 vs 1982">
+  <p class="kicker">Two real retirements</p>
+  <h2>Retiring in 1966 versus 1982</h2>
+  <p>Imagine two people who each retire with $1 million in a 60/40 portfolio and take $40,000 in the first year, raised with inflation. One retires at the start of 1966, the other at the start of 1982. Figure 77.3 follows both in their own start-year dollars.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.3 &mdash; $1 million, 4% fixed real withdrawals: 1966 and 1982 retirees</div>
+    <div id="f773"></div>
+    <figcaption class="cap"><b>After ten years the 1966 retiree had 49% of their starting real wealth; the 1982 retiree had 228%.</b> Real balances in each retiree's start-year dollars, 60/40, rebalanced yearly. The 1966 portfolio ran out in its 26th year; the 1982 portfolio ended its 30th year at 5.36 times its starting real value. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>60/40 portfolio, 30 years</th><th class="r">Retire 1966</th><th class="r">Retire 1982</th></tr></thead><tbody>
+    <tr><td>Compound real return, all 30 years</td><td class="r">4.06%</td><td class="r">7.51%</td></tr>
+    <tr><td>Compound real return, first 10 years</td><td class="r neg-t">&minus;1.76%</td><td class="r pos-t">11.68%</td></tr>
+    <tr><td>Compound real return, last 20 years</td><td class="r pos-t">7.11%</td><td class="r">5.49%</td></tr>
+    <tr><td>Rise in consumer prices over the first 10 years</td><td class="r">74.6%</td><td class="r">46.7%</td></tr>
+    <tr><td>Real balance after 10 years (start = 100%)</td><td class="r neg-t">48.6%</td><td class="r pos-t">228.4%</td></tr>
+    <tr><td>Outcome of 4% fixed real withdrawals</td><td class="r neg-t">ran out in year 26</td><td class="r pos-t">5.36&times; starting value</td></tr>
+  </tbody></table></div>
+  <p class="src">Computed from Damodaran, NYU Stern: S&amp;P 500 total return, 10-year Treasury bonds, CPI inflation, 1966&ndash;1995 and 1982&ndash;2011.</p>
+  <p>The most striking line is the third. The 1966 retiree's <i>last</i> twenty years were better than the 1982 retiree's last twenty. It did not matter. By 1976 the 1966 retiree had withdrawn ten years of inflation-adjusted spending from a portfolio that had lost real value, and the good years that followed were earned on a balance too small to recover. The 1969 retiree makes the point even more sharply: their 30-year compound real return of 5.62% was <i>higher</i> than the 1928&ndash;2025 average of 5.15%, and a 4% withdrawal still ran out.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Inflation is part of the sequence</summary><div class="layer-b">
+    <p>Sequence risk is usually described in terms of stock crashes, but the 1966 retiree's problem was as much inflation as markets. A fixed real withdrawal rises with prices; from 1966 to 1975, consumer prices rose about 75%, so the nominal withdrawal had to grow from $40,000 to nearly $70,000 while nominal stock returns were weak and bond prices fell. Treasury Inflation-Protected Securities (INV-010) and Social Security's cost-of-living adjustments (INV-078) are defenses aimed specifically at this form of the risk.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Monte Carlo">
+  <p class="kicker">Simulated history</p>
+  <h2>How a Monte Carlo simulation works</h2>
+  <p>History gives us only 69 overlapping 30-year retirements since 1928, and they share most of their years. A <span class="term" data-term="Monte Carlo simulation">Monte Carlo simulation</span> manufactures thousands of alternative histories by drawing returns at random, then counts how many of those imagined retirements would have lasted.</p>
+  <div class="def"><div class="def-h"><b>Monte Carlo simulation</b></div>
+    <div class="def-r"><div>What it is</div><div>Running a plan through thousands of randomly generated return paths and summarizing the spread of results, named after the casino because it relies on chance.</div></div>
+    <div class="def-r"><div>Used for</div><div>Estimating the share of possible futures in which a withdrawal plan lasts, and the range of balances along the way.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The "probability of success" in most planning software is a Monte Carlo result. It is only as good as the returns fed into it.</div></div></div>
+  <div class="def"><div class="def-h"><b>Bootstrapping</b><span>resampling history</span></div>
+    <div class="def-r"><div>What it is</div><div>Building a simulated path by picking calendar years from the historical record at random, with replacement, and using each chosen year's actual stock return, bond return and inflation together.</div></div>
+    <div class="def-r"><div>Used for</div><div>Keeping the real shape of returns, including bad years like 1931 and 2008, without assuming a bell curve; and keeping the link between stocks, bonds and inflation within each year.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>It uses nothing but real history, but it shuffles it. A bootstrapped path can put 1931, 1974 and 2008 back to back, or skip them entirely.</div></div></div>
+  <div class="def"><div class="def-h"><b>Random seed</b></div>
+    <div class="def-r"><div>What it is</div><div>The starting number for a computer's pseudo-random number generator. The same seed always produces the same "random" sequence.</div></div>
+    <div class="def-r"><div>Used for</div><div>Making a simulation reproducible, so that you and someone else get identical results from identical inputs.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>If a result changes a lot when you change only the <span class="term" data-term="Random seed">seed</span>, you need more simulations; the difference is noise, not information.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.4 &mdash; Bootstrapping: building one simulated retirement from history</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 190" role="img" aria-label="Draw random years from 1928 to 2025 to build a simulated path">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="200" height="150" rx="12" style="fill:var(--card2)"/><text x="110" y="46" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">98 historical years</text>
+      <g font-size="11.5" class="svg-s"><text x="30" y="72">1928 &middot; 1929 &middot; 1930 &middot; &hellip;</text><text x="30" y="92">1966 &middot; 1974 &middot; 1982 &middot; &hellip;</text><text x="30" y="112">2008 &middot; 2022 &middot; 2025</text><text x="30" y="140">each with stocks, bonds,</text><text x="30" y="156">and inflation</text></g>
+      <path d="M220 95 L285 95" style="stroke:var(--text2)" stroke-width="2" marker-end="url(#ar77)"/><defs><marker id="ar77" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" style="fill:var(--text2)"/></marker></defs>
+      <text x="252" y="82" text-anchor="middle" class="svg-s" font-size="11">draw at</text><text x="252" y="118" text-anchor="middle" class="svg-s" font-size="11">random</text>
+      <rect x="295" y="20" width="415" height="150" rx="12" style="fill:var(--blue-soft)"/><text x="502" y="46" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">One simulated 30-year retirement</text>
+      <g font-size="12" class="svg-t" font-weight="700"><text x="315" y="78">Year 1: 1974</text><text x="435" y="78">Year 2: 1995</text><text x="555" y="78">Year 3: 1931</text><text x="315" y="104">Year 4: 1995</text><text x="435" y="104">Year 5: 2013</text><text x="555" y="104">&hellip; Year 30</text></g>
+      <text x="315" y="136" class="svg-s" font-size="11.5">Repeat 1,000 or more times; count the paths</text><text x="315" y="152" class="svg-s" font-size="11.5">that pay every withdrawal. (Years shown are an example.)</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Each simulated year copies a whole historical year.</b> Drawing with replacement means a year can appear twice (1995 above) and some years not at all. Keeping each year's stock return, bond return and inflation together preserves how they moved within a year.</figcaption>
+  </figure>
+  <div data-tool="s11aMonteCarlo"></div>
+  <p>With the defaults ($1 million, $40,000 a year, 60/40, 30 years, 1,000 simulations, seed 2026), <b>89.6%</b> of simulated retirements paid every withdrawal. The median retiree ended with about <b>$1.63 million</b> in today's dollars, the 90th percentile with about $5.26 million, and the 10th percentile with nothing: more than one in ten simulations ran out, typically in year 26.</p>
+  <div class="def"><div class="def-h"><b>Percentile band</b></div>
+    <div class="def-r"><div>What it is</div><div>A line showing, for each year, the balance that a given share of simulations stayed above. The 10th-percentile line is the level that 90% of simulations beat.</div></div>
+    <div class="def-r"><div>Used for</div><div>Seeing the spread of outcomes over time, not just the single success number at the end.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Look at the 10th or 25th percentile in the first ten years. That is the realistic "bad but not disastrous" path you should be emotionally and financially ready to live through.</div></div></div>
+</section>
+
+<section class="panel" data-tab="Reading the results">
+  <p class="kicker">Using the output wisely</p>
+  <h2>What a "90% chance of success" does and does not mean</h2>
+  <p>A success rate is the share of simulated paths in which every planned withdrawal was paid. Three cautions follow directly from that definition.</p>
+  <ul>
+    <li><b>It counts failures but not their size.</b> A plan that runs dry at 94 and one that runs dry at 75 are both "failures." The <span class="term" data-term="Percentile band">percentile bands</span> and the typical depletion year show how bad the failures are.</li>
+    <li><b>It assumes you never adjust.</b> Real retirees cut spending after a crash. A 75% success rate for rigid spending might be a 99% success rate for someone following guardrails (INV-076). Treat low numbers as a signal to plan adjustments, not as a 25% chance of destitution.</li>
+    <li><b>Higher is not always better.</b> A 99% success rate usually means a large expected surplus: money unspent. Many planners aim for 75&ndash;90% combined with a willingness to adjust.</li>
+  </ul>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.5 &mdash; Success rate by yearly spending: bootstrapped history versus a bell curve</div>
+    <div id="f775"></div>
+    <figcaption class="cap"><b>Each extra $5,000 of spending on $1 million costs 3&ndash;11 points of success.</b> $1 million, 60/40, 30 years, 5,000 simulations, seed 2026. Bootstrap success: 98.4% at $30,000, 91.1% at $40,000, 75.8% at $50,000, 55.2% at $60,000. A normal distribution with the same mean (5.90%) and standard deviation (12.4%) gives almost identical figures for yearly data.</figcaption>
+  </figure>
+  <h3>How many simulations are enough?</h3>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Success rate, $40,000 on $1 million, 60/40, 30 years</th><th class="r">500 runs</th><th class="r">1,000 runs</th><th class="r">5,000 runs</th></tr></thead><tbody>
+    <tr><td>Seed 1</td><td class="r">91.0%</td><td class="r">91.2%</td><td class="r">90.6%</td></tr>
+    <tr><td>Seed 2</td><td class="r">90.2%</td><td class="r">90.9%</td><td class="r">90.5%</td></tr>
+    <tr><td>Seed 3</td><td class="r">93.2%</td><td class="r">91.8%</td><td class="r">90.4%</td></tr>
+    <tr><td>Seed 42</td><td class="r">89.6%</td><td class="r">89.7%</td><td class="r">90.9%</td></tr>
+    <tr><td>Seed 2026</td><td class="r">90.8%</td><td class="r">89.6%</td><td class="r">91.1%</td></tr>
+  </tbody></table></div>
+  <p class="src">Computed with this module's simulator. The range across seeds narrows from 3.6 points at 500 runs to 0.7 points at 5,000.</p>
+  <h3>Six limits of any Monte Carlo</h3>
+  <ol>
+    <li><b>Independence.</b> <span class="term" data-term="Bootstrapping">Bootstrapping</span> draws each year separately, so it destroys any pattern across years: the tendency of inflation to persist for several years, and any tendency of markets to recover after crashes. The 1970s were a run of related bad years, not a coincidence.</li>
+    <li><b>One country's history.</b> The US market was among the best-performing of the twentieth century. Sampling only US years may overstate future returns.</li>
+    <li><b>Today is not an average year.</b> Resampling ignores starting conditions such as bond yields and stock valuations, which do affect the next decade's returns.</li>
+    <li><b>No fees, taxes or behavior.</b> Subtract your costs from returns, and remember that simulated retirees never panic-sell.</li>
+    <li><b>Fixed spending.</b> Most simulators assume spending rises exactly with inflation; real spending adapts.</li>
+    <li><b>False precision.</b> "87.3% success" suggests an accuracy the inputs cannot support. Read it as "high," "moderate" or "low."</li>
+  </ol>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>Two methods, two different questions.</b> The historical sequences in INV-076 lasted in 94% of 30-year periods at 4%; this simulator gives about 90&ndash;91%. The historical test asks "what if the future repeats one of the past's actual sequences?"; the bootstrap asks "what if the future is a random shuffle of past years?" Neither is the truth. Consistent answers across methods are more reassuring than any single number.</p></div></div>
+</section>
+
+<section class="panel" data-tab="Managing it">
+  <p class="kicker">What to do about it</p>
+  <h2>Six ways to reduce sequence risk</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.6 &mdash; The sequence-risk toolbox</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 300" role="img" aria-label="Six tools: flexible spending, cash reserve, lower early stock exposure, delay Social Security, part-time work, annuitize a floor">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="130" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">1. Flexible spending</text><text x="16" y="54" class="svg-s" font-size="12">Cut after bad years,</text><text x="16" y="70" class="svg-s" font-size="12">raise after good ones.</text><text x="16" y="114" class="svg-m" font-size="11">INV-076 guardrails</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="130" rx="12" style="fill:var(--green-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">2. Cash reserve</text><text x="16" y="54" class="svg-s" font-size="12">One to two years of</text><text x="16" y="70" class="svg-s" font-size="12">spending to avoid selling low.</text><text x="16" y="114" class="svg-m" font-size="11">INV-076 buckets</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="130" rx="12" style="fill:var(--amber-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">3. Safer at the edge</text><text x="16" y="54" class="svg-s" font-size="12">Hold more bonds in the</text><text x="16" y="70" class="svg-s" font-size="12">years around retirement.</text><text x="16" y="114" class="svg-m" font-size="11">INV-050 glide paths</text></g>
+      <g transform="translate(10,152)"><rect width="226" height="130" rx="12" style="fill:var(--violet-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">4. Delay Social Security</text><text x="16" y="54" class="svg-s" font-size="12">Buy a bigger inflation-</text><text x="16" y="70" class="svg-s" font-size="12">adjusted lifetime income.</text><text x="16" y="114" class="svg-m" font-size="11">INV-078</text></g>
+      <g transform="translate(247,152)"><rect width="226" height="130" rx="12" style="fill:var(--teal-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">5. Part-time work</text><text x="16" y="54" class="svg-s" font-size="12">A few years of earnings</text><text x="16" y="70" class="svg-s" font-size="12">shrink early withdrawals.</text><text x="16" y="114" class="svg-m" font-size="11">INV-072</text></g>
+      <g transform="translate(484,152)"><rect width="226" height="130" rx="12" style="fill:var(--red-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">6. Annuitize a floor</text><text x="16" y="54" class="svg-s" font-size="12">Cover essentials with</text><text x="16" y="70" class="svg-s" font-size="12">income that cannot fall.</text><text x="16" y="114" class="svg-m" font-size="11">INV-082</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Every tool works by shrinking the withdrawals taken from a falling portfolio.</b> Some reduce the withdrawal (1, 5), some take it from something other than stocks (2, 3), and some replace portfolio income with guaranteed income (4, 6).</figcaption>
+  </figure>
+  <p>The two most powerful tools are often the least discussed, and both are aimed at <span class="term" data-term="longevity risk">longevity risk</span> as much as market risk. <b>Spending flexibility</b> changes the question from "will the money last?" to "how much will I spend?", which is a problem you can manage year by year. <b>Delaying Social Security</b> (INV-078) spends portfolio money in the early years to buy a larger, inflation-adjusted income for life, which reduces how much the portfolio must pay in the decades that follow. For the Harpers, Tom's benefit at 70 is 24% higher than at 67 and 77% higher than at 62, for as long as either of them lives.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why the danger zone starts before retirement</summary><div class="layer-b">
+    <p>A market fall just before retirement does the same damage as one just after: it shrinks the balance from which withdrawals are about to start. That is why target-date funds and many advisers reduce stock exposure in the five to ten years before the target date (INV-050). The cost is lower expected growth; the benefit is a narrower range of starting balances. Once the fragile first decade has passed, some retirees deliberately let stock exposure rise again.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Three real retirements from the data</p>
+  <h2>1929, 1966 and 2000</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.7 &mdash; Three hard starts, 4% fixed real withdrawals, 60/40</div>
+    <div id="f777"></div>
+    <figcaption class="cap"><b>A crash was survivable; a crash followed by inflation was not.</b> Real balances in each retiree's start-year dollars. 1929 fell to 43% of its starting value and ended 30 years at 52%. 1966 ran out in year 26. 2000, after two bear markets in its first decade, stood at 65% of its starting real value at the end of 2025, its 26th year. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>Retiring into the Great Depression, 1929</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Stocks lost 8.3% in 1929, 25.1% in 1930 and 43.8% in 1931. But consumer prices fell about 6&ndash;10% a year in 1930&ndash;1932, so an inflation-adjusted withdrawal actually shrank in dollars, and Treasury bonds held up. A 60/40 retiree taking 4% survived 30 years.</div></div>
+    <div class="row"><div>What it teaches</div><div>A deflationary crash, painful as it was, was easier on a fixed real withdrawal than a slow inflationary decline. Bengen made the same observation in 1994.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran (2026), <i>Historical returns on stocks, bonds and bills, 1928&ndash;2025</i>; Bengen (1994).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Retiring into the inflation decade, 1966</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Consumer prices rose 74.6% in the first ten years, stock returns were weak, and 10-year Treasury prices fell as rates rose. The real 60/40 return over the first decade was &minus;1.76% a year. The 4% withdrawal ran out in the 26th year, even though the last 20 years compounded at 7.11% after inflation.</div></div>
+    <div class="row"><div>What it teaches</div><div>The most dangerous sequence combines poor real returns with high inflation early in retirement. In Bengen's 1994 data, 1966 was also the start year with the shortest portfolio life at 4%: 33 years with 50% stocks and 32 years with 75%.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran (2026); Bengen, W. P. (1994), <i>Journal of Financial Planning</i>.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>Retiring at the 2000 peak</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>The S&amp;P 500 lost 9.0%, 11.9% and 22.0% in 2000&ndash;2002 and 36.6% in 2008. The 60/40 real return over 2000&ndash;2009 was just 0.40% a year. Bonds cushioned both crashes. After 26 years, the 4% retiree had withdrawn every year's inflation-adjusted amount and still held about 65% of the starting real balance, with four years to go.</div></div>
+    <div class="row"><div>What it teaches</div><div>A bad first decade does not have to be fatal if inflation is modest and the second decade is strong. The 2000 retiree is on course to finish, but with much less margin than the median retiree.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran (2026), data through 2025.</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Living with sequence risk</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.8 &mdash; Monte Carlo success by stock allocation</div>
+    <div id="f778"></div>
+    <figcaption class="cap"><b>Too little in stocks is as risky as too much.</b> $1 million, $40,000 a year in real terms, 30 years, 5,000 bootstrapped simulations, seed 2026: 79.3% success at 20% stocks, 89.2% at 40%, 91.1% at 60%, 89.9% at 80% and 87.7% at 100%. Consistent with Bengen's finding that fewer than 50% stocks was counterproductive.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Harpers, two years before retirement</div>
+    <p class="dq">The Harpers' plan shows a 94.8% Monte Carlo success rate ($1.69 million, $61,000 a year, 60/40, 30 years). Then stocks fall 25% the year before Tom's planned retirement. What should they do?</p>
+    <div class="opts"><button class="opt">Sell stocks now to stop further losses.</button><button class="opt">Rerun the plan with the new balance; if it drops sharply, consider working a year longer, delaying Tom's Social Security, or starting with a lower withdrawal and guardrails.</button><button class="opt">Ignore it; long-run averages will work out.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Sell stocks</b>This locks in the loss and removes the recovery that the plan depends on. It turns a sequence risk into a certainty.</div>
+      <div class="oc"><b>Rerun and adjust the levers</b>Right. A fall just before retirement is sequence risk arriving early. The best responses shrink early withdrawals: more working income, more Social Security later, or flexible spending. A year of extra work both adds savings and removes a year of withdrawals.</div>
+      <div class="oc"><b>Ignore it</b>Averages are exactly what the 1966 retiree relied on. A sizable fall at the start of withdrawals deserves a response, even if the response is small.</div>
+      <div class="verdict"><b>The principle:</b> respond to an early bad sequence by reducing early withdrawals, not by abandoning the allocation.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Ruth's two advisers</div>
+    <p class="dq">One adviser shows Ruth a 99% chance of success; another, using different software, shows 84%. Which should she believe?</p>
+    <div class="opts"><button class="opt">The 99%; it is from the more expensive firm.</button><button class="opt">Neither on its own: ask what returns, inflation, fees, taxes and spending each assumed, and look at the bad-case percentile paths.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>The higher number</b>A success rate is an output of assumptions. A difference that large almost always comes from different return assumptions or from one model including taxes and fees and the other not.</div>
+      <div class="oc"><b>Compare assumptions</b>Right. In this module's simulator, $25,200 a year from $780,000 at 50/50 for 25 years succeeds 99.1% of the time; adding $6,000 of taxes to the withdrawal lowers it to 95.8%. Assumptions, not arithmetic, drive the difference.</div>
+      <div class="verdict"><b>The principle:</b> never compare two success rates without comparing the assumptions behind them.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about simulations</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.9 &mdash; Success rate by length of retirement, $40,000 on $1 million</div>
+    <div id="f779"></div>
+    <figcaption class="cap"><b>Every five extra years costs roughly 2&ndash;5 points of success.</b> 60/40, 2,000 bootstrapped simulations, seed 2026: 98.8% for 20 years, 96.4% for 25, 91.0% for 30, 86.2% for 35 and 81.6% for 40.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"If the average return is high enough, the order does not matter."</div><div class="ma"><b>Myth.</b> It does not matter for a lump sum left alone. Once withdrawals begin, it can matter more than the average: the 1969 retiree's 30-year real return beat the long-run average and still ran out at 4%.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A 90% success rate means a 10% chance of going broke."</div><div class="ma"><b>Mostly myth.</b> It means 10% of simulated rigid-spending paths could not pay every withdrawal, usually late in retirement. Real retirees adjust long before the balance hits zero.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"More simulations make the answer more accurate."</div><div class="ma"><b>Only up to a point.</b> More runs reduce random noise (0.7 points across seeds at 5,000 runs), but they cannot fix wrong assumptions about returns, inflation or costs.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Bootstrapping uses only real history, so it is realistic."</div><div class="ma"><b>Partly.</b> Each year is real, but the order is random, so multi-year patterns such as the 1970s inflation are broken up, and only US history is sampled.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The safest retirement portfolio is all bonds."</div><div class="ma"><b>Myth.</b> With inflation-adjusted withdrawals, 20% stocks succeeded in 79.3% of simulations versus 91.1% for 60%. Bonds lower volatility but also lower the growth that funds 30 years of rising withdrawals.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Sequence risk only matters for early retirees."</div><div class="ma"><b>Myth.</b> It matters for everyone who withdraws. It is larger for longer retirements, but the 1966 retiree's problem was a 30-year horizon, not an early start.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.10 &mdash; Monte Carlo success for the Harpers and Ruth under different assumptions</div>
+    <div id="f7710"></div>
+    <figcaption class="cap"><b>Spending, not the market model, moves the result most.</b> 5,000 bootstrapped simulations, seed 2026. Harpers, $1.69 million at 60/40 for 30 years: 94.8% at $61,000, 89.1% at $70,000, 75.8% at $84,500 with rigid spending. Ruth, $780,000 at 50/50: 99.1% at $25,200 for 25 years, 97.5% for 30 years, 95.8% at $31,200 including tax.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Sequence risk is her friend, for now.</b> While Maya is buying every month, early bad markets let her buy cheaply. The risk flips to the other side when she starts withdrawing, some 40 years from now.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Learn to read the output.</b> When their 401(k) website shows a "probability of success," the Riveras should find what return and spending assumptions it uses. At their age, contribution rate matters far more than the number.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>The fragile decade is 57 to 77.</b> Jordan should plan to hold a larger cash and bond cushion in the few years around retirement and should reduce the single-stock concentration well before then.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>They are entering the danger zone.</b> The next five years matter more to the Harpers than the last twenty. A cash reserve, a written guardrail plan and a later Social Security claim for Tom are their main defenses.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Low rate, low risk.</b> At about 3.2% plus taxes, Ruth's simulated success is in the mid-to-high 90s. Her CDs let her skip selling stocks after a bad year.</div></div>
+  </div>
+  <div class="ws" data-ws="inv077" data-title="INV-077 worksheet: my sequence-risk plan">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w77a">My simulated success rate, and the assumptions behind it</label><textarea id="w77a" data-key="rate"></textarea></div>
+      <div><label for="w77b">The 10th-percentile balance after 10 years: could I live with it?</label><textarea id="w77b" data-key="bad"></textarea></div>
+      <div><label for="w77c">What I would change if markets fell 25% the year I retire</label><textarea id="w77c" data-key="plan"></textarea></div>
+      <div><label for="w77d">Which of the six sequence-risk tools I will use</label><textarea id="w77d" data-key="tools"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.11 &mdash; Two years, two orders, $10,000 withdrawn at the start of each</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 140" role="img" aria-label="Order A plus 50 then minus 50; order B minus 50 then plus 50">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="10" width="345" height="120" rx="12" style="fill:var(--green-soft)"/><text x="24" y="36" class="svg-t" font-size="13.5" font-weight="800">Order A: +50%, then &minus;50%</text><text x="24" y="62" class="svg-s" font-size="12">Start $100,000; withdraw, grow, withdraw, fall</text><text x="24" y="86" class="svg-s" font-size="12">No withdrawals: ends at $75,000</text><text x="24" y="110" class="svg-t" font-size="12" font-weight="700">With withdrawals: Exercise 2</text>
+      <rect x="365" y="10" width="345" height="120" rx="12" style="fill:var(--red-soft)"/><text x="379" y="36" class="svg-t" font-size="13.5" font-weight="800">Order B: &minus;50%, then +50%</text><text x="379" y="62" class="svg-s" font-size="12">Start $100,000; withdraw, fall, withdraw, grow</text><text x="379" y="86" class="svg-s" font-size="12">No withdrawals: ends at $75,000</text><text x="379" y="110" class="svg-t" font-size="12" font-weight="700">With withdrawals: Exercise 1</text>
+      </g></svg></div>
+  </figure>
+  <div class="ex" data-answer="52500" data-tol="0.002" data-ok="($100,000 &minus; $10,000) &times; 0.5 = $45,000; ($45,000 &minus; $10,000) &times; 1.5 = $52,500.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">Order B: start with $100,000, withdraw $10,000 at the start of each year, and earn &minus;50% in year one and +50% in year two. What is the ending balance, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Year one: ($100,000 &minus; $10,000) &times; 0.5 = $45,000. Year two: ($45,000 &minus; $10,000) &times; 1.5 = <b>$52,500</b>.</div></div>
+  <div class="ex" data-answer="62500" data-tol="0.002" data-ok="($100,000 &minus; $10,000) &times; 1.5 = $135,000; ($135,000 &minus; $10,000) &times; 0.5 = $62,500.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">Order A: the same, but +50% in year one and &minus;50% in year two. What is the ending balance, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Year one: $90,000 &times; 1.5 = $135,000. Year two: ($135,000 &minus; $10,000) &times; 0.5 = <b>$62,500</b>, $10,000 more than order B, from exactly the same two returns.</div></div>
+  <div class="ex" data-answer="89.6" data-tol="0.002" data-ok="(1,000 &minus; 104) &divide; 1,000 = 89.6%.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">In 1,000 simulated retirements, 104 ran out of money before year 30. What is the success rate, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">896 &divide; 1,000 = <b>89.6%</b>, the default result of this module's simulator.</div></div>
+  <div class="ex" data-answer="1.98" data-tol="0.01" data-ok="&radic;(1.30 &times; 0.80) &minus; 1 = 1.98%.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">Returns of +30% and &minus;20% average 5% arithmetically. What is the compound (geometric) average return per year, in percent (two decimals)?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">(1.30 &times; 0.80)<sup>1/2</sup> &minus; 1 = 1.04<sup>0.5</sup> &minus; 1 = <b>1.98%</b>. Simulators that draw returns from a distribution must be fed the right kind of average (INV-003).</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.12 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: order, first decade, simulate, adjust">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Order</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">matters once you withdraw</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--red-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">First decade</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">carries the most weight</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Simulate</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">then question the inputs</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Adjust</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">shrink early withdrawals</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"With no withdrawals, reversing the order of 30 yearly returns:","choices":["Always raises the ending value","Always lowers it","Leaves the ending value unchanged","Doubles it"],"answer":2,"explain":"Multiplication is commutative: the product of the growth factors is the same in any order."},
+    {"q":"Sequence-of-returns risk is greatest:","choices":["In the first years of withdrawals","In the last year of life","Only for 100% stock portfolios","Before you start saving"],"answer":0,"explain":"Early losses are locked in by the withdrawals that follow them."},
+    {"q":"The 1966 retiree (60/40, 4%) ran out of money even though:","choices":["Stocks never fell","Their last 20 years of real returns were better than the 1982 retiree's","Inflation was zero","They spent less each year"],"answer":1,"explain":"7.11% versus 5.49% a year real; the damage was done in the first decade."},
+    {"q":"Bootstrapping in a Monte Carlo simulation means:","choices":["Assuming a bell curve","Drawing whole historical years at random, with replacement","Using only the most recent 10 years","Adding a safety margin"],"answer":1,"explain":"Each simulated year copies one real year's stocks, bonds and inflation."},
+    {"q":"Why use a fixed random seed?","choices":["To make results higher","To make results reproducible","To remove bad years","To avoid inflation"],"answer":1,"explain":"The same seed produces the same pseudo-random sequence and so the same results."},
+    {"q":"A 10th-percentile balance line shows:","choices":["The average balance","The balance that 10% of simulations beat","The balance that 90% of simulations beat","The worst single simulation"],"answer":2,"explain":"Only 10% of simulations fell below it."},
+    {"q":"Which is a limitation of bootstrapping yearly returns?","choices":["It uses fake data","It cannot include bad years","It breaks up multi-year patterns such as persistent inflation","It ignores stocks"],"answer":2,"explain":"Years are drawn independently, so runs of related years are lost."},
+    {"q":"Which response best reduces sequence risk after a crash just before retirement?","choices":["Selling all stocks","Borrowing to buy more","Reducing early withdrawals, for example by working a year longer or delaying Social Security","Doubling withdrawals to enjoy retirement sooner"],"answer":2,"explain":"Every effective tool shrinks the withdrawals taken from a falling portfolio."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 77.13 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-078</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Social Security</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-050</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Glide paths</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-082</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Annuities for income</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-077"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">stern.nyu.edu</a></li>
+    <li>Bengen, W. P. (1994). Determining withdrawal rates using historical data. <i>Journal of Financial Planning</i> (October 1994); reprinted March 2004. <a href="https://www.financialplanningassociation.org/sites/default/files/2021-04/MAR04%20Determining%20Withdrawal%20Rates%20Using%20Historical%20Data.pdf">financialplanningassociation.org</a></li>
+    <li>Guyton, J. T., &amp; Klinger, W. J. (2006). Decision rules and maximum initial withdrawal rates. <i>Journal of Financial Planning</i> (March 2006). <a href="https://www.financialplanningassociation.org/sites/default/files/2021-11/2006%20-%20Guyton%20and%20Klinger%20-%20Decision%20Rules%20and%20SWR%20(1).PDF">financialplanningassociation.org</a></li>
+    <li>Cooley, P. L., Hubbard, C. M., &amp; Walz, D. T. (1998). Retirement savings: Choosing a withdrawal rate that is sustainable. <i>AAII Journal</i> (February 1998). <a href="https://www.aaii.com/journal/199802/feature.pdf">aaii.com</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Simulations and backtests use past US data before fees and taxes. A probability of success is an estimate built on assumptions, not a forecast.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s11a.js"></script>
+<script>
+INV.ready(function () {
+  var S = INV.s11a, yr = function (v) { return String(Math.round(v)); }, ms = INV.moneyShort, dol = function (v) { return INV.money(v, 0); }, pc = function (v) { return Math.round(v) + "%"; };
+  function cg(a) { return (Math.pow(a.reduce(function (g, r) { return g * (1 + r / 100); }, 1), 1 / a.length) - 1) * 100; }
+  /* 77.1 forward vs reversed */
+  var rr = S.windowRets(1966, 30, 0.6), rv = rr.slice().reverse(), fa = S.fixedReal(rr, 0.04), fb = S.fixedReal(rv, 0.04);
+  INV.lineChart(document.getElementById("f771"), { label: "Forward versus reversed", height: 250, xTitle: "Years into retirement", xFmt: yr, yFmt: ms, tipFmt: dol,
+    series: [{ name: "1966–1995 as it happened", color: "var(--s5)", data: fa.path.map(function (v, i) { return [i, v * 1e6]; }) }, { name: "Same returns, reversed", color: "var(--s2)", data: fb.path.map(function (v, i) { return [i, v * 1e6]; }) }] });
+  /* 77.2 first decade */
+  var d2 = []; for (var y = 1928; y <= 1996; y++) { var w = S.windowRets(y, 30, 0.6), ok = S.fixedReal(w, 0.04).ok; d2.push({ label: String(y), tip: "Retire in " + y + (ok ? "" : " — 4% ran out"), y: cg(w.slice(0, 10)), color: ok ? "var(--s1)" : "var(--s5)" }); }
+  INV.barChart(document.getElementById("f772"), { label: "First-decade real return", height: 230, maxLabels: 12, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return INV.pct(v, 2) + " a year after inflation"; }, data: d2 });
+  /* 77.3 1966 vs 1982 */
+  var a66 = S.fixedReal(S.windowRets(1966, 30, 0.6), 0.04).path, a82 = S.fixedReal(S.windowRets(1982, 30, 0.6), 0.04).path;
+  INV.lineChart(document.getElementById("f773"), { label: "1966 versus 1982", height: 250, xTitle: "Years into retirement", xFmt: yr, yFmt: ms, tipFmt: dol,
+    series: [{ name: "Retired 1966", color: "var(--s5)", data: a66.map(function (v, i) { return [i, v * 1e6]; }) }, { name: "Retired 1982", color: "var(--s2)", data: a82.map(function (v, i) { return [i, v * 1e6]; }) }], marks: [{ x: 10, label: "10 years" }] });
+  /* 77.5 success by spending */
+  var d5 = []; [30000, 40000, 50000, 60000].forEach(function (sp) { var b = S.monteCarlo({ bal: 1e6, spend: sp, s: 0.6, years: 30, sims: 5000, seed: 2026, method: "boot" }), n = S.monteCarlo({ bal: 1e6, spend: sp, s: 0.6, years: 30, sims: 5000, seed: 2026, method: "normal" });
+    d5.push({ label: "$" + sp / 1000 + "k boot", tip: "$" + sp.toLocaleString() + " a year, bootstrap", y: b.success * 100, color: "var(--s1)" }); d5.push({ label: "normal", tip: "$" + sp.toLocaleString() + " a year, bell curve", y: n.success * 100, color: "var(--s6)" }); });
+  INV.barChart(document.getElementById("f775"), { label: "Success by spending", height: 230, allLabels: true, valueLabels: true, yFmt: pc, tipFmt: function (v) { return v.toFixed(1) + "% succeeded"; }, data: d5 });
+  /* 77.7 three hard starts */
+  function pth(y0, n) { return S.fixedReal(S.windowRets(y0, n, 0.6), 0.04).path.map(function (v, i) { return [i, v * 1e6]; }); }
+  INV.lineChart(document.getElementById("f777"), { label: "1929, 1966 and 2000", height: 250, xTitle: "Years into retirement", xFmt: yr, yFmt: ms, tipFmt: dol,
+    series: [{ name: "Retired 1929", color: "var(--s3)", data: pth(1929, 30) }, { name: "Retired 1966", color: "var(--s5)", data: pth(1966, 30) }, { name: "Retired 2000 (through 2025)", color: "var(--s1)", data: pth(2000, 26) }] });
+  /* 77.8 allocation */
+  INV.barChart(document.getElementById("f778"), { label: "Success by stock allocation", height: 220, allLabels: true, valueLabels: true, xTitle: "Share in stocks", yFmt: pc, tipFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: [0.2, 0.4, 0.6, 0.8, 1].map(function (s) { return { label: Math.round(s * 100) + "%", y: S.monteCarlo({ bal: 1e6, spend: 40000, s: s, years: 30, sims: 5000, seed: 2026, method: "boot" }).success * 100, color: s === 0.6 ? "var(--s1)" : "var(--s6)" }; }) });
+  /* 77.9 horizon */
+  INV.barChart(document.getElementById("f779"), { label: "Success by retirement length", height: 220, allLabels: true, valueLabels: true, xTitle: "Years", yFmt: pc, tipFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: [20, 25, 30, 35, 40].map(function (n) { return { label: String(n), y: S.monteCarlo({ bal: 1e6, spend: 40000, s: 0.6, years: n, sims: 2000, seed: 2026, method: "boot" }).success * 100, color: "var(--s2)" }; }) });
+  /* 77.10 households */
+  var cases = [["Harpers $61k", 1690335, 61000, 0.6, 30, "var(--s4)"], ["Harpers $70k", 1690335, 70000, 0.6, 30, "var(--s4)"], ["Harpers $84.5k", 1690335, 84500, 0.6, 30, "var(--s4)"], ["Ruth 25 yrs", 780000, 25200, 0.5, 25, "var(--s5)"], ["Ruth 30 yrs", 780000, 25200, 0.5, 30, "var(--s5)"], ["Ruth + tax", 780000, 31200, 0.5, 25, "var(--s5)"]];
+  INV.barChart(document.getElementById("f7710"), { label: "Household simulations", height: 230, allLabels: true, valueLabels: true, yFmt: pc, tipFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: cases.map(function (c) { return { label: c[0], y: S.monteCarlo({ bal: c[1], spend: c[2], s: c[3], years: c[4], sims: 5000, seed: 2026, method: "boot" }).success * 100, color: c[5] }; }) });
+});
+</script>
+</body>
+</html>

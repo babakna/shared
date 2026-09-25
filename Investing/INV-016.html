@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-016 · Options and Derivatives Basics — Investing Learning Lab</title>
+<meta name="description" content="Calls, puts and payoff diagrams; covered calls and protective puts; time decay, leverage and assignment risk; and what the research shows about individuals who trade short-dated options.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-016">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-016</span><span class="ttl">Options and Derivatives Basics</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 2 · Asset Classes &amp; Vehicles</span><span class="chip teal">Intermediate</span><span class="chip gray">About 65 minutes</span><span class="chip gray">2 calculators</span></div>
+    <h1>Options and Derivatives Basics</h1>
+    <p class="sub">An option is a contract that gives its owner a right, not an obligation, to buy or sell something at a set price by a set date. Used carefully, options can insure a position or generate income. Used as lottery tickets, they transfer money from individual traders to professionals, and the research on that is unusually clear.</p>
+    <p class="q"><span>The question this module answers</span>How do options work, when can they help a long-term investor, and why do most individuals who trade short-dated options lose?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <line x1="40" y1="170" x2="330" y2="170" stroke="#8794A8" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <path d="M40 190 L190 190 L320 70" fill="none" stroke="#1F5FD1" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M40 70 L170 190 L320 190" fill="none" stroke="#C2332B" stroke-width="3" opacity=".7"/>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">The hockey stick</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A deposit that holds a price</h2>
+  <p class="lede">Suppose you pay a seller $500 today for the right to buy a house for $400,000 any time in the next six months. If prices jump, you buy at $400,000 and profit. If prices fall, you walk away and lose only the $500. You have bought an <span class="term" data-term="Option">option</span>.</p>
+  <p>Stock options work the same way, standardized and traded on exchanges. A <b>call</b> gives the right to buy 100 shares at a set price; a <b>put</b> gives the right to sell. Everything interesting about options follows from two facts: the buyer's loss is limited to what was paid, and the payoff is lopsided, zero on one side and growing on the other. Figure 16.1 draws it.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.1 &mdash; Owning 100 shares versus owning one call, at expiration</div>
+    <div id="f161"></div>
+    <figcaption class="cap"><b>The call gives up the first dollars of gain in exchange for a floor on losses.</b> Stock bought at $50 versus a call with a $50 strike bought for $5 a share ($500). Below $50 the call loses its whole $500; above $55 it gains dollar for dollar with the stock. Profit or loss per 100 shares.</figcaption>
+  </figure>
+  <p>Options are one kind of <span class="term" data-term="Derivative">derivative</span>, a contract whose value depends on another asset. INV-013 covered futures, which obligate both sides. An option obligates only the seller, called the <b>writer</b>, who collects the price, called the <b>premium</b>, in exchange for taking on that obligation.</p>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>Calls, puts, strikes and premiums, with a payoff calculator.</li>
+    <li>Payoff diagrams for the six basic positions.</li>
+    <li>Covered calls and protective puts: the two strategies long-term investors actually use.</li>
+    <li>Time decay and leverage.</li>
+    <li>What the research finds about retail options trading, and the risk of assignment.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Calls and puts">
+  <p class="kicker">The vocabulary</p>
+  <h2>Five words that define every option</h2>
+  <div class="def"><div class="def-h"><b>Call and put</b></div>
+    <div class="def-r"><div>What it is</div><div>IRS Publication 550 defines a call as the right to buy from the writer, before a specified future date, a stated number of shares at a specified price, and a put as the right to sell to the writer on the same terms.</div></div>
+    <div class="def-r"><div>Used for</div><div>Calls: betting on a rise, or selling upside for income. Puts: betting on a fall, or insuring shares you own.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A buyer can lose at most the premium. A writer's risk depends on what else they hold: small if covered by shares or cash, unlimited for a call written on shares they do not own.</div></div></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Term</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
+    <tr><td><b><span class="term" data-term="Strike price">Strike price</span></b></td><td>The price at which the holder may buy (call) or sell (put)</td><td>An XYZ 55 call: buy at $55</td></tr>
+    <tr><td><b><span class="term" data-term="Option premium">Premium</span></b></td><td>The price of the option, quoted per share</td><td>$2 &times; 100 shares = $200 per contract</td></tr>
+    <tr><td><b>Expiration</b></td><td>The last day the option exists</td><td>The third Friday of a month, a weekly date, or today</td></tr>
+    <tr><td><b>Contract size</b></td><td>The Options Clearing Corporation (OCC) states that most single-stock options cover 100 shares</td><td>One contract = 100 shares</td></tr>
+    <tr><td><b>Style</b></td><td>American-style: exercisable any time before expiration. European-style: only during a set period, which OCC says is currently the expiration date itself</td><td>Check each contract's specifications</td></tr>
+  </tbody></table></div>
+  <div class="def"><div class="def-h"><b>Intrinsic value and time value</b></div>
+    <div class="def-r"><div>What it is</div><div><b>Intrinsic value</b> is what the option would be worth exercised now: for a call, stock price minus strike, if positive. <b>Time value</b> is the rest of the premium. The CFTC defines it as the portion of the premium that exceeds intrinsic value, larger the longer the time to expiration.</div></div>
+    <div class="def-r"><div>Used for</div><div>Understanding what you are paying for: part certainty, part possibility.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>An option that is <span class="term" data-term="In the money">out of the money</span> (a call with a strike above the stock price) is all time value, and time value falls to zero at expiration.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.2 &mdash; In, at and out of the money, with the stock at $50</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="Strikes below and above the stock price for calls and puts">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <line x1="40" y1="100" x2="680" y2="100" style="stroke:var(--muted)" stroke-width="3"/>
+      <g class="svg-s" font-size="12" text-anchor="middle"><text x="120" y="126">$40 strike</text><text x="240" y="126">$45</text><text x="360" y="126">$50</text><text x="480" y="126">$55</text><text x="600" y="126">$60 strike</text></g>
+      <g style="fill:var(--s6)"><circle cx="120" cy="100" r="6"/><circle cx="240" cy="100" r="6"/><circle cx="480" cy="100" r="6"/><circle cx="600" cy="100" r="6"/></g>
+      <circle cx="360" cy="100" r="9" style="fill:var(--s1)"/><text x="360" y="80" text-anchor="middle" class="svg-t" font-size="12.5" font-weight="800">stock price today</text>
+      <rect x="40" y="20" width="300" height="34" rx="8" style="fill:var(--green-soft)"/><text x="190" y="42" text-anchor="middle" class="svg-t" font-size="12.5" font-weight="700">Calls here are in the money</text>
+      <rect x="380" y="20" width="300" height="34" rx="8" style="fill:var(--red-soft)"/><text x="530" y="42" text-anchor="middle" class="svg-t" font-size="12.5" font-weight="700">Calls here are out of the money</text>
+      <rect x="40" y="146" width="300" height="34" rx="8" style="fill:var(--red-soft)"/><text x="190" y="168" text-anchor="middle" class="svg-t" font-size="12.5" font-weight="700">Puts here are out of the money</text>
+      <rect x="380" y="146" width="300" height="34" rx="8" style="fill:var(--green-soft)"/><text x="530" y="168" text-anchor="middle" class="svg-t" font-size="12.5" font-weight="700">Puts here are in the money</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>A $45 call has $5 of intrinsic value; a $55 call has none.</b> With the stock at $50, calls with strikes below $50 and puts with strikes above $50 are in the money. Options struck at about $50 are at the money. Out-of-the-money options are made entirely of time value.</figcaption>
+  </figure>
+  <div class="formula">Call value at expiration = max(stock price &minus; strike, 0) &nbsp;&nbsp;&nbsp; Put value at expiration = max(strike &minus; stock price, 0)</div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Before you can trade options</summary><div class="layer-b">
+    <p>OCC states that before buying or selling an option, investors must read <i>Characteristics and Risks of Standardized Options</i>, the options disclosure document; broker-dealers must distribute it under SEC Rule 9b-1. Brokers also approve customers for options in levels, from buying calls and puts up to writing uncovered options, under FINRA's options rule (Rule 2360). The approval questions about experience and finances exist to keep beginners away from unlimited-loss strategies.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>How options are taxed</summary><div class="layer-b">
+    <p>IRS Publication 550: a bought option that expires is a capital loss, short- or long-term by holding period; a written option that expires gives the writer a <b>short-term capital gain</b> equal to the premium, whatever the holding period. Exercised calls add their cost to the stock's basis. Options on broad-based stock indexes, such as the S&amp;P 500 index, are "nonequity options" and <span class="term" data-term="Section 1256 contract">section 1256 contracts</span>: marked to market at year-end and taxed 60% long-term, 40% short-term. Buying a put on stock held a year or less can reset its holding period.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Payoff diagrams">
+  <p class="kicker">Build it yourself</p>
+  <h2>Six positions, one calculator</h2>
+  <p>A payoff diagram shows profit or loss at expiration for every possible stock price. Pick a strategy below and change the strike, premium and final price. Watch three numbers: the <b>breakeven</b>, the <b>best case</b> and the <b>worst case</b>.</p>
+  <div data-tool="s2bPayoff"></div>
+  <div class="def"><div class="def-h"><b>Breakeven price</b></div>
+    <div class="def-r"><div>What it is</div><div>The stock price at expiration at which a position neither makes nor loses money, counting the premium paid or received.</div></div>
+    <div class="def-r"><div>Used for</div><div>Judging how far the stock must move before a trade pays off.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>For a bought call it is the strike plus the premium: the stock has to rise past that, before expiration, just to get your money back.</div></div></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Position</th><th>Breakeven at expiration</th><th>Best case</th><th>Worst case</th></tr></thead><tbody>
+    <tr><td>Buy a call</td><td>Strike + premium</td><td>Unlimited</td><td>Premium paid</td></tr>
+    <tr><td>Buy a put</td><td>Strike &minus; premium</td><td>Strike &minus; premium (stock to $0)</td><td>Premium paid</td></tr>
+    <tr><td>Sell a call, no shares</td><td>Strike + premium</td><td>Premium received</td><td class="neg-t">Unlimited</td></tr>
+    <tr><td>Sell a put (cash-secured)</td><td>Strike &minus; premium</td><td>Premium received</td><td>Strike &minus; premium (stock to $0)</td></tr>
+    <tr><td>Covered call</td><td>Stock cost &minus; premium</td><td>Strike &minus; stock cost + premium</td><td>Stock cost &minus; premium</td></tr>
+    <tr><td>Protective put</td><td>Stock cost + premium</td><td>Unlimited</td><td>Stock cost &minus; strike + premium</td></tr>
+  </tbody></table></div>
+  <p class="src">Per share, before commissions, spreads, dividends and taxes. Multiply by 100 per contract.</p>
+  <p>Two patterns stand out. Every <b>bought</b> option has a capped loss and a skewed chance of a large gain; every <b>written</b> option has a capped gain and a larger possible loss. And a covered call behaves much like a cash-secured put with the same strike: both collect a premium in exchange for giving up upside above the strike while keeping most of the downside.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.3 &mdash; The four basic shapes</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 190" role="img" aria-label="Payoff shapes of long call, long put, short call and short put">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="165" height="170" rx="12" style="fill:var(--card2)"/><text x="14" y="26" class="svg-t" font-size="13" font-weight="800">Buy a call</text><line x1="14" y1="110" x2="150" y2="110" style="stroke:var(--muted)" stroke-dasharray="3 3"/><path d="M14 128 L90 128 L150 50" fill="none" style="stroke:var(--s1)" stroke-width="3.5"/><text x="14" y="160" class="svg-s" font-size="11">lose premium, or gain</text></g>
+      <g transform="translate(187,10)"><rect width="165" height="170" rx="12" style="fill:var(--card2)"/><text x="14" y="26" class="svg-t" font-size="13" font-weight="800">Buy a put</text><line x1="14" y1="110" x2="150" y2="110" style="stroke:var(--muted)" stroke-dasharray="3 3"/><path d="M14 50 L74 128 L150 128" fill="none" style="stroke:var(--s2)" stroke-width="3.5"/><text x="14" y="160" class="svg-s" font-size="11">gain as price falls</text></g>
+      <g transform="translate(364,10)"><rect width="165" height="170" rx="12" style="fill:var(--card2)"/><text x="14" y="26" class="svg-t" font-size="13" font-weight="800">Sell a call</text><line x1="14" y1="80" x2="150" y2="80" style="stroke:var(--muted)" stroke-dasharray="3 3"/><path d="M14 62 L90 62 L150 140" fill="none" style="stroke:var(--s5)" stroke-width="3.5"/><text x="14" y="160" class="svg-s" font-size="11">keep premium, or lose</text></g>
+      <g transform="translate(541,10)"><rect width="169" height="170" rx="12" style="fill:var(--card2)"/><text x="14" y="26" class="svg-t" font-size="13" font-weight="800">Sell a put</text><line x1="14" y1="80" x2="152" y2="80" style="stroke:var(--muted)" stroke-dasharray="3 3"/><path d="M14 140 L74 62 L152 62" fill="none" style="stroke:var(--s3)" stroke-width="3.5"/><text x="14" y="160" class="svg-s" font-size="11">keep premium, or buy</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Buyers and writers hold mirror images.</b> Horizontal axis: stock price at expiration; vertical: profit or loss. The dashed line is zero. Before costs, every dollar a buyer gains the writer loses, and the reverse.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why a covered call and a sold put look alike</summary><div class="layer-b">
+    <p>Owning 100 shares and selling a call has the same payoff shape as holding cash and selling a put with the same strike and expiration: a capped gain and most of the downside. That equivalence follows from put&ndash;call parity. It means the "income" from either strategy is compensation for accepting the same risk, not two different sources of free money.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Put&ndash;call parity</summary><div class="layer-b">
+    <div class="formula">C &minus; P = S &minus; K e<sup>&minus;rT</sup></div><p>For European-style options on a stock paying no dividends, a call minus a put with the same strike K and expiration equals the stock price minus the present value of the strike. If the relationship breaks, traders can profit risklessly, so market prices keep it close. Dividends and early exercise add terms for American-style stock options.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Covered calls and puts">
+  <p class="kicker">Two strategies for long-term investors</p>
+  <h2>Selling upside, buying insurance</h2>
+  <div class="def"><div class="def-h"><b>Covered call</b></div>
+    <div class="def-r"><div>What it is</div><div>Owning 100 shares and selling one call on them. You keep the premium; if the stock ends above the strike, your shares are sold at the strike.</div></div>
+    <div class="def-r"><div>Used for</div><div>Earning income from shares, or selling a position at a target price while being paid to wait.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>OCC's disclosure document puts it plainly: the covered call writer gives up the opportunity to benefit from a rise above the strike but <b>continues to bear the risk of a decline</b>. The premium is not free income; it is the price of your upside.</div></div></div>
+  <p><b>Worked example.</b> Jordan owns 100 shares of their employer's stock at $48 and sells a three-month call with a $52 strike for $1.50 ($150). If the stock ends at $50, the call expires worthless: Jordan keeps the shares and the $150. If it ends at $60, the shares are called away at $52: Jordan's gain is ($52 &minus; $48 + $1.50) &times; 100 = <b>$550</b>, instead of $1,200 from simply holding. If it ends at $35, the shares have lost $1,300 and the premium offsets only $150.</p>
+  <div class="def"><div class="def-h"><b>Protective put</b></div>
+    <div class="def-r"><div>What it is</div><div>Owning shares and buying a put on them, so your loss below the strike is capped until expiration.</div></div>
+    <div class="def-r"><div>Used for</div><div>Insuring a concentrated position through a risky period, for example between a vesting date and a planned sale.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Insurance you must rebuy every few months. Protecting a whole portfolio this way year after year usually costs more than simply holding less stock.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.4 &mdash; Covered call and protective put on 100 shares bought at $48</div>
+    <div id="f163"></div>
+    <figcaption class="cap"><b>The covered call caps the gain and barely cushions the loss; the protective put caps the loss and trims the gain.</b> Covered call: $52 strike sold for $1.50. Protective put: $44 strike bought for $1.20. Profit or loss at expiration, per 100 shares.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>The collar</summary><div class="layer-b">
+    <p>Combining the two, selling a call and using the premium to buy a put, creates a <b>collar</b>: the stock can move only within a band until expiration. Collars are sometimes used by executives and early employees with large single-stock positions who cannot sell immediately. They reduce risk for a period but do not diversify; the tax consequences can be complex and deserve professional advice (INV-040).</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Dividends and early assignment</summary><div class="layer-b">
+    <p>Stock options are not adjusted for ordinary cash dividends. OCC notes that a call holder who exercises before the ex-dividend date receives the dividend, so a covered call writer's chance of being assigned may increase as the ex-date approaches. Writers of in-the-money calls on dividend-paying stocks should expect that shares may be called away a day before the dividend.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Time decay and leverage">
+  <p class="kicker">Why timing is everything</p>
+  <h2>A melting ice cube with a lever attached</h2>
+  <p>An option buyer must be right about direction <b>and</b> timing. OCC's disclosure document describes an option as a "wasting asset which becomes worthless when it expires": if the price does not move far enough before expiration, the holder may lose all or much of the investment, whereas a stock buyer can wait.</p>
+  <div class="def"><div class="def-h"><b>Time decay</b></div>
+    <div class="def-r"><div>What it is</div><div>The day-by-day loss of an option's time value as expiration approaches, all else unchanged. Traders call the daily amount <b>theta</b>.</div></div>
+    <div class="def-r"><div>Used for</div><div>Estimating what it costs to hold a bought option, and what a writer collects each day.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Decay accelerates near expiration. An option bought "cheap" a few days out is cheap because the clock is almost out.</div></div></div>
+  <div data-tool="s2bDecay"></div>
+  <p>At the defaults (stock $100, strike $100, 30% <span class="term" data-term="Implied volatility">implied volatility</span>, 60 days), the model values the call at about $5.17 a share, $517 per contract. If the stock price does not move, it loses about $158 per contract over the first 30 days and $359 over the last 30. The <b>Black&ndash;Scholes</b> model used here is the standard way to price such options; the market's implied volatility is whatever volatility makes the model match the traded price.</p>
+  <h3>Leverage, in OCC's own example</h3>
+  <p>The disclosure document compares three investors with $5,000 each, when XYZ stock is $50. A buys 100 shares. B buys one six-month 50 call for $500 and puts $4,500 in Treasury bills (earning about $73). C spends all $5,000 on ten calls.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.5 &mdash; Percentage return on $5,000 at expiration, by XYZ's price</div>
+    <div id="f164"></div>
+    <figcaption class="cap"><b>More leverage, wider outcomes.</b> At $62 the all-in call buyer makes 140%; at $54, a price rise, he still loses 20%; at $50 or below he loses everything. The stock buyer's result moves one for one; the call-plus-bills investor can lose at most 8.5%. Source: OCC, <i>Characteristics and Risks of Standardized Options</i> (June 2024), Chapter X.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why buyers overpay around events</summary><div class="layer-b">
+    <p>Implied volatility rises before scheduled events such as earnings announcements, because a big move is more likely. Options then cost more. Tim de Silva, Kevin Smith and Eric So find that retail investors buy options disproportionately before earnings announcements with high expected volatility, and overpay relative to the volatility that actually follows (next tab).</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>The Black&ndash;Scholes formula</summary><div class="layer-b">
+    <div class="formula">C = S N(d<sub>1</sub>) &minus; K e<sup>&minus;rT</sup> N(d<sub>2</sub>), &nbsp; d<sub>1</sub> = [ln(S/K) + (r + &sigma;&sup2;/2)T] &divide; (&sigma;&radic;T), &nbsp; d<sub>2</sub> = d<sub>1</sub> &minus; &sigma;&radic;T</div>
+    <p>S is the stock price, K the strike, r the risk-free rate, T the time to expiration in years, &sigma; volatility and N the standard normal distribution. A put is P = K e<sup>&minus;rT</sup> N(&minus;d<sub>2</sub>) &minus; S N(&minus;d<sub>1</sub>). The model assumes constant volatility and no jumps, which real markets violate; practitioners adjust by quoting a different implied volatility for each strike and expiration.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Why most lose">
+  <p class="kicker">The evidence</p>
+  <h2>Short-dated options and individual traders</h2>
+  <p>Options trading by individuals has grown rapidly. Svetlana Bryzgalova, Anna Pavlova and Taisiya Sikorskaya (<i>Journal of Finance</i>, 2023) show that retail trading, facilitated by payment for order flow, recently reached <b>over 60% of total options market volume</b>, with nearly 90% of that payment for order flow coming from three wholesalers. They find retail investors prefer cheaper, <b>weekly options with an average bid-ask spread of 12.6%</b>, and <b>lose money on average</b>.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Study</th><th>What it examined</th><th>Main finding</th></tr></thead><tbody>
+    <tr><td>Bryzgalova, Pavlova &amp; Sikorskaya, <i>Journal of Finance</i> (2023)</td><td>US retail options trading</td><td>Retail favors cheap weekly options with 12.6% average spreads and loses money on average</td></tr>
+    <tr><td>de Silva, Smith &amp; So, <i>Review of Finance</i> (2026)</td><td>Retail option buying around earnings announcements</td><td>Overpaying for volatility, "enormous" spreads and slow exits produce average losses of <b>5&ndash;9%</b>, and <b>10&ndash;14%</b> for high expected-volatility announcements</td></tr>
+    <tr><td>Beckmeyer, Branger &amp; Gayda, working paper (2023)</td><td>Retail trading in same-day (0DTE) S&amp;P 500 options</td><td>More than 75% of retail S&amp;P 500 option trades were 0DTE; retail lost about <b>$241,000 on an average day</b> (Feb 2021&ndash;Sep 2023), about $350,000 a day after daily expirations began in May 2022</td></tr>
+    <tr><td>Chague, De-Losso &amp; Giovannetti, working paper (2020)</td><td>All individuals who began day trading Brazilian equity index futures in 2013&ndash;2015</td><td><b>97%</b> of those who persisted more than 300 days lost money</td></tr>
+  </tbody></table></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.6 &mdash; Retail losses in the research</div>
+    <div id="f165"></div>
+    <figcaption class="cap"><b>Different markets, methods and years, one direction.</b> Average percentage losses on retail option purchases around earnings announcements (de Silva, Smith and So), and the share of persistent futures day traders who lost money in Brazil (Chague, De-Losso and Giovannetti). Ranges shown at their midpoints.</figcaption>
+  </figure>
+  <p>Why the consistent result? Three costs stack up. <b>Spreads</b>: cheap options have wide bid-ask spreads relative to their price, so a round trip can cost a large share of the premium. <b>Overpaying for volatility</b>: buyers pay most when excitement is highest. <b>Time decay</b>: the clock runs against the buyer. On the other side are market makers, professional firms that price these costs in. The <span class="term" data-term="0DTE option">0DTE</span> market in particular has exploded: Cboe reports that same-day options averaged 2.3 million contracts a day in 2025, <b>59% of all S&amp;P 500 index option volume</b>.</p>
+  <h3>Assignment risk for option writers</h3>
+  <div class="def"><div class="def-h"><b>Assignment</b></div>
+    <div class="def-r"><div>What it is</div><div>The notice that a holder has exercised an option you wrote, obligating you to deliver shares (call) or buy them (put). OCC's disclosure document says the writer of an American-style option can be assigned <b>at any time</b> until expiration, and may not receive notice until one or more days after the assignment.</div></div>
+    <div class="def-r"><div>Used for</div><div>Settling exercised options. Brokers must have fixed procedures for allocating assignments among customers, such as random selection or first-in, first-out.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Once assigned, you can no longer close the position. A cash-secured put writer can suddenly own 100 shares per contract; an uncovered call writer can be forced to buy shares at any price.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Who does well with options?</summary><div class="layer-b">
+    <p>Beckmeyer, Branger and Gayda find that retail losses in 0DTE options come mainly from single-leg trades, trades that require paying up front, and high-implied-volatility options; multi-leg trades that collect the compensation for volatility risk were significantly more profitable. That is consistent with the broader pattern: the reliable profits go to whoever sells overpriced insurance and lottery tickets at scale, with risk controls, not to whoever buys them.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Payment for order flow</summary><div class="layer-b">
+    <p>Many retail option orders are routed to wholesalers, firms that pay brokers for the order flow and trade against it. Bryzgalova, Pavlova and Sikorskaya document that this payment for order flow facilitated the boom in retail options trading and that nearly 90% of it came from three wholesalers. It is how "commission-free" options trading is funded; the cost to the trader shows up in the bid-ask spread.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history</p>
+  <h2>Approval, disclosure and leverage</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>FINRA and Robinhood's options approvals, 2021</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>In a June 30, 2021 settlement, FINRA found that since Robinhood began offering options in December 2017, it had relied on computer algorithms, "option account approval bots," with limited oversight. The bots approved customers based on inconsistent information, including customers younger than 21 who claimed more than three years of options experience, and approved customers the firm had rejected minutes earlier. FINRA also found Robinhood falsely told customers they would "never lose more than the premium paid" on a debit spread when many lost far more. Robinhood consented, without admitting or denying the findings, to a censure, a <b>$57 million fine</b> and about <b>$12.6 million</b> in restitution plus interest.</div></div>
+    <div class="row"><div>What it teaches</div><div>Approval for options trading is not a sign that options suit you, and app screens can mislead. Read the disclosure document and understand the worst case before the first trade.</div></div>
+    <div class="row"><div>Source</div><div class="src">FINRA, Letter of Acceptance, Waiver and Consent, Robinhood Financial LLC (June 30, 2021).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Archegos Capital Management, 2021</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Archegos, Bill Hwang's family investment firm, used security-based swaps, derivatives that the SEC notes let investors take huge positions in stocks by posting limited funds up front. The SEC alleged that from March 2020 to March 2021 Archegos grew from about $1.5 billion of capital and $10 billion of exposure to about $36 billion and <b>$160 billion of gross exposure</b>, concentrated in a handful of stocks. In late March 2021 prices fell, Archegos could not meet its margin calls, and its counterparties lost billions of dollars. Hwang was convicted in July 2024 of racketeering conspiracy, securities fraud, market manipulation and wire fraud, and sentenced to 18 years in prison.</div></div>
+    <div class="row"><div>What it teaches</div><div>Derivatives can multiply exposure far beyond capital. When the underlying positions are concentrated, a modest price move becomes a total loss, and the losses spread to whoever lent the leverage.</div></div>
+    <div class="row"><div>Source</div><div class="src">SEC press release 2022-70 (April 27, 2022); U.S. Attorney's Office, Southern District of New York, press release on Hwang's sentencing (2024).</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.7 &mdash; Archegos: capital versus exposure, as alleged by the SEC</div>
+    <div id="f166"></div>
+    <figcaption class="cap"><b>Exposure grew to more than four times capital.</b> About $1.5 billion of capital and $10 billion of exposure in March 2020; about $36 billion and $160 billion of gross exposure at the March 2021 peak. Source: SEC press release 2022-70.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Three households, three option ideas</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.8 &mdash; Match the tool to the goal</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 150" role="img" aria-label="Goals and matching tools">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="130" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Reduce one stock</text><text x="16" y="56" class="svg-s" font-size="12">Best tool: sell shares</text><text x="16" y="72" class="svg-s" font-size="12">on a schedule. Options</text><text x="16" y="88" class="svg-s" font-size="12">only delay the decision.</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="130" rx="12" style="fill:var(--amber-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Insure a short period</text><text x="16" y="56" class="svg-s" font-size="12">Protective put or collar</text><text x="16" y="72" class="svg-s" font-size="12">around a known event,</text><text x="16" y="88" class="svg-s" font-size="12">then diversify.</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="130" rx="12" style="fill:var(--red-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Get rich quickly</text><text x="16" y="56" class="svg-s" font-size="12">No reliable tool. Short-</text><text x="16" y="72" class="svg-s" font-size="12">dated options lose money</text><text x="16" y="88" class="svg-s" font-size="12">for most who try.</text></g>
+      </g></svg></div>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; Jordan</div>
+    <p class="dq">Jordan holds $56,000 of employer stock and wants income. A coworker suggests selling covered calls every month instead of selling shares. What should Jordan weigh?</p>
+    <div class="opts"><button class="opt">Sell covered calls indefinitely; it is free income.</button><button class="opt">Treat covered calls, if used at all, as a way to sell shares at target prices while gradually diversifying, not as a reason to keep the concentration.</button><button class="opt">Buy calls on the employer's stock to add upside.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Covered calls forever</b>The premium caps Jordan's upside while leaving nearly all of the downside, on a stock tied to Jordan's own paycheck. Written options that expire are short-term gains in a taxable account.</div>
+      <div class="oc"><b>A tool for selling, not holding</b>Reasonable. Selling calls with strikes at prices where Jordan would be happy to sell gets paid for patience, while the plan to cut the stock toward 10% of savings continues (INV-004).</div>
+      <div class="oc"><b>Buy calls</b>Doubles the bet on a single company with leverage and time decay. The opposite of what the situation needs.</div>
+      <div class="verdict"><b>The principle:</b> options can change the shape of a risk; they do not diversify it.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Maya</div>
+    <p class="dq">Maya sees videos of people turning $500 into $5,000 in a day with same-day S&amp;P 500 options. Her broker's app offers to approve her for options in two minutes. What should she do?</p>
+    <div class="opts"><button class="opt">Try it with $500; the most she can lose is $500.</button><button class="opt">Skip it. The research on retail 0DTE and short-dated options shows average losses; her $500 does more in her 401(k) match or against her 6.8% loans.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Try it</b>The loss on one bought option is capped, but people rarely stop at one. Beckmeyer and co-authors estimate retail traders lost about $241,000 on an average day in these options; the videos show the survivors.</div>
+      <div class="oc"><b>Skip it</b>Right. A 50% employer match is a certain gain; a 0DTE option is a bet with a negative average.</div>
+      <div class="verdict"><b>The principle:</b> a capped loss per trade is not a capped loss per habit.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; The Harpers</div>
+    <p class="dq">Nervous about their $220,000 in 25 technology stocks before retirement, the Harpers ask their advisor about buying protective puts on each stock every quarter. What is a better first step?</p>
+    <div class="opts"><button class="opt">Buy puts every quarter indefinitely.</button><button class="opt">Diversify the tech holdings over time with tax-aware sales and charitable gifts of appreciated shares, perhaps using a collar only on the largest position for a short period.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Puts forever</b>Quarterly insurance on 25 stocks is expensive, and the premiums repeat. It treats the symptom and keeps the concentration.</div>
+      <div class="oc"><b>Diversify, hedge selectively</b>Right. Lower concentration is permanent risk reduction; options can bridge a short gap (INV-035, INV-037, INV-039).</div>
+      <div class="verdict"><b>The principle:</b> insurance is for risks you cannot remove; concentration is a risk you can.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about options</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.9 &mdash; A $5 call on a $50 stock: what share of the premium is left as expiration nears</div>
+    <div id="f168"></div>
+    <figcaption class="cap"><b>If the stock does not move, the option's value drains away faster and faster.</b> At-the-money call, 30% volatility, 4% interest, stock price held at $50, from 180 days to expiration. Black&ndash;Scholes values as a share of the starting value. Computed.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Covered calls are free money."</div><div class="ma"><b>Myth.</b> OCC notes the writer gives up gains above the strike but keeps the risk of a decline. The premium is the price of that trade.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Buying options is safer than buying stock because the loss is limited."</div><div class="ma"><b>Myth.</b> The loss per option is capped, but it is often total. In OCC's example the all-in call buyer loses 100% if the stock merely stays flat.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Retail traders are making a killing in 0DTE options."</div><div class="ma"><b>Myth on average.</b> Beckmeyer, Branger and Gayda estimate retail lost about $241,000 on an average day from February 2021 to September 2023.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"If I sold a call, I can always buy it back before I'm assigned."</div><div class="ma"><b>Myth.</b> American-style options can be assigned at any time, and notice can arrive a day or more later; once assigned, you cannot close the position.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"My broker approved me, so options must be suitable for me."</div><div class="ma"><b>Not necessarily.</b> FINRA found one large broker's approval bots approved thousands of customers who did not meet its own criteria.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"S&amp;P 500 index options are taxed like stock options."</div><div class="ma"><b>Myth.</b> Broad-based index options are section 1256 contracts: marked to market at year-end and taxed 60% long-term, 40% short-term.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.10 &mdash; Jordan's covered call on 100 shares at $48: result at expiration</div>
+    <div id="f169"></div>
+    <figcaption class="cap"><b>Selling the call trades the big gains for a small, certain premium.</b> 100 shares bought at $48; $52 call sold for $1.50. At $60 the covered call earns $550 against $1,200 for the shares alone; at $35 it loses $1,150 against $1,300. Computed.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>No options yet.</b> Her edge is time and a 50% employer match, not trading. If she ever learns options, it should be on paper first, with the disclosure document read.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Irrelevant to their plan.</b> Their 401(k) funds, idle cash and a 529 plan are where their money is decided. Options add complexity without solving any of their problems.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Covered calls only as a selling tool.</b> Strikes at prices where Jordan would gladly sell, while steadily reducing the employer stock.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>A short-term hedge at most.</b> A collar on their largest tech holding while they diversify with tax-aware sales is defensible; paying for insurance on 25 stocks every quarter is not.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Be wary of "income" pitches.</b> Selling puts or calls for income in her IRA exposes her to assignment and to losses in a crash, just when she needs stable withdrawals.</div></div>
+  </div>
+  <div class="ws" data-ws="inv016" data-title="INV-016 worksheet: before any option trade">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w16a">The goal: income, insurance, or a bet? Would owning or selling shares do it more simply?</label><textarea id="w16a" data-key="goal"></textarea></div>
+      <div><label for="w16b">Strategy, strike, expiration, premium, contracts</label><textarea id="w16b" data-key="terms"></textarea></div>
+      <div><label for="w16c">Breakeven, best case and worst case in dollars</label><textarea id="w16c" data-key="payoff"></textarea></div>
+      <div><label for="w16d">What happens if I am assigned early, and do I have the shares or cash?</label><textarea id="w16d" data-key="assign"></textarea></div>
+      <div><label for="w16e">The account and the tax treatment</label><textarea id="w16e" data-key="tax"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.11 &mdash; A long put, strike $40, premium $2.50, at expiration</div>
+    <div id="f1610"></div>
+    <figcaption class="cap"><b>The put pays off only below the breakeven of $37.50.</b> Profit or loss per contract (100 shares). Computed.</figcaption>
+  </figure>
+  <div class="ex" data-answer="500" data-tol="0.01" data-ok="($58 &minus; $50 &minus; $3) &times; 100 = $500.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">You buy one call with a $50 strike for $3.00 a share. At expiration the stock is $58. What is your profit, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Value at expiration: $58 &minus; $50 = $8 a share. Profit: ($8 &minus; $3) &times; 100 = <b>$500</b> on a $300 outlay.</div></div>
+  <div class="ex" data-answer="37.5" data-tol="0.01" data-ok="$40 &minus; $2.50 = $37.50.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">A put has a $40 strike and costs $2.50. Below what stock price at expiration does the buyer profit, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Breakeven = strike &minus; premium = <b>$37.50</b>. At $35 the put is worth $5, a profit of $2.50 a share.</div></div>
+  <div class="ex" data-answer="350" data-tol="0.01" data-ok="($50 &minus; $48 + $1.50) &times; 100 = $350.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">You own 100 shares bought at $48 and sell one call with a $50 strike for $1.50. At expiration the stock is $56 and the shares are called away. What is your total profit, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Share gain to the strike: $50 &minus; $48 = $2; plus premium $1.50; times 100 = <b>$350</b>. Holding the shares without the call would have made $800.</div></div>
+  <div class="ex" data-answer="-20" data-tol="0.01" data-ok="10 calls &times; $4 &times; 100 = $4,000 on $5,000: &minus;20%.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">In OCC's example, Investor C spends $5,000 on ten XYZ 50 calls at $5 a share. At expiration XYZ is $54. What is C's percentage return?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Each call is worth $54 &minus; $50 = $4 a share, $400 a contract; ten are worth $4,000. Return: $4,000 &divide; $5,000 &minus; 1 = <b>&minus;20%</b>, although the stock rose 8%.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.12 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: rights, decay, leverage, costs">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">A right</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">buyer's loss is capped</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Time decay</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">fastest at the end</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--red-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Leverage</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">wider outcomes</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Costs win</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">retail loses on average</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q": "A call option gives its holder the right to:", "choices": ["Sell shares at the strike", "Receive dividends", "Borrow shares", "Buy shares at the strike before expiration"], "answer": 3, "explain": "A put is the right to sell; a call is the right to buy."},
+    {"q": "A standard single-stock option contract usually covers:", "choices": ["1 share", "10 shares", "100 shares", "1,000 shares"], "answer": 2, "explain": "OCC: as a general rule a single-stock option covers 100 shares."},
+    {"q": "The breakeven of a long call with a $60 strike bought for $4 is:", "choices": ["$56", "$60", "$64", "$240"], "answer": 2, "explain": "Strike plus premium."},
+    {"q": "Which position has unlimited potential loss?", "choices": ["Selling a call without owning the shares", "Buying a put", "Buying a call", "A protective put"], "answer": 0, "explain": "If the stock soars, the uncovered writer must buy shares at any price to deliver."},
+    {"q": "If the stock price does not move, an option's time value:", "choices": ["Rises steadily", "Stays constant", "Falls, faster as expiration nears", "Becomes intrinsic value"], "answer": 2, "explain": "Time decay accelerates near expiration."},
+    {"q": "Bryzgalova, Pavlova and Sikorskaya (2023) found retail options traders:", "choices": ["Prefer long-dated options and profit", "Prefer cheap weekly options with wide spreads and lose money on average", "Trade only index options", "Do not exist in the US"], "answer": 1, "explain": "Average bid-ask spread of 12.6%, losses on average."},
+    {"q": "The writer of an American-style option can be assigned:", "choices": ["At any time before expiration", "Only at expiration", "Never", "Only on dividend dates"], "answer": 0, "explain": "OCC: assignment can come at any time, and notice may arrive a day or more later."},
+    {"q": "In 2021, FINRA fined Robinhood $57 million, finding among other things that it:", "choices": ["Refused all options trades", "Approved thousands of customers for options who did not meet its eligibility criteria", "Charged commissions on options", "Offered only covered calls"], "answer": 1, "explain": "Its approval bots relied on inconsistent information with limited oversight."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 16.13 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-017</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Annuities and insurance products</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-040</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Equity compensation</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-060</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Biases that cost money</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-016"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>The Options Clearing Corporation. (2024). <i>Characteristics and risks of standardized options</i> (June 2024). <a href="https://www.theocc.com/company-information/documents-and-archives/options-disclosure-document">theocc.com</a></li>
+    <li>Internal Revenue Service. <i>Publication 550 (2025), Investment income and expenses</i> (options, puts and calls, section 1256 contracts). <a href="https://www.irs.gov/publications/p550">irs.gov</a></li>
+    <li>Commodity Futures Trading Commission. <i>CFTC glossary</i> (premium, time value). <a href="https://www.cftc.gov/LearnAndProtect/EducationCenter/CFTCGlossary/glossary_co.html">cftc.gov</a></li>
+    <li>Bryzgalova, S., Pavlova, A., &amp; Sikorskaya, T. (2023). Retail trading in options and the rise of the big three wholesalers. <i>The Journal of Finance, 78</i>(6), 3465&ndash;3514. <a href="https://lbsresearch.london.edu/id/eprint/2827/">lbsresearch.london.edu</a></li>
+    <li>de Silva, T., Smith, K., &amp; So, E. C. (2026). Losing is optional: Retail option trading and expected announcement volatility. <i>Review of Finance, 30</i>(2). <a href="https://www.timdesilva.me/files/papers/losing_optional.pdf">author's copy</a></li>
+    <li>Beckmeyer, H., Branger, N., &amp; Gayda, L. (2023). <i>Retail traders love 0DTE options... but should they?</i> Working paper, University of M&uuml;nster (version of December 15, 2023). <a href="https://wp.lancs.ac.uk/fofi2024/files/2024/04/FoFI-2024-146-Leander-Gayda.pdf">lancs.ac.uk</a></li>
+    <li>Chague, F., De-Losso, R., &amp; Giovannetti, B. (2020). <i>Day trading for a living?</i> Working paper, SSRN 3423101.</li>
+    <li>Cboe Global Markets. (2026). <i>The state of the options industry: 2025</i>. <a href="https://www.cboe.com/insights/posts/the-state-of-the-options-industry-2025/">cboe.com</a></li>
+    <li>FINRA. (2021, June 30). <i>Letter of acceptance, waiver and consent: Robinhood Financial LLC</i>.</li>
+    <li>U.S. Securities and Exchange Commission. (2022, April 27). Press release 2022-70: charges against Archegos Capital Management and Sung Kook (Bill) Hwang.</li>
+    <li>U.S. Attorney's Office, Southern District of New York. (2024). <i>Founder and head of Archegos Capital Management Bill Hwang sentenced to 18 years in prison</i>. <a href="https://www.justice.gov/usao-sdny/pr/founder-and-head-archegos-capital-management-bill-hwang-sentenced-18-years-prison">justice.gov</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Options involve risk and are not suitable for all investors. Read <i>Characteristics and Risks of Standardized Options</i> before trading. Examples ignore commissions, spreads and taxes.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s2b.js"></script>
+<script>
+INV.ready(function () {
+  var ms = INV.moneyShort, $ = function (v) { return "$" + Math.round(v); };
+  function line(el, label, series, extra) { var o = { label: label, height: 240, xTitle: "Stock price at expiration", xFmt: $, yFmt: ms, tipFmt: function (v) { return INV.money(v); }, zeroBase: false, series: series }; for (var k in (extra || {})) o[k] = extra[k]; INV.lineChart(document.getElementById(el), o); }
+  function grid(f, lo, hi) { var d = []; for (var p = lo; p <= hi + 0.001; p += (hi - lo) / 60) d.push([p, f(p)]); return d; }
+  /* 16.1 stock vs call */
+  line("f161", "Stock versus call", [{ name: "100 shares bought at $50", color: "var(--s6)", data: grid(function (p) { return (p - 50) * 100; }, 30, 70), dash: "5 4" }, { name: "One $50 call bought for $5", color: "var(--s1)", data: grid(function (p) { return (Math.max(p - 50, 0) - 5) * 100; }, 30, 70), width: 3 }]);
+  /* 16.3 covered call vs protective put */
+  line("f163", "Covered call and protective put", [
+    { name: "Shares only", color: "var(--s6)", data: grid(function (p) { return (p - 48) * 100; }, 30, 66), dash: "5 4" },
+    { name: "Covered call ($52, +$1.50)", color: "var(--s3)", data: grid(function (p) { return (p - 48 + 1.5 - Math.max(p - 52, 0)) * 100; }, 30, 66), width: 3 },
+    { name: "Protective put ($44, −$1.20)", color: "var(--s2)", data: grid(function (p) { return (p - 48 - 1.2 + Math.max(44 - p, 0)) * 100; }, 30, 66), width: 3 }]);
+  /* 16.4 OCC leverage example */
+  var px = [38, 42, 46, 50, 54, 58, 62], A = [-24, -16, -8, 0, 8, 16, 24], B = [-8.5, -8.5, -8.5, -8.5, -0.5, 7.5, 15.5], C = [-100, -100, -100, -100, -20, 60, 140];
+  INV.lineChart(document.getElementById("f164"), { label: "OCC leverage example", height: 250, xTitle: "Price of XYZ at expiration", xFmt: $, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return INV.pct(v, 1); }, zeroBase: false,
+    series: [{ name: "A: 100 shares", color: "var(--s6)", data: px.map(function (p, i) { return [p, A[i]]; }) }, { name: "B: 1 call + T-bills", color: "var(--s2)", data: px.map(function (p, i) { return [p, B[i]]; }) }, { name: "C: 10 calls", color: "var(--s5)", data: px.map(function (p, i) { return [p, C[i]]; }), width: 3 }] });
+  /* 16.5 research */
+  INV.barChart(document.getElementById("f165"), { label: "Retail losses in research", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + "%"; },
+    data: [{ label: "Earnings options, avg loss", y: 7, color: "var(--s3)", tip: "Average loss 5–9% (de Silva, Smith and So)" }, { label: "High-volatility events", y: 12, color: "var(--s5)", tip: "Average loss 10–14% (de Silva, Smith and So)" }, { label: "Brazil day traders who lost", y: 97, color: "var(--s4)", tip: "97% of those persisting over 300 days lost money" }] });
+  /* 16.6 Archegos */
+  INV.barChart(document.getElementById("f166"), { label: "Archegos capital and exposure", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return "$" + v + "B"; },
+    data: [{ label: "Mar 2020 capital", y: 1.5, color: "var(--s2)" }, { label: "Mar 2020 exposure", y: 10, color: "var(--s3)" }, { label: "Mar 2021 capital", y: 36, color: "var(--s2)" }, { label: "Mar 2021 gross exposure", y: 160, color: "var(--s5)" }] });
+  /* 16.8 decay share */
+  var bs = INV.s2bBlackScholes, v0 = bs("call", 50, 50, 0.3, 0.04, 180 / 365), dd = [];
+  for (var d = 180; d >= 0; d -= 5) dd.push([180 - d, bs("call", 50, 50, 0.3, 0.04, d / 365) / v0 * 100]);
+  INV.lineChart(document.getElementById("f168"), { label: "Time decay", height: 230, xTitle: "Days elapsed (180 at start)", xFmt: function (x) { return Math.round(x) + "d"; }, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return INV.pct(v, 0); },
+    series: [{ name: "Value left, % of starting value", color: "var(--s1)", data: dd, area: true }] });
+  /* 16.9 Jordan covered call */
+  line("f169", "Jordan covered call", [{ name: "Shares only", color: "var(--s6)", data: grid(function (p) { return (p - 48) * 100; }, 30, 66), dash: "5 4" }, { name: "Covered call", color: "var(--s3)", data: grid(function (p) { return (p - 48 + 1.5 - Math.max(p - 52, 0)) * 100; }, 30, 66), width: 3 }],
+    { dots: [{ x: 60, y: 550, label: "+$550", color: "var(--s3)", dy: 16 }, { x: 35, y: -1150, label: "−$1,150", color: "var(--s3)", dy: -10 }] });
+  /* 16.10 long put */
+  line("f1610", "Long put", [{ name: "Long $40 put bought for $2.50", color: "var(--s2)", data: grid(function (p) { return (Math.max(40 - p, 0) - 2.5) * 100; }, 20, 60), width: 3 }], { dots: [{ x: 37.5, y: 0, label: "breakeven $37.50", color: "var(--s2)", dy: -10 }] });
+});
+</script>
+</body>
+</html>

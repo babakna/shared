@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-057 · Measuring Performance — Investing Learning Lab</title>
+<meta name="description" content="Time-weighted versus money-weighted returns, choosing and blending benchmarks, Sharpe and Sortino ratios, tracking error, and how to read an account statement.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-057">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-057</span><span class="ttl">Measuring Performance</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 7 · Portfolio Construction &amp; Monitoring</span><span class="chip teal">Intermediate</span><span class="chip gray">About 65 minutes</span><span class="chip gray">2 tools</span></div>
+    <h1>Measuring Performance</h1>
+    <p class="sub">"How am I doing?" sounds like one question. It is really three: how did my investments do, how did my money do, and was it good enough given the risk? Each has its own number. This module teaches all of them, shows how to build a fair yardstick, and walks through an account statement line by line.</p>
+    <p class="q"><span>The question this module answers</span>What return did I actually earn, compared with what, and was the risk worth it?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <path d="M40 190 L100 150 L150 165 L210 110 L260 120 L320 70" fill="none" stroke="#1F5FD1" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M40 190 L100 158 L150 160 L210 124 L260 118 L320 88" fill="none" stroke="#5B6B82" stroke-width="3" stroke-dasharray="6 5"/>
+      <rect x="250" y="160" width="70" height="44" rx="8" fill="#0B8A7E" opacity=".75"/>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Your line, the yardstick, the gap</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>The balance went up. Did you do well?</h2>
+  <p class="lede">Most people judge their investments by the balance. If it went up, things are fine. That works surprisingly often, and it fails in exactly the cases that matter.</p>
+  <p>A balance rises for two reasons: the investments grew, or you added money. A 401(k) that went from $80,000 to $95,000 in a year may have earned 10%, or it may have lost money while $20,000 of contributions made up the difference. Even once you separate the two, "10%" means little on its own. In a year when a comparable mix of index funds earned 20%, 10% is poor; in a year when it lost 15%, 10% is remarkable.</p>
+  <p>So measurement needs three things: a return that is computed correctly, a <span class="term" data-term="Benchmark">benchmark</span> that is a fair comparison, and some account of the risk taken to get the result. Figure 57.1 shows how they fit together.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.1 &mdash; Three questions, three measures</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="How did the investments do: time-weighted return. How did my money do: money-weighted return. Was it good enough: benchmark and risk-adjusted measures">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="180" rx="12" style="fill:var(--blue-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">How did the</text><text x="14" y="48" class="svg-t" font-size="13.5" font-weight="800">investments do?</text><text x="14" y="80" class="svg-s" font-size="12">Time-weighted return.</text><text x="14" y="96" class="svg-s" font-size="12">Ignores your deposits</text><text x="14" y="112" class="svg-s" font-size="12">and withdrawals.</text><text x="14" y="166" class="svg-m" font-size="11">Judges a fund or manager</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="180" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">How did my</text><text x="14" y="48" class="svg-t" font-size="13.5" font-weight="800">money do?</text><text x="14" y="80" class="svg-s" font-size="12">Money-weighted return.</text><text x="14" y="96" class="svg-s" font-size="12">Counts when and how</text><text x="14" y="112" class="svg-s" font-size="12">much you put in.</text><text x="14" y="166" class="svg-m" font-size="11">Judges your plan and timing</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="180" rx="12" style="fill:var(--violet-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">Was it good</text><text x="14" y="48" class="svg-t" font-size="13.5" font-weight="800">enough?</text><text x="14" y="80" class="svg-s" font-size="12">Compare with a blended</text><text x="14" y="96" class="svg-s" font-size="12">benchmark; adjust for</text><text x="14" y="112" class="svg-s" font-size="12">risk (Sharpe, Sortino).</text><text x="14" y="166" class="svg-m" font-size="11">Judges the whole approach</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Use the measure that fits the question.</b> Mixing them up is how an investor ends up firing a good fund for their own bad timing, or keeping an expensive advisor because the balance rose in a rising market.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>Annualizing returns so periods of different length can be compared.</li>
+    <li><span class="term" data-term="Time-weighted return">Time-weighted</span> versus <span class="term" data-term="Money-weighted return">money-weighted</span> returns, with a calculator that includes deposits.</li>
+    <li>Choosing a benchmark, and building a <span class="term" data-term="Blended benchmark">blended benchmark</span> to match your allocation.</li>
+    <li>Risk-adjusted measures: the <span class="term" data-term="Sharpe ratio">Sharpe ratio</span>, the <span class="term" data-term="Sortino ratio">Sortino ratio</span> and <span class="term" data-term="Tracking error">tracking error</span>.</li>
+    <li>Reading an account statement, and checking a return yourself.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Annualizing">
+  <p class="kicker">A common unit</p>
+  <h2>Turn any period's return into a yearly rate</h2>
+  <p>A statement might show 3.1% for the quarter, 18% since the account was opened four years ago, and 62% "since inception" for a fund. They cannot be compared until they are put in the same unit: a compound yearly rate.</p>
+  <div class="def"><div class="def-h"><b>Annualized return</b><span>also called compound annual growth rate</span></div>
+    <div class="def-r"><div>What it is</div><div>The constant yearly rate that, compounded, produces the same total growth over the period. It is a geometric average, not a simple average of yearly returns.</div></div>
+    <div class="def-r"><div>Used for</div><div>Comparing results over periods of different length, and comparing a portfolio with its benchmark.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>"Up 50% over five years" is 8.45% a year, not 10%. The simple average overstates what compounding delivers.</div></div></div>
+  <div class="formula">Annualized return = (1 + total return)<sup>1 / years</sup> &minus; 1 &nbsp;&nbsp; e.g. (1.50)<sup>1/5</sup> &minus; 1 = 8.45% a year</div>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.2 &mdash; Average versus compound: +50%, then &minus;50%</div>
+    <div id="f572"></div>
+    <figcaption class="cap"><b>The simple average says 0%; the balance says &minus;25%.</b> $10,000 gains 50% to $15,000, then loses 50% to $7,500. The arithmetic average of the two returns is 0%; the annualized (geometric) return is &radic;0.75 &minus; 1 = &minus;13.4% a year. Only the second matches the money.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Never annualize a short period</summary><div class="layer-b">
+    <p>A fund that rose 6% in three months has not "earned 26% a year" (1.06<sup>4</sup> &minus; 1). Annualizing a short burst assumes it repeats, which it almost never does. The SEC's marketing rule for investment advisers requires performance to be shown for one-, five- and ten-year periods when it is advertised (17 CFR 275.206(4)-1(d)(2)), in part to stop cherry-picked short windows. For your own records, report returns for periods of a year or more as annualized, and shorter periods as simple, unannualized figures.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Time- vs money-weighted">
+  <p class="kicker">The key distinction</p>
+  <h2>The fund's return and your return are different numbers</h2>
+  <div class="def"><div class="def-h"><b>Time-weighted return</b></div>
+    <div class="def-r"><div>What it is</div><div>The return of the investments themselves, found by computing the return of each period between cash flows and linking them: (1 + r<sub>1</sub>)(1 + r<sub>2</sub>)&hellip; &minus; 1. Deposits and withdrawals have no effect on it.</div></div>
+    <div class="def-r"><div>Used for</div><div>Judging a fund or a manager who does not control when clients add or remove money. Published fund returns are time-weighted.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Compare your funds with their benchmarks using this number.</div></div></div>
+  <div class="def"><div class="def-h"><b>Money-weighted return</b><span>internal rate of return</span></div>
+    <div class="def-r"><div>What it is</div><div>The single yearly rate that makes your starting balance plus every deposit, each growing from its own date, equal your ending balance. Dollars invested for longer, or in bigger amounts, count more.</div></div>
+    <div class="def-r"><div>Used for</div><div>Measuring what your own money earned, including the effect of when you added or withdrew it. Many brokers show it as "personal rate of return."</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>This is the number your retirement plan runs on. If it lags the time-weighted return, your timing cost you.</div></div></div>
+  <h3>A two-year example</h3>
+  <p>You invest $10,000. Year 1 returns +20%, so you have $12,000. Encouraged, you add $50,000 at the start of year 2. Year 2 returns &minus;10%, and you end with $62,000 &times; 0.9 = <b>$55,800</b> &mdash; less than the $60,000 you put in.</p>
+  <ul>
+    <li><b>Time-weighted:</b> 1.20 &times; 0.90 = 1.08, or 8% over two years: <b>+3.92% a year</b>. The investment itself did fine.</li>
+    <li><b>Money-weighted:</b> solve 10,000(1 + r)<sup>2</sup> + 50,000(1 + r) = 55,800. The answer is <b>&minus;6.05% a year</b>. Most of your money arrived just before the bad year.</li>
+  </ul>
+  <div class="formula">Money-weighted r solves: V<sub>0</sub>(1 + r)<sup>T</sup> + &Sigma; D<sub>t</sub>(1 + r)<sup>T &minus; t</sup> = V<sub>T</sub></div>
+  <div data-tool="s7Twr"></div>
+  <p>At the default settings the four yearly returns link to +30.4%, or <b>+6.86% a year</b> time-weighted. But the $50,000 deposit arrived just before the &minus;10% year, so your dollars earned only <b>+3.73% a year</b>. Move the deposit to year 3 or year 4 and watch the money-weighted return rise above the time-weighted one: the same funds, a different investor experience.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>A quick approximation you can do on a statement</summary><div class="layer-b">
+    <p>When you know only the beginning and ending values and the net cash flow for a period, the <b>simple Dietz</b> method approximates the money-weighted return by assuming the flows arrived halfway through:</p>
+    <div class="formula">Return &asymp; (End &minus; Begin &minus; Net flows) &divide; (Begin + &frac12; &times; Net flows)</div>
+    <p>For a year that began at $250,000, received $12,000 of contributions and ended at $284,800: (284,800 &minus; 250,000 &minus; 12,000) &divide; (250,000 + 6,000) = 22,800 &divide; 256,000 = <b>8.9%</b>. The <b>modified Dietz</b> method weights each flow by the fraction of the period it was invested and is what many statements use.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Why published fund returns must be time-weighted</summary><div class="layer-b">
+    <p>A fund manager does not decide when shareholders buy or sell. If fund returns were money-weighted, a manager whose fund attracted large inflows just before a downturn would look worse than one who happened to get inflows before a rally, with identical skill. Time-weighting removes that noise. The reverse is true for you: you do decide when to add money, so the money-weighted return is the fair measure of your decisions. The difference between the two, summed over all fund investors, is what Morningstar's <i>Mind the Gap</i> study measures (Case studies tab).</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Benchmarks">
+  <p class="kicker">Compared with what?</p>
+  <h2>A fair yardstick matches what you own</h2>
+  <div class="def"><div class="def-h"><b>Benchmark</b></div>
+    <div class="def-r"><div>What it is</div><div>A market index, or a mix of indexes, that represents the investments you could have owned passively instead. A US total stock fund is compared with a total US market index; a bond fund with a broad bond index.</div></div>
+    <div class="def-r"><div>Used for</div><div>Separating what the market gave from what a fund, manager or decision added or cost.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Comparing a 60/40 portfolio with the S&amp;P 500 alone is unfair in both directions: it looks terrible in bull markets and brilliant in crashes. The yardstick must carry the same risk.</div></div></div>
+  <div class="def"><div class="def-h"><b>Blended benchmark</b></div>
+    <div class="def-r"><div>What it is</div><div>A weighted mix of indexes in the same proportions as your target allocation, rebalanced to those weights.</div></div>
+    <div class="def-r"><div>Used for</div><div>Judging a multi-asset portfolio, an advisor or a target-date fund against the simplest low-cost alternative with the same allocation.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>If you could have bought the three index funds yourself, the blended benchmark minus a few hundredths of a percent in fees is what you should expect at minimum from anyone you pay.</div></div></div>
+  <div class="formula">Blended benchmark return = &Sigma; (target weight &times; index return) &nbsp;&nbsp; e.g. 0.42 &times; 20% + 0.18 &times; 10% + 0.40 &times; 3% = 11.4%</div>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.3 &mdash; Building the Harpers' blended benchmark (illustrative year)</div>
+    <div id="f573"></div>
+    <figcaption class="cap"><b>Weight each index by the allocation, then add.</b> The Harpers' target is 42% US stocks, 18% international stocks and 40% bonds (INV-055). In an illustrative year when the US index returns 20%, the international index 10% and the bond index 3%, the blend returns 11.4%. Their advisor-managed account returned 9.95% after the 1.25% fee: 1.45 points behind the yardstick.</figcaption>
+  </figure>
+  <h3>Choosing the pieces</h3>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>You own</th><th>A fair benchmark</th><th>Common mistake</th></tr></thead><tbody>
+    <tr><td>US total stock market fund</td><td>A total US stock market index</td><td>Comparing with the Nasdaq after a tech rally</td></tr>
+    <tr><td>International stock fund</td><td>A developed-plus-emerging markets index outside the US</td><td>Comparing with the S&amp;P 500</td></tr>
+    <tr><td>Bond fund</td><td>A broad US investment-grade bond index</td><td>Comparing with stocks, or with a savings rate</td></tr>
+    <tr><td>Target-date fund</td><td>The fund's own published composite benchmark</td><td>Comparing with a different company's glide path</td></tr>
+    <tr><td>Whole portfolio</td><td>Blended benchmark at your target weights</td><td>Comparing with whatever did best this year</td></tr>
+  </tbody></table></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Benchmarks and costs</summary><div class="layer-b">
+    <p>Indexes have no expenses; real funds do. A total-market index fund charging 0.03% should trail its index by about that much, year after year. A persistent shortfall much larger than the expense ratio suggests poor tracking. For an actively managed fund or an advisor, the fair test is <b>net of all fees</b> against the benchmark: the SEC's marketing rule forbids advisers from advertising gross performance unless net performance is shown with at least equal prominence (17 CFR 275.206(4)-1(d)(1)).</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Risk-adjusted">
+  <p class="kicker">Return per unit of risk</p>
+  <h2>Sharpe, Sortino and tracking error</h2>
+  <p>Two portfolios can earn the same return with very different rides. Risk-adjusted measures ask how much return you received for each unit of risk you bore. All three below are built on <span class="term" data-term="Standard deviation">standard deviation</span>, the typical size of yearly swings.</p>
+  <div class="def"><div class="def-h"><b>Sharpe ratio</b><span>William Sharpe, 1966; restated 1994</span></div>
+    <div class="def-r"><div>What it is</div><div>The average excess return over a risk-free rate (usually Treasury bills), divided by the standard deviation of that excess return. Sharpe originally called it the "reward-to-variability ratio."</div></div>
+    <div class="def-r"><div>Used for</div><div>Comparing strategies with different risk levels on one scale.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A riskier portfolio should earn more; the Sharpe ratio tells you whether it earned enough more to justify the extra swings.</div></div></div>
+  <div class="formula">Sharpe = average(R<sub>p</sub> &minus; R<sub>f</sub>) &divide; standard deviation(R<sub>p</sub> &minus; R<sub>f</sub>)</div>
+  <div class="def"><div class="def-h"><b>Sortino ratio</b><span>Sortino and Price, 1994</span></div>
+    <div class="def-r"><div>What it is</div><div>Like the Sharpe ratio, but the denominator counts only shortfalls: years when the return fell below a minimum acceptable return (here, the T-bill rate). This is the <b>downside deviation</b>.</div></div>
+    <div class="def-r"><div>Used for</div><div>Judging strategies whose ups and downs are lopsided, since investors mind losses far more than surprise gains.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Two funds with the same Sharpe ratio can differ on Sortino; the higher one delivered its return with fewer and smaller bad years.</div></div></div>
+  <div class="formula">Downside deviation = &radic;[ &Sigma; min(0, R<sub>p</sub> &minus; R<sub>f</sub>)<sup>2</sup> &divide; n ] &nbsp;&nbsp; Sortino = average(R<sub>p</sub> &minus; R<sub>f</sub>) &divide; downside deviation</div>
+  <div class="def"><div class="def-h"><b>Tracking error</b></div>
+    <div class="def-r"><div>What it is</div><div>The standard deviation of the difference between a portfolio's return and its benchmark's, period by period.</div></div>
+    <div class="def-r"><div>Used for</div><div>Measuring how far a portfolio typically strays from its yardstick. An index fund should have very low tracking error; an active fund, a higher one.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>High tracking error means your results will often look very different from the market's, in both directions. You need the stomach for that, and a reason to expect the differences to be positive on balance.</div></div></div>
+  <div class="formula">Tracking error = standard deviation(R<sub>p</sub> &minus; R<sub>b</sub>) &nbsp;&nbsp; Information ratio = annualized (R<sub>p</sub> &minus; R<sub>b</sub>) &divide; tracking error</div>
+  <div data-tool="s7Riskadj"></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.4 &mdash; Sharpe ratio of each stock/bond mix, three periods</div>
+    <div id="f574"></div>
+    <figcaption class="cap"><b>More stocks meant more return, not always more return per unit of risk.</b> Yearly Sharpe ratios versus 3-month T-bills for mixes of the S&amp;P 500 and 10-year Treasuries, rebalanced yearly. Over 1928&ndash;2025 the 60/40 mix scored 0.46 and all stocks 0.43; over 2000&ndash;2025, 0.53 and 0.42. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Measurement choices change the answer</summary><div class="layer-b">
+    <p>Sharpe himself noted that the ratio depends on the measurement interval: with independent returns, a ratio measured over T periods is roughly &radic;T times the single-period ratio, so he recommended measuring over short intervals such as months and then annualizing (Sharpe, 1994). The tool here uses calendar years because that is the data available. Two further cautions: ratios estimated from a few years of data are very noisy, and Sharpe ratios can be flattered by strategies with rare but large losses that have not happened yet in the sample. Use them to compare like with like over long periods, never as a single deciding number.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Reading a statement">
+  <p class="kicker">The document you already get</p>
+  <h2>Reading an account statement line by line</h2>
+  <p>Brokerage firms must send customers a statement at least once every calendar quarter showing positions, balances and account activity (FINRA Rule 2231); most send one monthly. FINRA's investor guide lists the sections below and urges you to review each statement as soon as it arrives.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.5 &mdash; The anatomy of a statement (illustrative)</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 330" role="img" aria-label="An illustrative account statement with account details, a change-in-value summary, income, fees, activity and holdings">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="10" width="440" height="310" rx="10" style="fill:var(--card2)"/>
+      <text x="26" y="36" class="svg-t" font-size="13.5" font-weight="800">Harper Joint Brokerage &#183; Jan 1&ndash;Dec 31</text>
+      <text x="26" y="54" class="svg-m" font-size="11">Account no. ending 4417 &#183; Clearing firm: example</text>
+      <line x1="26" y1="66" x2="434" y2="66" style="stroke:var(--border2)"/>
+      <text x="26" y="88" class="svg-t" font-size="12.5" font-weight="700">Change in value</text>
+      <g class="svg-s" font-size="12"><text x="26" y="108">Beginning value</text><text x="434" y="108" text-anchor="end">$250,000</text>
+      <text x="26" y="126">Deposits</text><text x="434" y="126" text-anchor="end">+$12,000</text>
+      <text x="26" y="144">Withdrawals</text><text x="434" y="144" text-anchor="end">$0</text>
+      <text x="26" y="162">Dividends and interest</text><text x="434" y="162" text-anchor="end">+$4,500</text>
+      <text x="26" y="180">Fees</text><text x="434" y="180" text-anchor="end">$0</text>
+      <text x="26" y="198">Change in market value</text><text x="434" y="198" text-anchor="end">+$18,300</text></g>
+      <line x1="26" y1="208" x2="434" y2="208" style="stroke:var(--border2)"/>
+      <text x="26" y="228" class="svg-t" font-size="12.5" font-weight="800">Ending value</text><text x="434" y="228" text-anchor="end" class="svg-t" font-size="12.5" font-weight="800">$284,800</text>
+      <text x="26" y="258" class="svg-t" font-size="12.5" font-weight="700">Holdings</text>
+      <g class="svg-s" font-size="11.5"><text x="26" y="278">Shares, price, market value, cost basis,</text><text x="26" y="294">unrealized gain or loss for each position</text></g>
+      <g transform="translate(470,10)"><rect width="240" height="96" rx="10" style="fill:var(--blue-soft)"/><text x="14" y="26" class="svg-t" font-size="12.5" font-weight="800">1. Check the details</text><text x="14" y="46" class="svg-s" font-size="11.5">Owner, account type,</text><text x="14" y="62" class="svg-s" font-size="11.5">address, contacts, the</text><text x="14" y="78" class="svg-s" font-size="11.5">clearing firm</text></g>
+      <g transform="translate(470,116)"><rect width="240" height="96" rx="10" style="fill:var(--teal-soft)"/><text x="14" y="26" class="svg-t" font-size="12.5" font-weight="800">2. Split the change</text><text x="14" y="46" class="svg-s" font-size="11.5">Your money in or out</text><text x="14" y="62" class="svg-s" font-size="11.5">versus what the</text><text x="14" y="78" class="svg-s" font-size="11.5">investments earned</text></g>
+      <g transform="translate(470,222)"><rect width="240" height="98" rx="10" style="fill:var(--amber-soft)"/><text x="14" y="26" class="svg-t" font-size="12.5" font-weight="800">3. Read fees and activity</text><text x="14" y="46" class="svg-s" font-size="11.5">Every charge, and every</text><text x="14" y="62" class="svg-s" font-size="11.5">trade you did or did not</text><text x="14" y="78" class="svg-s" font-size="11.5">authorize</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>The change-in-value summary tells you how much of the growth was yours and how much was the market's.</b> Of the $34,800 increase, $12,000 was the Harpers' own deposits; the investments earned $22,800 ($4,500 of income plus $18,300 of price change). Simple Dietz return: 22,800 &divide; (250,000 + 6,000) = 8.9%. Illustrative figures.</figcaption>
+  </figure>
+  <h3>What to look for, section by section</h3>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Section</th><th>What it tells you</th><th>What to check</th></tr></thead><tbody>
+    <tr><td><b>Account information</b></td><td>Owner, ownership type (individual, joint), account type (taxable, IRA)</td><td>Names, address, and that a retirement account is labeled as one</td></tr>
+    <tr><td><b>Account summary / change in value</b></td><td>Beginning value, deposits, withdrawals, income, fees, market change, ending value</td><td>Separate your contributions from investment gains</td></tr>
+    <tr><td><b>Income summary</b></td><td>Dividends and interest, and their sources</td><td>Whether income was reinvested or paid out as you intended</td></tr>
+    <tr><td><b>Fees</b></td><td>Advisory, account and transaction charges</td><td>That they match your agreement (INV-007)</td></tr>
+    <tr><td><b>Account activity</b></td><td>Trades, transfers and money movements</td><td>Every transaction was one you made or authorized</td></tr>
+    <tr><td><b>Portfolio detail</b></td><td>Each holding's value, cost basis and unrealized gain or loss</td><td>Your actual allocation, and lots for tax-aware selling (INV-056)</td></tr>
+    <tr><td><b>Performance</b> (if shown)</td><td>Time-weighted or personal (money-weighted) return</td><td>Which kind it is, for what period, and whether it is net of fees</td></tr>
+  </tbody></table></div>
+  <div class="callout bad"><div class="ic">&#9888;&#65039;</div><div><p><b>A red flag worth memorizing.</b> FINRA: "Be wary if your statement always shows the same rate of return, regardless of market conditions, and especially if the return is above market norms. This can be a sign of fraud." Report any error or unauthorized activity in writing to both your brokerage firm and the clearing firm listed on the statement (INV-062).</p></div></div>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">When measurement went wrong</p>
+  <h2>Three stories about the right number</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>The Beardstown Ladies, 1998</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>An Illinois investment club became famous in the 1990s for a reported 23.4% average annual return. In 1998, after questions were raised, an audit by Price Waterhouse found the club had actually earned 9.1% a year over 1984&ndash;1993, below the stock market's roughly 15% with dividends reinvested. Time magazine reported that the club "were making incorrect entries into their computer. Nobody double-checked the math."</div></div>
+    <div class="row"><div>What it teaches</div><div>A return that is never checked against a benchmark, or computed independently, is a story, not a measurement. The simplest audit &mdash; would an index fund have done better? &mdash; would have shown the problem at once.</div></div>
+    <div class="row"><div>Source</div><div class="src">Associated Press, "Beardstown Ladies sorry for slip-up," <i>Deseret News</i> (March 18, 1998); "Jail the Beardstown Ladies!", <i>Time</i> (March 30, 1998).</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.6 &mdash; Fund returns versus investor returns, 10 years ended 2024</div>
+    <div id="f576"></div>
+    <figcaption class="cap"><b>The average dollar earned less than the average fund.</b> Time-weighted total returns of US funds versus the money-weighted return of the dollars invested in them. Overall 8.2% versus 7.0% a year. Source: Ptak, J. (2025), <i>Mind the Gap 2025</i>, Morningstar.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Morningstar's <i>Mind the Gap</i>: time- versus money-weighted, at scale</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Morningstar compares each fund's time-weighted total return with a money-weighted "investor return" computed from monthly flows. For the ten years ended December 31, 2024, US mutual funds and ETFs returned 8.2% a year while the average dollar invested in them earned 7.0%: a 1.2-point gap, about 15% of the funds' return. Among US equity funds the gap was 0.6 point; among sector funds, 1.5 points.</div></div>
+    <div class="row"><div>What it teaches</div><div>Both numbers are correct. The difference is the cost of buying after gains and selling after losses. Your money-weighted return is the one that pays for retirement.</div></div>
+    <div class="row"><div>Source</div><div class="src">Ptak, J. (2025, August 13). <i>Mind the Gap 2025</i>. Morningstar Portfolio and Planning Research.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>The SEC's marketing rule, 2020</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>On December 22, 2020, the Securities and Exchange Commission adopted a new marketing rule for registered investment advisers. Among other things, an adviser may not show gross performance "unless the advertisement also presents net performance with at least equal prominence," and performance must be shown for one-, five- and ten-year periods ending no earlier than the most recent calendar year-end.</div></div>
+    <div class="row"><div>What it teaches</div><div>The rule writes the lessons of this module into law: judge results after fees, over standard long periods, not over a flattering window.</div></div>
+    <div class="row"><div>Source</div><div class="src">SEC press release 2020-334 (December 22, 2020); 17 CFR &sect; 275.206(4)-1(d)(1)&ndash;(2).</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Three performance questions</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.7 &mdash; Right number, right yardstick</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 130" role="img" aria-label="Harpers: net return versus blended benchmark. Jordan: personal return versus fund return. Riveras: portfolio versus the S&amp;P 500">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="110" rx="12" style="fill:var(--violet-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">The Harpers</text><text x="14" y="56" class="svg-s" font-size="12">Net return versus a</text><text x="14" y="72" class="svg-s" font-size="12">blended benchmark</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="110" rx="12" style="fill:var(--amber-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">Jordan</text><text x="14" y="56" class="svg-s" font-size="12">Personal return versus</text><text x="14" y="72" class="svg-s" font-size="12">the fund's return</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="110" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">The Riveras</text><text x="14" y="56" class="svg-s" font-size="12">80/20 versus the</text><text x="14" y="72" class="svg-s" font-size="12">S&amp;P 500 alone</text></g>
+      </g></svg></div>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Harpers' advisor review</div>
+    <p class="dq">The Harpers' advisor reports a 9.95% return this year after fees and notes that the balance grew by about $175,000. Their blended benchmark (42/18/40) returned 11.4%. What should they conclude?</p>
+    <div class="opts"><button class="opt">A great year: the balance grew $140,000.</button><button class="opt">They trailed a low-cost version of their own allocation by 1.45 points, about the size of the fee. One year proves little, but they should ask what the fee buys and track the gap over several years.</button><button class="opt">Fire the advisor today.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Great year</b>The balance includes their own contributions and a strong market. It says nothing about whether the advice added value.</div>
+      <div class="oc"><b>Measure against the blend, over time</b>Right. A persistent shortfall near the fee means they are paying for the market's return. Good advice can still earn its keep through taxes and planning (INV-007, INV-103), but that should be explicit.</div>
+      <div class="oc"><b>Fire the advisor</b>Premature. One year of a 1.45-point gap is within normal tracking error for a managed portfolio. Gather three to five years of net returns first.</div>
+      <div class="verdict"><b>The principle:</b> judge anyone you pay by net returns against a blended benchmark, over years.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Jordan's two numbers</div>
+    <p class="dq">Jordan's 401(k) statement shows a "personal rate of return" of 4.1% for the year, while the target-date fund Jordan owns reports 7.8%. Jordan moved most of the balance to cash in March and back in July. Is the fund at fault?</p>
+    <div class="opts"><button class="opt">Yes; switch funds.</button><button class="opt">No. The fund's 7.8% is time-weighted; Jordan's 4.1% is money-weighted and includes the cost of being out of the market for four months.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Switch funds</b>Punishes the fund for a timing decision it did not make; the next fund would suffer the same way.</div>
+      <div class="oc"><b>It was the timing</b>Right. The gap measures the move to cash. The fix is a rule against reacting to headlines (INV-061), not a new fund.</div>
+      <div class="verdict"><b>The principle:</b> time-weighted return judges the fund; money-weighted return judges you.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; The Riveras' disappointment</div>
+    <p class="dq">In a year when the S&amp;P 500 returned 25%, the Riveras' 80/20 portfolio returned 20%. Marcus wants to go 100% stocks. What is the fair comparison?</p>
+    <div class="opts"><button class="opt">The S&amp;P 500: they missed 5 points.</button><button class="opt">A blended 80/20 benchmark with international stocks. If they matched it, the portfolio did exactly its job.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>S&amp;P 500</b>An all-US, all-stock index carries far more risk than their plan. In a year like 2008 (&minus;36.6%) they would not want that comparison.</div>
+      <div class="oc"><b>Blended benchmark</b>Right. Their allocation was chosen for their risk capacity and tolerance (INV-025). A good year for stocks is not a reason to change it; INV-058 covers what is.</div>
+      <div class="verdict"><b>The principle:</b> a benchmark must carry the same risk as the portfolio it judges.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about performance</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.8 &mdash; Same funds, different timing: money-weighted return by deposit year</div>
+    <div id="f578"></div>
+    <figcaption class="cap"><b>Timing alone moved the investor's return by several points a year.</b> The four-year example from the calculator ($10,000 start; returns +20%, &minus;10%, +15%, +5%), with the $50,000 deposit made at the start of year 2, 3 or 4. The time-weighted return is 6.86% a year in every case.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"If my balance went up, my investments did well."</div><div class="ma"><b>Myth.</b> Contributions raise the balance too. Subtract deposits and add withdrawals before judging the investments.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The fund's return is the return I got."</div><div class="ma"><b>Often myth.</b> The fund reports a time-weighted return. Yours is money-weighted and depends on when you bought and sold; Morningstar measured an average gap of 1.2 points a year.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The S&amp;P 500 is the benchmark for everyone."</div><div class="ma"><b>Myth.</b> It suits a portfolio of large US stocks. A 60/40 portfolio needs a 60/40 benchmark.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A higher return means a better strategy."</div><div class="ma"><b>Not necessarily.</b> It may just mean more risk. Sharpe and Sortino ratios show return per unit of risk.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Averaging yearly returns gives my yearly growth rate."</div><div class="ma"><b>Myth.</b> +50% then &minus;50% averages 0% but loses 25% of the money. Use the compound (annualized) rate.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Advisers can advertise their best year before fees."</div><div class="ma"><b>Myth for SEC-registered advisers.</b> The marketing rule requires net performance alongside gross, and one-, five- and ten-year periods.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>Each household's yardstick</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.9 &mdash; Tracking error of each household's mix against a 60/40 yardstick, 1976&ndash;2025</div>
+    <div id="f579"></div>
+    <figcaption class="cap"><b>The further your allocation from the yardstick, the more your results will differ from it in any year.</b> Standard deviation of the yearly gap between each household's stock/bond mix and a 60/40 mix, using the S&amp;P 500 and 10-year Treasuries. This is why each household needs a benchmark built from its own allocation. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Her fund is her benchmark's twin.</b> A target-date fund publishes its own composite benchmark; she checks once a year that the fund tracks it closely after its expense ratio, and that her contributions went in every paycheck.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>An 80/20 blend, not the S&amp;P 500.</b> Their yardstick is 56% US stocks, 24% international and 20% bonds. With index funds, their time-weighted return should sit a few hundredths of a point below it.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Two measures, two lessons.</b> Personal (money-weighted) return shows the cost of moving to cash; comparing employer stock with a total-market index shows what the concentration has added or cost.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Hold the advisor to the blend.</b> Net-of-fee returns against a 42/18/40 blended benchmark, tracked over three to five years, plus a list of the planning work the fee covers.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>The measure that matters is sustainability.</b> In retirement, the question is less "did I beat the benchmark?" and more "is my money-weighted return, after withdrawals, keeping my plan on track?" (INV-076).</div></div>
+  </div>
+  <div class="ws" data-ws="inv057" data-title="INV-057 worksheet: my performance check">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w57a">Beginning value, net deposits and ending value for last year</label><textarea id="w57a" data-key="flows"></textarea></div>
+      <div><label for="w57b">My approximate money-weighted return (simple Dietz)</label><textarea id="w57b" data-key="mwr"></textarea></div>
+      <div><label for="w57c">My blended benchmark weights and its return</label><textarea id="w57c" data-key="bench"></textarea></div>
+      <div><label for="w57d">Gap after all fees, and what explains it</label><textarea id="w57d" data-key="gap"></textarea></div>
+      <div><label for="w57e">Anything on my statement I did not recognize or authorize</label><textarea id="w57e" data-key="flags"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.10 &mdash; Total return and its annualized equivalent</div>
+    <div id="f5710"></div>
+    <figcaption class="cap"><b>A 50% total return means very different things over 3, 5 or 10 years.</b> (1.5)<sup>1/n</sup> &minus; 1 for n = 3, 5, 10 and 20 years.</figcaption>
+  </figure>
+  <div class="ex" data-answer="8.45" data-tol="0.01" data-ok="1.5<sup>0.2</sup> &minus; 1 = 8.45%.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">An account grew a total of 50% over five years with no deposits or withdrawals. What is its annualized return, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">(1 + 0.50)<sup>1/5</sup> &minus; 1 = 1.0845 &minus; 1 = <b>8.45%</b> a year, not 10%.</div></div>
+  <div class="ex" data-answer="3.92" data-tol="0.01" data-ok="&radic;(1.2 &times; 0.9) &minus; 1 = 3.92%.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">A fund returns +20% in year 1 and &minus;10% in year 2. What is its time-weighted annualized return, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Link the years: 1.20 &times; 0.90 = 1.08. Annualize over two years: &radic;1.08 &minus; 1 = <b>3.92%</b>.</div></div>
+  <div class="ex" data-answer="11.4" data-tol="0.01" data-ok="0.42 &times; 20 + 0.18 &times; 10 + 0.40 &times; 3 = 11.4%.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">A blended benchmark is 42% US stocks, 18% international stocks and 40% bonds. The indexes return 20%, 10% and 3%. What does the benchmark return, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">8.4 + 1.8 + 1.2 = <b>11.4%</b>.</div></div>
+  <div class="ex" data-answer="8.91" data-tol="0.01" data-ok="22,800 &divide; 256,000 = 8.91%.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">A statement shows a beginning value of $250,000, deposits of $12,000 and an ending value of $284,800. Using the simple Dietz method, what was the return, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Gain from investing: 284,800 &minus; 250,000 &minus; 12,000 = $22,800. Average capital: 250,000 + 12,000 &divide; 2 = $256,000. Return 22,800 &divide; 256,000 = <b>8.91%</b>.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.11 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: annualize, weight, benchmark, adjust for risk">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Annualize</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">compound, not average</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Two returns</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">fund's and yours</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Blend</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">a fair yardstick</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Risk</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">return per unit of it</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"Published mutual fund returns are:","choices":["Money-weighted","Time-weighted","Simple averages","Before all expenses"],"answer":1,"explain":"Time-weighting removes the effect of shareholders' deposits and withdrawals, which the manager does not control."},
+    {"q":"You invest $10,000, earn +20%, add $50,000, then lose 10%. Your money-weighted return is about:","choices":["+3.9% a year","0%","&minus;6.1% a year","+10% a year"],"answer":2,"explain":"Most of the money was invested during the losing year; the time-weighted return is +3.92%."},
+    {"q":"A 50% total gain over five years annualizes to:","choices":["10.0%","8.45%","12.5%","5.0%"],"answer":1,"explain":"1.5<sup>1/5</sup> &minus; 1 = 8.45%."},
+    {"q":"The fairest benchmark for a 60% stock / 40% bond portfolio is:","choices":["The S&amp;P 500","A savings account rate","A 60/40 blend of stock and bond indexes","Last year's best fund"],"answer":2,"explain":"A benchmark must carry the same risk as the portfolio."},
+    {"q":"The Sortino ratio differs from the Sharpe ratio because its denominator:","choices":["Uses only shortfalls below a minimum acceptable return","Uses the benchmark's return","Ignores risk","Uses fees"],"answer":0,"explain":"Downside deviation counts only the bad periods."},
+    {"q":"Tracking error measures:","choices":["Fees","How far a portfolio's returns typically stray from its benchmark's","Trading mistakes","Tax drag"],"answer":1,"explain":"It is the standard deviation of the return differences."},
+    {"q":"In Morningstar's <i>Mind the Gap 2025</i>, the average dollar in US funds earned about how much less per year than the funds, over ten years?","choices":["0.1 point","1.2 points","3 points","Nothing"],"answer":1,"explain":"7.0% versus 8.2%, a 1.2-point yearly gap."},
+    {"q":"FINRA Rule 2231 requires brokerage firms to send account statements at least:","choices":["Daily","Once every calendar quarter","Once a year","Only on request"],"answer":1,"explain":"Not less than once every calendar quarter; many firms send them monthly."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 57.12 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-058</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Reviewing your plan</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-061</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">The behavior gap</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-103</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Choosing a financial advisor</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-057"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Sharpe, W. F. (1994). The Sharpe ratio. <i>The Journal of Portfolio Management, 21</i>(1), 49&ndash;58. <a href="https://web.stanford.edu/~wfsharpe/art/sr/sr.htm">stanford.edu</a></li>
+    <li>Sortino, F. A., &amp; Price, L. N. (1994). Performance measurement in a downside risk framework. <i>The Journal of Investing, 3</i>(3), 59&ndash;64.</li>
+    <li>Ptak, J. (2025). <i>Mind the Gap 2025</i>. Morningstar. <a href="https://www.morningstar.com/content/cs-assets/v3/assets/blt9415ea4cc4157833/blt2c5c4d9171638c42/689b424311f3880edc4b4813/US_Mind_the_Gap_2025.pdf">morningstar.com (PDF)</a></li>
+    <li>FINRA. <i>Your brokerage statement: How to read and make sense of it</i>. <a href="https://www.finra.org/investors/insights/your-brokerage-statement-how-read-and-make-sense-it">finra.org</a></li>
+    <li>FINRA. <i>Rule 2231: Customer account statements</i>. <a href="https://www.finra.org/rules-guidance/rulebooks/finra-rules/2231">finra.org</a></li>
+    <li>U.S. Securities and Exchange Commission. (2020, December 22). <i>SEC adopts modernized marketing rule for investment advisers</i> (Press release 2020-334); 17 CFR &sect; 275.206(4)-1. <a href="https://www.law.cornell.edu/cfr/text/17/275.206(4)-1">law.cornell.edu</a></li>
+    <li>Associated Press. (1998, March 18). Beardstown Ladies sorry for slip-up. <i>Deseret News</i>. <a href="https://www.deseret.com/1998/3/18/19369525/beardstown-ladies-sorry-for-slip-up/">deseret.com</a>; and <i>Time</i> (1998, March 30), Jail the Beardstown Ladies!</li>
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">stern.nyu.edu</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Examples are illustrative. Past performance, however measured, does not guarantee future results.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s7.js"></script>
+<script>
+INV.ready(function () {
+  var h = INV.hist(), R = h.rows, ms = INV.moneyShort;
+  INV.lineChart(document.getElementById("f572"), { label: "Up 50 then down 50", height: 220, xTicks: [0, 1, 2], xFmt: function (v) { return "Year " + Math.round(v); }, yFmt: ms, tipFmt: function (v) { return INV.money(v, 0); }, zeroBase: false,
+    series: [{ name: "Actual balance", color: "var(--s5)", data: [[0, 10000], [1, 15000], [2, 7500]] }, { name: "What a 0% 'average' implies", color: "var(--s6)", data: [[0, 10000], [1, 10000], [2, 10000]], dash: "5 4" }] });
+  INV.barChart(document.getElementById("f573"), { label: "Blended benchmark", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(2) + "%"; },
+    data: [{ label: "US 42% × 20%", y: 8.4, color: "var(--s1)" }, { label: "Intl 18% × 10%", y: 1.8, color: "var(--s4)" }, { label: "Bonds 40% × 3%", y: 1.2, color: "var(--s2)" }, { label: "Blended benchmark", y: 11.4, color: "var(--s6)" }, { label: "Harpers, net of fee", y: 9.95, color: "var(--s5)" }] });
+  function sharpe(s, y0) { var ex = R.filter(function (r) { return r[0] >= y0; }).map(function (r) { return s * r[1] + (1 - s) * r[3] - r[2]; }); var m = ex.reduce(function (a, b) { return a + b; }, 0) / ex.length; var sd = Math.sqrt(ex.reduce(function (a, b) { return a + (b - m) * (b - m); }, 0) / (ex.length - 1)); return m / sd; }
+  var d4 = [];
+  [[1928, "var(--s6)"], [1976, "var(--s1)"], [2000, "var(--s2)"]].forEach(function (p) { [0, 40, 60, 80, 100].forEach(function (k) { d4.push({ label: k + "%", tip: k + "% stocks, " + p[0] + "–" + h.last, y: sharpe(k / 100, p[0]), color: p[1] }); }); });
+  INV.barChart(document.getElementById("f574"), { label: "Sharpe ratios", height: 250, allLabels: true, xTitle: "Grey: from 1928 · Blue: 1976 · Teal: 2000", yFmt: function (v) { return v.toFixed(1); }, tipFmt: function (v) { return "Sharpe " + v.toFixed(2); }, data: d4 });
+  INV.barChart(document.getElementById("f576"), { label: "Mind the Gap 2025", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: [["US equity: funds", 11.6, "var(--s1)"], ["US equity: investors", 11.1, "var(--s3)"], ["Sector: funds", 8.5, "var(--s1)"], ["Sector: investors", 7.0, "var(--s3)"], ["All: funds", 8.2, "var(--s1)"], ["All: investors", 7.0, "var(--s3)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  function mwr(depYear) { var dep = [0, 0, 0, 0, 0]; dep[depYear] = 50000; var r = [0, 0.2, -0.1, 0.15, 0.05], V = 10000; for (var k = 1; k <= 4; k++) { V += dep[k]; V *= 1 + r[k]; }
+    var lo = 1e-6, hi = 20; for (var i = 0; i < 200; i++) { var x = (lo + hi) / 2, f = 10000 * Math.pow(x, 4) - V; for (var j = 2; j <= 4; j++) f += dep[j] * Math.pow(x, 5 - j); if (f > 0) hi = x; else lo = x; } return ((lo + hi) / 2 - 1) * 100; }
+  INV.barChart(document.getElementById("f578"), { label: "Money-weighted by deposit timing", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "% a year"; },
+    data: [{ label: "Time-weighted", y: 6.863, color: "var(--s6)" }, { label: "Deposit in year 2", y: mwr(2), color: "var(--s5)" }, { label: "Deposit in year 3", y: mwr(3), color: "var(--s1)" }, { label: "Deposit in year 4", y: mwr(4), color: "var(--s2)" }] });
+  function te(sp) { var g = R.filter(function (r) { return r[0] >= 1976; }).map(function (r) { return (sp - 0.6) * (r[1] - r[3]); }); var m = g.reduce(function (a, b) { return a + b; }, 0) / g.length; return Math.sqrt(g.reduce(function (a, b) { return a + (b - m) * (b - m); }, 0) / (g.length - 1)); }
+  INV.barChart(document.getElementById("f579"), { label: "Tracking error versus 60/40", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: [["Maya 90%", 0.9, "var(--s1)"], ["Riveras 80%", 0.8, "var(--s2)"], ["Jordan 70%", 0.7, "var(--s3)"], ["Harpers 60%", 0.6, "var(--s4)"], ["Ruth 45%", 0.45, "var(--s5)"]].map(function (x) { return { label: x[0], y: te(x[1]), color: x[2] }; }) });
+  INV.barChart(document.getElementById("f5710"), { label: "Annualized equivalents of 50%", height: 210, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "% a year"; },
+    data: [3, 5, 10, 20].map(function (n) { return { label: n + " years", y: (Math.pow(1.5, 1 / n) - 1) * 100, color: "var(--s1)" }; }) });
+});
+</script>
+</body>
+</html>

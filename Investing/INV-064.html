@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-064 · Mortgages — Investing Learning Lab</title>
+<meta name="description" content="Fixed versus adjustable rates, amortization and extra payments, discount points, PMI removal under the Homeowners Protection Act, refinancing math, and whether to prepay a mortgage or invest, with four calculators and current rate data.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-064">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-064</span><span class="ttl">Mortgages</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 9 · Real Estate</span><span class="chip teal">Beginner to intermediate</span><span class="chip gray">About 65 minutes</span><span class="chip gray">4 calculators</span></div>
+    <h1>Mortgages</h1>
+    <p class="sub">A mortgage is usually the largest loan of a lifetime and, for many households, the largest single cost in the budget. This module explains how a mortgage is priced and repaid, how to choose among fixed and adjustable rates and points, how to get rid of mortgage insurance, when refinancing pays, and whether extra money should go to the mortgage or to investments.</p>
+    <p class="q"><span>The question this module answers</span>How do I choose, manage and pay off a mortgage without overpaying for it?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <path d="M40 70 C120 74 200 100 320 196" fill="none" stroke="#1F5FD1" stroke-width="4"/>
+      <path d="M40 196 L320 196" style="stroke:var(--muted)" stroke-width="1.5"/>
+      <g fill="#0B8A7E" opacity=".75"><rect x="60" y="176" width="16" height="20" rx="2"/><rect x="120" y="166" width="16" height="30" rx="2"/><rect x="180" y="150" width="16" height="46" rx="2"/><rect x="240" y="126" width="16" height="70" rx="2"/><rect x="290" y="96" width="16" height="100" rx="2"/></g>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Balance falls; principal share grows</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A loan you repay in equal monthly slices</h2>
+  <p class="lede">If you have had a car loan or a student loan, you already know the shape of a mortgage: you borrow a lump sum and repay it in equal monthly payments over a set term. The difference is size and length. A <span class="term" data-term="Mortgage">mortgage</span> is often several times your annual income, and it runs 15 or 30 years.</p>
+  <p>Two facts about that equal payment surprise most first-time borrowers. First, early payments are mostly interest, because interest is charged on the balance still owed, and the balance is largest at the start. Second, over 30 years the total interest can exceed the amount borrowed. On a $300,000 loan at 7.03% &mdash; the average 30-year rate in Freddie Mac's survey on September 24, 2026 &mdash; the payment is $2,002 a month, and total interest over 30 years is about <b>$420,700</b>.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.1 &mdash; Where each year's payments go on a $300,000, 30-year loan at 7.03%</div>
+    <div id="f641"></div>
+    <figcaption class="cap"><b>For the first 20 years, interest takes most of every payment.</b> $24,024 of payments a year. In year 1, $20,994 is interest and $3,030 repays principal. Principal first exceeds interest in month 243, just over 20 years in. Computed with the standard amortization formula.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>Fixed-rate and adjustable-rate mortgages, and today's rates in historical context.</li>
+    <li>Amortization: the formula, and what extra payments do.</li>
+    <li>Discount points and when they pay back.</li>
+    <li>Private mortgage insurance and the federal rules for removing it.</li>
+    <li>Refinancing: break-even and the term-reset trap.</li>
+    <li>Prepaying versus investing, using the Riveras' 3.1% mortgage.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Fixed vs adjustable">
+  <p class="kicker">Choosing the rate</p>
+  <h2>Certainty, or a lower rate for now?</h2>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Fixed-rate mortgage">Fixed-rate mortgage</span></b></div>
+    <div class="def-r"><div>What it is</div><div>A loan whose interest rate never changes, so principal and interest are the same every month for 15, 20 or 30 years.</div></div>
+    <div class="def-r"><div>Used for</div><div>Locking in housing costs. In the US, most borrowers can also repay early without penalty, so if rates fall they can refinance; if rates rise they keep their rate.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>You buy protection against rising rates. That protection is why fixed rates are usually higher than an adjustable loan's starting rate.</div></div></div>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Adjustable-rate mortgage">Adjustable-rate mortgage (ARM)</span></b></div>
+    <div class="def-r"><div>What it is</div><div>A loan with a fixed rate for an initial period, often 5, 7 or 10 years, that then resets periodically. The new rate is a published market <b>index</b> plus a fixed <b>margin</b> set in the loan, limited by <span class="term" data-term="Rate caps">rate caps</span>.</div></div>
+    <div class="def-r"><div>Used for</div><div>Borrowers who expect to sell or refinance before the first reset, or who can absorb higher payments later.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The Consumer Financial Protection Bureau (CFPB) describes three caps: an <b>initial</b> adjustment cap (commonly 2 to 5 percentage points), a <b>subsequent</b> cap on each later adjustment (commonly 1 to 2 points) and a <b>lifetime</b> cap (commonly 5 points). Compute the payment at the lifetime cap before you sign.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.2 &mdash; Worst-case payments on a $300,000 ARM versus a fixed rate (illustration)</div>
+    <div id="f642"></div>
+    <figcaption class="cap"><b>An ARM's worst case can be 50% above its starting payment within eight years.</b> A hypothetical 5-year ARM starting at 6.25% with caps of 2 points at the first reset, 1 point a year after that and 5 points over the life of the loan, if the index rises enough to hit every cap. The payment starts at $1,847, rises to $2,208 in year 6 and reaches $2,768 at the 11.25% lifetime cap in year 9. The fixed 7.03% loan pays $2,002 throughout.</figcaption>
+  </figure>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.3 &mdash; Average 30-year fixed mortgage rate, 1971&ndash;2025, and September 2026</div>
+    <div id="f643"></div>
+    <figcaption class="cap"><b>Today's 7% is far above 2012&ndash;2021 but below most of the 1970s&ndash;1990s.</b> Annual averages of Freddie Mac's weekly survey: 16.64% in 1981, 2.96% in 2021, 6.60% in 2025. The dot is the September 24, 2026 reading, 7.03%, up from 6.30% a year earlier. Source: Freddie Mac PMMS via FRED (MORTGAGE30US).</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>When an ARM can make sense</summary><div class="layer-b">
+    <p>If you are confident you will sell within the fixed period &mdash; a job posting of known length, a planned move &mdash; an ARM's lower starting rate can save money with little reset risk. The risk is that plans change, and that when you need to sell, prices or your income may have fallen at the same time rates rose. The foreclosure wave after 2006 (INV-066) showed how rate resets, falling prices and lost refinancing options can arrive together.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Reading the ARM disclosures</summary><div class="layer-b">
+    <p>ARMs are described as "initial period / adjustment frequency," for example a 5/6-month or 7/1 ARM, with caps written as three numbers (initial / periodic / lifetime). The loan documents name the index, the margin, the first adjustment date, and the floor below which the rate cannot fall. The Loan Estimate a lender gives you shows how the payment can change over time; compare the highest possible payment across offers, not only the starting rate.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Amortization">
+  <p class="kicker">How the payment works</p>
+  <h2>The formula, and what extra payments do</h2>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Amortization">Amortization</span></b></div>
+    <div class="def-r"><div>What it is</div><div>Repaying a loan through equal payments calculated so that the last payment brings the balance exactly to zero. Each month, interest = balance &times; monthly rate; the rest of the payment reduces the balance.</div></div>
+    <div class="def-r"><div>Used for</div><div>Computing the payment for any loan amount, rate and term, and the balance at any date.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Any extra principal you pay skips ahead in the schedule. Every later payment then carries less interest and more principal, so the loan ends early.</div></div></div>
+  <div class="formula">M = P &times; r &divide; (1 &minus; (1 + r)<sup>&minus;n</sup>) &nbsp;&nbsp; P = amount borrowed, r = annual rate &divide; 12, n = number of monthly payments</div>
+  <div data-tool="s9aAmort"></div>
+  <p>The defaults are the Riveras' mortgage. They refinanced in fall 2021 into a 30-year fixed loan of about $348,000 at 3.1% (an illustrative detail consistent with their $310,000 balance today), so about 25 years remain and the payment is <b>$1,486</b> of principal and interest. Scheduled payments will cost about <b>$135,900</b> more in interest. Adding $500 a month would cut that to about $87,400, a saving of about <b>$48,500</b>, and end the loan 8 years and 3 months early.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>$300,000 loan</th><th class="r">Rate (Sept. 24, 2026 average)</th><th class="r">Monthly payment</th><th class="r">Total interest</th></tr></thead>
+  <tbody><tr><td>30-year fixed</td><td class="r">7.03%</td><td class="r">$2,002</td><td class="r">$420,704</td></tr>
+  <tr><td>15-year fixed</td><td class="r">6.42%</td><td class="r">$2,600</td><td class="r">$168,026</td></tr></tbody></table></div>
+  <p class="src">Rates from Freddie Mac PMMS, September 24, 2026; payments and interest computed with the formula above. The 15-year loan costs $598 more a month and about $252,700 less in total interest.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>A 15-year loan, or a 30-year loan paid like one?</summary><div class="layer-b">
+    <p>A 15-year loan has a lower rate (0.61 points lower in the September 24, 2026 survey), which is a real saving. A 30-year loan with voluntary extra payments keeps the flexibility to stop paying extra in a lean year. People who value that flexibility, or who would otherwise invest the difference at a higher expected return, often choose the 30-year loan. People who value certainty and a lower rate, and can comfortably afford the payment, often choose the 15-year.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Balance after k payments</summary><div class="layer-b">
+    <div class="formula">B<sub>k</sub> = P(1 + r)<sup>k</sup> &minus; M[(1 + r)<sup>k</sup> &minus; 1] &divide; r</div>
+    <p>This is the future value of the loan minus the future value of the payments. It is how a lender computes a payoff figure (plus accrued interest for the partial month) and how you can check the date your loan-to-value ratio reaches 80%, the key date for removing PMI.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Points and PMI">
+  <p class="kicker">Two upfront choices</p>
+  <h2>Discount points, and getting rid of mortgage insurance</h2>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Mortgage points">Discount points</span></b></div>
+    <div class="def-r"><div>What it is</div><div>Fees paid at closing to lower the interest rate. The CFPB: "One point equals one percent of the loan amount." How much a point lowers the rate "depends on the specific lender, the kind of loan, and the overall mortgage market." <b>Lender credits</b> work in reverse: a higher rate in exchange for help with closing costs.</div></div>
+    <div class="def-r"><div>Used for</div><div>Trading cash today for a lower payment over the life of the loan.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Points pay off only if you keep the loan longer than the break-even time. Most people sell or refinance well before 30 years, so be honest about your horizon.</div></div></div>
+  <div data-tool="s9aPoints"></div>
+  <p>At the defaults &mdash; one point ($3,000) to cut a 7.00% rate to 6.75% on $300,000 &mdash; the payment falls by about $50 a month. The simple break-even is 60 months; counting the faster-falling balance as well, about 4 years. Kept 7 years, the point is worth about $2,300; sold or refinanced after 3 years, it loses about $740.</p>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Private mortgage insurance">Private mortgage insurance (PMI)</span></b></div>
+    <div class="def-r"><div>What it is</div><div>Insurance that protects the lender, not you, usually required on conventional loans with less than 20% down. It is paid monthly, upfront, or both.</div></div>
+    <div class="def-r"><div>Used for</div><div>Letting lenders make loans with smaller down payments.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The <span class="term" data-term="Homeowners Protection Act">Homeowners Protection Act</span> of 1998 gives you the right to remove it on most conventional loans. Loans insured by the Federal Housing Administration (FHA) follow different rules.</div></div></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Homeowners Protection Act rule</th><th>When</th><th>Conditions</th></tr></thead><tbody>
+    <tr><td><b>Borrower request</b></td><td>The date the balance is scheduled to reach 80% of the home's original value (or earlier, if you pay it down)</td><td>Written request; good payment history; current on payments; no junior liens; may need proof the value has not declined</td></tr>
+    <tr><td><b>Automatic termination</b></td><td>The date the balance is scheduled to reach 78% of original value</td><td>You are current on payments</td></tr>
+    <tr><td><b>Final termination</b></td><td>The month after the midpoint of the amortization schedule (15 years on a 30-year loan)</td><td>You are current on payments, even if 78% has not been reached</td></tr>
+  </tbody></table></div>
+  <p class="src">Source: CFPB, "When can I remove private mortgage insurance (PMI) from my loan?" "Original value" generally means the lower of the purchase price and the appraised value at purchase.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.4 &mdash; When PMI can end on a $360,000 loan for a $400,000 home</div>
+    <div id="f644"></div>
+    <figcaption class="cap"><b>Asking at 80% instead of waiting for 78% saves over a year of premiums; extra payments save years.</b> 10% down, 30-year fixed at 7.03%, payment $2,402. Scheduled payments reach 80% of original value ($320,000) in month 101 (8 years 5 months) and 78% ($312,000) in month 116 (9 years 8 months). An extra $300 a month reaches 80% in month 57 (4 years 9 months).</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>FHA mortgage insurance</summary><div class="layer-b">
+    <p>FHA loans charge an <span class="term" data-term="FHA mortgage insurance premium">upfront premium</span> of 1.75% of the base loan and an annual premium. Under HUD Mortgagee Letter 2023-05 (effective for loans endorsed from March 20, 2023), on a term over 15 years and a base loan up to $726,200, the annual premium is 0.50% if the loan-to-value is 95% or less (0.55% above 95%). It lasts <b>11 years</b> if the original loan-to-value was 90% or less and for the <b>whole mortgage term</b> if it was above 90%. With the minimum down payment, the usual way to end FHA insurance is to refinance into a conventional loan once you have enough equity.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Points and taxes</summary><div class="layer-b">
+    <p>IRS Publication 936: points paid on a loan to buy your main home can often be deducted in full in the year paid if a list of conditions is met; points paid to refinance generally must be deducted evenly over the life of the loan. A deduction helps only if you itemize (INV-063). Lender credits reduce your costs rather than creating a deduction.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Refinancing">
+  <p class="kicker">Replacing the loan</p>
+  <h2>When refinancing pays, and the trap inside it</h2>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Refinancing">Refinancing</span></b></div>
+    <div class="def-r"><div>What it is</div><div>Taking out a new mortgage to pay off the old one, usually for a lower rate, a different term, or to take cash out (a <span class="term" data-term="Cash-out refinance">cash-out refinance</span>).</div></div>
+    <div class="def-r"><div>Used for</div><div>Cutting interest costs when rates fall, dropping PMI or FHA insurance, or switching from an ARM to a fixed rate.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>It costs money: closing costs similar to a purchase loan. It pays only if you keep the new loan past the break-even point.</div></div></div>
+  <div class="formula">Simple break-even (months) = closing costs &divide; monthly payment saving</div>
+  <div data-tool="s9aRefi"></div>
+  <p>The defaults describe a household that bought with a 7.75% loan and still owes $380,000 with 28 years left. Refinancing into a new 30-year loan at 6.75% with $6,000 of closing costs cuts the payment from $2,773 to $2,465 &mdash; $308 a month &mdash; and breaks even in about 20 months. Kept ten years, it is worth about $29,300. Notice the <b>term reset</b>: the new loan runs two years longer than the old one, so part of the lower payment comes from stretching the debt. Total interest still falls, from about $551,700 to $507,300, because the rate cut is large.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Avoiding the term-reset trap</summary><div class="layer-b">
+    <p>A household that refinances every few years into a fresh 30-year loan can pay a mortgage for 40 years. Three ways to avoid it: choose a new term that matches the years you had left (20 or 15 years); keep making your old, higher payment on the new loan; or compare total interest from today to payoff under each option, which the calculator shows.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>The rate lock-in effect</summary><div class="layer-b">
+    <p>When market rates rise far above existing loans' rates, owners stop selling, because moving means giving up a cheap loan. After 30-year rates averaged 2.96% in 2021 and 3.11% in 2020, then 6.81% in 2023 (Freddie Mac), many owners faced exactly this choice. The <span class="term" data-term="Rate lock-in effect">lock-in effect</span> is rational up to a point: the Riveras' 3.1% loan costs $1,486 a month, against about $2,197 for a new 25-year loan of the same $310,000 at 7.03% &mdash; a saving of about $710 a month. But if a household needs a different home, the lower rate is worth less than the life it prevents.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Prepay or invest?">
+  <p class="kicker">The classic dilemma</p>
+  <h2>Extra money: to the mortgage, or to investments?</h2>
+  <p>Paying extra principal earns exactly the mortgage's interest rate, with no risk: every dollar prepaid stops that rate being charged on it. Investing earns an uncertain return that may be higher or lower. So the comparison is a guaranteed return at your mortgage rate against an expected return elsewhere, after taxes, with the difference in risk and liquidity on top.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.5 &mdash; The Riveras' mortgage rate against market yields, September 24, 2026</div>
+    <div id="f645"></div>
+    <figcaption class="cap"><b>Safe Treasury yields were above the Riveras' 3.1% mortgage rate.</b> 3-month Treasury bill 4.08%, 10-year Treasury 5.18%, new 30-year mortgage average 7.03%. When risk-free assets pay more than your mortgage costs, prepaying earns less than simply holding Treasury bills. Sources: FRED (DTB3, DGS10); Freddie Mac PMMS.</figcaption>
+  </figure>
+  <div data-tool="s9aPrepay"></div>
+  <p>With the defaults &mdash; the Riveras' $310,000 at 3.1%, $500 extra a month, and a 4% after-tax return on the alternative &mdash; prepaying ends the loan in 16 years and 9 months, and investing the old payment afterward leaves them with about <b>$234,400</b> by year 25. Investing the $500 from the start leaves about <b>$254,400</b>, roughly $20,000 more. At a 2% return, prepaying would win by about $21,700; at 7%, investing would win by about $125,700, with much more risk. The break-even is close to the mortgage rate itself.</p>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>The order of operations matters more than the rate comparison.</b> Before any extra mortgage payment: an emergency fund (INV-019), the full employer 401(k) match (INV-031), and higher-rate debt paid off (INV-020). Money prepaid into a house cannot be withdrawn in an emergency without selling or borrowing against it.</p></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Taxes change the effective rate</summary><div class="layer-b">
+    <p>If you itemize, the mortgage interest deduction lowers the effective cost of your mortgage; if you take the standard deduction, it does not. The Riveras' first-year interest is about $9,500, far below the 2026 standard deduction of $32,200 for married couples filing jointly, so their effective mortgage rate is the full 3.1%. On the other side, investment returns in a taxable account are taxed; returns inside a 401(k) or IRA are sheltered (Stage 5). Compare after-tax to after-tax.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Paying off before retirement</summary><div class="layer-b">
+    <p>Near retirement the question shifts. A paid-off house lowers the income you must withdraw each year, which can lower taxes and the risk of selling investments in a bad market (INV-077). Against that, pulling a large sum from a pre-tax 401(k) to pay off a mortgage is itself taxable income. Many planners suggest paying it off from taxable savings or cash flow before retirement, when the rate is not far below safe yields, rather than with a large retirement-account withdrawal.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history and real law</p>
+  <h2>Three mortgage stories</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.6 &mdash; Monthly payment on a $300,000, 30-year loan at three moments in history</div>
+    <div id="f646"></div>
+    <figcaption class="cap"><b>The same loan has cost from $1,258 to $4,189 a month.</b> Principal and interest at the 1981 annual average rate (16.64%), the 2021 average (2.96%) and the September 24, 2026 reading (7.03%). Rates from Freddie Mac PMMS.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>1981: the 16.64% year</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>With inflation high and the Federal Reserve raising short-term rates sharply, Freddie Mac's 30-year fixed rate averaged 16.64% for 1981, its highest annual average since the survey began in 1971. By 1993 the average was 7.31%.</div></div>
+    <div class="row"><div>What it teaches</div><div>A fixed-rate loan with no prepayment penalty is a one-way bet in the borrower's favor: borrowers who took 1981 loans could refinance as rates fell, while lenders holding 1970s loans at 8% to 9% could not raise them. That option has value, and borrowers pay for it in the rate.</div></div>
+    <div class="row"><div>Source</div><div class="src">Freddie Mac, Primary Mortgage Market Survey, annual averages via FRED (MORTGAGE30US).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>2020&ndash;2026: the refinance wave and the lock-in</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Average 30-year rates fell to 3.11% in 2020 and 2.96% in 2021, and millions of owners refinanced; the Riveras' 3.1% loan is typical of that period. Rates then rose to 6.81% in 2023 and stood at 7.03% on September 24, 2026.</div></div>
+    <div class="row"><div>What it teaches</div><div>A low fixed rate is an asset that cannot be moved to a new house. The Riveras would pay about $710 a month more to borrow the same $310,000 over the same 25 years today. It is a good reason to keep the loan and to invest spare cash rather than prepay it; it is not a reason to stay in a home that no longer works.</div></div>
+    <div class="row"><div>Source</div><div class="src">Freddie Mac PMMS (release of September 24, 2026; annual averages via FRED).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>The Homeowners Protection Act of 1998</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Before the act, removing private mortgage insurance depended on the lender's willingness. The law created a borrower's right to request cancellation at a scheduled 80% of original value, required automatic termination at 78%, and set a final termination date at the loan's midpoint.</div></div>
+    <div class="row"><div>What it teaches</div><div>Knowing a rule is worth money. A borrower who asks at 80% rather than waiting for 78% saves more than a year of premiums in Figure 64.4; one who prepays to reach 80% sooner saves more.</div></div>
+    <div class="row"><div>Source</div><div class="src">CFPB, "When can I remove private mortgage insurance (PMI) from my loan?"</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Three mortgage decisions</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.7 &mdash; The Riveras' $41,000 of idle cash: two uses, one year</div>
+    <div id="f647"></div>
+    <figcaption class="cap"><b>In Treasury bills, the cash earns more than prepaying saves, and stays available.</b> $41,000 at the 4.08% 3-month Treasury bill yield of September 24, 2026 earns about $1,673 a year before tax; prepaid at 3.1% it saves about $1,271 of interest; in a checking account paying an example rate of 0.1% it earns about $41. Interest on Treasury bills is subject to federal income tax but exempt from state and local income tax.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Riveras</div>
+    <p class="dq">The Riveras have $41,000 sitting in checking on top of a $9,000 emergency fund. Marcus wants to put it all against the 3.1% mortgage "to be debt-free sooner." What would you advise?</p>
+    <div class="opts"><button class="opt">Prepay the mortgage with all $41,000.</button><button class="opt">Top up the emergency fund, move the rest to Treasury bills or a high-yield account, open 529 plans for Sofia and Leo, and increase 401(k) saving; keep the 3.1% loan on schedule.</button><button class="opt">Leave it in checking; it is safe there.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Prepay it all</b>It feels good but earns 3.1% while safe alternatives pay more, and the money is locked in the house. With two children and one emergency fund, liquidity matters.</div>
+      <div class="oc"><b>Put it to work, keep the loan</b>The strongest choice. Treasury bills alone beat the mortgage rate (Figure 64.7), and 529 plans and 401(k) contributions add tax benefits (INV-034, INV-031). The low-rate mortgage is the cheapest money they will ever borrow.</div>
+      <div class="oc"><b>Leave it in checking</b>Safe but costly: most checking accounts pay little, so $41,000 loses ground to inflation every year (INV-008).</div>
+      <div class="verdict"><b>The principle:</b> prepay a mortgage only when its rate beats what safe money can earn, and only after the higher priorities are funded.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; The Harpers</div>
+    <p class="dq">The Harpers owe $90,000 on their Raleigh home and plan to retire at 62&ndash;63. Rachel wants the mortgage gone before then. Tom suggests withdrawing $90,000 from his pre-tax 401(k) now to pay it off. What should they consider?</p>
+    <div class="opts"><button class="opt">Withdraw from the 401(k) now and pay it off.</button><button class="opt">Pay it down from cash flow and taxable savings over the next five years, comparing their rate with safe yields; avoid a large taxable 401(k) withdrawal while they are in a high bracket.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>401(k) withdrawal now</b>A $90,000 withdrawal is taxed as ordinary income on top of $260,000 of wages, likely in the 24% federal bracket or higher (the 24% bracket for 2026 starts above $211,400 of taxable income for joint filers), plus North Carolina tax. They would need to withdraw well over $90,000 to net $90,000.</div>
+      <div class="oc"><b>Pay down from cash flow</b>Sensible. With $260,000 of income they can direct extra cash to the loan, and their taxable account could cover part of it (INV-035). Entering retirement without a payment lowers the withdrawals they need each year.</div>
+      <div class="verdict"><b>The principle:</b> the source of the payoff money matters as much as the payoff itself.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; Jordan</div>
+    <p class="dq">If Jordan did buy the $325,000 home from INV-063, the lender offers 7.0% with no points or 6.75% for one point. Jordan may move in about four years, after Ava's college years begin. Points or no points?</p>
+    <div class="opts"><button class="opt">Pay the point; a lower rate is always better.</button><button class="opt">No points; the horizon is too short to recover the cost.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Pay the point</b>On a $292,500 loan the point costs $2,925 and saves about $49 a month. The simple break-even is about 60 months &mdash; beyond Jordan's likely four years.</div>
+      <div class="oc"><b>No points</b>Right for a short or uncertain stay. If anything, a lender credit (a slightly higher rate in exchange for lower closing costs) could fit Jordan better.</div>
+      <div class="verdict"><b>The principle:</b> pay points only for a loan you expect to keep past the break-even.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about mortgages</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.8 &mdash; Total interest on $300,000: 30-year versus 15-year, September 2026 rates</div>
+    <div id="f648"></div>
+    <figcaption class="cap"><b>The 15-year loan costs $598 a month more and $252,700 less in total interest.</b> 30-year at 7.03% versus 15-year at 6.42% (Freddie Mac, September 24, 2026).</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Always pay off your mortgage as fast as possible."</div><div class="ma"><b>Not always.</b> Prepaying earns your mortgage rate. When Treasury bills pay more than a 3.1% loan costs, as in September 2026, prepaying earns less than a risk-free alternative.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"PMI stays until you sell."</div><div class="ma"><b>Myth for most conventional loans.</b> Under the Homeowners Protection Act you can request removal at a scheduled 80% of original value, and it must end automatically at 78% or at the loan's midpoint. FHA premiums follow separate rules.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"An ARM is always riskier than a fixed rate."</div><div class="ma"><b>Mostly true, with a caveat.</b> If you will certainly sell within the fixed period, the reset risk is small. The danger is that plans change; compute the payment at the lifetime cap.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Refinance whenever rates drop 1%."</div><div class="ma"><b>Too simple.</b> Compare closing costs with the monthly saving and your horizon, and watch for a term reset. A small drop can pay on a large, long-held loan; a big drop may not pay if you will move soon.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Early payments are mostly interest."</div><div class="ma"><b>Fact.</b> On $300,000 at 7.03%, year 1's $24,024 of payments includes $20,994 of interest. Principal first exceeds interest after more than 20 years.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Paying points is a tax trick that always pays."</div><div class="ma"><b>Myth.</b> Points are deductible only if you itemize, and they pay back only if you keep the loan past the break-even: about four to five years in this module's example.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.9 &mdash; Monthly principal and interest per $100,000 borrowed, by rate</div>
+    <div id="f649"></div>
+    <figcaption class="cap"><b>Each percentage point adds about $56 to $71 a month per $100,000.</b> 30-year fixed. Use it to scale any quote: at 7%, $325,000 costs 3.25 &times; $665 = $2,162 a month.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Build the record lenders price.</b> Maya's future rate will depend on her credit score, debt-to-income ratio and down payment (INV-021). Paying student loans on time and keeping card balances low now is mortgage preparation.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Keep the 3.1%, invest the idle cash.</b> Their loan is cheaper than safe yields. The $41,000 does more in Treasury bills, 529 plans and 401(k)s than against the mortgage.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>If buying, skip points and check PMI dates.</b> With a four-year horizon, points do not pay back; with 10% down, Jordan should note the 80% date and ask for PMI removal then.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Retire payment-free, funded wisely.</b> Pay the $90,000 down from cash flow and taxable savings over five years rather than a taxable 401(k) withdrawal at a high bracket.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>No mortgage, but beware new debt pitches.</b> Ruth owns outright. If she is offered a reverse mortgage or a home-equity loan, compare every fee and consider the effect on Anna's inheritance before signing.</div></div>
+  </div>
+  <div class="ws" data-ws="inv064" data-title="INV-064 worksheet: my mortgage check-up">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w64a">My balance, rate, years left and monthly principal and interest</label><textarea id="w64a" data-key="loan"></textarea></div>
+      <div><label for="w64b">Do I pay PMI or FHA insurance? The date I can ask to remove it</label><textarea id="w64b" data-key="pmi"></textarea></div>
+      <div><label for="w64c">Would refinancing pay? Closing costs, saving, break-even</label><textarea id="w64c" data-key="refi"></textarea></div>
+      <div><label for="w64d">My mortgage rate versus what safe money earns today</label><textarea id="w64d" data-key="prepay"></textarea></div>
+      <div><label for="w64e">Priorities that come before any extra mortgage payment</label><textarea id="w64e" data-key="order"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.10 &mdash; Break-even months for $4,000 of closing costs, by monthly saving</div>
+    <div id="f6410"></div>
+    <figcaption class="cap"><b>Halving the saving doubles the break-even time.</b> Break-even = cost &divide; monthly saving.</figcaption>
+  </figure>
+  <div class="ex" data-answer="1498.88" data-tol="0.005" data-ok="$250,000 at 0.5% a month for 360 months: $1,498.88.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">What is the monthly principal and interest on a $250,000, 30-year fixed loan at 6%?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">r = 0.06 &divide; 12 = 0.005; n = 360. (1.005)<sup>&minus;360</sup> = 0.16604. M = 250,000 &times; 0.005 &divide; (1 &minus; 0.16604) = 1,250 &divide; 0.83396 = <b>$1,498.88</b>.</div></div>
+  <div class="ex" data-answer="80" data-tol="0.01" data-ok="$8,000 &divide; $100 = 80 months.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">You pay 2 points on a $400,000 loan and your payment falls by $100 a month. What is the simple break-even, in months?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in months" placeholder="months"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">2 points = 2% &times; $400,000 = $8,000. $8,000 &divide; $100 = <b>80 months</b>, about 6.7 years.</div></div>
+  <div class="ex" data-answer="312000" data-tol="0.001" data-ok="78% &times; $400,000 = $312,000.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">You bought a $400,000 home (its appraised value too). Under the Homeowners Protection Act, at what scheduled balance must PMI end automatically, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Automatic termination at 78% of original value: 0.78 &times; $400,000 = <b>$312,000</b>. You may request cancellation earlier, at $320,000 (80%).</div></div>
+  <div class="ex" data-answer="402" data-tol="0.02" data-ok="$41,000 &times; (4.08% &minus; 3.1%) &asymp; $402.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">The Riveras can earn 4.08% on Treasury bills or save 3.1% by prepaying. On $41,000, how many more dollars a year (before tax) do the bills earn?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$41,000 &times; 4.08% = $1,672.80; $41,000 &times; 3.1% = $1,271.00. Difference &asymp; <b>$402</b> a year, before federal tax on the bill interest, and the cash stays available.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.11 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: choose the rate, know the schedule, remove PMI, refinance and prepay only when it pays">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Fixed or ARM</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">check the worst case</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Amortization</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">extra goes to principal</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Points and PMI</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">horizon; 80% date</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Refi or prepay</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">only when it pays</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"Why are early mortgage payments mostly interest?","choices":["Lenders front-load fees","Interest is charged on the balance, which is largest at the start","Principal is repaid only at the end","Taxes are included"],"answer":1,"explain":"Interest = balance &times; monthly rate; the balance is highest early."},
+    {"q":"Under the Homeowners Protection Act, when must PMI end automatically on a conventional loan (if you are current)?","choices":["At 90% of original value","When the balance is scheduled to reach 78% of original value","After 5 years","Never"],"answer":1,"explain":"Request at 80%, automatic at 78%, final at the loan's midpoint."},
+    {"q":"One discount point on a $350,000 loan costs:","choices":["$350","$1,000","$3,500","$35,000"],"answer":2,"explain":"One point is 1% of the loan amount."},
+    {"q":"Closing costs are $5,400 and a refinance saves $180 a month. Simple break-even?","choices":["18 months","30 months","54 months","300 months"],"answer":1,"explain":"$5,400 &divide; $180 = 30 months."},
+    {"q":"What was Freddie Mac's average 30-year fixed rate on September 24, 2026?","choices":["2.96%","6.30%","7.03%","16.64%"],"answer":2,"explain":"7.03%, up from 6.30% a year earlier. 2.96% was the 2021 average; 16.64% the 1981 average."},
+    {"q":"Prepaying a mortgage earns a return equal to:","choices":["The stock market's return","The mortgage's interest rate, with no risk","Nothing","The inflation rate"],"answer":1,"explain":"Each prepaid dollar stops interest at the loan's rate."},
+    {"q":"An ARM has caps of 2 / 1 / 5 and starts at 6%. What is the highest rate it can ever reach?","choices":["7%","8%","11%","There is no limit"],"answer":2,"explain":"The lifetime cap of 5 points above the 6% start: 11%."},
+    {"q":"For FHA loans with a term over 15 years and an original loan-to-value above 90%, how long does the annual premium last under ML 2023-05?","choices":["Until 78% of value","11 years","The whole mortgage term","5 years"],"answer":2,"explain":"Above 90% LTV it lasts for the mortgage term; at or below 90%, 11 years."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 64.12 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-020</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Debt vs investing</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-065</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Analyzing a rental property</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-066</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Financing and leverage</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-064"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Freddie Mac. (2026). <i>Primary Mortgage Market Survey</i>, release of September 24, 2026; annual averages 1971&ndash;2025 via FRED (MORTGAGE30US). <a href="https://www.freddiemac.com/pmms">freddiemac.com</a></li>
+    <li>Board of Governors of the Federal Reserve System. (2026). <i>Market yield on U.S. Treasury securities at 10-year constant maturity</i> (DGS10) and <i>3-month Treasury bill secondary market rate</i> (DTB3). Retrieved from FRED. <a href="https://fred.stlouisfed.org/">fred.stlouisfed.org</a></li>
+    <li>Consumer Financial Protection Bureau. <i>When can I remove private mortgage insurance (PMI) from my loan?</i> <a href="https://www.consumerfinance.gov/ask-cfpb/when-can-i-remove-private-mortgage-insurance-pmi-from-my-loan-en-202/">consumerfinance.gov</a></li>
+    <li>Consumer Financial Protection Bureau. <i>What are rate caps with an adjustable-rate mortgage (ARM), and how do they work?</i> <a href="https://www.consumerfinance.gov/ask-cfpb/what-are-rate-caps-with-an-adjustable-rate-mortgage-arm-and-how-do-they-work-en-1951/">consumerfinance.gov</a></li>
+    <li>Consumer Financial Protection Bureau. <i>What are discount points and lender credits and how do they work?</i> <a href="https://www.consumerfinance.gov/ask-cfpb/what-are-discount-points-and-lender-credits-and-how-do-they-work-en-136/">consumerfinance.gov</a></li>
+    <li>U.S. Department of Housing and Urban Development. (2023). <i>Mortgagee Letter 2023-05: Reduction of Federal Housing Administration annual mortgage insurance premium rates</i>. <a href="https://www.hud.gov/sites/dfiles/OCHCO/documents/2023-05hsgml.pdf">hud.gov</a></li>
+    <li>TreasuryDirect, U.S. Department of the Treasury. <i>Treasury bills</i> (tax treatment of bill interest). <a href="https://www.treasurydirect.gov/marketable-securities/treasury-bills/">treasurydirect.gov</a></li>
+    <li>Internal Revenue Service. (2025). <i>Publication 936: Home mortgage interest deduction</i>; <i>Rev. Proc. 2025-32</i> (2026 standard deduction and brackets). <a href="https://www.irs.gov/publications/p936">irs.gov</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Rates change weekly and your rate depends on your credit, down payment and loan type. Compare Loan Estimates from several lenders before you choose.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s9a.js"></script>
+<script>
+INV.ready(function () {
+  var yr = function (v) { return String(Math.round(v)); }, ms = INV.moneyShort, m0 = function (v) { return INV.money(v, 0); }, MM = INV.s9aMath;
+  /* 64.1 interest vs principal by year */
+  var P = 300000, r = 0.0703, pm = MM.payment(P, r, 360), bi = [], bp = [], b = P;
+  for (var y = 1; y <= 30; y++) { var ti = 0, tp = 0; for (var k = 0; k < 12; k++) { var i = b * r / 12, pr = Math.min(b, pm - i); ti += i; tp += pr; b -= pr; } bi.push([y, ti]); bp.push([y, tp]); }
+  INV.lineChart(document.getElementById("f641"), { label: "Interest and principal by year", height: 250, xTitle: "Year of the loan", xFmt: yr, yFmt: ms, tipFmt: m0,
+    series: [{ name: "Interest paid that year", color: "var(--s5)", data: bi, area: true }, { name: "Principal repaid that year", color: "var(--s2)", data: bp, area: true }], marks: [{ x: 20.25, label: "Crossover" }] });
+  /* 64.2 ARM worst case */
+  var rates = [], bal = 300000, mo = 360, d42 = [];
+  for (y = 1; y <= 10; y++) { var rr = (y <= 5 ? 6.25 : Math.min(11.25, 8.25 + (y - 6))) / 100; var p2 = MM.payment(bal, rr, mo); d42.push({ label: "Yr " + y, tip: "Year " + y + ": " + (rr * 100).toFixed(2) + "%", y: p2, color: y <= 5 ? "var(--s2)" : "var(--s5)" }); for (k = 0; k < 12; k++) { bal = bal * (1 + rr / 12) - p2; mo--; } }
+  INV.barChart(document.getElementById("f642"), { label: "ARM worst-case payment by year", height: 240, allLabels: true, yFmt: m0, tipFmt: m0, data: d42 });
+  /* 64.3 rate history */
+  var hist = [7.54, 7.38, 8.04, 9.19, 9.05, 8.87, 8.85, 9.64, 11.20, 13.74, 16.64, 16.04, 13.24, 13.88, 12.43, 10.19, 10.21, 10.34, 10.32, 10.13, 9.25, 8.39, 7.31, 8.38, 7.93, 7.81, 7.60, 6.94, 7.44, 8.05, 6.97, 6.54, 5.83, 5.84, 5.87, 6.41, 6.34, 6.03, 5.04, 4.69, 4.45, 3.66, 3.98, 4.17, 3.85, 3.65, 3.99, 4.54, 3.94, 3.11, 2.96, 5.34, 6.81, 6.72, 6.60];
+  INV.lineChart(document.getElementById("f643"), { label: "30-year mortgage rate history", height: 250, xMax: 2026, yMax: 18, xFmt: yr, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "%"; },
+    series: [{ name: "Annual average 30-year fixed rate", color: "var(--s1)", data: hist.map(function (v, j) { return [1971 + j, v]; }), area: true }],
+    dots: [{ x: 2026, y: 7.03, label: "7.03%", color: "var(--s5)", anchor: "end", dx: -8 }] });
+  /* 64.4 PMI timeline */
+  var L = 360000, p4 = MM.payment(L, r, 360), s1 = [[0, L]], s2 = [[0, L]], b1 = L, b2 = L;
+  for (var m = 1; m <= 180; m++) { b1 -= p4 - b1 * r / 12; b2 = Math.max(0, b2 - (p4 - b2 * r / 12 + 300)); if (m % 3 === 0) { s1.push([m / 12, b1]); s2.push([m / 12, b2]); } }
+  INV.lineChart(document.getElementById("f644"), { label: "Loan balance and PMI thresholds", height: 250, xTitle: "Years", xFmt: yr, yFmt: ms, tipFmt: m0, zeroBase: false, yMin: 200000, yMax: 370000,
+    series: [{ name: "Scheduled balance", color: "var(--s1)", data: s1 }, { name: "With $300 extra a month", color: "var(--s2)", data: s2 },
+      { name: "80% of value: request", color: "var(--s3)", data: s1.map(function (q) { return [q[0], 320000]; }), dash: "5 4", width: 1.4 }, { name: "78%: automatic", color: "var(--s5)", data: s1.map(function (q) { return [q[0], 312000]; }), dash: "2 3", width: 1.4 }],
+    marks: [{ x: 101 / 12, label: "80%: 8y 5m" }, { x: 57 / 12, label: "4y 9m", dy: 14 }] });
+  /* 64.5 yields */
+  INV.barChart(document.getElementById("f645"), { label: "Mortgage rate versus yields", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(2) + "%"; },
+    data: [{ label: "Riveras' mortgage", y: 3.1, color: "var(--s2)" }, { label: "3-month T-bill", y: 4.08, color: "var(--s1)" }, { label: "10-year Treasury", y: 5.18, color: "var(--s4)" }, { label: "New 30-year mortgage", y: 7.03, color: "var(--s5)" }] });
+  /* 64.6 payments in history */
+  INV.barChart(document.getElementById("f646"), { label: "Payment at three rates", height: 220, allLabels: true, valueLabels: true, yFmt: m0,
+    data: [{ label: "1981: 16.64%", y: MM.payment(300000, 0.1664, 360), color: "var(--s5)" }, { label: "2021: 2.96%", y: MM.payment(300000, 0.0296, 360), color: "var(--s2)" }, { label: "Sept 2026: 7.03%", y: MM.payment(300000, 0.0703, 360), color: "var(--s1)" }] });
+  /* 64.7 idle cash */
+  INV.barChart(document.getElementById("f647"), { label: "One year on $41,000", height: 210, allLabels: true, valueLabels: true, yFmt: m0,
+    data: [{ label: "Treasury bills at 4.08%", y: 41000 * 0.0408, color: "var(--s1)" }, { label: "Prepay at 3.1%", y: 41000 * 0.031, color: "var(--s2)" }, { label: "Checking, 0.1%", y: 41000 * 0.001, color: "var(--s6)" }] });
+  /* 64.8 15 vs 30 */
+  var a30 = MM.schedule(300000, 0.0703, 360, 0, 0), a15 = MM.schedule(300000, 0.0642, 180, 0, 0);
+  INV.barChart(document.getElementById("f648"), { label: "Total interest 30 vs 15 year", height: 210, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: m0,
+    data: [{ label: "30-year at 7.03%", y: a30.interest, color: "var(--s5)" }, { label: "15-year at 6.42%", y: a15.interest, color: "var(--s2)" }] });
+  /* 64.9 payment per 100k */
+  INV.barChart(document.getElementById("f649"), { label: "Payment per 100,000", height: 220, allLabels: true, valueLabels: true, xTitle: "Interest rate, 30-year fixed", yFmt: m0,
+    data: [3, 4, 5, 6, 7, 8, 9].map(function (x) { return { label: x + "%", y: MM.payment(100000, x / 100, 360), color: x === 7 ? "var(--s1)" : "var(--s6)" }; }) });
+  /* 64.10 break-even */
+  var be = []; for (var s = 50; s <= 400; s += 10) be.push([s, 4000 / s]);
+  INV.lineChart(document.getElementById("f6410"), { label: "Break-even months by saving", height: 220, xTitle: "Monthly saving ($)", yTitle: "Months to break even", xFmt: function (v) { return "$" + v; }, yFmt: function (v) { return Math.round(v); }, tipFmt: function (v) { return v.toFixed(0) + " months"; },
+    series: [{ name: "Break-even", color: "var(--s1)", data: be }], dots: [{ x: 100, y: 40, label: "$100 → 40 months", color: "var(--s3)" }, { x: 200, y: 20, label: "$200 → 20", color: "var(--s2)" }] });
+});
+</script>
+</body>
+</html>

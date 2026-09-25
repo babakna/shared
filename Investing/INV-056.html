@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-056 · Rebalancing — Investing Learning Lab</title>
+<meta name="description" content="Why portfolios drift, calendar versus threshold rebalancing, rebalancing with cash flows, and doing it tax-efficiently, with a 98-year backtest of rebalanced versus drifting 60/40 portfolios.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-056">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-056</span><span class="ttl">Rebalancing</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 7 · Portfolio Construction &amp; Monitoring</span><span class="chip teal">Beginner to intermediate</span><span class="chip gray">About 60 minutes</span><span class="chip gray">2 tools</span></div>
+    <h1>Rebalancing</h1>
+    <p class="sub">A portfolio built at 60% stocks does not stay at 60%. Markets move the mix every day, usually toward more stocks and more risk. Rebalancing is the routine that brings it back. This module shows how far portfolios drift, compares the main rebalancing rules on 98 years of data, and shows how to rebalance with new money and without needless tax.</p>
+    <p class="q"><span>The question this module answers</span>How often should I bring my portfolio back to its target, and how do I do it without paying unnecessary tax?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <line x1="40" y1="120" x2="320" y2="120" stroke="#5B6B82" stroke-width="2" stroke-dasharray="6 5"/>
+      <path d="M40 120 C80 100 100 80 130 70 L130 118 C170 100 190 88 220 80 L220 119 C250 110 280 96 320 90" fill="none" stroke="#1F5FD1" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M40 120 C120 90 200 60 320 34" fill="none" stroke="#C2332B" stroke-width="3" stroke-dasharray="5 4"/>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Drift, then back to target</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>Doing nothing is a decision to take more risk</h2>
+  <p class="lede">After you build a portfolio (INV-055), the easiest thing is to leave it alone. For the individual funds, that is exactly right. For the <i>mix</i>, it is not: because stocks usually grow faster than bonds, a portfolio left alone slowly turns into a stock portfolio.</p>
+  <p>Here is how far that goes. Put $10,000 into a 60% stock / 40% bond portfolio at the start of 1928 and never touch it. By the end of 2025 stocks would make up <b>99.6%</b> of it. Vanguard's researchers found the same pattern in more recent data: a 60/40 portfolio at the end of 1989, never rebalanced, would have been 80% equities by the end of 2021 (Zhang et al., 2022). Nobody chose that risk. It simply arrived.</p>
+  <p><span class="term" data-term="Rebalancing">Rebalancing</span> means periodically selling some of what has grown beyond its target and buying what has fallen below it, so the portfolio keeps the risk you chose. It is the maintenance half of portfolio construction.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.1 &mdash; Stock share of a 60/40 portfolio, rebalanced every year versus never</div>
+    <div id="f561"></div>
+    <figcaption class="cap"><b>Left alone, a balanced portfolio becomes an all-stock portfolio.</b> Stock share at each year-end, before any rebalancing trade, for a portfolio started at 60% S&amp;P 500 / 40% 10-year Treasuries in 1928. The rebalanced version stays between 44% and 69%. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>Why portfolios drift, and why rebalancing is about risk rather than return.</li>
+    <li>Calendar rules versus <span class="term" data-term="Threshold rebalancing">threshold bands</span>, tested on 1928&ndash;2025 data with an interactive backtest.</li>
+    <li><span class="term" data-term="Cash-flow rebalancing">Cash-flow rebalancing</span>: letting contributions, dividends and withdrawals do the work.</li>
+    <li>Tax-aware rebalancing: which account to trade in, and how to avoid needless gains.</li>
+    <li>A practical routine for each household.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Why portfolios drift">
+  <p class="kicker">The mechanics</p>
+  <h2>Different returns change the weights</h2>
+  <div class="def"><div class="def-h"><b>Drift</b><span>the gap between your target and your actual mix</span></div>
+    <div class="def-r"><div>What it is</div><div>The change in a portfolio's asset weights caused by the assets earning different returns. If stocks rise 20% and bonds 2% in a year, a 60/40 portfolio ends the year at about 64/36.</div></div>
+    <div class="def-r"><div>Used for</div><div>Deciding when to rebalance: many rules trade only when drift passes a limit.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Drift is not a mistake; it is arithmetic. Checking your actual mix once or twice a year tells you whether your risk is still the one you chose.</div></div></div>
+  <div class="formula">New stock weight = w(1 + r<sub>s</sub>) &divide; [ w(1 + r<sub>s</sub>) + (1 &minus; w)(1 + r<sub>b</sub>) ] &nbsp;&nbsp; e.g. 0.6 &times; 1.20 &divide; (0.6 &times; 1.20 + 0.4 &times; 1.02) = 0.72 &divide; 1.128 = 63.8%</div>
+  <p>Drift runs in both directions. In a crash it runs the other way: a 60/40 portfolio at the start of 2008 ended that year at <b>44.2%</b> stocks, because stocks fell 36.6% while 10-year Treasuries rose 20.1%. A portfolio that was "moderate" in January was "conservative" by December &mdash; just as stocks became cheap.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.2 &mdash; What drift did to risk, 1928&ndash;2025</div>
+    <div id="f562"></div>
+    <figcaption class="cap"><b>The drifting portfolio earned more because it became riskier.</b> A 60/40 portfolio rebalanced every year grew 8.3% a year with 12.1% volatility and a worst year of &minus;27.3%. The same portfolio never rebalanced grew 9.5% a year, but with 15.8% volatility and a worst year of &minus;35.5%, and it ended nearly all in stocks. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>Rebalancing is risk control, not a return booster.</b> Vanguard's 2010 study put it this way: "the goal of portfolio rebalancing is to minimize risk (tracking error) relative to the investor's target asset allocation, rather than to maximize returns" (Jaconetti, Kinniry and Zilbering, 2010). Over periods when stocks beat bonds by a wide margin, a portfolio that is allowed to drift toward stocks will usually end with more money. That is not evidence against rebalancing; it is evidence that more stocks meant more return <i>and</i> more risk.</p></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Is there a "rebalancing bonus"?</summary><div class="layer-b">
+    <p>You will read that rebalancing "buys low and sells high" and so adds return. Sometimes it does: between assets with similar long-run returns that take turns leading, rebalancing can add a little. Between stocks and bonds, whose long-run returns differ a lot, the main effect is the opposite &mdash; rebalancing repeatedly sells the higher-returning asset. In the 1928&ndash;2025 data the annually rebalanced 60/40 portfolio grew 8.34% a year and the drifting one 9.45%. Over 2000&ndash;2025, when bonds did relatively well, rebalancing came out ahead: 6.94% versus 6.77% a year. Choose rebalancing for the risk it controls; treat any extra return as luck.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Drift compounds with time</summary><div class="layer-b">
+    <p>After n years without trading, the stock weight is w&middot;G<sub>s</sub> &divide; [w&middot;G<sub>s</sub> + (1 &minus; w)&middot;G<sub>b</sub>], where G<sub>s</sub> and G<sub>b</sub> are the cumulative growth factors of the two assets. Because G<sub>s</sub>/G<sub>b</sub> itself grows roughly geometrically, drift accelerates: from 1928 through 2025, 10-year Treasuries grew about 77-fold while the S&amp;P 500 grew about 11,600-fold &mdash; 150 times as much &mdash; which is why the drifting weight approaches 100%. Over any single year the drift is small; over a working lifetime it is decisive.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Calendar or bands?">
+  <p class="kicker">Choosing a rule</p>
+  <h2>Rebalance on a schedule, or when drift crosses a line</h2>
+  <div class="def"><div class="def-h"><b>Calendar rebalancing</b></div>
+    <div class="def-r"><div>What it is</div><div>Returning to the target on a fixed schedule &mdash; every year, every quarter, or every other year &mdash; whatever the drift.</div></div>
+    <div class="def-r"><div>Used for</div><div>Simplicity: pick a date (your birthday, the first week of January) and do it every time.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Easy to remember and to automate. It sometimes trades when drift is trivial and waits while drift is large.</div></div></div>
+  <div class="def"><div class="def-h"><b>Threshold (band) rebalancing</b></div>
+    <div class="def-r"><div>What it is</div><div>Checking the portfolio regularly but trading only when an asset's weight moves outside a band around its target &mdash; for example, when stocks move more than 5 percentage points from 60%.</div></div>
+    <div class="def-r"><div>Used for</div><div>Trading only when it matters, which cuts the number of trades and their costs and taxes.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Look at your mix on a schedule, act only if a band is breached. In calm years you may do nothing at all.</div></div></div>
+  <div data-tool="s7Rebal"></div>
+  <p>Start with the default: a 5-point band checked at each year-end. Then switch the rule to "every year" and to "never," and change the period to 2000 onward. Three patterns stand out. Every disciplined rule produced very similar growth and risk. The band rules traded far less often. And "never" always ended with the most stocks.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>60/40, 1928&ndash;2025</th><th class="r">Growth / yr</th><th class="r">Volatility</th><th class="r">Worst year</th><th class="r">Trades</th><th class="r">Highest stock share</th></tr></thead><tbody>
+    <tr><td>Every year</td><td class="r">8.34%</td><td class="r">12.1%</td><td class="r neg-t">&minus;27.3%</td><td class="r">98</td><td class="r">69%</td></tr>
+    <tr><td>Every 2 years</td><td class="r">8.30%</td><td class="r">12.1%</td><td class="r neg-t">&minus;23.9%</td><td class="r">49</td><td class="r">75%</td></tr>
+    <tr><td>Every 5 years</td><td class="r">8.37%</td><td class="r">12.6%</td><td class="r neg-t">&minus;27.3%</td><td class="r">19</td><td class="r">78%</td></tr>
+    <tr><td>5-point band, back to target</td><td class="r">8.37%</td><td class="r">12.2%</td><td class="r neg-t">&minus;27.3%</td><td class="r">35</td><td class="r">71%</td></tr>
+    <tr><td>10-point band, back to target</td><td class="r">8.38%</td><td class="r">12.3%</td><td class="r neg-t">&minus;26.3%</td><td class="r">15</td><td class="r">76%</td></tr>
+    <tr><td>5-point band, back to the band edge</td><td class="r">8.49%</td><td class="r">12.4%</td><td class="r neg-t">&minus;25.3%</td><td class="r">54</td><td class="r">73%</td></tr>
+    <tr><td>Never</td><td class="r">9.45%</td><td class="r">15.8%</td><td class="r neg-t">&minus;35.5%</td><td class="r">0</td><td class="r">100%</td></tr>
+  </tbody></table></div>
+  <p class="src">Computed from Damodaran, NYU Stern. Drift checked only at calendar year-ends; a trade counts each time the rule moved the portfolio. Highest stock share is at a year-end before trading. Before taxes, fees and trading costs.</p>
+  <h3>What the research says</h3>
+  <ul>
+    <li><b>No single best rule.</b> Using US stock and bond data from 1926 through 2009, Vanguard found that "there is no optimal frequency or threshold," that risk-adjusted returns were "not meaningfully different" whether portfolios were rebalanced monthly, quarterly or annually, but that the number of trades and costs rose sharply with frequency. It concluded that annual or semiannual monitoring with rebalancing at 5% thresholds was a reasonable balance for most investors (Jaconetti, Kinniry and Zilbering, 2010).</li>
+    <li><b>Not too often, not too rarely.</b> A 2022 Vanguard paper that simulated returns and trading costs found optimal methods were "neither too frequent, such as monthly or quarterly calendar-based methods, nor too infrequent, such as rebalancing every two years," and that annual rebalancing was optimal for investors who do not harvest tax losses (Zhang et al., 2022).</li>
+    <li><b>Bands can beat calendars on cost.</b> A 2024 Vanguard paper on target-date funds found that a threshold policy &mdash; trade when drift exceeds 2 percentage points, and trade back to 1.75 points from target rather than all the way &mdash; was expected to beat monthly rebalancing by 15&ndash;22 basis points a year during accumulation, mainly through lower transaction costs (Zhang et al., 2024).</li>
+  </ul>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Absolute bands, relative bands, and small assets</summary><div class="layer-b">
+    <p>An absolute band of 5 points works well for big slices such as 60% stocks. For a small slice &mdash; say a 10% allocation to TIPS &mdash; a 5-point band would let it swing from 5% to 15%, a relative change of 50%. Many investors therefore use a relative band for small slices (for example, a quarter of the target: 7.5% to 12.5% for a 10% slice). Whatever you choose, write it in your investment policy statement (INV-028) so the decision is made before markets move.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Trading back to target or to the band edge</summary><div class="layer-b">
+    <p>When a band is breached you can trade all the way back to target or only back inside the band. Trading to the edge moves less money each time, so it costs less, but it leaves the portfolio near the edge and may trigger again sooner. In the annual 1928&ndash;2025 data, trading to the edge of a 5-point band produced more trades (54 versus 35) but smaller ones, and kept the portfolio a little more stock-heavy on average. Vanguard's 200/175 policy is a middle ground: trigger at 2 points, stop at 1.75. With calendar-year data these differences are small; with monthly data and real trading costs they matter more.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Cash-flow rebalancing">
+  <p class="kicker">The cheapest trade is the one you do not make</p>
+  <h2>Let new money and withdrawals do the rebalancing</h2>
+  <div class="def"><div class="def-h"><b>Cash-flow rebalancing</b></div>
+    <div class="def-r"><div>What it is</div><div>Steering money that is already moving &mdash; new contributions, dividends, interest, withdrawals and required minimum distributions &mdash; toward whatever is underweight, or away from whatever is overweight, instead of selling one asset to buy another.</div></div>
+    <div class="def-r"><div>Used for</div><div>Rebalancing with no sales, and therefore no realized gains, no tax and little trading cost.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>While you are saving, you may rarely need to sell anything. In retirement, deciding which fund each withdrawal comes from does the same job.</div></div></div>
+  <div data-tool="s7Cashflow"></div>
+  <p>With the default numbers &mdash; $70,000 in stocks, $30,000 in bonds, a 60/40 target and $10,000 of new money &mdash; sending all $10,000 to bonds brings stocks from 70.0% to 63.6%. To reach 60% exactly would still mean selling $4,000 of stocks. In a taxable account with 40% of the value as gain, that sale realizes $1,600 of gain and about $240 of tax at a 15% rate. Inside an IRA it costs nothing. Many investors would simply accept 63.6% &mdash; well inside a 5-point band &mdash; and let next year's contributions finish the job.</p>
+  <h3>How much new money does it take?</h3>
+  <p>For the portfolio to reach its target without selling, the new money must at least equal the overweight asset's excess over its target <i>after</i> the new money arrives. For a stock-heavy portfolio:</p>
+  <div class="formula">New money needed (all to bonds) = S &divide; s &minus; (S + B) &nbsp;&nbsp; e.g. 70,000 &divide; 0.6 &minus; 100,000 = $16,667</div>
+  <p>That is why cash-flow rebalancing works best for savers whose contributions are large relative to the portfolio &mdash; Maya and the Riveras &mdash; and needs help from sales for large portfolios like the Harpers'.</p>
+  <h3>In retirement, withdrawals are the rebalancing tool</h3>
+  <p>Ruth withdraws money from her IRA every year, and from 2031 she must take required minimum distributions. Each withdrawal can come from whichever fund is overweight. After a strong year for stocks, she takes her spending money from the stock fund; after a crash, from the bond fund, leaving stocks to recover. Her $60,000 cash reserve adds flexibility: in a bad year she can spend from cash and sell nothing at all.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.3 &mdash; Four flows that rebalance for free</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 150" role="img" aria-label="Contributions, dividends and interest, withdrawals, and required minimum distributions can each be directed to rebalance">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="167" height="130" rx="12" style="fill:var(--blue-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Contributions</text><text x="14" y="52" class="svg-s" font-size="12">Send each paycheck's</text><text x="14" y="68" class="svg-s" font-size="12">money to what is</text><text x="14" y="84" class="svg-s" font-size="12">underweight</text></g>
+      <g transform="translate(187,10)"><rect width="167" height="130" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Dividends, interest</text><text x="14" y="52" class="svg-s" font-size="12">In taxable accounts,</text><text x="14" y="68" class="svg-s" font-size="12">take them as cash and</text><text x="14" y="84" class="svg-s" font-size="12">reinvest where needed</text></g>
+      <g transform="translate(364,10)"><rect width="167" height="130" rx="12" style="fill:var(--amber-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Withdrawals</text><text x="14" y="52" class="svg-s" font-size="12">Spend from the</text><text x="14" y="68" class="svg-s" font-size="12">overweight asset</text><text x="14" y="84" class="svg-s" font-size="12">first</text></g>
+      <g transform="translate(541,10)"><rect width="169" height="130" rx="12" style="fill:var(--violet-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">RMDs</text><text x="14" y="52" class="svg-s" font-size="12">Choose which fund</text><text x="14" y="68" class="svg-s" font-size="12">the required amount</text><text x="14" y="84" class="svg-s" font-size="12">comes from</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Money that must move anyway can move toward your target.</b> Each flow rebalances without a separate sale, and in taxable accounts without realizing gains.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="Tax-aware rebalancing">
+  <p class="kicker">Keep the tax bill small</p>
+  <h2>Where you trade matters as much as what you trade</h2>
+  <p>Selling a fund at a gain in a taxable account creates a taxable capital gain. Selling the same fund inside a 401(k), 403(b) or IRA creates none. Because your allocation is measured across all accounts together (INV-055), you can usually make the trade where it is free.</p>
+  <h3>A tax-aware sequence</h3>
+  <ol>
+    <li><b>Use cash flows first</b> (previous tab): contributions, dividends, withdrawals.</li>
+    <li><b>Trade inside tax-advantaged accounts.</b> Exchange stock funds for bond funds, or the reverse, inside the 401(k) or IRA. No tax, no reporting.</li>
+    <li><b>In taxable accounts, sell losses before gains.</b> Selling shares worth less than you paid realizes a loss that offsets gains and up to $3,000 a year of ordinary income (INV-037). This is <span class="term" data-term="Tax-loss harvesting">tax-loss harvesting</span>.</li>
+    <li><b>If you must sell gains, choose the lots.</b> With <span class="term" data-term="Specific identification">specific identification</span> you can sell the shares with the highest cost basis, and prefer shares held more than one year, which qualify for long-term rates.</li>
+    <li><b>Consider giving instead of selling.</b> Donating appreciated shares held more than a year to charity, or to a donor-advised fund, removes the overweight without realizing the gain (INV-039).</li>
+  </ol>
+  <h3>The 2026 long-term capital gains brackets</h3>
+  <p>Long-term gains (on investments held more than one year) are taxed at 0%, 15% or 20%, depending on taxable income. The 0% rate is worth knowing about: a household in a low-income year can sometimes rebalance a taxable account for no federal tax at all.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>For 2026, taxable income up to</th><th class="r">0% rate</th><th class="r">15% rate</th><th class="r">20% rate</th></tr></thead><tbody>
+    <tr><td>Married filing jointly</td><td class="r">$98,900</td><td class="r">$613,700</td><td class="r">above</td></tr>
+    <tr><td>Head of household</td><td class="r">$66,200</td><td class="r">$579,600</td><td class="r">above</td></tr>
+    <tr><td>Single</td><td class="r">$49,450</td><td class="r">$545,500</td><td class="r">above</td></tr>
+  </tbody></table></div>
+  <p class="src">Source: Internal Revenue Service, Revenue Procedure 2025-32, section 4.03. Gains held one year or less are short-term and taxed as ordinary income (IRS Publication 550).</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.4 &mdash; Moving $50,000 from stocks to bonds, four ways</div>
+    <div id="f564"></div>
+    <figcaption class="cap"><b>The same trade can cost $4,500 or nothing.</b> Federal tax on moving $50,000 from stocks to bonds when the stock shares carry a 60% gain: sold in a taxable account at 15% ($4,500) or 20% ($6,000); a taxable sale choosing high-basis lots with only a 20% gain, at 15% ($1,500); or the same exchange inside a 401(k) ($0). Illustrative; ignores state tax and the net investment income tax.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Wash-sale rule</b><span>the trap in tax-loss harvesting</span></div>
+    <div class="def-r"><div>What it is</div><div>You cannot deduct a loss if, within 30 days before or after the sale, you buy substantially identical stock or securities &mdash; including a purchase in your IRA or Roth IRA (IRS Publication 550).</div></div>
+    <div class="def-r"><div>Used for</div><div>Preventing people from claiming a loss while keeping the same position.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>When you harvest a loss while rebalancing, buy a similar but not identical fund, and check that no automatic purchase of the same fund lands in any of your accounts within the 61-day window.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why the Harpers rebalance in their 401(k)s</summary><div class="layer-b">
+    <p>The Harpers hold all their bonds in pre-tax 401(k)s and their technology stocks in the taxable account (INV-055). When stocks surge, the portfolio becomes stock-heavy, and it is tempting to sell the winners in the taxable account. The cheaper trade is inside the 401(k)s: exchange some of the US stock index fund for the bond fund there. The overall allocation returns to 60/40 and the taxable account's gains stay unrealized. The taxable account still has its own project &mdash; diversifying away from technology &mdash; which they manage with loss harvesting and charitable gifts over several years.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="In practice">
+  <p class="kicker">A routine you can keep</p>
+  <h2>A 20-minute rebalancing checklist</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.5 &mdash; The rebalancing routine</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="Five steps: add up all accounts, compare with target, check band, choose where to trade, record it">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="130" height="180" rx="12" style="fill:var(--blue-soft)"/><text x="12" y="28" class="svg-t" font-size="13" font-weight="800">1. Add up</text><text x="12" y="52" class="svg-s" font-size="11.5">Every account,</text><text x="12" y="67" class="svg-s" font-size="11.5">by asset class</text></g>
+      <g transform="translate(152,10)"><rect width="130" height="180" rx="12" style="fill:var(--teal-soft)"/><text x="12" y="28" class="svg-t" font-size="13" font-weight="800">2. Compare</text><text x="12" y="52" class="svg-s" font-size="11.5">Actual mix</text><text x="12" y="67" class="svg-s" font-size="11.5">versus target</text></g>
+      <g transform="translate(294,10)"><rect width="130" height="180" rx="12" style="fill:var(--amber-soft)"/><text x="12" y="28" class="svg-t" font-size="13" font-weight="800">3. Band?</text><text x="12" y="52" class="svg-s" font-size="11.5">Inside: stop.</text><text x="12" y="67" class="svg-s" font-size="11.5">Outside: trade</text></g>
+      <g transform="translate(436,10)"><rect width="130" height="180" rx="12" style="fill:var(--violet-soft)"/><text x="12" y="28" class="svg-t" font-size="13" font-weight="800">4. Where</text><text x="12" y="52" class="svg-s" font-size="11.5">Cash flows, then</text><text x="12" y="67" class="svg-s" font-size="11.5">tax-free accounts,</text><text x="12" y="82" class="svg-s" font-size="11.5">then losses, then</text><text x="12" y="97" class="svg-s" font-size="11.5">high-basis lots</text></g>
+      <g transform="translate(578,10)"><rect width="132" height="180" rx="12" style="fill:var(--green-soft)"/><text x="12" y="28" class="svg-t" font-size="13" font-weight="800">5. Record</text><text x="12" y="52" class="svg-s" font-size="11.5">Date, trades and</text><text x="12" y="67" class="svg-s" font-size="11.5">new mix in your</text><text x="12" y="82" class="svg-s" font-size="11.5">policy statement</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Check on a schedule, act only on a breach, trade where it is cheapest.</b> Once or twice a year is enough for most households; pick fixed dates so the decision is not made in the middle of a market scare.</figcaption>
+  </figure>
+  <h3>When someone else rebalances for you</h3>
+  <ul>
+    <li><b><span class="term" data-term="Target-date fund">Target-date</span> and balanced funds</b> rebalance internally. If one fund is your whole portfolio in an account, you do not need to rebalance it &mdash; but do not surround it with other funds, or the combined mix drifts again.</li>
+    <li><b>401(k) automatic rebalancing.</b> Many plans offer a setting that resets your chosen fund mix quarterly or annually. It works inside that plan only; it cannot see your IRA or brokerage account.</li>
+    <li><b>Robo-advisors and managed accounts</b> monitor drift automatically, often with bands, and may combine rebalancing with tax-loss harvesting. Compare the fee to the value of your time (INV-104).</li>
+  </ul>
+  <h3>The emotional part</h3>
+  <p>The hardest rebalancing trades are the most useful ones: buying stocks after a crash. Vanguard counted only seven occasions since 1926 when strongly negative stock markets created major rebalancing opportunities into equities &mdash; 1930, 1931, 1937, 1974, 2000, 2002 and 2008 &mdash; and noted that at such times "poor investment performance coupled with extreme uncertainty about the future made it seem counterintuitive" to buy (Jaconetti, Kinniry and Zilbering, 2010). A written rule made in calm times is what makes those trades possible.</p>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>Rebalancing is not market timing.</b> A rebalancing rule responds only to your own portfolio's drift, by a fixed amount, at fixed intervals. Selling because you expect a fall, or buying because a fund "has momentum," is a forecast; INV-052 covers why those rarely pay.</p></div></div>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">History, year by year</p>
+  <h2>Three episodes that show what rebalancing does</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.6 &mdash; $100,000 at 60/40 from 1990: rebalanced every year versus never</div>
+    <div id="f566"></div>
+    <figcaption class="cap"><b>Drift through the 1990s boom meant a bigger fall in the bust.</b> Never rebalanced, the portfolio reached 79.5% stocks by the end of 1999 and then fell 21.2% over 2000&ndash;2002; rebalanced, it fell 10.6% and ended 2002 ahead. Values at each year-end. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>The 1990s boom and the 2000&ndash;2002 bust</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>From 1990 through 1999 the S&amp;P 500 returned more than 15% in six of ten years. A $100,000 60/40 portfolio left alone grew to $396,853 by the end of 1999, but with 79.5% in stocks. Over 2000&ndash;2002 the S&amp;P 500 fell 9.0%, 11.9% and 22.0% while Treasuries gained. The drifting portfolio fell to $312,869 (&minus;21.2%). The annually rebalanced one went from $368,688 to $329,728 (&minus;10.6%).</div></div>
+    <div class="row"><div>What it teaches</div><div>By 1999 the drifting investor held a portfolio they never chose, at the worst possible moment. Rebalancing gave up about $28,000 of boom-time gains and got it all back, and more, in the bust.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, A. (2026), <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i>, NYU Stern.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>2008&ndash;2013: buying stocks when it felt worst</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>A $100,000 60/40 portfolio at the start of 2008 ended the year at $86,110 with only 44.2% in stocks. Rebalancing meant buying about $13,600 of stocks in January 2009. By the end of 2013 the rebalanced portfolio was worth $148,121; the one left alone, $136,379.</div></div>
+    <div class="row"><div>What it teaches</div><div>The rebalancing trade was the one nobody wanted to make. A rule made it automatic, and it added about $11,700 over five years.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, NYU Stern (2008: S&amp;P 500 &minus;36.55%, 10-year Treasury +20.10%). Vanguard lists 2008 among its seven major rebalancing opportunities since 1926 (Jaconetti et al., 2010).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>2022: when there was nothing to rebalance</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>In 2022 the S&amp;P 500 returned &minus;18.0% and 10-year Treasuries &minus;17.8%. A 60/40 portfolio lost about 18% and ended the year at 59.9% stocks.</div></div>
+    <div class="row"><div>What it teaches</div><div>Rebalancing helps only when assets diverge. When stocks and bonds fall together, the mix barely moves and there is no trade to make. Rebalancing controls drift; it cannot protect against a year when everything falls (INV-004).</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, NYU Stern.</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Three rebalancing choices</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.7 &mdash; Three households, three tools</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 130" role="img" aria-label="The Harpers use their 401(k)s, Ruth uses withdrawals, the Riveras use contributions">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="110" rx="12" style="fill:var(--violet-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">The Harpers</text><text x="14" y="56" class="svg-s" font-size="12">Trade inside the 401(k)s,</text><text x="14" y="72" class="svg-s" font-size="12">not the taxable account</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="110" rx="12" style="fill:var(--red-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">Ruth</text><text x="14" y="56" class="svg-s" font-size="12">Take withdrawals from</text><text x="14" y="72" class="svg-s" font-size="12">what is overweight</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="110" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="30" class="svg-t" font-size="13.5" font-weight="800">The Riveras</text><text x="14" y="56" class="svg-s" font-size="12">Point new contributions</text><text x="14" y="72" class="svg-s" font-size="12">at what is underweight</text></g>
+      </g></svg></div>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Harpers after a strong year</div>
+    <p class="dq">After a strong year for stocks the Harpers' $1.1 million portfolio is at 66% stocks against a 60% target, outside their 5-point band. Moving back means shifting about $66,000 from stocks to bonds. Where should they trade?</p>
+    <div class="opts"><button class="opt">Sell $66,000 of technology stocks in the taxable account.</button><button class="opt">Exchange $66,000 of the US stock index fund for the bond fund inside their 401(k)s.</button><button class="opt">Do nothing; stocks are doing well.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Sell in taxable</b>With large embedded gains, this could realize tens of thousands of dollars of gain. If 60% of the value were gain, $39,600 of gain at 15% is about $5,940 of federal tax for a trade they could make for free.</div>
+      <div class="oc"><b>Exchange in the 401(k)s</b>Right. Same allocation result, no tax. They continue diversifying the taxable account separately and patiently.</div>
+      <div class="oc"><b>Do nothing</b>Six years from retirement, drifting toward more stock risk is the opposite of their glide path (INV-058). Their band exists for exactly this moment.</div>
+      <div class="verdict"><b>The principle:</b> rebalance the portfolio as one, but place the trade in the account where it is cheapest.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Ruth after a crash</div>
+    <p class="dq">Stocks have fallen 30% this year. Ruth's IRA has dropped from 45% to about 36% stocks, and she needs $30,000 for next year's spending. How should she take it?</p>
+    <div class="opts"><button class="opt">Sell stocks now before they fall further.</button><button class="opt">Take the $30,000 from the bond fund or her cash reserve, and consider moving some bonds into stocks inside the IRA to get back toward 45%.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Sell stocks</b>That locks in the loss and pushes her further from her plan. It is a market-timing decision, not a rebalancing one.</div>
+      <div class="oc"><b>Spend from bonds or cash; rebalance inside the IRA</b>Right. Her bonds and cash reserve exist to fund spending while stocks recover. Trades inside the IRA carry no tax.</div>
+      <div class="verdict"><b>The principle:</b> in retirement, withdrawals are rebalancing trades; take them from what is overweight.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; The Riveras' contributions</div>
+    <p class="dq">The Riveras contribute about $1,500 a month to their 401(k)s. Their 80/20 portfolio has drifted to 84% stocks. What is the simplest fix?</p>
+    <div class="opts"><button class="opt">Sell stock funds and buy bond funds today.</button><button class="opt">Change their contribution election so new money goes to the bond fund until the mix is back near 80%, then switch back.</button><button class="opt">Switch everything to a target-date fund.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Sell and buy</b>Inside a 401(k) this is tax-free and perfectly fine. It is just more work than necessary for a 4-point drift inside a 5-point band.</div>
+      <div class="oc"><b>Redirect contributions</b>Right, and it is free. Many plans also offer an automatic rebalancing setting that would do this for them.</div>
+      <div class="oc"><b>Target-date fund</b>A reasonable choice that ends the rebalancing question inside the 401(k)s &mdash; but their Roth IRAs would still need their own mix, and the combined portfolio would need checking.</div>
+      <div class="verdict"><b>The principle:</b> for savers, the paycheck is the rebalancing tool.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about rebalancing</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.8 &mdash; Growth per year, rebalanced 60/40 versus drifting, four periods</div>
+    <div id="f568"></div>
+    <figcaption class="cap"><b>Whether rebalancing "paid" depends on the period; its risk control does not.</b> 1928&ndash;2025 and 1976&ndash;2025: drifting grew faster because it became stock-heavy. 2000&ndash;2025: rebalancing grew faster. In every period the drifting portfolio ended with far more in stocks. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Rebalancing always increases returns."</div><div class="ma"><b>Myth.</b> Between stocks and bonds it often lowers returns, because it keeps selling the faster-growing asset. Its job is to keep your risk where you set it.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"You should rebalance every month to stay precise."</div><div class="ma"><b>Myth.</b> Vanguard's research found no meaningful risk-adjusted benefit from monthly or quarterly rebalancing over annual, and much higher trading costs.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Rebalancing always means selling."</div><div class="ma"><b>Myth.</b> New contributions, dividends and withdrawals can often do all of it without a sale.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Rebalancing is a form of market timing."</div><div class="ma"><b>Myth.</b> Timing acts on forecasts. Rebalancing acts on your own portfolio's drift by a pre-set rule and needs no forecast at all.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A target-date fund needs no rebalancing."</div><div class="ma"><b>Fact, with a caveat.</b> The fund rebalances itself. If you hold other funds alongside it, your combined portfolio still drifts.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Selling in my IRA to rebalance triggers capital gains tax."</div><div class="ma"><b>Myth.</b> Trades inside IRAs and 401(k)s are not taxed. Tax applies only when money is withdrawn (and, for Roth accounts, usually not even then).</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>A rebalancing rule for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.9 &mdash; Contributions as a share of each saver's portfolio</div>
+    <div id="f569"></div>
+    <figcaption class="cap"><b>The bigger the yearly flow relative to the portfolio, the more rebalancing new money can do.</b> Approximate yearly contributions: Maya $5,580 on a portfolio that starts near zero; the Riveras about $18,000 including employer matches (assumed) on their $62,000 of 401(k)s; Jordan about $8,800 on $140,000; the Harpers $65,000 of deferrals on $1.1 million. Ruth withdraws rather than contributes. Illustrative figures.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Nothing to do.</b> A single target-date fund rebalances itself. If she uses three funds instead, pointing each paycheck at the underweight fund is enough for years.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Contributions first, annual check.</b> A January check across both 401(k)s (and any Roth IRAs they open); redirect contributions if drift exceeds 5 points; turn on the plans' automatic rebalancing if offered.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Rebalance while unwinding.</b> Each employer-stock sale in the taxable account is also a rebalancing trade; the 401(k) fine-tunes the stock/bond mix with no tax. Keep Ava's money out of the calculation.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Trade inside the 401(k)s.</b> Twice-yearly checks with a 5-point band; exchanges happen in the pre-tax accounts, while the taxable account is diversified separately with loss harvesting.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Withdrawals do the work.</b> Each month's or year's withdrawal comes from the overweight fund; a bad year is funded from cash and bonds. From 2031, RMDs follow the same rule.</div></div>
+  </div>
+  <div class="ws" data-ws="inv056" data-title="INV-056 worksheet: my rebalancing rule">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w56a">My target mix, and my band (for example, 5 percentage points)</label><textarea id="w56a" data-key="target"></textarea></div>
+      <div><label for="w56b">The dates each year I will check</label><textarea id="w56b" data-key="dates"></textarea></div>
+      <div><label for="w56c">My actual mix today, all accounts combined</label><textarea id="w56c" data-key="actual"></textarea></div>
+      <div><label for="w56d">Cash flows I can steer (contributions, dividends, withdrawals)</label><textarea id="w56d" data-key="flows"></textarea></div>
+      <div><label for="w56e">Where I will trade first (which tax-advantaged account)</label><textarea id="w56e" data-key="where"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.10 &mdash; One year of drift from 60/40</div>
+    <div id="f5610"></div>
+    <figcaption class="cap"><b>A good year for stocks tilts the mix.</b> Stock share after one year, starting at 60%, for stock returns from &minus;30% to +30% with bonds at +3%. Computed from the drift formula.</figcaption>
+  </figure>
+  <div class="ex" data-answer="63.8" data-tol="0.01" data-ok="0.72 &divide; 1.128 = 63.8%.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">A 60/40 portfolio has a year in which stocks return +20% and bonds +2%. What is the stock share at year-end, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Stocks 0.6 &times; 1.20 = 0.720; bonds 0.4 &times; 1.02 = 0.408; total 1.128. Stock share 0.720 &divide; 1.128 = <b>63.8%</b>.</div></div>
+  <div class="ex" data-answer="16667" data-tol="0.01" data-ok="70,000 &divide; 0.6 &minus; 100,000 = $16,667.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">A portfolio holds $70,000 of stocks and $30,000 of bonds; the target is 60% stocks. How much new money, all sent to bonds, would bring it back to target without selling?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">The $70,000 of stocks must be 60% of the new total: 70,000 &divide; 0.6 = $116,667. The portfolio is $100,000 now, so it needs <b>$16,667</b> of new money in bonds.</div></div>
+  <div class="ex" data-answer="4500" data-tol="0.01" data-ok="$50,000 &times; 60% gain &times; 15% = $4,500.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">You sell $50,000 of a stock fund in a taxable account. 60% of the value is long-term gain, and your rate on long-term gains is 15%. What is the federal tax, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Gain 50,000 &times; 0.6 = $30,000; tax 30,000 &times; 0.15 = <b>$4,500</b>. The same exchange inside a 401(k) would cost $0.</div></div>
+  <div class="ex" data-answer="66000" data-tol="0.01" data-ok="$1,100,000 &times; (66% &minus; 60%) = $66,000.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">The Harpers' $1,100,000 portfolio is at 66% stocks with a 60% target. How many dollars must move from stocks to bonds?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Stocks are 0.66 &times; 1,100,000 = $726,000; the target is 0.60 &times; 1,100,000 = $660,000. Move <b>$66,000</b>.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.11 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: drift, rule, flows, tax">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--red-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Drift</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">adds risk you didn't pick</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">A rule</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">yearly check, 5-pt band</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Cash flows</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">rebalance for free</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Tax</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">trade in IRAs first</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"A 60/40 portfolio started in 1928 and never rebalanced ended 2025 at roughly what stock share?","choices":["60%","75%","About 100%","40%"],"answer":2,"explain":"99.6% at the end of 2025, computed from Damodaran's data."},
+    {"q":"The main purpose of rebalancing is to:","choices":["Maximize returns","Keep the portfolio's risk at the level you chose","Avoid all taxes","Predict market turns"],"answer":1,"explain":"Vanguard: the goal is to minimize risk relative to the target allocation, rather than to maximize returns."},
+    {"q":"A threshold (band) rule trades:","choices":["Every month regardless","Only when an asset's weight moves outside a set range around its target","Only when the news is bad","Never"],"answer":1,"explain":"You check on a schedule but act only when a band is breached."},
+    {"q":"In the 1928&ndash;2025 backtest, a 5-point band rebalanced 35 times; annual rebalancing traded 98 times. Their growth rates were:","choices":["Very different","Almost the same (about 8.3&ndash;8.4% a year)","Band much lower","Band much higher"],"answer":1,"explain":"8.37% versus 8.34%: disciplined rules produced very similar results with very different numbers of trades."},
+    {"q":"Which is the cheapest way for a saver to rebalance?","choices":["Sell winners in a taxable account","Direct new contributions to the underweight asset","Buy a new fund each year","Borrow on margin"],"answer":1,"explain":"Cash-flow rebalancing involves no sale and no tax."},
+    {"q":"For 2026, married couples filing jointly pay 0% on long-term capital gains up to taxable income of:","choices":["$49,450","$66,200","$98,900","$613,700"],"answer":2,"explain":"$98,900 for joint filers (Rev. Proc. 2025-32); $613,700 is the top of the 15% bracket."},
+    {"q":"The wash-sale rule disallows a loss if you buy substantially identical securities within:","choices":["7 days","30 days before or after the sale, including in your IRA","90 days after only","One year"],"answer":1,"explain":"IRS Publication 550: within 30 days before or after, including purchases for an IRA or Roth IRA."},
+    {"q":"Why did rebalancing have almost nothing to do in 2022?","choices":["Markets were closed","Stocks and bonds fell by nearly the same amount, so the mix barely changed","Bonds rose sharply","Taxes prevented it"],"answer":1,"explain":"The S&amp;P 500 returned &minus;18.0% and 10-year Treasuries &minus;17.8%; a 60/40 mix ended at 59.9% stocks."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 56.12 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-057</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Measuring performance</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-037</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Tax-loss and tax-gain harvesting</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-050</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Target-date funds and glide paths</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-056"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Jaconetti, C. M., Kinniry, F. M., Jr., &amp; Zilbering, Y. (2010). <i>Best practices for portfolio rebalancing</i>. Vanguard Investment Perspectives, 8 (Fall/Winter 2010).</li>
+    <li>Zhang, Y., Ahluwalia, H., Ying, A., Rabinovich, M., &amp; Geysen, A. (2022). <i>Rational rebalancing: An analytical approach to multiasset portfolio rebalancing decisions and insights</i>. Vanguard Research. <a href="https://www.vanguardmexico.com/content/dam/intl/americas/documents/latam/en/2022/10/mx-sa-2558523-rational-rebalancing-an-analytical-approach.pdf">vanguardmexico.com</a></li>
+    <li>Zhang, Y., Ahluwalia, H., Daga, A., &amp; Zi, Y. (2024). <i>The rebalancing edge: Optimizing target-date fund rebalancing through threshold-based strategies</i>. Vanguard Research. <a href="https://corporate.vanguard.com/content/dam/corp/research/pdf/the_rebalancing_edge_optimizing_target_date_fund_rebalancing_through_threshold_based_strategies.pdf">corporate.vanguard.com</a></li>
+    <li>Internal Revenue Service. (2025). <i>Revenue Procedure 2025-32</i> (2026 inflation adjustments). <a href="https://www.irs.gov/pub/irs-drop/rp-25-32.pdf">irs.gov</a></li>
+    <li>Internal Revenue Service. <i>Publication 550: Investment income and expenses</i> (wash sales; holding period). <a href="https://www.irs.gov/publications/p550">irs.gov</a></li>
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">stern.nyu.edu</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Backtests use calendar-year index returns before taxes, fees and trading costs; past patterns may not repeat. Tax figures are for 2026; confirm current rules with the IRS or a tax professional.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s7.js"></script>
+<script>
+INV.ready(function () {
+  var h = INV.hist(), sim = INV.s7RebSim, yr = function (v) { return String(Math.round(v)); }, pc = function (v) { return Math.round(v) + "%"; };
+  var A = sim(1928, h.last, 0.6, { type: "cal", every: 1 }), N = sim(1928, h.last, 0.6, { type: "never" });
+  INV.lineChart(document.getElementById("f561"), { label: "Stock share, rebalanced versus drifting", height: 240, yMin: 0, yMax: 100, xFmt: yr, yFmt: pc, tipFmt: function (v) { return v.toFixed(1) + "% stocks"; },
+    series: [{ name: "Rebalanced every year", color: "var(--s2)", data: A.wts }, { name: "Never rebalanced", color: "var(--s5)", data: N.wts, dash: "5 4" }] });
+  INV.barChart(document.getElementById("f562"), { label: "Risk of rebalanced versus drifting", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: [{ label: "Growth / yr, rebalanced", y: A.cagr, color: "var(--s2)" }, { label: "Growth / yr, drifting", y: N.cagr, color: "var(--s5)" }, { label: "Volatility, rebalanced", y: A.sd, color: "var(--s2)" }, { label: "Volatility, drifting", y: N.sd, color: "var(--s5)" }, { label: "Worst year, rebalanced", y: A.worst, color: "var(--s2)" }, { label: "Worst year, drifting", y: N.worst, color: "var(--s5)" }] });
+  INV.barChart(document.getElementById("f564"), { label: "Tax on the same trade", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return INV.money(v, 0); },
+    data: [{ label: "Taxable, 20% rate", y: 6000, color: "var(--s5)" }, { label: "Taxable, 15% rate", y: 4500, color: "var(--s5)" }, { label: "High-basis lots, 15%", y: 1500, color: "var(--s3)" }, { label: "Inside a 401(k)", y: 0, color: "var(--s2)" }] });
+  function path(y0, y1, reb) { var S = 60000, B = 40000, out = [[y0, 100000]]; for (var y = y0; y <= y1; y++) { var r = h.rows[y - h.first]; S *= 1 + r[1] / 100; B *= 1 + r[3] / 100; var v = S + B; out.push([y + 1, v]); if (reb) { S = v * 0.6; B = v * 0.4; } } return out; }
+  INV.lineChart(document.getElementById("f566"), { label: "1990s boom and bust", height: 240, xFmt: yr, yFmt: INV.moneyShort, tipFmt: function (v) { return INV.money(v, 0); }, marks: [{ x: 2000, label: "End of 1999" }],
+    series: [{ name: "Rebalanced every year", color: "var(--s2)", data: path(1990, 2002, true) }, { name: "Never rebalanced", color: "var(--s5)", data: path(1990, 2002, false), dash: "5 4" }] });
+  var per = [[1928, "1928–2025"], [1976, "1976–2025"], [1990, "1990–2025"], [2000, "2000–2025"]], d8 = [];
+  per.forEach(function (p) { var a = sim(p[0], h.last, 0.6, { type: "cal", every: 1 }), n = sim(p[0], h.last, 0.6, { type: "never" }); d8.push({ label: p[1] + " reb.", tip: p[1] + ", rebalanced yearly", y: a.cagr, color: "var(--s2)" }); d8.push({ label: p[1] + " drift", tip: p[1] + ", never rebalanced", y: n.cagr, color: "var(--s5)" }); });
+  INV.barChart(document.getElementById("f568"), { label: "Growth by period", height: 240, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "% a year"; }, data: d8 });
+  INV.barChart(document.getElementById("f569"), { label: "Contributions relative to portfolio", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + "%"; },
+    data: [["Riveras", 18000 / 62000 * 100, "var(--s2)"], ["Jordan", 8800 / 140000 * 100, "var(--s3)"], ["Harpers", 65000 / 1100000 * 100, "var(--s4)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  var d10 = []; for (var rs = -30; rs <= 30; rs += 10) { var w = 0.6 * (1 + rs / 100) / (0.6 * (1 + rs / 100) + 0.4 * 1.03) * 100; d10.push({ label: (rs > 0 ? "+" : "") + rs + "%", tip: "Stocks " + (rs > 0 ? "+" : "") + rs + "%", y: w, color: rs === 0 ? "var(--s6)" : rs > 0 ? "var(--s1)" : "var(--s5)" }); }
+  INV.barChart(document.getElementById("f5610"), { label: "Drift after one year", height: 220, allLabels: true, valueLabels: true, xTitle: "Stock return for the year (bonds +3%)", yFmt: function (v) { return v.toFixed(0) + "%"; }, tipFmt: function (v) { return v.toFixed(1) + "% stocks"; }, data: d10 });
+});
+</script>
+</body>
+</html>

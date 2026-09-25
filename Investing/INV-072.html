@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-072 · The Math of Financial Independence — Investing Learning Lab</title>
+<meta name="description" content="The FI number, how a savings rate turns into years to financial independence, how sensitive the answer is to returns and withdrawal rates, and why spending is the most powerful lever.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-072">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-072</span><span class="ttl">The Math of Financial Independence</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 10 · Financial Independence</span><span class="chip teal">Intermediate</span><span class="chip gray">About 60 minutes</span><span class="chip gray">2 calculators</span></div>
+    <h1>The Math of Financial Independence</h1>
+    <p class="sub">Financial independence is the point at which your investments, not your paycheck, can pay for the life you live. The arithmetic behind it is short enough to fit on an index card. This module builds it from first principles, shows how much the answer moves when the assumptions change, and explains why spending matters more than income.</p>
+    <p class="q"><span>The question this module answers</span>How much do I need to stop depending on a paycheck, and how long will it take to get there?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <path d="M40 200 C120 196 200 160 320 60" fill="none" stroke="#0B8A7E" stroke-width="4"/>
+      <line x1="40" y1="92" x2="330" y2="92" stroke="#C2332B" stroke-width="2.5" stroke-dasharray="6 5"/>
+      <circle cx="283" cy="92" r="8" fill="#1F5FD1"/>
+      <text x="44" y="84" class="svg-t" font-size="12" font-weight="700">FI number = spending &#215; 25</text>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Where saving meets spending</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A paycheck you pay yourself</h2>
+  <p class="lede">Most people already understand the goal. Work pays the bills today; retirement savings are supposed to pay them later. Financial independence (FI) simply asks when "later" can begin, and it answers with two numbers you control: how much you spend, and what share of your income you save.</p>
+  <p>For most households the ordinary path is fine: save steadily in a workplace plan, collect Social Security, and retire in your sixties. Nothing in this module says you must do otherwise. But the same arithmetic that sizes a traditional retirement also tells you what it would take to have the <i>option</i> earlier &mdash; to change careers, work part-time, care for family, or stop. Figure 72.1 is the whole idea in one line.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.1 &mdash; Years to financial independence by savings rate, starting from zero</div>
+    <div id="f721"></div>
+    <figcaption class="cap"><b>The savings rate, not the income, sets the timeline.</b> Years until invested savings reach 25 times annual spending, assuming a 5% real (after-inflation) return and a 4% withdrawal rate. Saving 10% of take-home pay takes about 51 years; 25% takes about 32; 50% takes about 17; 75% about 7. Computed with the formula built in the "Savings rate math" tab.</figcaption>
+  </figure>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>Two levers, one of which pulls twice.</b> Saving more adds to the pile. Spending less also <i>shrinks the pile you need</i>. That double effect is why the curve is so steep at low savings rates and why this module spends a whole tab on spending.</p></div></div>
+  <h3>What this module covers</h3>
+  <ol>
+    <li><b>The FI number</b>: spending divided by a withdrawal rate, and where the famous "25 times" comes from.</li>
+    <li><b>Savings rate math</b>: the classic years-to-FI formula, derived step by step, with a calculator.</li>
+    <li><b>Sensitivity</b>: what happens when returns or the withdrawal rate differ from the assumption, using 98 years of US data.</li>
+    <li><b>The role of spending</b>: why a dollar not spent is worth more than a dollar earned.</li>
+    <li><b>What the formula leaves out</b>: taxes, health insurance, Social Security and the order of returns.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="The FI number">
+  <p class="kicker">The target</p>
+  <h2>How big does the pile need to be?</h2>
+  <p>Start with a question you can answer today: how much does your household spend in a year? Everything else follows from that figure, because the portfolio only has to replace what you spend, not what you earn. Taxes you pay on a salary, payroll taxes, commuting and the money you save all disappear from the calculation once you stop working &mdash; though taxes on withdrawals do not, as the last tab explains.</p>
+  <div class="def"><div class="def-h"><b>Withdrawal rate</b><span>a percentage</span></div>
+    <div class="def-r"><div>What it is</div><div>The share of a portfolio taken out in the first year of retirement. Under the classic rule, later withdrawals stay the same in real terms: the dollar amount rises each year with inflation, whatever markets do.</div></div>
+    <div class="def-r"><div>Used for</div><div>Converting a portfolio into a sustainable income, or, in reverse, converting a spending level into a portfolio target.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A 4% withdrawal rate on $1,000,000 means $40,000 in year one, then $40,000 adjusted for inflation every year after. The lower the rate, the larger the portfolio you need and the safer the plan.</div></div></div>
+  <div class="def"><div class="def-h"><b>FI number</b><span>your target portfolio</span></div>
+    <div class="def-r"><div>What it is</div><div>The portfolio that would support your annual spending at a chosen withdrawal rate. At 4%, it is 25 times spending, because 1 &divide; 0.04 = 25.</div></div>
+    <div class="def-r"><div>Used for</div><div>Setting a savings target and measuring progress: your portfolio divided by your FI number is the share of the way you have come.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>If you spend $50,000 a year, a 4% rate implies $1.25 million; a more cautious 3.5% implies about $1.43 million. The choice of rate is the single biggest judgment in the target.</div></div></div>
+  <div class="formula">FI number = annual spending &divide; withdrawal rate &nbsp;&nbsp;&rarr;&nbsp;&nbsp; at 4%: FI number = 25 &times; spending</div>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.2 &mdash; The FI number for $50,000 of yearly spending at five withdrawal rates</div>
+    <div id="f722"></div>
+    <figcaption class="cap"><b>Half a percentage point moves the target by hundreds of thousands of dollars.</b> $50,000 &divide; rate: $1.67 million at 3%, $1.43 million at 3.5%, $1.25 million at 4%, $1.11 million at 4.5%, $1.00 million at 5%.</figcaption>
+  </figure>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Annual spending</th><th class="r">FI number at 4% (&times; 25)</th><th class="r">FI number at 3.5% (&times; 28.6)</th></tr></thead>
+  <tbody><tr><td>$30,000</td><td class="r">$750,000</td><td class="r">$857,143</td></tr><tr><td>$50,000</td><td class="r">$1,250,000</td><td class="r">$1,428,571</td></tr><tr><td>$80,000</td><td class="r">$2,000,000</td><td class="r">$2,285,714</td></tr></tbody></table></div>
+  <p>Where does 4% come from? In 1994 the financial planner William Bengen tested every retirement start year in the US record from 1926 and found that a first-year withdrawal of 4%, raised with inflation afterward, from a portfolio of half stocks and half intermediate-term Treasuries, never ran out in fewer than 33 years. A 1998 study by three Trinity University professors (the <span class="term" data-term="Trinity study">Trinity study</span>) reached similar conclusions using data from 1926 to 1995. Both studies were about <b>30-year retirements</b>. INV-073 shows what happens over 50 or 60 years.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Subtract guaranteed income first</summary><div class="layer-b">
+    <p>The portfolio only needs to cover spending that no other source pays. If you will eventually receive Social Security or a pension, the long-run target is smaller:</p>
+    <div class="formula">FI number (after benefits begin) = (annual spending &minus; guaranteed income) &divide; withdrawal rate</div>
+    <p>With $60,000 of spending and $24,000 a year of expected Social Security, the long-run target at 4% is ($60,000 &minus; $24,000) &divide; 0.04 = <b>$900,000</b>, not $1.5 million. The catch for early retirees is timing: Social Security cannot start before 62, so the years before benefits need their own money. That bridge is the subject of INV-074, and Social Security itself of INV-078.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Gross up for taxes</summary><div class="layer-b">
+    <p>"Spending" in the formula must include the income tax you will owe on withdrawals. If you expect about 10% of each withdrawal to go to tax, a $50,000 lifestyle needs $50,000 &divide; (1 &minus; 0.10) = $55,556 of withdrawals, and the FI number at 4% becomes about <b>$1.39 million</b>. How much tax you pay depends heavily on which accounts the money sits in (Roth, pre-tax or taxable), which is why Stage 5 and INV-042 matter so much to early retirees.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Savings rate math">
+  <p class="kicker">Build the calculator</p>
+  <h2>From savings rate to years, step by step</h2>
+  <p>The classic years-to-FI calculation, popularized in 2012 by the blogger Mr. Money Mustache, has four ingredients and needs no knowledge of your income at all. Here is how to build it yourself.</p>
+  <div class="def"><div class="def-h"><b>Savings rate</b><span>the key input</span></div>
+    <div class="def-r"><div>What it is</div><div>The share of your after-tax income that you save and invest rather than spend. The cleanest definition for this calculation is: savings &divide; (savings + spending).</div></div>
+    <div class="def-r"><div>Used for</div><div>Measuring how fast you are converting income into independence.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Include every dollar that goes to investments, including 401(k) contributions and any employer match, and count every dollar you spend. Consistency matters more than the exact convention.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.3 &mdash; One savings rate, two effects</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 210" role="img" aria-label="Take-home pay splits into spending and saving; spending sets the target, saving fills it">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="80" width="150" height="56" rx="12" style="fill:var(--card2)"/><text x="85" y="104" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Take-home pay</text><text x="85" y="123" text-anchor="middle" class="svg-s" font-size="12">I</text>
+      <rect x="230" y="20" width="200" height="56" rx="12" style="fill:var(--red-soft)"/><text x="330" y="44" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Spending (1 &minus; s) &#215; I</text><text x="330" y="63" text-anchor="middle" class="svg-s" font-size="12">what you live on</text>
+      <rect x="230" y="140" width="200" height="56" rx="12" style="fill:var(--green-soft)"/><text x="330" y="164" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Saving s &#215; I</text><text x="330" y="183" text-anchor="middle" class="svg-s" font-size="12">invested every year</text>
+      <rect x="500" y="20" width="210" height="56" rx="12" style="fill:var(--amber-soft)"/><text x="605" y="44" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Target = spending &#247; w</text><text x="605" y="63" text-anchor="middle" class="svg-s" font-size="12">lower spending, smaller target</text>
+      <rect x="500" y="140" width="210" height="56" rx="12" style="fill:var(--blue-soft)"/><text x="605" y="164" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Portfolio grows at r</text><text x="605" y="183" text-anchor="middle" class="svg-s" font-size="12">more saving, faster growth</text>
+      <g style="stroke:var(--muted)" stroke-width="2" fill="none"><path d="M160 100 L230 50"/><path d="M160 116 L230 168"/><path d="M430 48 L500 48"/><path d="M430 168 L500 168"/><path d="M605 80 L605 136" stroke-dasharray="4 4"/></g>
+      <text x="614" y="112" class="svg-m" font-size="11">FI when they meet</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Raising s fills the bucket faster and makes the bucket smaller.</b> Income I appears on both sides, which is why it cancels out when you start from zero.</figcaption>
+  </figure>
+  <h3>The four steps</h3>
+  <ol>
+    <li><b>Spending.</b> With take-home pay I and savings rate s, you spend (1 &minus; s) &times; I.</li>
+    <li><b>Target.</b> The FI number is T = (1 &minus; s) &times; I &divide; w, where w is the withdrawal rate.</li>
+    <li><b>Growth.</b> Saving S = s &times; I at the end of each year, with a real return r, a starting portfolio P<sub>0</sub> grows to P<sub>n</sub> = P<sub>0</sub>(1 + r)<sup>n</sup> + S[(1 + r)<sup>n</sup> &minus; 1] &divide; r after n years (the future value of a growing pile plus the future value of a series of deposits, from INV-002).</li>
+    <li><b>Solve.</b> Set P<sub>n</sub> = T and solve for n using logarithms.</li>
+  </ol>
+  <div class="formula">n = ln[(T&middot;r + S) &divide; (P<sub>0</sub>&middot;r + S)] &divide; ln(1 + r)</div>
+  <p>Starting from zero (P<sub>0</sub> = 0) and substituting T and S, income cancels completely:</p>
+  <div class="formula">n = ln[1 + r(1 &minus; s) &divide; (s &middot; w)] &divide; ln(1 + r)</div>
+  <p><b>Worked example.</b> Save half your take-home pay (s = 0.50), earn 5% real (r = 0.05), plan on a 4% withdrawal rate (w = 0.04). Then r(1 &minus; s) &divide; (s&middot;w) = 0.025 &divide; 0.02 = 1.25, so n = ln(2.25) &divide; ln(1.05) = 0.8109 &divide; 0.04879 = <b>16.6 years</b>. That matches the roughly 17 years in Mr. Money Mustache's 2012 table, which used the same 5% and 4% assumptions.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Savings rate</th><th class="r">10%</th><th class="r">20%</th><th class="r">30%</th><th class="r">40%</th><th class="r">50%</th><th class="r">60%</th><th class="r">70%</th></tr></thead>
+  <tbody><tr><td>Years to FI (5% real, 4% withdrawal, from zero)</td><td class="r">51.4</td><td class="r">36.7</td><td class="r">28.0</td><td class="r">21.6</td><td class="r">16.6</td><td class="r">12.4</td><td class="r">8.8</td></tr></tbody></table></div>
+  <div data-tool="s10YearsFI"></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why the first points of savings rate are worth the most</summary><div class="layer-b">
+    <p>Moving from 10% to 20% cuts about 14.7 years from the timeline (51.4 to 36.7). Moving from 40% to 50% cuts 5.0 years, and 60% to 70% cuts 3.6. Each extra point matters less in years because the timeline is already short, but in proportion it matters just as much: every step both raises contributions and lowers the target. For someone saving 5% or less, the first few points are the most valuable financial decision available.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Assumptions hidden in the formula</summary><div class="layer-b">
+    <p>The formula assumes a <i>constant</i> real return, a constant savings rate, contributions at each year-end (contributing at the start of each year shortens the timeline slightly), and that spending before and after FI is the same. It works entirely in today's dollars, which is why the return must be real: a 7% nominal return with 2.5% inflation is a real return of 1.07 &divide; 1.025 &minus; 1 = 4.39%, not 4.5%. A portfolio you already hold shortens the timeline and reintroduces income into the answer, because P<sub>0</sub> is measured in dollars, not as a share of pay.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Sensitivity">
+  <p class="kicker">How sure is the answer?</p>
+  <h2>Sensitivity to return and withdrawal rate</h2>
+  <p>The formula gives one number, but its two market assumptions are guesses. Real returns over any 15 to 20 years have varied enormously, and the withdrawal rate is a judgment about the future. Use the grid below to see how far the answer moves.</p>
+  <div data-tool="s10Sens"></div>
+  <p>At a 50% savings rate, the base case is 16.6 years. A pessimistic pairing, 2% real returns with a 3% withdrawal rate, stretches it to 25.8 years; an optimistic pairing, 7% with 5%, shrinks it to 12.9. At a 20% savings rate the same range runs from 27.9 to 65.6 years around a base of 36.7. <b>The lower your savings rate, the more your timeline depends on markets.</b> A high savings rate is a hedge against bad luck.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.4 &mdash; Real annual return over every 17-year window, 75% stocks / 25% Treasuries</div>
+    <div id="f724"></div>
+    <figcaption class="cap"><b>"5% real" is a long-run average, not a promise for your saving years.</b> Each point is the annualized after-inflation return of a 75/25 mix of the S&amp;P 500 and 10-year Treasuries, rebalanced yearly, for the 17 calendar years starting that year. The worst window began in 1965 (&minus;0.8% a year), the best in 1982 (12.9% a year); the median was 5.8%, and 41% of windows returned less than 5%. Over the full 1928&ndash;2025 period the mix returned 5.8% a year after inflation. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Real return</b><span>after inflation</span></div>
+    <div class="def-r"><div>What it is</div><div>The growth of your purchasing power: (1 + nominal return) &divide; (1 + inflation) &minus; 1.</div></div>
+    <div class="def-r"><div>Used for</div><div>Every calculation in this module, because the FI number is stated in today's dollars.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A saver who happened to work from 1965 to 1981 earned almost nothing after inflation on a 75/25 mix, while one who worked from 1982 to 1998 earned almost 13% a year. You will not know which kind of period you are in until it is over.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Which assumption matters more?</summary><div class="layer-b">
+    <p>At a 50% savings rate and 5% returns, moving the withdrawal rate from 4% to 3.5% raises the target by 14% (28.6 times spending instead of 25) and adds 1.6 years (16.6 to 18.2). Moving to 3% adds 3.5 years (to 20.1). Moving the return from 5% to 4% at a 4% withdrawal rate adds 1.1 years (to 17.7). The withdrawal rate is the assumption you choose; the return is the one the market chooses for you. Choose the former conservatively, because you cannot choose the latter at all.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Accumulation risk and retirement risk are linked</summary><div class="layer-b">
+    <p>Poor returns while you save lengthen the timeline, but they also tend to leave markets cheaper when you start withdrawing, which historically helped later retirees. The reverse is also true: a saver who reaches the FI number quickly because of a boom retires into a market that may be expensive. INV-006 introduced valuation measures such as the CAPE ratio; some planners lower the withdrawal rate when valuations are high. The evidence is debated, and INV-076 and INV-077 cover it.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="The role of spending">
+  <p class="kicker">The strongest lever</p>
+  <h2>Why a dollar not spent beats a dollar earned</h2>
+  <p>Suppose your take-home pay is $100,000 and you save 20%: you spend $80,000 and, from zero, reach FI in 36.7 years (5% real, 4% withdrawal). Compare three changes of the same size.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.5 &mdash; Years to FI after a change worth 10% of pay</div>
+    <div id="f725"></div>
+    <figcaption class="cap"><b>Cutting spending wins because it works twice.</b> Base case 36.7 years. Cutting spending 10% (to $72,000, saving $28,000): 29.5 years. A 10% raise, all of it saved (spending $80,000, saving $30,000 of $110,000): 30.1 years. A 10% raise, all of it spent: still 36.7 years, because the savings rate is unchanged.</figcaption>
+  </figure>
+  <p>The raise that is fully saved puts more dollars into the portfolio ($30,000 versus $28,000) but the spending cut still wins, because it also lowers the target from $2.0 million to $1.8 million. The raise that is fully spent changes nothing: spending and savings grow in proportion, so the target grows exactly as fast as the savings that feed it.</p>
+  <div class="def"><div class="def-h"><b>Lifestyle inflation</b><span>also called lifestyle creep</span></div>
+    <div class="def-r"><div>What it is</div><div>The tendency for spending to rise as income rises, so that raises are absorbed by a more expensive way of life rather than saved.</div></div>
+    <div class="def-r"><div>Used for</div><div>Explaining why many high earners are no closer to financial independence than moderate earners.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A simple defense is to decide in advance what share of each raise you will save, and to raise your automatic 401(k) or IRA contribution the same month the raise starts.</div></div></div>
+  <div class="formula">Each $1 of permanent annual spending adds 1 &divide; w dollars to the FI number: $25 at 4%, about $28.57 at 3.5%</div>
+  <p>That conversion rate makes everyday choices concrete. A $150 monthly bundle of subscriptions is $1,800 a year, or <b>$45,000</b> of FI number at 4%. A $500-a-month car payment that becomes permanent (because the next car is always financed) is $6,000 a year, or $150,000. None of this says you should not spend on what you value; it says every recurring cost has a price measured in years.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Measure spending honestly</summary><div class="layer-b">
+    <p>The most common error in FI planning is underestimating spending. Average your actual outflows over at least 12 months, and add the irregular items that do not appear every month: car replacement, roof and appliance repairs, travel, gifts, insurance deductibles. Early retirees must add costs an employer used to pay, above all health insurance (INV-074). INV-018 shows how to build a cash-flow record from bank and card statements.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Spending changes over a life</summary><div class="layer-b">
+    <p>Spending is rarely flat. A mortgage ends, children leave, health costs rise, travel falls off in late life. A single "spending" figure multiplied by 25 is a starting point; a serious plan models phases. Babak's <a href="https://nest-egg-calculator.vercel.app/" target="_blank" rel="noopener noreferrer">Retirement Planner</a> lets you enter multiple spending phases and test them with Monte Carlo and historical sequences, which is the natural next step once the simple formula has given you a ballpark.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Beyond the formula">
+  <p class="kicker">What it leaves out</p>
+  <h2>Six things the index-card math ignores</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.6 &mdash; The simple formula and six real-world adjustments</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 300" role="img" aria-label="Six adjustments: taxes, health insurance, Social Security, sequence of returns, account access, changing spending">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="130" rx="12" style="fill:var(--amber-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">1. Taxes</text><text x="16" y="54" class="svg-s" font-size="12">Withdrawals may be taxed;</text><text x="16" y="70" class="svg-s" font-size="12">gross up spending to</text><text x="16" y="86" class="svg-s" font-size="12">cover them.</text><text x="16" y="114" class="svg-m" font-size="11">Stage 5, INV-042</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="130" rx="12" style="fill:var(--red-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">2. Health insurance</text><text x="16" y="54" class="svg-s" font-size="12">Before Medicare at 65,</text><text x="16" y="70" class="svg-s" font-size="12">coverage is a large new</text><text x="16" y="86" class="svg-s" font-size="12">cost for early retirees.</text><text x="16" y="114" class="svg-m" font-size="11">INV-074, INV-079</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="130" rx="12" style="fill:var(--green-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">3. Social Security</text><text x="16" y="54" class="svg-s" font-size="12">Reduces the long-run</text><text x="16" y="70" class="svg-s" font-size="12">target, but fewer working</text><text x="16" y="86" class="svg-s" font-size="12">years mean a smaller check.</text><text x="16" y="114" class="svg-m" font-size="11">INV-078</text></g>
+      <g transform="translate(10,152)"><rect width="226" height="130" rx="12" style="fill:var(--violet-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">4. Order of returns</text><text x="16" y="54" class="svg-s" font-size="12">A crash early in</text><text x="16" y="70" class="svg-s" font-size="12">retirement hurts far more</text><text x="16" y="86" class="svg-s" font-size="12">than the same crash later.</text><text x="16" y="114" class="svg-m" font-size="11">INV-073, INV-077</text></g>
+      <g transform="translate(247,152)"><rect width="226" height="130" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">5. Account access</text><text x="16" y="54" class="svg-s" font-size="12">Most retirement money</text><text x="16" y="70" class="svg-s" font-size="12">carries a 10% extra tax</text><text x="16" y="86" class="svg-s" font-size="12">before age 59&#189;.</text><text x="16" y="114" class="svg-m" font-size="11">INV-074</text></g>
+      <g transform="translate(484,152)"><rect width="226" height="130" rx="12" style="fill:var(--teal-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">6. Changing spending</text><text x="16" y="54" class="svg-s" font-size="12">Children, mortgages and</text><text x="16" y="70" class="svg-s" font-size="12">health change what you</text><text x="16" y="86" class="svg-s" font-size="12">need decade by decade.</text><text x="16" y="114" class="svg-m" font-size="11">INV-075</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>The formula gives the size of the problem, not the plan.</b> Each box is a reason a real plan's target and timeline differ from Figure 72.1, and the module that handles it.</figcaption>
+  </figure>
+  <p><b>Social Security deserves a closer look</b>, because early retirement changes it. The Social Security Administration computes benefits from "average indexed monthly earnings": it takes up to 35 years of a worker's wage-indexed earnings, chooses the highest years, and divides their total by the number of months in those years. Years without earnings still fill out the 35 if you have fewer good years, so someone who stops work at 45 after 22 years of earnings will average in 13 years of zero and a smaller benefit than the statement they received at 40 might suggest if it projected continued work. Download your record at my Social Security and ask how the estimate assumes you keep working.</p>
+  <div class="def"><div class="def-h"><b>Crossover point</b><span>a progress milestone</span></div>
+    <div class="def-r"><div>What it is</div><div>The moment when a safe withdrawal from your portfolio (for example, 4% of its value) first equals your annual spending. It is the FI number seen from the other side.</div></div>
+    <div class="def-r"><div>Used for</div><div>Tracking progress: many FI planners chart their "portfolio income" rising toward their spending line each year.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Reaching the crossover does not oblige you to stop working. It changes work from a necessity into a choice, which is the practical meaning of financial independence.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Deterministic math versus a range of outcomes</summary><div class="layer-b">
+    <p>Everything in this module is deterministic: one return, one answer. Real plans face a range of possible paths. Monte Carlo simulation (INV-077) and historical backtests replace the single return with thousands of possible sequences and report how often a plan succeeds. The simple formula is still useful, because it tells you which inputs matter; the simulation tells you how much uncertainty surrounds them.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>A "perpetual" withdrawal rate</summary><div class="layer-b">
+    <p>A 30-year rule is designed to spend the portfolio down if returns are poor. An early retiree who wants the principal to last indefinitely needs a withdrawal rate at or below the long-run real return the portfolio can reliably earn after fees. Mr. Money Mustache's 2012 article explicitly framed its 4% as "touching only the gains"; history suggests that is optimistic for 50-year spans, as INV-073 shows with the data.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Where the numbers come from</p>
+  <h2>Three sources of the FI arithmetic</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>Bengen's 1994 withdrawal study</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>William Bengen, a planner in California, tested inflation-adjusted withdrawals against every US starting year using Ibbotson Associates' data from 1926. A 50/50 portfolio of stocks and intermediate-term Treasuries with a 4% first-year withdrawal never ran out in less than 33 years; 4.25% could have run out in 28. A 3% rate, and rates up to about 3.5%, always lasted at least 50 years. He advised stock allocations between 50% and 75%.</div></div>
+    <div class="row"><div>What it teaches</div><div>The "multiply by 25" rule came from a 30-year retirement problem. Bengen's own charts show that longer horizons call for lower rates, a point FI planners sometimes skip.</div></div>
+    <div class="row"><div>Source</div><div class="src">Bengen, W. P. (1994, October). Determining withdrawal rates using historical data. <i>Journal of Financial Planning</i>; reprinted in the Journal, March 2004.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>"The shockingly simple math behind early retirement" (2012)</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>In January 2012 the blogger known as Mr. Money Mustache published a table of years to retirement by savings rate. It assumed 5% investment returns after inflation and a 4% withdrawal rate, and it became a founding text of the FIRE movement.</div></div>
+    <div class="row"><div>What it teaches</div><div>The table is exactly the formula built in this module; our 16.6 years at a 50% savings rate matches its roughly 17. Its power is the reframing: the savings rate, not income or investment skill, drives the timeline.</div></div>
+    <div class="row"><div>Source</div><div class="src">Mr. Money Mustache (2012, January 13). <i>The shockingly simple math behind early retirement</i> [Blog post]. A popular source, used here for its assumptions, which we reproduce and test.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>The 1966 retiree, computed from the data</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>A retiree with $1 million in a 75/25 mix of the S&amp;P 500 and 10-year Treasuries, taking $40,000 at the end of 1966 and raising it with inflation, ran out after 35 withdrawals. Taking the same withdrawals at the <i>start</i> of each year, which is how many people actually live, the money lasted 26 years. A 1982 retiree following the same rule ended 30 years later with about $6.1 million in 1982 dollars.</div></div>
+    <div class="row"><div>What it teaches</div><div>The same rule produced ruin and a fortune, depending on the start year. High inflation and weak real returns early in retirement (1966&ndash;1981) are the worst case in the US record.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, A. (2026), <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i>, NYU Stern. Before taxes and fees.</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.7 &mdash; Two retirees, one rule: 4% of $1 million, 75/25, withdrawn at each year-end</div>
+    <div id="f727"></div>
+    <figcaption class="cap"><b>The start year matters more than the rule.</b> Portfolio value in start-year dollars. The 1966 retiree's balance fell toward zero by 2001; the 1982 retiree's grew for decades. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Choose the lever</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.8 &mdash; Maya's years to FI under three choices</div>
+    <div id="f728"></div>
+    <figcaption class="cap"><b>A higher savings rate beats a higher hoped-for return.</b> Illustrative: $48,000 of take-home pay, $3,000 already invested, 4% withdrawal rate. Saving 10% at 5% real: 50.7 years. Saving 10% at 7%: 41.0 years. Saving 20% at 5%: 36.4 years. Both: 30.4 years.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; Maya</div>
+    <p class="dq">Maya takes home about $48,000 a year (an illustrative figure) and saves 10%. A coworker says she should switch her 401(k) to an aggressive fund that "should earn 7% after inflation" instead of raising her savings. What should she do?</p>
+    <div class="opts"><button class="opt">Switch to the aggressive fund and keep saving 10%.</button><button class="opt">Raise her savings rate to 20% over the next year, starting by capturing the full match, and keep a sensible allocation.</button><button class="opt">Do nothing until her student loans are gone.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Chase the return</b>Even if 7% arrives, the timeline falls only to about 41 years, and a 7% real return is not something she can choose. Figure 72.4 shows 17-year windows as low as &minus;0.8%.</div>
+      <div class="oc"><b>Raise the savings rate</b>Right. Doubling the savings rate cuts the timeline to about 36 years at the same 5% assumption, and it is entirely in her control. Her employer matches 50% of contributions up to 6% of pay, so contributing at least 6% is the first step (INV-022).</div>
+      <div class="oc"><b>Wait for the loans</b>Her 6.8% loans deserve attention (INV-020), but skipping the employer match gives up an immediate 50% return on those dollars. Paying down loans and capturing the match can happen at once.</div>
+      <div class="verdict"><b>The principle:</b> pull the lever you control; treat the return as weather.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; The Riveras</div>
+    <p class="dq">The Riveras take home roughly $114,000 (illustrative) and save 20% with $62,000 already invested. They also have $41,000 sitting idle in checking beyond their $9,000 emergency fund. Which change helps their FI timeline most?</p>
+    <div class="opts"><button class="opt">Invest the idle $41,000 and leave the savings rate alone.</button><button class="opt">Invest the idle money and raise the savings rate to 25%.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Invest the idle cash only</b>Helpful: adding $41,000 to their $62,000 moves the timeline from 34.1 to about 32.5 years at 5% real. Cash in checking loses purchasing power every year.</div>
+      <div class="oc"><b>Both</b>Right. The one-time deposit is worth about a year and a half; raising the savings rate to 25% is worth roughly four more years (34.1 to 29.8 from their current $62,000), because it works every year and lowers the target. A 529 plan for Sofia and Leo competes for the same dollars and should be decided at the same time (INV-034).</div>
+      <div class="verdict"><b>The principle:</b> a lump sum helps once; a higher savings rate helps every year.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; The Harpers</div>
+    <p class="dq">Tom (57) and Rachel (55) plan to retire around 62&ndash;63, a retirement that could last 30 years or more. A friend says they should use 4% "because that's the rule." What rate should they plan with?</p>
+    <div class="opts"><button class="opt">4%, exactly as the rule says.</button><button class="opt">Plan with a range, perhaps 3.5% to 4%, and test it against Social Security timing, taxes and flexible spending.</button><button class="opt">5%, because their portfolio is large.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Exactly 4%</b>Reasonable for about 30 years in the US record, but it was the historical <i>worst case</i> boundary, not a comfortable middle. Their horizon, taxes on $820,000 of pre-tax money and a 1.25% advisory fee all argue for testing lower.</div>
+      <div class="oc"><b>A range, tested</b>Right. A range turns one fragile number into a plan with a margin. Their Social Security, which can begin at 62 but grows until 70, reduces the rate the portfolio must bear later (INV-078).</div>
+      <div class="oc"><b>5%</b>Portfolio size does not change the percentage that is sustainable. In the data used here, a 5% rate failed in 16% to 23% of 30-year start years for a 75/25 mix, depending on whether withdrawals come at the end or the start of each year.</div>
+      <div class="verdict"><b>The principle:</b> the withdrawal rate is the assumption you pick; pick it with a margin.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about FI</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.9 &mdash; What a recurring monthly cost adds to the FI number at 4%</div>
+    <div id="f729"></div>
+    <figcaption class="cap"><b>Every permanent monthly cost has a price of 300 times itself.</b> Monthly amount &times; 12 &times; 25.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"You need a high income to reach financial independence."</div><div class="ma"><b>Mostly myth.</b> Starting from zero, the timeline depends only on the savings rate, the return and the withdrawal rate. A high income makes a high savings rate easier, but a high earner who spends it all never gets there.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Investment returns matter more than how much you save."</div><div class="ma"><b>Myth, early on.</b> For a new saver, raising the savings rate from 10% to 20% cuts about 15 years; raising the assumed return from 5% to 7% cuts about 10 (51.4 to 41.7 years from zero). Later, when the portfolio is large, returns dominate.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Twenty-five times spending guarantees you will never run out."</div><div class="ma"><b>Myth.</b> 25 times spending is a 4% withdrawal rate, which history supported for about 30 years, with no margin in the worst periods. Longer retirements and higher costs need more.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The 4% rule means taking 4% of whatever the balance is each year."</div><div class="ma"><b>Myth.</b> The classic rule sets the first withdrawal at 4% of the starting balance and then raises that dollar amount with inflation. Taking a fixed percentage of the current balance is a different, self-adjusting method (INV-076).</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Financial independence means you have to stop working."</div><div class="ma"><b>Myth.</b> It means work becomes optional. Many people use FI to change careers, work part-time or take long breaks. INV-073 covers these paths.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Cutting $100 a month is too small to matter."</div><div class="ma"><b>Myth.</b> $1,200 a year of permanent spending is $30,000 of FI number at 4%, plus the savings it frees each year.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>The FI arithmetic for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.10 &mdash; Years to full FI with the simple formula (illustrative inputs)</div>
+    <div id="f7210"></div>
+    <figcaption class="cap"><b>The pure formula ignores Social Security, so it overstates how long a traditional retirement takes.</b> 5% real, 4% withdrawal. Maya: 20% of $48,000 take-home, $3,000 invested (36.4 years). Riveras: 20% of $114,000, $62,000 invested (34.1). Jordan: 15% of $66,000, $140,000 invested (31.9). Harpers: 30% of $190,000, $1.1 million invested (14.1). Take-home figures are illustrative round numbers.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>The savings rate is everything at 24.</b> Moving from 10% to 20% cuts roughly 14 years off Maya's timeline. The match and her loans come first; the habit matters more than the amount.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Two children, one target that moves.</b> Their spending includes childcare and a mortgage that will not last forever. Investing the idle $41,000 and planning a 529 are the near-term moves; their FI number should be modeled in phases.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Spending is the lever.</b> On one income of $88,000, rent of $1,850 a month and Ava's college three years away, Jordan's savings rate is squeezed. A 31.9-year pure-FI timeline sounds bleak, but Social Security will cover a large share of their later spending (INV-073 runs Jordan's Coast FI numbers).</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Close, if the rate is right.</b> With $1.1 million and a high savings rate, the Harpers' question is not whether but which withdrawal rate, which accounts, and what the 1.25% advisory fee does to the sustainable rate.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Already independent &mdash; the check runs in reverse.</b> Ruth has $840,000 in her IRA and savings. If she spends $60,000 a year (illustrative) and Social Security pays $34,800, her portfolio must supply $25,200: a withdrawal rate of about 3.0%, comfortably inside historical norms.</div></div>
+  </div>
+  <div class="ws" data-ws="inv072" data-title="INV-072 worksheet: my FI arithmetic">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w72a">My annual spending (12-month average, including irregular costs)</label><textarea id="w72a" data-key="spend"></textarea></div>
+      <div><label for="w72b">My savings rate: savings &divide; (savings + spending)</label><textarea id="w72b" data-key="rate"></textarea></div>
+      <div><label for="w72c">My FI number at 4% and at 3.5%</label><textarea id="w72c" data-key="target"></textarea></div>
+      <div><label for="w72d">Years to FI from the calculator, and the range from the sensitivity grid</label><textarea id="w72d" data-key="years"></textarea></div>
+      <div><label for="w72e">Two recurring costs I could cut, and what each is worth in FI number</label><textarea id="w72e" data-key="cuts"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.11 &mdash; The FI number as a multiple of spending</div>
+    <div id="f7211"></div>
+    <figcaption class="cap"><b>The multiple is 1 divided by the withdrawal rate.</b> 33.3 times at 3%, 28.6 at 3.5%, 25 at 4%, 22.2 at 4.5%, 20 at 5%.</figcaption>
+  </figure>
+  <div class="ex" data-answer="1100000" data-tol="0.005" data-ok="$44,000 &divide; 0.04 = $1,100,000.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">A household spends $44,000 a year. What is its FI number at a 4% withdrawal rate, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$44,000 &divide; 0.04 = <b>$1,100,000</b>, or 25 &times; $44,000.</div></div>
+  <div class="ex" data-answer="1257143" data-tol="0.005" data-ok="$44,000 &divide; 0.035 &asymp; $1,257,143.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">Same household, but it plans with a 3.5% withdrawal rate. What is the FI number, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$44,000 &divide; 0.035 = <b>$1,257,143</b> &mdash; about $157,000 (14%) more than at 4%.</div></div>
+  <div class="ex" data-answer="21.6" data-tol="0.02" data-ok="ln(1 + 0.05 &times; 0.6 &divide; (0.4 &times; 0.04)) &divide; ln(1.05) = ln(2.875) &divide; 0.04879 &asymp; 21.6 years.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">Starting from zero, how many years to FI at a 40% savings rate, 5% real return and 4% withdrawal rate?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in years" placeholder="years"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">r(1 &minus; s) &divide; (s&middot;w) = 0.05 &times; 0.60 &divide; (0.40 &times; 0.04) = 0.03 &divide; 0.016 = 1.875. n = ln(2.875) &divide; ln(1.05) = 1.0561 &divide; 0.04879 = <b>21.6 years</b>.</div></div>
+  <div class="ex" data-answer="45000" data-tol="0.005" data-ok="$150 &times; 12 &times; 25 = $45,000.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">You cancel $150 a month of subscriptions for good. By how much does your FI number fall at a 4% withdrawal rate, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$150 &times; 12 = $1,800 a year; &times; 25 = <b>$45,000</b>. The $1,800 a year you now save also shortens the timeline.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.12 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: spending sets the target; savings rate sets the pace; assumptions set the range; spending cuts work twice">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Target</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">spending &#247; rate</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--green-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Pace</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">set by savings rate</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Range</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">returns are weather</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--red-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Spending</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">cuts work twice</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"A household spends $60,000 a year. What is its FI number at a 4% withdrawal rate?","choices":["$240,000","$600,000","$1,500,000","$2,400,000"],"answer":2,"explain":"$60,000 &divide; 0.04 = $1,500,000."},
+    {"q":"Starting from zero, which input does NOT affect years to FI in the classic formula?","choices":["The savings rate","The real return","The withdrawal rate","The size of your income"],"answer":3,"explain":"Income appears in both the target and the savings, so it cancels."},
+    {"q":"At a 5% real return and 4% withdrawal rate, about how long does a 50% savings rate take from zero?","choices":["About 9 years","About 17 years","About 28 years","About 37 years"],"answer":1,"explain":"ln(2.25) &divide; ln(1.05) &asymp; 16.6 years."},
+    {"q":"Why does cutting spending shorten the timeline more than an equal raise that is fully saved?","choices":["It is taxed less","It both raises savings and lowers the FI number","It earns a higher return","It does not"],"answer":1,"explain":"Lower spending shrinks the target as well as freeing money to invest."},
+    {"q":"Bengen's 1994 study found that a 4% first-year withdrawal from a 50/50 portfolio never ran out in fewer than:","choices":["15 years","25 years","33 years","60 years"],"answer":2,"explain":"He reported no case exhausted before 33 years; 4.25% could run out in 28."},
+    {"q":"A nominal return of 7% with 2.5% inflation is a real return of about:","choices":["4.39%","4.5%","9.5%","2.8%"],"answer":0,"explain":"1.07 &divide; 1.025 &minus; 1 = 4.39%."},
+    {"q":"Up to how many years of earnings does Social Security use to compute average indexed monthly earnings?","choices":["10","20","35","40"],"answer":2,"explain":"Up to 35 years of indexed earnings; years without earnings pull the average down, which matters for early retirees."},
+    {"q":"A permanent $250 monthly expense adds how much to the FI number at 4%?","choices":["$3,000","$25,000","$75,000","$300,000"],"answer":2,"explain":"$250 &times; 12 &times; 25 = $75,000."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 72.13 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-073</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">FIRE variants</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-074</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Accessing money before 59&#189;</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-076</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Withdrawal strategies</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-072"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Bengen, W. P. (1994, October). Determining withdrawal rates using historical data. <i>Journal of Financial Planning</i>. 2004 reprint: <a href="https://www.financialplanningassociation.org/sites/default/files/2021-04/MAR04%20Determining%20Withdrawal%20Rates%20Using%20Historical%20Data.pdf">financialplanningassociation.org</a></li>
+    <li>Cooley, P. L., Hubbard, C. M., &amp; Walz, D. T. (1998). Retirement savings: Choosing a withdrawal rate that is sustainable. <i>AAII Journal</i>. <a href="https://www.aaii.com/journal/article/retirement-savings-choosing-a-withdrawal-rate-that-is-sustainable">aaii.com</a></li>
+    <li>Mr. Money Mustache. (2012, January 13). <i>The shockingly simple math behind early retirement</i>. <a href="https://www.mrmoneymustache.com/2012/01/13/the-shockingly-simple-math-behind-early-retirement/">mrmoneymustache.com</a></li>
+    <li>Social Security Administration. (n.d.). <i>Social Security benefit amounts</i> (average indexed monthly earnings). <a href="https://www.ssa.gov/oact/cola/Benefits.html">ssa.gov</a></li>
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">stern.nyu.edu</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Projections use constant assumed returns and are illustrative. Historical results do not guarantee future results. Household take-home figures are illustrative.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s10.js"></script>
+<script>
+INV.ready(function () {
+  var yt = INV.s10yearsTo, ms = INV.moneyShort, yr = function (v) { return String(Math.round(v)); };
+  function yrs(s, r, w, P0, I) { I = I || 1; return yt((1 - s) * I / w, P0 || 0, s * I, r); }
+  var c1 = []; for (var s = 5; s <= 90; s++) c1.push([s, yrs(s / 100, 0.05, 0.04)]);
+  INV.lineChart(document.getElementById("f721"), { label: "Years to FI by savings rate", height: 250, xTitle: "Savings rate (% of take-home pay)", yTitle: "Years to FI", xFmt: function (v) { return v + "%"; }, yFmt: yr, tipFmt: function (v) { return v.toFixed(1) + " years"; },
+    series: [{ name: "Years to FI", color: "var(--s1)", data: c1, area: true }],
+    dots: [10, 25, 50, 75].map(function (k) { var v = yrs(k / 100, 0.05, 0.04); return { x: k, y: v, label: v.toFixed(1) + " yrs", color: "var(--s1)" }; }) });
+  INV.barChart(document.getElementById("f722"), { label: "FI number by withdrawal rate", height: 220, allLabels: true, valueLabels: true, xTitle: "Withdrawal rate", yFmt: ms, tipFmt: function (v) { return INV.money(v); },
+    data: [3, 3.5, 4, 4.5, 5].map(function (w) { return { label: w + "%", y: 50000 / (w / 100), color: w === 4 ? "var(--s1)" : "var(--s6)" }; }) });
+  var h = INV.hist(), R = h.rows, roll = [];
+  for (var st = 0; st + 17 <= R.length; st++) { var g = 1; for (var k = st; k < st + 17; k++) g *= (1 + (0.75 * R[k][1] + 0.25 * R[k][3]) / 100) / (1 + R[k][7] / 100); roll.push([R[st][0], (Math.pow(g, 1 / 17) - 1) * 100]); }
+  INV.lineChart(document.getElementById("f724"), { label: "Rolling 17-year real return", height: 240, zeroBase: false, xTitle: "First year of the 17-year window", xFmt: yr, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "% a year"; },
+    series: [{ name: "17-year real return, 75/25", color: "var(--s1)", data: roll }, { name: "5% assumption", color: "var(--s5)", data: roll.map(function (p) { return [p[0], 5]; }), dash: "5 4", width: 1.6 }] });
+  INV.barChart(document.getElementById("f725"), { label: "Spending versus income changes", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1); }, tipFmt: function (v) { return v.toFixed(1) + " years"; },
+    data: [["Base: save 20%", yrs(0.2, 0.05, 0.04), "var(--s6)"], ["Cut spending 10%", yrs(0.28, 0.05, 0.04), "var(--s2)"], ["Raise 10%, saved", yrs(30 / 110, 0.05, 0.04), "var(--s1)"], ["Raise 10%, spent", yrs(0.2, 0.05, 0.04), "var(--s5)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  function path(y0) { var i0 = y0 - h.first, b = 1e6, w = 40000, cpi = 1, d = [[y0, 1e6]]; for (var k = 0; k < 36 && R[i0 + k]; k++) { var r = R[i0 + k]; b *= 1 + (0.75 * r[1] + 0.25 * r[3]) / 100; b -= w; w *= 1 + r[7] / 100; cpi *= 1 + r[7] / 100; d.push([r[0] + 1, Math.max(0, b) / cpi]); if (b <= 0) break; } return d; }
+  var p66 = path(1966), p82 = path(1982).slice(0, 31);
+  INV.lineChart(document.getElementById("f727"), { label: "1966 versus 1982 retiree", height: 250, xTitle: "Years into retirement", xFmt: yr, yFmt: ms, tipFmt: function (v) { return INV.money(v); },
+    series: [{ name: "Retired 1966", color: "var(--s5)", data: p66.map(function (p) { return [p[0] - 1966, p[1]]; }) }, { name: "Retired 1982", color: "var(--s2)", data: p82.map(function (p) { return [p[0] - 1982, p[1]]; }) }] });
+  INV.barChart(document.getElementById("f728"), { label: "Maya's choices", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1); }, tipFmt: function (v) { return v.toFixed(1) + " years"; },
+    data: [["10% at 5%", yrs(0.1, 0.05, 0.04, 3000, 48000), "var(--s6)"], ["10% at 7%", yrs(0.1, 0.07, 0.04, 3000, 48000), "var(--s3)"], ["20% at 5%", yrs(0.2, 0.05, 0.04, 3000, 48000), "var(--s1)"], ["20% at 7%", yrs(0.2, 0.07, 0.04, 3000, 48000), "var(--s2)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  INV.barChart(document.getElementById("f729"), { label: "FI number of monthly costs", height: 220, allLabels: true, valueLabels: true, xTitle: "Permanent monthly cost", yFmt: ms, tipFmt: function (v) { return INV.money(v); },
+    data: [50, 100, 150, 250, 500].map(function (m) { return { label: "$" + m + "/mo", y: m * 300, color: "var(--s5)" }; }) });
+  INV.barChart(document.getElementById("f7210"), { label: "Years to FI by household", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1); }, tipFmt: function (v) { return v.toFixed(1) + " years"; },
+    data: [["Maya", yrs(0.2, 0.05, 0.04, 3000, 48000), "var(--s1)"], ["Riveras", yrs(0.2, 0.05, 0.04, 62000, 114000), "var(--s2)"], ["Jordan", yrs(0.15, 0.05, 0.04, 140000, 66000), "var(--s3)"], ["Harpers", yrs(0.3, 0.05, 0.04, 1100000, 190000), "var(--s4)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  INV.barChart(document.getElementById("f7211"), { label: "FI multiple", height: 210, allLabels: true, valueLabels: true, xTitle: "Withdrawal rate", yFmt: function (v) { return v.toFixed(1) + "×"; },
+    data: [3, 3.5, 4, 4.5, 5].map(function (w) { return { label: w + "%", y: 100 / w, color: w === 4 ? "var(--s1)" : "var(--s6)" }; }) });
+});
+</script>
+</body>
+</html>

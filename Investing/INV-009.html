@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-009 · How Bonds Work — Investing Learning Lab</title>
+<meta name="description" content="Coupons, prices and yields; why bond prices fall when rates rise; duration and convexity with worked math; the yield curve; credit and inflation risk; and what 2022 taught bond investors.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-009">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-009</span><span class="ttl">How Bonds Work</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 2 · Asset Classes &amp; Vehicles</span><span class="chip teal">Beginner to intermediate</span><span class="chip gray">About 60 minutes</span><span class="chip gray">Bond calculator</span></div>
+    <h1>How Bonds Work</h1>
+    <p class="sub">A bond is a loan with a price tag. The borrower's promise never changes, but what that promise is worth changes every day with interest rates. In 2022 that simple fact cost owners of 10-year Treasuries almost 18% in a single year. This module builds bond math from zero &mdash; price, yield, duration, the yield curve &mdash; so that nothing about a bond's behavior surprises you.</p>
+    <p class="q"><span>The question this module answers</span>What am I actually buying when I buy a bond, and what can make it lose value?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <line x1="60" y1="190" x2="300" y2="70" stroke="#16345C" stroke-width="6" stroke-linecap="round"/><polygon points="180,190 164,214 196,214" fill="#8794A8"/>
+      <circle cx="80" cy="176" r="18" fill="#0B8A7E"/><text x="80" y="181" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">Price</text>
+      <circle cx="282" cy="84" r="18" fill="#C2332B"/><text x="282" y="89" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">Yield</text>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">One goes up, the other goes down</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A bond is an IOU you can sell</h2>
+  <p class="lede">If you have ever lent money to a friend and agreed on when you would be paid back, you already understand a bond. A company or government borrows money from investors, promises to pay interest on a schedule, and promises to return the amount borrowed on a set date.</p>
+  <div class="def"><div class="def-h"><b>Bond</b><span>a tradable loan</span></div>
+    <div class="def-r"><div>What it is</div><div>A debt security. The issuer promises regular interest payments (the <b>coupon</b>) and repayment of the <b>face value</b>, also called par value or principal, on the <b>maturity date</b>.</div></div>
+    <div class="def-r"><div>Used for</div><div>Borrowers fund roads, schools, factories and government deficits. Investors use bonds for predictable income and to steady a portfolio that also holds stocks.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>If you hold a high-quality bond to maturity, you know almost exactly what you will receive. If you sell before maturity, you get whatever the market will pay that day, which may be more or less than you paid.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.1 &mdash; The cash flows of a five-year, 4% bond</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 230" role="img" aria-label="You pay 1,000 today; you receive 40 a year for five years and 1,000 back at the end">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <line x1="40" y1="120" x2="690" y2="120" style="stroke:var(--border2)" stroke-width="2"/>
+      <rect x="60" y="120" width="44" height="80" rx="4" style="fill:var(--s5)"/><text x="82" y="218" text-anchor="middle" class="svg-t" font-size="12" font-weight="700">&minus;$1,000</text>
+      <g style="fill:var(--s2)"><rect x="180" y="106" width="44" height="14" rx="3"/><rect x="300" y="106" width="44" height="14" rx="3"/><rect x="420" y="106" width="44" height="14" rx="3"/><rect x="540" y="106" width="44" height="14" rx="3"/><rect x="630" y="106" width="44" height="14" rx="3"/><rect x="630" y="30" width="44" height="76" rx="3" opacity=".75"/></g>
+      <g text-anchor="middle" class="svg-t" font-size="12" font-weight="700"><text x="202" y="98">$40</text><text x="322" y="98">$40</text><text x="442" y="98">$40</text><text x="562" y="98">$40</text><text x="652" y="22">$1,040</text></g>
+      <g text-anchor="middle" class="svg-s" font-size="11.5"><text x="82" y="140" fill="#fff" style="fill:#fff">today</text><text x="202" y="140">Year 1</text><text x="322" y="140">Year 2</text><text x="442" y="140">Year 3</text><text x="562" y="140">Year 4</text><text x="652" y="140">Year 5</text></g>
+      <text x="200" y="185" class="svg-s" font-size="12">You lend $1,000. You receive a $40 coupon each year,</text>
+      <text x="200" y="202" class="svg-s" font-size="12">and your $1,000 back with the last coupon.</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Everything about a bond follows from this picture.</b> A 4% coupon on $1,000 face value is $40 a year. (Most US bonds actually pay half the coupon every six months: $20 twice a year.) The question for the rest of the module is: what is this stream of payments worth today, and why does that change?</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>Why a bond's price moves opposite to interest rates, with the formula.</li>
+    <li>The different "yields" &mdash; coupon, current yield, yield to maturity &mdash; and which one matters.</li>
+    <li>Duration: the single number that tells you how much a bond will fall if rates rise.</li>
+    <li>The yield curve, and how it looked in 2022, 2023 and September 2026.</li>
+    <li>Credit risk and inflation risk.</li>
+    <li>2022, the worst year for 10-year Treasuries in the 98 years of data used in this course.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Price and yield">
+  <p class="kicker">The seesaw</p>
+  <h2>Why bond prices fall when rates rise</h2>
+  <p>Imagine you own the bond in Figure 9.1, paying $40 a year. Tomorrow, new five-year bonds from the same kind of borrower start paying $60 a year because interest rates have risen. Nobody will pay you $1,000 for your $40 bond when $1,000 buys a $60 bond. To sell, you must cut the price until your bond offers the buyer the same return as a new one. When rates fall, the opposite happens: your $40 coupon is suddenly generous, and buyers pay more than $1,000.</p>
+  <p>The precise version uses <span class="term" data-term="Present value">present value</span> from INV-002: a bond's price is the value today of each future payment, discounted at the current market yield.</p>
+  <div class="formula">Price = C&#8321;/(1 + y)&sup1; + C&#8322;/(1 + y)&sup2; + &hellip; + (C&#8345; + F)/(1 + y)&#8319;</div>
+  <p>C is each coupon, F the face value, y the market yield per period and n the number of periods. For a bond paying twice a year, use half the annual coupon, half the annual yield, and twice the number of years.</p>
+  <p><b>Worked example.</b> A 10-year bond with a 3% coupon, paying $15 every six months on $1,000 of face value. If market yields for 10-year bonds are 3%, it is worth exactly $1,000 &mdash; the coupon matches the market, so it trades at par. If yields rise to 5%, discount 20 payments of $15 and the final $1,000 at 2.5% per half-year: the price is <b>$844.11</b>, a 15.6% drop. If yields fall to 1%, the price is <b>$1,189.87</b>.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.2 &mdash; Price of a 3% bond at different market yields</div>
+    <div id="f92"></div>
+    <figcaption class="cap"><b>The longer the maturity, the steeper the seesaw.</b> Price per $100 of face value for 3%-coupon bonds maturing in 2, 10 and 30 years, semiannual payments. At a 5% yield the 2-year bond is worth 96.24, the 10-year 84.41 and the 30-year 69.09. All three are worth exactly 100 when the yield equals the coupon. Computed from the price formula.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Premium and discount bonds</b></div>
+    <div class="def-r"><div>What it is</div><div>A bond trading above face value is at a <b>premium</b>; below face value, at a <b>discount</b>. Premium bonds have coupons above today's yields; discount bonds have coupons below them.</div></div>
+    <div class="def-r"><div>Used for</div><div>Reading a bond quote. Bond prices are quoted per $100 of face value, so "96.24" means $962.40 for a $1,000 bond.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A premium does not mean a bond is expensive, or a discount that it is cheap. At the same yield, the market has already priced them to give the same return. Held to maturity, a premium bond's price drifts down to par and a discount bond's drifts up.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Clean price, dirty price and accrued interest</summary><div class="layer-b">
+    <p>Between coupon dates, the seller has earned part of the next coupon. The buyer pays the quoted ("clean") price plus accrued interest, together called the "dirty" or full price, and then receives the whole next coupon. Your trade confirmation shows both. The calculator in the next tab prices bonds on a coupon date, where accrued interest is zero.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Yield measures">
+  <p class="kicker">Which yield?</p>
+  <h2>Coupon rate, current yield and yield to maturity</h2>
+  <p>"Yield" gets used for several different numbers. They agree only when a bond trades at par.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Measure</th><th>Formula</th><th>For a 10-year 3% bond priced at $844.11</th></tr></thead><tbody>
+    <tr><td><b>Coupon rate</b></td><td>Annual coupon &divide; face value</td><td>$30 &divide; $1,000 = 3.00%</td></tr>
+    <tr><td><b>Current yield</b></td><td>Annual coupon &divide; price</td><td>$30 &divide; $844.11 = 3.55%</td></tr>
+    <tr><td><b>Yield to maturity</b></td><td>The single rate that makes the present value of all payments equal the price</td><td>5.00% (by construction)</td></tr>
+  </tbody></table></div>
+  <div class="def"><div class="def-h"><b>Yield to maturity (YTM)</b></div>
+    <div class="def-r"><div>What it is</div><div>The annual return you earn if you buy at today's price, receive every payment on time, hold to maturity, and reinvest each coupon at the same yield. It counts both the coupons and the gain or loss as the price moves to par.</div></div>
+    <div class="def-r"><div>Used for</div><div>Comparing bonds with different coupons, prices and maturities on one scale. Treasury's yield curves are YTM-style yields.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>When comparing bonds or bond funds, look at yield to maturity (for funds, often shown as "yield to maturity" or "SEC yield"), not the coupon or the current yield.</div></div></div>
+  <div class="formula">Quick approximation: YTM &asymp; [C + (F &minus; P) &divide; n] &divide; [(F + P) &divide; 2]</div>
+  <p>For our bond: [30 + (1,000 &minus; 844.11) &divide; 10] &divide; [(1,000 + 844.11) &divide; 2] = 45.59 &divide; 922.06 = 4.94%, close to the exact 5.00%. The calculator solves it exactly.</p>
+  <div data-tool="s2aBond"></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Callable bonds and yield to worst</summary><div class="layer-b">
+    <p>A callable bond lets the issuer repay early, usually at par or a small premium, after a set date. Issuers call bonds when rates fall, so the investor loses the high coupon just when it is most valuable (call risk, as the SEC's investor site describes for municipal bonds). For a callable bond trading above par, dealers quote the yield to worst: the lowest of the yield to maturity and the yields to each possible call date. Treat yield to worst as the honest number.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Duration">
+  <p class="kicker">The key risk number</p>
+  <h2>Duration: how far the seesaw tips</h2>
+  <p>Figure 9.2 showed that long bonds swing more. <span class="term" data-term="Duration">Duration</span> turns that into one number. It has two meanings that come out almost the same.</p>
+  <div class="def"><div class="def-h"><b>Macaulay duration</b><span>measured in years</span></div>
+    <div class="def-r"><div>What it is</div><div>The average time until you receive the bond's cash, with each payment weighted by its share of the bond's present value.</div></div>
+    <div class="def-r"><div>Used for</div><div>Seeing when, on average, a bond pays you back. A zero-coupon bond's Macaulay duration equals its maturity; coupons pull it earlier.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>If your holding period roughly matches a bond's duration, a rise in rates hurts the price but lets you reinvest coupons at higher rates, and the two effects roughly offset. That is why matching duration to when you need the money matters.</div></div></div>
+  <div class="def"><div class="def-h"><b>Modified duration</b><span>a sensitivity, in percent per point</span></div>
+    <div class="def-r"><div>What it is</div><div>Macaulay duration divided by (1 + yield per period). It estimates the percentage change in price for a one-percentage-point change in yield.</div></div>
+    <div class="def-r"><div>Used for</div><div>Estimating losses from a rate rise. Bond funds report it on their fact sheets, often simply as "duration."</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A fund with a duration of 6 would be expected to lose about 6% if yields rose one point, and gain about 6% if they fell one point.</div></div></div>
+  <div class="formula">Macaulay D = &Sigma; [t &times; PV(CF&#8348;)] &divide; Price &nbsp;&nbsp;&nbsp; Modified D = Macaulay D &divide; (1 + y) &nbsp;&nbsp;&nbsp; %&Delta;P &asymp; &minus;Modified D &times; &Delta;y</div>
+  <h3>Worked example: a five-year, 4% bond at a 5% yield (annual payments)</h3>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Year t</th><th class="r">Cash flow</th><th class="r">Present value at 5%</th><th class="r">Share of price</th><th class="r">t &times; share</th></tr></thead><tbody>
+    <tr><td>1</td><td class="r">$40</td><td class="r">$38.10</td><td class="r">3.98%</td><td class="r">0.040</td></tr>
+    <tr><td>2</td><td class="r">$40</td><td class="r">$36.28</td><td class="r">3.79%</td><td class="r">0.076</td></tr>
+    <tr><td>3</td><td class="r">$40</td><td class="r">$34.55</td><td class="r">3.61%</td><td class="r">0.108</td></tr>
+    <tr><td>4</td><td class="r">$40</td><td class="r">$32.91</td><td class="r">3.44%</td><td class="r">0.138</td></tr>
+    <tr><td>5</td><td class="r">$1,040</td><td class="r">$814.87</td><td class="r">85.17%</td><td class="r">4.259</td></tr>
+    <tr><td><b>Total</b></td><td class="r"></td><td class="r"><b>$956.71</b></td><td class="r">100%</td><td class="r"><b>4.62 years</b></td></tr>
+  </tbody></table></div>
+  <p>Macaulay duration is 4.62 years. Modified duration is 4.62 &divide; 1.05 = <b>4.40</b>. So if yields rise from 5% to 6%, duration predicts a price fall of about 4.40%. Repricing exactly at 6% gives $915.75, a fall of <b>4.28%</b>. The small gap is <span class="term" data-term="Convexity">convexity</span>.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.3 &mdash; Where the bond's value comes from, by year</div>
+    <div id="f93"></div>
+    <figcaption class="cap"><b>Duration is the balance point of these bars.</b> Present value of each payment of the five-year, 4% bond at a 5% yield. The final payment carries 85% of the value, so the balance point, 4.62 years, sits close to maturity. A higher coupon would move weight earlier and shorten duration.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Rules of thumb</summary><div class="layer-b">
+    <ul>
+      <li>Longer maturity means longer duration.</li>
+      <li>A lower coupon means longer duration (more of the value arrives at the end). Zero-coupon bonds have the longest duration for their maturity.</li>
+      <li>Higher yields mean slightly shorter duration, because distant payments are discounted more heavily.</li>
+      <li>At the par yields of September 25, 2026, modified durations were about 1.9 for a 2-year Treasury, 4.4 for a 5-year, 7.7 for a 10-year and 14.6 for a 30-year (computed).</li>
+    </ul>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Convexity</summary><div class="layer-b">
+    <div class="formula">%&Delta;P &asymp; &minus;D<sub>mod</sub> &times; &Delta;y + &frac12; &times; Convexity &times; (&Delta;y)&sup2;</div>
+    <p>For the five-year bond, convexity is 24.5 (in years&sup2;). A one-point rise: &minus;4.40 &times; 0.01 + &frac12; &times; 24.47 &times; 0.0001 = &minus;4.278%, matching the exact &minus;4.281% almost perfectly. Ordinary bonds have positive convexity: prices rise more when yields fall than they drop when yields rise by the same amount. Callable bonds and mortgage-backed securities can have negative convexity, because borrowers repay early when rates fall (INV-010).</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="The yield curve">
+  <p class="kicker">Rates across maturities</p>
+  <h2>The yield curve</h2>
+  <div class="def"><div class="def-h"><b>Yield curve</b></div>
+    <div class="def-r"><div>What it is</div><div>A line connecting the yields of bonds of the same credit quality, usually Treasuries, from the shortest maturity to the longest. The US Treasury publishes it every business day.</div></div>
+    <div class="def-r"><div>Used for</div><div>Seeing what the market pays for lending for different lengths of time, and pricing every other kind of bond as a "spread" over Treasuries.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Its shape tells you what you are paid for tying money up longer. When the curve is flat or inverted, you give up little or nothing by staying short.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.4 &mdash; The Treasury yield curve on three dates</div>
+    <div id="f94"></div>
+    <figcaption class="cap"><b>Three very different menus.</b> On January 3, 2022, short-term bills paid almost nothing and a 30-year bond about 2%. By July 3, 2023, the curve was inverted: a 6-month bill paid 5.53% and a 10-year note 3.86%. On September 25, 2026, the curve sloped upward again, from 4.04% at one month to 5.54% at 20 years. U.S. Treasury Daily Par Yield Curve Rates.</figcaption>
+  </figure>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.5 &mdash; 10-year yield minus 3-month yield, 2019&ndash;2026</div>
+    <div id="f95"></div>
+    <figcaption class="cap"><b>The curve was inverted for most of late 2022 through 2024.</b> Difference between the 10-year and 3-month Treasury par yields on the first trading day of each month, January 2019 to September 2026. Below zero, short-term lending paid more than long-term. U.S. Treasury Daily Par Yield Curve Rates.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>What moves the curve</summary><div class="layer-b">
+    <p>The Federal Reserve sets a target for overnight interest rates, which anchors the shortest end of the curve. Longer yields reflect what investors expect short rates to average over the bond's life, plus a <b>term premium</b> for the risk of locking money up. When investors expect the Fed to cut rates, long yields can sit below short ones and the curve inverts. Economists debate how much an inverted curve predicts; this course treats the curve as today's price list for time, not as a forecast.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Par, spot and forward curves</summary><div class="layer-b">
+    <p>Treasury's "par yield curve" gives the coupon at which a new bond of each maturity would trade at par. A <b>spot</b> (zero-coupon) curve gives the yield for a single payment at each date and is what you should use to discount individual cash flows. <b>Forward</b> rates implied by the spot curve are the break-even future short rates: lending for two years at the two-year spot rate earns the same as lending for one year and rolling at the one-year forward rate.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Credit and inflation risk">
+  <p class="kicker">The other two risks</p>
+  <h2>Will they pay, and what will it buy?</h2>
+  <p>Interest-rate risk affects every bond. Two more risks depend on who borrowed and on what happens to prices.</p>
+  <div class="def"><div class="def-h"><b>Credit risk</b></div>
+    <div class="def-r"><div>What it is</div><div>The chance that the issuer pays late, pays less, or does not pay at all (default). Rating agencies such as Moody's, S&amp;P and Fitch grade issuers; bonds rated Baa (Moody's) or BBB (S&amp;P and Fitch) or above are called investment grade. Lower-rated bonds are high yield.</div></div>
+    <div class="def-r"><div>Used for</div><div>Setting the extra yield, the <span class="term" data-term="Credit spread">credit spread</span>, that a borrower must pay over a Treasury of the same maturity.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Treasuries have essentially no credit risk; corporate bonds do. The riskier the borrower, the more the bond behaves like a stock in a recession, which is exactly when you want your bonds to hold up.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.6 &mdash; Corporate bonds versus Treasuries in four stress years</div>
+    <div id="f96"></div>
+    <figcaption class="cap"><b>In a flight to safety, credit and Treasuries part ways.</b> Calendar-year total returns of 10-year Treasuries and Baa-rated corporate bonds (the lowest investment-grade tier). In 2008 Treasuries gained 20.1% while Baa bonds lost 3.4%; in 2009 the order reversed as the crisis eased. In 2022 rising rates hit both. Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <p>Over 1928&ndash;2025 as a whole, Baa corporate bonds returned 6.63% a year against 4.53% for 10-year Treasuries: the spread paid, on average, for its bad years. The decision is how much of your "safe" allocation you want to depend on companies' health.</p>
+  <h3>Inflation risk</h3>
+  <p>A bond's payments are fixed in dollars. If prices rise faster than expected, those dollars buy less. From 1946 to 1981, a period of rising inflation, 10-year Treasuries lost 1.77% a year after inflation; a dollar invested in 1946 had about 52 cents of buying power by the end of 1981.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.7 &mdash; Growth of $1 in 10-year Treasuries and T-bills, after inflation</div>
+    <div id="f97"></div>
+    <figcaption class="cap"><b>Bonds beat cash over the long run, but not in every generation.</b> Real (inflation-adjusted) growth of $1 from the start of 1928, log scale. 10-year Treasuries ended 2025 at about $4.12 in 1928 dollars; T-bills at about $1.38. The long decline from the mid-1940s to 1981 is inflation risk made visible. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Reinvestment risk</summary><div class="layer-b">
+    <p><span class="term" data-term="Reinvestment risk">Reinvestment risk</span> is the mirror image of price risk: when rates fall, coupons and maturing principal must be reinvested at lower yields. Short-term savers faced it in 2009&ndash;2021, when T-bills returned 0.48% a year. Long bonds lock in a rate (low reinvestment risk, high price risk); bills do the opposite. Duration matching balances the two.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history</p>
+  <h2>Three years that explain bonds</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.8 &mdash; 2022: the year "safe" assets fell together</div>
+    <div id="f98"></div>
+    <figcaption class="cap"><b>Rising rates hurt every long-duration asset at once.</b> 2022 calendar-year returns and inflation. Only T-bills, which reset to new rates every few months, gained &mdash; and still lost to inflation. Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>2022: 10-year Treasuries fall 17.8%</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Inflation reached 6.45% for 2022 (December to December), and the Federal Reserve raised short-term rates rapidly. The 10-year Treasury par yield rose from 1.52% on December 31, 2021 to 3.88% on December 30, 2022. The series used in this course, which prices a 10-year bond bought at the start of the year, returned &minus;17.83%, the worst year since its data begin in 1928.</div></div>
+    <div class="row"><div>The math</div><div>A 10-year bond yielding about 1.5% had a modified duration of about 9. A yield rise of about 2.4 points times a duration of 9 predicts a loss of about 21%; convexity and a year of coupon income cut that to about 18%. Duration did exactly what it says.</div></div>
+    <div class="row"><div>What it teaches</div><div>High-quality bonds are safe from default, not from price swings. When yields start very low, there is little coupon income to cushion a rise. Investors who held the bonds to maturity will still be repaid in full; investors who needed to sell took the loss.</div></div>
+    <div class="row"><div>Source</div><div class="src">Damodaran, NYU Stern (2026), historical returns data; U.S. Treasury Daily Par Yield Curve Rates, 2021&ndash;2022.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>1946&ndash;1981: the long bond bear market</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Over 36 years of generally rising inflation (4.67% a year on average in this data), 10-year Treasuries returned 1.77% a year less than inflation. Nothing defaulted; the losses were entirely in buying power.</div></div>
+    <div class="row"><div>What it teaches</div><div>A bond's worst enemy is unexpected inflation. This is the reason Treasury Inflation-Protected Securities and I bonds exist (INV-010, INV-008), and why long-term investors do not hold only bonds.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, NYU Stern (2026).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>2008: when Treasuries did their job</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>In 2008 the S&amp;P 500 lost 36.55%. Investors fled to safety, pushing Treasury yields down, and 10-year Treasuries returned 20.10%. Baa corporate bonds lost 3.44%.</div></div>
+    <div class="row"><div>What it teaches</div><div>In a recession-driven crash, high-quality, longer-duration government bonds can offset a large part of stock losses (INV-004 shows the 60/40 arithmetic). The same duration that hurt in 2022 helped in 2008. Knowing which kind of shock you are protecting against is the heart of bond allocation.</div></div>
+    <div class="row"><div>Source</div><div class="src">Damodaran, NYU Stern (2026).</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Match the bond to the job</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.9 &mdash; Match duration to when you need the money</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="Three horizons and the durations that fit them">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="180" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Needed in 0&ndash;2 years</text><text x="16" y="58" class="svg-s" font-size="12">T-bills, CDs, money</text><text x="16" y="74" class="svg-s" font-size="12">market, short bonds</text><text x="16" y="120" class="svg-t" font-size="13" font-weight="700">Duration under 2</text><text x="16" y="146" class="svg-m" font-size="11">Jordan's college money</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="180" rx="12" style="fill:var(--teal-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Needed in 3&ndash;10 years</text><text x="16" y="58" class="svg-s" font-size="12">Ladders, intermediate</text><text x="16" y="74" class="svg-s" font-size="12">bond funds, TIPS</text><text x="16" y="120" class="svg-t" font-size="13" font-weight="700">Duration near horizon</text><text x="16" y="146" class="svg-m" font-size="11">The Harpers' first years</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="180" rx="12" style="fill:var(--violet-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Decades away</text><text x="16" y="58" class="svg-s" font-size="12">Mostly stocks; bonds</text><text x="16" y="74" class="svg-s" font-size="12">as a shock absorber</text><text x="16" y="120" class="svg-t" font-size="13" font-weight="700">Bond share is the lever</text><text x="16" y="146" class="svg-m" font-size="11">Maya's 401(k)</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Duration risk is only a risk if you must sell before the price recovers.</b> Illustration of a common planning approach: money needed sooner sits in shorter-duration holdings.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; Ruth</div>
+    <p class="dq">Ruth's IRA holds an intermediate-term Treasury fund that fell in 2022. It has partly recovered. A friend says bonds are "broken" and she should move that money to cash.</p>
+    <div class="opts"><button class="opt">Sell and hold cash; bonds proved risky.</button><button class="opt">Keep the fund if its duration fits her spending plan: yields are now much higher than in 2021, so its expected return is higher, and it still cushions a stock crash.</button><button class="opt">Switch into a long-term bond fund to recover faster.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Move to cash</b>Selling locks in the loss and gives up today's higher yields for money she does not need for years. Cash also offers no offset in a 2008-style crash.</div>
+      <div class="oc"><b>Keep, if it fits</b>Right. After the rise in rates, a bond fund's yield is its best rough guide to future returns. On September 25, 2026 the 5-year Treasury yielded 4.98%, against 1.37% at the start of 2022. What matters is that the fund's duration is shorter than the time until she will draw on it.</div>
+      <div class="oc"><b>Go long to catch up</b>Long funds recover faster only if yields fall; if yields rise, they fall about twice as far as intermediate funds. That is a bet on rates, not a plan.</div>
+      <div class="verdict"><b>The principle:</b> a bond loss caused by higher rates is partly repaid by higher future income. Judge a bond holding by whether its duration fits your timeline.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; The Harpers</div>
+    <p class="dq">Five years from retiring, the Harpers want money for their first years of retirement spending to be safe. Their advisor suggests a long-term corporate bond fund "for the higher yield."</p>
+    <div class="opts"><button class="opt">Accept: the yield is higher.</button><button class="opt">Ask for a Treasury ladder or short-to-intermediate high-quality bonds whose maturities match the years they will spend the money.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Long corporate fund</b>It adds two risks the job does not need: a long duration (a 30-year par Treasury had a modified duration near 14.6 in September 2026) and credit risk that tends to hurt in recessions, when retirement plans are most stressed.</div>
+      <div class="oc"><b>Match the dates</b>Right. A ladder (INV-010) turns price risk into a known schedule of cash. The Harpers' 1.25% advisory fee (INV-007) also takes a large bite out of bond yields; they should ask what they are paying for.</div>
+      <div class="verdict"><b>The principle:</b> the bonds that fund spending should be dull. Reach for yield with the money that can wait.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; Maya</div>
+    <p class="dq">Maya, 24, sees that her 401(k) target-date fund holds about 10% in bonds and wonders whether to switch to a 100% stock fund.</p>
+    <div class="opts"><button class="opt">Switch; bonds only slow her down.</button><button class="opt">Either can be reasonable at her age. The key is choosing a mix she will hold through a crash, and not selling bonds or stocks in a panic.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>All stocks</b>Mathematically defensible for money 40 years away, and many investors do it. But a 40% fall in her first bear market is a real test; a small bond slice makes the ride smoother at a modest cost in expected return.</div>
+      <div class="oc"><b>Choose what she will keep</b>Right. At her age the savings rate and staying invested matter far more than a 10% bond slice (INV-025 on risk tolerance and capacity).</div>
+      <div class="verdict"><b>The principle:</b> for long-term money, bonds are a shock absorber, not the engine. Size them to your nerves and your timeline.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about bonds</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.10 &mdash; The six worst years for 10-year Treasuries, 1928&ndash;2025</div>
+    <div id="f910"></div>
+    <figcaption class="cap"><b>Bond losses are real but usually modest, and all six of these came when yields rose.</b> Calendar-year total returns. Damodaran, NYU Stern. For comparison, US stocks' worst year in the same data was &minus;43.8% (1931).</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Government bonds can't lose money."</div><div class="ma"><b>Myth.</b> Treasuries almost certainly will be repaid, but their prices move with rates. 10-year Treasuries fell 17.8% in 2022 and had 20 losing calendar years out of 98.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"When rates rise, bonds are a bad investment."</div><div class="ma"><b>Mostly myth.</b> Rising rates cause an immediate price loss but raise future income. For a holder whose horizon is at least the bond's duration, the two roughly offset.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A bond's coupon is its return."</div><div class="ma"><b>Myth.</b> The return from buying today is closer to the yield to maturity, which includes the price's drift toward par. A 3% bond priced at $844 returns about 5% a year to maturity.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Duration is just maturity."</div><div class="ma"><b>Myth.</b> Only for zero-coupon bonds. A 10-year Treasury at 5.17% had a modified duration of about 7.7 in September 2026, well under 10.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Higher-yielding bonds are simply better."</div><div class="ma"><b>Myth.</b> Extra yield is payment for extra risk: longer duration, weaker credit or call features. In 2008 lower-rated corporate bonds fell while Treasuries rose 20%.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"An inverted yield curve means long bonds are a bad deal."</div><div class="ma"><b>Not necessarily.</b> It means lower yields for longer maturities at that moment. Locking in a long yield can still pay off if short rates later fall below it.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.11 &mdash; Estimated loss if yields rose one point, by Treasury maturity</div>
+    <div id="f911"></div>
+    <figcaption class="cap"><b>Know your duration before the rate move, not after.</b> Price change for a one-percentage-point rise in yield, for new par Treasuries at the yields of September 25, 2026 (2-year 4.81%, 5-year 4.98%, 10-year 5.17%, 30-year 5.49%). Computed with the bond price formula.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Bonds are the small shock absorber.</b> In Maya's target-date fund, bonds are a minor slice. Her priorities are saving the full 401(k) match and paying down 6.8% student loans.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Look for bonds at all.</b> The Riveras' six 401(k) funds are all large US stock funds. A core bond fund or a target-date fund would add the ballast they currently lack (INV-012).</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Short duration for the tuition money.</b> With college three years away, Jordan's $20,000 should sit in bonds or CDs maturing on the tuition dates, not in a long bond fund.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Build the bridge to retirement.</b> The Harpers can match high-quality bonds to their first five to seven years of retirement spending, and keep credit risk low.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Duration below her spending horizon.</b> Ruth draws from her IRA every year. Holding bonds whose duration is shorter than the time until each withdrawal protects her from 2022-style price swings.</div></div>
+  </div>
+  <div class="ws" data-ws="inv009" data-title="INV-009 worksheet: my bond check">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w9a">Each bond or bond fund I own, and its yield to maturity (or SEC yield)</label><textarea id="w9a" data-key="holdings"></textarea></div>
+      <div><label for="w9b">Each one's duration (from its fact sheet)</label><textarea id="w9b" data-key="duration"></textarea></div>
+      <div><label for="w9c">When I will need this money</label><textarea id="w9c" data-key="horizon"></textarea></div>
+      <div><label for="w9d">Credit quality: Treasuries, investment grade, high yield?</label><textarea id="w9d" data-key="credit"></textarea></div>
+      <div><label for="w9e">What a one-point rise in rates would cost me, in dollars</label><textarea id="w9e" data-key="shock"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.12 &mdash; Duration's estimate versus the exact price, five-year 4% bond</div>
+    <div id="f912"></div>
+    <figcaption class="cap"><b>A straight-line estimate of a curved relationship.</b> Exact price of the five-year, 4% annual-pay bond at yields from 1% to 9%, and the modified-duration estimate drawn from its value at 5%. The estimate is excellent for small moves and too pessimistic for large ones in either direction.</figcaption>
+  </figure>
+  <div class="ex" data-answer="844.11" data-tol="0.002" data-ok="20 payments of $15 plus $1,000, discounted at 2.5% per half-year = $844.11.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">A 10-year bond pays a 3% coupon twice a year on $1,000 of face value. Market yields are 5%. What is its price, in dollars? (Use the calculator if you like.)</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Price = 15 &times; [1 &minus; 1.025<sup>&minus;20</sup>] &divide; 0.025 + 1,000 &divide; 1.025<sup>20</sup> = 233.84 + 610.27 = <b>$844.11</b>.</div></div>
+  <div class="ex" data-answer="-4.9" data-tol="0.03" data-ok="&minus;6.5 &times; 0.75 = &minus;4.9%.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">A bond fund has a duration of 6.5. Yields rise by 0.75 percentage points. Roughly what is the change in its price, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">%&Delta;P &asymp; &minus;6.5 &times; 0.75 = <b>&minus;4.9%</b> (&minus;4.875%). On a $50,000 holding, about $2,440.</div></div>
+  <div class="ex" data-answer="3.55" data-tol="0.01" data-ok="$30 &divide; $844.11 = 3.55%.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">What is the current yield of the bond in Exercise 1, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Annual coupon $30 &divide; price $844.11 = <b>3.55%</b>. The yield to maturity (5%) is higher, because it also counts the $155.89 gain as the price rises to par.</div></div>
+  <div class="ex" data-answer="4.62" data-tol="0.01" data-ok="Sum of t &times; PV share = 4.62 years.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">Using the table in the Duration tab, what is the Macaulay duration of the five-year 4% bond at a 5% yield, in years?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in years" placeholder="years"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">0.040 + 0.076 + 0.108 + 0.138 + 4.259 = <b>4.62 years</b>; modified duration 4.62 &divide; 1.05 = 4.40.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.13 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: price, yield, duration, curve, credit">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Price &#8597; yield</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">they move opposite</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">YTM</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">the yield that matters</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Duration</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">% loss per 1-pt rise</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--red-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Credit, inflation</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">the other two risks</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"Market interest rates rise. What happens to the price of a bond you already own?","choices":["It rises","It falls","It stays at face value until maturity","It depends only on the coupon"],"answer":1,"explain":"Its fixed coupon is now less attractive than new bonds', so its price must fall until its yield matches the market."},
+    {"q":"A bond with a 3% coupon trades at $844 for $1,000 of face value. Its yield to maturity is:","choices":["Below 3%","Exactly 3%","Above 3%","Zero"],"answer":2,"explain":"A discount bond's yield to maturity exceeds its coupon, because the price rises to par by maturity."},
+    {"q":"A bond fund's duration is 8. If yields fall one percentage point, its price should rise about:","choices":["1%","8%","16%","It will fall"],"answer":1,"explain":"Percentage price change &asymp; &minus;duration &times; change in yield."},
+    {"q":"Which bond has the longest duration?","choices":["2-year, 5% coupon","10-year, 5% coupon","10-year, zero coupon","5-year, zero coupon"],"answer":2,"explain":"Longer maturity and lower coupon both lengthen duration; a 10-year zero's duration is 10 years."},
+    {"q":"On July 3, 2023, the Treasury yield curve was:","choices":["Steeply upward sloping","Flat at zero","Inverted: short-term yields above long-term","Not published"],"answer":2,"explain":"The 6-month bill yielded 5.53% and the 10-year note 3.86%."},
+    {"q":"In the 1928&ndash;2025 data, 10-year Treasuries' worst calendar year was:","choices":["1931","2008","1994","2022"],"answer":3,"explain":"&minus;17.83% in 2022, as the 10-year yield rose from about 1.5% to 3.88%."},
+    {"q":"Bonds rated BBB by S&amp;P, or Baa by Moody's, are:","choices":["The lowest investment-grade tier","High yield (junk)","In default","Government-guaranteed"],"answer":0,"explain":"Baa/BBB and above is investment grade; below is high yield."},
+    {"q":"From 1946 to 1981, 10-year Treasuries' real (after-inflation) return was about:","choices":["+4% a year","+1.8% a year","&minus;1.8% a year","&minus;10% a year"],"answer":2,"explain":"Inflation averaged 4.67% a year and eroded fixed payments: &minus;1.77% a year in real terms."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 9.14 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-010</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Bond types and bond funds</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-049</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Asset allocation models</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-077</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Sequence risk</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-009"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>U.S. Department of the Treasury. (2026). <i>Daily Treasury par yield curve rates</i> (2019&ndash;2026 data). <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&amp;field_tdr_date_value_month=202609">home.treasury.gov</a></li>
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">stern.nyu.edu</a></li>
+    <li>U.S. Securities and Exchange Commission, Investor.gov. (2026). <i>Bonds</i>; <i>Investment-grade bond (or high-grade bond)</i>; <i>Municipal bonds</i> (call risk). <a href="https://www.investor.gov/introduction-investing/investing-basics/investment-products/bonds-or-fixed-income-products/bonds">investor.gov</a></li>
+    <li>U.S. Department of the Treasury, TreasuryDirect. (2026). <i>Treasury notes</i>; <i>Treasury bonds</i>. <a href="https://www.treasurydirect.gov/marketable-securities/treasury-notes/">treasurydirect.gov</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Bond prices and yields change daily; figures are dated where given. Examples are illustrations of how bond math works, not recommendations of any security.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s2a.js"></script>
+<script>
+INV.ready(function () {
+  var h = INV.hist(), R = h.rows, yr = function (v) { return String(Math.round(v)); }, BM = INV.s2aBondMath;
+  var s92 = [[2, "2-year", "var(--s2)"], [10, "10-year", "var(--s1)"], [30, "30-year", "var(--s5)"]].map(function (k) {
+    var d = []; for (var y = 0.5; y <= 9.001; y += 0.25) d.push([y, BM(0.03, y / 100, k[0], 2).P]); return { name: k[1], color: k[2], data: d }; });
+  INV.lineChart(document.getElementById("f92"), { label: "Price versus yield", height: 260, zeroBase: false, xTitle: "Market yield (%)", yTitle: "Price per $100 face", xFmt: function (v) { return v + "%"; }, yFmt: function (v) { return Math.round(v); }, tipFmt: function (v) { return v.toFixed(2); },
+    series: s92, marks: [{ x: 3, label: "yield = coupon" }] });
+  var pv = [38.10, 36.28, 34.55, 32.91, 814.87];
+  INV.barChart(document.getElementById("f93"), { label: "Present value by year", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return INV.money(v, 0); }, tipFmt: function (v) { return INV.money(v, 2); },
+    data: pv.map(function (v, i) { return { label: "Year " + (i + 1), y: v, color: i === 4 ? "var(--s1)" : "var(--s2)" }; }) });
+  var mats = [[1 / 12, "1 Mo"], [2 / 12, "2 Mo"], [0.25, "3 Mo"], [0.5, "6 Mo"], [1, "1 Yr"], [2, "2 Yr"], [3, "3 Yr"], [5, "5 Yr"], [7, "7 Yr"], [10, "10 Yr"], [20, "20 Yr"], [30, "30 Yr"]];
+  var c22 = [0.05, 0.06, 0.08, 0.22, 0.40, 0.78, 1.04, 1.37, 1.55, 1.63, 2.05, 2.01], c23 = [5.27, 5.40, 5.44, 5.53, 5.43, 4.94, 4.56, 4.19, 4.03, 3.86, 4.08, 3.87], c26 = [4.04, 4.20, 4.24, 4.33, 4.50, 4.81, 4.94, 4.98, 5.06, 5.17, 5.54, 5.49];
+  var ser = function (c) { return mats.map(function (m, i) { return [m[0], c[i]]; }); };
+  INV.lineChart(document.getElementById("f94"), { label: "Treasury yield curves", height: 260, xTitle: "Years to maturity", yTitle: "Yield (%)", xTicks: [0, 2, 5, 10, 20, 30], xFmt: function (v) { return v + "y"; }, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "%"; },
+    series: [{ name: "Jan 3, 2022", color: "var(--s6)", data: ser(c22) }, { name: "Jul 3, 2023 (inverted)", color: "var(--s5)", data: ser(c23) }, { name: "Sep 25, 2026", color: "var(--s1)", data: ser(c26) }] });
+  var mo = [[2019.0,2.42,2.66],[2019.083,2.4,2.7],[2019.167,2.44,2.76],[2019.25,2.43,2.49],[2019.333,2.43,2.52],[2019.417,2.35,2.07],[2019.5,2.21,2.03],[2019.583,2.07,1.9],[2019.667,1.98,1.47],[2019.75,1.82,1.65],[2019.833,1.52,1.73],[2019.917,1.6,1.83],[2020.0,1.54,1.88],[2020.083,1.57,1.54],[2020.167,1.13,1.1],[2020.25,0.09,0.62],[2020.333,0.12,0.64],[2020.417,0.14,0.66],[2020.5,0.14,0.69],[2020.583,0.1,0.56],[2020.667,0.12,0.68],[2020.75,0.09,0.68],[2020.833,0.09,0.87],[2020.917,0.09,0.92],[2021.0,0.09,0.93],[2021.083,0.07,1.09],[2021.167,0.05,1.45],[2021.25,0.02,1.69],[2021.333,0.04,1.63],[2021.417,0.02,1.62],[2021.5,0.05,1.48],[2021.583,0.05,1.2],[2021.667,0.05,1.31],[2021.75,0.04,1.48],[2021.833,0.05,1.58],[2021.917,0.06,1.43],[2022.0,0.08,1.63],[2022.083,0.19,1.81],[2022.167,0.32,1.72],[2022.25,0.53,2.39],[2022.333,0.9,2.99],[2022.417,1.15,2.94],[2022.5,1.73,2.88],[2022.583,2.56,2.6],[2022.667,2.97,3.26],[2022.75,3.46,3.67],[2022.833,4.23,4.07],[2022.917,4.33,3.53],[2023.0,4.53,3.79],[2023.083,4.66,3.39],[2023.167,4.9,4.01],[2023.25,4.9,3.43],[2023.333,5.27,3.59],[2023.417,5.5,3.61],[2023.5,5.44,3.86],[2023.583,5.54,4.05],[2023.667,5.53,4.18],[2023.75,5.62,4.69],[2023.833,5.57,4.77],[2023.917,5.43,4.22],[2024.0,5.46,3.95],[2024.083,5.42,3.87],[2024.167,5.42,4.19],[2024.25,5.44,4.33],[2024.333,5.46,4.63],[2024.417,5.52,4.41],[2024.5,5.47,4.48],[2024.583,5.37,3.99],[2024.667,5.19,3.84],[2024.75,4.71,3.74],[2024.833,4.61,4.37],[2024.917,4.51,4.19],[2025.0,4.36,4.57],[2025.083,4.34,4.54],[2025.167,4.35,4.16],[2025.25,4.32,4.17],[2025.333,4.31,4.25],[2025.417,4.44,4.46],[2025.5,4.4,4.26],[2025.583,4.35,4.23],[2025.667,4.2,4.28],[2025.75,4.01,4.12],[2025.833,3.98,4.13],[2025.917,3.81,4.09],[2026.0,3.65,4.19],[2026.083,3.69,4.29],[2026.167,3.72,4.05],[2026.25,3.7,4.33],[2026.333,3.68,4.39],[2026.417,3.78,4.47],[2026.5,3.85,4.48],[2026.583,3.91,4.7],[2026.667,3.92,4.79]];
+  INV.lineChart(document.getElementById("f95"), { label: "10-year minus 3-month", height: 230, zeroBase: false, xFmt: yr, yFmt: function (v) { return v.toFixed(1); }, tipFmt: function (v) { return (v >= 0 ? "+" : "") + v.toFixed(2) + " pts"; }, yTitle: "Percentage points",
+    series: [{ name: "10-year minus 3-month", color: "var(--s1)", data: mo.map(function (r) { return [r[0], Math.round((r[2] - r[1]) * 100) / 100]; }), area: true }] });
+  var by = function (y) { return R[y - h.first]; };
+  var d96 = []; [1931, 2008, 2009, 2022].forEach(function (y) { var r = by(y); d96.push({ label: y + " Treasuries", tip: y + " 10-year Treasuries", y: r[3], color: "var(--s1)" }); d96.push({ label: y + " Baa", tip: y + " Baa corporates", y: r[4], color: "var(--s3)" }); });
+  INV.barChart(document.getElementById("f96"), { label: "Treasuries vs Baa", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return INV.pct(v, 1); }, data: d96 });
+  var tb = [[1928, 1]], tl = [[1928, 1]], a = 1, b = 1;
+  R.forEach(function (r) { a *= (1 + r[3] / 100) / (1 + r[7] / 100); b *= (1 + r[2] / 100) / (1 + r[7] / 100); tb.push([r[0] + 1, a]); tl.push([r[0] + 1, b]); });
+  INV.lineChart(document.getElementById("f97"), { label: "Real growth of $1", height: 250, log: true, xFmt: yr, yFmt: function (v) { return "$" + v; }, tipFmt: function (v) { return "$" + v.toFixed(2); },
+    series: [{ name: "10-year Treasuries", color: "var(--s1)", data: tb }, { name: "3-month T-bills", color: "var(--s3)", data: tl }], bands: [{ x0: 1946, x1: 1982, label: "1946–1981" }] });
+  var r22 = by(2022);
+  INV.barChart(document.getElementById("f98"), { label: "2022 returns", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; },
+    data: [["US stocks", r22[1], "var(--s5)"], ["10-yr Treasuries", r22[3], "var(--s1)"], ["Baa corporates", r22[4], "var(--s3)"], ["T-bills", r22[2], "var(--s2)"], ["Inflation", r22[7], "var(--s6)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  var worst = R.map(function (r) { return [r[0], r[3]]; }).sort(function (x, y) { return x[1] - y[1]; }).slice(0, 6);
+  INV.barChart(document.getElementById("f910"), { label: "Worst Treasury years", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; }, data: worst.map(function (w) { return { label: String(w[0]), y: w[1], color: "var(--s5)" }; }) });
+  var d911 = [[2, 4.81], [5, 4.98], [10, 5.17], [30, 5.49]].map(function (k) { var p0 = BM(k[1] / 100, k[1] / 100, k[0], 2).P, p1 = BM(k[1] / 100, k[1] / 100 + 0.01, k[0], 2).P; return { label: k[0] + "-year at " + k[1] + "%", y: (p1 / p0 - 1) * 100, color: "var(--s5)" }; });
+  INV.barChart(document.getElementById("f911"), { label: "One-point rise", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(1) + "%"; }, data: d911 });
+  var ex = [], es = [], p5 = BM(0.04, 0.05, 5, 1);
+  for (var y = 1; y <= 9.001; y += 0.25) { ex.push([y, BM(0.04, y / 100, 5, 1).P * 10]); es.push([y, p5.P * 10 * (1 - p5.mod * (y / 100 - 0.05))]); }
+  INV.lineChart(document.getElementById("f912"), { label: "Duration estimate", height: 240, zeroBase: false, xTitle: "Market yield (%)", xFmt: function (v) { return v + "%"; }, yFmt: function (v) { return INV.money(v, 0); }, tipFmt: function (v) { return INV.money(v, 2); },
+    series: [{ name: "Exact price", color: "var(--s1)", data: ex }, { name: "Duration estimate from 5%", color: "var(--s3)", data: es, dash: "5 4" }], dots: [{ x: 5, y: p5.P * 10, label: "$956.71", color: "var(--s1)" }] });
+});
+</script>
+</body>
+</html>

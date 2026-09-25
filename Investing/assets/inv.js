@@ -64,7 +64,7 @@
     [14, "Choosing a Financial Advisor"], [14, "Platforms, Brokerages and DIY Tools"],
     [15, "Five Households, Five Plans"]
   ];
-  var LIVE = { "INV-001": 1, "INV-002": 1, "INV-003": 1, "INV-004": 1, "INV-005": 1, "INV-006": 1, "INV-007": 1 };
+  var LIVE = {}; for (var li = 1; li <= 105; li++) LIVE["INV-" + String(li).padStart(3, "0")] = 1;
   var COURSE = T.map(function (t, i) {
     var id = "INV-" + String(i + 1).padStart(3, "0");
     return { id: id, n: i + 1, stage: t[0], title: t[1], live: !!LIVE[id] };
@@ -79,7 +79,7 @@
       line: "Married, two children (4 and 7). $145,000 household income, $310,000 mortgage at 3.1%, $62,000 in 401(k)s.",
       stage: "Building a family" },
     jordan: { name: "Jordan Ellis", short: "Jordan", age: "45", color: "var(--s3)", init: "JE",
-      line: "Single parent of a 15-year-old. $88,000 income, $140,000 saved for retirement, renting, no college fund yet.",
+      line: "Single parent of a 15-year-old. $88,000 income, $140,000 saved for retirement, $20,000 in savings for college (no 529), renting.",
       stage: "Mid-career, one income" },
     harper: { name: "Tom & Rachel Harper", short: "The Harpers", age: "57 & 55", color: "var(--s4)", init: "H",
       line: "$260,000 income, $1.1M saved (mostly pre-tax 401(k)), home worth $650,000 with $90,000 left on the mortgage.",

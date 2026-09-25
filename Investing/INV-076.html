@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-076 · Withdrawal Strategies — Investing Learning Lab</title>
+<meta name="description" content="The real history of the 4% rule (Bengen 1994, Trinity 1998), a backtest of every 30-year retirement since 1928, guardrails, variable percentage withdrawals and bucket strategies.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-076">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-076</span><span class="ttl">Withdrawal Strategies</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 11 · Retirement</span><span class="chip teal">Intermediate to advanced</span><span class="chip gray">About 70 minutes</span><span class="chip gray">2 historical tools</span></div>
+    <h1>Withdrawal Strategies</h1>
+    <p class="sub">Saving for retirement is a question of how much to put in. Retirement itself is the reverse: how much can you take out each year without running dry? This module tells the real story of the 4% rule, tests it on every retirement since 1928, and compares the flexible alternatives: guardrails, variable percentages and buckets.</p>
+    <p class="q"><span>The question this module answers</span>How much can I spend each year from my portfolio, and what rule should decide it?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <path d="M30 80 L330 80" stroke="#0B8A7E" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M30 170 L330 170" stroke="#C2332B" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M30 125 C80 100 110 160 160 140 S240 95 290 120 S320 130 330 125" fill="none" stroke="#1F5FD1" stroke-width="4"/>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Spending between two guardrails</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>Why you cannot simply spend the average return</h2>
+  <p class="lede">If a portfolio of 60% stocks and 40% bonds has earned about 5% a year after inflation over the long run, it seems natural to spend 5% a year and leave the principal intact. That reasoning is the single most common retirement-income mistake.</p>
+  <p>The average is real. From 1928 to 2025, a 60/40 mix of the S&amp;P 500 and 10-year Treasuries, rebalanced every year, compounded at 8.3% a year before inflation and 5.1% after it (computed from Damodaran's data in <code>inv-data.js</code>). But nobody retires into an average. You retire into one particular sequence of years, and if the bad years come first, withdrawals taken from a shrunken portfolio cannot be earned back. Figure 76.1 shows a retiree who started in 1966 and spent a fixed, inflation-adjusted amount.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.1 &mdash; Retiring in 1966 with $1 million: three spending rates</div>
+    <div id="f761"></div>
+    <figcaption class="cap"><b>Spending the long-run average return ran out in 18 years.</b> A 60/40 portfolio, withdrawals taken at the start of each year and raised with inflation, balances in 1966 dollars. At 5% the money lasted 18 years; at 7%, 13 years; at 4%, 25 years. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <p>William Bengen opened his 1994 paper with exactly this trap: a planner who "carefully computed their rates of withdrawal based on average rates of returns" and watched clients' money run out. His answer, the <span class="term" data-term="Safe withdrawal rate">safe withdrawal rate</span>, and the answers that followed it are the subject of this module.</p>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>What Bengen (1994) and the Trinity study (1998) actually found, and what they did not.</li>
+    <li>A backtest of the fixed real withdrawal on every retirement since 1928, which you can run yourself.</li>
+    <li>Guardrails: the Guyton&ndash;Klinger decision rules.</li>
+    <li>Variable percentage and amortization methods that can never run out.</li>
+    <li>Bucket strategies, and what they do and do not change.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="The 4% rule's history">
+  <p class="kicker">Where the number came from</p>
+  <h2>Bengen 1994 and the Trinity study</h2>
+  <div class="def"><div class="def-h"><b>Fixed real withdrawal</b><span>also called the constant-dollar or inflation-adjusted withdrawal</span></div>
+    <div class="def-r"><div>What it is</div><div>You withdraw a percentage of the starting portfolio in the first year; every year after, you take the same dollar amount raised by inflation, whatever the markets do. The percentage is used once, at the start.</div></div>
+    <div class="def-r"><div>Used for</div><div>The method behind the "4% rule": a $1 million portfolio pays $40,000 in year one, then $40,000 plus inflation, forever unchanged in buying power.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>It gives the steadiest possible income, which is why it was studied first, but it is also the most fragile rule, because it never adjusts spending to a falling portfolio.</div></div></div>
+  <h3>Bengen, 1994</h3>
+  <p>William Bengen, a financial planner in El Cajon, California, used Ibbotson Associates' data on large-company stocks, intermediate-term Treasury notes and inflation from 1926 onward. For each starting year he measured "portfolio longevity": how long a portfolio lasted with a fixed real withdrawal. His conclusions, in his words and numbers:</p>
+  <ul>
+    <li>A first-year withdrawal of <b>4%</b>, adjusted for inflation afterward, "should be safe": "In no past case has it caused a portfolio to be exhausted before 33 years."</li>
+    <li>A <b>4.25%</b> rate "could exhaust a portfolio in as little as 28 years."</li>
+    <li>About <b>3%</b> (up to roughly 3.5%) was "absolutely safe": never less than 50 years.</li>
+    <li>An initial 5% rate was "risky; six percent or more is 'gambling.'"</li>
+    <li>The best starting allocation was between <b>50% and 75% stocks</b>; below 50% was "counterproductive."</li>
+  </ul>
+  <h3>The Trinity study, 1998</h3>
+  <p>Philip Cooley, Carl Hubbard and Daniel Walz, finance professors at Trinity University, whose paper became known as the <span class="term" data-term="Trinity study">Trinity study</span>, published a broader test in the <i>AAII Journal</i> in February 1998. They used S&amp;P 500 returns and long-term, high-grade corporate bonds from 1926 to 1995, withdrawal rates from 3% to 12%, and payout periods of 15 to 30 years, and they reported "<span class="term" data-term="Success rate">success rates</span>": the share of past periods in which the portfolio lasted.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.2 &mdash; Trinity study: 30-year success rates with inflation-adjusted withdrawals, 1926&ndash;1995</div>
+    <div id="f762"></div>
+    <figcaption class="cap"><b>At 4%, stock-heavy portfolios lasted in 95&ndash;98% of 30-year periods; all-bond portfolios in only 20%.</b> Share of the 41 overlapping 30-year periods in which the portfolio supported the withdrawals, at 4% (teal) and 5% (amber) first-year rates; labels give stocks/bonds. At 6%, the rates were 68%, 68%, 51%, 20% and 12%. Source: Cooley, Hubbard and Walz (1998), Table 3.</figcaption>
+  </figure>
+  <p>The Trinity authors drew a conclusion that is often forgotten: "Retirees who demand CPI-adjusted withdrawals during their retirement years must accept a substantially reduced withdrawal rate from the initial portfolio." They also noted that stock-heavy portfolios at 3&ndash;4% frequently ended with <i>more</i> money than they started with, which means many rigid 4% retirees under-spent.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.3 &mdash; Three papers that shaped withdrawal planning</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 150" role="img" aria-label="Timeline: Bengen 1994, Trinity 1998, Guyton and Klinger 2006">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <line x1="40" y1="40" x2="680" y2="40" style="stroke:var(--border2)" stroke-width="3"/>
+      <circle cx="110" cy="40" r="9" fill="#1F5FD1"/><circle cx="360" cy="40" r="9" fill="#0B8A7E"/><circle cx="610" cy="40" r="9" fill="#C77A0A"/>
+      <rect x="20" y="62" width="200" height="78" rx="10" style="fill:var(--blue-soft)"/><text x="120" y="84" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">1994 &middot; Bengen</text><text x="120" y="104" text-anchor="middle" class="svg-s" font-size="11.5">4% fixed real never ran</text><text x="120" y="120" text-anchor="middle" class="svg-s" font-size="11.5">out in under 33 years</text>
+      <rect x="260" y="62" width="200" height="78" rx="10" style="fill:var(--teal-soft)"/><text x="360" y="84" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">1998 &middot; Trinity study</text><text x="360" y="104" text-anchor="middle" class="svg-s" font-size="11.5">success rates by rate,</text><text x="360" y="120" text-anchor="middle" class="svg-s" font-size="11.5">mix and payout period</text>
+      <rect x="500" y="62" width="200" height="78" rx="10" style="fill:var(--amber-soft)"/><text x="600" y="84" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">2006 &middot; Guyton&ndash;Klinger</text><text x="600" y="104" text-anchor="middle" class="svg-s" font-size="11.5">decision rules allow a</text><text x="600" y="120" text-anchor="middle" class="svg-s" font-size="11.5">5.2&ndash;5.6% start</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>From a fixed rule to flexible ones.</b> Each study kept the same idea (test spending rules against history or simulated history) and relaxed one assumption: first rigid spending, then fixed horizons, then rules that let spending respond to markets.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>What the rule is not</summary><div class="layer-b">
+    <p>The 4% rule is not "withdraw 4% of whatever the balance is each year"; that is a constant-percentage rule, which never runs out but makes income swing with markets. It is not a promise: both studies describe what would have happened in US history, one of the most successful stock markets in the world. And it was never meant to include fees or taxes: both studies used index returns with no costs.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Backtest it yourself">
+  <p class="kicker">Every retirement since 1928</p>
+  <h2>Test the fixed real withdrawal on 98 years of data</h2>
+  <p>The tool below runs the same experiment on this course's data set: every retirement starting in 1928 through the last year that still has a full period of data. For a 30-year retirement, that is 69 starting years, 1928 to 1996. Change the rate, the mix and the length and watch which years fail.</p>
+  <div data-tool="s11aBacktest"></div>
+  <h3>What the default shows</h3>
+  <p>At 4% with 60% stocks, using a <span class="term" data-term="Fixed real withdrawal">fixed real withdrawal</span>, the money lasted 30 years in <b>65 of 69</b> retirements (94%). The four failures all began in the late 1960s (1965, 1966, 1968 and 1969), when high inflation and poor stock returns in the 1970s arrived early; the worst, 1966, ran out in its 26th year. The highest rate that survived every one of the 69 starts was <b>3.73%</b>, set by 1966. At the other extreme, a 1982 retiree could have sustained over 10%. The median retiree ended 30 years with about <b>$1.39 million</b> in start-year dollars, more than they began with; 43 of the 69 ended with at least their starting real balance.</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Success rate, 30 years, 1928&ndash;1996 starts</th><th class="r">3%</th><th class="r">3.5%</th><th class="r">4%</th><th class="r">4.5%</th><th class="r">5%</th><th class="r">6%</th></tr></thead><tbody>
+    <tr><td>100% bonds (10-year Treasuries)</td><td class="r">84%</td><td class="r">48%</td><td class="r neg-t">39%</td><td class="r">33%</td><td class="r">25%</td><td class="r">14%</td></tr>
+    <tr><td>25% stocks</td><td class="r">100%</td><td class="r">97%</td><td class="r">74%</td><td class="r">54%</td><td class="r">42%</td><td class="r">25%</td></tr>
+    <tr><td>50% stocks</td><td class="r">100%</td><td class="r">100%</td><td class="r">93%</td><td class="r">83%</td><td class="r">67%</td><td class="r">49%</td></tr>
+    <tr><td>60% stocks</td><td class="r">100%</td><td class="r">100%</td><td class="r pos-t">94%</td><td class="r">84%</td><td class="r">72%</td><td class="r">52%</td></tr>
+    <tr><td>75% stocks</td><td class="r">100%</td><td class="r">100%</td><td class="r">94%</td><td class="r">87%</td><td class="r">77%</td><td class="r">62%</td></tr>
+    <tr><td>100% stocks</td><td class="r">100%</td><td class="r">99%</td><td class="r">93%</td><td class="r">90%</td><td class="r">78%</td><td class="r">68%</td></tr>
+  </tbody></table></div>
+  <p class="src">Computed from Damodaran, NYU Stern (S&amp;P 500 with dividends, 10-year Treasury bonds, CPI), rebalanced yearly, withdrawals at the start of each year, no fees or taxes. 69 overlapping 30-year periods.</p>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>Why this differs from Bengen's "never before 33 years."</b> Bengen used intermediate-term Treasuries and data from 1926 through the early 1990s; this data set uses 10-year Treasuries, which lost more in the 1970s inflation, and runs through 2025. Small changes in data and timing move the "safe" rate by a few tenths of a percent, which is itself a lesson: 4% is a neighborhood, not a precise line.</p></div></div>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>How the backtest works</summary><div class="layer-b">
+    <div class="formula">B<sub>t+1</sub> = (B<sub>t</sub> &minus; W) &times; (1 + r<sub>t</sub>), in real dollars, where r<sub>t</sub> = (1 + s&middot;R<sub>stock</sub> + (1 &minus; s)&middot;R<sub>bond</sub>) &divide; (1 + CPI) &minus; 1</div>
+    <p>Working in real (start-year) dollars with a constant W is identical to raising a nominal withdrawal by inflation each year. A retirement "fails" in the first year the balance is smaller than the withdrawal. The maximum sustainable rate for each start year is found by bisection. With only 98 years of data, the 69 thirty-year windows overlap heavily (two adjacent windows share 29 years), so they are far from 69 independent experiments.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Guardrails">
+  <p class="kicker">Flexible spending, part 1</p>
+  <h2>The Guyton&ndash;Klinger decision rules</h2>
+  <p>The fixed real withdrawal is rigid by design. Almost nobody actually spends that way: people trim a vacation after a crash and splurge after a boom. Jonathan Guyton and William Klinger asked what starting rate becomes safe if spending follows a few explicit rules.</p>
+  <div class="def"><div class="def-h"><b>Guardrails</b><span>the Guyton&ndash;Klinger decision rules</span></div>
+    <div class="def-r"><div>What it is</div><div>A starting withdrawal plus rules that cut spending when the current withdrawal rate drifts well above the starting rate, and raise it when the rate drifts well below.</div></div>
+    <div class="def-r"><div>Used for</div><div>Starting with a higher income than the fixed 4% rule allows, in exchange for accepting occasional cuts.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>You trade certainty of income for a higher starting income and a much lower chance of running out. It works only if you will actually make the cuts.</div></div></div>
+  <p>In their March 2006 <i>Journal of Financial Planning</i> paper, Guyton and Klinger used Monte Carlo simulation (INV-077) based on 1973&ndash;2004 and 1928&ndash;2004 data, tested 50%, 65% and 80% equity portfolios, and required the money to last at least <b>40 years</b>. Their rules:</p>
+  <ul>
+    <li><b>Withdrawal rule:</b> raise withdrawals by inflation each year, except that there is no increase after a year in which the portfolio's total return was negative, and no later make-up.</li>
+    <li><b>Capital preservation rule:</b> if the current withdrawal rate has risen more than <b>20%</b> above the initial rate (for example, above 6% for a 5% start), cut this year's withdrawal by <b>10%</b>. The rule stops applying in the final 15 years of the planning horizon.</li>
+    <li><b>Prosperity rule:</b> if the current rate has fallen more than 20% below the initial rate, raise this year's withdrawal by 10%.</li>
+    <li><b>Portfolio management rule:</b> fund withdrawals from asset classes that have grown above their target; do not sell stocks after a negative year if cash and bonds can cover the withdrawal.</li>
+  </ul>
+  <p>They concluded that initial withdrawal rates of <b>5.2&ndash;5.6%</b> were sustainable at a 99% confidence standard for portfolios with at least 65% in equities, falling to as low as 4.6% with 50% equities, and that consistently applying the two new rules "effectively eliminates the risk of exhausting retirement assets."</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.4 &mdash; How the guardrails work for a 5% starting rate</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="Upper guardrail at 6% triggers a 10% cut; lower guardrail at 4% triggers a 10% raise">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="20" y="20" width="680" height="44" rx="10" style="fill:var(--red-soft)"/><text x="40" y="47" class="svg-t" font-size="13" font-weight="800">Withdrawal rate above 6% (initial 5% &times; 1.2)</text><text x="690" y="47" text-anchor="end" class="svg-s" font-size="12">cut spending 10%</text>
+      <rect x="20" y="78" width="680" height="44" rx="10" style="fill:var(--green-soft)"/><text x="40" y="105" class="svg-t" font-size="13" font-weight="800">Between 4% and 6%</text><text x="690" y="105" text-anchor="end" class="svg-s" font-size="12">raise with inflation (none after a losing year)</text>
+      <rect x="20" y="136" width="680" height="44" rx="10" style="fill:var(--blue-soft)"/><text x="40" y="163" class="svg-t" font-size="13" font-weight="800">Withdrawal rate below 4% (initial 5% &times; 0.8)</text><text x="690" y="163" text-anchor="end" class="svg-s" font-size="12">raise spending 10%</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>The rules respond to the withdrawal rate, not to the market directly.</b> The current rate is this year's planned withdrawal divided by the current balance. A fall in the portfolio pushes the rate up toward the upper guardrail; a rise pushes it down toward the lower one.</figcaption>
+  </figure>
+  <p>Now try four rules on one real retirement, including a simplified version of <span class="term" data-term="Guardrails">guardrails</span>. The default is the worst kind of start, 1966, at a 5% initial rate: exactly the case where the fixed rule runs out.</p>
+  <div data-tool="s11aStrategies"></div>
+  <p>In 1966 at 5% and 60/40, the fixed real withdrawal paid $50,000 a year in 1966 dollars for 18 years and then ran out. The guardrails never ran out and ended with about $659,000, but they paid for that safety: five 10% cuts, plus inflation freezes in the high-inflation 1970s, reduced real spending to about <b>$20,600</b> by the 15th year, 59% below where it started. Across all 69 starts at 5%, the guardrails never ran out, but in the worst start (1968) real spending fell to 38% of its first-year level at its low point.</p>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>This tool is a simplified version.</b> It applies the withdrawal, capital preservation and prosperity rules to a rebalanced two-asset portfolio; it does not model the portfolio management rule or the paper's inflation cap, and it runs on actual history rather than simulation. Deep cuts in an inflationary decade are a real feature of rules that freeze inflation raises, not a bug in the tool.</p></div></div>
+</section>
+
+<section class="panel" data-tab="VPW and percentages">
+  <p class="kicker">Flexible spending, part 2</p>
+  <h2>Rules that can never run out</h2>
+  <p>A rule that withdraws a <i>percentage of the current balance</i> can never empty the portfolio: a percentage of something is always something. The price is that income moves with the market. Two versions are common.</p>
+  <div class="def"><div class="def-h"><b>Constant-percentage withdrawal</b></div>
+    <div class="def-r"><div>What it is</div><div>Withdraw the same percentage, such as 4% or 5%, of the balance at the start of each year.</div></div>
+    <div class="def-r"><div>Used for</div><div>A simple rule with no chance of depletion; some endowments use smoothed versions of it.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A 30% market fall means a 30% pay cut the next year. If your fixed bills are covered by Social Security and pensions, that may be tolerable; if not, it is not.</div></div></div>
+  <div class="def"><div class="def-h"><b>Variable percentage withdrawal</b><span>VPW, an amortization-based method</span></div>
+    <div class="def-r"><div>What it is</div><div>Each year, withdraw the payment that would use up the portfolio over your remaining planning horizon at an assumed return, like a mortgage payment in reverse. Because the remaining horizon shrinks, the percentage rises with age.</div></div>
+    <div class="def-r"><div>Used for</div><div>Spending more of the portfolio during your lifetime, deliberately, while still adapting to markets. The method, <span class="term" data-term="Variable percentage withdrawal">VPW</span>, was popularized by the Bogleheads investor community.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Income is higher on average and never depletes before the end of the horizon, but it varies year to year and shrinks after bad markets. Pick a horizon beyond your likely lifespan (for example, 100) so the late-life percentages do not strip the account.</div></div></div>
+  <div class="formula">Withdrawal rate at age a = r &divide; [ (1 &minus; (1 + r)<sup>&minus;n</sup>) &times; (1 + r) ], with n = years left in the horizon and r = assumed real return</div>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.5 &mdash; Amortization withdrawal rates by age (horizon to 100, 3% real return)</div>
+    <div id="f765"></div>
+    <figcaption class="cap"><b>The percentage rises steadily with age.</b> Payments at the start of each year that would exhaust the balance at 100 with a 3% real return: 4.15% at 60, 4.45% at 65, 4.85% at 70, 5.43% at 75, 6.30% at 80, 7.73% at 85 and 10.49% at 90. These are this module's illustrative assumptions; published VPW tables use their own return assumptions by asset mix.</figcaption>
+  </figure>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Smoothing the ride</summary><div class="layer-b">
+    <p>Pure percentage rules pass every market swing straight through to your income. Common fixes include basing the withdrawal on an average of the last few year-end balances, capping the change in spending to a set percentage each year, or covering essential spending with guaranteed income so that only discretionary spending varies. Each fix reduces volatility of income at the cost of some risk of lower spending later.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Why the amortization rule spends more</summary><div class="layer-b">
+    <p>The fixed real rule was calibrated to survive the worst historical start, so in a typical history it leaves a large balance: the median 60/40 retiree in this course's backtest ended 30 years with 1.39 times the starting real balance. An amortization rule targets zero at the horizon, so it spends that surplus during life. In the 1982 start, for example, amortization spending over 30 years totaled about $4.07 million per $1 million invested (in 1982 dollars), versus $1.5 million for a 5% fixed real withdrawal. Whether that is desirable depends on bequest goals.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Bucket strategy">
+  <p class="kicker">A way to organize the money</p>
+  <h2>Buckets: cash for now, stocks for later</h2>
+  <div class="def"><div class="def-h"><b>Bucket strategy</b></div>
+    <div class="def-r"><div>What it is</div><div>Dividing retirement savings by when you will spend them: a cash bucket for the next one to two years, a bond bucket for roughly years three to ten, and a stock bucket for the long run, with rules for refilling the near-term buckets.</div></div>
+    <div class="def-r"><div>Used for</div><div>Avoiding forced stock sales in a crash, and making a portfolio easier to live with emotionally.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Buckets are a way of holding an asset allocation, not a different return engine. Their main value is behavioral: knowing the next two years of spending are in cash makes it easier not to panic.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.6 &mdash; A three-bucket plan for $1 million and $50,000 a year of withdrawals (illustrative)</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 230" role="img" aria-label="Bucket 1 cash two years, bucket 2 bonds eight years, bucket 3 stocks; refill downward">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="20" y="30" width="200" height="130" rx="14" style="fill:var(--green-soft)"/><text x="120" y="60" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Bucket 1: cash</text><text x="120" y="84" text-anchor="middle" class="svg-s" font-size="12">2 years of withdrawals</text><text x="120" y="104" text-anchor="middle" class="svg-t" font-size="16" font-weight="800">$100,000</text><text x="120" y="126" text-anchor="middle" class="svg-s" font-size="11.5">spend from here</text>
+      <rect x="260" y="30" width="200" height="130" rx="14" style="fill:var(--blue-soft)"/><text x="360" y="60" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Bucket 2: bonds</text><text x="360" y="84" text-anchor="middle" class="svg-s" font-size="12">years 3 to 10</text><text x="360" y="104" text-anchor="middle" class="svg-t" font-size="16" font-weight="800">$400,000</text><text x="360" y="126" text-anchor="middle" class="svg-s" font-size="11.5">refills bucket 1</text>
+      <rect x="500" y="30" width="200" height="130" rx="14" style="fill:var(--amber-soft)"/><text x="600" y="60" text-anchor="middle" class="svg-t" font-size="14" font-weight="800">Bucket 3: stocks</text><text x="600" y="84" text-anchor="middle" class="svg-s" font-size="12">years 11 and beyond</text><text x="600" y="104" text-anchor="middle" class="svg-t" font-size="16" font-weight="800">$500,000</text><text x="600" y="126" text-anchor="middle" class="svg-s" font-size="11.5">refill after good years</text>
+      <path d="M500 190 L230 190" style="stroke:var(--text2)" stroke-width="2" marker-end="url(#ah)"/><defs><marker id="ah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" style="fill:var(--text2)"/></marker></defs>
+      <text x="365" y="214" text-anchor="middle" class="svg-s" font-size="12">money flows toward the spending bucket; skip stock sales after a bad year</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>This plan is simply a 50/50 portfolio held in three labeled pieces.</b> $100,000 cash plus $400,000 bonds plus $500,000 stocks is 50% stocks. The rules (which bucket refills which, and when) are what make it different from ordinary rebalancing.</figcaption>
+  </figure>
+  <p>The advantage people most often claim for buckets is "never selling stocks in a downturn." That is real but modest: with ordinary rebalancing, you would sell bonds, not stocks, after a crash anyway, because stocks would be below target. The honest case for a <span class="term" data-term="Bucket strategy">bucket strategy</span> is psychological. The honest cost is that a large cash bucket earns less over time, and a plan that refills buckets only when stocks are "up" is a form of market timing that may leave the cash bucket empty in a long bear market.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Buckets and the account you hold them in</summary><div class="layer-b">
+    <p>Buckets need not be separate accounts. Many retirees hold the cash bucket in a taxable account or an IRA money market fund, bonds in the IRA, and stocks spread across Roth and taxable accounts for tax reasons (INV-036, INV-042). Required minimum distributions from IRAs (INV-081) can be taken from whichever holdings you choose, which makes them a natural refill point for the cash bucket.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">The research record</p>
+  <h2>Three findings that shaped the field</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.7 &mdash; Maximum sustainable 30-year withdrawal rate by year of retirement, 60/40</div>
+    <div id="f767"></div>
+    <figcaption class="cap"><b>The retirement year decided the safe rate, from 3.7% to over 10%.</b> The highest fixed real withdrawal rate that would have lasted 30 years for each start year from 1928 to 1996, computed from Damodaran's data. The dashed line is 4%. Late-1960s retirees set the floor; early-1980s retirees could have spent more than double.</figcaption>
+  </figure>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>Bengen's worst years were the inflationary ones</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Bengen found that the 1973&ndash;1974 "Big Bang" damaged portfolios that began withdrawals "as much as 20 or more years earlier," and that it was "not a deflationary period like the Depression that is to be truly feared, but rather an inflationary period."</div></div>
+    <div class="row"><div>What it teaches</div><div>Rising prices force a fixed real withdrawal to grow just as the portfolio shrinks. The same pattern shows up in Figure 76.7: the lowest sustainable rates belong to retirees who started in 1965&ndash;1969.</div></div>
+    <div class="row"><div>Source</div><div class="src">Bengen, W. P. (1994). Determining withdrawal rates using historical data. <i>Journal of Financial Planning</i> (October 1994).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Trinity's warning about rigid inflation increases</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>The Trinity authors showed that without inflation adjustments, withdrawal rates of 3&ndash;4% were "extremely unlikely to exhaust any portfolio," but that retirees who "demand CPI-adjusted withdrawals" must accept a substantially lower starting rate. They added that for retirees with significant fixed costs and those who spend less as they age, CPI adjustments are likely to cause "a suboptimal exchange of present consumption for future consumption."</div></div>
+    <div class="row"><div>What it teaches</div><div>The famous success rates depend on one assumption: spending never adjusts. Relaxing that assumption, even partly, changes the answer more than tinkering with the asset mix.</div></div>
+    <div class="row"><div>Source</div><div class="src">Cooley, P. L., Hubbard, C. M., &amp; Walz, D. T. (1998). Retirement savings: Choosing a withdrawal rate that is sustainable. <i>AAII Journal</i> (February 1998).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>Decision rules raise the starting rate</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Guyton and Klinger found that with their capital preservation and prosperity rules, initial rates of 5.2&ndash;5.6% were sustainable over 40 years at a 99% confidence standard for portfolios with at least 65% equities, and that the 1973&ndash;2004 and 1928&ndash;2004 data periods gave "virtually identical results."</div></div>
+    <div class="row"><div>What it teaches</div><div>A willingness to cut spending by 10% in bad stretches is worth more than a point of starting income. The cost, as the tool shows for 1966, can be a long run of reduced real spending.</div></div>
+    <div class="row"><div>Source</div><div class="src">Guyton, J. T., &amp; Klinger, W. J. (2006). Decision rules and maximum initial withdrawal rates. <i>Journal of Financial Planning</i> (March 2006).</div></div>
+  </div></div>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Choosing a rule</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.8 &mdash; The Harpers' first-year income from $1.69 million under four rules</div>
+    <div id="f768"></div>
+    <figcaption class="cap"><b>The rule sets the starting income as much as the balance does.</b> First-year withdrawals from the Harpers' projected $1.69 million: 3.5% fixed real $59,150; 4% fixed real $67,600; a VPW-style amortization at 62 to age 100 (3% real) about $71,950; 5% with guardrails $84,500. Illustrative.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Harpers</div>
+    <p class="dq">The Harpers expect $1.69 million at retirement and a $61,000 gap before Social Security fully starts. Tom likes certainty; Rachel would rather travel more early and cut back later if needed. Which rule fits?</p>
+    <div class="opts"><button class="opt">Fixed real at 4%: $67,600 a year, never cut.</button><button class="opt">Guardrails starting near 5%, with a written list of what they would cut first if the upper guardrail is hit.</button><button class="opt">Constant 5% of the balance each year.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Fixed real at 4%</b>It covers their $61,000 gap with room to spare, and in 94% of historical 30-year periods it would have lasted. But it also would have left the median retiree with more real money than they started with: a lot of unspent travel.</div>
+      <div class="oc"><b>Guardrails with a cut list</b>A strong fit for a couple with a mix of essential and discretionary spending. Their $80,000 floor is mostly Social Security once both claim, so a 10% cut falls on travel, not groceries. Writing the cut list now makes it much more likely they will follow the rule later.</div>
+      <div class="oc"><b>Constant 5%</b>It can never run out, but a 2008-style year would cut their income by about a third the next year. With a large discretionary budget that may be acceptable; it is the least comfortable for Tom.</div>
+      <div class="verdict"><b>The principle:</b> the best rule is one you will follow; flexibility is worth the most when a large share of spending is discretionary.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Ruth</div>
+    <p class="dq">Ruth needs about $25,200 a year from her $780,000 IRA, a 3.2% rate. After a bad year, a neighbor tells her to "cut back to be safe." Should she?</p>
+    <div class="opts"><button class="opt">Yes, cut spending 20% until markets recover.</button><button class="opt">No: at 3.2% she is well inside every historical safe rate; keep spending, and draw from her CDs instead of selling stocks after a loss.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Cut 20%</b>Unnecessary at her rate. In this course's backtest, a 3.2% fixed real withdrawal from a 50/50 portfolio lasted in all 74 historical 25-year periods, which is about her horizon to the mid-90s.</div>
+      <div class="oc"><b>Keep spending; use the cushion</b>Right. Her $60,000 of CDs and savings is a natural cash bucket. Spending from it after a loss, and refilling it later from the IRA, avoids selling stocks low. Her RMDs from 73 (INV-081) will likely exceed her spending, so the cushion refills itself.</div>
+      <div class="verdict"><b>The principle:</b> a low withdrawal rate is itself the safety margin; do not add panic on top of it.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; Jordan's early question</div>
+    <p class="dq">Jordan, 45, reads that "4% is dead" and "5% is fine" in the same week. What should Jordan take from the research for a retirement 20 years away?</p>
+    <div class="opts"><button class="opt">Nothing; pick whichever article sounds better.</button><button class="opt">Plan with about 3.5&ndash;4% for a rigid budget, and treat a higher rate as available only with a written plan to cut spending.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Pick one</b>Both headlines describe the same research under different assumptions about flexibility, fees and horizon.</div>
+      <div class="oc"><b>Match the rate to the rule</b>Right. The rate is not a fact about markets; it is the output of a spending rule. A rigid rule needs a lower rate; a flexible rule allows a higher one.</div>
+      <div class="verdict"><b>The principle:</b> ask "safe under which rule?" before asking "how much is safe?"</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about withdrawal rates</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.9 &mdash; How 4% retirees ended, 60/40, 69 historical 30-year periods</div>
+    <div id="f769"></div>
+    <figcaption class="cap"><b>Failure was rare; ending richer was common.</b> Of 69 start years from 1928 to 1996, 4 ran out, 22 ended below their starting real balance, 16 ended between one and two times it, and 27 ended with more than double. Computed from Damodaran's data.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The 4% rule means withdrawing 4% of the balance every year."</div><div class="ma"><b>Myth.</b> It means 4% of the starting balance in year one, then that dollar amount raised by inflation. A fixed 4% of each year's balance is a different, never-depleting rule with a volatile income.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"4% has never failed."</div><div class="ma"><b>Depends on the data.</b> Bengen found no failure before 33 years with his data. With 10-year Treasuries through 2025, 4% at 60/40 failed in 4 of 69 thirty-year periods, all starting in the late 1960s.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"More bonds always make withdrawals safer."</div><div class="ma"><b>Myth.</b> In both the Trinity study and this backtest, all-bond portfolios failed far more often at 4% than balanced ones. Bengen called less than 50% stocks "counterproductive."</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Most 4% retirees ran out of money."</div><div class="ma"><b>Myth.</b> 65 of 69 lasted 30 years at 60/40, and the median ended with 1.39 times its starting real balance.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Guardrails remove all risk."</div><div class="ma"><b>Partly.</b> They sharply reduce the risk of running out, but the risk moves to your income: in the worst historical start, real spending fell to 38% of its first-year level under this module's simplified rules.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The 4% rule accounts for fees."</div><div class="ma"><b>Myth.</b> Both classic studies used index returns with no costs. A 1% fee is a quarter of a 4% withdrawal; lower the rate or lower the fee (INV-007).</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.10 &mdash; Historical 30-year success by withdrawal rate, 60/40</div>
+    <div id="f7610"></div>
+    <figcaption class="cap"><b>Below about 3.7%, a fixed real withdrawal survived every historical start.</b> Share of 69 thirty-year periods (starts 1928&ndash;1996) that lasted, at each first-year rate. Ruth's 3.2% and the Harpers' roughly 3.6% both sit in the zone that never failed. Computed from Damodaran's data.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Irrelevant for now, useful later.</b> For Maya, the point of this module is the savings target it implies: a rigid 4% rule means a portfolio of 25 times the gap. A flexible rule later would let her retire with somewhat less.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Know which rule your calculator uses.</b> Most online calculators assume fixed real withdrawals. When the Riveras run projections, the "success rate" they see is for the most rigid spending rule.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Plan conservatively, keep options.</b> As a single earner, Jordan has no second income to absorb a bad sequence. A 3.5&ndash;4% planning rate, with a written list of cuts, is prudent.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Guardrails suit them.</b> A $61,000 gap on $1.69 million is about 3.6%. They could start higher with guardrails, funding more early travel, because a large share of their budget is discretionary.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Her rate is the margin.</b> At about 3.2% plus taxes, Ruth is inside every historical safe rate. Her CDs act as a cash bucket for bad years.</div></div>
+  </div>
+  <div class="ws" data-ws="inv076" data-title="INV-076 worksheet: my withdrawal plan">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w76a">My yearly gap and my portfolio: my starting withdrawal rate</label><textarea id="w76a" data-key="rate"></textarea></div>
+      <div><label for="w76b">The rule I will use (fixed real, guardrails, percentage, amortization) and why</label><textarea id="w76b" data-key="rule"></textarea></div>
+      <div><label for="w76c">What I would cut first, and by how much, if I hit the upper guardrail</label><textarea id="w76c" data-key="cuts"></textarea></div>
+      <div><label for="w76d">My cash bucket: how many years of withdrawals, held where</label><textarea id="w76d" data-key="bucket"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.11 &mdash; Three spending rules in one line each</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 150" role="img" aria-label="Fixed real, guardrails, amortization formulas">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="10" width="700" height="38" rx="9" style="fill:var(--red-soft)"/><text x="24" y="34" class="svg-t" font-size="13" font-weight="700">Fixed real: W&#8321; = rate &times; B&#8320;; then W&#8348; = W&#8348;&#8331;&#8321; &times; (1 + inflation)</text>
+      <rect x="10" y="56" width="700" height="38" rx="9" style="fill:var(--blue-soft)"/><text x="24" y="80" class="svg-t" font-size="13" font-weight="700">Guardrails: if W &divide; B &gt; 1.2 &times; initial rate, cut W 10%; if &lt; 0.8 &times; initial rate, raise W 10%</text>
+      <rect x="10" y="102" width="700" height="38" rx="9" style="fill:var(--green-soft)"/><text x="24" y="126" class="svg-t" font-size="13" font-weight="700">Amortization: W = B &times; r &divide; [(1 &minus; (1 + r)&#8315;&#8319;)(1 + r)], n = years left</text>
+      </g></svg></div>
+  </figure>
+  <div class="ex" data-answer="49440" data-tol="0.002" data-ok="$48,000 &times; 1.03 = $49,440.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">You retire with $1,200,000 and use a 4% fixed real withdrawal. Inflation in your first year is 3%. How much do you withdraw in year two, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Year one: 4% &times; $1,200,000 = $48,000. Year two: $48,000 &times; 1.03 = <b>$49,440</b>, whatever the portfolio did.</div></div>
+  <div class="ex" data-answer="46350" data-tol="0.002" data-ok="$51,500 &divide; $800,000 = 6.44% &gt; 6%, so cut 10%: $46,350.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">Guardrails, 5% initial rate on $1,000,000. After a bad year the balance is $800,000, and this year's inflation-adjusted withdrawal would be $51,500. What do you actually withdraw, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Current rate = $51,500 &divide; $800,000 = 6.44%. The upper guardrail is 1.2 &times; 5% = 6%, so the capital preservation rule applies: $51,500 &times; 0.9 = <b>$46,350</b>. (If the previous year's return was negative, the withdrawal rule would also have frozen the inflation raise first.)</div></div>
+  <div class="ex" data-answer="29126" data-tol="0.002" data-ok="$600,000 &times; 4.854% &asymp; $29,126.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">An amortization (VPW-style) rule at age 70, with a horizon to age 100 (31 payments) and a 3% real return, gives a withdrawal rate of 4.854%. What is the withdrawal from a $600,000 balance, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">0.03 &divide; [(1 &minus; 1.03<sup>&minus;31</sup>) &times; 1.03] = 0.04854. $600,000 &times; 0.04854 = <b>$29,126</b>. Next year the rate will be a little higher and the balance will have moved with the market.</div></div>
+  <div class="ex" data-answer="25" data-tol="0.001" data-ok="1 &divide; 4% = 25 years.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">If a portfolio earned exactly 0% after inflation every year, how many years would a 4% fixed real withdrawal last?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in years" placeholder="years"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">With no real growth, 25 withdrawals of 4% use up 100%: <b>25 years</b>. Every year the rule lasts beyond 25 is paid for by real returns, which is why a 30-year retirement needs a portfolio that earns something after inflation.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.12 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: rigid, tested, flexible, organized">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--red-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Rigid</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">fixed real needs ~4%</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Tested</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">65 of 69 lasted at 4%</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--green-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Flexible</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">cuts buy a higher start</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Organized</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">buckets help behavior</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"Under the 4% rule, a retiree with $1,000,000 withdraws $40,000 in year one. In year two, after 5% inflation, they withdraw:","choices":["4% of the new balance","$42,000","$40,000","$38,000"],"answer":1,"explain":"The first-year dollar amount is raised by inflation: $40,000 &times; 1.05 = $42,000."},
+    {"q":"Bengen (1994) found that a 4% first-year withdrawal:","choices":["Had never exhausted a portfolio before 33 years","Failed about half the time","Was safe only with 100% bonds","Worked only after 1950"],"answer":0,"explain":"In no past case had it exhausted a portfolio in less than 33 years, using his data."},
+    {"q":"In the Trinity study, the 30-year success rate for 100% bonds at a 4% inflation-adjusted withdrawal was:","choices":["95%","71%","20%","100%"],"answer":2,"explain":"Only 20%, versus 95&ndash;98% for stock-heavy portfolios."},
+    {"q":"In this course's backtest (60/40, 1928&ndash;1996 starts), which start year set the lowest sustainable 30-year rate?","choices":["1929","2000","1982","1966"],"answer":3,"explain":"1966, at about 3.73%; the late 1960s were the worst years to retire."},
+    {"q":"Guyton and Klinger's capital preservation rule cuts spending 10% when:","choices":["The market falls 10%","The current withdrawal rate is more than 20% above the initial rate","Inflation exceeds 6%","The retiree turns 80"],"answer":1,"explain":"It responds to the withdrawal rate; it also stops applying in the final 15 years."},
+    {"q":"A constant-percentage withdrawal rule:","choices":["Can never fully deplete the portfolio, but income varies","Guarantees a fixed income","Is the same as the 4% rule","Ignores the balance"],"answer":0,"explain":"A percentage of a positive balance is always positive; income moves with markets."},
+    {"q":"A three-bucket plan with $100,000 cash, $400,000 bonds and $500,000 stocks is equivalent to what stock allocation?","choices":["100%","60%","50%","40%"],"answer":2,"explain":"$500,000 &divide; $1,000,000 = 50% stocks; buckets are a way of holding an allocation."},
+    {"q":"Why do amortization (VPW-style) rules spend more on average than the fixed real rule?","choices":["They ignore inflation","They assume higher returns","They aim to use up the balance by the horizon instead of preserving it","They skip years"],"answer":2,"explain":"The fixed rule is calibrated to the worst case, so it usually leaves a large surplus."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 76.13 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-077</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Sequence risk, Monte Carlo</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-042</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Tax-aware withdrawals</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-082</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Annuities for income</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-076"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Bengen, W. P. (1994). Determining withdrawal rates using historical data. <i>Journal of Financial Planning</i> (October 1994); reprinted March 2004. <a href="https://www.financialplanningassociation.org/sites/default/files/2021-04/MAR04%20Determining%20Withdrawal%20Rates%20Using%20Historical%20Data.pdf">financialplanningassociation.org</a></li>
+    <li>Cooley, P. L., Hubbard, C. M., &amp; Walz, D. T. (1998). Retirement savings: Choosing a withdrawal rate that is sustainable. <i>AAII Journal</i> (February 1998). <a href="https://www.aaii.com/journal/199802/feature.pdf">aaii.com</a></li>
+    <li>Guyton, J. T., &amp; Klinger, W. J. (2006). Decision rules and maximum initial withdrawal rates. <i>Journal of Financial Planning</i> (March 2006). <a href="https://www.financialplanningassociation.org/sites/default/files/2021-11/2006%20-%20Guyton%20and%20Klinger%20-%20Decision%20Rules%20and%20SWR%20(1).PDF">financialplanningassociation.org</a></li>
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">stern.nyu.edu</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Historical backtests describe one country's past, before fees and taxes. Past sustainable withdrawal rates do not guarantee future ones.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s11a.js"></script>
+<script>
+INV.ready(function () {
+  var S = INV.s11a, yr = function (v) { return String(Math.round(v)); }, ms = INV.moneyShort, dol = function (v) { return INV.money(v, 0); };
+  /* 76.1 1966 at 4, 5, 7% */
+  var r66 = S.windowRets(1966, 30, 0.6);
+  function path(w) { return S.fixedReal(r66, w).path.map(function (v, i) { return [1966 + i, v * 1e6]; }); }
+  INV.lineChart(document.getElementById("f761"), { label: "1966 retiree at three rates", height: 250, xFmt: yr, yFmt: ms, tipFmt: dol, yTitle: "Balance, 1966 dollars",
+    series: [{ name: "4% a year", color: "var(--s2)", data: path(0.04) }, { name: "5% (about the average real return)", color: "var(--s3)", data: path(0.05) }, { name: "7%", color: "var(--s5)", data: path(0.07) }] });
+  /* 76.2 Trinity table 3, 30 years */
+  var T = [["100/0", "100% stocks", 95, 85], ["75/25", "75% stocks", 98, 83], ["50/50", "50% stocks", 95, 76], ["25/75", "25% stocks", 71, 27], ["0/100", "100% bonds", 20, 17]], d2 = [];
+  T.forEach(function (x) { d2.push({ label: x[0] + " 4%", tip: x[1] + " at 4%", y: x[2], color: "var(--s2)" }); d2.push({ label: x[0] + " 5%", tip: x[1] + " at 5%", y: x[3], color: "var(--s3)" }); });
+  INV.barChart(document.getElementById("f762"), { label: "Trinity study success rates", height: 250, allLabels: true, yFmt: function (v) { return v + "%"; }, data: d2 });
+  /* 76.5 amortization rates */
+  INV.barChart(document.getElementById("f765"), { label: "Amortization withdrawal rates by age", height: 220, allLabels: true, valueLabels: true, xTitle: "Age", yFmt: function (v) { return v.toFixed(1) + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "%"; },
+    data: [60, 65, 70, 75, 80, 85, 90].map(function (a) { var n = 101 - a, r = 0.03; return { label: String(a), y: r / ((1 - Math.pow(1 + r, -n)) * (1 + r)) * 100, color: "var(--s2)" }; }) });
+  /* 76.7 safemax by start */
+  var sm = []; for (var y = 1928; y <= 1996; y++) sm.push({ label: String(y), tip: "Retire in " + y, y: S.safeMax(S.windowRets(y, 30, 0.6)) * 100 });
+  sm.forEach(function (d) { d.color = d.y < 4 ? "var(--s5)" : "var(--s2)"; });
+  INV.barChart(document.getElementById("f767"), { label: "Maximum sustainable rate by start year", height: 240, maxLabels: 12, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "%"; }, data: sm });
+  /* 76.8 Harpers first-year income */
+  INV.barChart(document.getElementById("f768"), { label: "First-year income by rule", height: 220, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: dol,
+    data: [["3.5% fixed real", 59150, "var(--s6)"], ["4% fixed real", 67600, "var(--s5)"], ["Amortization at 62", 71952, "var(--s2)"], ["5% guardrails", 84500, "var(--s1)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  /* 76.9 outcome buckets */
+  var fail = 0, below = 0, mid = 0, dbl = 0; for (var y2 = 1928; y2 <= 1996; y2++) { var f = S.fixedReal(S.windowRets(y2, 30, 0.6), 0.04); if (!f.ok) fail++; else if (f.end < 1) below++; else if (f.end < 2) mid++; else dbl++; }
+  INV.barChart(document.getElementById("f769"), { label: "How 4% retirees ended", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return String(Math.round(v)); },
+    data: [["Ran out", fail, "var(--s5)"], ["Ended below start", below, "var(--s3)"], ["1–2× start", mid, "var(--s2)"], ["Over 2× start", dbl, "var(--s1)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+  /* 76.10 success by rate */
+  var d10 = []; [3, 3.2, 3.5, 3.6, 3.8, 4, 4.5, 5, 5.5, 6].forEach(function (w) { var ok = 0; for (var y3 = 1928; y3 <= 1996; y3++) if (S.fixedReal(S.windowRets(y3, 30, 0.6), w / 100).ok) ok++; d10.push({ label: w + "%", y: ok / 69 * 100, color: w === 3.2 ? "var(--s5)" : w === 3.6 ? "var(--s4)" : "var(--s2)", tip: (w === 3.2 ? "Ruth, " : w === 3.6 ? "Harpers, " : "") + w + "%" }); });
+  INV.barChart(document.getElementById("f7610"), { label: "Success rate by withdrawal rate", height: 220, allLabels: true, valueLabels: true, xTitle: "First-year withdrawal rate", yFmt: function (v) { return Math.round(v) + "%"; }, data: d10 });
+});
+</script>
+</body>
+</html>

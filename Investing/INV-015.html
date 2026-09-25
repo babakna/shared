@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-015 · Crypto Assets — Investing Learning Lab</title>
+<meta name="description" content="What bitcoin and blockchains are, how volatile crypto has been, custody on exchanges versus self-custody, spot bitcoin ETFs, why SIPC and FDIC do not cover crypto, how the IRS taxes it, and how to size a position.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-015">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-015</span><span class="ttl">Crypto Assets</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 2 · Asset Classes &amp; Vehicles</span><span class="chip teal">Beginner to intermediate</span><span class="chip gray">About 60 minutes</span><span class="chip gray">1 calculator</span></div>
+    <h1>Crypto Assets</h1>
+    <p class="sub">Bitcoin went from a white paper in 2008 to exchange-traded funds on the same shelf as index funds. It has also fallen by three-quarters more than once, and crypto has been the setting for some of the largest frauds in history. This module explains what crypto assets are, how to hold them, how they are taxed and how to size a position you can live with.</p>
+    <p class="q"><span>The question this module answers</span>If I own crypto at all, how do I hold it safely, pay the right tax, and keep it small enough that a crash cannot hurt my plan?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <g fill="none" stroke-width="3"><rect x="40" y="96" width="70" height="56" rx="8" stroke="#1F5FD1"/><rect x="145" y="96" width="70" height="56" rx="8" stroke="#1F5FD1"/><rect x="250" y="96" width="70" height="56" rx="8" stroke="#1F5FD1"/></g>
+      <path d="M110 124 L145 124 M215 124 L250 124" stroke="#C77A0A" stroke-width="4"/>
+      <path d="M40 200 L90 170 L130 196 L180 150 L220 190 L270 160 L320 186" fill="none" stroke="#C2332B" stroke-width="3"/>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">A shared ledger, a wild price</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>A spreadsheet that everyone keeps a copy of</h2>
+  <p class="lede">When you pay with a debit card, your bank updates its private record of who owns what. A <span class="term" data-term="Cryptocurrency">crypto asset</span> replaces the bank's record with a public one: a ledger copied across thousands of computers, updated by rules everyone can check, with no company in charge.</p>
+  <p>That design is genuinely new, and it has attracted serious investment: US regulators now allow exchange-traded products that hold bitcoin. But the price of the asset recorded on that ledger has been one of the most volatile in modern markets. Figure 15.1 shows bitcoin's month-end price since 2015 on a log scale, where equal vertical distances are equal percentage moves.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.1 &mdash; Bitcoin's month-end price in US dollars, January 2015 to September 2026 (log scale)</div>
+    <div id="f151"></div>
+    <figcaption class="cap"><b>Enormous gains, interrupted by falls of 50% to 75%.</b> From $430 at the end of 2015 to $87,696 at the end of 2025, about 70% a year, with month-end declines of 75% (December 2017 to January 2019), 73% (October 2021 to December 2022) and 51% (September 2025 to June 2026). Latest value is September 24, 2026. Source: Coinbase, via FRED (series CBBTCUSD).</figcaption>
+  </figure>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>Past returns this large are not a forecast.</b> An asset that rose 70% a year from a tiny base cannot keep doing so as it grows, and many other crypto assets that were popular at the same time have lost nearly everything. The rest of this module is about the risks you control: custody, fraud, taxes and position size.</p></div></div>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>What a <span class="term" data-term="Blockchain">blockchain</span> and bitcoin are, and what <span class="term" data-term="Stablecoin">stablecoins</span> are.</li>
+    <li>How volatile crypto has been, measured with real data.</li>
+    <li>Custody: exchanges, self-custody and ETFs, and why SIPC and the FDIC do not cover crypto.</li>
+    <li><span class="term" data-term="Spot bitcoin ETP">Spot bitcoin exchange-traded products</span> and how the IRS taxes crypto, including the new <span class="term" data-term="Form 1099-DA">Form 1099-DA</span>.</li>
+    <li>How to size a position, and the frauds that cost investors most.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="Blockchains">
+  <p class="kicker">How it works</p>
+  <h2>Blocks, keys and a fixed supply</h2>
+  <p>Bitcoin was described in a nine-page paper, "Bitcoin: A Peer-to-Peer Electronic Cash System," published in 2008 under the name Satoshi Nakamoto. The problem it solved was how strangers could send digital money without a trusted third party, such as a bank, to stop the same coin being spent twice.</p>
+  <div class="def"><div class="def-h"><b>Blockchain</b></div>
+    <div class="def-r"><div>What it is</div><div>A shared record of transactions grouped into <b>blocks</b>, each linked to the one before, copied across many computers. In bitcoin, adding a block requires "proof of work," a costly computation, so rewriting history would mean redoing that work faster than everyone else combined.</div></div>
+    <div class="def-r"><div>Used for</div><div>Recording who owns which coins and every transfer, without a central bookkeeper.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The ledger itself has proved hard to tamper with. The businesses around it, such as exchanges, lenders and wallet apps, are where most investors have actually lost money.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.2 &mdash; Three linked blocks</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 190" role="img" aria-label="Three blocks, each containing transactions and a fingerprint of the previous block">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,20)"><rect width="200" height="140" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="28" class="svg-t" font-size="14" font-weight="800">Block 1</text><text x="16" y="54" class="svg-s" font-size="12">Transactions:</text><text x="16" y="70" class="svg-s" font-size="12">A pays B 0.5</text><text x="16" y="86" class="svg-s" font-size="12">C pays D 1.2</text><text x="16" y="118" class="svg-m" font-size="11">fingerprint: 7f3a...</text></g>
+      <g transform="translate(260,20)"><rect width="200" height="140" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="28" class="svg-t" font-size="14" font-weight="800">Block 2</text><text x="16" y="54" class="svg-s" font-size="12">Previous: 7f3a...</text><text x="16" y="70" class="svg-s" font-size="12">B pays E 0.2</text><text x="16" y="86" class="svg-s" font-size="12">D pays A 0.7</text><text x="16" y="118" class="svg-m" font-size="11">fingerprint: 91c0...</text></g>
+      <g transform="translate(510,20)"><rect width="200" height="140" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="28" class="svg-t" font-size="14" font-weight="800">Block 3</text><text x="16" y="54" class="svg-s" font-size="12">Previous: 91c0...</text><text x="16" y="70" class="svg-s" font-size="12">E pays F 0.1</text><text x="16" y="86" class="svg-s" font-size="12">...</text><text x="16" y="118" class="svg-m" font-size="11">fingerprint: 04be...</text></g>
+      <path d="M212 90 L256 90 M462 90 L506 90" style="stroke:var(--s3)" stroke-width="4"/>
+      <text x="360" y="182" text-anchor="middle" class="svg-m" font-size="11">Change any old transaction and every later fingerprint breaks.</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Each block carries a fingerprint of the one before, so history cannot be quietly edited.</b> Simplified; real blocks hold thousands of transactions. The white paper notes that transactions are public, while the owners behind addresses need not be named.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b>Private key</b></div>
+    <div class="def-r"><div>What it is</div><div>A secret number that authorizes spending from a crypto address. Wallet software usually shows it as a <b>recovery (seed) phrase</b> of 12 or 24 words.</div></div>
+    <div class="def-r"><div>Used for</div><div>Signing transactions. The network accepts any correctly signed transfer; it does not know or care who signed it.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Whoever has the key has the coins. There is no password reset, no fraud department and no way to reverse a transfer.</div></div></div>
+  <p>Bitcoin's supply is fixed by its rules. Bitcoin.org explains that new coins are created at a decreasing rate, halving over time, until issuance stops with a total of <b>21 million bitcoins</b>; each bitcoin divides into 100,000,000 units called satoshis. Supporters see this scarcity as the basis of bitcoin's value, like gold's. A fixed supply does not guarantee a rising price: demand can fall, as every crash in Figure 15.1 shows.</p>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>What proof of work does</summary><div class="layer-b">
+    <p>The white paper describes a chain of blocks secured by hash-based proof of work, "forming a record that cannot be changed without redoing the proof-of-work." Honest participants extend the longest chain, and the longest chain serves as proof of the sequence of events. An attacker would need to outpace everyone else's computing power to rewrite recent history. The cost is energy: the security comes from making each block expensive to produce.</p>
+  </div></details>
+  <div class="def"><div class="def-h"><b>Stablecoin</b><span>and the GENIUS Act</span></div>
+    <div class="def-r"><div>What it is</div><div>A crypto asset designed to hold a fixed value, usually $1. The GENIUS Act, signed on July 18, 2025 (Public Law 119-27), defines a <b>payment stablecoin</b> as one redeemable at a fixed amount, requires US issuers to be approved by a state or federal regulator and to hold at least $1 of permitted reserves for every $1 issued.</div></div>
+    <div class="def-r"><div>Used for</div><div>Moving dollars on blockchains, and trading between crypto assets.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The Congressional Research Service summarizes the law as clarifying that payment stablecoins are not securities or commodities and <b>are not federally insured</b>. A stablecoin is not a bank deposit.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Bitcoin, ether and everything else</summary><div class="layer-b">
+    <p>Thousands of other crypto assets exist. Ether is the native asset of Ethereum, a blockchain that runs programs ("smart contracts"). Many others are "tokens" issued by projects, and some are openly jokes ("memecoins"). The case for bitcoin as digital scarcity does not transfer to them; each has its own supply rules, insiders and risks. The collapse of TerraUSD, a stablecoin that was not backed by reserves, is in the Case studies tab.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Volatility">
+  <p class="kicker">Measured, not described</p>
+  <h2>How much crypto prices move</h2>
+  <p>"Volatile" is an understatement. Using bitcoin's month-end prices from 2015 to 2026, its monthly swings annualize to a volatility of about <b>66%</b>. For comparison, US stocks' calendar-year volatility since 1928 is about 19% (INV-003). In calendar years, bitcoin's returns have ranged from &minus;73% to +1,324%.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.3 &mdash; Calendar-year returns, bitcoin and the S&amp;P 500, 2016&ndash;2025</div>
+    <div id="f153"></div>
+    <figcaption class="cap"><b>Bitcoin's worst years were far worse than stocks' worst years, and its best years far better.</b> Amber bars: bitcoin; blue bars: S&amp;P 500. Bitcoin, December-to-December month-end prices: 2018 &minus;73.4%, 2022 &minus;64.3%, 2017 +1,324% (shown capped at 400% so other years stay readable). Sources: Coinbase via FRED; S&amp;P 500 from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Year</th><th class="r">Bitcoin</th><th class="r">S&amp;P 500</th><th>Year</th><th class="r">Bitcoin</th><th class="r">S&amp;P 500</th></tr></thead><tbody>
+    <tr><td>2016</td><td class="r">+126.2%</td><td class="r">+11.8%</td><td>2021</td><td class="r">+59.3%</td><td class="r">+28.5%</td></tr>
+    <tr><td>2017</td><td class="r">+1,324.2%</td><td class="r">+21.6%</td><td>2022</td><td class="r neg-t">&minus;64.3%</td><td class="r neg-t">&minus;18.0%</td></tr>
+    <tr><td>2018</td><td class="r neg-t">&minus;73.4%</td><td class="r neg-t">&minus;4.2%</td><td>2023</td><td class="r">+155.9%</td><td class="r">+26.1%</td></tr>
+    <tr><td>2019</td><td class="r">+93.9%</td><td class="r">+31.2%</td><td>2024</td><td class="r">+123.1%</td><td class="r">+24.9%</td></tr>
+    <tr><td>2020</td><td class="r">+305.5%</td><td class="r">+18.0%</td><td>2025</td><td class="r neg-t">&minus;7.1%</td><td class="r">+17.7%</td></tr>
+  </tbody></table></div>
+  <p class="src">Computed from month-end Coinbase prices (FRED, CBBTCUSD) and Damodaran, NYU Stern.</p>
+  <p>Notice that bitcoin fell in both 2018 and 2022, years when stocks also fell. Crypto has not reliably moved opposite to stocks; in the 2022 bear market it fell three times as far. Treat it as a high-risk growth asset, not a hedge.</p>
+  <div class="def"><div class="def-h"><b>Drawdown</b><span>and the arithmetic of recovery</span></div>
+    <div class="def-r"><div>What it is</div><div>The fall from a previous peak. A 75% drawdown leaves 25 cents of every dollar.</div></div>
+    <div class="def-r"><div>Used for</div><div>Measuring how painful an asset has been to hold, not just how volatile.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>After a 75% fall the price must rise 300% just to get back to even. Most people who buy near a peak and panic near the bottom never see the recovery.</div></div></div>
+  <div class="formula">Gain needed to recover = 1 &divide; (1 &minus; loss) &minus; 1 &nbsp;&nbsp; e.g. 1 &divide; 0.25 &minus; 1 = 300%</div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why the starting date changes everything</summary><div class="layer-b">
+    <p>Someone who bought at the end of December 2017 at about $13,900 was down 75% by January 2019 and did not see a higher month-end price until November 2020. Someone who bought at the October 2021 month-end, $61,300, waited until March 2024. Averages over the whole history hide how different individual investors' experiences were, depending on when they bought and whether they held on.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>How the volatility figure is computed</summary><div class="layer-b">
+    <p>Monthly log returns ln(P<sub>t</sub> &divide; P<sub>t&minus;1</sub>) for January 2015 to September 2026 have a standard deviation of about 19% a month; multiplied by &radic;12, that is about 66% a year. The most recent 60 months give about 55%. Month-end data understate the intramonth range, so true peak-to-trough falls were somewhat larger than the month-end figures quoted here.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Custody and protection">
+  <p class="kicker">Who holds the keys</p>
+  <h2>Exchanges, self-custody and funds</h2>
+  <p>Owning crypto means controlling private keys, directly or through someone else. There are three main arrangements, each with a different way to lose money.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.4 &mdash; Three ways to hold crypto, three kinds of risk</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 210" role="img" aria-label="Exchange, self-custody and ETF compared">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,10)"><rect width="226" height="190" rx="12" style="fill:var(--red-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">On an exchange</text><text x="16" y="56" class="svg-s" font-size="12">The exchange holds the</text><text x="16" y="72" class="svg-s" font-size="12">keys; you hold a claim.</text><text x="16" y="104" class="svg-t" font-size="12" font-weight="700">Main risk:</text><text x="16" y="120" class="svg-s" font-size="12">exchange fails, freezes</text><text x="16" y="136" class="svg-s" font-size="12">or misuses deposits</text><text x="16" y="172" class="svg-m" font-size="11">Example: FTX, 2022</text></g>
+      <g transform="translate(247,10)"><rect width="226" height="190" rx="12" style="fill:var(--amber-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Self-custody</text><text x="16" y="56" class="svg-s" font-size="12">You hold the keys in</text><text x="16" y="72" class="svg-s" font-size="12">a wallet or device.</text><text x="16" y="104" class="svg-t" font-size="12" font-weight="700">Main risk:</text><text x="16" y="120" class="svg-s" font-size="12">lost phrase, theft, scams,</text><text x="16" y="136" class="svg-s" font-size="12">heirs who cannot access it</text><text x="16" y="172" class="svg-m" font-size="11">No one can reverse it</text></g>
+      <g transform="translate(484,10)"><rect width="226" height="190" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">Spot bitcoin ETP</text><text x="16" y="56" class="svg-s" font-size="12">A fund's custodian holds</text><text x="16" y="72" class="svg-s" font-size="12">the keys; you own shares.</text><text x="16" y="104" class="svg-t" font-size="12" font-weight="700">Main risk:</text><text x="16" y="120" class="svg-s" font-size="12">bitcoin's price, plus a</text><text x="16" y="136" class="svg-s" font-size="12">yearly expense ratio</text><text x="16" y="172" class="svg-m" font-size="11">Regular brokerage or IRA</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>You cannot remove all the risks; you can choose which one you carry.</b> For most investors who want a small bitcoin position, a fund in an ordinary account removes the custody and theft risks while keeping the price risk.</figcaption>
+  </figure>
+  <h3>What is not protected</h3>
+  <p>Two protections that ordinary investors rely on do not extend to crypto.</p>
+  <ul>
+    <li><b>SIPC.</b> The Securities Investor Protection Corporation protects securities and cash at a failed brokerage firm. SIPC states that it does not protect any digital or crypto asset that does not qualify as a "security" under the Securities Investor Protection Act, and that digital asset securities that are unregistered investment contracts are not protected even if held at a SIPC-member firm. SIPC never protects against a fall in price.</li>
+    <li><b>FDIC.</b> The Federal Deposit Insurance Corporation insures deposits at FDIC-insured banks. Its list of products it does not insure includes stocks, bonds, mutual funds, annuities and <b>crypto assets</b>.</li>
+  </ul>
+  <p>Shares of a registered spot bitcoin exchange-traded product held at a SIPC-member brokerage are securities; if the broker failed, SIPC's protection would apply to the missing shares, not to any loss in bitcoin's price.</p>
+  <div class="def"><div class="def-h"><b>Self-custody</b></div>
+    <div class="def-r"><div>What it is</div><div>Holding your own <span class="term" data-term="Private key">private keys</span>, typically in a hardware wallet kept offline, with the recovery phrase written down and stored securely.</div></div>
+    <div class="def-r"><div>Used for</div><div>Removing the risk that an exchange or lender fails or freezes withdrawals.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>You become your own bank, security department and estate planner. Your executor needs to know the assets exist and how to reach them (INV-084).</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Crypto "yield" and lending platforms</summary><div class="layer-b">
+    <p>A yield on crypto comes from lending it to someone or putting it at risk; it is not a bank deposit rate, and the FDIC does not insure crypto assets. If a platform pays much more than Treasury bills, ask where the return comes from, who holds your coins in the meantime and who bears the loss if the borrower fails.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>SIPC's test for digital assets</summary><div class="layer-b">
+    <p>SIPC explains that some digital assets may be securities if they are investment contracts, but that an investment contract, digital asset or otherwise, must be registered with the SEC to be a "security" under the Securities Investor Protection Act. Unregistered digital asset securities are therefore not protected, even at a SIPC-member firm, and assets that are not securities at all are never protected.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="ETFs and taxes">
+  <p class="kicker">The regulated wrapper and the IRS</p>
+  <h2>Spot bitcoin ETPs, and crypto as property</h2>
+  <p>On <b>January 10, 2024</b>, the SEC approved the listing and trading of a number of spot bitcoin exchange-traded product (ETP) shares: funds that hold bitcoin itself through a custodian and trade on stock exchanges. The SEC chair's statement that day was careful: "While we approved the listing and trading of certain spot bitcoin ETP shares today, we did not approve or endorse bitcoin," adding that investors "should remain cautious about the myriad risks associated with bitcoin." On September 17, 2025 the SEC approved generic listing standards that let exchanges list qualifying commodity-based trust shares, including those holding digital assets, without a separate SEC rule filing for each.</p>
+  <div class="def"><div class="def-h"><b>Spot bitcoin ETP</b></div>
+    <div class="def-r"><div>What it is</div><div>An exchange-traded product that owns bitcoin, not futures. Its shares track the bitcoin price, less the fund's expense ratio.</div></div>
+    <div class="def-r"><div>Used for</div><div>Holding bitcoin exposure in an ordinary brokerage account or IRA, with ordinary tax forms and no keys to manage.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Convenience, not safety from price swings. Compare expense ratios; they differ across funds that hold the same asset.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.5 &mdash; Four ways to hold bitcoin exposure, compared</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 230" role="img" aria-label="Comparison of spot ETP, exchange account, self-custody and futures fund">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g class="svg-t" font-size="12.5" font-weight="800"><text x="160" y="28">Spot ETP</text><text x="300" y="28">Exchange</text><text x="440" y="28">Self-custody</text><text x="580" y="28">Futures fund</text></g>
+      <g class="svg-s" font-size="12"><text x="10" y="62">Holds</text><text x="10" y="98">Keys managed by</text><text x="10" y="134">Tax reporting</text><text x="10" y="170">Extra risk</text><text x="10" y="206">SIPC if broker fails</text></g>
+      <g class="svg-s" font-size="11.5">
+        <text x="160" y="62">bitcoin</text><text x="300" y="62">a claim on bitcoin</text><text x="440" y="62">bitcoin</text><text x="580" y="62">bitcoin futures</text>
+        <text x="160" y="98">fund's custodian</text><text x="300" y="98">the exchange</text><text x="440" y="98">you</text><text x="580" y="98">not applicable</text>
+        <text x="160" y="134">broker 1099</text><text x="300" y="134">Form 1099-DA</text><text x="440" y="134">your own records</text><text x="580" y="134">fund's tax forms</text>
+        <text x="160" y="170">expense ratio</text><text x="300" y="170">exchange failure</text><text x="440" y="170">loss, theft</text><text x="580" y="170">roll costs (INV-013)</text>
+        <text x="160" y="206">yes, for the shares</text><text x="300" y="206">no, for most crypto</text><text x="440" y="206">not applicable</text><text x="580" y="206">yes, for the shares</text></g>
+      <g style="stroke:var(--border)"><line x1="10" y1="44" x2="710" y2="44"/><line x1="10" y1="80" x2="710" y2="80"/><line x1="10" y1="116" x2="710" y2="116"/><line x1="10" y1="152" x2="710" y2="152"/><line x1="10" y1="188" x2="710" y2="188"/></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>The price exposure is similar; the plumbing is not.</b> A spot ETP puts bitcoin inside an ordinary brokerage account with ordinary tax forms. An exchange account adds the exchange's own risk. Self-custody removes the middleman and makes record keeping and security your job.</figcaption>
+  </figure>
+  <h3>How the IRS taxes crypto</h3>
+  <p>Since IRS Notice 2014-21, virtual currency has been treated as <b>property</b> for federal tax purposes. The IRS's digital assets page states that digital assets are considered property, not currency. That single rule drives everything else:</p>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>What you do</th><th>Tax result</th></tr></thead><tbody>
+    <tr><td>Buy crypto with dollars and hold it</td><td>No tax. Moving it between your own wallets is not a sale either (unless you pay a fee in crypto).</td></tr>
+    <tr><td>Sell it for dollars</td><td>Capital gain or loss: price received minus your cost basis.</td></tr>
+    <tr><td>Trade one crypto asset for another</td><td>A sale of the first asset, with gain or loss.</td></tr>
+    <tr><td>Spend it on goods or services</td><td>Also a sale: gain or loss on the crypto spent.</td></tr>
+    <tr><td>Receive it as pay or a reward</td><td>Ordinary income at its dollar value when received; that value becomes your basis.</td></tr>
+  </tbody></table></div>
+  <p>Gains are <b>short-term</b> if you held the asset as a capital asset for one year or less and <b>long-term</b> if more than one year, the same holding periods as stocks (INV-030). Every federal return asks, yes or no, whether you received or disposed of a digital asset during the year.</p>
+  <div class="def"><div class="def-h"><b>Form 1099-DA</b><span>new broker reporting</span></div>
+    <div class="def-r"><div>What it is</div><div>The form brokers use to report digital asset sales to you and the IRS. Under Treasury and IRS final regulations, brokers must report <b>gross proceeds for transactions on or after January 1, 2025</b>, and <b>basis for certain transactions on or after January 1, 2026</b>.</div></div>
+    <div class="def-r"><div>Used for</div><div>Matching taxpayers' reported gains with brokers' records, as with Form 1099-B for stocks.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The IRS now sees your sales. Keep your own records of what you paid, especially for assets bought before 2026 or moved between platforms, because the form may show proceeds without basis.</div></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Records to keep</summary><div class="layer-b">
+    <p>For each acquisition: date, amount, dollar cost and fees, platform or wallet. For each disposal: date, amount, dollar value received. Transfers between your own wallets should be documented so they are not mistaken for sales. A spot ETP in a brokerage account avoids most of this, because the broker tracks basis like any other security.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>Holding crypto funds in retirement accounts</summary><div class="layer-b">
+    <p>Inside an IRA or 401(k), gains on a spot ETP are not taxed each year; a traditional account taxes withdrawals as ordinary income and a Roth account can make qualified withdrawals tax-free (INV-032). A very volatile asset in a Roth concentrates both the tax-free upside and the risk of a permanent loss of scarce Roth space.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Sizing">
+  <p class="kicker">How much, if any</p>
+  <h2>Size it by the loss you can survive</h2>
+  <p>A position's share of your statement understates its share of your risk. Because crypto is several times as volatile as a diversified portfolio, a small allocation supplies a large share of the ups and downs. The calculator shows both: the dollars you would lose in a crash, and crypto's share of total portfolio risk.</p>
+  <div class="def"><div class="def-h"><b>Risk contribution</b></div>
+    <div class="def-r"><div>What it is</div><div>The share of a portfolio's total ups and downs that comes from one holding. It depends on the holding's weight, its volatility and its correlation with everything else.</div></div>
+    <div class="def-r"><div>Used for</div><div>Sizing volatile positions by their effect on the whole portfolio rather than by dollars alone.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A position's dollar weight understates its risk weight whenever it is much more volatile than the rest of your holdings.</div></div></div>
+  <div data-tool="s2bCryptoSize"></div>
+  <p>With the defaults (5% in crypto, crypto volatility 60%, the rest 12%, correlation 0.3), crypto supplies about <b>12%</b> of the portfolio's risk. At 10% it supplies about 29%. A 75% crypto crash in a year when everything else falls 10% costs a 5% position $3,750 of $100,000 and the whole portfolio about 13%, compared with 10% without the crypto.</p>
+  <div class="callout key"><div class="ic">&#128161;</div><div><p><b>A practical rule.</b> Hold crypto, if at all, only after the emergency fund, the full employer match and high-interest debt are handled, and only in an amount whose total loss would not change your retirement date or your children's education. For most households that means a low single-digit percentage or nothing. This is a course guideline, not a law or an industry standard.</p></div></div>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Rebalancing a very volatile asset</summary><div class="layer-b">
+    <p>If you decide on a target, such as 2%, rebalancing back to it trims the position after surges and adds after crashes. In a year like 2017 (+1,324%), an unrebalanced 2% position would have become roughly a fifth of the portfolio. Setting the target in writing, in an investment policy statement (INV-028), is what keeps a small bet small.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>The formula behind the calculator</summary><div class="layer-b">
+    <p>For two parts with weights w and 1 &minus; w, volatilities &sigma;<sub>c</sub> and &sigma;<sub>r</sub> and correlation &rho;, portfolio variance is &sigma;<sub>p</sub>&sup2; = w&sup2;&sigma;<sub>c</sub>&sup2; + (1 &minus; w)&sup2;&sigma;<sub>r</sub>&sup2; + 2w(1 &minus; w)&rho;&sigma;<sub>c</sub>&sigma;<sub>r</sub>. The crypto part contributes w&sup2;&sigma;<sub>c</sub>&sup2; + w(1 &minus; w)&rho;&sigma;<sub>c</sub>&sigma;<sub>r</sub>. At w = 5%, &sigma;<sub>c</sub> = 60%, &sigma;<sub>r</sub> = 12%, &rho; = 0.3: portfolio variance is 0.0159 (volatility 12.6%) and crypto contributes 0.0019, about 12%.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">Real history</p>
+  <h2>Where crypto investors actually lost money</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>FTX, 2022</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>FTX was an international cryptocurrency exchange founded by Samuel Bankman-Fried. Federal prosecutors showed that from 2019 to 2022 he misappropriated billions of dollars of customer deposits, channeling them to his trading firm, Alameda Research, while telling customers their deposits were kept safe and separate. He was convicted and, on March 28, 2024, sentenced to 25 years in prison and over $11 billion in forfeiture. The US Attorney described the fraud as "stealing over $8 billion of his customers' money."</div></div>
+    <div class="row"><div>What it teaches</div><div>Crypto held on an exchange is only as safe as the exchange. The blockchain worked perfectly; the company holding the keys did not.</div></div>
+    <div class="row"><div>Source</div><div class="src">U.S. Attorney's Office, Southern District of New York, "Samuel Bankman-Fried Sentenced To 25 Years In Prison" (March 28, 2024).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>TerraUSD, May 2022</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>TerraUSD (UST) was a crypto asset marketed as a stablecoin worth $1. When it lost its peg in May 2022, the SEC says, the collapse "wiped out $40 billion in market value nearly overnight." On April 5, 2024 a jury found Terraform Labs and its founder Do Kwon liable for securities fraud, and in June 2024 they agreed to pay more than $4.5 billion.</div></div>
+    <div class="row"><div>What it teaches</div><div>"Stable" is a claim, not a property. Ask what backs a stablecoin and whether you can redeem it for dollars. The 2025 GENIUS Act now requires US payment stablecoin issuers to hold one-for-one reserves.</div></div>
+    <div class="row"><div>Source</div><div class="src">SEC press release 2024-73, "Terraform and Kwon to Pay $4.5 Billion Following Fraud Verdict" (June 13, 2024).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>Crypto scams reported to the FBI, 2025</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>The FBI's Internet Crime Complaint Center (IC3) received 181,565 complaints involving cryptocurrency in 2025, with reported losses of $11.366 billion, up 22% from 2024. Crypto investment fraud alone accounted for 61,559 complaints and $7.228 billion. Across all internet crime, reported losses passed $20 billion.</div></div>
+    <div class="row"><div>What it teaches</div><div>The largest crypto losses for individuals come from fraud: fake investment platforms, romance and "investment club" schemes, impersonators. Anyone who asks you to move money into crypto to "protect" it or to join a platform they control is running a scam (INV-062).</div></div>
+    <div class="row"><div>Source</div><div class="src">Federal Bureau of Investigation, <i>2025 IC3 Annual Report</i>.</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.6 &mdash; Reported crypto-related losses to the FBI, 2025</div>
+    <div id="f155"></div>
+    <figcaption class="cap"><b>Investment fraud dominates crypto losses.</b> Of $11.366 billion in reported 2025 losses involving cryptocurrency, $7.228 billion was crypto investment fraud. Source: FBI, 2025 IC3 Annual Report.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Four households, four crypto questions</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.7 &mdash; The order of operations before any crypto</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 130" role="img" aria-label="Emergency fund, match, high-interest debt, diversified core, then optional crypto">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g font-size="12.5" font-weight="700" text-anchor="middle">
+      <rect x="10" y="30" width="130" height="70" rx="10" style="fill:var(--green-soft)"/><text x="75" y="60" class="svg-t">Emergency</text><text x="75" y="78" class="svg-t">fund</text>
+      <rect x="152" y="30" width="130" height="70" rx="10" style="fill:var(--green-soft)"/><text x="217" y="60" class="svg-t">Full employer</text><text x="217" y="78" class="svg-t">match</text>
+      <rect x="294" y="30" width="130" height="70" rx="10" style="fill:var(--green-soft)"/><text x="359" y="60" class="svg-t">High-interest</text><text x="359" y="78" class="svg-t">debt gone</text>
+      <rect x="436" y="30" width="130" height="70" rx="10" style="fill:var(--blue-soft)"/><text x="501" y="60" class="svg-t">Diversified</text><text x="501" y="78" class="svg-t">core portfolio</text>
+      <rect x="578" y="30" width="132" height="70" rx="10" style="fill:var(--amber-soft)"/><text x="644" y="60" class="svg-t">Optional small</text><text x="644" y="78" class="svg-t">crypto slice</text>
+      </g></g></svg></div>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; Maya</div>
+    <p class="dq">Maya's friends made money in bitcoin last year. She has $3,000 saved and $28,000 of student loans at 6.8%. She wants to put $2,000 into bitcoin on an app. What should she do?</p>
+    <div class="opts"><button class="opt">Put in the $2,000; she is young and can take risk.</button><button class="opt">Build the emergency fund and take the full 401(k) match first. If she still wants crypto later, limit it to a small amount she could lose entirely, preferably through a spot ETP.</button><button class="opt">Borrow on a credit card to buy more while it is "cheap."</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Buy now</b>Her capacity to take risk is higher than a retiree's, but her cushion is $3,000. A 75% fall, which has happened twice, would take $1,500 and leave her one car repair from new debt.</div>
+      <div class="oc"><b>Base first, then a small slice</b>Right. The match is an immediate 50% return and each dollar of 6.8% debt repaid earns a certain 6.8%.</div>
+      <div class="oc"><b>Borrow to buy</b>Leverage on the most volatile asset she could own. Card interest is certain; the gain is not.</div>
+      <div class="verdict"><b>The principle:</b> speculate only with money whose loss would not change your plans.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; Jordan</div>
+    <p class="dq">Worried that $20,000 will not cover Ava's college costs in three years, Jordan considers moving the fund into bitcoin to "catch up." What is the better move?</p>
+    <div class="opts"><button class="opt">Move it; a good year would double it.</button><button class="opt">Keep it in safe, liquid assets, and close the gap with aid applications, in-state options, a savings plan from cash flow and, if appropriate, gradually selling employer stock.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Move it</b>Bitcoin fell 64% in 2022. A fall like that in the year before tuition would leave about $7,000. Money with a fixed date three years out should not be in the most volatile asset available.</div>
+      <div class="oc"><b>Keep it safe and close the gap other ways</b>Right. Jordan's $56,000 of employer stock is both a concentration risk and a possible source of college money (INV-004, INV-096).</div>
+      <div class="verdict"><b>The principle:</b> the shorter the time horizon, the less volatility you can afford.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; Ruth</div>
+    <p class="dq">Ruth has been messaging with a friendly stranger online who shows her screenshots of large gains on a "crypto investment platform" and offers to help her open an account and move $50,000 from her savings. What should she do?</p>
+    <div class="opts"><button class="opt">Try a small amount first to see if it works.</button><button class="opt">Stop, send nothing, tell her daughter Anna, and report it to the FBI's IC3 at ic3.gov.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Test with a little</b>These schemes often let a victim withdraw a small "profit" to build trust before asking for much more. Money sent in crypto is very hard to recover.</div>
+      <div class="oc"><b>Stop and report</b>Right. This is the pattern of crypto investment fraud, the largest category of crypto losses reported to the FBI in 2025 ($7.2 billion).</div>
+      <div class="verdict"><b>The principle:</b> an unsolicited "friend" plus a platform you cannot verify plus urgency equals fraud.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 4 &middot; The Harpers</div>
+    <p class="dq">The Harpers want 2% of their $1.1 million, about $22,000, in bitcoin. Where and how?</p>
+    <div class="opts"><button class="opt">Buy coins on an offshore exchange that offers 10% yield on deposits.</button><button class="opt">Buy a low-cost spot bitcoin ETP in an IRA or their taxable account, write the 2% target into their plan and rebalance to it.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Offshore yield platform</b>Adds counterparty and fraud risk to price risk, with no SIPC protection. A 10% yield on crypto means someone is taking risk with their coins.</div>
+      <div class="oc"><b>ETP, target, rebalance</b>A defensible way to hold a small position. In a traditional IRA, gains are not taxed each year; in taxable accounts, basis is tracked like any security.</div>
+      <div class="verdict"><b>The principle:</b> if you own it, own it simply, and keep it small on purpose.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about crypto</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.8 &mdash; Bitcoin's fall from its previous month-end peak, 2015&ndash;2026</div>
+    <div id="f157"></div>
+    <figcaption class="cap"><b>Most of the time, bitcoin has been below a previous high.</b> Percentage below the highest earlier month-end price. Deepest points: &minus;75% (January 2019) and &minus;73% (December 2022). Source: Coinbase via FRED.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The SEC approving bitcoin ETFs means bitcoin is safe."</div><div class="ma"><b>Myth.</b> The SEC chair's statement said the Commission "did not approve or endorse bitcoin" and urged caution about its "myriad risks."</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Crypto at my brokerage is protected by SIPC."</div><div class="ma"><b>Usually myth.</b> SIPC does not protect crypto assets that are not securities under its law, nor unregistered digital asset securities. It never covers price losses.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Only 21 million bitcoin will exist, so the price has to rise."</div><div class="ma"><b>Myth.</b> The supply cap is real, but price depends on demand, which has collapsed by 50&ndash;75% several times.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Using crypto to buy something isn't a taxable event."</div><div class="ma"><b>Myth.</b> Crypto is property to the IRS; spending it is a disposal, with gain or loss measured from your basis.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The IRS can't see my crypto."</div><div class="ma"><b>Myth.</b> Brokers report gross proceeds on Form 1099-DA for sales on or after January 1, 2025, and basis for certain sales from 2026. Every return asks about digital assets.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Crypto protects you when stocks fall."</div><div class="ma"><b>Myth so far.</b> In 2018 and 2022, stocks fell 4% and 18%; bitcoin fell 73% and 64%.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.9 &mdash; Dollars lost if 5% of each household's investments were in crypto and it fell 75%</div>
+    <div id="f158"></div>
+    <figcaption class="cap"><b>The same percentage is a nuisance for some and a real loss for others.</b> 5% &times; 75% = 3.75% of invested assets: Maya $113 (on $3,000), the Riveras $2,325, Jordan $5,250, Ruth $29,250, the Harpers $41,250. Assets as used in INV-007.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>Foundation first.</b> Emergency fund, match, loans. Crypto, if ever, is a small slice later, through a fund rather than an app that lends out her coins.</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Their $41,000 of idle cash is not "crypto money."</b> It belongs partly in an emergency fund and partly in diversified investments and a 529 plan for Sofia and Leo.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Short horizon, one income.</b> Ava's college fund stays safe. Jordan's concentration risk is already the employer stock; adding crypto would stack a second concentrated bet.</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>A small, written, rebalanced slice is defensible.</b> Through a spot ETP, sized so a total loss would not change their retirement date.</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Fraud defense matters more than allocation.</b> Ruth is the household most likely to be targeted. Anyone asking her to move savings into crypto should be reported to IC3.</div></div>
+  </div>
+  <div class="ws" data-ws="inv015" data-title="INV-015 worksheet: my crypto rules">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w15a">Have I finished the order of operations (emergency fund, match, high-interest debt)?</label><textarea id="w15a" data-key="base"></textarea></div>
+      <div><label for="w15b">My maximum crypto share, and the dollar loss I could accept</label><textarea id="w15b" data-key="size"></textarea></div>
+      <div><label for="w15c">How I will hold it (ETP, exchange, self-custody) and why</label><textarea id="w15c" data-key="custody"></textarea></div>
+      <div><label for="w15d">My tax records: purchases, costs, platforms</label><textarea id="w15d" data-key="tax"></textarea></div>
+      <div><label for="w15e">How my heirs or executor would find and access it</label><textarea id="w15e" data-key="estate"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.10 &mdash; The gain needed to recover from a loss</div>
+    <div id="f159"></div>
+    <figcaption class="cap"><b>Losses and recoveries are not symmetric.</b> A 50% loss needs a 100% gain to recover; a 75% loss needs 300%; a 90% loss needs 900%. Formula: 1 &divide; (1 &minus; loss) &minus; 1.</figcaption>
+  </figure>
+  <div class="ex" data-answer="6000" data-tol="0.01" data-ok="$10,000 &minus; $4,000 = $6,000.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">You bought 0.5 bitcoin for $20,000. Two years later you spend 0.1 bitcoin on a purchase when bitcoin is worth $100,000. What is your taxable gain on the 0.1 bitcoin, in dollars?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Basis per bitcoin: $20,000 &divide; 0.5 = $40,000, so 0.1 bitcoin cost $4,000. Value spent: 0.1 &times; $100,000 = $10,000. Gain = <b>$6,000</b>, long-term because held more than a year.</div></div>
+  <div class="ex" data-answer="300" data-tol="0.01" data-ok="1 &divide; 0.25 &minus; 1 = 300%.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">An asset falls 75%. What percentage gain does it need to return to its previous value?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">$1 becomes $0.25. To return to $1: 1 &divide; 0.25 = 4 times, a gain of <b>300%</b>.</div></div>
+  <div class="ex" data-answer="4800" data-tol="0.01" data-ok="$200,000 &times; 3% &times; 80% = $4,800.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">A $200,000 portfolio holds 3% in crypto. Crypto falls 80%. How many dollars does the crypto position lose?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Position: $200,000 &times; 0.03 = $6,000. Loss: $6,000 &times; 0.80 = <b>$4,800</b>, 2.4% of the portfolio.</div></div>
+  <div class="ex" data-answer="-13.25" data-tol="0.01" data-ok="0.05 &times; (&minus;75%) + 0.95 &times; (&minus;10%) = &minus;13.25%.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">A portfolio holds 5% in crypto and 95% in a diversified mix. In a bad year crypto falls 75% and the mix falls 10%. What is the whole portfolio's return, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">0.05 &times; (&minus;75) = &minus;3.75; 0.95 &times; (&minus;10) = &minus;9.5. Total <b>&minus;13.25%</b>, against &minus;10% without the crypto.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.11 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: ledger, volatility, custody, taxes">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Public ledger</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">keys = ownership</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--red-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">~66% volatility</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">falls of 50&ndash;75%</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">No SIPC, no FDIC</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">custody is your risk</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Property</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">every disposal taxed</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q": "For federal tax purposes, the IRS treats bitcoin as:", "choices": ["Foreign currency", "Property", "A bank deposit", "Tax-exempt"], "answer": 1, "explain": "Notice 2014-21 and the IRS digital assets page: property, not currency."},
+    {"q": "On what date did the SEC approve the first spot bitcoin exchange-traded products?", "choices": ["January 10, 2024", "August 15, 1971", "July 18, 2025", "October 31, 2008"], "answer": 0, "explain": "The chair's statement that day also said the SEC did not approve or endorse bitcoin."},
+    {"q": "Which statement about SIPC and crypto is correct?", "choices": ["SIPC insures all crypto held at any exchange", "SIPC covers crypto price losses up to $500,000", "SIPC is the same as FDIC insurance", "SIPC does not protect crypto assets that are not securities under its law"], "answer": 3, "explain": "SIPC protects only qualifying securities and cash at failed member firms, never price losses."},
+    {"q": "You trade one crypto asset for another. For tax purposes this is:", "choices": ["A disposal of the first asset, with gain or loss", "Not reportable", "Ordinary income on both", "A gift"], "answer": 0, "explain": "Exchanging property is a sale of the property given up."},
+    {"q": "Brokers must report gross proceeds of digital asset sales on Form 1099-DA for transactions on or after:", "choices": ["January 1, 2020", "January 1, 2025", "January 1, 2030", "Never"], "answer": 1, "explain": "Basis reporting for certain transactions begins January 1, 2026."},
+    {"q": "After a 75% loss, an asset needs what gain to recover?", "choices": ["75%", "150%", "300%", "25%"], "answer": 2, "explain": "1 &divide; 0.25 &minus; 1 = 300%."},
+    {"q": "A 5% crypto position with 60% volatility, in a portfolio whose other 95% has 12% volatility (correlation 0.3), supplies about what share of total risk?", "choices": ["5%", "50%", "95%", "12%"], "answer": 3, "explain": "Its high volatility makes its share of risk more than twice its share of dollars."},
+    {"q": "In the FBI's 2025 IC3 report, reported losses involving cryptocurrency were about:", "choices": ["$11.4 billion", "$114 million", "$1.1 trillion", "$0"], "answer": 0, "explain": "181,565 complaints and $11.366 billion, of which $7.228 billion was crypto investment fraud."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 15.12 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-016</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Options and derivatives</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-062</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Scams, fraud and hype</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-030</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">How investment income is taxed</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-015"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Nakamoto, S. (2008). <i>Bitcoin: A peer-to-peer electronic cash system</i>. <a href="https://bitcoin.org/bitcoin.pdf">bitcoin.org</a></li>
+    <li>Bitcoin.org. <i>Frequently asked questions</i> (supply of 21 million; halving). <a href="https://bitcoin.org/en/faq">bitcoin.org</a></li>
+    <li>Coinbase. <i>Coinbase Bitcoin (CBBTCUSD)</i>, retrieved from FRED, Federal Reserve Bank of St. Louis, September 2026. <a href="https://fred.stlouisfed.org/series/CBBTCUSD">fred.stlouisfed.org</a></li>
+    <li>U.S. Securities and Exchange Commission. (2024, January 10). Statement by Chair Gary Gensler on spot bitcoin exchange-traded products. <a href="https://www.sec.gov/newsroom/speeches-statements/gensler-statement-spot-bitcoin-011023">sec.gov</a></li>
+    <li>U.S. Securities and Exchange Commission. (2025, September 17). <i>SEC approves generic listing standards for commodity-based trust shares</i> (Press release 2025-121).</li>
+    <li>Securities Investor Protection Corporation. <i>What SIPC protects</i>. <a href="https://www.sipc.org/for-investors/what-sipc-protects">sipc.org</a></li>
+    <li>Federal Deposit Insurance Corporation. <i>Understanding deposit insurance</i>. <a href="https://www.fdic.gov/resources/deposit-insurance/understanding-deposit-insurance">fdic.gov</a></li>
+    <li>Internal Revenue Service. (2014). <i>Notice 2014-21</i>; <i>Digital assets</i>; <i>About Form 1099-DA</i>. <a href="https://www.irs.gov/filing/digital-assets">irs.gov</a></li>
+    <li>Congressional Research Service. (2025, July 18). <i>Stablecoin legislation: An overview of the GENIUS Act of 2025 (P.L. 119-27)</i> (IN12553). <a href="https://www.congress.gov/crs-product/IN12553">congress.gov</a></li>
+    <li>U.S. Attorney's Office, Southern District of New York. (2024, March 28). <i>Samuel Bankman-Fried sentenced to 25 years in prison</i>. <a href="https://www.justice.gov/usao-sdny/pr/samuel-bankman-fried-sentenced-25-years-prison">justice.gov</a></li>
+    <li>U.S. Securities and Exchange Commission. (2024, June 13). <i>Terraform and Kwon to pay $4.5 billion following fraud verdict</i> (Press release 2024-73).</li>
+    <li>Federal Bureau of Investigation. (2026). <i>2025 IC3 annual report</i>. <a href="https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf">ic3.gov</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Crypto assets are highly volatile and can lose all of their value. They are not protected by SIPC or FDIC insurance. Tax rules summarized here are federal and can change.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s2b.js"></script>
+<script>
+INV.ready(function () {
+  /* Coinbase Bitcoin (CBBTCUSD), FRED, monthly end-of-period, Jan 2015 - Sep 2026 (Sep 2026 = Sep 24 value) */
+  var BTC = [218.45,255.59,245.50,236.81,230.21,263.82,285.19,230.75,237.14,314.85,376.86,430.35,367.95,436.44,416.03,454.02,531.34,673.49,626.97,572.89,608.99,696.90,742.69,973.37,970.01,1195.08,1088.99,1384.55,2303.29,2455.19,2856.88,4743.94,4339.00,6445.01,9903.00,13863.13,10099.99,10307.27,6928.50,9243.82,7485.00,6383.19,7727.27,7015.01,6605.00,6304.18,3976.00,3691.86,3411.50,3792.14,4094.99,5270.69,8550.18,10778.74,10099.00,9593.95,8305.14,9146.75,7551.70,7158.01,9343.28,8552.08,6434.73,8652.30,9435.80,9129.47,11372.76,11665.93,10783.24,13745.02,19727.00,29026.97,33076.09,45352.29,58837.71,57640.17,37153.71,34995.83,41472.42,47065.73,43834.03,61333.45,56879.47,46244.63,38430.30,43206.02,45475.83,37658.53,31804.27,19837.58,23296.14,20025.48,19415.80,20472.79,17179.78,16531.00,23134.74,23146.93,28492.72,29271.16,27222.90,30475.82,29223.31,25922.51,26959.40,34667.88,37743.00,42300.78,42599.49,61240.13,71213.11,60690.80,67506.03,62678.10,64607.71,58956.52,60790.00,69467.29,97263.18,94383.59,100623.85,86018.76,85170.37,96524.98,105697.94,105711.78,113248.73,109240.55,118659.97,110052.25,87446.89,87696.00,78727.30,66680.36,68133.96,76442.08,73688.35,58585.96,62886.64,78603.02,84470.76];
+  var MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var xF = function (v) { return String(Math.floor(v + 0.001)); };
+  var tF = function (v) { var i = Math.round((v - 2015) * 12); return MN[((i % 12) + 12) % 12] + " " + (2015 + Math.floor(i / 12)); };
+  var pts = BTC.map(function (p, i) { return [2015 + i / 12, p]; });
+  INV.lineChart(document.getElementById("f151"), { label: "Bitcoin month-end price", log: true, height: 270, xFmt: xF, yFmt: function (v) { return v >= 1000 ? "$" + Math.round(v / 1000) + "k" : "$" + Math.round(v); }, tipFmt: function (v) { return INV.money(v, 0); },
+    series: [{ name: "Bitcoin, month-end (USD)", color: "var(--s3)", data: pts, width: 2.6 }] });
+  /* 15.3 annual returns vs S&P */
+  var h = INV.hist(), dec = {}; BTC.forEach(function (p, i) { if (i % 12 === 11) dec[2015 + Math.floor(i / 12)] = p; });
+  var d3 = [];
+  for (var y = 2016; y <= 2025; y++) { var br = (dec[y] / dec[y - 1] - 1) * 100; d3.push({ label: String(y), tip: y + " bitcoin" + (br > 400 ? " (actual " + INV.pct(br, 0) + ")" : ""), y: Math.min(br, 400), color: "var(--s3)" }); d3.push({ label: "", tip: y + " S&P 500", y: h.stocks[y - h.first], color: "var(--s1)" }); }
+  INV.barChart(document.getElementById("f153"), { label: "Bitcoin versus S&P 500", height: 250, allLabels: true, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return INV.pct(v, 1); }, data: d3 });
+  /* 15.5 IC3 */
+  INV.barChart(document.getElementById("f155"), { label: "Crypto-related losses 2025", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return "$" + v.toFixed(1) + "B"; },
+    data: [{ label: "All crypto-related", y: 11.366, color: "var(--s5)" }, { label: "Crypto investment fraud", y: 7.228, color: "var(--s3)" }, { label: "All other crypto-related", y: 11.366 - 7.228, color: "var(--s6)" }] });
+  /* 15.7 drawdown */
+  var pk = 0, dd = BTC.map(function (p, i) { pk = Math.max(pk, p); return [2015 + i / 12, (p / pk - 1) * 100]; });
+  INV.lineChart(document.getElementById("f157"), { label: "Bitcoin drawdown", height: 240, xFmt: xF, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return INV.pct(v, 0); }, yMax: 0, zeroBase: false,
+    series: [{ name: "Below previous month-end high", color: "var(--s5)", data: dd, area: true }] });
+  /* 15.8 households */
+  INV.barChart(document.getElementById("f158"), { label: "Loss from a 75% fall on a 5% slice", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return "$" + Math.round(v).toLocaleString(); },
+    data: [["Maya", 3000, "var(--s1)"], ["Riveras", 62000, "var(--s2)"], ["Jordan", 140000, "var(--s3)"], ["Ruth", 780000, "var(--s5)"], ["Harpers", 1100000, "var(--s4)"]].map(function (x) { return { label: x[0], y: x[1] * 0.0375, color: x[2] }; }) });
+  /* 15.9 recovery */
+  INV.barChart(document.getElementById("f159"), { label: "Gain needed to recover", height: 220, allLabels: true, valueLabels: true, xTitle: "Loss", yFmt: function (v) { return Math.round(v) + "%"; },
+    data: [10, 25, 50, 64, 75, 90].map(function (l) { return { label: "−" + l + "%", y: (1 / (1 - l / 100) - 1) * 100, color: l >= 64 ? "var(--s5)" : "var(--s3)" }; }) });
+  void tF;
+});
+</script>
+</body>
+</html>

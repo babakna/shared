@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INV-049 · Asset Allocation Models — Investing Learning Lab</title>
+<meta name="description" content="60/40, three-fund, All Weather-style, Permanent Portfolio, Golden Butterfly, 100% stocks and age-based rules, each tested on 98 years of data, with an honest guide to what backtests can and cannot tell you.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/inv.css">
+</head>
+<body data-module="INV-049">
+<header class="top"><div class="top-in">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">INV-049</span><span class="ttl">Asset Allocation Models</span><span class="version">V1.0 (September 2026)</span></div>
+  <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><a class="btn ghost" href="tools.html">Tools</a><a class="btn ghost" href="resources.html">Resources</a><button class="btn" type="button" data-theme-btn>Dark</button><button class="btn" type="button" data-help-btn>Help</button></div>
+</div></header>
+
+<main class="wrap">
+<section class="mhero">
+  <div>
+    <div class="meta"><span class="chip">Stage 6 · Approaches &amp; Philosophies</span><span class="chip teal">Intermediate</span><span class="chip gray">About 60 minutes</span><span class="chip gray">1 model-comparison tool</span></div>
+    <h1>Asset Allocation Models</h1>
+    <p class="sub">A handful of famous recipes &mdash; 60/40, the three-fund portfolio, the Permanent Portfolio, All Weather, the Golden Butterfly, all stocks, and "your age in bonds" &mdash; compete for the same job: deciding how much of your money sits in growth assets and how much in shock absorbers. This module tests each one on 98 years of US data and shows you how to read those results without fooling yourself.</p>
+    <p class="q"><span>The question this module answers</span>Which ready-made portfolio recipe fits me, and how much should I trust the backtest that makes it look good?</p>
+  </div>
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
+      <g><rect x="40" y="62" width="168" height="22" rx="5" fill="#1F5FD1"/><rect x="208" y="62" width="112" height="22" rx="5" fill="#0B8A7E"/></g>
+      <g><rect x="40" y="98" width="70" height="22" rx="5" fill="#1F5FD1"/><rect x="110" y="98" width="70" height="22" rx="5" fill="#0B8A7E"/><rect x="180" y="98" width="70" height="22" rx="5" fill="#8794A8"/><rect x="250" y="98" width="70" height="22" rx="5" fill="#C77A0A"/></g>
+      <g><rect x="40" y="134" width="280" height="22" rx="5" fill="#1F5FD1"/></g>
+      <g><rect x="40" y="170" width="84" height="22" rx="5" fill="#1F5FD1"/><rect x="124" y="170" width="154" height="22" rx="5" fill="#0B8A7E"/><rect x="278" y="170" width="42" height="22" rx="5" fill="#C77A0A"/></g>
+      <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Same ingredients, different recipes</text>
+    </svg>
+  </div>
+</section>
+
+<div class="tabs-shell">
+
+<section class="panel" data-tab="Start here">
+  <p class="kicker">Start here</p>
+  <h2>Every portfolio is a recipe</h2>
+  <p class="lede">If you have ever followed a recipe, you already understand an allocation model. A recipe does not tell you which brand of flour to buy; it tells you how much flour, how much sugar and how much butter. An allocation model does the same for money: so much in stocks, so much in bonds, so much in cash, perhaps some gold.</p>
+  <p>For most people most of the time, the ordinary answer is fine: a broad stock fund and a broad bond fund in a proportion that suits your age and nerves, rebalanced once a year. Nothing in this module will overturn that. What the famous recipes add is a set of <i>arguments</i> about what can go wrong &mdash; inflation, deflation, a lost decade for stocks &mdash; and each builds its mix to survive a different fear. Seeing them side by side shows you what you are really choosing when you pick a mix: which bad decade you are willing to live through.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.1 &mdash; Seven allocation models, drawn to scale</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 330" role="img" aria-label="Stacked bars showing the stock, international, bond, cash and gold shares of seven allocation models">
+      <g font-family="Segoe UI, system-ui, sans-serif" id="f491"></g></svg></div>
+    <figcaption class="cap"><b>The models differ mainly in how much they bet on stocks and whether they hold gold.</b> The three-fund split shown is one common version (60% stocks, 40% of them international). The All Weather-style and Golden Butterfly bars are the approximations this module can test with its data; see the "Built for every season" tab. The age rule is shown for a 40-year-old.</figcaption>
+  </figure>
+  <h3>What this module covers</h3>
+  <ol>
+    <li>What an allocation model is, and the three decisions inside every one.</li>
+    <li>The stock&ndash;bond family: 100% stocks, 80/20, 60/40, 40/60 and the three-fund portfolio.</li>
+    <li>Age-based rules such as "110 minus your age."</li>
+    <li>The "all-season" portfolios: Permanent Portfolio, All Weather and Golden Butterfly.</li>
+    <li>A comparison tool that backtests all of them on 1928&ndash;2025 data.</li>
+    <li>How to read a backtest honestly, and three historical episodes that broke the rankings.</li>
+  </ol>
+</section>
+
+<section class="panel" data-tab="What a model decides">
+  <p class="kicker">The building blocks</p>
+  <h2>Three decisions hide inside every model</h2>
+  <p>Before comparing recipes, name the parts. Every allocation model answers three questions, whether or not it says so out loud.</p>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Asset allocation">Asset allocation</span></b><span>the mix, not the picks</span></div>
+    <div class="def-r"><div>What it is</div><div>The division of a portfolio among broad asset classes &mdash; stocks, bonds, cash, and sometimes real assets such as gold &mdash; expressed as percentages.</div></div>
+    <div class="def-r"><div>Used for</div><div>Setting how much a portfolio can grow and how far it can fall. The mix, far more than the individual funds chosen, decides how a diversified portfolio behaves in a crash.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Choosing between an S&amp;P 500 fund and a total-market fund is a small decision. Choosing between 90% and 50% in stocks is a big one.</div></div></div>
+  <div class="def"><div class="def-h"><b>Allocation model</b><span>a named, rule-based mix</span></div>
+    <div class="def-r"><div>What it is</div><div>A fixed recipe or rule for the mix, such as "60% stocks and 40% bonds" or "25% each in four assets," usually with a rule to restore the targets periodically.</div></div>
+    <div class="def-r"><div>Used for</div><div>Replacing moment-to-moment judgment with a plan you can follow when markets are frightening.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A model is only useful if you can hold it through its worst year. Pick one whose bad years you have looked at in advance.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.2 &mdash; The three decisions inside every allocation model</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 200" role="img" aria-label="Three boxes: how much risk, which shock absorbers, how to keep the mix">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <g transform="translate(10,14)"><rect width="226" height="172" rx="12" style="fill:var(--blue-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">1. How much growth?</text><text x="16" y="56" class="svg-s" font-size="12">The share in stocks sets</text><text x="16" y="72" class="svg-s" font-size="12">long-run growth and the</text><text x="16" y="88" class="svg-s" font-size="12">depth of the worst fall.</text><text x="16" y="120" class="svg-t" font-size="12" font-weight="700">100%, 80%, 60%... or</text><text x="16" y="136" class="svg-t" font-size="12" font-weight="700">a rule tied to your age</text></g>
+      <g transform="translate(247,14)"><rect width="226" height="172" rx="12" style="fill:var(--teal-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">2. Which shock absorbers?</text><text x="16" y="56" class="svg-s" font-size="12">Bonds help in recessions;</text><text x="16" y="72" class="svg-s" font-size="12">cash in rising rates; gold</text><text x="16" y="88" class="svg-s" font-size="12">has helped in inflation.</text><text x="16" y="120" class="svg-t" font-size="12" font-weight="700">Bonds only, or bonds</text><text x="16" y="136" class="svg-t" font-size="12" font-weight="700">plus cash and gold</text></g>
+      <g transform="translate(484,14)"><rect width="226" height="172" rx="12" style="fill:var(--amber-soft)"/><text x="16" y="30" class="svg-t" font-size="14" font-weight="800">3. How to keep it?</text><text x="16" y="56" class="svg-s" font-size="12">Rebalance on a calendar</text><text x="16" y="72" class="svg-s" font-size="12">or when weights drift</text><text x="16" y="88" class="svg-s" font-size="12">past a band (INV-056).</text><text x="16" y="120" class="svg-t" font-size="12" font-weight="700">This module: once a</text><text x="16" y="136" class="svg-t" font-size="12" font-weight="700">year, at year-end</text></g>
+      </g></svg></div>
+    <figcaption class="cap"><b>Most of the differences between famous models come from decision 2.</b> They mostly agree that you need some growth and some ballast; they disagree about which kind of ballast protects you from which kind of trouble.</figcaption>
+  </figure>
+  <p>The arithmetic of a mix is simple. Over one year, a rebalanced portfolio's return is the weighted average of its parts:</p>
+  <div class="formula">r<sub>portfolio</sub> = w<sub>1</sub>r<sub>1</sub> + w<sub>2</sub>r<sub>2</sub> + &hellip; + w<sub>n</sub>r<sub>n</sub>, with w<sub>1</sub> + &hellip; + w<sub>n</sub> = 100%</div>
+  <p>In 2008, for example, the S&amp;P 500 returned &minus;36.55% and 10-year Treasuries +20.10% (Damodaran data). A 60/40 mix therefore returned 0.6 &times; (&minus;36.55%) + 0.4 &times; 20.10% = <b>&minus;13.9%</b>. Over many years, though, the growth rate of the mix is <i>not</i> the average of the parts' growth rates, because rebalancing sells what rose and buys what fell, and because volatility itself drags down compound growth (INV-003). That is why models must be tested on real sequences of returns, which is what the rest of this module does.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why the mix matters more than the picks</summary><div class="layer-b">
+    <p>For a portfolio built from broad index funds, almost all the year-to-year variation comes from the asset mix, because each fund already holds thousands of securities. The picks start to matter more when a portfolio is concentrated &mdash; the Harpers' 25 technology stocks behave much more like one large bet than like "the stock market" (INV-004). Every model in this module assumes the stock and bond pieces are broad, low-cost funds.</p>
+  </div></details>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>How this module measures each model</summary><div class="layer-b">
+    <p>Every result uses calendar-year total returns from Damodaran's dataset (1928&ndash;2025): the S&amp;P 500 with dividends for stocks, the 10-year Treasury bond for bonds, 3-month Treasury bills for cash, and the gold price. Each model is rebalanced to its targets at every year-end. <b>Growth per year</b> is the compound annual growth rate, (ending value &divide; starting value)<sup>1/n</sup> &minus; 1. <b>Real growth</b> deflates each year by CPI-U inflation: (1 + r) &divide; (1 + i) &minus; 1. <b>Deepest fall</b> is the largest decline from a previous year-end peak to a later year-end low; falls within a year were deeper. <b>Longest under water</b> counts consecutive year-ends spent below a previous peak. No fees or taxes are deducted.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="The stock-bond family">
+  <p class="kicker">The mainstream recipes</p>
+  <h2>100% stocks, 60/40 and the three-fund portfolio</h2>
+  <p>The most widely used models hold only two ingredients: stocks and high-quality bonds. They differ only in proportion.</p>
+  <div class="def"><div class="def-h"><b>The 60/40 portfolio</b></div>
+    <div class="def-r"><div>What it is</div><div>60% stocks and 40% high-quality bonds, rebalanced periodically. Its cousins are 80/20 (more growth) and 40/60 (more stability).</div></div>
+    <div class="def-r"><div>Used for</div><div>A middle-of-the-road default: a long-standing benchmark for "balanced" funds and pension portfolios.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>Over 1928&ndash;2025 it grew 8.3% a year versus 10.0% for all stocks, with a worst year of &minus;27.3% instead of &minus;43.8%. You trade some growth for a much shallower bottom.</div></div></div>
+  <div class="def"><div class="def-h"><b>The three-fund portfolio</b></div>
+    <div class="def-r"><div>What it is</div><div>A total US stock market fund, a total international stock fund and a total US bond fund, in proportions you choose. It is a 60/40-style portfolio with the stock half spread across the world.</div></div>
+    <div class="def-r"><div>Used for</div><div>Owning nearly every listed company and investment-grade bond with three low-cost funds.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>It is the do-it-yourself twin of a target-date fund (INV-050) and was popularized by the Bogleheads community (INV-044). The international question is covered in INV-054.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.3 &mdash; Growth of $10,000, 1928&ndash;2025, four stock&ndash;bond mixes</div>
+    <div id="f493"></div>
+    <figcaption class="cap"><b>More stocks, more growth &mdash; and deeper holes along the way.</b> Log scale, so equal vertical distances are equal percentage changes. Rebalanced every year-end, before fees and taxes. $10,000 became about $116 million in 100% stocks, $25.7 million at 60/40 and $9.4 million at 40/60 &mdash; figures no real investor earned, because nobody pays no fees and no taxes for 98 years. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>1928&ndash;2025, rebalanced yearly</th><th class="r">Growth / yr</th><th class="r">After inflation</th><th class="r">Worst year</th><th class="r">Deepest fall</th></tr></thead>
+  <tbody><tr><td>100% stocks</td><td class="r">10.0%</td><td class="r">6.8%</td><td class="r neg-t">&minus;43.8% (1931)</td><td class="r neg-t">&minus;65%</td></tr>
+  <tr><td>80/20</td><td class="r">9.3%</td><td class="r">6.1%</td><td class="r neg-t">&minus;35.6% (1931)</td><td class="r neg-t">&minus;53%</td></tr>
+  <tr><td>60/40</td><td class="r">8.3%</td><td class="r">5.1%</td><td class="r neg-t">&minus;27.3% (1931)</td><td class="r neg-t">&minus;40%</td></tr>
+  <tr><td>40/60</td><td class="r">7.2%</td><td class="r">4.1%</td><td class="r neg-t">&minus;19.1% (1931)</td><td class="r neg-t">&minus;26%</td></tr></tbody></table></div>
+  <p class="src">Computed from Damodaran, NYU Stern (stocks = S&amp;P 500 with dividends; bonds = 10-year Treasuries). "Deepest fall" is year-end to year-end, 1929&ndash;1932 for the stock-heavy mixes.</p>
+  <p>Two patterns show up in every period you test. First, each step from 40/60 to 100% stocks added roughly a percentage point of growth a year over the long run. Second, the price of that point was a bigger worst case: the all-stock portfolio's year-end value fell 65% from 1928 to 1932. The question "how much in stocks?" is therefore really "how deep a hole can I sit in without selling?" INV-025 on risk tolerance and capacity is the place to answer it honestly.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>The three-fund portfolio cannot be tested back to 1928 here</summary><div class="layer-b">
+    <p>This course's long dataset has no international stock series. Kenneth French's data library does have value-weighted returns for developed markets outside the US from 1991 onward, so the comparison tool runs a three-fund model (36% US, 24% international, 40% Treasuries) from 1991. Over 1991&ndash;2025 it grew 8.2% a year against 9.1% for a US-only 60/40 &mdash; because this happened to be one of the strongest stretches in US history. INV-054 shows the decades when the opposite was true.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Age-based rules">
+  <p class="kicker">Rules of thumb</p>
+  <h2>"Your age in bonds" and its descendants</h2>
+  <p>The oldest shortcut ties the mix to your age: hold your age in bonds and the rest in stocks. A 30-year-old would hold 70% stocks; a 70-year-old, 30%. As people began living longer and bond yields fell, variations appeared that hold more stocks: 110 minus your age, or 120 minus your age.</p>
+  <div class="def"><div class="def-h"><b>Age-based allocation rule</b></div>
+    <div class="def-r"><div>What it is</div><div>A formula that sets the stock share from your age, such as stocks = 110 &minus; age (in percent). It automatically becomes more conservative every year.</div></div>
+    <div class="def-r"><div>Used for</div><div>A simple, self-adjusting starting point; it is the idea behind target-date glide paths (INV-050).</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>The rule knows your age and nothing else. It ignores your pension, Social Security, job stability and how much you have saved &mdash; all of which change how much risk you can carry.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.4 &mdash; Stock share by age: three rules and one real glide path</div>
+    <div id="f494"></div>
+    <figcaption class="cap"><b>The rules fall in a straight line; professionally designed glide paths stay high, then drop late.</b> The Vanguard line converts its target-date funds' stock shares (September 30, 2025 prospectus data) to age, assuming retirement at 65. Target-date funds hold about 90% stocks until roughly 25 years before retirement, which no age rule does.</figcaption>
+  </figure>
+  <div class="formula">Stocks (%) = 110 &minus; age &nbsp;&nbsp;&rArr;&nbsp;&nbsp; at 45: 110 &minus; 45 = 65% stocks, 35% bonds</div>
+  <p>The straight line is the rule's weakness as much as its strength. Economists think of your future paychecks as a bond-like asset called <span class="term" data-term="Human capital">human capital</span>. At 25 you own decades of future earnings and very little in investments, so your total wealth is mostly "bond" already; you can afford a stock-heavy portfolio. At 64 your paychecks are almost used up. That logic supports a mix that stays heavy in stocks for a long time and then de-risks in the last decade or two before retirement &mdash; the shape of the Vanguard line in Figure 49.4 &mdash; rather than a steady one-point-a-year decline from your twenties.</p>
+  <p>Tested on history, the 110-minus-age rule for someone who was 40 at the start of 1972 grew 8.1% a year through 2025, against 9.4% for a fixed 60/40 &mdash; not because the rule is bad, but because it held under 50% stocks from age 61 onward, during the strong markets of the 1990s and 2010s. Its reward came in calm: by 2010, at 78, it held 32% stocks, a mix many retirees find easy to live with.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>When an age rule is too aggressive</summary><div class="layer-b">
+    <p>Age rules can also err the other way. Jordan, at 45 with 40% of their savings in their employer's stock, would get "65% stocks" from the 110 rule, but Jordan's real stock exposure is higher because that employer stock is a single, concentrated bet tied to their paycheck. A rule is a starting point to adjust for human capital, not a replacement for looking at the whole balance sheet.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Built for every season">
+  <p class="kicker">The all-weather family</p>
+  <h2>Permanent Portfolio, All Weather and Golden Butterfly</h2>
+  <p>A different school starts from economic scenarios instead of from stocks. The idea: no one knows whether the next decade brings growth or recession, inflation or deflation, so hold something that does well in each and balance them. Figure 49.5 shows the logic.</p>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.5 &mdash; Four economic seasons and what each has tended to reward</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 280" role="img" aria-label="Two-by-two grid of growth and inflation environments with the assets the all-weather school assigns to each">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <text x="360" y="22" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">Growth rising</text><text x="360" y="272" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">Growth falling</text>
+      <g transform="translate(110,34)"><rect width="246" height="110" rx="12" style="fill:var(--blue-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Prosperity</text><text x="14" y="52" class="svg-s" font-size="12">Growth up, inflation calm</text><text x="14" y="84" class="svg-t" font-size="12" font-weight="700">Stocks</text></g>
+      <g transform="translate(364,34)"><rect width="246" height="110" rx="12" style="fill:var(--amber-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Inflationary boom</text><text x="14" y="52" class="svg-s" font-size="12">Growth up, prices up</text><text x="14" y="84" class="svg-t" font-size="12" font-weight="700">Gold, commodities, TIPS</text></g>
+      <g transform="translate(110,152)"><rect width="246" height="110" rx="12" style="fill:var(--teal-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Deflationary bust</text><text x="14" y="52" class="svg-s" font-size="12">Growth down, prices down</text><text x="14" y="84" class="svg-t" font-size="12" font-weight="700">Long-term Treasuries</text></g>
+      <g transform="translate(364,152)"><rect width="246" height="110" rx="12" style="fill:var(--red-soft)"/><text x="14" y="28" class="svg-t" font-size="13.5" font-weight="800">Stagflation / tight money</text><text x="14" y="52" class="svg-s" font-size="12">Growth down, prices up</text><text x="14" y="84" class="svg-t" font-size="12" font-weight="700">Cash, gold, TIPS</text></g>
+      <text x="100" y="92" text-anchor="end" class="svg-s" font-size="12">Inflation</text><text x="100" y="108" text-anchor="end" class="svg-s" font-size="12">falling</text>
+      <text x="620" y="92" class="svg-s" font-size="12">Inflation</text><text x="620" y="108" class="svg-s" font-size="12">rising</text>
+      </g></svg></div>
+    <figcaption class="cap"><b>Balance across seasons instead of betting on one.</b> A simplified map in the spirit of Bridgewater's "four boxes" and Harry Browne's four economic conditions. Real assets do not always behave as the box says: gold fell sharply in the inflationary early 1980s, and stocks and bonds fell together in 2022.</figcaption>
+  </figure>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Permanent Portfolio">Permanent Portfolio</span></b><span>Harry Browne</span></div>
+    <div class="def-r"><div>What it is</div><div>25% each in stocks, long-term Treasury bonds, cash (Treasury bills) and gold, rebalanced periodically. Browne introduced the concept in <i>Inflation-Proofing Your Investments</i> (1981, with Terry Coxon); his last investment book was <i>Fail-Safe Investing</i> (1999).</div></div>
+    <div class="def-r"><div>Used for</div><div>Balancing four conditions equally: prosperity (stocks), deflation (long bonds), inflation (gold) and recession (cash).</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>It has had remarkably shallow drawdowns since the 1970s, and markedly lower growth than stock-heavy portfolios whenever stocks did well.</div></div></div>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="All Weather portfolio">All Weather</span></b><span>Bridgewater Associates, 1996</span></div>
+    <div class="def-r"><div>What it is</div><div>A strategy Bridgewater launched in 1996, originally for Ray Dalio's trust assets, that puts <i>equal risk</i> on four growth-and-inflation scenarios. The institutional version uses leverage and inflation-linked bonds; retail versions are simplified, unleveraged approximations.</div></div>
+    <div class="def-r"><div>Used for</div><div>Holding a portfolio designed "to be indifferent to shifts in discounted economic conditions," in Bridgewater's words; it is the origin of the "risk parity" movement.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>You cannot buy the real thing in a 401(k). The version tested here (30% stocks, 55% 10-year Treasuries, 15% gold) is this module's own stand-in, not Bridgewater's portfolio.</div></div></div>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Golden Butterfly portfolio">Golden Butterfly</span></b><span>Portfolio Charts</span></div>
+    <div class="def-r"><div>What it is</div><div>20% each in US large-cap stocks, US small-cap value stocks, long-term Treasuries, short-term Treasuries and gold, created by the author of the Portfolio Charts website as a variation on the Permanent Portfolio tilted toward prosperity.</div></div>
+    <div class="def-r"><div>Used for</div><div>Keeping the Permanent Portfolio's resilience while adding growth.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>It was designed with the historical record in view, so its backtests are partly the data it was built from (see "Reading a backtest"). This module's data lack a small-cap value series, so the test uses 40% S&amp;P 500 in place of both stock slices.</div></div></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Model</th><th>As published</th><th>As tested here</th></tr></thead><tbody>
+    <tr><td><b>Permanent Portfolio</b></td><td>25% US stocks, 25% long-term Treasuries, 25% T-bills, 25% gold</td><td>25% S&amp;P 500, 25% 10-year Treasuries, 25% T-bills, 25% gold</td></tr>
+    <tr><td><b>All Weather-style</b></td><td>Leveraged risk parity across four scenarios (institutional)</td><td>30% S&amp;P 500, 55% 10-year Treasuries, 15% gold (no leverage, no commodities, no TIPS)</td></tr>
+    <tr><td><b>Golden Butterfly</b></td><td>20% each: large-cap, small-cap value, long-term Treasuries, short-term Treasuries, gold</td><td>40% S&amp;P 500, 20% 10-year Treasuries, 20% T-bills, 20% gold</td></tr>
+  </tbody></table></div>
+  <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>Gold's history splits in two.</b> Until 1933 the dollar was convertible into gold at $20.67 an ounce; the Roosevelt administration suspended the gold standard in 1933 and, with the Gold Reserve Act of 1934, reset the link. Under the postwar Bretton Woods system dollars were convertible into gold at $35 an ounce, until President Nixon closed the "gold window" on August 15, 1971 (Federal Reserve History). So gold's pre-1971 "returns" in any dataset describe a controlled price, not a market; the dataset used here even shows yearly moves in the fixed-price era that a fixed official price would not produce. Treat gold-heavy results before the 1970s as unreliable, and notice how much gold's post-1971 history does to the rankings.</p></div></div>
+</section>
+
+<section class="panel" data-tab="Compare them">
+  <p class="kicker">The comparison tool</p>
+  <h2>Backtest every model yourself</h2>
+  <p>Choose a period and a model to highlight. The table ranks all of them on the same five measures; the chart plots the highlighted model against 100% stocks and 60/40. The default period starts in 1972, after gold began trading freely.</p>
+  <div data-tool="s6bModels"></div>
+  <p>With the default settings (1972&ndash;2025) you should see a surprising table. The Permanent Portfolio grew 8.5% a year, the Golden Butterfly stand-in 9.2% and 60/40 9.4%, while their worst years were &minus;8.3%, &minus;10.3% and &minus;18.0% respectively (all in 2022). 100% stocks grew 11.1% a year, with a worst year of &minus;36.5% (2008). On these numbers the gold portfolios look like a free lunch: almost 60/40's growth with half the pain.</p>
+  <p>Now move the first year to 1981. The Permanent Portfolio drops to 7.3% a year against 60/40's 10.1%, and the gap in ending wealth becomes enormous. What changed? Nothing about the models &mdash; only the start date. Gold rose from $35 to a record in 1980, then fell for two decades: the dataset's gold series lost 53.5% from 1981 through 2000. Any test that starts in 1972 includes gold's best decade in history; any test that starts in 1981 includes its worst. The next tab turns this into rules for reading every backtest you will ever see.</p>
+  <details class="layer l3"><summary><span class="lv">Practitioner depth</span>What the tool does and does not include</summary><div class="layer-b">
+    <p>Rebalancing to exact targets every December 31 is an idealization; real investors rebalance with bands, cash flows and taxes (INV-056). Year-end values understate drawdowns: a market can fall steeply within a year and recover before December 31, and the tool never sees it. The 10-year Treasury stands in for "long-term Treasuries," which were more volatile, so the Permanent Portfolio's real historical swings were larger than shown. No fund fees, no trading costs and no taxes. Taxes can differ by ingredient: gold coins are collectibles, and net gains on collectibles are taxed at a maximum 28% rate (IRS Topic 409), so ask how any gold product is taxed before holding it in a taxable account (INV-030).</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Reading a backtest">
+  <p class="kicker">Honest caveats</p>
+  <h2>Six questions to ask of any backtest</h2>
+  <div class="def"><div class="def-h"><b><span class="term" data-term="Backtest">Backtest</span></b></div>
+    <div class="def-r"><div>What it is</div><div>A simulation of how a rule or portfolio would have performed on past data, as if someone had followed it.</div></div>
+    <div class="def-r"><div>Used for</div><div>Checking whether an idea survived real history, and seeing its worst periods before you live through them.</div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A backtest shows one path the world took. It is evidence about how a model behaves, not a forecast of what it will earn.</div></div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.6 &mdash; Rolling 10-year growth rates: 60/40 versus the Permanent Portfolio</div>
+    <div id="f496"></div>
+    <figcaption class="cap"><b>The "winner" depends on which decade you pick.</b> Each point is the compound growth rate over the ten calendar years ending that year. The Permanent Portfolio led in the ten-year windows dominated by the 1970s and lagged badly in those dominated by the 1980s&ndash;1990s and 2010s. Computed from Damodaran, NYU Stern; pre-1971 gold figures are unreliable (see the warning in "Built for every season").</figcaption>
+  </figure>
+  <ol class="takeaways">
+    <li><b>Where does it start and end?</b> Starting in 1972 flatters gold; starting in 1981 punishes it; ending in 2025 includes gold's 66% gain that year. Always test several start dates.</li>
+    <li><b>Was the model designed after seeing the data?</b> A recipe built by trying combinations on past returns will look good on those returns. That is <span class="term" data-term="Look-ahead bias">look-ahead bias</span> and <span class="term" data-term="Overfitting">overfitting</span>. The Permanent Portfolio has decades of results after its 1981 publication; newer models have far less out-of-sample history.</li>
+    <li><b>Are the ingredients real?</b> Our All Weather and Golden Butterfly stand-ins substitute available series for missing ones. Many online backtests do the same without saying so.</li>
+    <li><b>How coarse is the data?</b> Year-end data miss drops inside a year; monthly data miss drops inside a month. Real drawdowns were always at least as deep as shown.</li>
+    <li><b>Which country?</b> This is US data, from the country whose stock market did best in the 20th century. Survivorship matters (INV-054).</li>
+    <li><b>After costs, taxes and behavior?</b> A model you abandon in its worst year has no long-run return at all. The behavior gap is covered in INV-061.</li>
+  </ol>
+  <div class="formula">Real return = (1 + nominal return) &divide; (1 + inflation) &minus; 1 &nbsp;&nbsp; e.g. (1.094 &divide; 1.039) &minus; 1 = 5.3%</div>
+  <p>That formula explains the "after inflation" column. Inflation averaged 3.9% a year from 1972 to 2025 (CPI-U), so 60/40's 9.4% nominal growth is 5.3% in real terms &mdash; the number that tells you what your money could actually buy.</p>
+  <details class="layer l2"><summary><span class="lv">Going further</span>Why a longer backtest is not automatically a better one</summary><div class="layer-b">
+    <p>It is tempting to trust 98 years over 54. But the longer test mixes regimes that may never recur: a gold standard, bond yields held down by the Federal Reserve during and after World War II, and markets without index funds or cheap trading. A long test is best used to see the range of things that happened, not to pin down a single "expected" return.</p>
+  </div></details>
+</section>
+
+<section class="panel" data-tab="Case studies">
+  <p class="kicker">History that broke the rankings</p>
+  <h2>Three episodes every model must survive</h2>
+  <div class="case"><div class="case-h"><span class="tag">Case study 1</span><b>The inflation decade, 1972&ndash;1980</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>Consumer prices rose 12.3% in 1974 and 12.5% in 1980. Over 1972&ndash;1980 the S&amp;P 500 grew 7.9% a year before inflation but lost 0.7% a year after it; a 60/40 mix lost 2.1% a year after inflation. Gold, freed from its official price, rose about 33.6% a year. The Permanent Portfolio mix gained 5.6% a year after inflation.</div></div>
+    <div class="row"><div>What it teaches</div><div>Stocks and nominal bonds can both fail against inflation for a decade. The all-weather school was built on memories of exactly this period; if it recurs, a small allocation to real assets such as TIPS or gold earns its keep.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, NYU Stern, historical returns 1928&ndash;2025 (S&amp;P 500, 10-year Treasury, T-bill, gold, CPI).</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 2</span><b>Gold's long slide, 1981&ndash;2000</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>After peaking in 1980, gold lost 53.5% over 1981&ndash;2000 in this dataset, while stocks enjoyed one of their best two decades. From 1981 through 2018 the Permanent Portfolio grew 6.7% a year and 60/40 10.0% a year: after 38 years, 60/40 ended with about three times as much wealth.</div></div>
+    <div class="row"><div>What it teaches</div><div>Insurance has a premium. A portfolio that holds 25% in an asset with no cash flows will lag badly whenever that asset is out of favor, and the lag can last longer than most investors' patience.</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, NYU Stern.</div></div>
+  </div></div>
+  <div class="case"><div class="case-h"><span class="tag">Case study 3</span><b>2022: the year 60/40 had nowhere to hide</b></div><div class="case-b">
+    <div class="row"><div>What happened</div><div>With inflation at 6.5% and interest rates rising fast, the S&amp;P 500 returned &minus;18.0% and 10-year Treasuries &minus;17.8%. A 60/40 mix lost 18.0%, its third-worst year in the dataset, after 1931 and 1937. The Permanent Portfolio mix lost 8.3%, cushioned by T-bills (+2.1%) and gold (+0.6%).</div></div>
+    <div class="row"><div>What it teaches</div><div>Bonds protect best against recessions and deflation, not against inflation shocks. That is the core argument for holding more than one kind of shock absorber (INV-004 shows how the stock&ndash;bond correlation changes).</div></div>
+    <div class="row"><div>Source</div><div class="src">Computed from Damodaran, NYU Stern.</div></div>
+  </div></div>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.7 &mdash; 2022 returns by model</div>
+    <div id="f497"></div>
+    <figcaption class="cap"><b>The models with cash and gold fell least in the inflation shock.</b> One calendar year, 2022, as tested in this module. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+</section>
+
+<section class="panel" data-tab="What would you do?">
+  <p class="kicker">Decisions</p>
+  <h2>Choosing a recipe for a real household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.8 &mdash; Worst calendar year by model, 1972&ndash;2025</div>
+    <div id="f498"></div>
+    <figcaption class="cap"><b>Know the worst year before you choose.</b> Worst single calendar-year return for each model over 1972&ndash;2025; the age rule assumes age 40 in 1972. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="decide">
+    <div class="dq-tag">Scenario 1 &middot; The Riveras</div>
+    <p class="dq">Marcus saw a Golden Butterfly backtest online and wants to move their $62,000 of 401(k)s into it. Their plans offer index funds for US stocks, international stocks and bonds, a money market fund and target-date funds &mdash; no gold and no small-cap value fund. They are 35 and 34. What should they do?</p>
+    <div class="opts"><button class="opt">Build it anyway, buying gold in a taxable account to complete the recipe.</button><button class="opt">Use a stock-heavy mix from the funds they have (for example a target-date fund or a three-fund split around 80&ndash;90% stocks) and keep things simple.</button><button class="opt">Move everything to the money market fund until they decide.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Build it anyway</b>Possible, but it means a model that holds 40% in bonds and cash plus 20% gold for a couple with 30 years of paychecks ahead of them &mdash; human capital already provides their ballast. It also adds an account, a tax wrinkle (collectibles rates on gold ETF gains) and the temptation to tinker.</div>
+      <div class="oc"><b>Simple and stock-heavy</b>A defensible choice. The backtest they saw is not a reason to hold 60% outside stocks at 35. They should also consolidate their six overlapping funds (INV-004) and make sure they capture the full employer match.</div>
+      <div class="oc"><b>Wait in cash</b>Indecision has a cost. Vanguard's research found money held in cash usually lagged invested money (INV-051). They can pick a sensible default now and refine it later.</div>
+      <div class="verdict"><b>The principle:</b> the best model is one you can build from the funds you have and hold for decades.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 2 &middot; The Harpers</div>
+    <p class="dq">Tom and Rachel are 57 and 55 and plan to retire around 62&ndash;63. Their $1.1 million is roughly 80% in stocks, including $220,000 in 25 technology stocks. Their advisor proposes moving to a 60/40 mix over the next two years. Rachel asks whether 100% stocks would "make up for lost time."</p>
+    <div class="opts"><button class="opt">Go to 100% stocks for the higher long-run return.</button><button class="opt">Move toward 60/40 (or a glide path like a target-date fund), diversifying the technology stocks with attention to taxes.</button><button class="opt">Adopt the Permanent Portfolio to avoid any big loss.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>100% stocks</b>The historical worst year was &minus;43.8% (1931) and &minus;36.5% as recently as 2008. A loss like that two years before retirement can force a later retirement or lower spending: sequence risk (INV-078).</div>
+      <div class="oc"><b>Toward 60/40</b>Sensible. Near retirement, a mix whose worst year was about &minus;27% (1931) and &minus;18% since 1972 is easier to hold. Selling concentrated winners in the taxable account should be staged to manage capital gains (INV-035, INV-037).</div>
+      <div class="oc"><b>Permanent Portfolio</b>It would have limited losses since 1972 but grown far less in the long stretches when stocks led; with perhaps 30 years of retirement ahead, too little growth is also a risk.</div>
+      <div class="verdict"><b>The principle:</b> near retirement, reduce the chance of a devastating loss first; chasing extra return comes last.</div>
+    </div>
+  </div>
+  <div class="decide">
+    <div class="dq-tag">Scenario 3 &middot; Ruth</div>
+    <p class="dq">Ruth, 68, has $780,000 in her IRA and $60,000 in CDs and savings. A newsletter says she should hold "your age in bonds": 68% bonds. Her Social Security survivor benefit of $2,900 a month covers most of her basic bills. What should she think about?</p>
+    <div class="opts"><button class="opt">Follow the rule exactly: 32% stocks.</button><button class="opt">Treat the rule as a starting point, then adjust for the fact that inflation-adjusted Social Security already acts like a large bond holding.</button></div>
+    <div class="outcomes">
+      <div class="oc"><b>Follow the rule</b>Not wrong, and very safe. But she may live another 25 years, and her IRA mostly funds extras and emergencies; a lower stock share means less growth against inflation.</div>
+      <div class="oc"><b>Adjust for Social Security</b>Right. A reliable, inflation-adjusted income stream lets many retirees hold somewhat more in stocks than an age rule suggests &mdash; as long as they can stomach the swings. Her required minimum distributions from 2031 will need cash available too (INV-081).</div>
+      <div class="verdict"><b>The principle:</b> count guaranteed income as part of your safe assets before applying any rule of thumb.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Myth or fact?">
+  <p class="kicker">Test the claims</p>
+  <h2>Six things people say about allocation models</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.9 &mdash; Growth after inflation by model, 1928&ndash;2025 and 1972&ndash;2025</div>
+    <div id="f499"></div>
+    <figcaption class="cap"><b>The rankings change with the period, but stocks stay on top over the long run.</b> Real compound growth per year. The earlier period includes the fixed-price gold era, which penalizes the gold portfolios. Computed from Damodaran, NYU Stern.</figcaption>
+  </figure>
+  <div class="myths">
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The best model is the one with the best backtest."</div><div class="ma"><b>Myth.</b> The ranking of models flips with the start date (Figure 49.6). A model that looks best over one window was often the luckiest, or was designed after seeing that window.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"60/40 is dead after 2022."</div><div class="ma"><b>Overstated.</b> 2022 was 60/40's worst year since 1937 in this dataset, but over 1972&ndash;2025 it still grew 9.4% a year. One bad year reveals a weakness (inflation shocks); it does not erase decades of results.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"Gold always protects against inflation."</div><div class="ma"><b>Myth.</b> Gold soared in the 1970s but fell in 1981 (&minus;32.6%) while inflation was still near 9%, and it lost more than half its value over 1981&ndash;2000. It has been an unreliable, if sometimes spectacular, hedge.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"A young investor should hold 100% stocks."</div><div class="ma"><b>Often reasonable, not mandatory.</b> Long horizons and human capital support a high stock share, and target-date funds hold about 90% for young workers. But only if you will not sell after a 40&ndash;50% fall.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"The Permanent Portfolio never loses much."</div><div class="ma"><b>Mostly true since 1972, in nominal terms.</b> Its worst year-end fall was about 8% (2022). After inflation, it lost about 15% from peak (2022). Before 1972 its results are distorted by fixed gold prices.</div></button>
+    <button class="myth" type="button"><div class="mt">Myth or fact?</div><div class="mq">"More asset classes always means a better portfolio."</div><div class="ma"><b>Myth.</b> Each added asset must earn its place through return or genuine diversification. Adding one with no expected return above cash can lower long-run growth more than it lowers risk.</div></button>
+  </div>
+</section>
+
+<section class="panel" data-tab="Your household">
+  <p class="kicker">Apply it</p>
+  <h2>What this module means for each household</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.10 &mdash; "110 minus age" for each household</div>
+    <div id="f4910"></div>
+    <figcaption class="cap"><b>A starting point, not an answer.</b> Stock share implied by the 110-minus-age rule; for couples, the older partner's age. Each household's real answer depends on guaranteed income, job stability and concentration, discussed below.</figcaption>
+  </figure>
+  <div class="lens">
+    <div class="lens-row" data-hh="maya"><div><b>The rule says 86%; a target-date fund says about 90%.</b> At 24, with $3,000 saved and 40 years of earnings ahead, a single stock-heavy fund in her 401(k) is the simplest sound model. Her first priorities are the employer match and her 6.8% loans (INV-020).</div></div>
+    <div class="lens-row" data-hh="rivera"><div><b>Pick one model and consolidate.</b> Six overlapping large-cap funds are not a model. A three-fund split or a target-date fund, at roughly 80&ndash;90% stocks, fits their horizon; their $41,000 idle in checking is the more urgent fix.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>The rule says 65%, but the employer stock skews it.</b> Jordan's $56,000 of employer stock is 40% of their savings. Reducing it is step one; then a 60&ndash;70% stock model across the whole $140,000 makes sense, with Ava's college money kept separately and safe (INV-034).</div></div>
+    <div class="lens-row" data-hh="harper"><div><b>Moving from about 80% toward 60% makes sense before retiring.</b> Five or six years out, the Harpers are in the window where a model's worst year matters most. They should compare their advisor's proposal with a target-date fund for the same year (INV-050).</div></div>
+    <div class="lens-row" data-hh="ruth"><div><b>Count Social Security as her bond.</b> The rule says 42% stocks for Ruth. Her survivor benefit covers most fixed costs, so a balanced model with a cash bucket for two to three years of withdrawals may suit her better than a rigid formula.</div></div>
+  </div>
+  <div class="ws" data-ws="inv049" data-title="INV-049 worksheet: my allocation model">
+    <div class="ws-tag">Worksheet &middot; saved only in this browser</div>
+    <div class="ws-grid">
+      <div><label for="w49a">My current mix (stocks / bonds / cash / other)</label><textarea id="w49a" data-key="current"></textarea></div>
+      <div><label for="w49b">The model closest to what I want, and why</label><textarea id="w49b" data-key="model"></textarea></div>
+      <div><label for="w49c">That model's worst year and deepest fall (from the tool)</label><textarea id="w49c" data-key="worst"></textarea></div>
+      <div><label for="w49d">Guaranteed income or human capital that changes my answer</label><textarea id="w49d" data-key="income"></textarea></div>
+      <div><label for="w49e">How and when I will rebalance</label><textarea id="w49e" data-key="rebalance"></textarea></div>
+    </div>
+    <div class="ws-actions"><button type="button" class="btn small" data-ws-download>Download as text</button><button type="button" class="btn small ghost" data-ws-clear>Clear</button><span class="saved"></span></div>
+  </div>
+</section>
+
+<section class="panel" data-tab="Exercises">
+  <p class="kicker">Practice</p>
+  <h2>Work the numbers yourself</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.11 &mdash; 2008 returns by model</div>
+    <div id="f4911"></div>
+    <figcaption class="cap"><b>In a recession-driven crash, Treasuries did the heavy lifting.</b> Calendar-year 2008: stocks &minus;36.55%, 10-year Treasuries +20.10%, T-bills +1.40%, gold +4.32% (Damodaran). Each bar is the weighted average of those returns.</figcaption>
+  </figure>
+  <div class="ex" data-answer="-13.9" data-tol="0.02" data-ok="0.6 &times; (&minus;36.55) + 0.4 &times; 20.10 = &minus;13.89%.">
+    <div class="ex-tag">Exercise 1</div><p class="ex-q">In 2008 stocks returned &minus;36.55% and 10-year Treasuries +20.10%. What did a 60/40 portfolio return, in percent (one decimal)?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">0.6 &times; (&minus;36.55%) = &minus;21.93%; 0.4 &times; 20.10% = +8.04%; total <b>&minus;13.9%</b>.</div></div>
+  <div class="ex" data-answer="-8.3" data-tol="0.02" data-ok="(&minus;18.04 &minus; 17.83 + 2.09 + 0.55) &divide; 4 = &minus;8.31%.">
+    <div class="ex-tag">Exercise 2</div><p class="ex-q">In 2022: stocks &minus;18.04%, 10-year Treasuries &minus;17.83%, T-bills +2.09%, gold +0.55%. What did a Permanent Portfolio (25% each) return, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">Equal weights, so take the simple average: (&minus;18.04 &minus; 17.83 + 2.09 + 0.55) &divide; 4 = &minus;33.23 &divide; 4 = <b>&minus;8.3%</b>.</div></div>
+  <div class="ex" data-answer="5.3" data-tol="0.03" data-ok="1.094 &divide; 1.039 &minus; 1 = 5.29%.">
+    <div class="ex-tag">Exercise 3</div><p class="ex-q">A portfolio grew 9.4% a year while inflation averaged 3.9% a year. What was its real growth rate, in percent?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in percent" placeholder="%"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">(1 + 0.094) &divide; (1 + 0.039) &minus; 1 = 1.0529 &minus; 1 = <b>5.3%</b>. Simply subtracting (9.4 &minus; 3.9 = 5.5%) slightly overstates it.</div></div>
+  <div class="ex" data-answer="91000" data-tol="0.01" data-ok="(110 &minus; 45)% &times; $140,000 = $91,000.">
+    <div class="ex-tag">Exercise 4</div><p class="ex-q">Jordan is 45 with $140,000 of retirement savings. Under the 110-minus-age rule, how many dollars would be in stocks?</p>
+    <div class="ex-row"><input type="text" inputmode="decimal" aria-label="Your answer in dollars" placeholder="$"><button type="button" class="btn small primary" data-check>Check</button><button type="button" class="btn small ghost" data-reveal>Show worked solution</button></div>
+    <div class="ex-fb"></div><div class="ex-sol">110 &minus; 45 = 65% stocks; 0.65 &times; $140,000 = <b>$91,000</b>. Jordan's $56,000 of employer stock already makes up most of that.</div></div>
+</section>
+
+<section class="panel" data-tab="Check yourself">
+  <p class="kicker">Knowledge check</p>
+  <h2>Eight questions &mdash; 70% passes the module</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.12 &mdash; The module in one picture</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 120" role="img" aria-label="Summary: growth share, shock absorbers, backtest honesty, fit">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="20" width="165" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="92" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Stock share</text><text x="92" y="76" text-anchor="middle" class="svg-s" font-size="11.5">sets growth and pain</text>
+      <rect x="190" y="20" width="165" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="272" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Shock absorbers</text><text x="272" y="76" text-anchor="middle" class="svg-s" font-size="11.5">each fits one storm</text>
+      <rect x="370" y="20" width="165" height="80" rx="12" style="fill:var(--amber-soft)"/><text x="452" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Backtests</text><text x="452" y="76" text-anchor="middle" class="svg-s" font-size="11.5">one path, many traps</text>
+      <rect x="550" y="20" width="160" height="80" rx="12" style="fill:var(--green-soft)"/><text x="630" y="54" text-anchor="middle" class="svg-t" font-size="13.5" font-weight="800">Fit</text><text x="630" y="76" text-anchor="middle" class="svg-s" font-size="11.5">one you can hold</text>
+      </g></svg></div>
+  </figure>
+  <div id="quizBox"></div>
+  <div class="quiz-bar"><span id="quizScore"></span><button type="button" class="btn small" id="quizReset">Reset quiz</button></div>
+  <script type="application/json" id="quizData">[
+    {"q":"A 60/40 portfolio's return in a single year is:","choices":["The better of the two assets' returns","0.6 &times; the stock return + 0.4 &times; the bond return","Always positive","The stock return minus 40%"],"answer":1,"explain":"Over one rebalanced year, the portfolio return is the weighted average of its parts."},
+    {"q":"What four assets make up Harry Browne's Permanent Portfolio?","choices":["US, international, emerging and bond funds","Stocks, long-term Treasuries, cash and gold, 25% each","Real estate, gold, silver and oil","Stocks, corporate bonds, REITs and cash"],"answer":1,"explain":"Each is meant to protect against one economic condition: prosperity, deflation, inflation and tight money."},
+    {"q":"Why is a backtest of a gold-heavy portfolio starting in 1972 especially flattering?","choices":["Gold was illegal to trade in 1972","It begins just as gold was freed from its fixed price and includes gold's best decade","Stocks did not exist in 1972","It is not flattering"],"answer":1,"explain":"Gold rose about 34% a year from 1972 to 1980 in the dataset, then lost more than half its value over 1981&ndash;2000."},
+    {"q":"Under the 110-minus-age rule, what stock share does a 60-year-old hold?","choices":["40%","50%","60%","110%"],"answer":1,"explain":"110 &minus; 60 = 50% stocks."},
+    {"q":"In 2022 a 60/40 portfolio lost about 18% because:","choices":["Stocks fell but bonds rose","Stocks and 10-year Treasuries both fell about 18% as inflation and interest rates rose","Gold collapsed","Cash yields were negative"],"answer":1,"explain":"Bonds cushion recessions best; in an inflation shock both can fall together."},
+    {"q":"A model designed by testing many combinations on past data and choosing the best is at risk of:","choices":["Overfitting: looking good on the data it was fitted to","Higher taxes","Too little diversification by definition","Regulatory action"],"answer":0,"explain":"Performance on the data used to design a model overstates what to expect afterward."},
+    {"q":"Which is the best reason a retiree like Ruth might hold more stocks than an age rule suggests?","choices":["Stocks cannot fall after 65","Reliable, inflation-adjusted Social Security income acts like a large safe asset","Age rules are illegal for IRAs","Required distributions must be in stocks"],"answer":1,"explain":"Guaranteed income is part of the safe side of her total balance sheet."},
+    {"q":"From 1981 through 2018, how did the Permanent Portfolio compare with 60/40 in this dataset?","choices":["It grew about 6.7% a year versus about 10.0% for 60/40","It beat 60/40 by 3 points a year","They were identical","It lost money"],"answer":0,"explain":"Gold's two-decade decline after 1980 weighed heavily on a 25% gold allocation."}
+  ]</script>
+</section>
+
+<section class="panel" data-tab="Resources">
+  <p class="kicker">Keep learning</p>
+  <h2>Resources and sources</h2>
+  <figure class="fig">
+    <div class="fig-title">Figure 49.13 &mdash; Where to go next</div>
+    <div class="fig-scroll"><svg viewBox="0 0 720 110" role="img" aria-label="Next modules">
+      <g font-family="Segoe UI, system-ui, sans-serif">
+      <rect x="10" y="15" width="220" height="80" rx="12" style="fill:var(--blue-soft)"/><text x="120" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-050</text><text x="120" y="70" text-anchor="middle" class="svg-s" font-size="12">Target-date funds</text>
+      <rect x="250" y="15" width="220" height="80" rx="12" style="fill:var(--teal-soft)"/><text x="360" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-055</text><text x="360" y="70" text-anchor="middle" class="svg-s" font-size="12">Building a portfolio</text>
+      <rect x="490" y="15" width="220" height="80" rx="12" style="fill:var(--violet-soft)"/><text x="600" y="48" text-anchor="middle" class="svg-t" font-size="13" font-weight="800">INV-056</text><text x="600" y="70" text-anchor="middle" class="svg-s" font-size="12">Rebalancing</text>
+      </g></svg></div>
+  </figure>
+  <h3>Curated resources for this module</h3>
+  <div data-resources="INV-049"></div>
+  <h3>Sources used in this module</h3>
+  <ol class="srcs">
+    <li>Damodaran, A. (2026). <i>Historical returns on stocks, bonds and bills: 1928&ndash;2025</i> [Data set]. NYU Stern School of Business.</li>
+    <li>Bridgewater Associates. (2012). <i>The All Weather story</i>. <a href="https://www.bridgewater.com/research-and-insights/the-all-weather-story">bridgewater.com</a></li>
+    <li>Portfolio Charts. (n.d.). <i>Permanent Portfolio</i> and <i>Golden Butterfly Portfolio</i>. <a href="https://portfoliocharts.com/portfolio/permanent-portfolio/">portfoliocharts.com</a>; <a href="https://portfoliocharts.com/portfolio/golden-butterfly/">portfoliocharts.com</a></li>
+    <li>HarryBrowne.org. (n.d.). <i>About Harry Browne</i> (investment books, including <i>Inflation-Proofing Your Investments</i>, 1981, and <i>Fail-Safe Investing</i>, 1999). <a href="https://www.harrybrowne.org/">harrybrowne.org</a></li>
+    <li>Federal Reserve History. (n.d.). <i>Nixon ends convertibility of US dollars to gold and announces wage/price controls</i>; and <i>Roosevelt's gold program</i>. <a href="https://www.federalreservehistory.org/essays/gold-convertibility-ends">federalreservehistory.org</a></li>
+    <li>French, K. R. (2026). <i>Data library: Fama/French developed ex-US and US market returns</i>. Tuck School of Business, Dartmouth. <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">dartmouth.edu</a></li>
+    <li>The Vanguard Group. (2026). <i>Vanguard Target Retirement Funds prospectus</i> (Form 485BPOS filed January 28, 2026). U.S. Securities and Exchange Commission. <a href="https://www.sec.gov/Archives/edgar/data/752177/000119312526024962/f43837d1.htm">sec.gov</a></li>
+  </ol>
+</section>
+
+</div>
+<p class="disclaim"><b>Educational material, not advice.</b> Backtests use historical index data before fees and taxes and cannot predict future results. No allocation model eliminates the risk of loss.</p>
+</main>
+<footer class="site">Namiranian, Babak &mdash; Investing Learning Lab &middot; V1.0 (September 2026) &middot; Runs entirely in your browser; nothing is tracked</footer>
+
+<script src="assets/inv-data.js"></script>
+<script src="assets/inv-glossary.js"></script>
+<script src="assets/inv-resources.js"></script>
+<script src="assets/inv.js"></script>
+<script src="assets/inv-tools.js"></script>
+<script src="assets/inv-tools-s6b.js"></script>
+<script>
+INV.ready(function () {
+  var yr = function (v) { return String(Math.round(v)); }, pc1 = function (v) { return INV.pct(v, 1); };
+  var S = function (k, a, b, o) { return INV.s6bModelStats(k, a, b, o || { age: 40 }); };
+  /* 49.1 stacked bars */
+  var rows = [["100% stocks", [[100, "Stocks", "var(--s1)"]]], ["60/40", [[60, "Stocks", "var(--s1)"], [40, "Bonds", "var(--s2)"]]],
+    ["Three-fund (one version)", [[36, "US", "var(--s1)"], [24, "Intl", "var(--s4)"], [40, "Bonds", "var(--s2)"]]],
+    ["All Weather-style", [[30, "Stocks", "var(--s1)"], [55, "Bonds", "var(--s2)"], [15, "Gold", "var(--s3)"]]],
+    ["Permanent Portfolio", [[25, "Stocks", "var(--s1)"], [25, "Bonds", "var(--s2)"], [25, "Cash", "var(--s6)"], [25, "Gold", "var(--s3)"]]],
+    ["Golden Butterfly", [[40, "Stocks", "var(--s1)"], [20, "Bonds", "var(--s2)"], [20, "Cash", "var(--s6)"], [20, "Gold", "var(--s3)"]]],
+    ["110 minus age (at 40)", [[70, "Stocks", "var(--s1)"], [30, "Bonds", "var(--s2)"]]]];
+  var g = document.getElementById("f491"), html = "";
+  rows.forEach(function (r, i) {
+    var y = 14 + i * 44, x = 200;
+    html += '<text x="10" y="' + (y + 21) + '" class="svg-t" font-size="12.5" font-weight="700">' + r[0] + "</text>";
+    r[1].forEach(function (s) { var w = s[0] * 5; html += '<rect x="' + x + '" y="' + y + '" width="' + (w - 2) + '" height="30" rx="5" style="fill:' + s[2] + '"/>'; if (w >= 60) html += '<text x="' + (x + w / 2) + '" y="' + (y + 20) + '" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">' + s[1] + " " + s[0] + "%</text>"; else html += '<text x="' + (x + w / 2) + '" y="' + (y + 20) + '" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">' + s[0] + "%</text>"; x += w; });
+  });
+  g.innerHTML = html;
+  /* 49.3 growth of 10k */
+  var cols = { s100: "var(--s5)", s80: "var(--s3)", s6040: "var(--s1)", s4060: "var(--s2)" }, names = { s100: "100% stocks", s80: "80/20", s6040: "60/40", s4060: "40/60" };
+  INV.lineChart(document.getElementById("f493"), { label: "Growth of $10,000", log: true, height: 260, xFmt: yr, yFmt: INV.moneyShort, yTitle: "Growth of $10,000 (log scale)",
+    series: ["s100", "s80", "s6040", "s4060"].map(function (k) { return { name: names[k], color: cols[k], data: S(k, 1928, 2025).path.map(function (p) { return [p[0], p[1] * 10000]; }) }; }) });
+  /* 49.4 age rules */
+  var r100 = [], r110 = [], r120 = [], vg = [];
+  for (var a = 20; a <= 85; a++) { r100.push([a, Math.max(0, 100 - a)]); r110.push([a, Math.min(100, 110 - a)]); r120.push([a, Math.min(100, 120 - a)]); var e = INV.s6bEqAt("vg", 65 - a); if (e != null) vg.push([a, e]); }
+  INV.lineChart(document.getElementById("f494"), { label: "Stock share by age", height: 250, yMin: 0, yMax: 100, xTitle: "Age", yTitle: "Share in stocks", xFmt: yr, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return v.toFixed(0) + "% stocks"; },
+    series: [{ name: "100 minus age", color: "var(--s6)", data: r100, dash: "4 4" }, { name: "110 minus age", color: "var(--s3)", data: r110 }, { name: "120 minus age", color: "var(--s2)", data: r120, dash: "4 4" }, { name: "Vanguard target-date funds", color: "var(--s1)", data: vg, width: 3 }] });
+  /* 49.6 rolling 10-year */
+  var rp = [], r64 = [];
+  for (var y1 = 1937; y1 <= 2025; y1++) { rp.push([y1, S("pp", y1 - 9, y1).cagr]); r64.push([y1, S("s6040", y1 - 9, y1).cagr]); }
+  INV.lineChart(document.getElementById("f496"), { label: "Rolling 10-year growth", height: 250, zeroBase: false, xFmt: yr, yFmt: function (v) { return v + "%"; }, tipFmt: pc1, xTitle: "Last year of each 10-year window", bands: [{ x0: 1928, x1: 1971, label: "gold price fixed", color: "var(--card2)" }],
+    series: [{ name: "60/40", color: "var(--s1)", data: r64 }, { name: "Permanent Portfolio", color: "var(--s3)", data: rp }] });
+  /* bars by model for a single year */
+  var keys = [["s100", "100% stocks"], ["s6040", "60/40"], ["s4060", "40/60"], ["aw", "All Weather-style"], ["pp", "Permanent"], ["gb", "Golden Butterfly"]];
+  var mcol = ["var(--s5)", "var(--s1)", "var(--s2)", "var(--s4)", "var(--s3)", "var(--s6)"];
+  function yearBars(el, yy) { INV.barChart(document.getElementById(el), { label: yy + " returns", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: pc1, data: keys.map(function (k, i) { return { label: k[1], y: S(k[0], yy, yy).cagr, color: mcol[i] }; }) }); }
+  yearBars("f497", 2022); yearBars("f4911", 2008);
+  INV.barChart(document.getElementById("f498"), { label: "Worst year 1972-2025", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: pc1,
+    data: keys.concat([["age", "110 minus age"]]).map(function (k, i) { var s = S(k[0], 1972, 2025); return { label: k[1], tip: k[1] + " (" + s.worstY + ")", y: s.worst, color: mcol[i] || "var(--s3)" }; }) });
+  var d499 = []; keys.forEach(function (k, i) { d499.push({ label: k[1] + " 1928", tip: k[1] + ", 1928–2025", y: S(k[0], 1928, 2025).rcagr, color: mcol[i], dim: true }); d499.push({ label: k[1] + " 1972", tip: k[1] + ", 1972–2025", y: S(k[0], 1972, 2025).rcagr, color: mcol[i] }); });
+  INV.barChart(document.getElementById("f499"), { label: "Real growth by model", height: 250, allLabels: true, yFmt: function (v) { return v + "%"; }, tipFmt: function (v) { return INV.pct(v, 1) + " a year after inflation"; }, data: d499 });
+  INV.barChart(document.getElementById("f4910"), { label: "110 minus age by household", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return v + "%"; },
+    data: [["Maya (24)", 86, "var(--s1)"], ["Riveras (35)", 75, "var(--s2)"], ["Jordan (45)", 65, "var(--s3)"], ["Harpers (57)", 53, "var(--s4)"], ["Ruth (68)", 42, "var(--s5)"]].map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }) });
+});
+</script>
+</body>
+</html>

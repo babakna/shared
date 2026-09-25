@@ -13,7 +13,8 @@ const fs = require('fs'), path = require('path');
 const BASE = process.env.INV_BASE || 'http://localhost:8732/Investing/';
 const OUT = process.env.INV_SHOTS || path.join(require('os').tmpdir(), 'investing-shots'); fs.mkdirSync(OUT, { recursive: true });
 const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7);
-const PAGES0 = ['index.html', 'INV-001.html', 'INV-002.html', 'INV-003.html', 'INV-004.html', 'INV-005.html', 'INV-006.html', 'INV-007.html', 'tools.html', 'glossary.html', 'resources.html'];
+const DIR = path.join(__dirname, '..');
+const PAGES0 = ['index.html'].concat(fs.readdirSync(DIR).filter(f => /^INV-\d{3}\.html$/.test(f)).sort(), ['tools.html', 'glossary.html', 'resources.html']);
 const PAGES = ONLY ? PAGES0.filter(p => ONLY.split(',').includes(p)) : PAGES0;
 const VIEWS = ONLY ? [[1440, 900], [390, 844]] : [[1440, 900], [1024, 768], [768, 1024], [390, 844]];
 const SHOTS = process.argv.includes('--shots');
@@ -77,6 +78,8 @@ function ok(c, m) { checks++; if (!c) fail(m); }
         ok(!r.tiny.length, `${tag}: illegible SVG text: ${r.tiny.join(', ')}`);
         if (SHOTS && (w === 1440 || w === 390)) await page.screenshot({ path: path.join(OUT, `${pg.replace('.html', '')}-${w}-t${String(i + 1).padStart(2, '0')}.png`), fullPage: true });
       }
+      const dup = await page.evaluate(() => { const c = {}; document.querySelectorAll('[id]').forEach(e => { c[e.id] = (c[e.id] || 0) + 1; }); return Object.keys(c).filter(k => c[k] > 1); });
+      ok(!dup.length, `${pg} @${w}: duplicate element ids (a tool may be writing into the wrong element): ${dup.slice(0, 5).join(', ')}`);
       ok(!errs.length, `${pg} @${w}: errors: ${errs.join(' || ')}`);
       await ctx.close();
     }
@@ -120,6 +123,12 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       let kBlank = [];
       panels.forEach((p, i) => { p.querySelectorAll('[data-tool]').forEach(t => { show(i); t.querySelectorAll('.kpi .v').forEach(v => { const x = v.textContent.trim(); if ((x === '\u2014' || x === 'n/a' || x === '') && t.dataset.tool !== 'orders') kBlank.push(t.dataset.tool + ':' + v.previousElementSibling.textContent); }); }); });
       out.kBlank = kBlank;
+      // tools must actually render results (catches id clashes that leave result areas empty)
+      panels.forEach((p, i) => { p.querySelectorAll('[data-tool]').forEach(t => { show(i);
+        const o = t.querySelector('.tool-out'); if (o && !o.querySelector('svg, table, .kpi') && o.innerText.trim().length < 20) kBlank.push(t.dataset.tool + ':empty results');
+        t.querySelectorAll('.kpis').forEach(k => { if (!k.children.length) kBlank.push(t.dataset.tool + ':empty kpis'); });
+        t.querySelectorAll('.chart').forEach(c => { if (!c.querySelector('svg')) kBlank.push(t.dataset.tool + ':empty chart'); });
+        if (!t.children.length) kBlank.push(t.dataset.tool + ':tool did not render'); }); });
       // tools: push every range to min and max, check for bad output
       let tBad = [];
       panels.forEach((p, i) => { p.querySelectorAll('[data-tool]').forEach(t => { show(i); t.querySelectorAll('input[type=range]').forEach(r => { [r.min, r.max].forEach(v => { r.value = v; r.dispatchEvent(new Event('input')); const tx = t.innerText; if (/NaN|undefined|Infinity/.test(tx)) tBad.push(t.dataset.tool + ':' + r.id + '=' + v); }); }); t.querySelectorAll('select').forEach(s => { [...s.options].forEach(o => { s.value = o.value; s.dispatchEvent(new Event('input')); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':' + s.id + '=' + o.value); }); }); t.querySelectorAll('.seg button').forEach(b => { b.click(); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':seg'); }); t.querySelectorAll('input[type=number]').forEach(n => { n.value = '0'; n.dispatchEvent(new Event('input')); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':' + n.id + '=0'); n.value = ''; n.dispatchEvent(new Event('input')); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':' + n.id + '=blank'); }); }); });
@@ -162,7 +171,7 @@ function ok(c, m) { checks++; if (!c) fail(m); }
   ok(rs.all > 50 && rs.vid > 10 && rs.vid < rs.all, `resources filter ${JSON.stringify(rs)}`);
   await page.goto(BASE + 'index.html'); await page.waitForTimeout(200);
   const ix = await page.evaluate(() => ({ live: document.querySelectorAll('a.mod').length, soon: document.querySelectorAll('.mod.soon').length, done: document.querySelectorAll('.st.done').length, tabs: document.querySelectorAll('.tab').length }));
-  ok(ix.live === 7 && ix.soon === 98 && ix.done === 7 && ix.tabs === 17, `index ${JSON.stringify(ix)}`);
+  ok(ix.live + ix.soon === 105 && ix.done === ix.live && ix.tabs === 17, `index ${JSON.stringify(ix)}`);
   }
   ok(!errs.length, 'interaction page errors: ' + errs.join(' | '));
   await browser.close();
