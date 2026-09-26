@@ -266,7 +266,6 @@
       }
       if (idx > -1) store("inv-last", { id: currentId, tab: i, title: COURSE[idx].title, tabName: panels[i].getAttribute("data-tab") || "" });
       if (focusTab) { tabs[i].focus(); try { tabs[i].scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {} }
-      try { history.replaceState(null, "", "#s" + (i + 1)); } catch (e) {}
       panels[i].dispatchEvent(new CustomEvent("inv-show", { bubbles: true }));
     }
     function goScroll(i) {
@@ -285,7 +284,7 @@
     function step(dir) {
       if (dir > 0) {
         if (cur < panels.length - 1) return goScroll(cur + 1);
-        if (idx > -1) { var nx2 = nextLive(idx); location.href = nx2 ? nx2.id + ".html#s1" : "index.html"; }
+        if (idx > -1) { var nx2 = nextLive(idx); location.href = nx2 ? nx2.id + ".html" : "index.html"; }
       } else {
         if (cur > 0) return goScroll(cur - 1);
         if (idx > -1) { var pv2 = prevLive(idx); if (pv2) location.href = pv2.id + ".html#last"; }
@@ -301,9 +300,9 @@
     var start = 0, hm = /^#s(\d+)$/.exec(location.hash);
     if (location.hash === "#last") start = panels.length - 1;
     else if (hm && Number(hm[1]) >= 1 && Number(hm[1]) <= panels.length) start = Number(hm[1]) - 1;
-    else if (store(key) != null) start = Math.min(store(key), panels.length - 1);
     show(start, false);
-    INV.showTab = function (i) { goScroll(i); };
+    if (location.hash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+    INV.showTab = function (i) { goScroll(Math.max(0, Math.min(i, panels.length - 1))); };
   }
 
   if (!shell && guide) guide.querySelectorAll("[data-step]").forEach(function (g) { g.hidden = true; });
@@ -335,7 +334,7 @@
         html += '<details class="map-stage"' + (open ? " open" : "") + '><summary><span class="map-sn">' + st.n + "</span>" + esc(st.name) + '<small>' + done + " / " + mods.length + " complete</small></summary><ol>" +
           mods.map(function (m) {
             var here = cur && cur.id === m.id, ok = p[m.id] && p[m.id].done;
-            return '<li' + (here ? ' class="here"' : "") + '><a href="' + m.id + '.html#s1"><span class="map-code">' + m.id + "</span>" + esc(m.title) + (ok ? ' <span class="map-ok" title="Complete">\u2713</span>' : "") + (here ? ' <span class="map-here">You are here</span>' : "") + "</a></li>";
+            return '<li' + (here ? ' class="here"' : "") + '><a href="' + m.id + '.html"><span class="map-code">' + m.id + "</span>" + esc(m.title) + (ok ? ' <span class="map-ok" title="Complete">\u2713</span>' : "") + (here ? ' <span class="map-here">You are here</span>' : "") + "</a></li>";
           }).join("") + "</ol></details>";
       });
       body.innerHTML = html;
@@ -347,7 +346,7 @@
       function hit(t) { t = norm(t); return words.every(function (w) { return t.indexOf(w) > -1; }); }
       COURSE.forEach(function (m) {
         var info = I[m.id] || {};
-        if (hit(m.id + " " + m.title + " " + (info.scope || "") + " " + (info.q || "") + " " + STAGES[m.stage - 1].name)) res.push({ href: m.id + ".html#s1", code: m.id, title: m.title, sub: info.scope || STAGES[m.stage - 1].name, score: hit(m.title) ? 0 : 1 });
+        if (hit(m.id + " " + m.title + " " + (info.scope || "") + " " + (info.q || "") + " " + STAGES[m.stage - 1].name)) res.push({ href: m.id + ".html", code: m.id, title: m.title, sub: info.scope || STAGES[m.stage - 1].name, score: hit(m.title) ? 0 : 1 });
         (info.tabs || []).forEach(function (t, k) { if (hit(t)) tabsRes.push({ href: m.id + ".html#s" + (k + 1), code: m.id, title: t, sub: m.title + " \u00B7 tab " + (k + 1) }); });
       });
       res.sort(function (a, b) { return a.score - b.score; });
@@ -373,7 +372,7 @@
       if (!typing && (e.key === "/" || ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")))) { e.preventDefault(); openMap(); }
     });
     /* hash links into other pages' tabs keep working; same-page stage links on the landing page */
-    window.addEventListener("hashchange", function () { var hm2 = /^#s(\d+)$/.exec(location.hash); if (hm2 && INV.showTab) INV.showTab(Number(hm2[1]) - 1); });
+    window.addEventListener("hashchange", function () { var hm2 = /^#s(\d+)$/.exec(location.hash) || (location.hash === "#last" ? [0, 999] : null); if (hm2 && INV.showTab) { INV.showTab(Number(hm2[1]) - 1); try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} } });
   })();
 
   /* ---------- Tables: label cells so narrow screens can stack rows ---------- */
