@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 12 (Estate Planning & Wealth Transfer) calculators, INV-090 to INV-094 - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 12 (Estate Planning & Wealth Transfer) calculators, INV-090 to INV-094 - V1.1 (September 2026)
    Every tool computes from its stated formula in the browser. Tax figures are for 2026 from IRS
    Rev. Proc. 2025-32 (brackets, standard deduction, gift exclusion, estate exemption, section 2032A and
    6166 amounts), Rev. Rul. 2026-19 (October 2026 applicable federal rates) and the Single Life Table in

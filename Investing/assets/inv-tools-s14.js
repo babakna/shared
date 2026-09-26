@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 14 calculators (INV-103, INV-104) - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 14 calculators (INV-103, INV-104) - V1.1 (September 2026)
    Every figure is computed in the browser from the formula stated in each tool.
    All fee levels and rates in the defaults are hypothetical inputs, not quotes from any firm. */
 (function () {

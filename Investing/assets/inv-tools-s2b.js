@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 2 calculators (INV-013 to INV-017) - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 2 calculators (INV-013 to INV-017) - V1.1 (September 2026)
    Namiranian, Babak. Every tool computes from its stated formula in the browser.
    Mortality in the income-annuity tool: Social Security Administration, 2023 period life table
    (as used in the 2026 Trustees Report), qx for ages 55-119. Historical returns: window.INV_RETURNS

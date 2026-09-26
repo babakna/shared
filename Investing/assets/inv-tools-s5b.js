@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 5 (Taxes) calculators for INV-036 to INV-042 - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 5 (Taxes) calculators for INV-036 to INV-042 - V1.1 (September 2026)
    Every tool computes from its stated formula in the browser. Federal figures are for tax year 2026:
    Rev. Proc. 2025-32 (brackets, standard deduction, capital-gain thresholds, AMT), P.L. 119-21
    (senior deduction, SALT cap, charitable changes, 2/37 itemized limit), IRS Notice 2025-67 (QCD limit),

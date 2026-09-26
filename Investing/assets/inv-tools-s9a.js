@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 9 (Real Estate) calculators, INV-063 to INV-067 - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 9 (Real Estate) calculators, INV-063 to INV-067 - V1.1 (September 2026)
    Every tool computes from its stated formula in the browser. Nothing is sent anywhere.
    Load after assets/inv-tools.js. Tool names carry the s9a prefix. */
 (function () {

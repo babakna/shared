@@ -1,4 +1,4 @@
-/* Investing Learning Lab - resource library - V1.0 (September 2026)
+/* Investing Learning Lab - resource library - V1.1 (September 2026)
    k: kind (video | podcast | official | tool | babak | book | research | data | course)
    lv: audience level (1 new, 2 some experience, 3 advanced)   st: stages this resource serves
    mods: modules that feature it   why: why it is worth your time

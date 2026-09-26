@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.0 (September 2026)
+V1.1 (September 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -96,7 +96,7 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The V1.0 run after the full audit: **36,965 checks, 0 failures** across 109 pages (105 modules, landing page,
+The full-audit run: **36,965 checks, 0 failures** across 109 pages (105 modules, landing page,
 tools, glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
@@ -107,6 +107,14 @@ navigation and theme toggle. Deliberately injected bugs were caught before relea
 screenshots were reviewed by eye at 1440 and 390 px and in dark mode.
 
 ## Changelog
+
+### V1.1 (September 2026)
+
+- Clean addresses like the other sections: tabs no longer add `#s1`, `#s2` to the address, and a
+  module always opens on its first tab.
+- A Home button on every page, in the guide bar, returns to the course home.
+- Wrong-case addresses such as `/shared/investing/` redirect to the right page (site 404 page).
+- Asset links carry the version so browsers load new files after an update.
 
 ### V1.0 (September 2026)
 

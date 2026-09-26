@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 7 tools (Portfolio Construction & Monitoring) - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 7 tools (Portfolio Construction & Monitoring) - V1.1 (September 2026)
    Namiranian, Babak. Every tool computes from its stated formula in the browser.
    Historical tools use window.INV_RETURNS (Damodaran, NYU Stern, 1928-2025): S&P 500 total return,
    10-year Treasury bond and 3-month T-bill, calendar years. Load after assets/inv-tools.js. */

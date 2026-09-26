@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 5 (Taxes) calculators, INV-029 to INV-035 - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 5 (Taxes) calculators, INV-029 to INV-035 - V1.1 (September 2026)
    Every 2026 figure below is taken from IRS Rev. Proc. 2025-32 (tax year 2026 inflation adjustments,
    reflecting Public Law 119-21), IRS Notice 2025-67 (2026 retirement plan limits), IRS Rev. Proc. 2025-19
    (2026 HSA limits), the Internal Revenue Code as amended by P.L. 119-21, and SSA (2026 wage base).

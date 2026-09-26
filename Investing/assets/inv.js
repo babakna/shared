@@ -1,7 +1,7 @@
-/* Investing Learning Lab - shared engine - V1.0 (September 2026) */
+/* Investing Learning Lab - shared engine - V1.1 (September 2026) */
 (function () {
   "use strict";
-  var VERSION = "V1.0 (September 2026)";
+  var VERSION = "V1.1 (September 2026)";
   var AUTHOR = "Namiranian, Babak";
   var root = document.documentElement;
 
@@ -137,7 +137,7 @@
       crumbs = '<a class="crumb-home" href="index.html">Course</a>' + (PAGENAME && PAGENAME !== "Course home" ? '<span class="sep">\u203A</span><b class="crumb-mod">' + PAGENAME + "</b>" : "") +
         '<span class="sep" data-crumb-sep hidden>\u203A</span><span class="crumb-tab" data-crumb-tab></span>';
     }
-    guide.innerHTML = '<div class="guide-in"><button type="button" class="btn small" data-map aria-haspopup="dialog" title="Course map and search (press /)">\u2630 Course map &amp; search</button>' +
+    guide.innerHTML = '<div class="guide-in"><a class="btn small home-btn" href="index.html" title="Investing course home: all stages and modules">\u2302 Home</a><button type="button" class="btn small" data-map aria-haspopup="dialog" title="Course map and search (press /)">\u2630 Course map &amp; search</button>' +
       '<div class="crumbs">' + crumbs + '</div><div class="guide-step"><button type="button" class="btn small" data-step="-1">\u2190 <span>Previous</span></button>' +
       '<button type="button" class="btn small primary" data-step="1"><span>Next</span> \u2192</button></div></div>' +
       '<div class="guide-track" aria-hidden="true"><span></span></div>';
@@ -319,7 +319,7 @@
     var q = modal.querySelector("#mapQ"), body = modal.querySelector("#mapBody"), opener = null, loaded = !!window.INV_INDEX;
     function ensureIndex(cb) {
       if (window.INV_INDEX) return cb();
-      var sc = document.createElement("script"); sc.src = "assets/inv-index.js"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
+      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.1"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
     }
     var prog = function () { return readProgress(); };
     function outline() {

@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 2 calculators (INV-008 to INV-012) - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 2 calculators (INV-008 to INV-012) - V1.1 (September 2026)
    Namiranian, Babak. Every tool computes from its stated formula in the browser.
    Default rates are dated in each tool's note; change them to your own quotes. */
 (function () {

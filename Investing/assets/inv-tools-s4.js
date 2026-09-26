@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 4 (Planning & You) calculators - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 4 (Planning & You) calculators - V1.1 (September 2026)
    Tools for INV-024 to INV-028. Every tool computes from its stated formula in the browser.
    Historical tools use window.INV_RETURNS (Damodaran, NYU Stern, 1928-2025). */
 (function () {

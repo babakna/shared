@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 10 (Financial Independence) calculators - V1.0 (September 2026)
+/* Investing Learning Lab - Stage 10 (Financial Independence) calculators - V1.1 (September 2026)
    Tools for INV-072, INV-073 and INV-074. Each tool computes from its stated formula in the browser.
    Sources: IRS Notice 2022-6 and 26 CFR 1.401(a)(9)-9 (72(t) tables and mortality rates);
    Rev. Rul. 2026-17 (September 2026 federal mid-term rate); Rev. Proc. 2025-25 (2026 applicable
