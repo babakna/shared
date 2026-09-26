@@ -26,7 +26,7 @@
     <svg viewBox="0 0 360 240"><rect x="10" y="10" width="340" height="220" rx="18" style="fill:var(--card2)"/>
       <path d="M30 190 C100 170 150 120 200 110 S280 60 330 50" fill="none" stroke="#C77A0A" stroke-width="4"/>
       <path d="M30 190 C100 180 160 160 210 140 S290 100 330 90" fill="none" stroke="#1F5FD1" stroke-width="4"/>
-      <text x="300" y="44" class="svg-t" font-size="12" font-weight="800" text-anchor="end">value</text><text x="300" y="112" class="svg-t" font-size="12" font-weight="800" text-anchor="end">growth</text>
+      <text x="300" y="44" class="svg-t" font-size="12" font-weight="800" text-anchor="end">value</text><text x="325" y="126" class="svg-t" font-size="12" font-weight="800" text-anchor="end">growth</text>
       <text x="40" y="44" class="svg-t" font-size="13" font-weight="800">Cheap versus fast</text>
     </svg>
   </div>
@@ -172,7 +172,7 @@
     <div id="f467"></div>
     <figcaption class="cap"><b>The styles take turns, sometimes violently.</b> Calendar-year returns of the value and growth portfolios (Hi 30 and Lo 30 book-to-market). Computed from the Kenneth R. French Data Library.</figcaption>
   </figure>
-  <p>The P/E ratios in Figure 46.2 put numbers on the price. At a P/E of 36.7, the S&amp;P 500 growth half, priced at a high <span class="term" data-term="Price-to-earnings ratio">P/E</span>, offers an earnings yield of about 2.7% (1 &divide; 36.74); the value half, at 24.9, about 4.0%. The growth half must grow its earnings substantially faster, for many years, to deliver the same return. It may; the point is that the price already assumes it will.</p>
+  <p>The P/E ratios in Figure 46.2 put numbers on the price. At a <span class="term" data-term="Price-to-earnings ratio">P/E</span> of 36.74, the S&amp;P 500 growth half offers an earnings yield of about 2.7% (1 &divide; 36.74); the value half, at 24.90, about 4.0% (1 &divide; 24.90). The growth half must grow its earnings substantially faster, for many years, to deliver the same return. It may; the point is that the price already assumes it will.</p>
   <div class="callout warn"><div class="ic">&#9888;&#65039;</div><div><p><b>Style funds and your allocation.</b> Owning both a large-cap growth fund and a large-cap value fund in equal amounts approximately recreates the S&amp;P 500, at a higher combined cost. If you want a tilt, choose one; if you do not, a total-market fund already holds both.</p></div></div>
 </section>
 
@@ -381,8 +381,8 @@ INV.ready(function () {
   var dol = function (x) { return x >= 1000 ? "$" + Math.round(x / 1000) + "k" : x >= 10 ? "$" + Math.round(x) : "$" + x.toFixed(x >= 1 ? 1 : 2); };
   INV.lineChart(document.getElementById("f461"), { label: "Value versus growth since 1927", height: 260, log: true, xFmt: yr, yFmt: dol, yTitle: "Growth of $1 (log scale)", tipFmt: function (v) { return "$" + (v >= 100 ? Math.round(v).toLocaleString() : v.toFixed(2)); },
     series: [{ name: "Value stocks", color: "var(--s3)", data: path(S.bm.value, 1927) }, { name: "Growth stocks", color: "var(--s1)", data: path(S.bm.growth, 1927) }] });
-  var d2 = []; [["P/E", 24.90, 36.74], ["P/B", 3.71, 9.94], ["Yield %", 1.50, 0.36]].forEach(function (m) { d2.push({ label: "Value " + m[0], y: m[1], color: "var(--s3)" }); d2.push({ label: "Growth " + m[0], y: m[2], color: "var(--s1)" }); });
-  INV.barChart(document.getElementById("f462"), { label: "Value and growth characteristics", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return v.toFixed(v < 10 ? 2 : 1); }, data: d2 });
+  var d2 = []; [["P/E", 24.90, 36.74], ["P/B", 3.71, 9.94]].forEach(function (m) { d2.push({ label: "Value " + m[0], y: m[1], color: "var(--s3)" }); d2.push({ label: "Growth " + m[0], y: m[2], color: "var(--s1)" }); });
+  INV.barChart(document.getElementById("f462"), { label: "Value and growth characteristics", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return String(Math.round(v * 100) / 100); }, data: d2 });
   var roll = []; for (var y = 1936; y <= 2025; y++) roll.push([y, St.cagr(St.slice(S.bm, "value", y - 9, y)) - St.cagr(St.slice(S.bm, "growth", y - 9, y))]);
   INV.lineChart(document.getElementById("f464"), { label: "Rolling 10-year value minus growth", height: 240, xFmt: yr, yFmt: function (v) { return (v > 0 ? "+" : "") + v.toFixed(0) + " pts"; }, tipFmt: function (v) { return (v > 0 ? "+" : "") + v.toFixed(1) + " points a year"; },
     series: [{ name: "Value minus growth, 10-year annualized", color: "var(--s3)", data: roll, area: true }], bands: [{ x0: 2011, x1: 2025, label: "growth led", color: "var(--red-soft)" }] });

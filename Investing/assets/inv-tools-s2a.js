@@ -90,14 +90,17 @@
         { k: "CD", r: Number(self(el, "r3").value), st: true },
         { k: "Money market fund", r: Number(self(el, "r4").value), st: true },
         { k: "Treasury bills", r: Number(self(el, "r5").value), st: false },
-        { k: "I bond", r: 4.26, st: false, ibond: true }
+        { k: "I bond", r: 4.26, st: false, ibond: true, cap: 10000 }
       ];
       opts.forEach(function (o) {
         var gross, note2 = "";
         if (o.ibond) {
+          var inI = Math.min(A, o.cap), extra = A - inI, tb = opts[4].r;
+          var shareI = function (rate, months) { return inI * (Math.pow(1 + rate / 200, months / 6) - 1); }; /* I bonds compound every six months */
           if (m < 12) { gross = 0; note2 = "locked"; }
-          else if (m < 60) { gross = earn(o.r, m - 3); note2 = "3-month penalty"; }
-          else gross = earn(o.r, m);
+          else if (m < 60) { gross = shareI(o.r, m - 3); note2 = "3-month penalty"; }
+          else gross = shareI(o.r, m);
+          if (extra > 0 && m >= 12) { gross += extra * (Math.pow(1 + tb / 100, m / 12) - 1); note2 += (note2 ? "; " : "") + "amount above $10,000 in T-bills"; o.k = "I bond + T-bills"; }
         } else gross = earn(o.r, m);
         o.gross = gross; o.after = gross * (1 - f - (o.st ? s : 0)); o.note = note2;
       });
@@ -106,10 +109,11 @@
       self(el, "k").innerHTML = kpi("Best after tax", esc(best.k)) + kpi("It earns, after tax", money(best.after, 0), "good") +
         kpi("Big-bank savings earns", money(base.after, 0), base.after < best.after ? "bad" : "") + kpi("Difference", money(best.after - base.after, 0));
       INV.barChart(self(el, "c"), { label: "After-tax interest by option", height: 230, allLabels: true, valueLabels: true, yFmt: function (v) { return money(v, 0); },
-        data: opts.map(function (o) { return { label: o.k + (o.note === "locked" ? " (locked)" : ""), tip: o.k + (o.note ? " — " + o.note : ""), y: o.after, color: o === best ? "var(--s2)" : o.ibond ? "var(--s4)" : "var(--s1)" }; }) });
+        data: opts.map(function (o) { return { label: o.k + (o.note.indexOf("locked") === 0 ? " (locked)" : ""), tip: o.k + (o.note ? " — " + o.note : ""), y: o.after, color: o === best ? "var(--s2)" : o.ibond ? "var(--s4)" : "var(--s1)" }; }) });
       var ib = opts[5];
       self(el, "n").innerHTML = "After-tax interest on " + money(A, 0) + " over " + m + (m === 1 ? " month" : " months") + " (" + yrs.toFixed(2) + " years). " +
-        (ib.note === "locked" ? "An I bond cannot be cashed in during its first 12 months, so it is not an option for money needed sooner. " : ib.note ? "Cashed before 5 years, an I bond gives up its last 3 months of interest; that is included. " : "") +
+        (ib.note.indexOf("locked") === 0 ? "An I bond cannot be cashed in during its first 12 months, so it is not an option for money needed sooner. " : ib.note.indexOf("penalty") > -1 ? "Cashed before 5 years, an I bond gives up its last 3 months of interest; that is included. " : "") +
+        (A > 10000 && m >= 12 ? "I bond purchases are limited to $10,000 per person per calendar year, so the I bond bar assumes the first $10,000 in an I bond and the rest in T-bills. " : "") +
         "Combined tax on fully taxed interest: " + pct((f + s) * 100, 1) + "; on Treasury and I bond interest: " + pct(f * 100, 0) + ". State income tax deductions and the time value of taxes are ignored.";
     }
     wire(el, run);
@@ -134,25 +138,25 @@
       rng(u + "-c", "Coupon rate", 0, 10, 0.25, 3, "pct") +
       rng(u + "-y", "Market yield (yield to maturity)", 0.25, 12, 0.05, 5, "pct") +
       rng(u + "-n", "Years to maturity", 1, 30, 1, 10, "yr") +
-      sel(u + "-q", "Coupons paid", [[2, "Twice a year (Treasuries, most US bonds)"], [1, "Once a year"]], 2) +
+      sel(u + "-q", "Coupons paid", [[2, "Twice a year (most US bonds)"], [1, "Once a year"]], 2) +
       note("Price = the present value of every coupon and the face value, discounted at the market yield. Macaulay duration is the present-value-weighted average time to each payment; modified duration = Macaulay ÷ (1 + yield per period). Priced on a coupon date (no accrued interest)."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var F = num(el, "fv"), c = Number(self(el, "c").value) / 100, y = Number(self(el, "y").value) / 100, n = Number(self(el, "n").value), fq = Number(self(el, "q").value) || 2;
-      var b = bondMath(c, y, n, fq), up = bondMath(c, y + 0.01, n, fq), dn = bondMath(c, Math.max(0.0001, y - 0.01), n, fq);
+      var yDn = Math.max(0, y - 0.01), b = bondMath(c, y, n, fq), up = bondMath(c, y + 0.01, n, fq), dn = bondMath(c, yDn, n, fq);
       var price = b.P * F / 100, cy = c * 100 / b.P * 100;
       var chUp = (up.P / b.P - 1) * 100, chDn = (dn.P / b.P - 1) * 100, est = -b.mod * 1 + 0.5 * b.conv * 0.0001 * 100;
       var tag = Math.abs(b.P - 100) < 0.005 ? "At par" : b.P > 100 ? "Premium" : "Discount";
       self(el, "k").innerHTML = kpi("Price", money(price, 2)) + kpi("Price per $100", b.P.toFixed(2) + " · " + tag) + kpi("Current yield", pct(cy, 2)) +
-        kpi("Macaulay duration", b.mac.toFixed(2) + " yrs") + kpi("Modified duration", b.mod.toFixed(2)) + kpi("If yields rise 1 point", pct(chUp, 1), "bad") + kpi("If yields fall 1 point", "+" + chDn.toFixed(1) + "%", "good");
+        kpi("Macaulay duration", b.mac.toFixed(2) + " yrs") + kpi("Modified duration", b.mod.toFixed(2)) + kpi("If yields rise 1 point", pct(chUp, 1), "bad") + kpi(y - 0.01 >= -1e-9 ? "If yields fall 1 point" : "If yields fall to 0%", "+" + chDn.toFixed(1) + "%", "good");
       var pts = [], tan = [];
-      for (var yy = 0.25; yy <= 12.001; yy += 0.25) { var bb = bondMath(c, yy / 100, n, fq); pts.push([yy, bb.P * F / 100]); tan.push([yy, price * (1 - b.mod * (yy / 100 - y))]); }
+      for (var yy = 0.25; yy <= 12.001; yy += 0.25) { var bb = bondMath(c, yy / 100, n, fq); pts.push([yy, bb.P * F / 100]); var tv = price * (1 - b.mod * (yy / 100 - y)); tan.push([yy, tv >= 0 ? tv : NaN]); }
       INV.lineChart(self(el, "ch"), { label: "Price versus yield", height: 250, xTitle: "Market yield (%)", yTitle: "Price ($)", zeroBase: false, xFmt: function (v) { return v + "%"; }, yFmt: function (v) { return money(v, 0); }, tipFmt: function (v) { return money(v, 2); },
-        yMin: Math.max(0, Math.min.apply(null, pts.map(function (p) { return p[1]; }))), yMax: Math.max.apply(null, pts.map(function (p) { return p[1]; })),
+        yMin: Math.max(0, Math.min.apply(null, pts.concat(tan).filter(function (p) { return isFinite(p[1]); }).map(function (p) { return p[1]; }))), yMax: Math.max.apply(null, pts.concat(tan).filter(function (p) { return isFinite(p[1]); }).map(function (p) { return p[1]; })),
         series: [{ name: "Actual price", color: "var(--s1)", data: pts }, { name: "Duration's straight-line estimate", color: "var(--s3)", data: tan, dash: "5 4", width: 1.6 }],
         dots: [{ x: y * 100, y: price, label: money(price, 0), color: "var(--s1)" }] });
       self(el, "n2").innerHTML = "At a " + pct(y * 100, 2) + " yield, this " + n + "-year, " + pct(c * 100, 2) + " bond is worth <b>" + money(price, 2) + "</b>. Modified duration " + b.mod.toFixed(2) +
-        " predicts about a " + (b.mod).toFixed(1) + "% price change for each 1-point move in yields; adding convexity (" + b.conv.toFixed(1) + ") refines the estimate for a 1-point rise to " + pct(est, 1) + ", against an exact " + pct(chUp, 1) + ". The curve bends (convexity), so the straight line always underestimates the price.";
+        " predicts a price change of about " + (b.mod).toFixed(1) + "% for each 1-point move in yields; adding convexity (" + b.conv.toFixed(1) + ") refines the estimate for a 1-point rise to " + pct(est, 1) + ", against an exact " + pct(chUp, 1) + ". The curve bends (convexity), so the straight line always underestimates the price.";
     }
     wire(el, run);
   };
@@ -180,7 +184,7 @@
       var win = muniAfter >= taxAfter ? "Municipal, by " + (muniAfter - taxAfter).toFixed(2) + " pts" : "Taxable, by " + (taxAfter - muniAfter).toFixed(2) + " pts";
       self(el, "k").innerHTML = kpi("Federal bracket, 2026", pct(fr * 100, 0)) + kpi("Tax rate on the taxable bond", pct(taxRateTaxable * 100, 1)) +
         kpi("Tax-equivalent yield", pct(tey, 2), "good") + kpi("After tax: muni vs taxable", pct(muniAfter, 2) + " vs " + pct(taxAfter, 2)) + kpi("Higher after tax", esc(win));
-      INV.barChart(self(el, "c"), { label: "Tax-equivalent yield by bracket", height: 220, allLabels: true, valueLabels: true, xTitle: "Federal bracket (2026)", yFmt: function (v) { return v.toFixed(2) + "%"; },
+      INV.barChart(self(el, "c"), { label: "Tax-equivalent yield by bracket", height: 220, allLabels: true, valueLabels: true, xTitle: "Federal bracket (2026)", yFmt: function (v) { return v.toFixed(1) + "%"; }, tipFmt: function (v) { return v.toFixed(2) + "%"; },
         data: RATES.map(function (r) { var tr = r / 100 + niit + (tsy ? 0 : s); return { label: r + "%", tip: r + "% bracket", y: muniAfter / (1 - tr), color: r / 100 === fr ? "var(--s2)" : "var(--s6)" }; }) });
       self(el, "n").innerHTML = "Tax-equivalent yield = municipal yield after any state tax ÷ (1 − tax rate the taxable bond would bear) = " + muniAfter.toFixed(2) + "% ÷ (1 − " + (taxRateTaxable * 100).toFixed(1) + "%) = <b>" + tey.toFixed(2) + "%</b>. " +
         "The quick federal-only version, " + ym.toFixed(2) + "% ÷ (1 − " + (fr * 100).toFixed(0) + "%) = " + simple.toFixed(2) + "%. A taxable bond must yield more than the tax-equivalent yield to leave you ahead.";
@@ -229,13 +233,13 @@
   TOOLS.s2aStock = function (el) {
     var u = uid(el);
     shell(el, "Build a stock-return estimate from its parts", "Model",
-      rng(u + "-d", "Dividend yield today", 0.5, 7, 0.05, 1.15, "pct") +
+      rng(u + "-d", "Dividend yield today", 0.5, 7, 0.01, 1.16, "pct") +
       rng(u + "-g", "Real (after-inflation) earnings growth per year", 0, 5, 0.1, 2.3, "pct") +
       rng(u + "-i", "Inflation per year", 0, 6, 0.1, 2.5, "pct") +
-      rng(u + "-p0", "Valuation today (CAPE)", 5, 50, 0.5, 40.5, "x") +
-      rng(u + "-p1", "Valuation at the end (CAPE)", 5, 50, 0.5, 40.5, "x") +
+      rng(u + "-p0", "Valuation today (CAPE)", 5, 50, 0.1, 40.6, "x") +
+      rng(u + "-p1", "Valuation at the end (CAPE)", 5, 50, 0.1, 40.6, "x") +
       rng(u + "-n", "Years", 5, 30, 1, 10, "yr") +
-      note("Return ≈ dividend yield + real earnings growth + inflation + change in valuation, compounded: (1 + g)(1 + i)(P₁/P₀)<sup>1/n</sup> − 1 + dividend yield. Defaults: S&amp;P 500 dividend yield about 1.2% (December 2025) and CAPE 40.6 (September 2026), Shiller data; 2.3% is the 1928–2025 real earnings growth rate in the same data. A model to explore assumptions, not a forecast."),
+      note("Return ≈ dividend yield + real earnings growth + inflation + change in valuation, compounded: (1 + g)(1 + i)(P₁/P₀)<sup>1/n</sup> − 1 + dividend yield. Defaults: S&amp;P Composite dividend yield 1.16% (December 2025) and CAPE 40.6 (September 2026), Shiller data; 2.3% is the December 1928 to December 2025 real earnings-per-share growth rate in the same data. A model to explore assumptions, not a forecast."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var d = Number(self(el, "d").value) / 100, g = Number(self(el, "g").value) / 100, i = Number(self(el, "i").value) / 100,
@@ -248,7 +252,7 @@
       INV.barChart(self(el, "c"), { label: "Parts of the return", height: 220, allLabels: true, valueLabels: true, yFmt: function (x) { return x.toFixed(1) + "%"; },
         data: [{ label: "Dividends", y: d * 100, color: "var(--s2)" }, { label: "Real growth", y: g * 100, color: "var(--s1)" }, { label: "Inflation", y: i * 100, color: "var(--s3)" },
           { label: "Valuation", y: v * 100, color: v < 0 ? "var(--s5)" : "var(--s4)" }, { label: "Total", y: nom * 100, color: "var(--s6)" }] });
-      self(el, "n2").innerHTML = "Moving the valuation from " + p0.toFixed(1) + "× to " + p1.toFixed(1) + "× over " + n + " years adds <b>" + (v >= 0 ? "+" : "") + pct(v * 100, 2) + "</b> a year. " +
+      self(el, "n2").innerHTML = "Moving the valuation from " + p0.toFixed(1) + "× to " + p1.toFixed(1) + "× over " + n + " years " + (v >= 0 ? "adds <b>+" + pct(v * 100, 2) : "subtracts <b>" + pct(-v * 100, 2)) + "</b> a year. " +
         "Dividends and earnings growth are the business's contribution; the valuation change is what other investors decide to pay. Over long periods the first two dominate; over a decade the third can swamp them.";
     }
     wire(el, run);

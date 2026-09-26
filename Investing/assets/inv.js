@@ -79,13 +79,13 @@
       line: "Married, two children (4 and 7). $145,000 household income, $310,000 mortgage at 3.1%, $62,000 in 401(k)s.",
       stage: "Building a family" },
     jordan: { name: "Jordan Ellis", short: "Jordan", age: "45", color: "var(--s3)", init: "JE",
-      line: "Single parent of a 15-year-old. $88,000 income, $140,000 saved for retirement, $20,000 in savings for college (no 529), renting.",
+      line: "Single parent of a 15-year-old. $88,000 income, $140,000 saved for retirement, $20,000 in savings for college (not in a 529 college plan), renting.",
       stage: "Mid-career, one income" },
     harper: { name: "Tom & Rachel Harper", short: "The Harpers", age: "57 & 55", color: "var(--s4)", init: "H",
       line: "$260,000 income, $1.1M saved (mostly pre-tax 401(k)), home worth $650,000 with $90,000 left on the mortgage.",
       stage: "Pre-retirement" },
     ruth: { name: "Ruth Kowalski", short: "Ruth", age: "68", color: "var(--s5)", init: "RK",
-      line: "Widowed and retired. $780,000 in an IRA, Social Security of $2,900 a month, paid-off house, $60,000 in cash.",
+      line: "Widowed and retired. $780,000 in an individual retirement account (IRA), Social Security of $2,900 a month, paid-off house, $60,000 in cash.",
       stage: "In retirement" }
   };
 
@@ -116,31 +116,46 @@
   /* Hook for page-specific scripts */
   INV.ready = function (fn) { if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); };
 
-  /* ---------- Journey bar ---------- */
+  /* ---------- Guide bar: where you are, one Previous/Next, course map and search ---------- */
   var currentId = document.body.getAttribute("data-module") || "";
   var idx = COURSE.findIndex(function (m) { return m.id === currentId; });
   function prevLive(i) { for (var k = i - 1; k >= 0; k--) if (COURSE[k].live) return COURSE[k]; return null; }
   function nextLive(i) { for (var k = i + 1; k < COURSE.length; k++) if (COURSE[k].live) return COURSE[k]; return null; }
-  if (idx > -1) {
-    var top = document.querySelector(".top");
-    var m = COURSE[idx], pv = prevLive(idx), nx = nextLive(idx);
-    var opts = COURSE.filter(function (c) { return c.live; }).map(function (c) {
-      return '<option value="' + c.id + '.html"' + (c.id === currentId ? " selected" : "") + ">" + c.id + " — " + esc(c.title) + "</option>";
-    }).join("");
-    if (top) {
-      var j = document.createElement("nav");
-      j.className = "journey"; j.setAttribute("aria-label", "Course journey");
-      j.innerHTML = '<div class="journey-in"><div class="journey-status"><span>Stage ' + m.stage + " · " + esc(STAGES[m.stage - 1].name) +
-        "</span><strong>Module " + m.n + " of " + COURSE.length + '</strong></div><div class="journey-track" aria-hidden="true"><span style="width:' +
-        (m.n / COURSE.length * 100).toFixed(1) + '%"></span></div><div class="journey-controls">' +
-        (pv ? '<a class="btn small" href="' + pv.id + '.html">← ' + pv.id + "</a>" : '<a class="btn small" href="index.html">Course home</a>') +
-        '<label class="sr-only" for="jsel">Jump to a module</label><select id="jsel">' + opts + "</select>" +
-        (nx ? '<a class="btn small primary" href="' + nx.id + '.html">' + nx.id + " →</a>" : '<a class="btn small primary" href="index.html">Course home</a>') +
-        "</div></div>";
-      top.appendChild(j);
-      j.querySelector("select").addEventListener("change", function () { location.href = this.value; });
+  var PAGE = (location.pathname.split("/").pop() || "index.html");
+  var PAGENAME = { "index.html": "Course home", "": "Course home", "glossary.html": "Glossary", "tools.html": "Tools", "resources.html": "Resources" }[PAGE] || "";
+  var guide = null;
+  (function buildGuide() {
+    var top = document.querySelector(".top"); if (!top) return;
+    guide = document.createElement("nav");
+    guide.className = "guide"; guide.setAttribute("aria-label", "Where you are in the course");
+    var crumbs;
+    if (idx > -1) {
+      var m = COURSE[idx], st = STAGES[m.stage - 1];
+      crumbs = '<a class="crumb-home" href="index.html">Course</a><span class="sep">\u203A</span><a href="index.html#s' + (m.stage + 1) + '">Stage ' + m.stage + " \u00B7 " + esc(st.name) +
+        '</a><span class="sep">\u203A</span><b class="crumb-mod">' + m.id + " \u00B7 " + esc(m.title) + '</b><span class="sep">\u203A</span><span class="crumb-tab" data-crumb-tab></span>';
+    } else {
+      crumbs = '<a class="crumb-home" href="index.html">Course</a>' + (PAGENAME && PAGENAME !== "Course home" ? '<span class="sep">\u203A</span><b class="crumb-mod">' + PAGENAME + "</b>" : "") +
+        '<span class="sep" data-crumb-sep hidden>\u203A</span><span class="crumb-tab" data-crumb-tab></span>';
     }
-  }
+    guide.innerHTML = '<div class="guide-in"><button type="button" class="btn small" data-map aria-haspopup="dialog" title="Course map and search (press /)">\u2630 Course map &amp; search</button>' +
+      '<div class="crumbs">' + crumbs + '</div><div class="guide-step"><button type="button" class="btn small" data-step="-1">\u2190 <span>Previous</span></button>' +
+      '<button type="button" class="btn small primary" data-step="1"><span>Next</span> \u2192</button></div></div>' +
+      '<div class="guide-track" aria-hidden="true"><span></span></div>';
+    top.appendChild(guide);
+  })();
+  function setTrack(frac) { if (!guide) return; var t = guide.querySelector(".guide-track span"); if (t) t.style.width = Math.max(0, Math.min(100, frac * 100)).toFixed(2) + "%"; }
+  if (idx > -1) setTrack((idx + 1) / COURSE.length); else if (PAGENAME === "Course home") setTrack(0);
+
+  /* ---------- Back-to-top floater ---------- */
+  (function () {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "to-top"; b.setAttribute("aria-label", "Back to top"); b.title = "Back to top";
+    b.innerHTML = "\u2191<span>Top</span>";
+    document.body.appendChild(b);
+    function vis() { b.classList.toggle("show", window.scrollY > 500); }
+    window.addEventListener("scroll", vis, { passive: true }); vis();
+    b.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); });
+  })();
 
   /* ---------- Theme (light default) ---------- */
   function setTheme(t) {
@@ -156,7 +171,7 @@
   /* ---------- Help modal (injected) ---------- */
   var helpHTML = '<div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="modal-card">' +
     '<h2 id="helpTitle">How this course works</h2><p>' + VERSION + ' · ' + AUTHOR + '</p>' +
-    '<h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. Use the tab bar, the Previous / Next buttons, or the left and right arrow keys (Home and End jump to the first and last tab). On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
+    '<h3>Finding your way</h3><p>The bar at the top always shows where you are: stage, module and tab. Its <b>Next</b> button walks through every tab in order and, at the last tab, straight into the next module; <b>Previous</b> does the reverse. <b>Course map &amp; search</b> (or press <b>/</b>) lists all 105 modules by stage, marks where you are and what you have completed, and searches every module, every tab and the glossary. The round <b>Top</b> button returns you to the top of a long page.</p><h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. You can also click a tab, or use the left and right arrow keys on the tab bar. On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
     '<h3>Three layers of depth</h3><ul><li><b>Start here</b> — the main text of every tab. No background needed.</li><li><b>Going further</b> — expandable panels for readers with some experience.</li><li><b>Practitioner depth</b> — the actual rules, formulas, edge cases and research.</li></ul>' +
     '<h3>Things to do, not just read</h3><ul><li><b>Calculators</b> run their formulas live in your browser.</li><li><b>What would you do?</b> — pick an option first, then see every option’s trade-offs.</li><li><b>Exercises</b> — type an answer and check it; a worked solution follows.</li><li><b>Myth or fact</b> — tap a card to test a popular claim.</li><li><b>Worksheets</b> save in your own browser and can be downloaded.</li><li><b>Dotted terms</b> open a glossary definition.</li></ul>' +
     '<h3>The five households</h3><p>Maya (24), the Riveras (35 and 34), Jordan (45), the Harpers (57 and 55) and Ruth (68) are fictional households who reappear in every module, so each idea is shown at different ages and stages of life.</p>' +
@@ -225,16 +240,31 @@
       });
       dots.forEach(function (d, k) { d.className = k === i ? "on" : (seen[k] ? "seen" : ""); });
       sel.value = String(i);
+      document.body.classList.toggle("later-tab", i > 0);
+      var tb = tabs[i]; if (tb && bar.scrollWidth > bar.clientWidth) { var tr = tb.getBoundingClientRect(), br = bar.getBoundingClientRect();
+        if (tr.left < br.left) bar.scrollLeft += tr.left - br.left - 24; else if (tr.right > br.right) bar.scrollLeft += tr.right - br.right + 24; }
       foot.querySelector(".pos").textContent = "Tab " + (i + 1) + " of " + panels.length;
       var pb = foot.querySelector("[data-prev]"), nb = foot.querySelector("[data-next]");
-      pb.disabled = i === 0;
-      nb.disabled = false;
-      if (i === panels.length - 1 && idx === -1) { nb.textContent = "Next →"; nb.disabled = true; delete nb.dataset.href; }
-      else if (i === panels.length - 1) {
-        var nxm = idx > -1 ? nextLive(idx) : null;
-        nb.textContent = nxm ? "Next module: " + nxm.id + " →" : "Course home →";
-        nb.dataset.href = nxm ? nxm.id + ".html" : "index.html";
-      } else { nb.textContent = "Next →"; delete nb.dataset.href; }
+      var pvm = idx > -1 ? prevLive(idx) : null, nxm = idx > -1 ? nextLive(idx) : null;
+      var atFirst = i === 0, atLast = i === panels.length - 1;
+      var prevLabel = atFirst ? (pvm ? "Previous module: " + pvm.id : "Previous") : "Previous";
+      var nextLabel = atLast ? (nxm ? "Next module: " + nxm.id : (idx > -1 ? "Course home" : "Next")) : "Next";
+      var prevOff = atFirst && !pvm, nextOff = atLast && idx === -1;
+      pb.innerHTML = "\u2190 " + esc(prevLabel); pb.disabled = prevOff;
+      nb.innerHTML = esc(nextLabel) + " \u2192"; nb.disabled = nextOff;
+      if (guide) {
+        var gp = guide.querySelector('[data-step="-1"]'), gn = guide.querySelector('[data-step="1"]');
+        gp.disabled = prevOff; gn.disabled = nextOff;
+        gp.querySelector("span").textContent = atFirst && pvm ? "Previous module" : "Previous";
+        gn.querySelector("span").textContent = atLast && nxm ? "Next module" : atLast && idx > -1 ? "Course home" : "Next";
+        gp.title = atFirst && pvm ? pvm.id + " \u00B7 " + pvm.title : "Previous tab";
+        gn.title = atLast && nxm ? nxm.id + " \u00B7 " + nxm.title : "Next tab";
+        var ct = guide.querySelector("[data-crumb-tab]");
+        if (ct) ct.textContent = "Tab " + (i + 1) + " of " + panels.length + " \u00B7 " + (panels[i].getAttribute("data-tab") || "");
+        var cs = guide.querySelector("[data-crumb-sep]"); if (cs) cs.hidden = false;
+        if (idx > -1) setTrack((idx + (i + 1) / panels.length) / COURSE.length);
+      }
+      if (idx > -1) store("inv-last", { id: currentId, tab: i, title: COURSE[idx].title, tabName: panels[i].getAttribute("data-tab") || "" });
       if (focusTab) { tabs[i].focus(); try { tabs[i].scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {} }
       try { history.replaceState(null, "", "#s" + (i + 1)); } catch (e) {}
       panels[i].dispatchEvent(new CustomEvent("inv-show", { bubbles: true }));
@@ -252,19 +282,107 @@
       if (n !== null) { e.preventDefault(); show(n, true); }
     });
     sel.addEventListener("change", function () { show(Number(sel.value), false); });
-    foot.querySelector("[data-prev]").addEventListener("click", function () { goScroll(cur - 1); });
-    foot.querySelector("[data-next]").addEventListener("click", function () {
-      if (this.dataset.href) { location.href = this.dataset.href; return; } goScroll(cur + 1);
-    });
+    function step(dir) {
+      if (dir > 0) {
+        if (cur < panels.length - 1) return goScroll(cur + 1);
+        if (idx > -1) { var nx2 = nextLive(idx); location.href = nx2 ? nx2.id + ".html#s1" : "index.html"; }
+      } else {
+        if (cur > 0) return goScroll(cur - 1);
+        if (idx > -1) { var pv2 = prevLive(idx); if (pv2) location.href = pv2.id + ".html#last"; }
+      }
+    }
+    INV.step = step;
+    foot.querySelector("[data-prev]").addEventListener("click", function () { step(-1); });
+    foot.querySelector("[data-next]").addEventListener("click", function () { step(1); });
+    if (guide) guide.querySelectorAll("[data-step]").forEach(function (g) { g.addEventListener("click", function () { step(Number(g.getAttribute("data-step"))); }); });
     document.querySelectorAll("[data-goto-tab]").forEach(function (a) {
       a.addEventListener("click", function (e) { e.preventDefault(); goScroll(Number(a.getAttribute("data-goto-tab")) - 1); });
     });
     var start = 0, hm = /^#s(\d+)$/.exec(location.hash);
-    if (hm && Number(hm[1]) >= 1 && Number(hm[1]) <= panels.length) start = Number(hm[1]) - 1;
+    if (location.hash === "#last") start = panels.length - 1;
+    else if (hm && Number(hm[1]) >= 1 && Number(hm[1]) <= panels.length) start = Number(hm[1]) - 1;
     else if (store(key) != null) start = Math.min(store(key), panels.length - 1);
     show(start, false);
     INV.showTab = function (i) { goScroll(i); };
   }
+
+  if (!shell && guide) guide.querySelectorAll("[data-step]").forEach(function (g) { g.hidden = true; });
+
+  /* ---------- Course map and search ---------- */
+  (function () {
+    if (!guide) return;
+    var modal = document.createElement("div");
+    modal.className = "modal map-modal"; modal.id = "mapModal"; modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true"); modal.setAttribute("aria-labelledby", "mapTitle");
+    modal.innerHTML = '<div class="modal-card map-card"><div class="map-head"><h2 id="mapTitle">Course map</h2><button type="button" class="btn small" data-map-close>Close</button></div>' +
+      '<label class="sr-only" for="mapQ">Search the course</label><input type="search" id="mapQ" placeholder="Search modules, tabs and glossary terms (e.g. Roth, RMD, cap rate)" autocomplete="off">' +
+      '<div class="map-hint src">Type to search every module, every tab and the glossary. Or browse by stage below. Press Esc to close.</div><div class="map-body" id="mapBody"></div></div>';
+    document.body.appendChild(modal);
+    var q = modal.querySelector("#mapQ"), body = modal.querySelector("#mapBody"), opener = null, loaded = !!window.INV_INDEX;
+    function ensureIndex(cb) {
+      if (window.INV_INDEX) return cb();
+      var sc = document.createElement("script"); sc.src = "assets/inv-index.js"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
+    }
+    var prog = function () { return readProgress(); };
+    function outline() {
+      var p = prog(), cur = idx > -1 ? COURSE[idx] : null, last = store("inv-last");
+      var html = "";
+      if (last && last.id && (!cur || last.id !== cur.id)) html += '<a class="map-continue" href="' + last.id + ".html#s" + (last.tab + 1) + '"><span>Continue where you left off</span><b>' + esc(last.id) + " \u00B7 " + esc(last.title || "") + "</b><small>Tab " + (last.tab + 1) + (last.tabName ? " \u00B7 " + esc(last.tabName) : "") + "</small></a>";
+      html += '<div class="map-links"><a href="index.html">Course home</a><a href="glossary.html">Glossary</a><a href="tools.html">Tools</a><a href="resources.html">Resources</a></div>';
+      STAGES.forEach(function (st) {
+        var mods = COURSE.filter(function (m) { return m.stage === st.n; });
+        var done = mods.filter(function (m) { return p[m.id] && p[m.id].done; }).length;
+        var open = cur ? cur.stage === st.n : st.n === 1;
+        html += '<details class="map-stage"' + (open ? " open" : "") + '><summary><span class="map-sn">' + st.n + "</span>" + esc(st.name) + '<small>' + done + " / " + mods.length + " complete</small></summary><ol>" +
+          mods.map(function (m) {
+            var here = cur && cur.id === m.id, ok = p[m.id] && p[m.id].done;
+            return '<li' + (here ? ' class="here"' : "") + '><a href="' + m.id + '.html#s1"><span class="map-code">' + m.id + "</span>" + esc(m.title) + (ok ? ' <span class="map-ok" title="Complete">\u2713</span>' : "") + (here ? ' <span class="map-here">You are here</span>' : "") + "</a></li>";
+          }).join("") + "</ol></details>";
+      });
+      body.innerHTML = html;
+    }
+    function norm(t) { return String(t || "").toLowerCase(); }
+    function search(term) {
+      var words = norm(term).split(/\s+/).filter(Boolean); if (!words.length) return outline();
+      var I = window.INV_INDEX || {}, res = [], tabsRes = [], G = window.INV_GLOSSARY || [];
+      function hit(t) { t = norm(t); return words.every(function (w) { return t.indexOf(w) > -1; }); }
+      COURSE.forEach(function (m) {
+        var info = I[m.id] || {};
+        if (hit(m.id + " " + m.title + " " + (info.scope || "") + " " + (info.q || "") + " " + STAGES[m.stage - 1].name)) res.push({ href: m.id + ".html#s1", code: m.id, title: m.title, sub: info.scope || STAGES[m.stage - 1].name, score: hit(m.title) ? 0 : 1 });
+        (info.tabs || []).forEach(function (t, k) { if (hit(t)) tabsRes.push({ href: m.id + ".html#s" + (k + 1), code: m.id, title: t, sub: m.title + " \u00B7 tab " + (k + 1) }); });
+      });
+      res.sort(function (a, b) { return a.score - b.score; });
+      var gl = G.filter(function (g) { return hit(g.t + " " + (g.a || []).join(" ")); }).slice(0, 12);
+      var gl2 = gl.length < 6 ? G.filter(function (g) { return gl.indexOf(g) < 0 && hit(g.d); }).slice(0, 6 - gl.length) : [];
+      function list(title, arr) { return arr.length ? '<h3 class="map-sec">' + title + " (" + arr.length + ')</h3><ul class="map-res">' + arr.slice(0, 30).map(function (r) { return '<li><a href="' + r.href + '"><span class="map-code">' + esc(r.code) + "</span><b>" + esc(r.title) + "</b><small>" + esc(r.sub) + "</small></a></li>"; }).join("") + "</ul>" : ""; }
+      var gItems = gl.concat(gl2).map(function (g) { return { href: "glossary.html#" + slug(g.t), code: "Glossary", title: g.t, sub: g.d.length > 110 ? g.d.slice(0, 110) + "\u2026" : g.d }; });
+      var html = list("Modules", res) + list("Tabs inside modules", tabsRes) + list("Glossary", gItems);
+      body.scrollTop = 0;
+      body.innerHTML = html || '<p class="src">Nothing matches "' + esc(term) + '". Try a shorter word, or browse by stage after clearing the search.</p>';
+    }
+    function openMap(o) { opener = o || document.activeElement; ensureIndex(function () { q.value = ""; outline(); modal.classList.add("open"); setTimeout(function () { q.focus(); var h = body.querySelector(".here a"); if (h) h.scrollIntoView({ block: "center" }); }, 30); }); }
+    function closeMap() { modal.classList.remove("open"); if (opener && opener.focus) opener.focus(); }
+    INV.openMap = openMap;
+    guide.querySelector("[data-map]").addEventListener("click", function () { openMap(this); });
+    modal.querySelector("[data-map-close]").addEventListener("click", closeMap);
+    modal.addEventListener("click", function (e) { if (e.target === modal) closeMap(); });
+    q.addEventListener("input", function () { search(q.value); });
+    q.addEventListener("keydown", function (e) { if (e.key === "Enter") { var a = body.querySelector("a"); if (a) location.href = a.getAttribute("href"); } });
+    document.addEventListener("keydown", function (e) {
+      if (modal.classList.contains("open")) { if (e.key === "Escape") { e.preventDefault(); closeMap(); } return; }
+      var tg = e.target, typing = tg && (/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName) || tg.isContentEditable);
+      if (!typing && (e.key === "/" || ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")))) { e.preventDefault(); openMap(); }
+    });
+    /* hash links into other pages' tabs keep working; same-page stage links on the landing page */
+    window.addEventListener("hashchange", function () { var hm2 = /^#s(\d+)$/.exec(location.hash); if (hm2 && INV.showTab) INV.showTab(Number(hm2[1]) - 1); });
+  })();
+
+  /* ---------- Tables: label cells so narrow screens can stack rows ---------- */
+  document.querySelectorAll("table.tbl").forEach(function (t) {
+    var hs = [].slice.call(t.querySelectorAll("thead th")).map(function (th) { return th.textContent.trim(); });
+    if (!hs.length) return;
+    t.classList.add("stackable");
+    t.querySelectorAll("tbody tr").forEach(function (tr) { [].slice.call(tr.children).forEach(function (td, i) { if (hs[i] && !td.hasAttribute("data-label")) td.setAttribute("data-label", hs[i]); }); });
+  });
 
   /* ---------- Households: cards and lens rows ---------- */
   function avatar(h, cls) { return '<span class="' + (cls || "av") + '" style="background:' + h.color + '">' + esc(h.init) + "</span>"; }
@@ -393,7 +511,7 @@
         flag = ' <span class="pass-flag ' + (pass ? "pass" : "fail") + '">' + (pass ? "✓ Passed — module complete" : "Keep reviewing (70% to pass)") + "</span>";
         if (pass) markModule(currentId, got, total);
       }
-      if (scoreEl) scoreEl.innerHTML = "Score: " + got + " / " + total + " answered " + done + flag;
+      if (scoreEl) scoreEl.innerHTML = "Score: " + got + " of " + total + " correct \u00B7 " + done + " of " + total + " answered" + flag;
     };
     var rs = document.getElementById("quizReset");
     if (rs) rs.addEventListener("click", function () { answered = {}; renderQuiz(); });
@@ -499,6 +617,12 @@
     s += '</g><g class="axis">';
     ticks.forEach(function (t) { s += '<text x="' + (L - 8) + '" y="' + (sy(t) + 4) + '" text-anchor="end">' + esc(yF(t)) + "</text>"; });
     var xt = o.xTicks || niceTicks(x0, x1, Math.min(8, Math.max(3, Math.round((W - L - R) / 90))));
+    if (o.xTicks) { xt = xt.filter(function (t) { return t >= x0 && t <= x1; });
+      var xNeed = function (t) { return String(xF(t)).length * 6.6 + 10; }, xKeep = [];
+      xt.forEach(function (t) { var pv = xKeep[xKeep.length - 1]; if (pv == null || sx(t) - sx(pv) >= (xNeed(t) + xNeed(pv)) / 2) xKeep.push(t); });
+      var xLast = xt[xt.length - 1];
+      if (xKeep.length && xKeep[xKeep.length - 1] !== xLast) { while (xKeep.length > 1 && sx(xLast) - sx(xKeep[xKeep.length - 1]) < (xNeed(xLast) + xNeed(xKeep[xKeep.length - 1])) / 2) xKeep.pop(); if (xKeep.length > 1 || sx(xLast) - sx(xKeep[0]) >= (xNeed(xLast) + xNeed(xKeep[0])) / 2) xKeep.push(xLast); }
+      xt = xKeep; }
     xt.forEach(function (t) { if (t < x0 || t > x1) return; var px = sx(t), an = px > W - R - 24 ? "end" : px < L + 24 ? "start" : "middle"; s += '<text x="' + px + '" y="' + (H - B + 16) + '" text-anchor="' + an + '">' + esc(xF(t)) + "</text>"; });
     if (o.xTitle) s += '<text class="axis-title" x="' + ((L + W - R) / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + esc(o.xTitle) + "</text>";
     if (o.yTitle) s += '<text class="axis-title" x="' + (L - 8) + '" y="' + (Tp - 14) + '" text-anchor="start">' + esc(o.yTitle) + "</text>";
@@ -553,17 +677,65 @@
     hit.addEventListener("mouseleave", function () { tip.classList.remove("show"); hl.setAttribute("opacity", "0"); });
   };
   /* opts: data:[{x,label,y,color}], yFmt, height, highlight:fn */
+  function barLegend(o) {
+    return Array.isArray(o.legend) && o.legend.length ? '<div class="legend">' + o.legend.map(function (g) { return '<span><i style="background:' + g.color + '"></i>' + esc(g.name) + "</span>"; }).join("") + "</div>" : "";
+  }
+  function hBarChart(el, o, W) {
+    var n = o.data.length, rowH = 30, longL = Math.max.apply(null, o.data.map(function (d) { return String(d.label || "").length; }).concat([4])), L = Math.round(Math.min(W * 0.5, Math.max(90, longL * 6.2 + 14))), R = o.valueLabels ? 64 : 16, Tp = o.yTitle ? 24 : 8, H = Tp + n * rowH + 26;
+    var ys = o.data.map(function (d) { return d.y; });
+    var x0 = Math.min(0, Math.min.apply(null, ys)), x1 = Math.max(0, Math.max.apply(null, ys));
+    var ticks = niceTicks(x0, x1, 3); x0 = ticks[0]; x1 = ticks[ticks.length - 1];
+    var sx = function (x) { return L + (x - x0) / ((x1 - x0) || 1) * (W - L - R); };
+    var yF = o.yFmt || function (v) { return String(v); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(o.label || "Bar chart") + '"><g class="grid">';
+    ticks.forEach(function (t) { s += '<line x1="' + sx(t) + '" x2="' + sx(t) + '" y1="' + Tp + '" y2="' + (H - 22) + '"/>'; });
+    s += '</g><g class="axis">';
+    ticks.forEach(function (t, k) { if (!(k === 0 || k === ticks.length - 1 || t === 0)) return; if (t === 0 && k > 0 && k < ticks.length - 1 && (sx(0) - sx(ticks[0]) < 46 || sx(ticks[ticks.length - 1]) - sx(0) < 46)) return; s += '<text x="' + sx(t) + '" y="' + (H - 6) + '" text-anchor="' + (k === 0 ? "start" : k === ticks.length - 1 ? "end" : "middle") + '">' + esc(yF(t)) + "</text>"; });
+    if (o.yTitle) s += '<text class="axis-title" x="' + L + '" y="' + (Tp - 10) + '" text-anchor="start">' + esc(o.yTitle) + "</text>";
+    var maxCh = Math.floor((L - 10) / 6.2), lastLab = "";
+    o.data.forEach(function (d, i) {
+      var cy = Tp + i * rowH + rowH / 2, lab = String(d.label || "");
+      if (!lab && d.tip) lab = ""; if (lab) lastLab = lab;
+      if (lab.length > maxCh) lab = lab.slice(0, maxCh - 1) + "\u2026";
+      s += '<text x="' + (L - 8) + '" y="' + (cy + 4) + '" text-anchor="end">' + esc(lab) + "</text>";
+    });
+    s += "</g>";
+    o.data.forEach(function (d, i) {
+      var cy = Tp + i * rowH + rowH / 2, a = sx(Math.min(0, d.y)), b = sx(Math.max(0, d.y));
+      var col = d.color || (d.y >= 0 ? "var(--s2)" : "var(--s5)");
+      s += '<rect data-i="' + i + '" x="' + a.toFixed(1) + '" y="' + (cy - 9) + '" width="' + Math.max(1, b - a).toFixed(1) + '" height="18" rx="3" style="fill:' + col + '"' + (d.dim ? ' opacity=".35"' : "") + "/>";
+      if (o.valueLabels) s += '<text x="' + (W - 4) + '" y="' + (cy + 4) + '" text-anchor="end" class="svg-t" font-size="11" font-weight="700">' + esc(yF(d.y)) + "</text>";
+    });
+    if (x0 < 0) s += '<line class="zero" x1="' + sx(0) + '" x2="' + sx(0) + '" y1="' + Tp + '" y2="' + (H - 22) + '"/>';
+    s += "</svg>";
+    el.classList.add("chart");
+    el.innerHTML = barLegend(o) + s + '<div class="tip"></div>';
+    var tip = el.querySelector(".tip"), svg = el.querySelector("svg");
+    el.querySelectorAll("rect[data-i]").forEach(function (rc) {
+      function sh() { var d = o.data[Number(rc.getAttribute("data-i"))], r = svg.getBoundingClientRect(), bb = rc.getBoundingClientRect();
+        tip.innerHTML = "<b>" + esc(d.tip || d.label) + "</b><br>" + esc((o.tipFmt || yF)(d.y)); tip.style.left = Math.max(60, Math.min(r.width - 60, bb.right - r.left)) + "px"; tip.style.top = (bb.top - el.getBoundingClientRect().top) + "px"; tip.classList.add("show"); }
+      rc.addEventListener("mouseenter", sh); rc.addEventListener("touchstart", sh, { passive: true }); rc.addEventListener("mouseleave", function () { tip.classList.remove("show"); });
+    });
+  }
   INV.barChart = function (el, o) {
     el.__chart = ["bar", o];
-    var W = chartWidth(el, o), H = o.height || 260, L = o.left || 56, R = 12, Tp = (o.valueLabels || o.yTitle) ? 28 : 14, B = o.xTitle ? 44 : 30;
+    var Wn = chartWidth(el, o);
+    if (!o.width && Wn < 520 && o.data.length <= 16 && (o.allLabels || o.data.length <= 8)) {
+      var longest = Math.max.apply(null, o.data.map(function (d) { return String(d.label || "").length; }).concat([1]));
+      if (longest * 6.3 > (Wn - 56) / o.data.length * 0.92 && !o.data.some(function (d) { return d.label === ""; })) return hBarChart(el, o, Wn);
+    }
+    var W = Wn, H = o.height || 260, L = o.left || 56, R = 12, Tp = (o.valueLabels || o.yTitle) ? 28 : 14, B = o.xTitle ? 44 : 30;
     var ys = o.data.map(function (d) { return d.y; });
     var y0 = Math.min(0, Math.min.apply(null, ys)), y1 = Math.max(0, Math.max.apply(null, ys));
-    var ticks = niceTicks(y0, y1, o.yTicks || 5); y0 = ticks[0]; y1 = ticks[ticks.length - 1];
+    var ticks = niceTicks(y0, y1, o.yTicks || 5);
+    if (o.valueLabels && ticks[0] < 0 && ticks.length > 1) { var stp = ticks[1] - ticks[0], mn = Math.min.apply(null, ys); if (mn - ticks[0] < stp * 0.35) ticks.unshift(ticks[0] - stp); }
+    y0 = ticks[0]; y1 = ticks[ticks.length - 1];
     var n = o.data.length, bw = (W - L - R) / n;
     var every = Math.max(1, Math.ceil(n / Math.min(o.maxLabels || 12, Math.max(3, Math.floor((W - L - R) / 44)))));
     var shown = o.data.filter(function (d, i) { return o.allLabels || i % every === 0; });
     var maxLen = Math.max.apply(null, shown.map(function (d) { return String(d.label).length; }).concat([1]));
     var rot = maxLen * 6.3 > (o.allLabels ? bw : bw * every) * 0.92;
+    if (rot && bw * every < 20 && !o.data.some(function (d) { return d.label === ""; })) { every = Math.ceil(20 / bw); o = Object.assign({}, o, { allLabels: false }); }
     if (rot) { var extraB = Math.min(70, Math.round(maxLen * 4.6)); B += extraB; H += extraB; var needL = Math.round(maxLen * 5.1 - bw / 2); if (needL > L) { L = needL; bw = (W - L - R) / n; } }
     var sy = function (y) { return Tp + (y1 - y) / ((y1 - y0) || 1) * (H - Tp - B); };
     var yF = o.yFmt || function (v) { return String(v); };
@@ -584,12 +756,12 @@
       var yA = sy(Math.max(0, d.y)), yB = sy(Math.min(0, d.y));
       var col = d.color || (d.y >= 0 ? "var(--s2)" : "var(--s5)");
       s += '<rect data-i="' + i + '" x="' + (L + bw * i + bw * 0.12).toFixed(1) + '" y="' + yA.toFixed(1) + '" width="' + (bw * 0.76).toFixed(1) + '" height="' + Math.max(1, yB - yA).toFixed(1) + '" rx="' + Math.min(3, bw * 0.2) + '" style="fill:' + col + '"' + (d.dim ? ' opacity=".35"' : "") + "/>";
-      if (o.valueLabels && bw >= 34) s += '<text x="' + (L + bw * i + bw / 2) + '" y="' + (d.y >= 0 ? yA - 5 : yB + 13) + '" text-anchor="middle" class="svg-t" font-size="11" font-weight="700">' + esc(yF(d.y)) + "</text>";
+      if (o.valueLabels && bw >= 22) s += '<text x="' + (L + bw * i + bw / 2) + '" y="' + (d.y >= 0 ? yA - 5 : yB + 13) + '" text-anchor="middle" class="svg-t" font-size="' + (bw >= 34 ? 11 : 9.5) + '" font-weight="700">' + esc(yF(d.y)) + "</text>";
     });
     if (y0 < 0) s += '<line class="zero" x1="' + L + '" x2="' + (W - R) + '" y1="' + sy(0) + '" y2="' + sy(0) + '"/>';
     s += "</svg>";
     el.classList.add("chart");
-    el.innerHTML = s + '<div class="tip"></div>';
+    el.innerHTML = barLegend(o) + s + '<div class="tip"></div>';
     var tip = el.querySelector(".tip"), svg = el.querySelector("svg");
     el.querySelectorAll("rect[data-i]").forEach(function (rc) {
       function sh() {
@@ -614,7 +786,10 @@
   document.addEventListener("inv-show", function (e) { setTimeout(function () { rerender(e.target); }, 0); });
   var rsT = null; window.addEventListener("resize", function () { clearTimeout(rsT); rsT = setTimeout(function () { rerender(document); }, 150); });
   INV.ready(function () { setTimeout(function () { rerender(document); }, 30); });
-  /* narrow screens: static diagrams scroll sideways at a readable size */
+  /* narrow screens: static diagrams scroll sideways at a readable size; show a cue when they do */
+  function scrollCues() { document.querySelectorAll(".fig-scroll").forEach(function (f) { f.classList.toggle("scrolls", f.scrollWidth > f.clientWidth + 4); }); }
+  INV.ready(function () { setTimeout(scrollCues, 60); }); window.addEventListener("resize", function () { setTimeout(scrollCues, 160); });
+  document.addEventListener("inv-show", function () { setTimeout(scrollCues, 30); });
   INV.ready(function () { document.querySelectorAll(".fig-scroll").forEach(function (f) { f.setAttribute("tabindex", "0"); f.setAttribute("role", "region"); var t = f.closest(".fig"); var ttl = t && t.querySelector(".fig-title"); f.setAttribute("aria-label", (ttl ? ttl.textContent : "Diagram") + " (scrolls sideways on small screens)"); }); });
 
   /* ---------- Historical data helpers ---------- */

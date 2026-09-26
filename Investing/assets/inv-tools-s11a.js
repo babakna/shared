@@ -262,18 +262,23 @@
       var cpl = st.who === "couple"; el.querySelector("[data-p2]").hidden = !cpl;
       var s1 = self(el, "s1").value, a1 = Number(self(el, "a1").value), s2 = self(el, "s2").value, a2 = Number(self(el, "a2").value);
       var p1 = [], p2 = [], p3 = [], plan = null, plan1 = null;
-      for (var t = 0; a1 + t <= 110; t++) {
-        var q1 = survive(s1, a1, a1 + t), q2 = cpl ? survive(s2, a2, Math.min(119, a2 + t)) : 0, e = cpl ? 1 - (1 - q1) * (1 - q2) : q1;
+      /* run until both people would be past 110, so a much younger spouse is not cut off at person 1's age 110 */
+      var tMax = cpl ? Math.max(110 - a1, 110 - a2) : 110 - a1;
+      for (var t = 0; t <= tMax; t++) {
+        var q1 = survive(s1, a1, Math.min(119, a1 + t)), q2 = cpl ? survive(s2, a2, Math.min(119, a2 + t)) : 0, e = cpl ? 1 - (1 - q1) * (1 - q2) : q1;
         p1.push([a1 + t, q1 * 100]); if (cpl) { p2.push([a1 + t, q2 * 100]); p3.push([a1 + t, e * 100]); }
-        if (plan1 === null && q1 < 0.25) plan1 = a1 + t; if (plan === null && e < 0.25) plan = a1 + t;
+        if (plan1 === null && q1 < 0.25) plan1 = t; if (plan === null && e < 0.25) plan = t;
       }
       var e1 = (s1 === "m" ? EM : EF)[a1], to90 = survive(s1, a1, Math.max(90, a1)), last90 = cpl ? 1 - (1 - to90) * (1 - survive(s2, a2, Math.max(a2, a2 + 90 - a1))) : to90;
+      var hz = cpl ? (plan === null ? tMax : plan) : (plan1 === null ? tMax : plan1);
       self(el, "k").innerHTML = kpi("Person 1 life expectancy", "to " + (a1 + e1).toFixed(1)) + kpi("Person 1 reaches 90", pct(to90 * 100, 0)) +
-        (cpl ? kpi("Either alive when person 1 would be 90", pct(last90 * 100, 0), "good") : "") + kpi("Plan to age (25% chance of outliving it)", String(cpl ? (plan || 110) : (plan1 || 110)));
+        (cpl ? kpi("Either alive when person 1 would be 90", pct(last90 * 100, 0), "good") : "") +
+        (cpl && a2 !== a1 ? kpi("Plan horizon (25% chance of outliving it)", hz + " years") : kpi("Plan to age (25% chance of outliving it)", String(a1 + hz)));
       var ser = [{ name: "Person 1 alive", color: "var(--s1)", data: p1 }];
       if (cpl) { ser.push({ name: "Person 2 alive", color: "var(--s3)", data: p2 }); ser.push({ name: "At least one alive", color: "var(--s2)", data: p3, width: 3.2 }); }
       INV.lineChart(self(el, "c"), { label: "Chance of being alive at each age", height: 250, xTitle: "Person 1's age", yTitle: "Chance alive (%)", xFmt: yearFmt, yMin: 0, yMax: 100, yFmt: pctFmt, tipFmt: function (v) { return pct(v, 0); }, series: ser });
-      self(el, "n").innerHTML = "Life expectancy is only the average: about half of people outlive it. A plan that ends at life expectancy fails about half the time, so planners usually pick an age with a 10–25% chance of still being alive. Period tables use one year's death rates and do not assume future improvement, so they tend to understate how long today's retirees will live.";
+      function ageTxt(x) { return x > 110 ? "past 110" : String(x); }
+      self(el, "n").innerHTML = (cpl && a2 !== a1 ? "A " + hz + "-year plan runs to person 1's age " + ageTxt(a1 + hz) + " and person 2's age " + ageTxt(a2 + hz) + ". " : "") + "Life expectancy is only the average: about half of people outlive it. A plan that ends at life expectancy fails about half the time, so planners usually pick an age with a 10–25% chance of still being alive. Period tables use one year's death rates and do not assume future improvement, so they tend to understate how long today's retirees will live.";
     }
     segWire(el, st, run); wire(el, run);
   };
@@ -400,7 +405,7 @@
     function run() {
       var a = num(el, "a"), p = pia2026(a);
       self(el, "k").innerHTML = kpi("90% slice", money(p.p1, 2)) + kpi("32% slice", money(p.p2, 2)) + kpi("15% slice", money(p.p3, 2)) + kpi("PIA (benefit at FRA)", money(p.pia, 2), "good") +
-        kpi("PIA as % of AIME", pct(a > 0 ? p.pia / Math.floor(a) * 100 : 90, 0));
+        kpi("PIA as % of AIME", pct(Math.floor(a) > 0 ? p.pia / Math.floor(a) * 100 : 90, 0));
       var line = [], rr = []; for (var x = 0; x <= 16000; x += 250) { var q = pia2026(x); line.push([x, q.pia]); rr.push([x, x > 0 ? q.pia / x * 100 : 90]); }
       INV.lineChart(self(el, "c"), { label: "PIA by AIME", height: 230, xTitle: "AIME ($ a month)", xFmt: ms, yFmt: ms, tipFmt: function (v) { return money(v, 0); },
         series: [{ name: "PIA", color: "var(--s1)", data: line }], marks: [{ x: 1286, label: "$1,286" }, { x: 7749, label: "$7,749" }], dots: [{ x: Math.min(a, 16000), y: pia2026(Math.min(a, 16000)).pia, color: "var(--s1)", label: money(p.pia, 0) }] });

@@ -158,16 +158,19 @@
       for (var mo = 1; mo <= horizon; mo++) {
         var uiShare = Math.max(0, Math.min(1, uiMonths - (mo - 1))), burn = spend - oth - wk * 52 / 12 * uiShare, prev = b;
         b -= burn;
-        if (mo <= 36) pts.push([mo, b]);
+        pts.push([mo, b]);
         if (out == null && b < 0) out = mo - 1 + (burn > 0 ? Math.max(0, prev) / burn : 0);
         if (mo === job) atJob = b;
       }
       var gapUI = spend - oth - wk * 52 / 12, gapAfter = spend - oth;
+      /* chart only a few months past the later of the job, the end of benefits and the runway, so a shortfall is visible without a long fall below zero */
+      var span = Math.min(36, Math.max(6, job, Math.ceil(uiMonths), out == null ? 36 : Math.ceil(out)) + 6);
+      pts = pts.filter(function (p) { return p[0] <= span; });
       var runway = spend <= oth ? "No shortfall" : out == null ? "60+ months" : out.toFixed(1) + " months";
       self(el, "k").innerHTML = kpi("Starting cushion", money(bal)) + kpi("Monthly gap with benefits", money(Math.max(0, weeks > 0 ? gapUI : gapAfter)), "bad") +
         kpi("Runway", runway, out != null && out < job ? "bad" : "good") + kpi("Left at month " + job, money(atJob), atJob < 0 ? "bad" : "good");
       INV.lineChart(self(el, "ch"), { label: "Cash over time", height: 240, xTitle: "Months after the job ends", xFmt: yearFmt, yFmt: ms, zeroBase: false,
-        series: [{ name: "Cash remaining", color: "var(--s1)", data: pts, area: true }], marks: [{ x: Math.min(job, 36), label: "Planned new job" }].concat(weeks > 0 ? [{ x: Math.min(uiMonths, 36), label: "Benefits end", dy: 14 }] : []) });
+        series: [{ name: "Cash remaining (below zero = shortfall)", color: "var(--s1)", data: pts, area: true }], marks: [{ x: Math.min(job, span), label: "Planned new job" }].concat(weeks > 0 && uiMonths <= span ? [{ x: uiMonths, label: "Benefits end", dy: 14 }] : []) });
       self(el, "n2").innerHTML = "Benefits of " + money(wk) + " a week are about " + money(wk * 52 / 12) + " a month for " + uiMonths.toFixed(1) + " months. " +
         (out == null ? "On these numbers the cushion outlasts five years." : "The cushion runs out after about <b>" + out.toFixed(1) + " months</b>" + (out < job ? " — before the planned new job, so cut spending, add income or line up other resources now." : ", after the planned new job.")) +
         " Unemployment benefits are taxable; have tax withheld or set some aside.";
@@ -308,7 +311,7 @@
       self(el, "k").innerHTML = kpi("Countable unearned", money(x.cu)) + kpi("Countable wages", money(x.ce)) + kpi("Federal SSI payment", money(x.pay), x.pay > 0 ? "good" : "bad") + kpi("Total monthly income", money(x.pay + un + ea));
       var d = []; for (var w = 0; w <= 2400; w += 100) { var q = calc(un, w); d.push([w, q.pay + un + w]); }
       var d2 = []; for (var w2 = 0; w2 <= 2400; w2 += 100) d2.push([w2, calc(un, w2).pay]);
-      INV.lineChart(self(el, "ch"), { label: "Income as wages rise", height: 230, xTitle: "Gross wages per month", xFmt: function (v) { return "$" + v; }, yFmt: function (v) { return "$" + Math.round(v).toLocaleString(); },
+      INV.lineChart(self(el, "ch"), { label: "Income as wages rise", height: 230, xTitle: "Gross wages per month", xFmt: function (v) { return "$" + v.toLocaleString(); }, xTicks: [0, 400, 800, 1200, 1600, 2000, 2400], yFmt: function (v) { return "$" + Math.round(v).toLocaleString(); },
         series: [{ name: "Total income (wages + benefits + SSI)", color: "var(--s2)", data: d }, { name: "SSI payment", color: "var(--s1)", data: d2, dash: "5 4" }] });
       self(el, "n2").innerHTML = "$994 − " + money(x.cnt) + " countable = <b>" + money(x.pay) + "</b> a month. Because only half of wages above the exclusions count, every extra dollar earned raises total income by about 50 cents until SSI reaches zero — work nearly always leaves the person better off.";
     }

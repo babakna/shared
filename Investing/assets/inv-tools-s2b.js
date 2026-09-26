@@ -56,7 +56,7 @@
   }
   function segVal(el, name) { var b = el.querySelector('.seg[data-seg="' + name + '"] button[aria-pressed="true"]'); return b ? b.getAttribute("data-v") : ""; }
   function kpi(k, v, cls) { return '<div class="kpi"><div class="k">' + esc(k) + '</div><div class="v ' + (cls || "") + '">' + v + "</div></div>"; }
-  function num(el, id, dflt) { var v = Number(self(el, id).value); return isFinite(v) && self(el, id).value !== "" ? v : (dflt || 0); }
+  function num(el, id, dflt) { var i = self(el, id), v = Number(i.value); if (!(isFinite(v) && i.value !== "")) return dflt || 0; return i.type === "number" && v < 0 ? 0 : v; } /* typed amounts and prices cannot be negative */
   function yearFmt(v) { return String(Math.round(v)); }
   function sgn(v, dp) { return (v > 0 ? "+" : "") + pct(v, dp == null ? 1 : dp); }
   function sd(a) { if (a.length < 2) return 0; var m = a.reduce(function (s, x) { return s + x; }, 0) / a.length; return Math.sqrt(a.reduce(function (s, x) { return s + (x - m) * (x - m); }, 0) / (a.length - 1)); }
@@ -169,7 +169,7 @@
       rng(u + "-vc", "Crypto volatility (yearly)", 20, 100, 5, 60, "pct") +
       rng(u + "-vr", "Volatility of the rest", 5, 25, 1, 12, "pct") +
       rng(u + "-r", "Correlation between them", -0.5, 1, 0.05, 0.3, "rho") +
-      note("Risk share = (w² σc² + w(1 − w) ρ σc σr) ÷ σp², where σp² = w² σc² + (1 − w)² σr² + 2 w(1 − w) ρ σc σr. Bitcoin's month-end prices on FRED (2015–2026) imply yearly volatility of about 66%."),
+      note("Risk share = (w² σc² + w(1 − w) ρ σc σr) ÷ σp², where σp² = w² σc² + (1 − w)² σr² + 2 w(1 − w) ρ σc σr. Bitcoin's month-end prices on FRED (Coinbase series CBBTCUSD, January 2015 to August 2026) imply yearly volatility of about 66% (standard deviation of monthly log returns × √12)."),
       '<div class="kpis" id="' + u + '-kp"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-nt"></p>');
     function risk(w, sc, sr, rho) {
       var v = w * w * sc * sc + (1 - w) * (1 - w) * sr * sr + 2 * w * (1 - w) * rho * sc * sr;
@@ -182,7 +182,9 @@
       var rk = risk(w, sc, sr, rho);
       self(el, "kp").innerHTML = kpi("Dollars lost on the crypto", money(lossC), lossC > 0 ? "bad" : "") + kpi("Whole portfolio change", sgn(chg, 1), chg < 0 ? "bad" : "good") +
         kpi("Portfolio volatility", pct(rk.vol * 100, 1)) + kpi("Crypto's share of total risk", pct(rk.share, 0), rk.share > 30 ? "bad" : "");
-      var data = [0, 1, 2, 3, 5, 7, 10, 15, 20, 25].map(function (k) {
+      var ks = [0, 1, 2, 3, 5, 7, 10, 15, 20, 25], wk = Math.round(w * 100);
+      if (ks.indexOf(wk) < 0) { ks.push(wk); ks.sort(function (x, y) { return x - y; }); } /* always show the chosen allocation */
+      var data = ks.map(function (k) {
         var z = risk(k / 100, sc, sr, rho);
         return { label: k + "%", tip: k + "% in crypto", y: z.share, color: Math.round(w * 100) === k ? "var(--s5)" : "var(--s3)" };
       });
@@ -272,8 +274,10 @@
       INV.lineChart(self(el, "ch"), { label: "Option value as time passes", height: 240, xTitle: "Days elapsed (stock price unchanged)", xFmt: function (x) { return Math.round(x) + "d"; }, yFmt: function (y) { return "$" + Math.round(y); }, tipFmt: function (y) { return money(y, 2) + " per contract"; },
         series: [{ name: "Value of one contract", color: "var(--s1)", data: pts, width: 3 }, { name: "Intrinsic value", color: "var(--s6)", data: ins, dash: "5 4", width: 1.4 }] });
       var half = bs(type, S, K, v, r, D / 2 / 365);
-      self(el, "nt").innerHTML = "If the stock price does not move, this " + type + " loses " + money((val - half) * 100, 2) + " per contract in the first half of its remaining life and " + money((half - intr > 0 ? half - Math.min(intr, half) : 0) * 100, 2) +
-        " in the second half. Buyers need the stock to move far enough, and soon enough, to outrun that decay; sellers collect it and carry the risk of a large move.";
+      var l1 = (val - half) * 100, l2 = (half - intr) * 100;
+      self(el, "nt").innerHTML = l1 < 0 || l2 < 0 ?
+        "Black–Scholes values a European option, which cannot be exercised early. A put this deep in the money is then worth less than its intrinsic value, because the strike is received only at expiration, and with the stock price unchanged its value drifts up toward intrinsic value instead of decaying. Listed US stock options are American-style and could be exercised early instead." :
+        "If the stock price does not move, this " + type + " loses " + money(l1, 2) + " per contract in the first half of its remaining life and " + money(l2, 2) + " in the second half. Buyers need the stock to move far enough, and soon enough, to outrun that decay; sellers collect it and carry the risk of a large move.";
     }
     wire(el, run);
   };

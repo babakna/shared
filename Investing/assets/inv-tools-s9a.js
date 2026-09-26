@@ -40,6 +40,7 @@
   }
   function kpi(k, v, cls) { return '<div class="kpi"><div class="k">' + esc(k) + '</div><div class="v ' + (cls || "") + '">' + v + "</div></div>"; }
   function yearFmt(v) { return String(Math.round(v)); }
+  function yearTick(v) { return Math.abs(v - Math.round(v)) > 1e-9 ? "" : String(Math.round(v)); }
   function num(el, id) { var v = Number(self(el, id).value); return isFinite(v) && v > 0 ? v : 0; }
   function rv(el, id) { return Number(self(el, id).value); }
   function note(t) { return '<p class="hint" style="font-size:.76rem;color:var(--muted)">' + t + "</p>"; }
@@ -80,7 +81,7 @@
   function irr(cf) {
     function npv(r) { var s = 0; for (var i = 0; i < cf.length; i++) s += cf[i] / Math.pow(1 + r, i); return s; }
     var lo = -0.99, hi = 1.5, flo = npv(lo), fhi = npv(hi);
-    if (!isFinite(flo) || !isFinite(fhi) || flo * fhi > 0) return NaN;
+    if (!isFinite(flo) || !isFinite(fhi) || !(flo * fhi < 0)) return NaN; /* no sign change (e.g. all flows zero): no IRR */
     for (var k = 0; k < 200; k++) { var mid = (lo + hi) / 2, fm = npv(mid); if (flo * fm <= 0) { hi = mid; fhi = fm; } else { lo = mid; flo = fm; } }
     return (lo + hi) / 2;
   }
@@ -134,6 +135,7 @@
       var p = { price: num(el, "price"), down: rv(el, "down") / 100, rate: rv(el, "rate") / 100, tax: rv(el, "tax") / 100, ins: num(el, "ins"),
         maint: rv(el, "maint") / 100, hoa: num(el, "hoa"), pmi: rv(el, "pmi") / 100, close: rv(el, "close") / 100, sell: rv(el, "sell") / 100,
         app: rv(el, "app") / 100, rent: num(el, "rent"), rins: num(el, "rins"), rg: rv(el, "rg") / 100, ret: rv(el, "ret") / 100, horizon: 30 };
+      if (!(p.price > 0)) { self(el, "k").innerHTML = kpi("Home price", "enter a price above $0"); self(el, "c").innerHTML = ""; self(el, "n2").innerHTML = "Enter the price of the home you are considering to compare buying with renting."; return; }
       var n = rv(el, "n"), M = rentBuyModel(p);
       var ow = M.own[n][1], rw = M.ren[n][1], pr = p.rent > 0 ? p.price / (p.rent * 12) : NaN;
       self(el, "k").innerHTML = kpi("Owning per month, year 1 (all costs)", money(M.y1own)) + kpi("Renting per month, year 1", money(M.y1rent)) +
@@ -145,7 +147,9 @@
         marks: M.be !== null && M.be <= n ? [{ x: M.be, label: "Break-even" }] : [] });
       self(el, "n2").innerHTML = "Mortgage principal and interest: <b>" + money(M.pmt) + "</b> a month on a " + money(M.loan) + " loan. After " + n + (n === 1 ? " year" : " years") + ", the " +
         (ow >= rw ? "buyer is ahead by <b>" + money(ow - rw) + "</b>." : "renter is ahead by <b>" + money(rw - ow) + "</b>.") +
-        " The first years favor renting because buying and selling costs must be recovered first. Try a longer stay, a lower rate, or a smaller price growth assumption.";
+        (M.be === null ? " At these inputs the buyer never recovers the costs of buying and selling, and any higher monthly costs, within 30 years." :
+          " Buying and selling costs put the renter ahead at first; the buyer catches up in year " + M.be + ".") +
+        " Try a longer stay, a different rate or a different price growth assumption to see how the answer moves.";
     }
     wire(el, run);
   };
@@ -170,9 +174,12 @@
         ["Mortgage interest", P * (1 - d) * rate, "var(--s1)"], ["Lost return on down pmt", P * d * ret, "var(--s6)"], ["Less price growth", -P * app, "var(--s2)"]];
       var tot = parts.reduce(function (s, x) { return s + x[1]; }, 0), rentY = rent * 12;
       self(el, "k").innerHTML = kpi("Unrecoverable cost / year", money(tot), tot > rentY ? "bad" : "good") + kpi("As % of price", P > 0 ? pct(tot / P * 100, 1) : "—") +
-        kpi("Per month", money(tot / 12)) + kpi("Rent per month", money(rent)) + kpi(tot > rentY ? "Renting is cheaper by" : "Owning is cheaper by", money(Math.abs(tot - rentY) / 12) + "/mo", tot > rentY ? "bad" : "good");
-      INV.barChart(self(el, "c"), { label: "Components of the unrecoverable cost", height: 230, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return money(v) + " a year"; },
-        data: parts.map(function (x) { return { label: x[0], y: x[1], color: x[2] }; }).concat([{ label: "Rent", y: rentY, color: "var(--s7)" }]) });
+        kpi("Per month", money(tot / 12)) + kpi("Rent per month", money(rent)) + kpi(tot > rentY ? "Renting is cheaper by" : "Owning is cheaper by", money(Math.abs(tot - rentY) / 12, 0) + "/mo", tot > rentY ? "bad" : "good");
+      /* all bars drawn upward: expected price growth is shown as an offset (subtracted), a price decline as an added cost */
+      var bars = parts.slice(0, 5).map(function (x) { return { label: x[0], y: x[1], color: x[2] }; });
+      bars.push(app >= 0 ? { label: "Minus: price growth", y: P * app, color: "var(--s2)" } : { label: "Plus: price decline", y: -P * app, color: "var(--s5)" });
+      bars.push({ label: "Rent", y: rentY, color: "var(--s7)" });
+      INV.barChart(self(el, "c"), { label: "Components of the unrecoverable cost", height: 230, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return money(v) + " a year"; }, data: bars });
       self(el, "n2").innerHTML = "Unrecoverable cost ≈ tax + maintenance + insurance + interest + (expected return × down payment) − (price growth × price) = <b>" + money(tot) + "</b> a year, or " +
         (P > 0 ? pct(tot / P * 100, 1) : "—") + " of the price, against " + money(rentY) + " of rent. This is a first-year snapshot; it leaves out buying and selling costs, which make short stays more expensive still.";
     }
@@ -192,6 +199,7 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var P = num(el, "bal"), r = rv(el, "rate") / 100, n = rv(el, "yrs") * 12, xm = num(el, "xm"), xy = num(el, "xy");
+      if (!(P > 0)) { self(el, "k").innerHTML = kpi("Loan balance", "enter a balance above $0"); self(el, "c").innerHTML = ""; self(el, "n2").innerHTML = "Enter the balance you still owe to see the schedule."; return; }
       var A = schedule(P, r, n, 0, 0), B = schedule(P, r, n, xm, xy);
       var saved = A.interest - B.interest, cut = A.months - B.months;
       self(el, "k").innerHTML = kpi("Monthly principal + interest", money(A.pmt)) + kpi("Interest left to pay", money(A.interest)) +
@@ -220,6 +228,7 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var L = num(el, "loan"), r0 = rv(el, "rate") / 100, pts = rv(el, "pts"), cut = rv(el, "cut") / 100 * pts, keep = rv(el, "keep");
+      if (!(L > 0)) { self(el, "k").innerHTML = kpi("Loan amount", "enter an amount above $0"); self(el, "c").innerHTML = ""; self(el, "n2").innerHTML = "Enter the loan amount the lender quoted."; return; }
       var r1 = Math.max(0, r0 - cut), cost = L * pts / 100, p0 = payment(L, r0, 360), p1 = payment(L, r1, 360), sav = p0 - p1;
       var cum = [], be = null;
       for (var m = 0; m <= 360; m += 1) {
@@ -234,7 +243,7 @@
         kpi("Net gain after " + keep + (keep === 1 ? " year" : " years"), money(atKeep), atKeep >= 0 ? "good" : "bad");
       INV.lineChart(self(el, "c"), { label: "Cumulative net gain from paying points", height: 240, xTitle: "Years you keep the loan", yFmt: ms, xFmt: yearFmt, zeroBase: false,
         series: [{ name: "Net gain", color: "var(--s1)", data: cum, area: true }], marks: [{ x: keep, label: "Your horizon" }] });
-      self(el, "n2").innerHTML = pts === 0 ? "Choose a number of points to compare." : "Simple break-even = cost ÷ monthly saving = " + money(cost) + " ÷ " + money(sav) + ". " +
+      self(el, "n2").innerHTML = pts === 0 ? "Choose a number of points to compare." : "Simple break-even = cost ÷ monthly saving = " + money(cost) + " ÷ " + money(sav) + (isFinite(simple) ? " ≈ " + Math.round(simple) + " months" : "") + ". " +
         (be === null ? "At these inputs the points never pay back within 30 years." : "Counting the faster-falling balance too, the points pay back after about <b>" + yrsMo(be) + "</b>.") +
         " If you are likely to sell or refinance sooner, the points are money lost.";
     }
@@ -255,6 +264,7 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var B = num(el, "bal"), r0 = rv(el, "r0") / 100, n0 = rv(el, "y0") * 12, r1 = rv(el, "r1") / 100, n1 = Number(self(el, "t1").value) * 12, c = num(el, "cost"), keep = rv(el, "keep");
+      if (!(B > 0)) { self(el, "k").innerHTML = kpi("Loan balance", "enter a balance above $0"); self(el, "c").innerHTML = ""; self(el, "n2").innerHTML = "Enter the balance you still owe on the current loan."; return; }
       var p0 = payment(B, r0, n0), p1 = payment(B, r1, n1), sav = p0 - p1;
       var I0 = p0 * n0 - B, I1 = p1 * n1 - B, cum = [], be = null;
       for (var m = 0; m <= 360; m++) {
@@ -268,7 +278,8 @@
         kpi("Total interest left: old / new", ms(I0) + " / " + ms(I1)) + kpi("Net gain after " + keep + (keep === 1 ? " year" : " years"), money(atKeep), atKeep >= 0 ? "good" : "bad");
       INV.lineChart(self(el, "c"), { label: "Cumulative net gain from refinancing", height: 240, xTitle: "Years after refinancing", yFmt: ms, xFmt: yearFmt, zeroBase: false,
         series: [{ name: "Net gain", color: "var(--s2)", data: cum, area: true }], marks: [{ x: keep, label: "Your horizon" }] });
-      self(el, "n2").innerHTML = "Simple break-even = closing costs ÷ monthly saving" + (sav > 0 ? " = " + money(c) + " ÷ " + money(sav) + " ≈ " + yrsMo(c / sav) : " (no monthly saving here)") + ". " +
+      self(el, "n2").innerHTML = "Simple break-even = closing costs ÷ monthly saving" + (sav > 0 ? " = " + money(c) + " ÷ " + money(sav) + " ≈ " + Math.round(c / sav) + " months" : " (no monthly saving here)") + ". " +
+        (be === null ? "Counting the difference in loan balances too, the refinance does not pay back within 30 years. " : "Counting the difference in loan balances too, it pays back after about <b>" + yrsMo(be) + "</b> (the break-even shown above). ") +
         (n1 > n0 ? "The new loan runs " + ((n1 - n0) / 12) + " years longer than the old one, so compare total interest, not just the payment." : "The new term is no longer than the old one, so the saving is not bought by stretching the debt.");
     }
     wire(el, run);
@@ -287,6 +298,7 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var P = num(el, "bal"), r = rv(el, "rate") / 100, n = rv(el, "yrs") * 12, x = num(el, "x"), g = Math.pow(1 + rv(el, "ret") / 100, 1 / 12) - 1;
+      if (!(P > 0)) { self(el, "k").innerHTML = kpi("Loan balance", "enter a balance above $0"); self(el, "c").innerHTML = ""; self(el, "n2").innerHTML = "Enter the balance you still owe to compare prepaying with investing."; return; }
       var pmt = payment(P, r, n), bA = P, bB = P, pA = 0, pB = 0, payoff = null, A = [[0, -P]], B = [[0, -P]];
       for (var m = 1; m <= n; m++) {
         pA *= 1 + g; pB *= 1 + g;
@@ -300,7 +312,7 @@
         kpi("Plan B wealth at year " + (n / 12), money(wB), wB > wA ? "good" : "") + kpi(diff >= 0 ? "Investing ahead by" : "Prepaying ahead by", money(Math.abs(diff)));
       INV.lineChart(self(el, "c"), { label: "Net position: investments minus mortgage balance", height: 250, xTitle: "Years from now", yFmt: ms, xFmt: yearFmt, zeroBase: false,
         series: [{ name: "A: prepay, then invest", color: "var(--s2)", data: A }, { name: "B: invest the extra", color: "var(--s1)", data: B }] });
-      self(el, "n2").innerHTML = "The break-even return is the mortgage rate itself, " + pct(r * 100, 2) + ". Above it (after tax), investing wins on average; below it, prepaying wins — and prepaying is certain while investing is not. " +
+      self(el, "n2").innerHTML = "The break-even return is close to the mortgage rate itself, " + pct(r * 100, 2) + ". Above it (after tax), investing wins on average; below it, prepaying wins — and prepaying is certain while investing is not. " +
         "Prepaid principal is also illiquid: you cannot get it back without selling or borrowing.";
     }
     wire(el, run);
@@ -356,10 +368,10 @@
         kpi("Cash flow per month, year 1", money(M.rows[0].cf / 12), M.rows[0].cf >= 0 ? "good" : "bad") + kpi("Cash-on-cash return", M.cash0 > 0 ? f(M.coc, 1) : "no cash in", M.coc >= 0 ? "" : "bad") +
         kpi("Debt service coverage", M.ds > 0 ? (isFinite(M.dscr) ? M.dscr.toFixed(2) + "×" : "n/a") : "no loan", M.ds > 0 && M.dscr < 1 ? "bad" : "") +
         kpi("Rent ÷ price (the 1% rule)", f(M.one, 2)) + kpi("IRR over " + p.hold + (p.hold === 1 ? " year" : " years"), f(M.irr, 1)) + kpi("Cash back per $1 invested", isFinite(M.mult) ? "$" + M.mult.toFixed(2) : "n/a");
-      INV.lineChart(self(el, "c"), { label: "Equity and cumulative cash flow", height: 250, xTitle: "Year", yFmt: ms, xFmt: yearFmt, zeroBase: false,
+      INV.lineChart(self(el, "c"), { label: "Equity and cumulative cash flow", height: 250, xTitle: "Year", yFmt: ms, xFmt: yearTick, zeroBase: false,
         series: [{ name: "Equity (value − loan)", color: "var(--s1)", data: [[0, p.price - M.loan]].concat(M.rows.map(function (r) { return [r.y, r.eq]; })) },
           { name: "Cumulative cash flow", color: "var(--s3)", data: (function () { var c = 0, d = [[0, 0]]; M.rows.forEach(function (r) { c += r.cf; d.push([r.y, c]); }); return d; })() }] });
-      var h = '<table class="tbl"><thead><tr><th>Year</th><th class="r">Effective rent</th><th class="r">Operating costs</th><th class="r">NOI</th><th class="r">Loan payments</th><th class="r">Cash flow</th><th class="r">Loan balance</th><th class="r">Value</th></tr></thead><tbody>';
+      var h = '<table class="tbl" style="white-space:nowrap"><thead><tr><th>Year</th><th class="r">Effective rent</th><th class="r">Operating costs</th><th class="r">NOI</th><th class="r">Loan payments</th><th class="r">Cash flow</th><th class="r">Loan balance</th><th class="r">Value</th></tr></thead><tbody>';
       M.rows.forEach(function (r) { h += "<tr><td>" + r.y + '</td><td class="r">' + money(r.egi) + '</td><td class="r">' + money(r.opx) + '</td><td class="r">' + money(r.noi) + '</td><td class="r">' + money(r.ds) + '</td><td class="r ' + (r.cf < 0 ? "neg-t" : "") + '">' + money(r.cf) + '</td><td class="r">' + money(r.bal) + '</td><td class="r">' + money(r.value) + "</td></tr>"; });
       self(el, "t").innerHTML = h + "</tbody></table>";
       var last = M.rows[M.rows.length - 1];
@@ -392,6 +404,7 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var P = num(el, "price"), d = rv(el, "down") / 100, r = rv(el, "rate") / 100, cap = rv(el, "cap") / 100, app = rv(el, "app") / 100, n = rv(el, "yrs");
+      if (!(P > 0)) { self(el, "k").innerHTML = kpi("Return on equity per year", "enter a price"); self(el, "c").innerHTML = ""; self(el, "n2").innerHTML = "Enter a property price above zero."; return; }
       var L = levReturn(P, d, r, cap, app, n), C = levReturn(P, 1, r, cap, app, n);
       var f = function (v) { return isFinite(v) ? pct(v * 100, 1) : "lost it all"; };
       self(el, "k").innerHTML = kpi("Return on equity per year, " + Math.round(d * 100) + "% down", f(L.irr), L.irr >= C.irr ? "good" : "bad") +

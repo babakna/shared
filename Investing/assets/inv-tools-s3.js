@@ -60,7 +60,7 @@
   /* emergency-fund months from household factors */
   S3.efMonths = function (income, stability, deps, home) {
     var base = { two: 3, one: 4, variable: 6, retired: 3 }[income] || 4;
-    var st = { stable: 0, typical: 1, risky: 2 }[stability] || 0;
+    var st = income === "retired" ? 0 : ({ stable: 0, typical: 1, risky: 2 }[stability] || 0); /* no job to lose in retirement */
     return base + st + (deps === "yes" ? 1 : 0) + (home === "own" ? 1 : 0);
   };
   /* debts: [{b, apr, min}], extra per month, order "avalanche"|"snowball" */
@@ -82,6 +82,8 @@
     return { months: month, interest: interest, path: path, first: first, done: !d.some(function (x) { return x.b > 0.005; }), order: d.slice().sort(function (a, b) { return (a.paidAt || 999) - (b.paidAt || 999); }).map(function (x) { return x.i; }), paid: d.map(function (x) { return [x.i, x.paidAt]; }) };
   };
   S3.fvMonthly = function (pmt, annual, years) { var i = Math.pow(1 + annual, 1 / 12) - 1, n = years * 12; return i === 0 ? pmt * n : pmt * (Math.pow(1 + i, n) - 1) / i; };
+  /* same, for a loan quoted as an APR: interest accrues at APR / 12 a month (as in S3.payoff) */
+  S3.fvMonthlyApr = function (pmt, apr, years) { var i = apr / 12, n = years * 12; return i === 0 ? pmt * n : pmt * (Math.pow(1 + i, n) - 1) / i; };
   S3.match = function (salary, contribPct, matchRate, capPct, limit) {
     var mine = Math.min(salary * contribPct / 100, limit), eff = salary > 0 ? mine / salary * 100 : 0;
     var match = salary * Math.min(eff, capPct) / 100 * matchRate / 100, full = salary * capPct / 100 * matchRate / 100;
@@ -163,7 +165,7 @@
       sel(u + "-h", "Housing", [["rent", "Rent"], ["own", "Own (repairs are yours)"]], "rent") +
       numf(u + "-x", "Plus deductibles you could owe at once ($)", 1000, 100, "Health, car or home insurance") +
       numf(u + "-c0", "Cash already set aside ($)", 3000, 100) + numf(u + "-a", "You can add each month ($)", 400, 25) +
-      note("A heuristic: 3 months for two steady incomes, 4 for one, 6 if income varies; add a month each for an unstable job (two if at risk), dependents and home ownership. Defaults are Maya's."),
+      note("A heuristic: 3 months for two steady incomes (or a retiree with Social Security or a pension), 4 for one steady income, 6 if income varies; add 1 month for a typical job (2 if cyclical or at risk, 0 if very stable; ignored for retirees), 1 for dependents and 1 for home ownership. Defaults are Maya's."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var e = num(el, "e"), x = num(el, "x"), c0 = num(el, "c0"), a = num(el, "a");
@@ -220,18 +222,19 @@
       rng(u + "-t", "Tax rate at which the interest is deductible (0 if not)", 0, 37, 1, 12, "pct") +
       rng(u + "-i", "Expected investment return (not guaranteed)", 0, 10, 0.5, 6, "pct") +
       rng(u + "-y", "Years", 1, 30, 1, 10, "yr") +
-      note("Paying a debt early 'earns' its after-tax interest rate with certainty. Investing earns an uncertain return. Assumes the debt is large enough to absorb every extra payment, and ignores taxes on investment gains (as in a Roth or 401(k))."),
+      note("Paying a debt early 'earns' its after-tax interest rate with certainty; interest is taken as accruing monthly at APR ÷ 12. Investing earns an uncertain return, entered as a yearly compound rate. Assumes the debt is large enough to absorb every extra payment, and ignores taxes on investment gains (as in a Roth or 401(k))."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var p = num(el, "p"), d = rv(el, "d") / 100, t = rv(el, "t") / 100, i = rv(el, "i") / 100, y = rv(el, "y");
-      var dAfter = d * (1 - t), R = S3.fvMonthly(p, dAfter, y), I = S3.fvMonthly(p, i, y);
+      var dAfter = d * (1 - t), R = S3.fvMonthlyApr(p, dAfter, y), I = S3.fvMonthly(p, i, y);
       self(el, "k").innerHTML = kpi("Repaying earns (after tax)", pct(dAfter * 100, 2), "good") + kpi("Investing hopes to earn", pct(i * 100, 1)) +
         kpi("Value of repaying after " + y + " yrs", money(R)) + kpi("Value of investing", money(I), I > R ? "good" : "");
-      var a = [], b = []; for (var k = 0; k <= y; k++) { a.push([k, S3.fvMonthly(p, dAfter, k)]); b.push([k, S3.fvMonthly(p, i, k)]); }
+      var a = [], b = []; for (var k = 0; k <= y; k++) { a.push([k, S3.fvMonthlyApr(p, dAfter, k)]); b.push([k, S3.fvMonthly(p, i, k)]); }
       INV.lineChart(self(el, "c"), { label: "Repay versus invest", height: 230, xTitle: "Years", xFmt: function (v) { return String(Math.round(v)); }, yFmt: ms,
         series: [{ name: "Repay debt (certain)", color: "var(--s2)", data: a }, { name: "Invest (expected, uncertain)", color: "var(--s1)", data: b, dash: "5 4" }] });
       self(el, "n").innerHTML = "The debt's after-tax cost is " + pct(d * 100, 1) + " × (1 − " + pct(t * 100, 0) + ") = <b>" + pct(dAfter * 100, 2) + "</b>. " +
-        (i > dAfter ? "Investing comes out ahead <i>on average</i> by " + money(I - R) + ", but only if the return arrives; a bad decade can reverse it." : "Repaying wins even before counting risk: the certain return is at least as high as the hoped-for one.");
+        "Charged monthly (APR ÷ 12), that compounds to " + pct((Math.pow(1 + dAfter / 12, 12) - 1) * 100, 2) + " a year, the certain return on every extra dollar you repay. " +
+        (I > R ? "Investing comes out ahead <i>on average</i> by " + money(I - R) + ", but only if the return arrives; a bad decade can reverse it." : "Repaying wins even before counting risk: the certain return is at least as high as the hoped-for one.");
     }
     wire(el, run);
   };
@@ -254,7 +257,7 @@
       var what = self(el, "x").value, msg = "";
       if (what === "close") {
         var best = -1, un = -1; cs.forEach(function (c, i) { if (c.l - c.b > un && c.l > 0) { un = c.l - c.b; best = i; } });
-        if (best > -1) { msg = "Closing the " + cs[best].n.toLowerCase() + " removes " + money(cs[best].l) + " of limit (its balance still has to be paid). "; cs[best].b = 0; cs[best].l = 0; }
+        if (best > -1) { msg = "Closing the " + cs[best].n.toLowerCase() + " removes " + money(cs[best].l) + " of limit" + (cs[best].b > 0 ? "; its " + money(cs[best].b) + " balance still has to be paid, so it stays in the total below" : "") + ". "; cs[best].l = 0; }
       }
       if (what === "early") { msg = "Paying the everyday card down to about 10% of its limit before the statement date lowers the reported balance, with no change in spending. "; cs[0].b = Math.min(cs[0].b, cs[0].l * 0.1); }
       var L = cs.reduce(function (s, c) { return s + c.l; }, 0), B = cs.reduce(function (s, c) { return s + c.b; }, 0);
@@ -276,7 +279,7 @@
       rng(u + "-c", "You contribute (% of pay)", 0, 25, 0.5, 6, "pct") +
       rng(u + "-mr", "Employer matches (% of your contribution)", 0, 200, 5, 50, "pct") +
       rng(u + "-cap", "…on contributions up to (% of pay)", 0, 10, 0.5, 6, "pct") +
-      sel(u + "-v", "Vesting schedule for the match", [["now", "Immediate"], ["cliff3", "3-year cliff"], ["graded6", "Graded: 20% a year from year 2 to year 6"]], "graded6") +
+      sel(u + "-v", "Vesting schedule for the match", [["now", "Immediate"], ["cliff3", "3-year cliff"], ["graded6", "Graded: 20% a year, years 2 to 6"]], "graded6") +
       rng(u + "-y", "Years of service so far", 0, 7, 1, 1, "yr") +
       note("Your own contributions are always 100% yours. The 2026 limit on employee deferrals is $24,500 (plus $8,000 catch-up at 50+, or $11,250 at 60–63). Defaults are Maya's plan."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n"></p>');
@@ -300,12 +303,17 @@
     shell(el, "Employee stock purchase plan: what the discount is worth", "Calculator",
       numf(u + "-c", "Payroll deductions this offering period ($)", 3000, 100) +
       rng(u + "-d", "Discount", 0, 15, 1, 15, "pct") +
-      sel(u + "-l", "Lookback provision?", [["yes", "Yes: discount applies to the lower of start or purchase price"], ["no", "No: discount on the purchase-date price only"]], "yes") +
+      sel(u + "-l", "Lookback provision?", [["yes", "Yes: lower of start or purchase price"], ["no", "No: purchase-date price only"]], "yes") +
       numf(u + "-p0", "Share price at the start of the period ($)", 40, 0.5) + numf(u + "-p1", "Share price on the purchase date ($)", 46, 0.5) +
-      note("Assumes you sell right after purchase at the purchase-date price. Selling that early is a 'disqualifying disposition': the discount is taxed as ordinary wages. Holding 2 years from grant and 1 year from purchase changes the tax, not the concentration risk."),
+      note("Assumes you sell right after purchase at the purchase-date price. Selling that early is a 'disqualifying disposition': the whole spread between the purchase-date price and the price you paid is taxed as ordinary wages. Holding 2 years from the start of the offering and 1 year from purchase changes the tax, not the concentration risk."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c2"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var c = num(el, "c"), d = rv(el, "d") / 100, p0 = num(el, "p0"), p1 = num(el, "p1"), lb = self(el, "l").value === "yes";
+      if (!(p1 > 0) || (lb && !(p0 > 0))) {
+        self(el, "k").innerHTML = kpi("Your purchase price", "—") + kpi("Shares bought", "—") + kpi("Value at purchase", "—") + kpi("Gain on your money", "—");
+        self(el, "c2").innerHTML = ""; self(el, "n").innerHTML = "Enter the share price " + (lb ? "at the start of the period and " : "") + "on the purchase date to see the result.";
+        return;
+      }
       var base = lb ? Math.min(p0, p1) : p1, price = base * (1 - d), sh = price > 0 ? c / price : 0, val = sh * p1, gain = val - c;
       self(el, "k").innerHTML = kpi("Your purchase price", money(price, 2)) + kpi("Shares bought", sh.toFixed(2)) + kpi("Value at purchase", money(val)) +
         kpi("Gain on your money", pct(c > 0 ? gain / c * 100 : 0, 1), gain > 0 ? "good" : "bad");

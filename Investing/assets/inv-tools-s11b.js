@@ -72,6 +72,8 @@
   var ULT = [27.4,26.5,25.5,24.6,23.7,22.9,22.0,21.1,20.2,19.4,18.5,17.7,16.8,16.0,15.2,14.4,13.7,12.9,12.2,11.5,10.8,10.1,9.5,8.9,8.4,7.8,7.3,6.8,6.4,6.0,5.6,5.2,4.9,4.6,4.3,4.1,3.9,3.7,3.5,3.4,3.3,3.1,3.0,2.9,2.8,2.7,2.5,2.3,2.0];
   /* 2026 federal brackets, single filer (Rev. Proc. 2025-32, Table 3) */
   var BR = [[12400, 0.10], [50400, 0.12], [105700, 0.22], [201775, 0.24], [256225, 0.32], [640600, 0.35], [Infinity, 0.37]];
+  /* 2026 qualified charitable distribution exclusion limit per person, IRC 408(d)(8)(A) as indexed (IRS Notice 2025-67) */
+  var QCDMAX = 111000;
 
   /* ---------- shared math (exposed for page charts as INV.s11b) ---------- */
   /* sex codes: m, f = SSA general population; pm, pf = IRS 2026 pension table; u = IRS 2026 unisex 417(e) table */
@@ -169,7 +171,7 @@
         self(el, "k").innerHTML = kpi("Estimated minimum lump sum", money(lump)) + kpi("Per $1 of yearly pension", "$" + fac.toFixed(2)) +
           kpi("Highest, Jan 2020 to May 2026", money(hi[1]), "good") + kpi("Lowest in that period", money(lo[1]), "bad");
         INV.lineChart(self(el, "c"), { label: "Lump sum under each month's IRS segment rates", height: 250, yFmt: ms, zeroBase: false,
-          xTicks: [0, 12, 24, 36, 48, 60, 72], xFmt: function (v) { var s = SEG[Math.max(0, Math.min(SEG.length - 1, Math.round(v)))]; return s ? s[0] : ""; },
+          xTicks: self(el, "c").clientWidth < 520 ? [0, 24, 48, 72] : [0, 12, 24, 36, 48, 60, 72], xFmt: function (v) { var s = SEG[Math.max(0, Math.min(SEG.length - 1, Math.round(v)))]; return s ? s[0] : ""; },
           xTitle: "IRS segment-rate month", series: [{ name: "Lump sum for this pension", color: "var(--s1)", data: hist }],
           dots: [{ x: hi[0], y: hi[1], color: "var(--s2)" }, { x: lo[0], y: lo[1], color: "var(--s5)" }] });
         self(el, "n").innerHTML = "Each future monthly payment is multiplied by the chance you are alive to receive it, then discounted at the first segment rate if it falls within 5 years, the second if within 5 to 20 years, and the third after that. " +
@@ -216,15 +218,14 @@
       numf(u + "-ss", "Social Security per year ($)", 34800, 100) +
       numf(u + "-oi", "Other taxable income per year, such as CD interest ($)", 2400, 100) +
       numf(u + "-cv", "Roth conversion each year before RMDs begin ($)", 0, 1000) +
-      numf(u + "-qc", "Qualified charitable distribution each year from age 71 ($)", 0, 500) +
+      numf(u + "-qc", "Qualified charitable distribution each year from age 71 ($)", 0, 500, "Capped at the 2026 limit of $111,000 a year.") +
       '<p class="hint" style="font-size:.76rem;color:var(--muted)">In today\'s dollars. Federal tax for a single filer, using 2026 brackets and deductions throughout; the extra deductions for age 65+, including the $6,000 senior deduction, apply from 65, and the senior deduction only through 2028, as the law now reads. Assumes each RMD is taken by December 31 of its year.</p>',
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><div id="' + u + '-c2"></div><p class="tool-note" id="' + u + '-n"></p>');
     function project(B0, born, r, ss, oi, cv, qc) {
       var ra = rmdAge(born), b = B0, roth = 0, rows = [], tax = 0;
       for (var y = 2026; y - born <= 95; y++) {
         var age = y - born; if (age < 60) { b *= 1 + r; continue; }
-        var rmd = age >= ra ? b / ult(age) : 0, qcd = age >= 71 ? Math.min(qc, b) : 0, wd = Math.max(rmd, qcd), conv = age < ra ? Math.min(cv, b) : 0;
-        wd = Math.min(wd, b);
+        var rmd = age >= ra ? b / ult(age) : 0, qcd = age >= 71 ? Math.min(qc, QCDMAX, b) : 0, wd = Math.min(Math.max(rmd, qcd), b), conv = age < ra ? Math.min(cv, b - wd) : 0;
         var taxable = wd - Math.min(qcd, wd) + conv, t = fedTax(ss, oi + taxable, y, age);
         var mt = (fedTax(ss, oi + taxable + 100, y, age).tax - t.tax) / 100;
         rows.push({ y: y, age: age, bal: b, rmd: rmd, wd: wd, conv: conv, qcd: qcd, taxable: taxable, tax: t.tax, ti: t.ti, mt: mt, roth: roth });

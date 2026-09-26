@@ -53,7 +53,7 @@ a.mod:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(31,95,209,.12)}
   <p class="ver">V1.0 (September 2026)</p>
   <p class="desc">A comprehensive, self-paced investing curriculum for every stage of life &mdash; from your first paycheck to passing wealth on. Each module teaches from zero, then goes as deep as you want, with live calculators built on real market history, case studies, decisions to make, and five households whose lives show how each idea plays out.</p>
   <span class="stats" id="landStats">15 stages &middot; 105 modules &middot; 1,000+ glossary terms &middot; 173 calculators &middot; 370+ curated resources</span>
-  <div class="quick"><a class="btn primary" href="INV-001.html">Start with INV-001 &rarr;</a><a class="btn" href="tools.html">Open the tools</a><a class="btn" href="glossary.html">Browse the glossary</a></div>
+  <div class="quick"><a class="btn primary" id="continueBtn" href="INV-001.html">Start with INV-001 &rarr;</a><button type="button" class="btn" onclick="INV.openMap(this)">Course map &amp; search</button><a class="btn" href="tools.html">Open the tools</a><a class="btn" href="glossary.html">Browse the glossary</a></div>
 </section>
 
 <div class="tabs-shell">
@@ -235,7 +235,7 @@ INV.ready(function () {
     var panel = document.querySelector('.panel[data-stage="' + st.n + '"]'); if (!panel) return;
     var mods = INV.course.filter(function (m) { return m.stage === st.n; });
     var live = mods.filter(function (m) { return m.live; }).length;
-    var html = '<div class="stage-intro"><span class="num">' + st.n + '</span><div><p class="kicker">Stage ' + st.n + " of 15</p><h2>" + INV.esc(st.name) + '</h2><p class="src">' + INV.esc(st.blurb) + " &middot; " + mods.length + " modules" + (live ? " &middot; " + live + " live" : " &middot; in development") + "</p></div></div>";
+    var html = '<div class="stage-intro"><span class="num">' + st.n + '</span><div><p class="kicker">Stage ' + st.n + " of 15</p><h2>" + INV.esc(st.name) + '</h2><p class="src">' + INV.esc(st.blurb) + " &middot; " + mods.length + " modules</p></div></div>";
     html += '<div class="mods">' + mods.map(function (m) {
       var done = prog[m.id] && prog[m.id].done;
       var inner = '<span class="code">' + m.id + '</span><span><span class="t">' + INV.esc(m.title) + '</span><br><span class="s">' + INV.esc((window.INV_SCOPE || {})[m.id] || "") + "</span></span>" +
@@ -245,6 +245,8 @@ INV.ready(function () {
     
     panel.innerHTML = html;
   });
+  var last = INV.store("inv-last");
+  if (last && last.id) { var cb = document.getElementById("continueBtn"); cb.href = last.id + ".html#s" + (last.tab + 1); cb.textContent = "Continue: " + last.id + " \u00B7 " + (last.title || "") + " \u2192"; }
   var liveMods = INV.course.filter(function (m) { return m.live; }), done = liveMods.filter(function (m) { return prog[m.id] && prog[m.id].done; }).length;
   document.getElementById("pfill").style.width = (liveMods.length ? done / liveMods.length * 100 : 0) + "%";
   document.getElementById("ptext").textContent = done + " of " + liveMods.length + " live modules complete";

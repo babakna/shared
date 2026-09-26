@@ -41,7 +41,7 @@
   }
   function kpi(k, v, cls) { return '<div class="kpi"><div class="k">' + esc(k) + '</div><div class="v ' + (cls || "") + '">' + v + "</div></div>"; }
   function num(el, id) { var v = Number(self(el, id).value); return isFinite(v) && v > 0 ? v : 0; }
-  function yearFmt(v) { return String(Math.round(v)); }
+  function yearFmt(v) { return Math.abs(v - Math.round(v)) > 1e-9 ? "" : String(Math.round(v)); }
   function hint(t) { return '<p class="hint" style="font-size:.76rem;color:var(--muted)">' + t + "</p>"; }
   function seg(el, cb) {
     el.querySelectorAll(".seg button").forEach(function (b) {
@@ -75,7 +75,7 @@
     function run() {
       var I = num(el, "i"), s = Number(self(el, "s").value) / 100, P0 = num(el, "p"), r = Number(self(el, "r").value) / 100, w = Number(self(el, "w").value) / 100;
       var spend = (1 - s) * I, S = s * I, T = spend / w, n = yearsTo(T, P0, S, r);
-      self(el, "k").innerHTML = kpi("Spending per year", money(spend)) + kpi("Saved per year", money(S)) + kpi("FI number", money(T)) + kpi("Years to FI", yrsTxt(n), n != null && n <= 20 ? "good" : "");
+      self(el, "k").innerHTML = kpi("Spending per year", money(spend)) + kpi("Saved per year", money(S)) + kpi("FI number", money(T)) + kpi("Years to FI", I > 0 ? yrsTxt(n) : "—", I > 0 && n != null && n <= 20 ? "good" : "");
       var curve = [];
       for (var k = 5; k <= 90; k += 1) { var nk = yearsTo((1 - k / 100) * I / w, P0, k / 100 * I, r); if (nk != null && nk <= 70) curve.push([k, nk]); }
       var dots = n != null && n <= 70 ? [{ x: s * 100, y: n, label: n.toFixed(1) + " years", color: "var(--s1)" }] : [];
@@ -133,13 +133,13 @@
       var arrive = P >= T ? a : P > 0 ? a + Math.log(T / P) / Math.log(1 + r) : null;
       var gap = Math.max(0, T - atT), af = yl > 0 ? (Math.pow(1 + r, yl) - 1) / r : 0, need = gap > 0 ? (af > 0 ? gap / af : gap) : 0;
       self(el, "k").innerHTML = kpi("FI number", money(T)) + kpi("Coast number today", money(C)) + kpi(P >= C ? "Ahead of coast by" : "Short of coast by", money(Math.abs(P - C)), P >= C ? "good" : "bad") +
-        kpi("Age growth alone gets you there", arrive == null ? "Not without saving" : arrive <= a ? "Already there" : "age " + arrive.toFixed(1)) + kpi("Saving needed per year to hit it by " + t, money(need), need > 0 ? "" : "good");
+        kpi("Age growth alone gets you there", arrive == null ? "Not without saving" : arrive <= a ? "Already there" : arrive > 110 ? "Not in a lifetime" : "age " + arrive.toFixed(1)) + kpi("Saving needed per year to hit it by " + t, t > a ? money(need) : "choose a later age", t > a && need <= 0 ? "good" : "");
       var cn = [], pr = [];
       for (var x = a; x <= Math.max(t, a + 1); x++) { var left = Math.max(0, t - x); cn.push([x, T / Math.pow(1 + r, left)]); pr.push([x, P * Math.pow(1 + r, x - a)]); }
       INV.lineChart(self(el, "c"), { label: "Coast number versus your portfolio", height: 240, xTitle: "Age", xFmt: yearFmt, yFmt: ms,
         series: [{ name: "Coast number at each age", color: "var(--s5)", data: cn, dash: "5 4" }, { name: "Your portfolio, no new saving", color: "var(--s2)", data: pr }],
         marks: [{ x: Math.max(t, a + 1) }] });
-      self(el, "n").innerHTML = "FI number = " + money(sp) + " ÷ " + pct(w * 100, 2) + " = " + money(T) + ". Coast number = " + money(T) + " ÷ " + (1 + r).toFixed(3) + "<sup>" + yl + "</sup> = <b>" + money(C) + "</b>. " +
+      self(el, "n").innerHTML = (t <= a ? "<b>The FI age must be later than your age now.</b> " : "") + "FI number = " + money(sp) + " ÷ " + pct(w * 100, 2) + " = " + money(T) + ". Coast number = " + money(T) + " ÷ " + (1 + r).toFixed(3) + "<sup>" + yl + "</sup> = <b>" + money(C) + "</b>. " +
         (P >= C ? "You could stop saving for this goal and, if returns match the assumption, still arrive on time. " : "Growth alone would turn " + money(P) + " into " + money(atT) + " by age " + t + ". ") +
         "A 1-point lower return raises today's coast number to " + money(T / Math.pow(1 + Math.max(0.001, r - 0.01), yl)) + ".";
     }

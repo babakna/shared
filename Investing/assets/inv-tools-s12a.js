@@ -2,8 +2,9 @@
    Tools for INV-084 to INV-089. Every tool computes from its stated rule in the browser.
    Federal figures are for 2026 (IRS Rev. Proc. 2025-32, as amended by Public Law 119-21):
    basic exclusion amount $15,000,000; annual gift exclusion $19,000; rate schedule of 26 U.S.C. 2001(c).
-   State figures: Tax Foundation, Facts & Figures 2026 (Tables 36-37, as of January 1, 2026);
-   Pennsylvania rates from the PA Department of Revenue. General information only, not legal advice. */
+   State figures: Tax Foundation, Facts & Figures 2026 (Tables 36-37, as of January 1, 2026), except Washington,
+   shown for deaths on or after July 1, 2026 from the WA Department of Revenue estate tax tables;
+   Pennsylvania rates from the PA Department of Revenue and 72 P.S. 9116; Maryland exemptions from Md. Code, Tax-Gen. 7-203. General information only, not legal advice. */
 (function () {
   "use strict";
   var INV = window.INV; if (!INV || !INV.tools) return;
@@ -367,7 +368,7 @@
     ["CT", "Connecticut", 15000000, "12%", "e"], ["HI", "Hawaii", 5490000, "10%–20%", "e"], ["IL", "Illinois", 4000000, "0.8%–16%", "e"], ["ME", "Maine", 7000000, "8%–12%", "e"],
     ["MD", "Maryland (also inheritance tax)", 5000000, "0.8%–16%", "b"], ["MA", "Massachusetts", 2000000, "0.8%–16%", "e"], ["MN", "Minnesota", 3000000, "13%–16%", "e"],
     ["NY", "New York (cliff at 105%)", 7350000, "3.06%–16%", "e"], ["OR", "Oregon", 1000000, "10%–16%", "e"], ["RI", "Rhode Island", 1838056, "0.8%–16%", "e"],
-    ["VT", "Vermont", 5000000, "16%", "e"], ["WA", "Washington", 3076000, "10%–35%", "e"], ["DC", "District of Columbia", 4988400, "11.2%–16%", "e"],
+    ["VT", "Vermont", 5000000, "16%", "e"], ["WA", "Washington (deaths from July 1, 2026)", 3000000, "10%–20%", "e"], ["DC", "District of Columbia", 4988400, "11.2%–16%", "e"],
     ["PA", "Pennsylvania (inheritance tax)", 0, "0%–15% by heir", "i"], ["NJ", "New Jersey (inheritance tax)", 0, "0%–16% by heir", "i"], ["KY", "Kentucky (inheritance tax)", 0, "0%–16% by heir", "i"], ["NE", "Nebraska (inheritance tax)", 0, "1%–15% by heir", "i"],
     ["AZ", "Arizona, Colorado, North Carolina, Ohio and other states with neither tax", -1, "None", "n"]];
   TOOLS.s12aStateCheck = function (el) {
@@ -375,16 +376,17 @@
     shell(el, "Does a state death tax apply?", "Lookup, 2026",
       sel(u + "-s", "State of residence (or where real estate is located)", STATES.map(function (s) { return [s[0], s[1]]; }), "MA") +
       numf(u + "-v", "Taxable estate ($)", 3000000, 50000) +
-      note("Exemptions and rates as of January 1, 2026, from the Tax Foundation's Facts & Figures 2026 (compiled from state statutes and Bloomberg Tax). New York and Washington figures were checked against their revenue departments. Rules change often: confirm with the state before relying on a number."),
+      note("Exemptions and rates as of January 1, 2026, from the Tax Foundation's Facts & Figures 2026 (compiled from state statutes and Bloomberg Tax); New York checked against its Department of Taxation and Finance. Washington is shown for deaths on or after July 1, 2026, from its Department of Revenue tables: for deaths from July 1, 2025 through June 30, 2026 its top rate was 35%, and its exclusion was $3,076,000 for deaths from January 1 to June 30, 2026. Rules change often: confirm with the state before relying on a number."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var code = self(el, "s").value, v = num(el, "v"), s = STATES.filter(function (x) { return x[0] === code; })[0];
       var kind = s[4], ex = s[2], over = kind === "e" || kind === "b" ? Math.max(0, v - ex) : 0, msg;
       if (kind === "n") msg = "No state estate or inheritance tax. Only the federal estate tax can apply, and only above " + $0(BEA2026) + " in 2026.";
-      else if (kind === "i") msg = "An inheritance tax: the exemption and rate depend on who inherits, not on the size of the estate. Spouses are exempt in every inheritance-tax state; in Pennsylvania, children pay 4.5% from the first dollar.";
+      else if (kind === "i") msg = "An inheritance tax: the exemption and rate depend on who inherits, not on the size of the estate. Spouses are exempt in every inheritance-tax state; in Pennsylvania, adult children pay 4.5% from the first dollar, and in Nebraska close relatives pay 1% on amounts above $100,000.";
       else if (code === "NY") { var cliff = ex * 1.05, fr = v <= ex ? 1 : v >= cliff ? 0 : 1 - (v - ex) / (ex * 0.05); msg = "New York phases out its credit between " + $0(ex) + " and " + $0(cliff) + " (105%). At " + $0(v) + ", " + pct(fr * 100, 0) + " of the exclusion still applies" + (fr === 0 ? ": the whole estate is taxed, not just the excess." : "."); }
       else msg = v > ex ? "The estate is above this state's exemption, so a state estate tax return and tax are likely. State tax is due even when no federal tax is." : "The estate is under this state's exemption.";
-      if (kind === "b") msg += " Maryland also levies a 10% inheritance tax on transfers to heirs other than spouses and lineal heirs.";
+      if (code === "WA") msg += " Washington's rules depend on the date of death: for deaths from July 1, 2025 through June 30, 2026 the rates ran from 10% to 35%, with a $3,076,000 exclusion for deaths in the first half of 2026.";
+      if (kind === "b") msg += " Maryland also levies a 10% inheritance tax on transfers to heirs other than spouses, parents, grandparents, children and other descendants, their spouses, and brothers and sisters (Md. Code, Tax–General § 7-203).";
       self(el, "k").innerHTML = kpi("Estate-tax exemption", kind === "e" || kind === "b" ? $0(ex) : kind === "i" ? "Depends on heir" : "No tax") + kpi("Amount above exemption", kind === "e" || kind === "b" ? $0(over) : "Not applicable", over ? "bad" : "good") + kpi("Rate range", esc(s[3]));
       var d = STATES.filter(function (x) { return x[4] === "e" || x[4] === "b"; }).map(function (x) { return { label: x[0], tip: x[1], y: x[2], color: x[0] === code ? "var(--s1)" : "var(--s6)" }; });
       INV.barChart(self(el, "c"), { label: "State estate-tax exemptions, 2026", height: 220, allLabels: true, yFmt: ms, tipFmt: function (v2) { return $0(v2); }, data: d });

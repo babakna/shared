@@ -66,7 +66,7 @@
     });
     var y0i = self(el, "y0"), y1i = self(el, "y1");
     function run() {
-      var amt = Math.max(0, Number(self(el, "amt").value) || 0), y0 = Number(y0i.value), y1 = Number(y1i.value);
+      var amt0 = Math.max(0, Number(self(el, "amt").value) || 0), amt = amt0 > 0 ? amt0 : 10000, y0 = Number(y0i.value), y1 = Number(y1i.value);
       if (y1 <= y0) { y1 = y0 + 1; y1i.value = y1; fmtOut(y1i); }
       var cpi = 1, vals = { cash: amt, tbill: amt, tbond: amt, stocks: amt }, pts = { cash: [], tbill: [], tbond: [], stocks: [] };
       Object.keys(pts).forEach(function (k) { pts[k].push([y0, amt]); });
@@ -76,7 +76,7 @@
         Object.keys(pts).forEach(function (k) { pts[k].push([y + 1, mode === "real" ? vals[k] / cpi : vals[k]]); });
       }
       var yrs = y1 - y0 + 1, avgInf = (Math.pow(cpi, 1 / yrs) - 1) * 100;
-      self(el, "k").innerHTML = kpi("Prices rose", pct((cpi - 1) * 100, 0)) + kpi("Avg inflation / yr", pct(avgInf, 2)) +
+      self(el, "k").innerHTML = kpi(cpi >= 1 ? "Prices rose" : "Prices fell", pct(Math.abs(cpi - 1) * 100, 0)) + kpi("Avg inflation / yr", pct(avgInf, 2)) +
         kpi("Cash under the mattress", money(amt / cpi), "bad") + kpi("Needed to keep pace", money(amt * cpi));
       var label = mode === "real" ? "Value in start-of-" + y0 + " dollars" : "Value in dollars of each year";
       INV.lineChart(self(el, "c"), { label: label, log: true, height: 290, yTitle: label, xFmt: yearFmt, yFmt: ms,
@@ -85,7 +85,7 @@
           { name: "10-yr Treasury bonds", color: "var(--s2)", data: pts.tbond },
           { name: "3-month T-bills", color: "var(--s3)", data: pts.tbill },
           { name: "Cash, no interest", color: "var(--s5)", data: pts.cash, dash: "5 4" }] });
-      self(el, "n").innerHTML = "Over " + yrs + " calendar years (start of " + y0 + " to end of " + y1 + "), " + money(amt) + " left in cash buys what " +
+      self(el, "n").innerHTML = (amt0 > 0 ? "" : "No amount entered, so $10,000 is shown. ") + "Over " + yrs + " calendar years (start of " + y0 + " to end of " + y1 + "), " + money(amt) + " left in cash buys what " +
         "<b>" + money(amt / cpi) + "</b> bought at the start. In stocks it became " + money(vals.stocks) + " (" + money(vals.stocks / cpi) + " in start-year dollars); in T-bills, " +
         money(vals.tbill) + " (" + money(vals.tbill / cpi) + ").";
     }
@@ -101,7 +101,7 @@
       rng(u + "-i", "Inflation (for today's-dollar view)", 0, 6, 0.5, 2.5, "pct"),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
-      var P = Number(self(el, "p").value) || 0, M = Number(self(el, "m").value) || 0, r = Number(self(el, "r").value) / 100,
+      var P = Math.max(0, Number(self(el, "p").value) || 0), M = Math.max(0, Number(self(el, "m").value) || 0), r = Number(self(el, "r").value) / 100,
         n = Number(self(el, "n").value), inf = Number(self(el, "i").value) / 100;
       var rm = Math.pow(1 + r, 1 / 12) - 1, bal = P, contrib = P, pB = [[0, P]], pC = [[0, P]], pR = [[0, P]];
       for (var mth = 1; mth <= n * 12; mth++) {
@@ -134,7 +134,7 @@
       '<p class="hint" style="font-size:.76rem;color:var(--muted)">Saver B keeps investing every year until 65. Contributions are made at the start of each year.</p>',
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
-      var A = Number(self(el, "amt").value) || 0, a0 = Number(self(el, "a0").value), an = Number(self(el, "an").value),
+      var A = Math.max(0, Number(self(el, "amt").value) || 0), a0 = Number(self(el, "a0").value), an = Number(self(el, "an").value),
         b0 = Number(self(el, "b0").value), r = Number(self(el, "r").value) / 100;
       var ba = 0, bb = 0, ca = 0, cb = 0, pa = [], pb = [];
       for (var age = 18; age <= 65; age++) {
@@ -147,7 +147,7 @@
       self(el, "k").innerHTML = kpi("A invested", money(ca)) + kpi("A at 65", money(fa), fa >= fb ? "good" : "") + kpi("B invested", money(cb)) + kpi("B at 65", money(fb), fb > fa ? "good" : "");
       INV.lineChart(self(el, "c"), { label: "Early versus late saver", height: 270, xTitle: "Age", yFmt: ms, xFmt: yearFmt,
         series: [{ name: "Saver A (early, then stops)", color: "var(--s1)", data: pa }, { name: "Saver B (later, never stops)", color: "var(--s3)", data: pb }] });
-      self(el, "n").innerHTML = fa >= fb ? "Saver A put in <b>" + money(ca) + "</b> and still ends ahead of Saver B, who put in " + money(cb) + ". The early years had longer to compound."
+      self(el, "n").innerHTML = A <= 0 ? "Enter a yearly amount above zero to compare the two savers." : fa >= fb ? "Saver A put in <b>" + money(ca) + "</b> and still ends ahead of Saver B, who put in " + money(cb) + ". The early years had longer to compound."
         : "Saver B ends ahead — but needed <b>" + money(cb - ca) + "</b> more of their own money to get there. Try moving Saver B's start later, or raising the return.";
     }
     wire(el, run);
@@ -192,16 +192,19 @@
     function run() {
       var r = Number(self(el, "r").value) / 100;
       if (mode === "lump") {
-        var fv = Number(self(el, "fv").value) || 0, n = Number(self(el, "n").value), pv = fv / Math.pow(1 + r, n);
+        var fv = Math.max(0, Number(self(el, "fv").value) || 0), n = Number(self(el, "n").value), pv = fv / Math.pow(1 + r, n);
         self(el, "k").innerHTML = kpi("Worth today", money(pv)) + kpi("Discount", pct(fv ? (1 - pv / fv) * 100 : 0, 0), "bad");
         var pts = []; for (var t = 0; t <= 40; t++) pts.push([t, fv / Math.pow(1 + r, t)]);
         INV.lineChart(self(el, "c"), { label: "Present value by delay", height: 240, xTitle: "Years until received", yFmt: ms, xFmt: yearFmt,
           series: [{ name: "Value today", color: "var(--s1)", data: pts, area: true }], dots: [{ x: n, y: pv, label: money(pv), color: "var(--s1)" }] });
         self(el, "n2").innerHTML = "PV = FV ÷ (1 + r)<sup>n</sup> = " + money(fv) + " ÷ (1 + " + (r * 100).toFixed(2) + "%)<sup>" + n + "</sup> = <b>" + money(pv) + "</b>.";
       } else {
-        var ls = Number(self(el, "ls").value) || 0, p = Number(self(el, "pmt").value) || 0, np = Number(self(el, "np").value);
-        var pvs = r === 0 ? p * np : p * (1 - Math.pow(1 + r, -np)) / r;
-        var be = null; for (var rr = 0; rr <= 0.3; rr += 0.0005) { var v = rr === 0 ? p * np : p * (1 - Math.pow(1 + rr, -np)) / rr; if (v <= ls) { be = rr; break; } }
+        var ls = Math.max(0, Number(self(el, "ls").value) || 0), p = Math.max(0, Number(self(el, "pmt").value) || 0), np = Number(self(el, "np").value);
+        var ann = function (q) { return q === 0 ? p * np : p * (1 - Math.pow(1 + q, -np)) / q; };
+        var pvs = ann(r);
+        /* break-even discount rate: payments' present value equals the lump sum (bisection; value falls as the rate rises) */
+        var be = null;
+        if (ann(0) <= ls) be = 0; else if (ann(0.3) <= ls) { var lo = 0, hi = 0.3; for (var it = 0; it < 60; it++) { var mid = (lo + hi) / 2; if (ann(mid) > ls) lo = mid; else hi = mid; } be = (lo + hi) / 2; }
         self(el, "k").innerHTML = kpi("Payments worth today", money(pvs), pvs > ls ? "good" : "") + kpi("Lump sum", money(ls), ls >= pvs ? "good" : "") +
           kpi("Break-even rate", be == null ? "> 30%" : pct(be * 100, 2));
         var pts2 = [], lsl = []; for (var x = 0; x <= 12; x += 0.25) { var q = x / 100; pts2.push([x, q === 0 ? p * np : p * (1 - Math.pow(1 + q, -np)) / q]); lsl.push([x, ls]); }
@@ -209,7 +212,7 @@
           series: [{ name: "Payments, valued today", color: "var(--s1)", data: pts2 }, { name: "Lump sum", color: "var(--s3)", data: lsl, dash: "5 4" }],
           dots: [{ x: r * 100, y: pvs, color: "var(--s1)" }] });
         self(el, "n2").innerHTML = "At a " + pct(r * 100, 2) + " discount rate, " + np + " payments of " + money(p) + " are worth <b>" + money(pvs) + "</b> today, versus a lump sum of " + money(ls) + ". " +
-          (be == null ? "" : "Below a " + pct(be * 100, 2) + " rate the payments are worth more; above it, the lump sum is.") + " This ignores taxes, inflation adjustments on the payments, and how long you actually live — each covered in the retirement stage.";
+          (be == null ? "Even at a 30% discount rate the payments are worth more than the lump sum." : be === 0 ? "Even at a 0% discount rate the payments add up to no more than the lump sum, so the lump sum is worth at least as much at any rate." : "Below a " + pct(be * 100, 2) + " rate the payments are worth more; above it, the lump sum is.") + " This ignores taxes, inflation adjustments on the payments, and how long you actually live — each covered in the retirement stage.";
       }
     }
     wire(el, run);
@@ -266,7 +269,7 @@
       b.addEventListener("click", function () { mode = b.dataset.v; el.querySelectorAll(".seg button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); run(); });
     });
     function run() {
-      var e = EP.find(function (x) { return x.k === self(el, "e").value; }), amt = Number(self(el, "amt").value) || 0, s = Number(self(el, "s").value) / 100;
+      var e = EP.find(function (x) { return x.k === self(el, "e").value; }), amt0 = Math.max(0, Number(self(el, "amt").value) || 0), amt = amt0 > 0 ? amt0 : 100000, s = Number(self(el, "s").value) / 100;
       var v = amt, vs = amt, pts = [[e.y0, amt]], ptsS = [[e.y0, amt]], low = amt, lowY = e.y0, rec = null, cpi = 1;
       for (var y = e.y0; y <= e.y1; y++) {
         var i = yIndex(y), r = mixRet(i, s), rs = h.stocks[i];
@@ -284,7 +287,7 @@
       if (s < 1) ser.push({ name: "100% stocks", color: "var(--s5)", data: ptsS, dash: "5 4" });
       INV.lineChart(self(el, "c"), { label: "Value through the episode", height: 260, yFmt: ms, xFmt: yearFmt, zeroBase: false,
         series: ser, marks: [{ x: e.y0, label: "Invest" }] });
-      self(el, "n2").innerHTML = "Values shown at the start of each year (after the prior year's return). " + (mode === "real" ? "Adjusted for inflation. " : "") +
+      self(el, "n2").innerHTML = (amt0 > 0 ? "" : "No amount entered, so $100,000 is shown. ") + "Values shown at the start of each year (after the prior year's return). " + (mode === "real" ? "Adjusted for inflation. " : "") +
         (rec ? "It took until the start of " + rec + " to get back to the starting amount — " + (rec - e.y0) + " years." : low < amt ? "It had not recovered by the end of the episode shown." : "This mix never fell below its starting value at a year-end.");
     }
     wire(el, run);
@@ -361,10 +364,11 @@
       rng(u + "-d", "That stock falls by", 0, 100, 1, 99, "pct") + rng(u + "-o", "Everything else returns", -40, 30, 1, -10, "pct"),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div>');
     function run() {
-      var t = Number(self(el, "t").value) || 0, w = Number(self(el, "w").value) / 100, d = Number(self(el, "d").value) / 100, o = Number(self(el, "o").value) / 100;
-      var one = t * w * (1 - d), rest = t * (1 - w) * (1 + o), after = one + rest;
-      self(el, "k").innerHTML = kpi("Before", money(t)) + kpi("After", money(after), after < t ? "bad" : "good") + kpi("Change", pct((after / t - 1) * 100, 0), after < t ? "bad" : "good");
-      var data = []; for (var k = 0; k <= 100; k += 10) { var a2 = t * (k / 100) * (1 - d) + t * (1 - k / 100) * (1 + o); data.push({ label: k + "%", tip: k + "% in the one stock", y: (a2 / t - 1) * 100, color: k === Math.round(w * 10) * 10 ? "var(--s1)" : undefined }); }
+      var t = Math.max(0, Number(self(el, "t").value) || 0), w = Number(self(el, "w").value) / 100, d = Number(self(el, "d").value) / 100, o = Number(self(el, "o").value) / 100;
+      /* the percentage change does not depend on the amount, so it is computed per dollar */
+      var chg = w * (1 - d) + (1 - w) * (1 + o) - 1, after = t * (1 + chg);
+      self(el, "k").innerHTML = kpi("Before", money(t)) + kpi("After", money(after), chg < 0 ? "bad" : "good") + kpi("Change", pct(chg * 100, 0), chg < 0 ? "bad" : "good");
+      var data = []; for (var k = 0; k <= 100; k += 10) { var c2 = (k / 100) * (1 - d) + (1 - k / 100) * (1 + o) - 1; data.push({ label: k + "%", tip: k + "% in the one stock", y: c2 * 100, color: k === Math.round(w * 10) * 10 ? "var(--s1)" : undefined }); }
       INV.barChart(self(el, "c"), { label: "Portfolio change by concentration", height: 220, xTitle: "Share of savings in the single stock", yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return pct(v, 0) + " for the whole portfolio"; }, data: data, allLabels: true });
     }
     wire(el, run);
@@ -381,14 +385,14 @@
     function run() {
       var P = Number(self(el, "p").value) || 0, E = Number(self(el, "e").value) || 0, D = Number(self(el, "d").value) || 0, r = Number(self(el, "r").value) / 100;
       var pe = E > 0 ? P / E : NaN, ey = P > 0 ? E / P * 100 : NaN, dy = P > 0 ? D / P * 100 : NaN, po = E > 0 ? D / E * 100 : NaN;
-      var g = P > 0 ? (r - D / P) * 100 : NaN;
+      var g = P > 0 && D > 0 ? (r - D / P) * 100 : NaN;
       self(el, "k").innerHTML = kpi("P/E ratio", isFinite(pe) ? pe.toFixed(1) + "×" : "n/a") + kpi("Earnings yield", isFinite(ey) ? pct(ey, 2) : "n/a") +
         kpi("Dividend yield", isFinite(dy) ? pct(dy, 2) : "n/a") + kpi("Payout ratio", isFinite(po) ? pct(po, 0) : "n/a") + kpi("Growth the price implies", isFinite(g) ? pct(g, 1) + "/yr" : "n/a");
       var data = [];
       [10, 15, 20, 25, 30, 40, 50].forEach(function (m) { data.push({ label: m + "×", tip: "P/E of " + m, y: 100 / m, color: isFinite(pe) && Math.abs(pe - m) < 2.5 ? "var(--s1)" : "var(--s6)" }); });
       INV.barChart(self(el, "c"), { label: "Earnings yield at different P/E ratios", height: 200, xTitle: "P/E ratio", yFmt: function (v) { return v.toFixed(0) + "%"; }, tipFmt: function (v) { return "earnings yield " + v.toFixed(1) + "%"; }, data: data, allLabels: true, valueLabels: true });
       self(el, "n2").innerHTML = "Implied growth uses the constant-growth (Gordon) model, P = D<sub>1</sub> ÷ (r − g), rearranged to g ≈ r − D ÷ P, using this year's dividend as an approximation for next year's. " +
-        "At " + money(P) + " a share and a " + pct(r * 100, 1) + " required return, the dividend must grow about <b>" + (isFinite(g) ? pct(g, 1) : "n/a") + "</b> a year forever to justify the price.";
+        (isFinite(g) ? "At " + money(P) + " a share and a " + pct(r * 100, 1) + " required return, the dividend must grow about <b>" + pct(g, 1) + "</b> a year forever to justify the price." : "The implied-growth figure needs a share price and a dividend above zero; the model does not apply to a company that pays no dividend.");
     }
     wire(el, run);
   };
@@ -407,11 +411,12 @@
         fa = Number(self(el, "a").value) / 100, fb = Number(self(el, "b").value) / 100;
       var A = grow(P, C, r, fa, n), B = grow(P, C, r, fb, n), Z = grow(P, C, r, 0, n);
       var gap = A.b - B.b;
-      self(el, "k").innerHTML = kpi("With fee A", money(A.b)) + kpi("With fee B", money(B.b)) + kpi("Difference", money(gap), "bad") + kpi("Share of no-fee result lost to B", pct(Z.b ? (1 - B.b / Z.b) * 100 : 0, 0), "bad");
+      self(el, "k").innerHTML = kpi("With fee A", money(A.b)) + kpi("With fee B", money(B.b)) + kpi("Difference", money(gap), gap > 0 ? "bad" : "") + kpi("Share of no-fee result lost to B", pct(Z.b ? (1 - B.b / Z.b) * 100 : 0, 0), "bad");
       INV.lineChart(self(el, "ch"), { label: "Balance with two fee levels", height: 260, xTitle: "Years", yFmt: ms, xFmt: yearFmt,
         series: [{ name: "Fee A " + pct(fa * 100, 2), color: "var(--s2)", data: A.pts }, { name: "Fee B " + pct(fb * 100, 2), color: "var(--s5)", data: B.pts }, { name: "No fees", color: "var(--s6)", data: Z.pts, dash: "4 4", width: 1.4 }] });
-      self(el, "n2").innerHTML = "Fee B's " + pct(fb * 100, 2) + " a year looks small, but it is charged on the <i>whole balance</i> every year, and the money taken can no longer compound. After " + n +
-        " years it leaves you with <b>" + money(gap) + "</b> less than fee A — more than the " + money(B.paid) + " actually deducted, because the deducted dollars also lost their future growth.";
+      self(el, "n2").innerHTML = gap > 0 ? "Fee B's " + pct(fb * 100, 2) + " a year looks small, but it is charged on the <i>whole balance</i> every year, and the money taken can no longer compound. After " + n +
+        " years it leaves you with <b>" + money(gap) + "</b> less than fee A. Compared with no fees at all, fee B costs " + money(Z.b - B.b) + " — more than the " + money(B.paid) + " actually deducted, because the deducted dollars also lost their future growth."
+        : gap < 0 ? "Fee A is the higher fee here, so fee B ends " + money(-gap) + " ahead after " + n + " years." : "The two fees are equal, so the balances match.";
     }
     wire(el, run);
   };

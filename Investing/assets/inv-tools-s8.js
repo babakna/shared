@@ -147,7 +147,7 @@
         xFmt: function (v) { return (v < 0 ? "−" : "") + ms(Math.abs(v)); }, yFmt: function (v) { return Math.round(v); },
         series: [{ name: "With loss aversion λ = " + lam.toFixed(2), color: "var(--s5)", data: pts }, { name: "No loss aversion (λ = 1)", color: "var(--s6)", data: ref, dash: "5 4", width: 1.6 }],
         dots: [{ x: G, y: vg, color: "var(--s2)", label: "gain", anchor: "end", dx: -8 }, { x: -L, y: vl, color: "var(--s5)", label: "loss", dx: 8, dy: 14 }] });
-      self(el, "n").innerHTML = "A coin flip that wins " + money(G) + " or loses " + money(L) + " has an expected value of " + (G - L >= 0 ? "" : "−") + money(Math.abs(G - L)) +
+      self(el, "n").innerHTML = "A coin flip that wins " + money(G) + " or loses " + money(L) + " has an expected value of " + (G - L >= 0 ? "" : "−") + money(Math.abs(G - L), 0) +
         ". With these settings it feels like <b>" + (net >= 0 ? "+" : "−") + Math.abs(net).toFixed(0) + "</b> units, so a typical person would " + (net >= 0 ? "take it" : "turn it down") +
         ". To accept a 50/50 chance of losing " + money(L) + ", the possible gain would need to be about <b>" + money(need) + "</b> (L × λ<sup>1/α</sup>).";
     }
@@ -291,7 +291,7 @@
       var mk = r.sells.map(function (s) { return { x: s.sold + 1, label: "sold" }; });
       INV.lineChart(self(el, "c"), { label: "Holding versus selling after a bad year", height: 260, xFmt: yearFmt, yFmt: ms, zeroBase: false, log: y1 - y0 > 30,
         series: [{ name: "Held throughout", color: "var(--s2)", data: r.ph }, { name: "Sold after a bad year, bought back later", color: "var(--s5)", data: r.pv }], marks: mk.slice(0, 6) });
-      var txt = r.sells.length ? r.sells.map(function (s) { return "sold at the end of " + s.sold + " after a " + pct(s.ret, 1) + " year" + (s.back ? " and bought back at the end of " + s.back : " and was still out at the end"); }).join("; ") + "." : "";
+      var txt = r.sells.length ? r.sells.map(function (s) { return "sold at the end of " + s.sold + " after a " + pct((s.ret < 0 ? -1 : 1) * Math.round(Math.abs(s.ret) * 10) / 10, 1) + " year" + (s.back ? " and bought back at the end of " + s.back : " and was still out at the end"); }).join("; ") + "." : "";
       self(el, "n").innerHTML = (r.sells.length ? "The seller " + txt + " Years spent out of the market: " + r.yrsOut + ". " : "No calendar year in this window fell far enough to trigger a sale, so the two paths are identical. Try an earlier start, such as 1929, 1973 or 2000. ") +
         (r.sells.length ? (diff > 0 ? "Holding ended <b>" + pct(r.v > 0 ? (r.hold / r.v - 1) * 100 : 0, 0) + "</b> ahead." : diff < 0 ? "Here selling happened to help: the market kept falling after the sale. Such windows exist, but the seller could not have known in advance." : "") : "");
     }

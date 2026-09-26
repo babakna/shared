@@ -45,7 +45,7 @@
   }
   function kpi(k, v, cls) { return '<div class="kpi"><div class="k">' + esc(k) + '</div><div class="v ' + (cls || "") + '">' + v + "</div></div>"; }
   function num(el, id) { var v = Number(self(el, id).value); return isFinite(v) && v > 0 ? v : 0; }
-  function yearFmt(v) { return String(Math.round(v)); }
+  function yearFmt(v) { return Math.abs(v - Math.round(v)) > 1e-9 ? "" : String(Math.round(v)); }
   function fin(x) { return isFinite(x) ? x : 0; }
   function sgnMoney(v) { return (v < 0 ? "−" : "") + money(Math.abs(v)); }
   var RATES = [[10, "10%"], [12, "12%"], [22, "22%"], [24, "24%"], [32, "32%"], [35, "35%"], [37, "37%"]];
@@ -258,7 +258,7 @@
       numf(u + "-arv", "After-repair value (appraisal) ($)", 250000, 1000) + rng(u + "-ltv", "Cash-out refinance loan-to-value", 50, 80, 1, 75, "pct") +
       rng(u + "-rc", "Refinance closing costs, % of new loan", 0, 5, 0.25, 3, "pct") + rng(u + "-r", "Refinance interest rate", 3, 10, 0.125, 7, "pct") +
       numf(u + "-rent", "Monthly rent after rehab ($)", 2200, 25) + rng(u + "-ex", "Operating costs, % of rent (tax, insurance, repairs, vacancy, management)", 20, 60, 1, 40, "pct") +
-      hint("Assumes the purchase and rehab are paid in cash, then refinanced into a 30-year fixed loan. Fannie Mae's 2026 Eligibility Matrix caps cash-out refinances of investment properties at 75% (one unit) and 70% (two to four units), and generally requires six months on title."),
+      hint("Assumes the purchase and rehab are paid in cash, then refinanced into a 30-year fixed loan. Fannie Mae's Eligibility Matrix (August 2026) caps cash-out refinances of investment properties at 75% (one unit) and 70% (two to four units); its Selling Guide generally requires six months on title."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var P = num(el, "p"), rh = num(el, "rh"), cc = num(el, "cc"), hc = num(el, "hc"), arv = num(el, "arv"), ltv = Number(self(el, "ltv").value) / 100, rc = Number(self(el, "rc").value) / 100;
@@ -269,7 +269,7 @@
       var loan10 = arv * 0.9 * ltv * (1 - rc), left10 = cashIn - loan10;
       self(el, "k").innerHTML = kpi("Cash put in", money(cashIn)) + kpi("Cash back at refinance", money(cashOut), "good") +
         kpi(left >= 0 ? "Cash left in the deal" : "Cash pulled out beyond cost", money(Math.abs(left)), left <= 0 ? "good" : "") +
-        kpi("Cash flow per year after the new mortgage", sgnMoney(cfy), cfy >= 0 ? "good" : "bad") + kpi("Debt service coverage", dscr.toFixed(2) + "×", dscr >= 1.2 ? "good" : "bad") + kpi("Cash-on-cash return", coc);
+        kpi("Cash flow per year after the new mortgage", sgnMoney(cfy), cfy >= 0 ? "good" : "bad") + kpi("Debt service coverage", pmt > 0 ? dscr.toFixed(2) + "×" : "no loan", pmt > 0 ? (dscr >= 1.2 ? "good" : "bad") : "") + kpi("Cash-on-cash return", coc);
       INV.barChart(self(el, "ch"), { label: "Cash in and out", height: 220, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return sgnMoney(v); },
         data: [{ label: "Purchase", y: P, color: "var(--s6)" }, { label: "Rehab", y: rh, color: "var(--s6)" }, { label: "Closing + holding", y: cc + hc, color: "var(--s6)" },
           { label: "Refi cash back", y: cashOut, color: "var(--s2)" }, { label: "Left in deal", y: left, color: left > 0 ? "var(--s5)" : "var(--s2)" }] });

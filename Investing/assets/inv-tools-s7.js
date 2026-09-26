@@ -157,7 +157,7 @@
   INV.s7RebSim = rebSim;
   TOOLS.s7Rebal = function (el) {
     var u = uid(el), h = hist();
-    shell(el, "Rebalanced versus drifting: 98 years of history", "Historical data",
+    shell(el, "Rebalanced versus drifting: a backtest on " + h.first + "–" + h.last + " data", "Historical data",
       rng(u + "-s", "Target mix", 0, 100, 5, 60, "stk") +
       sel(u + "-p", "Period", [["1928", "1928–" + h.last + " (all data)"], ["1950", "1950–" + h.last], ["1976", "1976–" + h.last], ["2000", "2000–" + h.last], ["2010", "2010–" + h.last]], "1928") +
       sel(u + "-m", "Rebalancing rule", [["band", "Threshold band, checked each year-end"], ["cal1", "Calendar: every year"], ["cal2", "Calendar: every 2 years"], ["cal3", "Calendar: every 3 years"], ["cal5", "Calendar: every 5 years"], ["never", "Never rebalance (drift)"]], "band") +
@@ -340,7 +340,7 @@
       seg("how", "How the money moves", [["ind", "Check to you (60-day)"], ["dir", "Direct rollover"]]) +
       '<div data-ind>' + rng(u + "-m", "Share of the 20% withheld you replace from savings", 0, 100, 5, 0, "pct") +
       seg("late", "Deposited within 60 days?", [["yes", "Yes"], ["no", "No, missed it"]]) + "</div>" +
-      hint("A plan must withhold 20% of an eligible rollover distribution paid to you (IRS). Any amount not rolled over is taxable, and under age 59½ usually also owes a 10% additional tax. This sketch ignores exceptions, such as leaving an employer in or after the year you turn 55, and state-specific rules."),
+      hint("A plan must withhold 20% of an eligible rollover distribution paid to you (IRS). Any amount not rolled over is taxable, and under age 59½ usually also owes a 10% additional tax (this sketch applies it at ages below 60). It ignores exceptions, such as leaving an employer in or after the year you turn 55, and state-specific rules."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n"></p>');
     function cost(B, a, t, how, m, late) {
       if (how === "dir") return { wh: 0, rolled: B, taxed: 0, cost: 0 };

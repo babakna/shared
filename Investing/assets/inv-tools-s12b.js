@@ -86,8 +86,7 @@
     function run() {
       var V = num(el, "v"), B = num(el, "b"), g = Number(self(el, "g").value) / 100, n = Number(self(el, "n").value), t = Number(self(el, "t").value) / 100;
       var Vn = V * Math.pow(1 + g, n);
-      var gain = 0, loss = 0;
-      if (Vn > B) gain = Vn - B; else if (V < B && Vn < V) loss = V - Vn;
+      var gain = Math.max(0, Vn - B), underwater = V < B;
       var cgGift = gain * t, cgInh = 0;
       var ttGift = est === "yes" ? 0.4 * V : 0, ttInh = est === "yes" ? 0.4 * Vn : 0;
       var totG = cgGift + ttGift, totI = cgInh + ttInh, better = totI <= totG ? "Inherit" : "Gift now";
@@ -97,7 +96,7 @@
         data: [{ label: "Gift: gains tax", y: cgGift, color: "var(--s3)" }, { label: "Gift: gift tax", y: ttGift, color: "var(--s5)" },
           { label: "Inherit: gains tax", y: cgInh, color: "var(--s2)" }, { label: "Inherit: estate tax", y: ttInh, color: "var(--s4)" }] });
       var note = "If the heir receives the asset as a gift and sells it after " + n + " years for " + money(Vn) + ", the taxable gain is " + money(gain) + " and the tax at " + pct(t * 100, 1) + " is <b>" + money(cgGift) + "</b>. Inherited at death, the basis resets to " + money(Vn) + " and a prompt sale owes <b>no</b> capital gains tax.";
-      if (loss > 0) note += " Here the asset is worth less than its basis. A gift carries a loss basis of " + money(V) + " (the value on the gift date), so the heir can deduct " + money(loss) + "; at death the basis steps <i>down</i> and any loss disappears. Selling a loser during life is usually better.";
+      if (underwater) note += " Here the asset is already worth less than the owner's " + money(B) + " basis. The owner's unrealized loss of " + money(B - V) + " cannot pass to anyone: a gift gives the heir a loss basis of only " + money(V) + " (the value on the gift date), and at death the basis steps <i>down</i> to the value then. Selling a loser during life and deducting the loss is usually better.";
       if (est === "yes") note += " With a taxable estate, keeping the asset exposes all of its growth (" + money(Vn - V) + ") to the 40% estate tax, which is why large estates sometimes give appreciating assets away early even at the cost of a lost step-up.";
       self(el, "n2").innerHTML = note;
     }
@@ -188,7 +187,7 @@
       self(el, "n2").innerHTML = (roth ? "A Roth IRA owner is treated as dying before the required beginning date, so there are no annual minimums; qualified withdrawals are tax-free, and leaving money inside the Roth avoids the tax drag it would face outside. " :
         "Taking income in large lumps pushes it into higher brackets; spreading it keeps more at lower rates. ") +
         "After-tax money counts each withdrawal, less its federal tax, reinvested at the growth rate minus the tax drag until the end of year 10. " +
-        (o.after ? "Because the owner died on or after the required beginning date, every plan must take at least the annual minimum in years 1&ndash;9; skipping one triggers a 25% excise tax (10% if corrected in time)." : "No annual minimum applies, but the account must be empty by December 31 of the tenth year after the year of death.");
+        (o.after ? "Because the owner died on or after the required beginning date, every plan must take at least the annual minimum in years 1&ndash;9; skipping one triggers a 25% excise tax (10% if corrected in time)." + (o.ownerAge < 73 ? " Check the owner's age: required distributions now start at 73 (75 for people born in 1960 or later), so an owner who died younger than 73 had usually not reached the required beginning date." : "") : "No annual minimum applies, but the account must be empty by December 31 of the tenth year after the year of death.");
     }
     wire(el, run);
   };
@@ -277,7 +276,7 @@
       rng(u + "-n", "Term", 1, 30, 1, 9, "yr") +
       rng(u + "-r", "Interest rate the family charges", 0, 10, 0.01, 4.52, "pct") +
       rng(u + "-b", "Rate a lender would charge (your estimate)", 0, 12, 0.25, 6.5, "pct") +
-      hint("Applicable federal rates for October 2026, monthly compounding (Rev. Rul. 2026-19): short-term (3 years or less) 4.17%, mid-term (over 3 to 9 years) 4.52%, long-term (over 9 years) 5.10%. Monthly payments, fully amortized. Charging less than the AFR makes the loan a below-market gift loan under IRC 7872 unless an exception applies."),
+      hint("Applicable federal rates for October 2026, monthly compounding (Rev. Rul. 2026-19): short-term (3 years or less) 4.17%, mid-term (over 3 to 9 years) 4.52%, long-term (over 9 years) 5.10%. Monthly payments, fully amortized. Charging less than the AFR makes the loan a below-market gift loan under IRC 7872 unless an exception applies; the up-front gift discounts the payments at the monthly-compounded AFR."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function pay(P, a, n) { var i = a / 100 / 12, m = n * 12; return i === 0 ? P / m : P * i / (1 - Math.pow(1 + i, -m)); }
     function run() {
@@ -286,13 +285,14 @@
       var pm = pay(P, r, n), pmB = pay(P, bk, n), pmA = pay(P, afr, n);
       var intR = pm * n * 12 - P, intB = pmB * n * 12 - P, intA = pmA * n * 12 - P;
       var forgone = Math.max(0, afr - r) / 100 * P;
+      var ia = afr / 100 / 12, pvA = pm * (1 - Math.pow(1 + ia, -n * 12)) / ia, giftUp = r < afr ? Math.max(0, P - pvA) : 0;
       self(el, "k").innerHTML = kpi("AFR for this term", afr.toFixed(2) + "% (" + tier + ")") + kpi("Monthly payment", money(pm, 2)) +
         kpi("Interest paid to the family", money(intR)) + kpi("Saved versus the lender", money(intB - intR), intB >= intR ? "good" : "bad") +
-        kpi("Below-AFR shortfall, year 1", money(forgone), forgone > 0 ? "bad" : "good");
+        kpi("Below-AFR shortfall, year 1", money(forgone), forgone > 0 ? "bad" : "good") + kpi("Gift at the start (term loan)", money(giftUp), giftUp > 0 ? "bad" : "good");
       INV.barChart(self(el, "c"), { label: "Total interest over the loan", height: 220, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return money(v); },
         data: [{ label: "Lender at " + bk.toFixed(2) + "%", y: intB, color: "var(--s5)" }, { label: "AFR " + afr.toFixed(2) + "%", y: intA, color: "var(--s2)" }, { label: "Family at " + r.toFixed(2) + "%", y: intR, color: "var(--s1)" }] });
       self(el, "n2").innerHTML = "At the AFR, the interest stays in the family instead of going to a bank, and the loan is not a gift. " +
-        (forgone > 0 ? "At " + r.toFixed(2) + "%, roughly <b>" + money(forgone) + "</b> of interest a year is forgone; the tax law treats it as a gift from lender to borrower and as interest income to the lender, unless the loan fits an exception: total loans between the two of $10,000 or less (not used to buy income-producing assets), or $100,000 or less, where the imputed interest is capped at the borrower's net investment income and treated as zero if that is $1,000 or less. " : "") +
+        (forgone > 0 ? "At " + r.toFixed(2) + "%, roughly <b>" + money(forgone) + "</b> of interest is forgone in the first year. For income tax, forgone interest is treated as interest the lender receives each year. For gift tax, because this is a term loan, the gift is counted once, when the loan is made: the amount lent minus the present value of the payments at the AFR, about <b>" + money(giftUp) + "</b> here (IRC 7872(b) and (d)(2)); a demand loan instead makes the forgone interest a gift each year. Exceptions: total loans between the two of $10,000 or less (not used to buy income-producing assets), and, for income tax only, loans of $100,000 or less, where the imputed interest is capped at the borrower's net investment income and treated as zero if that is $1,000 or less. " : "") +
         "Put it in writing, set a payment schedule and actually collect: loans that are never enforced tend to be treated as gifts.";
     }
     wire(el, run);
@@ -422,7 +422,7 @@
         kpi("Tax that can be deferred", money(def)) + kpi("Blended interest rate", def > 0 ? pct((two * 0.02 + (def - two) * hi) / def * 100, 2) : pct(0, 2)) + kpi("Total interest", money(totI));
       INV.barChart(self(el, "c"), { label: "Payments on the deferred tax", height: 220, allLabels: true, yFmt: ms, xTitle: "Year after the estate tax due date", tipFmt: function (v) { return money(v); },
         data: rows.map(function (x) { return { label: x.label, tip: x.tip, y: x.y, color: "var(--s1)" }; }) });
-      self(el, "n2").innerHTML = ok ? "Instead of raising " + money(def) + " within nine months of death, perhaps by selling the business, the estate pays only interest for " + (dly - 1) + (dly === 2 ? " year" : " years") + ", then " + k + " annual installments of " + money(def / k) + " starting in year " + dly + ", with interest on the unpaid balance each year. Selling or withdrawing a large part of the business can speed up the remaining tax (IRC 6166(g))."
+      self(el, "n2").innerHTML = ok ? "Instead of raising " + money(def) + " within nine months of death, perhaps by selling the business, the estate pays " + (dly > 1 ? "only interest for " + (dly - 1) + (dly === 2 ? " year" : " years") + ", then " : "") + k + " annual installments of " + money(def / k) + " starting in year " + dly + ", with interest on the unpaid balance each year. Selling or withdrawing a large part of the business can speed up the remaining tax (IRC 6166(g))."
         : "The business must be worth more than 35% of the adjusted gross estate. Here it is " + pct(share * 100, 1) + ", so the estate tax is due in full nine months after death.";
     }
     wire(el, run);

@@ -78,6 +78,8 @@ function ok(c, m) { checks++; if (!c) fail(m); }
         ok(!r.tiny.length, `${tag}: illegible SVG text: ${r.tiny.join(', ')}`);
         if (SHOTS && (w === 1440 || w === 390)) await page.screenshot({ path: path.join(OUT, `${pg.replace('.html', '')}-${w}-t${String(i + 1).padStart(2, '0')}.png`), fullPage: true });
       }
+      const crashed = await page.evaluate(() => [...document.querySelectorAll('[data-tool]')].filter(t => /could not start/i.test(t.innerText)).map(t => t.dataset.tool));
+      ok(!crashed.length, `${pg} @${w}: calculator crashed on load: ${crashed.join(', ')}`);
       const dup = await page.evaluate(() => { const c = {}; document.querySelectorAll('[id]').forEach(e => { c[e.id] = (c[e.id] || 0) + 1; }); return Object.keys(c).filter(k => c[k] > 1); });
       ok(!dup.length, `${pg} @${w}: duplicate element ids (a tool may be writing into the wrong element): ${dup.slice(0, 5).join(', ')}`);
       ok(!errs.length, `${pg} @${w}: errors: ${errs.join(' || ')}`);
@@ -128,7 +130,8 @@ function ok(c, m) { checks++; if (!c) fail(m); }
         const o = t.querySelector('.tool-out'); if (o && !o.querySelector('svg, table, .kpi') && o.innerText.trim().length < 20) kBlank.push(t.dataset.tool + ':empty results');
         t.querySelectorAll('.kpis').forEach(k => { if (!k.children.length) kBlank.push(t.dataset.tool + ':empty kpis'); });
         t.querySelectorAll('.chart').forEach(c => { if (!c.querySelector('svg')) kBlank.push(t.dataset.tool + ':empty chart'); });
-        if (!t.children.length) kBlank.push(t.dataset.tool + ':tool did not render'); }); });
+        if (!t.children.length) kBlank.push(t.dataset.tool + ':tool did not render');
+        if (/could not start/i.test(t.innerText)) kBlank.push(t.dataset.tool + ':tool crashed on load'); }); });
       // tools: push every range to min and max, check for bad output
       let tBad = [];
       panels.forEach((p, i) => { p.querySelectorAll('[data-tool]').forEach(t => { show(i); t.querySelectorAll('input[type=range]').forEach(r => { [r.min, r.max].forEach(v => { r.value = v; r.dispatchEvent(new Event('input')); const tx = t.innerText; if (/NaN|undefined|Infinity/.test(tx)) tBad.push(t.dataset.tool + ':' + r.id + '=' + v); }); }); t.querySelectorAll('select').forEach(s => { [...s.options].forEach(o => { s.value = o.value; s.dispatchEvent(new Event('input')); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':' + s.id + '=' + o.value); }); }); t.querySelectorAll('.seg button').forEach(b => { b.click(); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':seg'); }); t.querySelectorAll('input[type=number]').forEach(n => { n.value = '0'; n.dispatchEvent(new Event('input')); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':' + n.id + '=0'); n.value = ''; n.dispatchEvent(new Event('input')); if (/NaN|undefined|Infinity/.test(t.innerText)) tBad.push(t.dataset.tool + ':' + n.id + '=blank'); }); }); });
@@ -143,6 +146,13 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       out.end = document.querySelectorAll('.tab')[panels.length - 1].getAttribute('aria-selected') === 'true';
       // resources rendered
       out.res = document.querySelectorAll('[data-resources] .res').length;
+      // navigation guide: breadcrumb, unified Previous/Next, map search, back-to-top floater
+      show(panels.length - 1);
+      out.navLast = /Next module|Course home/.test(document.querySelector('.guide [data-step="1"]').textContent);
+      out.navCrumb = /Tab \d+ of \d+/.test(document.querySelector('.guide [data-crumb-tab]').textContent);
+      show(0);
+      out.navFirst = /Previous module|Previous/.test(document.querySelector('.guide [data-step="-1"]').textContent);
+      out.floater = !!document.querySelector('.to-top');
       // theme
       document.querySelector('[data-theme-btn]').click(); out.dark = document.documentElement.dataset.theme === 'dark'; document.querySelector('[data-theme-btn]').click();
       return out;
@@ -160,6 +170,7 @@ function ok(c, m) { checks++; if (!c) fail(m); }
     ok(res.arrow && res.end, `${tag}: keyboard tabs arrow=${res.arrow} end=${res.end}`);
     ok(res.res > 0, `${tag}: no resources rendered`);
     ok(res.dark, `${tag}: theme toggle`);
+    ok(res.navLast && res.navCrumb && res.navFirst && res.floater, `${tag}: navigation guide last=${res.navLast} crumb=${res.navCrumb} first=${res.navFirst} floater=${res.floater}`);
   }
   // glossary search and resources filters
   if (!ONLY) {

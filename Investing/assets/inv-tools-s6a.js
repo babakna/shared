@@ -109,7 +109,7 @@
       var data = []; for (var j = 0; j <= k; j++) { data.push({ label: String(j), tip: j + " of " + k + " years beaten", y: N * binom(k, j) * Math.pow(p, j) * Math.pow(1 - p, k - j), color: j === k ? "var(--s2)" : "var(--s6)" }); }
       INV.barChart(self(el, "ch"), { label: "Expected number of funds by years beaten", height: 220, allLabels: true, xTitle: "Years beaten (out of " + k + ")", yFmt: function (v) { return v >= 100 ? Math.round(v).toLocaleString() : v.toFixed(v >= 10 ? 0 : 1); }, data: data });
       self(el, "t").innerHTML = "Out of " + N.toLocaleString() + " funds with no skill at all, about <b>" + (all >= 10 ? Math.round(all).toLocaleString() : all.toFixed(1)) + "</b> would beat the benchmark " + k + " year" + (k === 1 ? "" : "s") + " in a row by chance. " +
-        "A winning streak is therefore weak evidence of skill unless it is far longer, or far more common, than chance predicts. S&amp;P's Persistence Scorecard finds real fund streaks are usually <i>rarer</i> than this coin-flip benchmark.";
+        "A winning streak is therefore weak evidence of skill unless it is far longer, or far more common, than chance predicts. In S&amp;P's Year-End 2025 Persistence Scorecard, only 4.5% of top-half large-cap funds stayed in the top half four more years, fewer than the 6.25% a coin flip predicts, and no top-quartile large-cap fund stayed in the top quartile.";
     }
     wire(el, run);
   };
@@ -150,7 +150,7 @@
       note("Comparison: the same mix at the Investment Company Institute's 2025 asset-weighted averages for all equity mutual funds (0.40%) and bond mutual funds (0.36%). Growth assumes 6% a year before costs, no additions."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
-      var V = num(el, "v"), s = num(el, "s") / 100, i = num(el, "i") / 100, eu = num(el, "eu"), ei = num(el, "ei"), eb = num(el, "eb"), n = num(el, "y");
+      var V = Math.max(0, num(el, "v")), s = num(el, "s") / 100, i = num(el, "i") / 100, eu = num(el, "eu"), ei = num(el, "ei"), eb = num(el, "eb"), n = num(el, "y");
       var wU = s * (1 - i), wI = s * i, wB = 1 - s;
       var er = wU * eu + wI * ei + wB * eb, erC = s * 0.40 + wB * 0.36;
       var a = [[0, V]], b = [[0, V]], va = V, vb = V;
@@ -180,12 +180,13 @@
       var net = a - f, ir = net / te, p = ncdf(ir * Math.sqrt(y));
       var need = Math.abs(net) < 0.01 ? null : Math.pow(2 / Math.abs(ir), 2);
       self(el, "k").innerHTML = kpi("Edge after the fee", pct(net, 2), net > 0 ? "good" : "bad") + kpi("Information ratio", ir.toFixed(2)) +
-        kpi("Chance of beating the index over " + y + " yr", pct(p * 100, 0), p >= 0.5 ? "good" : "bad") + kpi("Years of data to prove it", need == null ? "Never" : need > 999 ? "999+" : Math.round(need).toLocaleString());
+        kpi("Chance of beating the index over " + y + " yr", pct(p * 100, 0), p >= 0.5 ? "good" : "bad") + kpi("Years of data to detect the edge", need == null ? "Never" : need > 9999 ? "9,999+" : Math.round(need).toLocaleString());
       var pts = []; for (var t = 1; t <= 40; t++) pts.push([t, ncdf(ir * Math.sqrt(t)) * 100]);
       INV.lineChart(self(el, "ch"), { label: "Chance of beating the index by holding period", height: 230, yMin: 0, yMax: 100, xTitle: "Years held", yTitle: "Chance of ending ahead (%)", xFmt: yearFmt, yFmt: function (v) { return Math.round(v) + "%"; },
         series: [{ name: "Chance of beating the index", color: net > 0 ? "var(--s2)" : "var(--s5)", data: pts }], dots: [{ x: y, y: p * 100, label: pct(p * 100, 0), color: "var(--s1)" }] });
-      self(el, "n").innerHTML = "The information ratio (edge after fees ÷ tracking error) is " + ir.toFixed(2) + ". To show a real edge with the usual statistical test (a t-statistic of 2), you would need about " +
-        (need == null ? "an infinite number of" : Math.round(need).toLocaleString()) + " years of results: (2 ÷ " + Math.abs(ir).toFixed(2) + ")². " +
+      self(el, "n").innerHTML = "The information ratio (edge after fees ÷ tracking error) is " + ir.toFixed(2) + ". " +
+        (need == null ? "With no edge after fees there is nothing for any number of years of results to detect. " :
+          "To show " + (net > 0 ? "a real edge" : "that the fund really trails") + " with the usual statistical test (a t-statistic of 2), you would need about " + Math.round(need).toLocaleString() + " years of results: (2 ÷ " + Math.abs(ir).toFixed(2) + ")². ") +
         (net <= 0 ? "Because the fee is at least as large as the edge, time works <b>against</b> you: the longer you hold, the more likely you trail." : "A positive edge helps more the longer you hold, but noise dominates over any period an investor can wait.");
     }
     wire(el, run);
@@ -227,7 +228,7 @@
       note("Income-only: spend the dividends and never sell; the portfolio grows at total return minus yield, and dividends grow with it. Total-return: withdraw the inflation-adjusted amount you need, selling shares when dividends fall short. Before taxes; both portfolios earn the same total return, as Miller and Modigliani's reasoning implies."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
-      var V = num(el, "v"), W = num(el, "w"), r = num(el, "r") / 100, y = num(el, "y") / 100, inf = num(el, "i") / 100, n = num(el, "n");
+      var V = Math.max(0, num(el, "v")), W = Math.max(0, num(el, "w")), r = num(el, "r") / 100, y = num(el, "y") / 100, inf = num(el, "i") / 100, n = num(el, "n");
       var va = V, vb = V, inc = [], need = [], wd = [], short = 0, depleted = null;
       for (var t = 1; t <= n; t++) {
         var nd = W * Math.pow(1 + inf, t - 1), div = va * y;
@@ -241,7 +242,7 @@
       INV.lineChart(self(el, "ch"), { label: "Spending each year under two approaches", height: 250, xTitle: "Year of retirement", xFmt: yearFmt, yFmt: ms,
         series: [{ name: "Dividends (income-only)", color: "var(--s3)", data: inc }, { name: "Withdrawal (total-return)", color: "var(--s2)", data: wd }, { name: "What you need", color: "var(--s6)", data: need, dash: "5 4", width: 1.6 }] });
       self(el, "n2").innerHTML = "At a " + pct(y * 100, 1) + " yield, dividends cover " + pct(W > 0 ? Math.min(999, d1 / W * 100) : 0, 0) + " of the first year's need. " +
-        "The income-only approach lets the market decide what you spend; the total-return approach lets you decide and sells shares to fill the gap. " +
+        "Where the withdrawal line and the dashed need line coincide, the total-return portfolio is paying exactly what you need. The income-only approach lets the market decide what you spend; the total-return approach lets you decide and sells shares to fill the gap. " +
         (depleted ? "At this spending level the total-return portfolio runs out in year " + depleted + "; spending, not dividend policy, is the real risk." : "Neither choice changes the total return; it only changes who sets your paycheck.");
     }
     wire(el, run);
@@ -249,12 +250,12 @@
 
   /* ---------- 8. Factor explorer (INV-048, INV-046) ---------- */
   var FACT = {
-    mkt: { n: "Market (stocks minus T-bills)", o: "ff", k: "mkt", sub: "rf", y0: 1927 },
-    smb: { n: "Size: small minus big (SMB)", o: "ff", k: "smb", y0: 1927 },
-    hml: { n: "Value: high minus low book-to-market (HML)", o: "ff", k: "hml", y0: 1927 },
-    mom: { n: "Momentum: past winners minus losers", o: "ff", k: "mom", y0: 1927 },
-    rmw: { n: "Profitability: robust minus weak (RMW)", o: "ff5", k: "rmw", y0: 1964 },
-    cma: { n: "Investment: conservative minus aggressive (CMA)", o: "ff5", k: "cma", y0: 1964 }
+    mkt: { n: "Market minus T-bills", o: "ff", k: "mkt", sub: "rf", y0: 1927 },
+    smb: { n: "Size (SMB)", o: "ff", k: "smb", y0: 1927 },
+    hml: { n: "Value (HML)", o: "ff", k: "hml", y0: 1927 },
+    mom: { n: "Momentum", o: "ff", k: "mom", y0: 1927 },
+    rmw: { n: "Profitability (RMW)", o: "ff5", k: "rmw", y0: 1964 },
+    cma: { n: "Investment (CMA)", o: "ff5", k: "cma", y0: 1964 }
   };
   function factorSeries(key, a, b) {
     var f = FACT[key], o = D[f.o];
@@ -269,10 +270,11 @@
     shell(el, "Factor explorer: premiums and droughts", "Historical data",
       sel(u + "-f", "Factor", Object.keys(FACT).map(function (k) { return [k, FACT[k].n]; }), start) +
       rng(u + "-a", "First year", 1927, last - 10, 1, 1927, "y") +
-      note("Each factor is the yearly return of a long-short portfolio (the first group minus the second), US stocks, before costs and taxes. Kenneth R. French Data Library. The market factor is stocks minus one-month Treasury bills. The growth line compounds each year's premium, which no one can hold directly without shorting."),
+      note("SMB: small minus big companies. HML: high minus low book-to-market (value minus growth). Momentum: past winners minus losers. RMW: robust minus weak profitability. CMA: conservative minus aggressive investment. Each factor is the yearly return of a long-short portfolio (the first group minus the second), US stocks, before costs and taxes. Kenneth R. French Data Library. The market factor is stocks minus one-month Treasury bills. The growth line compounds each year's premium, which no one can hold directly without shorting."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><div id="' + u + '-bars"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
-      var key = self(el, "f").value, f = FACT[key] || FACT.hml, a = Math.max(Number(self(el, "a").value), f.y0), r = factorSeries(key, a, last);
+      var key = self(el, "f").value, f = FACT[key] || FACT.hml, ai = self(el, "a"), a = Math.max(Number(ai.value), f.y0), r = factorSeries(key, a, last);
+      if (Number(ai.value) < f.y0) { ai.value = a; fmtOut(ai); }
       var g = 1, peak = 1, under = 0, mu = 0, pts = [[a, 1]], worst = Infinity, wy = a, pos = 0;
       r.forEach(function (x, i) { g *= 1 + x / 100; if (g >= peak) { peak = g; under = 0; } else { under++; mu = Math.max(mu, under); } pts.push([a + i + 1, g]); if (x < worst) { worst = x; wy = a + i; } if (x > 0) pos++; });
       var neg = 0, win = 0; for (var i = 0; i + 10 <= r.length; i++) { win++; if (cagr(r.slice(i, i + 10)) < 0) neg++; }

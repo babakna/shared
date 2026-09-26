@@ -63,7 +63,7 @@
     for (var i = 0; i < RATES.length; i++) { var hi = i < b.length ? b[i] : Infinity; if (ti > lo) t += (Math.min(ti, hi) - lo) * RATES[i]; lo = hi; }
     return t;
   }
-  function margRate(ti, st) { var b = BR[st]; for (var i = 0; i < b.length; i++) if (ti <= b[i]) return RATES[i]; return 0.37; }
+  function margRate(ti, st) { if (!(ti > 0)) return 0; var b = BR[st]; for (var i = 0; i < b.length; i++) if (ti <= b[i]) return RATES[i]; return 0.37; }
   /* Taxable part of Social Security, 26 U.S.C. 86 (joint: $32,000 / $44,000; others: $25,000 / $34,000) */
   function ssTaxable(ss, otherAgi, joint) {
     var base = joint ? 32000 : 25000, adj = joint ? 44000 : 34000, pi = otherAgi + ss / 2;
@@ -151,7 +151,8 @@
         kpi("Monthly saving needed", m0(monthly), "good") + kpi("Years to save", String(n));
       INV.lineChart(self(el, "c"), { label: "College fund balance", height: 250, xTitle: "Child's age", yFmt: ms, xFmt: function (v) { return String(Math.round(v)); },
         series: [{ name: "Fund balance", color: "var(--s2)", data: pts, area: true }, { name: "Money you put in", color: "var(--s3)", data: cont, dash: "5 4" }] });
-      self(el, "n").innerHTML = "Saving " + money(monthly) + " a month from age " + age + " to 18 builds the " + money(need) +
+      self(el, "n").innerHTML = (gap > 0 ? "Saving " + money(monthly) + " a month from age " + age + " to 18 builds the " + money(need) :
+          "The " + money(have) + " already saved, invested at " + pct(r * 100, 1) + " a year, grows to about " + money(fvHave) + " by 18 and already covers the " + money(need)) +
         " needed to pay " + Math.round(cov * 100) + "% of four years of costs, with the unspent balance still invested during college. Grants, scholarships, income during college and loans cover the rest. Assumptions are yours; results are not predictions.";
     }
     wire(el, run);
@@ -213,7 +214,7 @@
         series: [{ name: "Savings left", color: "var(--s5)", data: pts, area: true }] });
       self(el, "n").innerHTML = (t === "home" ? h + " hours a week at $35 an hour is " : "This setting costs ") + money(c0) + " in the first year. " +
         (done ? "With " + money(inc) + " a year of income toward care, " + money(sv) + " of savings runs out after about " + yrs.toFixed(1) + " years. Medicare does not pay for this kind of long-term custodial care; Medicaid may, once savings are spent down to your state's limit." :
-          "Income covers most of the cost, so savings last more than 30 years at these inputs.");
+          "At these inputs, income and savings together cover more than 30 years of care.");
     }
     wire(el, run);
   };
@@ -231,7 +232,7 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var gi = num(el, "gi"), tot = num(el, "tot"), you = num(el, "you"), fs = self(el, "fs").value, home = self(el, "home").value === "y";
-      var incOk = gi < 5300, supOk = tot > 0 && you > tot / 2, share = tot > 0 ? you / tot * 100 : 0, ok = incOk && supOk;
+      var badSup = you > tot, incOk = gi < 5300, supOk = tot > 0 && you > tot / 2 && !badSup, share = tot > 0 ? you / tot * 100 : 0, ok = incOk && supOk;
       var hoh = ok && fs === "single" && home;
       self(el, "k").innerHTML = kpi("Gross income test", incOk ? "Passes" : "Fails", incOk ? "good" : "bad") + kpi("Your share of support", pct(share, 0), supOk ? "good" : "bad") +
         kpi("Dependent?", ok ? "Likely yes" : "No", ok ? "good" : "bad") + kpi("Credit for other dependents", ok ? "$500" : "$0");
@@ -239,7 +240,7 @@
         data: [{ label: "You provided", y: you, color: supOk ? "var(--s2)" : "var(--s5)" }, { label: "Half of total support", y: tot / 2, color: "var(--s6)" }, { label: "Parent's gross income", y: gi, color: incOk ? "var(--s1)" : "var(--s5)" }, { label: "Income limit", y: 5300, color: "var(--s6)" }] });
       self(el, "n").innerHTML = ok ? "The parent appears to be your qualifying relative, which can bring the $500 credit for other dependents (subject to income limits)" + (hoh ? " and, because you are unmarried and paid more than half the cost of the parent's main home, head-of-household filing status, with its larger standard deduction ($24,150 versus $16,100 for 2026) and wider brackets." : ".") +
         " You may also count the parent's medical costs you paid if you itemize." :
-        (!incOk ? "The parent's taxable gross income is at or above $5,300, so they cannot be your dependent this year. " : "") + (!supOk ? "You provided half or less of their total support. If siblings together provide more than half, a multiple support agreement can let one of you claim the parent." : "");
+        (!incOk ? "The parent's taxable gross income is at or above $5,300, so they cannot be your dependent this year. " : "") + (badSup ? "The support you provided cannot be more than the parent's total support; enter the total from every source, including the parent's own money." : !supOk ? "You provided half or less of their total support. If siblings together provide more than half, a multiple support agreement can let one of you claim the parent." : "");
     }
     wire(el, run);
   };
@@ -262,12 +263,13 @@
       var incB = ss2 + other, incA = ss1 + other;
       var pA = old ? partB(after.agi, false) * 12 : 0;
       self(el, "k").innerHTML = kpi("Tax as a couple", m0(before.tax)) + kpi("Tax as a survivor", m0(after.tax), after.tax > before.tax ? "bad" : "") +
-        kpi("Income change", pct(incB ? (incA / incB - 1) * 100 : 0, 0)) + kpi("Tax change", before.tax > 0 ? pct((after.tax / before.tax - 1) * 100, 0) : (after.tax > 0 ? "+" + m0(after.tax) : "$0"), after.tax > before.tax ? "bad" : "good") +
+        kpi("Income change", pct(incB ? (incA / incB - 1) * 100 : 0, 0)) + kpi("Tax change", before.tax > 0 ? (after.tax > before.tax ? "+" : "") + pct((after.tax / before.tax - 1) * 100, 0) : (after.tax > 0 ? "+" + m0(after.tax) : "$0"), after.tax > before.tax ? "bad" : "good") +
         kpi("Survivor's marginal rate", Math.round(after.marg * 100) + "%");
       INV.barChart(self(el, "c"), { label: "Income and tax before and after", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return ms(v); }, tipFmt: function (v) { return money(v); },
         data: [{ label: "Income, couple", y: incB, color: "var(--s1)" }, { label: "Income, survivor", y: incA, color: "var(--s1)", dim: true }, { label: "Tax, couple", y: before.tax, color: "var(--s5)" },
           { label: "Tax, survivor", y: after.tax, color: "var(--s5)", dim: true }, { label: "Survivor's tax if joint", y: sameJoint.tax, color: "var(--s6)" }] });
-      self(el, "n").innerHTML = "The household's income falls " + pct(incB ? (1 - incA / incB) * 100 : 0, 0) + ", but tax " + (after.tax >= before.tax ? "rises" : "falls only") + " from " + money(before.tax) + " to " + money(after.tax) +
+      var incDrop = incB ? 1 - incA / incB : 0, taxDrop = before.tax > 0 ? 1 - after.tax / before.tax : 0;
+      self(el, "n").innerHTML = "The household's income " + (incDrop >= 0 ? "falls " : "rises ") + pct(Math.abs(incDrop) * 100, 0) + (Math.abs(after.tax - before.tax) < 0.5 ? ", and tax stays at " + money(after.tax) : (after.tax > before.tax ? ", but tax rises" : taxDrop < incDrop ? ", but tax falls only" : ", and tax falls") + " from " + money(before.tax) + " to " + money(after.tax)) +
         ". On the very same survivor income, a joint return would owe " + money(sameJoint.tax) + ": the single brackets, the smaller standard deduction and the lower Social Security thresholds explain the difference of " + money(after.tax - sameJoint.tax) + ". " +
         (old ? "Medicare Part B for 2026: " + money(pA / 12, 2) + " a month for the survivor on this income (" + (partB(after.agi, false) > 202.9 ? "includes an income-related surcharge" : "standard premium") + "). IRMAA uses the tax return from two years earlier; the death of a spouse is a life-changing event you can report on Form SSA-44." : "");
     }

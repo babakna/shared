@@ -74,7 +74,7 @@
   <div class="def"><div class="def-h"><b>Active share</b></div>
     <div class="def-r"><div>What it is</div><div>The percentage of a portfolio that differs from its benchmark. Computed as half the sum of the absolute differences between each holding's weight in the fund and in the index. 0% is an index fund; 100% shares nothing with it.</div></div>
     <div class="def-r"><div>Used for</div><div>Measuring how much actual management a fund delivers, separately from how its returns turned out.</div></div>
-    <div class="def-r you"><div>What it means for you</div><div>A fund with a 1% fee and 30% active share charges you roughly 2.7% a year for the part that is actually managed (Closet indexing tab).</div></div></div>
+    <div class="def-r you"><div>What it means for you</div><div>A fund with a 0.85% fee and 30% active share charges you roughly 2.7% a year for the part that is actually managed (Closet indexing tab).</div></div></div>
   <div class="formula">Active share = &frac12; &times; &Sigma; | weight in fund &minus; weight in index |</div>
   <div class="def"><div class="def-h"><b>Tracking error</b></div>
     <div class="def-r"><div>What it is</div><div>The standard deviation of the difference between a fund's return and its benchmark's, year by year. A fund with 5% tracking error typically beats or trails the index by up to about 5 points in a given year.</div></div>
@@ -92,7 +92,7 @@
   <div data-tool="s6aSpiva" data-cat="20"></div>
   <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Category (benchmark)</th><th class="r">3 years</th><th class="r">5 years</th><th class="r">10 years</th><th class="r">20 years</th></tr></thead>
   <tbody>
-    <tr><td>Small-cap value (S&amp;P SmallCap 600 Value)</td><td class="r">46.0%</td><td class="r pos-t">30.0%</td><td class="r">79.0%</td><td class="r">95.7%</td></tr>
+    <tr><td>Small-cap value (S&amp;P SmallCap 600 Value)</td><td class="r pos-t">46.0%</td><td class="r pos-t">30.0%</td><td class="r">79.0%</td><td class="r">95.7%</td></tr>
     <tr><td>International small-cap (S&amp;P Developed Ex-U.S. SmallCap)</td><td class="r">62.8%</td><td class="r">61.5%</td><td class="r">76.5%</td><td class="r">80.4%</td></tr>
     <tr><td>Emerging markets (S&amp;P Emerging Plus)</td><td class="r">63.4%</td><td class="r">71.4%</td><td class="r">84.9%</td><td class="r">90.9%</td></tr>
     <tr><td>General municipal bond (S&amp;P National AMT-Free Municipal Bond)</td><td class="r pos-t">37.5%</td><td class="r">77.1%</td><td class="r">75.9%</td><td class="r">84.8%</td></tr>
@@ -299,7 +299,7 @@
   <div class="lens">
     <div class="lens-row" data-hh="maya"><div><b>No reason yet.</b> Maya's money is in a 401(k), where taxes are deferred and the plan's index or target-date fund is cheapest. Active management offers her nothing an index fund does not.</div></div>
     <div class="lens-row" data-hh="rivera"><div><b>Check for closet indexing.</b> If any of their six large-cap funds are active, compare their holdings and fees with the plan's index fund. Six overlapping funds are likely a lot of index exposure at active prices.</div></div>
-    <div class="lens-row" data-hh="jordan"><div><b>Customize cheaply.</b> Jordan's real need is reducing employer and industry risk. Selling the ESPP shares on a schedule does most of the work; a direct-indexing account is optional.</div></div>
+    <div class="lens-row" data-hh="jordan"><div><b>Customize cheaply.</b> Jordan's real need is reducing employer and industry risk. Selling the employee stock purchase plan (ESPP) shares on a schedule does most of the work; a direct-indexing account is optional.</div></div>
     <div class="lens-row" data-hh="harper"><div><b>The strongest case.</b> A large taxable account with embedded gains, a concentration to unwind and high income: tax-aware management can be worth paying for, if its price is judged separately from the 1.25% advisory fee.</div></div>
     <div class="lens-row" data-hh="ruth"><div><b>Keep the safe part simple.</b> Ruth's money is in a traditional IRA and CDs, so harvesting is irrelevant. For her bonds, an index fund's predictability is worth more than a manager's chance of a small win.</div></div>
   </div>
@@ -413,7 +413,7 @@ INV.ready(function () {
   var S = INV.s6a, find = function (n) { return S.spiva.filter(function (c) { return c.n === n; })[0]; };
   var cats = [["Large-cap", "All Large-Cap Funds"], ["Small-cap", "All Small-Cap Funds"], ["Intl small", "International Small-Cap Funds"], ["Emerging", "Emerging Markets Funds"], ["Munis", "General Municipal Debt Funds"], ["IG bonds", "Investment-Grade Intermediate Funds"]], d1 = [];
   cats.forEach(function (c) { var r = find(c[1]); d1.push({ label: c[0] + " 5y", tip: c[1] + ", 5 years", y: r.u[3], color: "var(--s3)" }); d1.push({ label: c[0] + " 20y", tip: c[1] + ", 20 years", y: r.u[6], color: "var(--s5)" }); });
-  INV.barChart(document.getElementById("f451"), { label: "Underperformance 5 vs 20 years", height: 240, allLabels: true, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return v.toFixed(1) + "% trailed"; }, data: d1 });
+  INV.barChart(document.getElementById("f451"), { label: "Underperformance 5 vs 20 years", height: 240, allLabels: true, legend: [{ name: "5 years", color: "var(--s3)" }, { name: "20 years", color: "var(--s5)" }], yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return v.toFixed(1) + "% trailed"; }, data: d1 });
   var g = document.getElementById("di"), rs = [22, -8, 15, 31, -12, 9, -4, 18, 35, -6], h = "";
   rs.forEach(function (r, i) { var x = 20 + i * 42, base = 110, hgt = Math.abs(r) * 1.6; h += '<rect x="' + x + '" y="' + (r >= 0 ? base - hgt : base) + '" width="30" height="' + hgt + '" rx="4" style="fill:' + (r >= 0 ? "var(--s2)" : "var(--s5)") + '"/>';
     h += '<text x="' + (x + 15) + '" y="' + (r >= 0 ? base - hgt - 5 : base + hgt + 13) + '" text-anchor="middle" class="svg-t" font-size="11" font-weight="700">' + (r > 0 ? "+" : "") + r + "%</text>"; });

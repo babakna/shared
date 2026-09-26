@@ -54,8 +54,8 @@ Kowalski (68, widowed retiree). Their data lives in `assets/inv.js` (`HOUSEHOLDS
 | File | What it is |
 |---|---|
 | `index.html` | Landing page: start-here paths by audience, one tab per stage, progress |
-| `glossary.html` | 1,014 terms across the whole curriculum; each has what it is, what it is used for, and what it means for you; search, topic and level filters |
-| `resources.html` | 374 curated resources: YouTube channels and podcasts, official sources, free tools, data, books, research, and Babak's tools; filter by kind, level and stage |
+| `glossary.html` | 1,008 terms across the whole curriculum; each has what it is, what it is used for, and what it means for you; search, topic and level filters |
+| `resources.html` | 373 curated resources: YouTube channels and podcasts, official sources, free tools, data, books, research, and Babak's tools; filter by kind, level and stage |
 | `tools.html` | Stage 1's 13 calculators embedded, a directory of the other 160 by stage, Babak's planning tools and official calculators |
 | `assets/inv.css` | Design system (light by default, dark mode) |
 | `assets/inv.js` | Engine: course registry, tabs, journey bar, help, quiz, decisions, myths, exercises, worksheets, glossary popovers, resources, SVG charts |
@@ -96,7 +96,7 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The V1.0 run: **36,424 checks, 0 failures** across 109 pages (105 modules, landing page,
+The V1.0 run after the full audit: **36,965 checks, 0 failures** across 109 pages (105 modules, landing page,
 tools, glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
@@ -111,10 +111,18 @@ screenshots were reviewed by eye at 1440 and 390 px and in dark mode.
 ### V1.0 (September 2026)
 
 - Release of the full section: landing page, all 105 modules across 15 stages (including the
-  capstone), 1,013-term glossary, 374-entry resource library, tools hub with 173 calculators,
+  capstone), 1,008-term glossary, 373-entry resource library, tools hub with 173 calculators,
   and the verification harness.
 - A household consistency pass aligned shared figures (Social Security amounts, essential
   spending, cash balances) across modules.
+- Full audit of all 105 modules: facts checked line by line against primary sources (2026 IRS,
+  SSA and CMS figures, statutes, research papers), every calculation recomputed with the pages'
+  own tool code, calculators stress-tested at blank, zero and extreme inputs, and every tab
+  reviewed on screen at 1440 and 390 px. Wrong rules, figures and cross-references corrected;
+  calculator bugs fixed (senior-deduction phase-out, lowest-tax lot selection, Medicare surcharge
+  timing, runway and longevity horizons, RMD and charitable-distribution caps).
+- Navigation: the active tab scrolls into view, crowded axis labels thin out on narrow screens,
+  formulas wrap, and on phones the module header shrinks to its title after the first tab.
 
 ## Author
 

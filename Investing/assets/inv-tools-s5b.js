@@ -75,7 +75,7 @@
     amtEx: { single: 90100, mfj: 140200, hoh: 90100 }, amtPh: { single: 500000, mfj: 1000000, hoh: 500000 }, amt28: 244500
   };
   /* IRS Publication 590-B, Appendix B, Table III (Uniform Lifetime) */
-  var ULT = { 72: 27.4, 73: 26.5, 74: 25.5, 75: 24.6, 76: 23.7, 77: 22.9, 78: 22.0, 79: 21.1, 80: 20.2, 81: 19.4, 82: 18.5, 83: 17.7, 84: 16.8, 85: 16.0, 86: 15.2, 87: 14.4, 88: 13.7, 89: 12.9, 90: 12.2, 91: 11.5, 92: 10.8, 93: 10.1, 94: 9.5, 95: 8.9, 96: 8.4 };
+  var ULT = { 72: 27.4, 73: 26.5, 74: 25.5, 75: 24.6, 76: 23.7, 77: 22.9, 78: 22.0, 79: 21.1, 80: 20.2, 81: 19.4, 82: 18.5, 83: 17.7, 84: 16.8, 85: 16.0, 86: 15.2, 87: 14.4, 88: 13.7, 89: 12.9, 90: 12.2, 91: 11.5, 92: 10.8, 93: 10.1, 94: 9.5, 95: 8.9, 96: 8.4, 97: 7.8, 98: 7.3, 99: 6.8, 100: 6.4 };
   function ordTax(ti, fs) {
     var b = TX.brk[fs], t = 0, lo = 0;
     for (var i = 0; i < b.length; i++) { var hi = b[i][0]; if (ti > lo) t += (Math.min(ti, hi) - lo) * b[i][1]; lo = hi; }
@@ -96,7 +96,8 @@
      salt, mort (mortgage interest), cash (cash gifts to public charities), prop (appreciated-stock gifts at value),
      daf (true if the gifts go to a donor-advised fund), itemize ('auto' | 'no') */
   function fed(p) {
-    var fs = p.fs || "single", ord = p.ord || 0, qd = p.qd || 0, ss = p.ss || 0, n65 = p.n65 || 0, year = p.year || 2026;
+    var fs = p.fs || "single", ord = p.ord || 0, qd = p.qd || 0, ss = p.ss || 0, year = p.year || 2026;
+    var n65 = Math.max(0, Math.min(p.n65 || 0, fs === "mfj" ? 2 : 1)); /* only a joint return can have two people aged 65+ */
     var tss = taxableSS(ss, ord + qd + (p.exempt || 0), fs);
     var agi = ord + qd + tss;
     var stdd = TX.std[fs] + n65 * TX.add65[fs];
@@ -106,9 +107,9 @@
     var cashAllowed = Math.min(p.cash || 0, 0.6 * agi), propAllowed = Math.min(p.prop || 0, 0.3 * agi, Math.max(0, 0.6 * agi - cashAllowed));
     var charity = Math.max(0, cashAllowed + propAllowed - 0.005 * agi);
     var item = Math.min(p.salt || 0, saltCap) + (p.mort || 0) + charity;
-    var useItem = p.itemize !== "no" && item > stdd;
-    var ded = useItem ? item : stdd;
-    if (!useItem && !p.daf) ded += Math.min(p.cash || 0, TX.nonItem[fs]);
+    var nonItemCash = p.daf ? 0 : Math.min(p.cash || 0, TX.nonItem[fs]); /* section 170(p): cash gifts, not to donor-advised funds, for non-itemizers from 2026 */
+    var useItem = p.itemize !== "no" && item > stdd + nonItemCash;
+    var ded = useItem ? item : stdd + nonItemCash;
     var senior = year <= 2028 ? n65 * Math.max(0, TX.senior - 0.06 * Math.max(0, agi - TX.seniorPh[fs])) : 0;
     var ti0 = Math.max(0, agi - ded - senior);
     if (useItem) { /* section 68 as amended: reduce itemized deductions by 2/37 of the lesser of the deductions or the excess over the 37% bracket start */
@@ -204,7 +205,7 @@
       numf(u + "-l", "Loss you harvest ($)", 20000, 500) + sel(u + "-lt", "The loss is", [["lt", "Long-term (held more than 1 year)"], ["st", "Short-term (1 year or less)"]], "lt") +
       numf(u + "-sg", "Other short-term gains this year ($)", 0, 500) + numf(u + "-lg", "Other long-term gains this year ($)", 5000, 500) +
       rng(u + "-or", "Your ordinary tax rate", 10, 37, 1, 22, "pct") + rng(u + "-cr", "Your long-term gains rate", 0, 23.8, 0.1, 15, "pct") +
-      sel(u + "-mfs", "Filing status", [["0", "Any status except married filing separately"], ["1", "Married filing separately"]], "0") +
+      sel(u + "-mfs", "Filing status", [["0", "Single, joint or head of household"], ["1", "Married filing separately"]], "0") +
       note("Losses first offset gains of the same type, then the other type; up to $3,000 of any net loss ($1,500 if married filing separately) offsets ordinary income each year, and the rest carries forward with no time limit (IRC §1211, §1212; IRS Topic 409). The replacement investment's basis is lower, so part of the saving is a deferral."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
@@ -216,7 +217,7 @@
       var payback = L * rc, net = saved + carry * ro - payback;
       self(el, "k").innerHTML = kpi("Tax saved this year", money(saved), "good") + kpi("Deducted from ordinary income", money(ta.ded)) + kpi("Carried forward", money(carry)) +
         kpi("Years to use carryforward at $" + cap.toLocaleString() + "/yr", carry > 0 ? String(yrs) : "—") + kpi("Future gain tax on lower basis", money(payback), "bad");
-      INV.lineChart(self(el, "c"), { label: "Capital loss carryforward remaining", height: 210, xTitle: "Years from now (no other gains assumed)", xFmt: yearFmt, yFmt: ms, series: [{ name: "Carryforward left", color: "var(--s1)", data: pts.length > 1 ? pts : [[0, 0], [1, 0]], area: true }] });
+      INV.lineChart(self(el, "c"), { label: "Capital loss carryforward remaining", height: 210, xTitle: "Years from now (no other gains assumed)", xFmt: yearFmt, xTicks: (function () { var n = Math.max(1, pts.length - 1), st = Math.max(1, Math.ceil(n / 8)), t = []; for (var i = 0; i <= n; i += st) t.push(i); if (t[t.length - 1] !== n) t.push(n); return t; })(), yFmt: ms, yMin: 0, yMax: carry > 0 ? null : 1000, series: [{ name: "Carryforward left", color: "var(--s1)", data: pts.length > 1 ? pts : [[0, 0], [1, 0]], area: true }] });
       self(el, "n2").innerHTML = "This year the loss offsets " + money(Math.max(0, (before[0] > 0 ? before[0] : 0) + (before[1] > 0 ? before[1] : 0) - Math.max(0, after[0]) - Math.max(0, after[1]))) + " of gains and " + money(ta.ded) + " of ordinary income, saving <b>" + money(saved) + "</b>. " +
         (carry > 0 ? "The remaining " + money(carry) + " carries forward; used against ordinary income at your current rate it is worth up to about " + money(carry * ro) + " more over " + yrs + " years. " : "") +
         "Because the replacement investment now has a basis " + money(L) + " lower, selling it someday at your long-term rate would give back about " + money(payback) + " &mdash; unless it is donated, held until death (step-up in basis), or sold in a 0% year. The rough lifetime net, ignoring the time value of money, is <b>" + money(net) + "</b>.";
@@ -259,7 +260,7 @@
     shell(el, "How much gain can you realize at 0% in 2026?", "Calculator",
       sel(u + "-fs", "Filing status", FS3, "mfj") + numf(u + "-o", "Ordinary income: wages, pensions, IRA withdrawals, interest ($)", 60000, 1000) +
       numf(u + "-ss", "Social Security benefits received ($)", 0, 1000) + numf(u + "-q", "Qualified dividends already expected ($)", 2000, 500) +
-      numf(u + "-g", "Unrealized long-term gain you could realize ($)", 40000, 1000) + sel(u + "-n65", "People on the return age 65 or older", [["0", "None"], ["1", "One"], ["2", "Two"]], "0") +
+      numf(u + "-g", "Unrealized long-term gain you could realize ($)", 40000, 1000) + sel(u + "-n65", "People on the return age 65 or older", [["0", "None"], ["1", "One"], ["2", "Two (joint return only)"]], "0") +
       note("2026 thresholds (Rev. Proc. 2025-32): the 0% rate applies to long-term gains and qualified dividends that fit under $49,450 of taxable income (single), $98,900 (married filing jointly) or $66,200 (head of household). The calculator uses the 2026 standard deduction, the extra deduction at 65, and the temporary $6,000 senior deduction. Federal only; states usually tax these gains."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
@@ -273,7 +274,8 @@
       var reset = free * 0.15;
       self(el, "k").innerHTML = kpi("Gain you can realize tax-free", money(free), "good") + kpi("Federal tax to realize all of it", money(all), all > 0 ? "bad" : "good") +
         kpi("Average rate on the whole gain", g ? pct(all / g * 100, 1) : "—") + kpi("Future 15% tax avoided on the reset", money(reset), "good");
-      INV.lineChart(self(el, "c"), { label: "Extra federal tax by gain realized", height: 220, xTitle: "Long-term gain realized", xFmt: ms, yFmt: ms, series: [{ name: "Extra federal tax", color: "var(--s5)", data: pts, area: true }],
+      var maxY = Math.max.apply(null, pts.map(function (p) { return p[1]; }));
+      INV.lineChart(self(el, "c"), { label: "Extra federal tax by gain realized", height: 220, xTitle: "Long-term gain realized", xFmt: ms, yFmt: ms, yMin: 0, yMax: maxY < 100 ? 100 : null, series: [{ name: "Extra federal tax", color: "var(--s5)", data: pts, area: true }],
         dots: [dot(free, 0, money(free) + " free", "var(--s2)", 0, g)] });
       var r = fed({ fs: fs, ord: o, ss: ss, qd: q + free, n65: n65 });
       self(el, "n2").innerHTML = "You can sell and immediately rebuy (there is no wash-sale rule for gains) up to <b>" + money(free) + "</b> of long-term gain with no federal tax, raising your cost basis by that much. " +
@@ -298,7 +300,7 @@
       var ss = (a >= P.c1 ? P.ss1 : 0) + (P.fs === "mfj" && a2 >= P.c2 ? P.ss2 : 0);
       var n65 = (a >= 65 ? 1 : 0) + (P.fs === "mfj" && a2 >= 65 ? 1 : 0);
       trad += contrib;
-      var rmd = a >= P.rmd && ULT[Math.min(96, a)] ? trad / ULT[Math.min(96, a)] : 0;
+      var rmd = a >= P.rmd && ULT[Math.min(100, a)] ? trad / ULT[Math.min(100, a)] : 0;
       if (a === P.rmd) out.firstRmd = rmd;
       var need = a >= P.retire ? P.spend : 0, spend = Math.min(Math.max(0, trad), need), fromIra = Math.max(rmd, spend), short = need - spend;
       var fromRoth = Math.min(Math.max(0, roth), short); roth -= fromRoth; short -= fromRoth;
@@ -312,8 +314,9 @@
       var withAll = fed({ fs: P.fs, ord: baseOrd + conv, ss: ss, n65: n65, year: y });
       var incTax = withAll.total - noIra.total;
       magiHist.push(withAll.magi); magiBase.push(noIra.magi);
-      var look = Math.max(0, magiHist.length - 3);
-      var ir = 0; if (n65 > 0) ir = n65 * (irmaaAnnual(magiHist[look], P.fs) - irmaaAnnual(magiBase[look], P.fs));
+      /* IRMAA uses the tax return from two years earlier; premiums in the plan's first two years rest on returns filed before it starts, which are the same with or without conversions */
+      var look = magiHist.length - 3;
+      var ir = 0; if (n65 > 0 && look >= 0) ir = n65 * (irmaaAnnual(magiHist[look], P.fs) - irmaaAnnual(magiBase[look], P.fs));
       trad -= fromIra + conv; roth += conv;
       side += (fromIra - spend) - incTax - ir - short;
       if (side < 0 && out.sideNeg === null) out.sideNeg = a;
@@ -375,14 +378,14 @@
     shell(el, "How close are you to a Medicare IRMAA cliff?", "Calculator",
       sel(u + "-fs", "Filing status on the tax return", [["single", "Single, head of household"], ["mfj", "Married filing jointly"]], "single") +
       numf(u + "-m", "Modified adjusted gross income ($)", 105000, 1000, "AGI plus tax-exempt interest") + sel(u + "-p", "People on Medicare", [["1", "One"], ["2", "Two"]], "1") +
-      note("CMS 2026 amounts. The 2026 surcharge is based on the tax return for 2024 (two years earlier). Each tier applies in full once MAGI exceeds its threshold by even $1; a life-changing event such as the death of a spouse or retirement can be reported to Social Security on Form SSA-44."),
+      note("CMS 2026 amounts. The 2026 surcharge is based on the tax return for 2024 (two years earlier). Each tier applies in full once MAGI exceeds its threshold by even $1; a life-changing event such as the death of a spouse or retirement can be reported to Social Security on Form SSA-44. Married people filing separately use a different, steeper table that this tool does not model."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var fs = self(el, "fs").value, m = num(el, "m"), n = Number(self(el, "p").value), t = IRM[fs], k = irmaaTier(m, fs), cost = n * irmaaAnnual(m, fs);
       var nextT = k < 5 ? t[k] : null, room = nextT != null ? nextT - m : null, nextCost = k < 5 ? n * 12 * (IRM.B[k + 1] - IRM.B[0] + IRM.D[k + 1]) : null;
       self(el, "k").innerHTML = kpi("Tier", k === 0 ? "Standard (none)" : "Tier " + k, k ? "bad" : "good") + kpi("Part B premium each / month", money(IRM.B[k], 2)) + kpi("Part D surcharge each / month", money(IRM.D[k], 2)) +
         kpi("Extra cost a year, all people", money(cost), cost > 0 ? "bad" : "good") + kpi("Room below next threshold", room != null ? money(Math.max(0, room + (k === 4 ? -1 : 0))) : "top tier");
-      var data = [0, 1, 2, 3, 4, 5].map(function (i) { return { label: i === 0 ? "≤ " + ms(t[0]) : i < 5 ? "≤ " + ms(t[i]) : "≥ " + ms(t[4]), tip: "Tier " + i, y: n * 12 * (IRM.B[i] - IRM.B[0] + IRM.D[i]), color: i === k ? "var(--s5)" : "var(--s6)" }; });
+      var data = [0, 1, 2, 3, 4, 5].map(function (i) { return { label: i < 4 ? "≤ " + ms(t[i]) : i === 4 ? "< " + ms(t[4]) : "≥ " + ms(t[4]), tip: "Tier " + i, y: n * 12 * (IRM.B[i] - IRM.B[0] + IRM.D[i]), color: i === k ? "var(--s5)" : "var(--s6)" }; });
       INV.barChart(self(el, "c"), { label: "Annual surcharge by tier", height: 210, allLabels: true, valueLabels: true, xTitle: "MAGI tier", yFmt: ms, tipFmt: function (v) { return money(v) + " a year"; }, data: data });
       self(el, "n2").innerHTML = room != null ? "One more dollar above " + money(nextT) + " would raise the yearly cost from " + money(cost) + " to " + money(nextCost) + " &mdash; a jump of <b>" + money(nextCost - cost) + "</b>. When sizing a Roth conversion or a capital gain, stop just below a threshold unless the extra income is worth the jump." : "You are in the top tier; more income no longer raises the surcharge.";
     }
@@ -409,7 +412,7 @@
       numf(u + "-ss", "Social Security received ($)", 0, 1000) + numf(u + "-qd", "Qualified dividends and long-term gains ($)", 6000, 500) +
       numf(u + "-salt", "State and local taxes paid ($)", 14000, 500) + numf(u + "-mort", "Mortgage interest paid ($)", 3500, 500) +
       numf(u + "-g", "Giving each year ($)", 10000, 500) + rng(u + "-y", "Years in a bunching cycle", 2, 5, 1, 3, "yr") + rng(u + "-bs", "Cost basis of the stock you would give", 0, 100, 5, 30, "pct") +
-      sel(u + "-age", "Age of the IRA owner", [["y", "Under 70½"], ["o", "70½ or older (QCDs allowed)"]], "y") + sel(u + "-n65", "People age 65 or older", [["0", "None"], ["1", "One"], ["2", "Two"]], "0") +
+      sel(u + "-age", "Age of the IRA owner", [["y", "Under 70½"], ["o", "70½ or older (QCDs allowed)"]], "y") + sel(u + "-n65", "People age 65 or older", [["0", "None"], ["1", "One"], ["2", "Two (joint return only)"]], "0") +
       note("2026 federal rules: standard deduction $32,200 joint / $16,100 single; non-itemizers may deduct up to $1,000 ($2,000 joint) of cash gifts, but not gifts to a donor-advised fund; itemizers lose the first 0.5% of AGI of gifts; the SALT cap is $40,400 (phased down above $505,000); appreciated stock held more than a year is deductible at value up to 30% of AGI. QCDs up to $111,000 a person from age 70½. The stock value includes the capital-gains tax you avoid by not selling it."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
@@ -453,8 +456,8 @@
       numf(u + "-sh", "Shares bought this period", 200, 10) + numf(u + "-offer", "Price on the offering (grant) date ($)", 50, 0.5) + numf(u + "-fmvp", "Price on the purchase date ($)", 58, 0.5) +
       rng(u + "-disc", "Plan discount", 0, 15, 1, 15, "pct") + sel(u + "-look", "Lookback to the lower of the two prices?", [["1", "Yes"], ["0", "No"]], "1") +
       numf(u + "-sale", "Price if you sell today ($)", 58, 0.5) + numf(u + "-later", "Price when a qualifying sale becomes possible ($)", 58, 0.5) +
-      rng(u + "-or", "Your ordinary tax rate (federal + state)", 10, 45, 1, 26, "pct") + rng(u + "-cr", "Your long-term gains rate (federal + state)", 0, 30, 1, 18, "pct") +
-      note("IRS Publication 525 and IRC §423. A qualifying disposition needs both more than 2 years from the offering date and more than 1 year from purchase. Qualifying: ordinary income is the lesser of the discount measured at the offering date or your actual gain; the rest is long-term gain. Disqualifying: ordinary income is the purchase-date price minus what you paid, even if the stock later falls; the rest is a capital gain or loss (short-term here)."),
+      rng(u + "-or", "Your ordinary tax rate (federal + state)", 10, 45, 0.25, 14.75, "pct") + rng(u + "-cr", "Your long-term gains rate (federal + state)", 0, 30, 0.25, 17.75, "pct") +
+      note("Defaults are Jordan's plan and Jordan's approximate rates (12% federal + 2.75% Ohio; up to 15% + 2.75% on long-term gains). IRS Publication 525 and IRC §423. A qualifying disposition needs both more than 2 years from the offering date and more than 1 year from purchase. Qualifying: ordinary income is the lesser of the discount measured at the offering date or your actual gain; the rest is long-term gain. Disqualifying: ordinary income is the purchase-date price minus what you paid, even if the stock later falls; the rest is a capital gain or loss (short-term here)."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var o = { sh: num(el, "sh"), offer: num(el, "offer"), fmvp: num(el, "fmvp"), disc: num(el, "disc") / 100, look: self(el, "look").value === "1", sale: num(el, "sale") }, ro = num(el, "or") / 100, rc = num(el, "cr") / 100, later = num(el, "later");
@@ -516,10 +519,12 @@
     out.NC = 0.0399 * Math.max(0, agi - f.taxableSS - ncStd);
     /* Pennsylvania: 3.07% (PA DOR); retirement distributions after retirement age and Social Security excluded; no standard deduction */
     out.PA = 0.0307 * Math.max(0, s.wages + s.inv + s.cg + (s.age < 59.5 ? s.ira + s.gov : 0));
-    /* Ohio 2026 (ORC 5747.02): no tax at or below $26,050 of income after exemptions; above it, $332 plus 2.75% of the excess. Social Security deducted; personal exemptions (ORC 5747.025); retirement income credit (ORC 5747.055) */
-    var ohAgi = Math.max(0, agi - f.taxableSS), ex = ohAgi <= 40000 ? 2350 : ohAgi <= 80000 ? 2100 : 1850, ohBase = Math.max(0, ohAgi - (ohAgi < 500000 ? ex * n : 0));
+    /* Ohio 2026 (ORC 5747.02): no tax at or below $26,050 of income after exemptions; above it, $332 plus 2.75% of the excess. Social Security deducted.
+       Personal exemptions (ORC 5747.025, indexed): $2,400 / $2,150 / $1,900 per person, the latest amounts published (2025 Ohio IT 1040 instructions), none at MAGI of $500,000 or more from 2026.
+       Retirement income credit up to $200 and the $50 senior citizen credit when income less exemptions is under $100,000 (ORC 5747.055) */
+    var ohAgi = Math.max(0, agi - f.taxableSS), ex = ohAgi <= 40000 ? 2400 : ohAgi <= 80000 ? 2150 : 1900, ohBase = Math.max(0, ohAgi - (ohAgi < 500000 ? ex * n : 0));
     var oh = ohBase > 26050 ? 332 + 0.0275 * (ohBase - 26050) : 0, ret = s.ira + s.gov;
-    var cr = ohBase < 100000 ? (ret > 8000 ? 200 : ret > 5000 ? 130 : ret > 3000 ? 80 : ret > 1500 ? 50 : ret > 500 ? 25 : 0) : 0;
+    var cr = ohBase < 100000 ? (ret > 8000 ? 200 : ret > 5000 ? 130 : ret > 3000 ? 80 : ret > 1500 ? 50 : ret > 500 ? 25 : 0) + (s.age >= 65 ? 50 : 0) : 0;
     out.OH = Math.max(0, oh - cr);
     /* Arizona: 2.5% (AZDOR 2026 estimated-tax booklet); Social Security excluded; up to $2,500 of government pension subtracted per recipient; 2025 standard deduction and $2,100 age-65 exemption per person (2025 Form 140 instructions) */
     var azStd = s.fs === "mfj" ? 31500 : s.fs === "hoh" ? 23625 : 15750;
@@ -542,7 +547,7 @@
       sel(u + "-fs", "Filing status", FS3, "single") + numf(u + "-age", "Age (older spouse)", 68, 1) + numf(u + "-w", "Wages ($)", 0, 1000) + numf(u + "-i", "IRA and private pension distributions ($)", 30000, 1000) +
       numf(u + "-g", "Government pension ($)", 0, 1000) + numf(u + "-s", "Social Security benefits ($)", 34800, 600) + numf(u + "-v", "Interest and dividends ($)", 2400, 500) + numf(u + "-c", "Long-term capital gains ($)", 0, 1000),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>' +
-      note("Simplified resident tax, standard deductions only, no local income taxes or credits other than those named. NC: 3.99% for 2026 after the NC standard deduction, Social Security deducted. PA: 3.07%, retirement distributions after retirement age and Social Security not taxed. OH: 2026 schedule in ORC 5747.02 after personal exemptions, Social Security deducted, retirement income credit up to $200. AZ: 2.5%, Social Security excluded, up to $2,500 of government pension subtracted, 2025 standard deduction and $2,100 age-65 exemption. CO: 4.4% (the 2025 rate) on federal taxable income after the Social Security subtraction and the pension subtraction ($24,000 at 65 or older, $20,000 at 55 to 64, each reduced by the Social Security subtracted). Rules and amounts change; confirm with each revenue department."));
+      note("Simplified resident tax, standard deductions only, no local income taxes or credits other than those named. NC: 3.99% for 2026 after the NC standard deduction, Social Security deducted. PA: 3.07%, retirement distributions after retirement age and Social Security not taxed. OH: 2026 schedule in ORC 5747.02 after personal exemptions ($2,400, $2,150 or $1,900 a person, the 2025 amounts), Social Security deducted, retirement income credit up to $200 and $50 senior credit. AZ: 2.5%, Social Security excluded, up to $2,500 of government pension subtracted, 2025 standard deduction and $2,100 age-65 exemption. CO: 4.4% (the 2025 rate) on federal taxable income after the Social Security subtraction and the pension subtraction ($24,000 at 65 or older, $20,000 at 55 to 64, each reduced by the Social Security subtracted). Rules and amounts change; confirm with each revenue department."));
     var PRE = { ruth: ["single", 68, 0, 30000, 0, 34800, 2400, 0], harper: ["mfj", 67, 0, 60000, 0, 75600, 3000, 10000], maya: ["single", 24, 62000, 0, 0, 0, 100, 0] };
     var ids = ["fs", "age", "w", "i", "g", "s", "v", "c"];
     el.querySelectorAll(".seg button").forEach(function (b) {
@@ -552,10 +557,10 @@
       var s = { fs: self(el, "fs").value, age: num(el, "age"), wages: num(el, "w"), ira: num(el, "i"), gov: num(el, "g"), ss: num(el, "s"), inv: num(el, "v"), cg: num(el, "c") };
       var t = stateTaxes(s), names = [["NC", "North Carolina"], ["PA", "Pennsylvania"], ["OH", "Ohio"], ["AZ", "Arizona"], ["CO", "Colorado"]];
       var lo = names.reduce(function (a, n) { return t[n[0]] < t[a[0]] ? n : a; }), hi = names.reduce(function (a, n) { return t[n[0]] > t[a[0]] ? n : a; });
-      self(el, "k").innerHTML = names.map(function (n) { return kpi(n[1], money(t[n[0]]), n === lo ? "good" : n === hi ? "bad" : ""); }).join("") + kpi("Federal AGI", money(t.fedAGI));
+      self(el, "k").innerHTML = names.map(function (n) { return kpi(n[1], money(t[n[0]], 0), n === lo ? "good" : n === hi ? "bad" : ""); }).join("") + kpi("Federal AGI", money(t.fedAGI));
       INV.barChart(self(el, "ch"), { label: "State income tax by state", height: 220, allLabels: true, valueLabels: true, yFmt: ms, tipFmt: function (v) { return money(v); },
         data: names.map(function (n, i) { return { label: n[0], tip: n[1], y: t[n[0]], color: ["var(--s4)", "var(--s5)", "var(--s3)", "var(--s2)", "var(--s1)"][i] }; }).concat([{ label: "No tax", tip: "A state with no income tax", y: 0, color: "var(--s6)" }]) });
-      self(el, "n2").innerHTML = "On " + money(s.wages + s.ira + s.gov + s.ss + s.inv + s.cg) + " of total income, the resident income tax ranges from " + money(t[lo[0]]) + " in " + lo[1] + " to " + money(t[hi[0]]) + " in " + hi[1] + ", a difference of <b>" + money(t[hi[0]] - t[lo[0]]) + "</b> a year. " +
+      self(el, "n2").innerHTML = "On " + money(s.wages + s.ira + s.gov + s.ss + s.inv + s.cg) + " of total income, the resident income tax ranges from " + money(t[lo[0]], 0) + " in " + lo[1] + " to " + money(t[hi[0]], 0) + " in " + hi[1] + ", a difference of <b>" + money(t[hi[0]] - t[lo[0]], 0) + "</b> a year. " +
         "Income tax is only one of a state's taxes; property, sales and local taxes can reverse the ranking.";
     }
     wire(el, run);
@@ -573,7 +578,7 @@
     for (var a = P.a1, y = 2026; a <= P.horizon; a++, y++) {
       var a2 = P.fs === "mfj" ? P.a2 + (a - P.a1) : 0, n65 = (a >= 65 ? 1 : 0) + (P.fs === "mfj" && a2 >= 65 ? 1 : 0);
       var ss = P.ssFixed != null ? P.ssFixed : ((a >= P.c1 ? P.ss1 : 0) + (P.fs === "mfj" && a2 >= P.c2 ? P.ss2 : 0));
-      var rmd = a >= P.rmd && ULT[Math.min(96, a)] ? D / ULT[Math.min(96, a)] : 0;
+      var rmd = a >= P.rmd && ULT[Math.min(100, a)] ? D / ULT[Math.min(100, a)] : 0;
       var need = P.need;
       function tx(d, t) { var gf = T > 0 ? Math.max(0, 1 - Bs / T) : 0; return fed({ fs: P.fs, ord: d, qd: t * gf, ss: ss, n65: n65, year: y }).total; }
       function netOf(d, t, ro) { return d + t + ro + ss - tx(d, t); }
@@ -654,7 +659,7 @@
     var u = uid(el);
     shell(el, "The tax torpedo: marginal rate on each extra IRA dollar", "Calculator",
       sel(u + "-fs", "Filing status", [["single", "Single"], ["mfj", "Married filing jointly"]], "single") + numf(u + "-ss", "Social Security benefits ($ a year)", 34800, 600) +
-      numf(u + "-q", "Qualified dividends and long-term gains ($)", 0, 500) + sel(u + "-n65", "People age 65 or older", [["0", "None"], ["1", "One"], ["2", "Two"]], "1") + numf(u + "-x", "IRA withdrawals and other ordinary income ($ a year)", 32400, 1000) +
+      numf(u + "-q", "Qualified dividends and long-term gains ($)", 0, 500) + sel(u + "-n65", "People age 65 or older", [["0", "None"], ["1", "One"], ["2", "Two (joint return only)"]], "1") + numf(u + "-x", "IRA withdrawals and other ordinary income ($ a year)", 32400, 1000) +
       note("IRS Publication 915: up to 50% of benefits become taxable once other income plus half the benefits passes $25,000 (single) or $32,000 (joint), and up to 85% past $34,000 or $44,000. These thresholds are set in law and are not adjusted for inflation. Each extra IRA dollar can make $0.50 or $0.85 of benefits taxable too."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
@@ -667,7 +672,7 @@
       self(el, "k").innerHTML = kpi("Taxable Social Security", money(here.taxableSS) + " of " + money(ss)) + kpi("Federal tax", money(here.total)) + kpi("Your bracket", br ? br + "%" : "none") + kpi("Marginal rate on the next $1,000", pct(mr, 1), mr > br + 1 ? "bad" : "") + kpi("Highest marginal rate", pct(peak.r, 1) + " near " + ms(peak.x));
       INV.lineChart(self(el, "c"), { label: "Marginal federal rate by IRA income", height: 240, xTitle: "IRA withdrawals and other ordinary income", yTitle: "Marginal rate on the next $1,000", xFmt: ms, yFmt: function (v) { return Math.round(v) + "%"; }, yMin: 0,
         series: [{ name: "Marginal rate", color: "var(--s5)", data: pts }], dots: [dot(x, mr, pct(mr, 1), "var(--s1)", 0, 150000)] });
-      self(el, "n2").innerHTML = "At " + money(x) + " of IRA income the next $1,000 costs about <b>" + money(mr * 10) + "</b> of federal tax (" + pct(mr, 1) + "), though the bracket is " + (br || 0) + "%. The hump is the 'tax torpedo': while benefits are being pulled into taxable income, each dollar is taxed once for itself and again through the Social Security it drags in. Past the hump, the rate falls back to the bracket rate once 85% of benefits are already taxable.";
+      self(el, "n2").innerHTML = "At " + money(x) + " of IRA withdrawals and other ordinary income, the next $1,000 costs about <b>" + money(mr * 10) + "</b> of federal tax (" + pct(mr, 1) + "), though the bracket is " + (br || 0) + "%. The hump is the 'tax torpedo': while benefits are being pulled into taxable income, each dollar is taxed once for itself and again through the Social Security it drags in. Past the hump, the rate falls back to the bracket rate once 85% of benefits are already taxable.";
     }
     wire(el, run);
   };

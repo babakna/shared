@@ -45,7 +45,7 @@
     o.textContent = f === "pct" ? v.toFixed(input.step.indexOf(".") > -1 ? (input.step.split(".")[1].length) : 0) + "%" :
       f === "spct" ? (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(input.step.indexOf(".") > -1 ? (input.step.split(".")[1].length) : 0) + "%" :
       f === "yr" ? v + (v === 1 ? " year" : " years") : f === "age" ? "age " + v : f === "year" ? String(v) :
-      f === "rel" ? (v > 0 ? v + " years to go" : v < 0 ? (-v) + " years after" : "retiring now") :
+      f === "rel" ? (v > 0 ? v + (v === 1 ? " year to go" : " years to go") : v < 0 ? (-v) + (v === -1 ? " year after" : " years after") : "retiring now") :
       f === "stk" ? v + "% stocks / " + (100 - v) + "% bonds" : String(v);
   }
   function wire(el, fn) {
@@ -253,9 +253,10 @@
       var worst = res.reduce(function (a, b) { return b.adv < a.adv ? b : a; }), best = res.reduce(function (a, b) { return b.adv > a.adv ? b : a; });
       self(el, "k").innerHTML = kpi("Start years tested", res.length) + kpi("Lump sum ended ahead", pct(wins / res.length * 100, 0), "good") + kpi("Median lump-sum edge", pct(med, 1)) +
         kpi("Worst for lump sum", pct(worst.adv, 1) + " (" + worst.y + ")", "bad") + kpi("Best for lump sum", "+" + pct(best.adv, 1) + " (" + best.y + ")", "good");
-      INV.barChart(self(el, "c"), { label: "Lump-sum advantage by start year", height: 240, maxLabels: 10, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return (v >= 0 ? "lump sum ahead by " : "spreading ahead by ") + Math.abs(v).toFixed(1) + "%"; },
+      INV.barChart(self(el, "c"), { label: "Lump-sum advantage by start year", height: 240, maxLabels: 10, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return (v >= 0 ? "lump sum ahead by " : "lump sum behind by ") + Math.abs(v).toFixed(1) + "%"; },
         data: res.map(function (x) { return { label: String(x.y), tip: "Start " + x.y + " (" + k + " installments, to end of " + (x.y + k - 1) + ")", y: x.adv, color: x.adv >= 0 ? "var(--s2)" : "var(--s5)" }; }) });
       var ex = res.find(function (x) { return x.y === ey; }) || res[res.length - 1];
+      if (ex.y !== ey) { self(el, "e").value = ex.y; fmtOut(self(el, "e")); }
       self(el, "n").innerHTML = "Bars above zero: investing everything at once ended ahead once the last installment went in. Example: starting in " + ex.y + ", " + money(A) + " invested at once was worth <b>" + money(A * ex.ls) + "</b> at the end of " + (ex.y + k - 1) +
         "; spread over " + k + " years it was worth <b>" + money(A * ex.dca) + "</b>. " + (ex.adv >= 0 ? "The lump sum was ahead." : "Spreading it out was ahead &mdash; the kind of year that makes cost averaging feel wise.");
     }
@@ -291,15 +292,15 @@
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var rule = self(el, "r").value, p = rule === "cape" ? num(el, "c") : num(el, "m"), safe = self(el, "s").value, y0 = num(el, "y0"), y1 = h.last;
-      self(el, "ch").closest(".fld").hidden = rule !== "cape"; self(el, "m").closest(".fld").hidden = rule !== "ma";
+      self(el, "c").closest(".fld").hidden = rule !== "cape"; self(el, "m").closest(".fld").hidden = rule !== "ma";
       var o = INV.s6bTiming(rule, p, safe, y0, y1);
       self(el, "k").innerHTML = kpi("Rule: growth / yr", pct(o.t.cagr, 1), o.t.cagr >= o.b.cagr ? "good" : "bad") + kpi("Buy and hold / yr", pct(o.b.cagr, 1)) +
         kpi("Years in stocks", pct(o.inPct, 0)) + kpi("Switches", o.switches) + kpi("Rule: deepest fall", pct(o.t.mdd, 0), "bad") + kpi("Buy and hold: deepest fall", pct(o.b.mdd, 0), "bad");
-      INV.lineChart(self(el, "ch"), { label: "Timing rule versus buy and hold", log: true, height: 260, yFmt: ms, xFmt: yearFmt, yTitle: "Growth of $10,000 (log scale); shaded = out of stocks",
+      INV.lineChart(self(el, "ch"), { label: "Timing rule versus buy and hold", log: true, height: 260, yFmt: ms, xFmt: yearFmt, yTitle: "Growth of $10,000 (log scale)",
         bands: o.bands.map(function (b) { return { x0: b.x0, x1: b.x1, color: "var(--amber-soft)" }; }),
         series: [{ name: "Timing rule", color: "var(--s3)", data: o.t.path.map(function (q) { return [q[0], q[1] * 10000]; }), width: 2.6 }, { name: "Buy and hold stocks", color: "var(--s1)", data: o.b.path.map(function (q) { return [q[0], q[1] * 10000]; }), dash: "5 4", width: 1.8 }] });
       var gap = o.t.end / o.b.end;
-      self(el, "n").innerHTML = "From " + y0 + " to " + y1 + ", $10,000 became <b>" + money(o.t.end * 10000) + "</b> with the rule and <b>" + money(o.b.end * 10000) + "</b> buying and holding &mdash; the rule ended with " + pct(gap * 100, 0) + " of buy-and-hold's wealth. " +
+      self(el, "n").innerHTML = "Shaded years: the rule was out of stocks. From " + y0 + " to " + y1 + ", $10,000 became <b>" + money(o.t.end * 10000) + "</b> with the rule and <b>" + money(o.b.end * 10000) + "</b> buying and holding &mdash; the rule ended with " + pct(gap * 100, 0) + " of buy-and-hold's wealth. " +
         (o.t.mdd > o.b.mdd ? "It did soften the worst decline. " : "") + "Try other settings, and notice how much the answer depends on the threshold and start year you pick: that sensitivity is the problem.";
     }
     wire(el, run);
@@ -355,8 +356,11 @@
       var I = intl(), bars = [];
       for (var y = 1991 + 9; y <= 2025; y++) { var gu = 1, gi = 1; for (var j = y - 9; j <= y; j++) { gu *= 1 + I[j].us / 100; gi *= 1 + ((1 - e) * I[j].dev + e * I[j].em) / 100; } var dd = (Math.pow(gu, 0.1) - Math.pow(gi, 0.1)) * 100; bars.push({ label: String(y), tip: (y - 9) + "–" + y, y: dd, color: dd >= 0 ? "var(--s5)" : "var(--s2)" }); }
       INV.barChart(self(el, "d"), { label: "US minus international, rolling 10 years", height: 200, maxLabels: 9, yFmt: function (v) { return Math.round(v) + "%"; }, tipFmt: function (v) { return (v >= 0 ? "US ahead by " : "international ahead by ") + Math.abs(v).toFixed(1) + " points a year"; }, data: bars });
-      self(el, "n").innerHTML = "Red bars: the US led over the ten years ending that year; blue: international led. From " + y0 + " to 2025, $10,000 in your mix became <b>" + money(o.mix.end * 10000) + "</b>, versus " + money(o.us.end * 10000) + " in US stocks alone. " +
-        "This window happens to be one of the strongest stretches in US market history; the 2000s (blue bars ending 2006&ndash;2012) show the opposite can happen.";
+      var lead = bars.filter(function (b) { return b.y < 0; }).map(function (b) { return Number(b.label); });
+      var ahead = o.mix.end >= o.us.end;
+      self(el, "n").innerHTML = "Red bars: the US led over the ten years ending that year; teal: international led. From " + y0 + " to 2025, $10,000 in your mix became <b>" + money(o.mix.end * 10000) + "</b>, versus " + money(o.us.end * 10000) + " in US stocks alone" +
+        (ahead ? ", so the mix came out ahead over this window. " : ", so US stocks alone came out ahead over this window. ") +
+        (lead.length ? "The teal bars (ten-year periods ending " + lead[0] + "&ndash;" + lead[lead.length - 1] + ") show that the opposite has also happened for long stretches." : "In no ten-year period ending 2000&ndash;2025 did this international mix lead the US.");
     }
     wire(el, run);
   };
@@ -374,7 +378,7 @@
       self(el, "k").innerHTML = kpi("Your return in dollars", pct(blend * 100, 1), blend >= 0 ? "good" : "bad") + kpi("Fully unhedged", pct(unh * 100, 1)) + kpi("Fully hedged", pct(hed * 100, 1)) + kpi("Ending value", money(A * (1 + blend)));
       INV.barChart(self(el, "c"), { label: "Return pieces", height: 220, allLabels: true, valueLabels: true, yFmt: function (v) { return (Math.round(v * 10) / 10) + "%"; }, tipFmt: function (v) { return pct(v, 1); },
         data: [{ label: "Local market", y: L * 100, color: "var(--s1)" }, { label: "Currency", y: (unh - L) * 100, color: F >= 0 ? "var(--s2)" : "var(--s5)" }, { label: "Unhedged", y: unh * 100, color: "var(--s6)" }, { label: "Hedged", y: hed * 100, color: "var(--s4)" }, { label: "Your mix", y: blend * 100, color: "var(--s3)" }] });
-      self(el, "n").innerHTML = "Unhedged: (1 + local) &times; (1 + currency) &minus; 1 = (1 + " + pct(L * 100, 0) + ") &times; (1 + " + pct(F * 100, 0) + ") &minus; 1 = <b>" + pct(unh * 100, 1) + "</b>. " +
+      self(el, "n").innerHTML = "Unhedged: (1 + local) &times; (1 + currency) &minus; 1 = " + (1 + L).toFixed(2) + " &times; " + (1 + F).toFixed(2) + " &minus; 1 = <b>" + pct(unh * 100, 1) + "</b>. " +
         "A hedge swaps the currency's move for the difference in short-term interest rates between the two countries (covered interest parity), so hedged &asymp; (1 + local) &times; (1 + rate gap) &minus; 1. Real hedges also carry small costs this ignores.";
     }
     wire(el, run);
