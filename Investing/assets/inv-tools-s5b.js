@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 5 (Taxes) calculators for INV-036 to INV-042 - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 5 (Taxes) calculators for INV-036 to INV-042 - V1.2 (September 2026)
    Every tool computes from its stated formula in the browser. Federal figures are for tax year 2026:
    Rev. Proc. 2025-32 (brackets, standard deduction, capital-gain thresholds, AMT), P.L. 119-21
    (senior deduction, SALT cap, charitable changes, 2/37 itemized limit), IRS Notice 2025-67 (QCD limit),
@@ -457,7 +457,7 @@
       rng(u + "-disc", "Plan discount", 0, 15, 1, 15, "pct") + sel(u + "-look", "Lookback to the lower of the two prices?", [["1", "Yes"], ["0", "No"]], "1") +
       numf(u + "-sale", "Price if you sell today ($)", 58, 0.5) + numf(u + "-later", "Price when a qualifying sale becomes possible ($)", 58, 0.5) +
       rng(u + "-or", "Your ordinary tax rate (federal + state)", 10, 45, 0.25, 14.75, "pct") + rng(u + "-cr", "Your long-term gains rate (federal + state)", 0, 30, 0.25, 17.75, "pct") +
-      note("Defaults are Jordan's plan and Jordan's approximate rates (12% federal + 2.75% Ohio; up to 15% + 2.75% on long-term gains). IRS Publication 525 and IRC §423. A qualifying disposition needs both more than 2 years from the offering date and more than 1 year from purchase. Qualifying: ordinary income is the lesser of the discount measured at the offering date or your actual gain; the rest is long-term gain. Disqualifying: ordinary income is the purchase-date price minus what you paid, even if the stock later falls; the rest is a capital gain or loss (short-term here)."),
+      note("Defaults are an illustrative Ohio employee's plan and approximate rates (12% federal + 2.75% Ohio; up to 15% + 2.75% on long-term gains). IRS Publication 525 and IRC §423. A qualifying disposition needs both more than 2 years from the offering date and more than 1 year from purchase. Qualifying: ordinary income is the lesser of the discount measured at the offering date or your actual gain; the rest is long-term gain. Disqualifying: ordinary income is the purchase-date price minus what you paid, even if the stock later falls; the rest is a capital gain or loss (short-term here)."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var o = { sh: num(el, "sh"), offer: num(el, "offer"), fmvp: num(el, "fmvp"), disc: num(el, "disc") / 100, look: self(el, "look").value === "1", sale: num(el, "sale") }, ro = num(el, "or") / 100, rc = num(el, "cr") / 100, later = num(el, "later");
@@ -511,7 +511,7 @@
      10. State income tax on the same income (INV-041)
      ===================================================================== */
   function stateTaxes(s) {
-    /* s: fs, age, wages, ira (IRA and private pension distributions), gov (government pension), ss, inv (interest and dividends), cg (long-term gains) */
+    /* s: fs, age, wages, ira (IRA and private pension distributions), gov (government pension), ss, inv (interest and dividends), cg (long-term gains), dep (dependents; used only for Ohio's per-person exemptions) */
     var f = fed({ fs: s.fs, ord: s.wages + s.ira + s.gov + s.inv, qd: s.cg, ss: s.ss, n65: s.age >= 65 ? (s.fs === "mfj" ? 2 : 1) : 0 });
     var agi = f.agi, joint = s.fs === "mfj", n = joint ? 2 : 1, out = {};
     /* North Carolina: 3.99% flat for 2026 (NCDOR); deduct taxable Social Security; NC standard deduction */
@@ -522,7 +522,7 @@
     /* Ohio 2026 (ORC 5747.02): no tax at or below $26,050 of income after exemptions; above it, $332 plus 2.75% of the excess. Social Security deducted.
        Personal exemptions (ORC 5747.025, indexed): $2,400 / $2,150 / $1,900 per person, the latest amounts published (2025 Ohio IT 1040 instructions), none at MAGI of $500,000 or more from 2026.
        Retirement income credit up to $200 and the $50 senior citizen credit when income less exemptions is under $100,000 (ORC 5747.055) */
-    var ohAgi = Math.max(0, agi - f.taxableSS), ex = ohAgi <= 40000 ? 2400 : ohAgi <= 80000 ? 2150 : 1900, ohBase = Math.max(0, ohAgi - (ohAgi < 500000 ? ex * n : 0));
+    var ohAgi = Math.max(0, agi - f.taxableSS), ex = ohAgi <= 40000 ? 2400 : ohAgi <= 80000 ? 2150 : 1900, ohBase = Math.max(0, ohAgi - (ohAgi < 500000 ? ex * (n + (s.dep || 0)) : 0));
     var oh = ohBase > 26050 ? 332 + 0.0275 * (ohBase - 26050) : 0, ret = s.ira + s.gov;
     var cr = ohBase < 100000 ? (ret > 8000 ? 200 : ret > 5000 ? 130 : ret > 3000 ? 80 : ret > 1500 ? 50 : ret > 500 ? 25 : 0) + (s.age >= 65 ? 50 : 0) : 0;
     out.OH = Math.max(0, oh - cr);
@@ -543,18 +543,19 @@
   TOOLS.s5bState = function (el) {
     var u = uid(el);
     shell(el, "The same income in five states", "Calculator",
-      '<div class="fld"><label>Start from</label><div class="seg" role="group"><button type="button" data-v="ruth" aria-pressed="true">Ruth</button><button type="button" data-v="harper" aria-pressed="false">Harpers retired</button><button type="button" data-v="maya" aria-pressed="false">Maya</button></div></div>' +
+      '<div class="fld"><label>Start from</label><div class="seg" role="group"><button type="button" data-v="ruth" aria-pressed="true">Ruth</button><button type="button" data-v="harper" aria-pressed="false">Harpers retired</button><button type="button" data-v="denise" aria-pressed="false">Denise</button><button type="button" data-v="maya" aria-pressed="false">Maya</button></div></div>' +
       sel(u + "-fs", "Filing status", FS3, "single") + numf(u + "-age", "Age (older spouse)", 68, 1) + numf(u + "-w", "Wages ($)", 0, 1000) + numf(u + "-i", "IRA and private pension distributions ($)", 30000, 1000) +
-      numf(u + "-g", "Government pension ($)", 0, 1000) + numf(u + "-s", "Social Security benefits ($)", 34800, 600) + numf(u + "-v", "Interest and dividends ($)", 2400, 500) + numf(u + "-c", "Long-term capital gains ($)", 0, 1000),
+      numf(u + "-g", "Government pension ($)", 0, 1000) + numf(u + "-s", "Social Security benefits ($)", 34800, 600) + numf(u + "-v", "Interest and dividends ($)", 2400, 500) + numf(u + "-c", "Long-term capital gains ($)", 0, 1000) + numf(u + "-dep", "Dependents claimed (Ohio exemptions only)", 0, 1),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>' +
-      note("Simplified resident tax, standard deductions only, no local income taxes or credits other than those named. NC: 3.99% for 2026 after the NC standard deduction, Social Security deducted. PA: 3.07%, retirement distributions after retirement age and Social Security not taxed. OH: 2026 schedule in ORC 5747.02 after personal exemptions ($2,400, $2,150 or $1,900 a person, the 2025 amounts), Social Security deducted, retirement income credit up to $200 and $50 senior credit. AZ: 2.5%, Social Security excluded, up to $2,500 of government pension subtracted, 2025 standard deduction and $2,100 age-65 exemption. CO: 4.4% (the 2025 rate) on federal taxable income after the Social Security subtraction and the pension subtraction ($24,000 at 65 or older, $20,000 at 55 to 64, each reduced by the Social Security subtracted). Rules and amounts change; confirm with each revenue department."));
-    var PRE = { ruth: ["single", 68, 0, 30000, 0, 34800, 2400, 0], harper: ["mfj", 67, 0, 60000, 0, 75600, 3000, 10000], maya: ["single", 24, 62000, 0, 0, 0, 100, 0] };
-    var ids = ["fs", "age", "w", "i", "g", "s", "v", "c"];
+      note("Simplified resident tax, standard deductions only, no local income taxes or credits other than those named. NC: 3.99% for 2026 after the NC standard deduction, Social Security deducted. PA: 3.07%, retirement distributions after retirement age and Social Security not taxed. OH: 2026 schedule in ORC 5747.02 after personal exemptions ($2,400, $2,150 or $1,900 a person, the 2025 amounts, for the filer, a spouse and each dependent entered; dependents affect no other state here), Social Security deducted, retirement income credit up to $200 and $50 senior credit. AZ: 2.5%, Social Security excluded, up to $2,500 of government pension subtracted, 2025 standard deduction and $2,100 age-65 exemption. CO: 4.4% (the 2025 rate) on federal taxable income after the Social Security subtraction and the pension subtraction ($24,000 at 65 or older, $20,000 at 55 to 64, each reduced by the Social Security subtracted). Rules and amounts change; confirm with each revenue department."));
+    var PRE = { ruth: ["single", 68, 0, 30000, 0, 34800, 2400, 0, 0], harper: ["mfj", 67, 0, 60000, 0, 75600, 3000, 10000, 0], denise: ["single", 24, 62000, 0, 0, 0, 100, 0, 0],
+      maya: ["hoh", 58, 80960, 0, 0, 0, 0, 0, 1] }; /* Maya: $92,000 salary minus $11,040 of 401(k) deferrals (W-2 wages); one dependent, Eli */
+    var ids = ["fs", "age", "w", "i", "g", "s", "v", "c", "dep"];
     el.querySelectorAll(".seg button").forEach(function (b) {
       b.addEventListener("click", function () { el.querySelectorAll(".seg button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); PRE[b.dataset.v].forEach(function (v, i) { setv(el, ids[i], v); }); run(); });
     });
     function run() {
-      var s = { fs: self(el, "fs").value, age: num(el, "age"), wages: num(el, "w"), ira: num(el, "i"), gov: num(el, "g"), ss: num(el, "s"), inv: num(el, "v"), cg: num(el, "c") };
+      var s = { fs: self(el, "fs").value, age: num(el, "age"), wages: num(el, "w"), ira: num(el, "i"), gov: num(el, "g"), ss: num(el, "s"), inv: num(el, "v"), cg: num(el, "c"), dep: Math.floor(num(el, "dep")) };
       var t = stateTaxes(s), names = [["NC", "North Carolina"], ["PA", "Pennsylvania"], ["OH", "Ohio"], ["AZ", "Arizona"], ["CO", "Colorado"]];
       var lo = names.reduce(function (a, n) { return t[n[0]] < t[a[0]] ? n : a; }), hi = names.reduce(function (a, n) { return t[n[0]] > t[a[0]] ? n : a; });
       self(el, "k").innerHTML = names.map(function (n) { return kpi(n[1], money(t[n[0]], 0), n === lo ? "good" : n === hi ? "bad" : ""); }).join("") + kpi("Federal AGI", money(t.fedAGI));

@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 12 (Estate Planning & Wealth Transfer) calculators, part A - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 12 (Estate Planning & Wealth Transfer) calculators, part A - V1.2 (September 2026)
    Tools for INV-084 to INV-089. Every tool computes from its stated rule in the browser.
    Federal figures are for 2026 (IRS Rev. Proc. 2025-32, as amended by Public Law 119-21):
    basic exclusion amount $15,000,000; annual gift exclusion $19,000; rate schedule of 26 U.S.C. 2001(c).

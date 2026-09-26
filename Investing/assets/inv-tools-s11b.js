@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 11 (Retirement) calculators, set s11b - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 11 (Retirement) calculators, set s11b - V1.2 (September 2026)
    Tools: s11bPension (INV-080), s11bRmd (INV-081), s11bAnnuity (INV-082), s11bLtc (INV-083).
    Mortality: Social Security Administration, 2023 period life table as used in the 2026 Trustees Report
    (death probabilities q(x), ages 40-119). 417(e) rates: IRS minimum present value segment rates, January 2020 - May 2026.

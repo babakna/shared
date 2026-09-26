@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 13 (Life Events) calculators, part A - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 13 (Life Events) calculators, part A - V1.2 (September 2026)
    Tools for INV-095 to INV-098. Every figure is computed in the browser from the stated rule.
    Tax year 2026 federal figures: Rev. Proc. 2025-32 (tax rate tables, standard deductions,
    additional standard deduction for age 65+), P.L. 119-21 (senior deduction, 2025-2028;

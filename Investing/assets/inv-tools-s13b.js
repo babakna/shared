@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 13 life-event calculators (INV-099 to INV-102) - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 13 life-event calculators (INV-099 to INV-102) - V1.2 (September 2026)
    Every tool computes from its stated formula in the browser. Dollar limits are 2026 figures from
    IRS Rev. Proc. 2025-32, IRS Notice 2025-67 and SSA's 2026 COLA and SSI pages; they are labelled
    with the year wherever they appear. Historical tools use window.INV_RETURNS (Damodaran, NYU Stern). */
@@ -21,7 +21,7 @@
     return '<div class="fld"><label for="' + id + '">' + esc(label) + '</label><input type="number" id="' + id + '" value="' + val + '" step="' + (step || 1) + '" min="0">' + (hint ? '<span class="hint">' + esc(hint) + "</span>" : "") + "</div>";
   }
   function sel(id, label, opts) {
-    return '<div class="fld"><label for="' + id + '">' + esc(label) + '</label><select id="' + id + '">' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + "</option>"; }).join("") + "</select></div>";
+    return '<div class="fld"><label for="' + id + '">' + esc(label) + '</label><select id="' + id + '">' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[2] ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select></div>";
   }
   function hint(t) { return '<p class="hint" style="font-size:.76rem;color:var(--muted)">' + t + "</p>"; }
   function self(el, id) { return el.querySelector("#" + el.dataset.uid + "-" + id); }
@@ -145,12 +145,12 @@
   TOOLS.s13bRunway = function (el) {
     var u = uid(el);
     shell(el, "How long will the money last?", "Runway calculator",
-      numf(u + "-s", "Emergency savings available ($)", 5000, 500) + numf(u + "-v", "Severance, after tax withheld ($)", 14000, 500) +
-      numf(u + "-e", "Essential spending per month ($)", 4500, 100, "Rent, food, utilities, insurance other than health, minimum debt payments") +
-      numf(u + "-h", "Health coverage per month ($)", 900, 50, "COBRA or a Marketplace plan") +
-      numf(u + "-b", "Unemployment benefit per week ($)", 480, 10, "From your state's estimate; taxable income") +
+      numf(u + "-s", "Emergency savings available ($)", 30000, 500) + numf(u + "-v", "Severance, after tax withheld ($)", 14900, 500) +
+      numf(u + "-e", "Essential spending per month ($)", 5200, 100, "Rent, food, utilities, insurance other than health, minimum debt payments") +
+      numf(u + "-h", "Health coverage per month ($)", 1300, 50, "COBRA or a Marketplace plan") +
+      numf(u + "-b", "Unemployment benefit per week ($)", 500, 10, "From your state's estimate; taxable income") +
       rng(u + "-w", "Weeks of unemployment benefits", 0, 26, 1, 26, "wk") + numf(u + "-o", "Other income per month ($)", 0, 100, "Part-time or freelance work") +
-      rng(u + "-j", "Months until a new job (to plan around)", 1, 24, 1, 6, "mo"),
+      rng(u + "-j", "Months until a new job (to plan around)", 1, 24, 1, 9, "mo"),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var bal = num(el, "s") + num(el, "v"), spend = num(el, "e") + num(el, "h"), wk = num(el, "b"), weeks = num(el, "w"), oth = num(el, "o"), job = Math.max(1, Math.round(num(el, "j")));
@@ -182,10 +182,10 @@
   TOOLS.s13bLeave401k = function (el) {
     var u = uid(el);
     shell(el, "Leaving a job: cash out or keep the 401(k) invested?", "Calculator",
-      numf(u + "-b", "Vested 401(k) balance, before any loan ($)", 84000, 1000) + numf(u + "-l", "Outstanding 401(k) loan ($)", 8000, 500) +
-      sel(u + "-a", "Your age when you leave", [["u", "Under 55 in the year you leave"], ["r55", "55 or older in the year you leave (plan only)"], ["o", "59½ or older"]]) +
-      rng(u + "-f", "Your federal marginal tax rate", 10, 37, 1, 22, "pct") + rng(u + "-s", "Your state income tax rate", 0, 11, 0.5, 3, "pct") +
-      rng(u + "-y", "Years until retirement", 1, 40, 1, 20, "yr") + rng(u + "-r", "Return if it stays invested", 0, 10, 0.5, 6, "pct") +
+      numf(u + "-b", "Vested 401(k) balance, before any loan ($)", 290000, 1000) + numf(u + "-l", "Outstanding 401(k) loan ($)", 0, 500) +
+      sel(u + "-a", "Your age when you leave", [["u", "Under 55 in the year you leave"], ["r55", "55 or older in the year you leave (plan only)", true], ["o", "59½ or older"]]) +
+      rng(u + "-f", "Your federal marginal tax rate", 10, 37, 1, 29, "pct") + rng(u + "-s", "Your state income tax rate", 0, 11, 0.5, 3, "pct") +
+      rng(u + "-y", "Years until retirement", 1, 40, 1, 9, "yr") + rng(u + "-r", "Return if it stays invested", 0, 10, 0.5, 6, "pct") +
       hint("Cashing out: the plan withholds 20% federal tax; the rest of the tax, any state tax and any 10% additional tax are settled on your return. A loan not repaid is offset (subtracted) from the balance and taxed unless you roll the same amount over by your tax-filing deadline, including extensions."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
@@ -274,8 +274,8 @@
   TOOLS.s13bAble = function (el) {
     var u = uid(el);
     shell(el, "ABLE account growth and the SSI $100,000 line", "Calculator",
-      numf(u + "-b", "ABLE balance today ($)", 18000, 500) + numf(u + "-o", "Other countable resources ($)", 1200, 100, "Cash, bank accounts, investments in the person's name") +
-      numf(u + "-c", "Contributions per year ($)", 12000, 500, "Standard 2026 limit: $20,000 from all contributors combined") +
+      numf(u + "-b", "ABLE balance today ($)", 0, 500) + numf(u + "-o", "Other countable resources ($)", 500, 100, "Cash, bank accounts, investments in the person's name") +
+      numf(u + "-c", "Contributions per year ($)", 4000, 500, "Standard 2026 limit: $20,000 from all contributors combined") +
       rng(u + "-r", "Annual return", 0, 8, 0.5, 5, "pct") + rng(u + "-y", "Years to project", 1, 40, 1, 20, "yr") +
       hint("SSI ignores the first $100,000 in an ABLE account; any excess counts toward the $2,000 individual resource limit. Medicaid continues if only the ABLE excess causes the overage. Withdrawals are ignored if spent on qualified disability expenses (housing counts, but housing money held past the month it is withdrawn can count)."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n2"></p>');

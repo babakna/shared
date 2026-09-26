@@ -1,7 +1,7 @@
-/* Investing Learning Lab - shared engine - V1.1 (September 2026) */
+/* Investing Learning Lab - shared engine - V1.2 (September 2026) */
 (function () {
   "use strict";
-  var VERSION = "V1.1 (September 2026)";
+  var VERSION = "V1.2 (September 2026)";
   var AUTHOR = "Namiranian, Babak";
   var root = document.documentElement;
 
@@ -72,15 +72,15 @@
 
   /* ---------- The five recurring households ---------- */
   var HOUSEHOLDS = {
-    maya: { name: "Maya Brooks", short: "Maya", age: "24", color: "var(--s1)", init: "MB",
+    denise: { name: "Denise Brooks", short: "Denise", age: "24", color: "var(--s1)", init: "DB",
       line: "Single, first full-time job at $62,000. $28,000 of student loans at 6.8%, $3,000 in savings, renting.",
       stage: "Starting out" },
     rivera: { name: "Marcus & Elena Rivera", short: "The Riveras", age: "35 & 34", color: "var(--s2)", init: "R",
       line: "Married, two children (4 and 7). $145,000 household income, $310,000 mortgage at 3.1%, $62,000 in 401(k)s.",
       stage: "Building a family" },
-    jordan: { name: "Jordan Ellis", short: "Jordan", age: "45", color: "var(--s3)", init: "JE",
-      line: "Single parent of a 15-year-old. $88,000 income, $140,000 saved for retirement, $20,000 in savings for college (not in a 529 college plan), renting.",
-      stage: "Mid-career, one income" },
+    maya: { name: "Maya Walker", short: "Maya", age: "58", color: "var(--s3)", init: "MW",
+      line: "Divorced single mother of Eli, 13, who has autism and an intellectual disability. $92,000 income, $400,000 saved, $310,000 home with $95,000 left on the mortgage.",
+      stage: "Late career, single parent" },
     harper: { name: "Tom & Rachel Harper", short: "The Harpers", age: "57 & 55", color: "var(--s4)", init: "H",
       line: "$260,000 income, $1.1M saved (mostly pre-tax 401(k)), home worth $650,000 with $90,000 left on the mortgage.",
       stage: "Pre-retirement" },
@@ -174,7 +174,7 @@
     '<h3>Finding your way</h3><p>The bar at the top always shows where you are: stage, module and tab. Its <b>Next</b> button walks through every tab in order and, at the last tab, straight into the next module; <b>Previous</b> does the reverse. <b>Course map &amp; search</b> (or press <b>/</b>) lists all 105 modules by stage, marks where you are and what you have completed, and searches every module, every tab and the glossary. The round <b>Top</b> button returns you to the top of a long page.</p><h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. You can also click a tab, or use the left and right arrow keys on the tab bar. On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
     '<h3>Three layers of depth</h3><ul><li><b>Start here</b> — the main text of every tab. No background needed.</li><li><b>Going further</b> — expandable panels for readers with some experience.</li><li><b>Practitioner depth</b> — the actual rules, formulas, edge cases and research.</li></ul>' +
     '<h3>Things to do, not just read</h3><ul><li><b>Calculators</b> run their formulas live in your browser.</li><li><b>What would you do?</b> — pick an option first, then see every option’s trade-offs.</li><li><b>Exercises</b> — type an answer and check it; a worked solution follows.</li><li><b>Myth or fact</b> — tap a card to test a popular claim.</li><li><b>Worksheets</b> save in your own browser and can be downloaded.</li><li><b>Dotted terms</b> open a glossary definition.</li></ul>' +
-    '<h3>The five households</h3><p>Maya (24), the Riveras (35 and 34), Jordan (45), the Harpers (57 and 55) and Ruth (68) are fictional households who reappear in every module, so each idea is shown at different ages and stages of life.</p>' +
+    '<h3>The five households</h3><p>Denise (24), the Riveras (35 and 34), Maya (58), the Harpers (57 and 55) and Ruth (68) are fictional households who reappear in every module, so each idea is shown at different ages and stages of life.</p>' +
     '<h3>Progress and privacy</h3><p>Passing a module’s knowledge check (70% or better) marks it complete. Progress, worksheets and your theme are stored only in this browser (localStorage). Nothing is sent anywhere.</p>' +
     '<h3>Not advice</h3><p>This is educational material, not financial, tax, legal or investment advice. Tax figures and rules change; confirm current numbers with the IRS, SSA and other primary sources, or a qualified professional, before acting.</p>' +
     '<p style="margin-top:14px"><button class="btn primary" id="closeHelp">Close</button></p></div></div>';
@@ -319,7 +319,7 @@
     var q = modal.querySelector("#mapQ"), body = modal.querySelector("#mapBody"), opener = null, loaded = !!window.INV_INDEX;
     function ensureIndex(cb) {
       if (window.INV_INDEX) return cb();
-      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.1"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
+      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.2"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
     }
     var prog = function () { return readProgress(); };
     function outline() {
@@ -386,7 +386,7 @@
   /* ---------- Households: cards and lens rows ---------- */
   function avatar(h, cls) { return '<span class="' + (cls || "av") + '" style="background:' + h.color + '">' + esc(h.init) + "</span>"; }
   document.querySelectorAll("[data-households]").forEach(function (el) {
-    var keys = (el.getAttribute("data-households") || "maya,rivera,jordan,harper,ruth").split(",");
+    var keys = (el.getAttribute("data-households") || "denise,rivera,maya,harper,ruth").split(",");
     el.classList.add("hh-grid");
     el.innerHTML = keys.map(function (k) {
       var h = HOUSEHOLDS[k.trim()]; if (!h) return "";

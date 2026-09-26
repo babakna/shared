@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 11 (Retirement) calculators, part A - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 11 (Retirement) calculators, part A - V1.2 (September 2026)
    Tools for INV-075 to INV-079. Every tool computes from its stated formula in the browser.
    Historical tools use window.INV_RETURNS (Damodaran, NYU Stern, 1928-2025).
    Longevity uses the SSA 2023 period life table as used in the 2026 Trustees Report.

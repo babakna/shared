@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 3 (Your Financial Base) calculators - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 3 (Your Financial Base) calculators - V1.2 (September 2026)
    Tools for INV-018 to INV-023. Every tool computes from its stated formula in the browser.
    Pure calculation functions are exposed on INV.s3 so the numbers quoted in the modules can be
    reproduced exactly. */
@@ -113,7 +113,7 @@
       numf(u + "-s", "Saved from take-home ($/month)", 400, 25, "Transfers to savings or investments, extra debt payments") +
       numf(u + "-k", "Pre-tax retirement contribution ($/month)", 310, 10, "Already taken out before take-home") +
       numf(u + "-m", "Employer match ($/month)", 155, 5) +
-      note("Defaults are Maya's plan from this module. The 50/30/20 split is a rule of thumb applied to take-home pay, not a law of nature."),
+      note("Defaults are Denise's plan from this module. The 50/30/20 split is a rule of thumb applied to take-home pay, not a law of nature."),
       '<div class="kpis" id="' + u + '-k2"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n2"></p>');
     function run() {
       var g = num(el, "g"), t = num(el, "t"), n = num(el, "n"), w = num(el, "w"), s = num(el, "s"), k = num(el, "k"), m = num(el, "m");
@@ -165,7 +165,7 @@
       sel(u + "-h", "Housing", [["rent", "Rent"], ["own", "Own (repairs are yours)"]], "rent") +
       numf(u + "-x", "Plus deductibles you could owe at once ($)", 1000, 100, "Health, car or home insurance") +
       numf(u + "-c0", "Cash already set aside ($)", 3000, 100) + numf(u + "-a", "You can add each month ($)", 400, 25) +
-      note("A heuristic: 3 months for two steady incomes (or a retiree with Social Security or a pension), 4 for one steady income, 6 if income varies; add 1 month for a typical job (2 if cyclical or at risk, 0 if very stable; ignored for retirees), 1 for dependents and 1 for home ownership. Defaults are Maya's."),
+      note("A heuristic: 3 months for two steady incomes (or a retiree with Social Security or a pension), 4 for one steady income, 6 if income varies; add 1 month for a typical job (2 if cyclical or at risk, 0 if very stable; ignored for retirees), 1 for dependents and 1 for home ownership. Defaults are Denise's."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var e = num(el, "e"), x = num(el, "x"), c0 = num(el, "c0"), a = num(el, "a");
@@ -281,7 +281,7 @@
       rng(u + "-cap", "…on contributions up to (% of pay)", 0, 10, 0.5, 6, "pct") +
       sel(u + "-v", "Vesting schedule for the match", [["now", "Immediate"], ["cliff3", "3-year cliff"], ["graded6", "Graded: 20% a year, years 2 to 6"]], "graded6") +
       rng(u + "-y", "Years of service so far", 0, 7, 1, 1, "yr") +
-      note("Your own contributions are always 100% yours. The 2026 limit on employee deferrals is $24,500 (plus $8,000 catch-up at 50+, or $11,250 at 60–63). Defaults are Maya's plan."),
+      note("Your own contributions are always 100% yours. The 2026 limit on employee deferrals is $24,500 (plus $8,000 catch-up at 50+, or $11,250 at 60–63). Defaults are Denise's plan."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-ch"></div><p class="tool-note" id="' + u + '-n"></p>');
     function run() {
       var sal = num(el, "sal"), c = rv(el, "c"), mr = rv(el, "mr"), cap = rv(el, "cap"), y = rv(el, "y"), v = self(el, "v").value;

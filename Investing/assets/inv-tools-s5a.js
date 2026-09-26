@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 5 (Taxes) calculators, INV-029 to INV-035 - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 5 (Taxes) calculators, INV-029 to INV-035 - V1.2 (September 2026)
    Every 2026 figure below is taken from IRS Rev. Proc. 2025-32 (tax year 2026 inflation adjustments,
    reflecting Public Law 119-21), IRS Notice 2025-67 (2026 retirement plan limits), IRS Rev. Proc. 2025-19
    (2026 HSA limits), the Internal Revenue Code as amended by P.L. 119-21, and SSA (2026 wage base).
@@ -358,8 +358,8 @@
     wire(el, run);
   };
 
-  /* ---------- 9. Tax lots and cost-basis methods: Jordan's ESPP shares (INV-035) ---------- */
-  var LOTS = [{ id: "A", d: "Jun 2019", sh: 280, b: 24.0, lt: true }, { id: "B", d: "Dec 2021", sh: 260, b: 38.0, lt: true }, { id: "C", d: "Jun 2023", sh: 300, b: 41.0, lt: true }, { id: "D", d: "Dec 2025", sh: 280, b: 46.75, lt: false }];
+  /* ---------- 9. Tax lots and cost-basis methods: Maya's index-fund lots (INV-035) ---------- */
+  var LOTS = [{ id: "A", d: "Mar 2012", sh: 120, b: 30.0, lt: true }, { id: "B", d: "Mar 2016", sh: 100, b: 50.0, lt: true }, { id: "C", d: "Mar 2020", sh: 100, b: 72.0, lt: true }, { id: "D", d: "Dec 2025", sh: 80, b: 92.0, lt: false }];
   INV.s5aLots = LOTS;
   function pick(method, n, px) {
     var order = LOTS.slice();
@@ -387,11 +387,11 @@
   INV.s5aLotsMin = pickMin;
   TOOLS.s5aLots = function (el) {
     var u = uid(el);
-    shell(el, "Which shares should Jordan sell? Four tax lots, three methods", "Calculator · tax year 2026",
-      rng(u + "-n", "Shares to sell (of 1,120)", 20, 1120, 20, 400) + numf(u + "-p", "Sale price per share ($)", 50, 0.5) +
-      numf(u + "-ti", "Taxable ordinary income before the sale ($)", 58570, 500, "Jordan's 2026 estimate as head of household.") +
+    shell(el, "Which shares should Maya sell? Four tax lots, three methods", "Calculator · tax year 2026",
+      rng(u + "-n", "Shares to sell (of 400)", 20, 400, 20, 160) + numf(u + "-p", "Sale price per share ($)", 100, 0.5) +
+      numf(u + "-ti", "Taxable ordinary income before the sale ($)", 56810, 500, "Maya's 2026 estimate as head of household: $92,000 salary minus $11,040 of 401(k) deferrals and the $24,150 standard deduction.") +
       sel(u + "-st", "Filing status", STATUS, "hoh") +
-      note("Lots (adjusted basis per share, after the ordinary income already reported on Jordan's W-2): A Jun 2019, 280 sh, $24.00; B Dec 2021, 260 sh, $38.00; C Jun 2023, 300 sh, $41.00; D Dec 2025, 280 sh, $46.75 (held under a year in September 2026, so short-term). Illustrative. Losses offset gains in the simplified tax math; the $3,000 loss limit and state tax are ignored."),
+      note("Lots of one broad US stock index exchange-traded fund (basis per share; no commissions, dividends taken in cash): A Mar 2012, 120 sh, $30.00; B Mar 2016, 100 sh, $50.00; C Mar 2020, 100 sh, $72.00; D Dec 2025, 80 sh, $92.00 (held under a year in September 2026, so short-term). Illustrative. Losses offset gains in the simplified tax math; the $3,000 loss limit and state tax are ignored."),
       '<div class="kpis" id="' + u + '-kp"></div><div id="' + u + '-ch"></div><div id="' + u + '-tb"></div><p class="tool-note" id="' + u + '-nt"></p>');
     function run() {
       var n = Number(val(el, "n")), px = num(el, "p"), ti = num(el, "ti"), status = val(el, "st");
@@ -402,7 +402,7 @@
         data: M.map(function (m, i) { return { label: m.name, y: m.tax, color: ["var(--s5)", "var(--s3)", "var(--s2)"][i] }; }) });
       self(el, "tb").innerHTML = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Method</th><th>Lots sold</th><th class="r">Short-term gain</th><th class="r">Long-term gain</th><th class="r">Federal tax</th></tr></thead><tbody>' +
         M.map(function (m) { return "<tr><td>" + m.name + "</td><td>" + m.used + '</td><td class="r">' + money(m.st) + '</td><td class="r">' + money(m.lt) + '</td><td class="r">' + money(m.tax, 2) + "</td></tr>"; }).join("") + "</tbody></table></div>";
-      self(el, "nt").innerHTML = "If Jordan gives no instruction, the broker sells the oldest shares first (FIFO), which here realizes the largest gains. Naming the lots in writing at the time of the sale (specific identification) changes the tax without changing the shares' market value. Note that the lowest tax today is not always best: long-term gains that fit under the 0% ceiling (" + money(Y.cg0[status]) + " of taxable income for this filing status in 2026) cost nothing to realize.";
+      self(el, "nt").innerHTML = "If Maya gives no instruction, the broker sells the oldest shares first (FIFO), which here realizes the largest gains. Naming the lots in writing at the time of the sale (specific identification) changes the tax without changing the shares' market value. Note that the lowest tax today is not always best: long-term gains that fit under the 0% ceiling (" + money(Y.cg0[status]) + " of taxable income for this filing status in 2026) cost nothing to realize.";
     }
     wire(el, run);
   };

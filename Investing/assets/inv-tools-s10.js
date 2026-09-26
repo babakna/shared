@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 10 (Financial Independence) calculators - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 10 (Financial Independence) calculators - V1.2 (September 2026)
    Tools for INV-072, INV-073 and INV-074. Each tool computes from its stated formula in the browser.
    Sources: IRS Notice 2022-6 and 26 CFR 1.401(a)(9)-9 (72(t) tables and mortality rates);
    Rev. Rul. 2026-17 (September 2026 federal mid-term rate); Rev. Proc. 2025-25 (2026 applicable
@@ -121,9 +121,9 @@
   TOOLS.s10Coast = function (el) {
     var u = uid(el);
     shell(el, "Coast FI calculator", "Calculator",
-      rng(u + "-a", "Your age now", 20, 60, 1, 45, "age") + rng(u + "-t", "Age you want to be financially independent", 50, 70, 1, 65, "age") +
-      numf(u + "-sp", "Yearly spending the portfolio must cover then ($, today's dollars)", 30000, 1000, "After Social Security or a pension") +
-      numf(u + "-p", "Invested for this goal today ($)", 140000, 1000) +
+      rng(u + "-a", "Your age now", 20, 60, 1, 58, "age") + rng(u + "-t", "Age you want to be financially independent", 50, 70, 1, 67, "age") +
+      numf(u + "-sp", "Yearly spending the portfolio must cover then ($, today's dollars)", 38300, 1000, "After Social Security or a pension") +
+      numf(u + "-p", "Invested for this goal today ($)", 370000, 1000) +
       rng(u + "-r", "Real return (after inflation)", 1, 8, 0.5, 5, "pct") + rng(u + "-w", "Withdrawal rate at FI", 3, 5, 0.25, 4, "pct") +
       hint("Coast number = FI number ÷ (1 + r)<sup>years left</sup>. If you already have it, growth alone should carry you to the FI number with no new saving — provided you keep covering today's spending from work."),
       '<div class="kpis" id="' + u + '-k"></div><div id="' + u + '-c"></div><p class="tool-note" id="' + u + '-n"></p>');

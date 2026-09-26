@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 6 tools (INV-049 to INV-054) - V1.1 (September 2026)
+/* Investing Learning Lab - Stage 6 tools (INV-049 to INV-054) - V1.2 (September 2026)
    Author: Namiranian, Babak. Every tool computes in the browser from its stated formula.
    US historical series: window.INV_RETURNS (Damodaran, NYU Stern, 1928-2025).
    CAPE: window.INV_CAPE (Shiller, ie_data.xls).

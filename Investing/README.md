@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.1 (September 2026)
+V1.2 (September 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -45,8 +45,8 @@ Where a 2026 figure could not be confirmed, the rule is described without the nu
 ## The five households
 
 Fictional households recur in every module so each idea is shown at a different life stage:
-Maya Brooks (24, first job), Marcus and Elena Rivera (35 and 34, two children), Jordan
-Ellis (45, single parent), Tom and Rachel Harper (57 and 55, pre-retirement) and Ruth
+Denise Brooks (24, first job), Marcus and Elena Rivera (35 and 34, two children), Maya
+Walker (58, single mother of Eli, 13, who has a disability), Tom and Rachel Harper (57 and 55, pre-retirement) and Ruth
 Kowalski (68, widowed retiree). Their data lives in `assets/inv.js` (`HOUSEHOLDS`).
 
 ## Shared pages and assets
@@ -54,8 +54,8 @@ Kowalski (68, widowed retiree). Their data lives in `assets/inv.js` (`HOUSEHOLDS
 | File | What it is |
 |---|---|
 | `index.html` | Landing page: start-here paths by audience, one tab per stage, progress |
-| `glossary.html` | 1,008 terms across the whole curriculum; each has what it is, what it is used for, and what it means for you; search, topic and level filters |
-| `resources.html` | 373 curated resources: YouTube channels and podcasts, official sources, free tools, data, books, research, and Babak's tools; filter by kind, level and stage |
+| `glossary.html` | 1,010 terms across the whole curriculum; each has what it is, what it is used for, and what it means for you; search, topic and level filters |
+| `resources.html` | 375 curated resources: YouTube channels and podcasts, official sources, free tools, data, books, research, and Babak's tools; filter by kind, level and stage |
 | `tools.html` | Stage 1's 13 calculators embedded, a directory of the other 160 by stage, Babak's planning tools and official calculators |
 | `assets/inv.css` | Design system (light by default, dark mode) |
 | `assets/inv.js` | Engine: course registry, tabs, journey bar, help, quiz, decisions, myths, exercises, worksheets, glossary popovers, resources, SVG charts |
@@ -96,7 +96,7 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The full-audit run: **36,965 checks, 0 failures** across 109 pages (105 modules, landing page,
+The V1.2 run: **36,989 checks, 0 failures** across 109 pages (105 modules, landing page,
 tools, glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
@@ -107,6 +107,18 @@ navigation and theme toggle. Deliberately injected bugs were caught before relea
 screenshots were reviewed by eye at 1440 and 390 px and in dark mode.
 
 ## Changelog
+
+### V1.2 (September 2026)
+
+- New household: Maya Walker, 58, a divorced single mother in Columbus, Ohio, whose son Eli (13)
+  has autism and an intellectual disability; $92,000 income and $400,000 saved. She replaces
+  Jordan Ellis in every module, with her own numbers recomputed from each page's calculators:
+  special needs trust, Ohio STABLE account, SSI at 18, childhood disability benefits, guardianship,
+  term life payable to the trust, catch-up contributions and a $957,500 retirement target.
+- The 24-year-old household is now named Denise Brooks (formerly Maya Brooks); nothing else
+  about her changed.
+- Glossary adds parental deeming and Medicaid home and community-based services waivers;
+  resources add Ohio's STABLE account and the Ohio DODD waiver pages.
 
 ### V1.1 (September 2026)
 
