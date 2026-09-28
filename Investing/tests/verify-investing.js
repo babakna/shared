@@ -35,9 +35,9 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       await page.goto(BASE + pg, { waitUntil: 'load' });
       await page.waitForTimeout(250);
       const release = await page.evaluate(() => ({
-        current: document.body.innerText.includes('V1.3 (October 2026)'),
-        stale: document.body.innerText.includes('V1.2 (September 2026)'),
-        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.2(?:&|$)/.test(u))
+        current: document.body.innerText.includes('V1.4 (October 2026)'),
+        stale: /V1\.[23] \((?:September|October) 2026\)/.test(document.body.innerText),
+        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[23](?:&|$)/.test(u))
       }));
       ok(release.current && !release.stale && !release.oldAssets.length, `${pg} @${w}: release marker ${JSON.stringify(release)}`);
       const tabCount = await page.$$eval('.tabs-shell:not([hidden]) .panel', p => p.length);

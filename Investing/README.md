@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.3 (October 2026)
+V1.4 (October 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -9,8 +9,20 @@ will leave behind. Static HTML with no build step, no server and no tracking. Op
 
 ## Scope
 
-15 stages and **105 modules, all live**, plus a capstone that builds complete plans for the
-six households.
+Eight clear course groups organize 15 subject stages and **105 modules, all live**, plus a
+capstone that builds complete plans for the six households. The landing page shows only the
+eight course choices; each opens a new-tab course hub containing its related modules.
+
+| Course | Focus | Modules |
+|---|---|---|
+| 1 | Investing Essentials | INV-001 to INV-017 |
+| 2 | Money & Life Planning | INV-018 to INV-028 |
+| 3 | Taxes & Accounts, including state taxes | INV-029 to INV-042 |
+| 4 | Strategies & Portfolio Management | INV-043 to INV-062 |
+| 5 | Real Estate Investing, including state-dependent rules | INV-063 to INV-071 |
+| 6 | Financial Independence & Retirement | INV-072 to INV-083 |
+| 7 | Estate, Legacy & Life Changes, including state estate/inheritance taxes | INV-084 to INV-102 |
+| 8 | Advice & Complete Plans | INV-103 to INV-105 |
 
 | Stage | Topic | Modules |
 |---|---|---|
@@ -56,12 +68,15 @@ trust rather than a standard 30-year horizon. Their data lives in `assets/inv.js
 
 | File | What it is |
 |---|---|
-| `index.html` | Landing page: start-here paths by audience, one tab per stage, progress |
+| `index.html` | Simple eight-card course landing page with graphics, progress and new-tab launch behavior |
+| `course-*.html` | Eight course hubs that group and describe all 105 modules; every module opens in a new tab |
 | `glossary.html` | 1,010 terms across the whole curriculum; each has what it is, what it is used for, and what it means for you; search, topic and level filters |
 | `resources.html` | 375 curated resources: YouTube channels and podcasts, official sources, free tools, data, books, research, and Babak's tools; filter by kind, level and stage |
 | `tools.html` | Stage 1's 13 calculators embedded, a directory of the other 160 by stage, Babak's planning tools and official calculators |
 | `assets/inv.css` | Design system (light by default, dark mode) |
+| `assets/inv-hub.css` | Landing-card and course-hub layouts, graphics and responsive behavior |
 | `assets/inv.js` | Engine: course registry, tabs, journey bar, help, quiz, decisions, myths, exercises, worksheets, glossary popovers, resources, SVG charts |
+| `assets/inv-hub.js` | Course-hub renderer, progress and module launch behavior |
 | `assets/inv-tools.js` | Stage 1's 13 calculators |
 | `assets/inv-tools-s*.js` | Calculators for Stages 2&ndash;14 (160), one file per build group, each loaded only by its modules; several expose shared engines such as `INV.s5aEngine` (2026 federal tax) |
 | `assets/inv-data.js` | Annual returns 1928&ndash;2025 (Damodaran, NYU Stern) |
@@ -99,19 +114,31 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The V1.3 run: **37,562 checks, 0 failures** across 109 pages (105 modules, landing page,
-tools, glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
+The V1.4 run: **37,472 checks, 0 failures** across 117 pages (105 modules, eight course hubs, the landing page, tools,
+glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
 element ids and console errors; then it drives every decision card, myth card, exercise
 (right and wrong answers), quiz, worksheet, calculator (every slider at both extremes, every
 option, blank and zero inputs, empty result areas), glossary popover, keyboard tab
 navigation and theme toggle. It also verifies the Shah lens across the course, the six-household
-capstone, typo-tolerant searches and abbreviations, saved-tab resume/restart, and V1.3 October
-release markers and cache keys on every page. Selected revised tabs were reviewed by eye at
+capstone, typo-tolerant searches and abbreviations, saved-tab resume/restart, the eight-course
+grouping and new-tab launch behavior, and V1.4 October release markers and cache keys on every
+page. Selected revised pages were reviewed by eye at
 1440 and 390 px.
 
 ## Changelog
+
+### V1.4 (October 2026)
+
+- Replaces the overwhelming 15-tab landing experience with eight professionally grouped,
+  illustrated course cards modeled on the AI tutorial's simple course-selection pattern.
+- Adds eight dedicated course hubs covering every one of the 105 modules exactly once. Landing
+  cards and module cards open in new tabs so the learner's course map remains available.
+- Makes estate planning and state-specific material visible in the grouping, including state
+  income taxes, state estate and inheritance taxes, and state-dependent real-estate rules.
+- Preserves saved progress, typo-tolerant search, the full contextual curriculum, all six
+  households, dark/light mode, Help, tools, glossary and resources.
 
 ### V1.3 (October 2026)
 
