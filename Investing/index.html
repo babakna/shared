@@ -51,7 +51,7 @@ a.mod:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(31,95,209,.12)}
   <h1>Investing: <span>Learn</span> &middot; Plan &middot; Invest</h1>
   <p class="byline"><b>Namiranian, Babak</b></p>
   <p class="ver">V1.2 (September 2026)</p>
-  <p class="desc">A comprehensive, self-paced investing curriculum for every stage of life &mdash; from your first paycheck to passing wealth on. Each module teaches from zero, then goes as deep as you want, with live calculators built on real market history, case studies, decisions to make, and five households whose lives show how each idea plays out.</p>
+  <p class="desc">A comprehensive, self-paced investing curriculum for every stage of life &mdash; from your first paycheck to passing wealth on. Each module teaches from zero, then goes as deep as you want, with live calculators built on real market history, case studies, decisions to make, and six households whose lives show why recommendations change with context.</p>
   <span class="stats" id="landStats">15 stages &middot; 105 modules &middot; 1,000+ glossary terms &middot; 173 calculators &middot; 370+ curated resources</span>
   <div class="quick"><a class="btn primary" id="continueBtn" href="INV-001.html">Start with INV-001 &rarr;</a><button type="button" class="btn" onclick="INV.openMap(this)">Course map &amp; search</button><a class="btn" href="tools.html">Open the tools</a><a class="btn" href="glossary.html">Browse the glossary</a></div>
 </section>
@@ -66,9 +66,10 @@ a.mod:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(31,95,209,.12)}
     <div class="path"><span class="chip teal">Some experience</span><div class="who">"I have a 401(k) but don't really understand it."</div><p class="src">Risk, diversification and costs explain most of what matters.</p><div class="go"><a class="btn small primary" href="INV-003.html">INV-003 Risk</a><a class="btn small" href="INV-004.html">INV-004 Diversification</a><a class="btn small" href="INV-007.html">INV-007 Costs</a></div></div>
     <div class="path"><span class="chip amber">Families</span><div class="who">"We're juggling kids, a mortgage and retirement."</div><p class="src">Foundations first; then your financial base, planning, taxes and education accounts (Stages 3&ndash;5).</p><div class="go"><a class="btn small primary" href="INV-027.html">INV-027 Families</a><a class="btn small" href="INV-034.html">INV-034 529s</a></div></div>
     <div class="path"><span class="chip violet">Near or in retirement</span><div class="who">"Will my money last?"</div><p class="src">Withdrawals, sequence risk, Social Security and Medicare (Stage 11).</p><div class="go"><a class="btn small primary" href="INV-076.html">INV-076 Withdrawals</a><a class="btn small" href="INV-078.html">INV-078 Social Security</a></div></div>
+    <div class="path"><span class="chip amber">Complex family planning</span><div class="who">"Our ages, dependents and timelines do not fit a standard plan."</div><p class="src">Start with life stages and families, then connect Social Security, trusts and special-needs planning.</p><div class="go"><a class="btn small primary" href="INV-026.html">INV-026 Life stages</a><a class="btn small" href="INV-078.html">INV-078 Social Security</a><a class="btn small" href="INV-102.html">INV-102 Special needs</a></div></div>
     <div class="path"><span class="chip gray">Legacy</span><div class="who">"What happens to it when I'm gone?"</div><p class="src">Estate planning, trusts, estate and gift tax, inherited accounts (Stage 12).</p><div class="go"><a class="btn small primary" href="INV-084.html">INV-084 Documents</a><a class="btn small" href="#s13" data-goto-tab="13">Stage 12</a></div></div>
   </div>
-  <h3>The five households who appear in every module</h3>
+  <h3>The six households who appear in every module</h3>
   <div data-households></div>
   <h3>How every module works</h3>
   <figure class="fig">
@@ -246,7 +247,7 @@ INV.ready(function () {
     panel.innerHTML = html;
   });
   var last = INV.store("inv-last");
-  if (last && last.id) { var cb = document.getElementById("continueBtn"); cb.href = last.id + ".html#s" + (last.tab + 1); cb.textContent = "Continue: " + last.id + " \u00B7 " + (last.title || "") + " \u2192"; }
+  if (last && last.id) { var cb = document.getElementById("continueBtn"); cb.href = last.id + ".html#s" + (last.tab + 1); cb.textContent = "Continue: " + last.id + " · tab " + (last.tab + 1) + (last.tabName ? " · " + last.tabName : "") + " →"; cb.title = last.title || "Continue where you left off"; }
   var liveMods = INV.course.filter(function (m) { return m.live; }), done = liveMods.filter(function (m) { return prog[m.id] && prog[m.id].done; }).length;
   document.getElementById("pfill").style.width = (liveMods.length ? done / liveMods.length * 100 : 0) + "%";
   document.getElementById("ptext").textContent = done + " of " + liveMods.length + " live modules complete";

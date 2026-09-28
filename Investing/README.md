@@ -10,7 +10,7 @@ will leave behind. Static HTML with no build step, no server and no tracking. Op
 ## Scope
 
 15 stages and **105 modules, all live**, plus a capstone that builds complete plans for the
-five households.
+six households.
 
 | Stage | Topic | Modules |
 |---|---|---|
@@ -28,7 +28,7 @@ five households.
 | 12 | Estate planning and wealth transfer | INV-084 to INV-094 |
 | 13 | Life events | INV-095 to INV-102 |
 | 14 | Getting help | INV-103 to INV-104 |
-| 15 | Capstone: five households, five plans | INV-105 |
+| 15 | Capstone: six households, six plans | INV-105 |
 
 Every module is split into 12&ndash;14 tabs (one panel on screen at a time, arrow-key
 navigation, deep links as `#s3`) with the same anatomy: Start here, concept tabs with
@@ -42,12 +42,15 @@ module complete) and curated resources plus cited primary sources. Every tab has
 (including Rev. Proc. 2025-32, Notice 2025-67, and pages reflecting Public Law 119-21).
 Where a 2026 figure could not be confirmed, the rule is described without the number.
 
-## The five households
+## The six households
 
 Fictional households recur in every module so each idea is shown at a different life stage:
 Denise Brooks (24, first job), Marcus and Elena Rivera (35 and 34, two children), Maya
 Walker (58, single mother of Eli, 13, who has a disability), Tom and Rachel Harper (57 and 55, pre-retirement) and Ruth
-Kowalski (68, widowed retiree). Their data lives in `assets/inv.js` (`HOUSEHOLDS`).
+Kowalski (68, widowed retiree). Daniel and Priya Shah (62 and 48) add a large-age-gap household
+with substantial taxable, tax-deferred and Roth assets and a 14-year-old daughter, Leena, who has
+lifelong support needs. Their plan spans staggered retirements and a third-party special needs
+trust rather than a standard 30-year horizon. Their data lives in `assets/inv.js` (`HOUSEHOLDS`).
 
 ## Shared pages and assets
 

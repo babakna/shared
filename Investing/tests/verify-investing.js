@@ -146,6 +146,9 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       out.end = document.querySelectorAll('.tab')[panels.length - 1].getAttribute('aria-selected') === 'true';
       // resources rendered
       out.res = document.querySelectorAll('[data-resources] .res').length;
+      // every standard household application includes the sixth persona exactly once
+      const hp = document.querySelector('.panel[data-tab="Your household"]');
+      out.shah = !hp || hp.querySelectorAll('[data-hh="shah"]').length === 1;
       // navigation guide: breadcrumb, unified Previous/Next, map search, back-to-top floater
       show(panels.length - 1);
       out.navLast = /Next module|Course home/.test(document.querySelector('.guide [data-step="1"]').textContent);
@@ -169,6 +172,7 @@ function ok(c, m) { checks++; if (!c) fail(m); }
     ok(res.pop !== false, `${tag}: glossary popover`);
     ok(res.arrow && res.end, `${tag}: keyboard tabs arrow=${res.arrow} end=${res.end}`);
     ok(res.res > 0, `${tag}: no resources rendered`);
+    ok(res.shah, `${tag}: Shah household lens missing or duplicated`);
     ok(res.dark, `${tag}: theme toggle`);
     ok(res.navLast && res.navCrumb && res.navFirst && res.floater, `${tag}: navigation guide last=${res.navLast} crumb=${res.navCrumb} first=${res.navFirst} floater=${res.floater}`);
   }
@@ -183,6 +187,37 @@ function ok(c, m) { checks++; if (!c) fail(m); }
   await page.goto(BASE + 'index.html'); await page.waitForTimeout(200);
   const ix = await page.evaluate(() => ({ live: document.querySelectorAll('a.mod').length, soon: document.querySelectorAll('.mod.soon').length, done: document.querySelectorAll('.st.done').length, tabs: document.querySelectorAll('.tab').length }));
   ok(ix.live + ix.soon === 105 && ix.done === ix.live && ix.tabs === 17, `index ${JSON.stringify(ix)}`);
+
+  // typo-tolerant course-map search, abbreviations and sixth-persona capstone
+  await page.goto(BASE + 'INV-001.html'); await page.waitForTimeout(200);
+  const srch = await page.evaluate(async () => {
+    document.querySelector('[data-map]').click();
+    await new Promise(r => setTimeout(r, 180));
+    const q = document.getElementById('mapQ'), body = document.getElementById('mapBody'), out = {};
+    for (const term of ['bukets', 'socail securty', 'guradrails', 'snt']) {
+      q.value = term; q.dispatchEvent(new Event('input')); out[term] = body.innerText;
+    }
+    q.value = 'six households'; q.dispatchEvent(new Event('input')); out.six = body.innerText;
+    return out;
+  });
+  ok(/INV-076/.test(srch.bukets), `fuzzy search bukets missed INV-076`);
+  ok(/INV-078/.test(srch['socail securty']), `fuzzy search socail securty missed INV-078`);
+  ok(/INV-076/.test(srch.guradrails), `fuzzy search guradrails missed INV-076`);
+  ok(/INV-102/.test(srch.snt), `abbreviation search SNT missed INV-102`);
+  ok(/INV-105/.test(srch.six) && /Shah/i.test(srch.six), `six-household search missed INV-105`);
+
+  // returning learners resume the saved tab and can restart the module
+  await page.goto(BASE + 'INV-049.html');
+  await page.evaluate(() => localStorage.setItem('inv-tab-INV-049', JSON.stringify(3)));
+  await page.reload(); await page.waitForTimeout(200);
+  const resumed = await page.evaluate(() => ({ tab: document.querySelector('.panel.active').getAttribute('data-tab'), note: document.querySelector('.resume-note') && document.querySelector('.resume-note').innerText }));
+  ok(resumed.tab === 'Age-based rules' && /Resumed where you left off/.test(resumed.note || ''), `resume state ${JSON.stringify(resumed)}`);
+  await page.click('.resume-note button');
+  ok(await page.evaluate(() => document.querySelector('.panel.active').getAttribute('data-tab') === 'Start here' && !document.querySelector('.resume-note')), 'resume restart button');
+
+  await page.goto(BASE + 'INV-105.html'); await page.waitForTimeout(200);
+  const cap = await page.evaluate(() => ({ shahTab: [...document.querySelectorAll('.panel')].filter(p => p.dataset.tab === 'The Shahs').length, cards: document.querySelectorAll('[data-households] .hh').length, title: document.title }));
+  ok(cap.shahTab === 1 && cap.cards === 6 && /Six Households/.test(cap.title), `capstone sixth persona ${JSON.stringify(cap)}`);
   }
   ok(!errs.length, 'interaction page errors: ' + errs.join(' | '));
   await browser.close();

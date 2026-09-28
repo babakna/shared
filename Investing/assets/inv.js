@@ -21,7 +21,7 @@
     { n: 12, name: "Estate Planning & Wealth Transfer", blurb: "Documents, beneficiaries, trusts, estate and gift tax, and inherited assets." },
     { n: 13, name: "Life Events", blurb: "Marriage, divorce, children, aging parents, windfalls, job loss and more." },
     { n: 14, name: "Getting Help", blurb: "Choosing an advisor and the platforms you use." },
-    { n: 15, name: "Capstone", blurb: "Five households, five complete plans." }
+    { n: 15, name: "Capstone", blurb: "Six households, six contextual plans." }
   ];
   var T = [
     [1, "Why Invest at All?"], [1, "Compounding and the Time Value of Money"], [1, "Risk and Return"],
@@ -62,7 +62,7 @@
     [13, "Widowhood and Survivor Planning"], [13, "Windfalls and Inheritance"], [13, "Job Loss and Career Change"],
     [13, "Self-Employment"], [13, "Special-Needs Planning"],
     [14, "Choosing a Financial Advisor"], [14, "Platforms, Brokerages and DIY Tools"],
-    [15, "Five Households, Five Plans"]
+    [15, "Six Households, Six Plans"]
   ];
   var LIVE = {}; for (var li = 1; li <= 105; li++) LIVE["INV-" + String(li).padStart(3, "0")] = 1;
   var COURSE = T.map(function (t, i) {
@@ -70,7 +70,7 @@
     return { id: id, n: i + 1, stage: t[0], title: t[1], live: !!LIVE[id] };
   });
 
-  /* ---------- The five recurring households ---------- */
+  /* ---------- The six recurring households ---------- */
   var HOUSEHOLDS = {
     denise: { name: "Denise Brooks", short: "Denise", age: "24", color: "var(--s1)", init: "DB",
       line: "Single, first full-time job at $62,000. $28,000 of student loans at 6.8%, $3,000 in savings, renting.",
@@ -86,8 +86,122 @@
       stage: "Pre-retirement" },
     ruth: { name: "Ruth Kowalski", short: "Ruth", age: "68", color: "var(--s5)", init: "RK",
       line: "Widowed and retired. $780,000 in an individual retirement account (IRA), Social Security of $2,900 a month, paid-off house, $60,000 in cash.",
-      stage: "In retirement" }
+      stage: "In retirement" },
+    shah: { name: "Daniel & Priya Shah", short: "The Shahs", age: "62 & 48", color: "var(--s7)", init: "S",
+      line: "Married with a 14-year age gap. Their daughter Leena, 14, has lifelong support needs. $3.2M invested: $1.2M taxable, $1.5M tax-deferred and $500,000 Roth; planning a third-party special needs trust.",
+      stage: "Staggered retirement, lifetime caregiving" }
   };
+
+  /* Module-specific sixth-household lens. These short applications make the age-gap,
+     account-mix and lifetime-support context visible in every module without pretending
+     that one recommendation fits all six households. */
+  var SHAH_LENS = [
+    "Their purpose is multigenerational: fund Daniel's earlier retirement, Priya's longer working and retirement years, and Leena's support for life. The portfolio cannot be judged by one 30-year horizon.",
+    "Compounding runs on three clocks: Daniel's near-term withdrawals, Priya's decades of growth, and Leena's lifetime trust. Each pool needs its own horizon and assumptions.",
+    "A single risk score is misleading. Daniel faces sequence risk soon; Priya still has substantial human capital; Leena's support fund must survive both parents.",
+    "Diversification protects more than retirement. A concentrated loss could impair Daniel's income, Priya's future, and Leena's support at the same time.",
+    "Brokerage choice must cover joint, individual, retirement and trust accounts, with clear successor access and protections. Simplicity for the future trustee matters.",
+    "No individual company belongs at the center of Leena's support plan. Any stock analysis is a satellite decision after the family's diversified core is secured.",
+    "At $3.2 million, every 0.50% of annual cost is about $16,000. Fees must be measured against actual planning, tax and trust work delivered.",
+    "They need separate cash reserves for ordinary emergencies, Daniel's retirement transition and known trust expenses. Calling all three one bucket hides their different jobs.",
+    "Bond duration should match liabilities: short bonds for Daniel's early withdrawals, inflation protection for later spending, and growth assets for Priya and Leena.",
+    "A ladder, bond fund and TIPS sleeve solve different problems. Their choice depends on dates, inflation exposure, taxes and who will spend the money.",
+    "Stocks fund the long horizons for Priya and Leena, but money Daniel will spend soon should not depend on recovering from a market fall.",
+    "Low-cost broad funds make the family's many accounts easier to coordinate and eventually administer. Fund structure and tax location still matter.",
+    "Gold may be an optional diversifier, not a substitute for Leena's funded trust or Daniel's near-term reserve. Any allocation should be small and purposeful.",
+    "Illiquidity is unusually costly when one spouse is retiring and a child may need support unexpectedly. Private assets must not crowd out liquid reserves.",
+    "Crypto, if held at all, belongs in a capped speculative sleeve that the retirement and special-needs plans do not rely on.",
+    "Options can create obligations at the wrong time. Assets earmarked for retirement income or Leena's care should not secure speculative positions.",
+    "Lifetime income may protect Daniel or Priya, but an annuity is not automatically the right vehicle for Leena's support. Beneficiary, inflation and insurer terms control.",
+    "Cash flow changes twice: when Daniel retires and when Priya eventually does. The plan must also fund recurring care and trustee costs that do not end at retirement.",
+    "Their reserve should exceed a generic month count because caregiving can disrupt Priya's work and Daniel is near retirement. Trust assets are not the household emergency fund.",
+    "Debt payoff competes with three investment horizons. Compare the guaranteed debt return with liquidity, taxes, employer matches and the funded status of Leena's plan.",
+    "Both spouses need independent credit and account access. A future trustee or agent also needs a documented path that does not depend on one spouse's memory.",
+    "Daniel's retirement date, Priya's employment benefits and Leena's eligibility interact. Health, disability, life and workplace benefits must be mapped as a household system.",
+    "They need term or permanent coverage only for measured needs, disability protection for Priya's remaining earnings, long-term-care planning for both spouses, and coverage coordinated with the SNT.",
+    "Their goals cannot share one date: Daniel's retirement, Priya's retirement and Leena's lifetime support each require a separate amount, priority and funding source.",
+    "Capacity varies within the household. Daniel's spending pool has little recovery time; Priya and Leena have long horizons but cannot absorb a failure of the near-term plan.",
+    "This family spans several life stages simultaneously. Age-based guidance must be combined with caregiving, disability, survivor and account-type context.",
+    "The age gap makes retirement and survivor planning joint decisions. Each spouse also needs independent legal authority, account access and a plan for caring for Leena alone.",
+    "Their IPS should define separate sleeves, ranges and refill rules for near-term retirement, long-term growth and Leena's trust, plus who acts after incapacity or death.",
+    "Their tax plan changes when Daniel retires, when Social Security begins, when Medicare starts, when Priya retires and when either spouse dies. One current-year bracket is not enough.",
+    "Taxable income, qualified dividends and gains affect Roth conversions, Medicare premiums and trust funding. Lots should be managed across the whole household, not account by account.",
+    "Daniel can use age-based catch-ups now while Priya has many contribution years left. Roth versus traditional treatment should reflect their different withdrawal dates and future survivor brackets.",
+    "Their pre-tax, Roth and taxable balances create planning flexibility. Conversions and contributions should reduce lifetime tax and preserve accessible money for the staggered retirement.",
+    "Medicare eligibility arrives for Daniel long before Priya. HSA contributions, reimbursements and enrollment dates must be tracked separately for each spouse.",
+    "A 529 may fit education, but Leena's broader disability expenses and benefit eligibility call for an ABLE account and SNT analysis rather than a college-only answer.",
+    "The $1.2 million taxable account is both a bridge and an estate asset. Specific-lot records, charitable gifts and step-up planning can materially change after-tax results.",
+    "Their three account types should be located as one portfolio. Near-term spending, future Roth growth, tax-efficient equities and SNT funding may belong in different places.",
+    "Losses can fund rebalancing and offset gains, but replacement investments must preserve each sleeve's risk. Priya's ongoing income may create opportunities after Daniel retires.",
+    "Daniel's retirement-to-RMD years may be a conversion window, but Priya's earnings, Medicare IRMAA and survivor taxes can change the optimal amount each year.",
+    "Charitable goals come after the lifetime-support plan is funded. Appreciated taxable assets and later qualified charitable distributions may be more efficient than cash.",
+    "If either spouse receives employer stock, it adds household and career concentration. Leena's support assets should not depend on the same company paying the salary.",
+    "State residency affects income, estate, trust and benefit planning over several decades. A move must be evaluated for both spouses and the services Leena relies on.",
+    "A fixed taxable-first order is too simple. Annual withdrawals, gains, Roth conversions, Social Security, RMDs and SNT funding should be coordinated across all three tax treatments.",
+    "Market efficiency supports a low-cost core, but their real planning value comes from tax, benefit and horizon coordination rather than trying to identify mispriced securities.",
+    "A broad index core is easy for a surviving spouse and trustee to maintain. Simplicity is a risk control when the plan may outlive both parents.",
+    "Active management must overcome fees, taxes and governance burden. Any active sleeve needs a written reason and must not complicate Leena's long-term administration.",
+    "Style exposure should be intentional, diversified and measured across accounts. Their support plan should not depend on one style returning to favor on schedule.",
+    "Dividends are not a separate safety system. Total return, taxes and the timing of the family's actual cash needs matter more than yield alone.",
+    "Factor tilts can endure long droughts. A small, documented tilt may fit the long horizons, but not Daniel's near-term spending reserve.",
+    "One age rule cannot serve them. Daniel's reserve, Priya's long horizon, guaranteed income, tax mix and Leena's lifetime need point to a purpose-based allocation across the household.",
+    "One target-date fund cannot express three horizons. Separate funds may work for each spouse, while Leena's trust needs its own policy and trustee-ready allocation.",
+    "A lump sum is statistically favored for long-horizon money, but staged investing may protect near-term liabilities and behavior. The answer can differ by sleeve.",
+    "Tactical timing adds decision risk to an already complex plan. Written rebalancing and spending rules are more dependable than forecasts for essential support assets.",
+    "Values-based choices should be measured against diversification, fees and tracking error. Fiduciary duties to Leena's trust may constrain how far preferences can narrow investments.",
+    "International diversification reduces dependence on one country across multi-decade horizons. Currency exposure may be acceptable for growth but not for near-term dollar spending.",
+    "Build three coordinated sleeves, not three disconnected portfolios: Daniel's transition, Priya's long-term retirement and Leena's lifetime support, then locate them tax-efficiently.",
+    "Rebalance the combined household portfolio with contributions, withdrawals and taxable lots. Separate accounts do not justify six unrelated target allocations.",
+    "Performance should be measured against each goal's benchmark and funding progress. Beating one market index can still leave the retirement or SNT plan short.",
+    "Reviews should occur at least annually and at Daniel's retirement, Social Security claims, Medicare enrollments, Priya's retirement, Leena's adulthood, and either spouse's incapacity or death.",
+    "Their family file must let Priya, Daniel, successor trustees and agents find accounts, basis, beneficiaries, benefits, care instructions and professional contacts without guesswork.",
+    "Mental accounting can help if the labeled sleeves enforce a sound total allocation; it hurts if labels hide duplicated risk or idle cash.",
+    "A written crash plan matters because selling could impair three lives. Near-term reserves and rebalancing rules should be agreed before Daniel retires.",
+    "A large visible portfolio and concern for a disabled child make them targets for affinity and urgency scams. Both spouses and the future trustee need a verification protocol.",
+    "Housing must support accessibility, school and adult services as well as finances. A purely numerical rent-versus-buy result can miss the stability Leena needs.",
+    "Mortgage payoff may lower Daniel's retirement expenses, while investing preserves liquidity for Priya and Leena. Rate, taxes and reserve adequacy decide the trade-off.",
+    "A rental must improve the plan after vacancies, work and concentration. It is unsuitable if it consumes the liquidity or management capacity reserved for caregiving.",
+    "Leverage magnifies losses near Daniel's retirement and may burden Priya or a successor trustee. Debt must be stress-tested against one-income and care-cost scenarios.",
+    "Operating property competes for time with caregiving and retirement. Professional management costs belong in the return calculation from the start.",
+    "Depreciation, passive losses and sale taxes affect the family's taxable bridge. Estate and step-up consequences matter if property may fund Leena later.",
+    "Public REITs offer liquidity and simple administration; private syndications add lockups and sponsor risk. Trustee usability matters as much as projected yield.",
+    "House hacking or BRRRR may suit an active younger investor, but the Shahs should not add operational complexity unless it clearly advances a funded goal.",
+    "Securities are easier to divide, rebalance and administer for three horizons; real estate may provide control and inflation exposure but adds concentration and work.",
+    "Their FI number is not spending divided by one rate. It must model Daniel, Priya and Leena over different horizons, with Social Security, taxes and support costs.",
+    "Daniel can retire while Priya continues working, so the household is neither fully retired nor conventionally FIRE. Benefits, taxes and caregiving define the transition.",
+    "Priya may need accessible taxable and Roth basis before 59½ even though Daniel can use retirement accounts. The bridge should not raid Leena's trust funding.",
+    "A standard 30-year target is inadequate. The plan must cover both spouses' joint and survivor years plus Leena's support after both parents are gone.",
+    "Buckets, guardrails and rebalancing should be compared by purpose: essential family support permits less spending flexibility than travel or gifts.",
+    "Sequence risk begins when Daniel draws from the portfolio, but Priya's earnings partly offset it. The plan must also protect Leena if a parent dies during a downturn.",
+    "Daniel's claim can activate a child benefit for Leena and possibly a child-in-care spousal benefit for Priya, all subject to the family maximum. Claiming is a family decision.",
+    "Daniel reaches Medicare long before Priya. The plan needs separate enrollment calendars, coverage for Priya and Leena, and MAGI control for premiums and subsidies.",
+    "Any pension election must weigh Daniel's life, Priya's longer expected survivor period and Leena's needs. The largest single-life payment may be the weakest family choice.",
+    "Daniel's RMDs begin years before Priya's. Coordinated conversions and charitable distributions can reduce the later survivor's tax burden and protect plan flexibility.",
+    "An income floor can cover essential spending for the spouses, while liquid growth assets preserve flexibility for Leena. Compare inflation, survivor and refund features.",
+    "They are planning for their own possible care while already planning Leena's. Insurance, self-funding and housing choices must not make the child's support plan fragile.",
+    "Their documents need agents, successor decision-makers, guardianship or supported-decision provisions, an SNT, trustee succession and detailed care instructions for Leena.",
+    "Beneficiary forms must route Leena's share to the third-party SNT, not to her directly. The spouses also need contingent beneficiaries and coordinated account titling.",
+    "Avoiding probate is about continuity, not just cost. Priya and successor trustees need immediate authority over household and trust funding after death or incapacity.",
+    "A revocable trust may manage family assets through incapacity; Leena's third-party SNT has a different job. Trustee powers, succession and distribution standards must be explicit.",
+    "Their current $3.2 million may be below federal estate-tax exposure, but growth, life insurance and law changes matter over a lifetime. Portability and state rules still deserve review.",
+    "State estate and inheritance taxes can affect where the family lives, owns property and locates trusts. Services for Leena may outweigh a tax-only relocation.",
+    "Highly appreciated taxable assets may receive a step-up at death, but the survivor and SNT need liquidity too. Hold-versus-sell decisions belong in the full estate plan.",
+    "Retirement-account beneficiaries require special drafting for Leena. The SNT's status, payout rules and taxes must be reviewed by a qualified special-needs attorney.",
+    "Gifts for Leena should go to an ABLE account or the third-party SNT as appropriate, not directly to her. Gifts to the other family members follow different rules.",
+    "A charitable legacy is appropriate only after both spouses' survivor needs and Leena's lifetime support are conservatively funded. Contingent gifts preserve flexibility.",
+    "If they own a business later, succession must provide liquidity without making Priya or Leena dependent on an illiquid company or an unprepared successor.",
+    "The age gap changes support, property and survivor consequences. Any agreement should preserve Leena's SNT funding and avoid leaving either spouse without resources or authority.",
+    "Education savings are only one need. Leena may require therapies, supported living and lifelong services, so the 529, ABLE account and SNT must have distinct roles.",
+    "They may support aging parents while caring for Leena and funding two retirements. Legal authority, time demands and boundaries belong in the financial plan.",
+    "Priya is likely to manage the plan alone for years if Daniel dies first. Survivor Social Security, taxes, account access, trustee succession and Leena's care plan must work immediately.",
+    "Any inheritance should be paused and assigned by purpose. A gift meant for Leena must avoid direct ownership that could disrupt means-tested benefits.",
+    "Priya's job loss would affect benefits and the long runway; Daniel's late-career loss could accelerate retirement. Their reserve and health-coverage plan must handle either event.",
+    "Self-employment would add irregular income, benefit and retirement-plan decisions. The family should protect predictable cash flow before accepting extra tax complexity.",
+    "Their plan must fund a third-party SNT, establish an ABLE account when useful, name capable successor trustees, coordinate public benefits and document Leena's care for adulthood.",
+    "They need advice across retirement income, Social Security, tax and special-needs law. Fee structure matters less than verified competence, coordination and written deliverables.",
+    "The platform must support trust accounts, specific-lot tax management, strong security, successor access and simple reporting that Priya and a future trustee can actually use.",
+    "Their capstone is a staggered, multigenerational plan: Daniel's retirement, Priya's longer horizon and Leena's lifetime support must remain funded under death, disability and market stress."
+  ];
 
   /* ---------- Helpers ---------- */
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -174,7 +288,7 @@
     '<h3>Finding your way</h3><p>The bar at the top always shows where you are: stage, module and tab. Its <b>Next</b> button walks through every tab in order and, at the last tab, straight into the next module; <b>Previous</b> does the reverse. <b>Course map &amp; search</b> (or press <b>/</b>) lists all 105 modules by stage, marks where you are and what you have completed, and searches every module, every tab and the glossary. The round <b>Top</b> button returns you to the top of a long page.</p><h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. You can also click a tab, or use the left and right arrow keys on the tab bar. On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
     '<h3>Three layers of depth</h3><ul><li><b>Start here</b> — the main text of every tab. No background needed.</li><li><b>Going further</b> — expandable panels for readers with some experience.</li><li><b>Practitioner depth</b> — the actual rules, formulas, edge cases and research.</li></ul>' +
     '<h3>Things to do, not just read</h3><ul><li><b>Calculators</b> run their formulas live in your browser.</li><li><b>What would you do?</b> — pick an option first, then see every option’s trade-offs.</li><li><b>Exercises</b> — type an answer and check it; a worked solution follows.</li><li><b>Myth or fact</b> — tap a card to test a popular claim.</li><li><b>Worksheets</b> save in your own browser and can be downloaded.</li><li><b>Dotted terms</b> open a glossary definition.</li></ul>' +
-    '<h3>The five households</h3><p>Denise (24), the Riveras (35 and 34), Maya (58), the Harpers (57 and 55) and Ruth (68) are fictional households who reappear in every module, so each idea is shown at different ages and stages of life.</p>' +
+    '<h3>The six households</h3><p>Denise (24), the Riveras (35 and 34), Maya (58), the Harpers (57 and 55), Ruth (68), and Daniel and Priya Shah (62 and 48, with their daughter Leena) are fictional households who reappear throughout the course. Their different ages, family structures, assets and responsibilities show why sound recommendations are contextual rather than one-size-fits-all.</p>' +
     '<h3>Progress and privacy</h3><p>Passing a module’s knowledge check (70% or better) marks it complete. Progress, worksheets and your theme are stored only in this browser (localStorage). Nothing is sent anywhere.</p>' +
     '<h3>Not advice</h3><p>This is educational material, not financial, tax, legal or investment advice. Tax figures and rules change; confirm current numbers with the IRS, SSA and other primary sources, or a qualified professional, before acting.</p>' +
     '<p style="margin-top:14px"><button class="btn primary" id="closeHelp">Close</button></p></div></div>';
@@ -297,10 +411,17 @@
     document.querySelectorAll("[data-goto-tab]").forEach(function (a) {
       a.addEventListener("click", function (e) { e.preventDefault(); goScroll(Number(a.getAttribute("data-goto-tab")) - 1); });
     });
-    var start = 0, hm = /^#s(\d+)$/.exec(location.hash);
+    var start = 0, hm = /^#s(\d+)$/.exec(location.hash), savedTab = store(key);
     if (location.hash === "#last") start = panels.length - 1;
     else if (hm && Number(hm[1]) >= 1 && Number(hm[1]) <= panels.length) start = Number(hm[1]) - 1;
+    else if (Number.isInteger(savedTab) && savedTab >= 0 && savedTab < panels.length) start = savedTab;
     show(start, false);
+    if (!location.hash && start > 0) {
+      var resume = document.createElement("div"); resume.className = "resume-note";
+      resume.innerHTML = '<span><b>Resumed where you left off:</b> Tab ' + (start + 1) + " of " + panels.length + " · " + esc(panels[start].getAttribute("data-tab") || "") + '</span><button type="button" class="btn small ghost">Start this module again</button>';
+      resume.querySelector("button").addEventListener("click", function () { show(0, true); resume.remove(); });
+      shell.insertBefore(resume, bar.nextSibling);
+    }
     if (location.hash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
     INV.showTab = function (i) { goScroll(Math.max(0, Math.min(i, panels.length - 1))); };
   }
@@ -339,24 +460,57 @@
       });
       body.innerHTML = html;
     }
-    function norm(t) { return String(t || "").toLowerCase(); }
+    function norm(t) {
+      t = String(t || "").toLowerCase();
+      if (t.normalize) t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return t.replace(/&(?:amp|quot|#39);/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+    }
+    var SEARCH_PHRASES = { snt: "special needs trust", ss: "social security", etf: "exchange traded fund",
+      rmd: "required minimum distribution", dac: "disabled adult child" };
+    var SEARCH_CANON = { stocks: "stock", equities: "stock", equity: "stock", bonds: "bond", buckets: "bucket",
+      guardrails: "guardrail", advisers: "advisor", adviser: "advisor", disabilities: "disability", disabled: "disability" };
+    function canonWord(w) { return SEARCH_CANON[w] || w; }
+    function editDistance(a, b) {
+      var prev = [], cur = [], i, j; for (j = 0; j <= b.length; j++) prev[j] = j;
+      for (i = 1; i <= a.length; i++) { cur[0] = i; for (j = 1; j <= b.length; j++) cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur.slice(); }
+      return prev[b.length];
+    }
+    function wordScore(w, toks) {
+      var best = 99;
+      toks.forEach(function (t) {
+        if (t === w || (w.length >= 3 && (t.indexOf(w) === 0 || w.indexOf(t) === 0))) best = Math.min(best, 0);
+        else if (w.length >= 4 && t.length >= 4) { var len = Math.max(w.length, t.length), lim = len >= 9 ? 3 : len >= 5 ? 2 : 1; if (Math.abs(w.length - t.length) <= lim && editDistance(w, t) <= lim) best = Math.min(best, 1); }
+      });
+      return best;
+    }
+    function matchScore(text, words) {
+      var n = norm(text), toks = n.split(/\s+/).filter(Boolean).map(canonWord); if (!toks.length) return 99;
+      var phrase = words.join(" "), total = n.indexOf(phrase) > -1 ? 0 : 1;
+      for (var wi = 0; wi < words.length; wi++) { var s = wordScore(words[wi], toks); if (s > 1) return 99; total += s; }
+      return total;
+    }
     function search(term) {
-      var words = norm(term).split(/\s+/).filter(Boolean); if (!words.length) return outline();
+      var entered = norm(term), words = entered.split(/\s+/).filter(Boolean); if (!words.length) return outline();
+      var expanded = [];
+      words.forEach(function (w) { if (SEARCH_PHRASES[w]) expanded = expanded.concat(norm(SEARCH_PHRASES[w]).split(" ")); else expanded.push(canonWord(w)); });
+      words = expanded.filter(function (w, i, a) { return a.indexOf(w) === i; });
       var I = window.INV_INDEX || {}, res = [], tabsRes = [], G = window.INV_GLOSSARY || [];
-      function hit(t) { t = norm(t); return words.every(function (w) { return t.indexOf(w) > -1; }); }
       COURSE.forEach(function (m) {
         var info = I[m.id] || {};
-        if (hit(m.id + " " + m.title + " " + (info.scope || "") + " " + (info.q || "") + " " + STAGES[m.stage - 1].name)) res.push({ href: m.id + ".html", code: m.id, title: m.title, sub: info.scope || STAGES[m.stage - 1].name, score: hit(m.title) ? 0 : 1 });
-        (info.tabs || []).forEach(function (t, k) { if (hit(t)) tabsRes.push({ href: m.id + ".html#s" + (k + 1), code: m.id, title: t, sub: m.title + " \u00B7 tab " + (k + 1) }); });
+        var ms = matchScore(m.id + " " + m.title + " " + (info.scope || "") + " " + (info.q || "") + " " + STAGES[m.stage - 1].name, words);
+        if (ms < 99) res.push({ href: m.id + ".html", code: m.id, title: m.title, sub: info.scope || STAGES[m.stage - 1].name, score: ms });
+        (info.tabs || []).forEach(function (t, k) { var ts = matchScore(t, words); if (ts < 99) tabsRes.push({ href: m.id + ".html#s" + (k + 1), code: m.id, title: t, sub: m.title + " \u00B7 tab " + (k + 1), score: ts }); });
       });
       res.sort(function (a, b) { return a.score - b.score; });
-      var gl = G.filter(function (g) { return hit(g.t + " " + (g.a || []).join(" ")); }).slice(0, 12);
-      var gl2 = gl.length < 6 ? G.filter(function (g) { return gl.indexOf(g) < 0 && hit(g.d); }).slice(0, 6 - gl.length) : [];
+      tabsRes.sort(function (a, b) { return a.score - b.score; });
+      var rankedG = G.map(function (g) { return { g: g, score: matchScore(g.t + " " + (g.a || []).join(" ") + " " + (g.d || ""), words) }; }).filter(function (x) { return x.score < 99; }).sort(function (a, b) { return a.score - b.score; });
+      var gl = rankedG.slice(0, 12).map(function (x) { return x.g; });
+      var gl2 = [];
       function list(title, arr) { return arr.length ? '<h3 class="map-sec">' + title + " (" + arr.length + ')</h3><ul class="map-res">' + arr.slice(0, 30).map(function (r) { return '<li><a href="' + r.href + '"><span class="map-code">' + esc(r.code) + "</span><b>" + esc(r.title) + "</b><small>" + esc(r.sub) + "</small></a></li>"; }).join("") + "</ul>" : ""; }
       var gItems = gl.concat(gl2).map(function (g) { return { href: "glossary.html#" + slug(g.t), code: "Glossary", title: g.t, sub: g.d.length > 110 ? g.d.slice(0, 110) + "\u2026" : g.d }; });
       var html = list("Modules", res) + list("Tabs inside modules", tabsRes) + list("Glossary", gItems);
       body.scrollTop = 0;
-      body.innerHTML = html || '<p class="src">Nothing matches "' + esc(term) + '". Try a shorter word, or browse by stage after clearing the search.</p>';
+      body.innerHTML = html || '<p class="src">Nothing relevant found for "' + esc(term) + '". Try the idea in different words, or browse by stage after clearing the search.</p>';
     }
     function openMap(o) { opener = o || document.activeElement; ensureIndex(function () { q.value = ""; outline(); modal.classList.add("open"); setTimeout(function () { q.focus(); var h = body.querySelector(".here a"); if (h) h.scrollIntoView({ block: "center" }); }, 30); }); }
     function closeMap() { modal.classList.remove("open"); if (opener && opener.focus) opener.focus(); }
@@ -386,13 +540,20 @@
   /* ---------- Households: cards and lens rows ---------- */
   function avatar(h, cls) { return '<span class="' + (cls || "av") + '" style="background:' + h.color + '">' + esc(h.init) + "</span>"; }
   document.querySelectorAll("[data-households]").forEach(function (el) {
-    var keys = (el.getAttribute("data-households") || "denise,rivera,maya,harper,ruth").split(",");
+    var keys = (el.getAttribute("data-households") || "denise,rivera,maya,harper,ruth,shah").split(",");
     el.classList.add("hh-grid");
     el.innerHTML = keys.map(function (k) {
       var h = HOUSEHOLDS[k.trim()]; if (!h) return "";
       return '<div class="hh">' + avatar(h) + '<div><div class="nm">' + esc(h.name) + ' <span class="chip gray">' + esc(h.age) + '</span></div><div class="ds">' + esc(h.line) + "</div></div></div>";
     }).join("");
   });
+  if (idx > -1) {
+    var householdPanel = document.querySelector('.panel[data-tab="Your household"] .lens');
+    if (householdPanel && !householdPanel.querySelector('[data-hh="shah"]') && SHAH_LENS[idx]) {
+      var shahRow = document.createElement("div"); shahRow.className = "lens-row"; shahRow.setAttribute("data-hh", "shah");
+      shahRow.innerHTML = "<div><b>Their plan spans three lives.</b> " + esc(SHAH_LENS[idx]) + "</div>"; householdPanel.appendChild(shahRow);
+    }
+  }
   document.querySelectorAll(".lens-row[data-hh]").forEach(function (row) {
     var h = HOUSEHOLDS[row.getAttribute("data-hh")]; if (!h) return;
     var who = document.createElement("div"); who.className = "who";
