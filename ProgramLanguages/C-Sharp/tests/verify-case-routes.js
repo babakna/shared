@@ -1,0 +1,10 @@
+"use strict";
+const fs=require("node:fs"),path=require("node:path"),http=require("node:http"),{chromium}=require("playwright");
+const ROOT=path.resolve(__dirname,"../../..");
+function exact(relative){let current=ROOT;for(const part of relative.split("/").filter(Boolean)){try{if(!fs.readdirSync(current).includes(part))return false;current=path.join(current,part);}catch{return false;}}return true;}
+const server=http.createServer((request,response)=>{const pathname=decodeURIComponent(new URL(request.url,"http://local").pathname);let relative=pathname.replace(/^\/+/,"").replace(/^shared\/?/,"")||"index.html";let target=path.resolve(ROOT,relative);if(pathname.endsWith("/"))target=path.join(target,"index.html");if(!exact(relative)){response.writeHead(404,{"content-type":"text/html"});response.end(fs.readFileSync(path.join(ROOT,"404.html")));return;}fs.readFile(target,(error,data)=>{if(error){response.writeHead(404).end("Not found");return;}response.writeHead(200,{"content-type":path.extname(target)===".js"?"text/javascript":path.extname(target)===".css"?"text/css":"text/html"});response.end(data);});});
+(async()=>{await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));const base=`http://127.0.0.1:${server.address().port}/shared/`,browser=await chromium.launch({headless:true}),page=await browser.newPage();const cases=[
+ ["programlanguages/csharp/","ProgramLanguages/C-Sharp/"],
+ ["PROGRAMLANGUAGES/C-SHARP/CSHARP-101.HTML#cs-004","ProgramLanguages/C-Sharp/csharp-101.html#cs-004"],
+ ["ProgramLanguages/cShArP/CSHARP-REFERENCE.HTML","ProgramLanguages/C-Sharp/csharp-reference.html"]
+];let passed=0;for(const [input,expected] of cases){await page.goto(base+input,{waitUntil:"networkidle"});const actual=page.url();if(actual===base+expected)passed++;else console.error("FAIL",input,actual,"expected",base+expected);}console.log(`PASS ${passed} FAIL ${cases.length-passed}`);await browser.close();await new Promise(resolve=>server.close(resolve));if(passed!==cases.length)process.exitCode=1;})().catch(error=>{console.error(error);process.exit(1);});
