@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.4 (October 2026)
+V1.5 (October 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -129,6 +129,19 @@ page. Selected revised pages were reviewed by eye at
 
 ## Changelog
 
+### V1.5 (October 2026)
+
+- Revises the six-household profiles: Denise is a 27-year-old medical student three years from
+  completing her neurosurgery specialization, debt-free and maxing a Roth IRA; Maya is described
+  only as a single mom with a child with special needs and $400,000 saved and invested; Daniel and
+  Priya Shah have $5 million invested across 60% taxable brokerage, 25% traditional 401(k)s and 15%
+  Roth accounts, with Daniel a few years from retirement.
+- Adds a clearly labeled answer and contextual recommendation to every decision scenario, plus two
+  low-stakes in-lesson knowledge checks in every module before the scored quiz.
+- Keeps nominal and inflation-adjusted comparisons on the same chart scale, deepens the capstone's
+  recommendations without inventing missing facts, and retains explicit estate, special-needs,
+  state-tax, Social Security spouse/survivor/child, and nontraditional retirement planning.
+
 ### V1.4 (October 2026)
 
 - Replaces the overwhelming 15-tab landing experience with eight professionally grouped,
@@ -155,13 +168,9 @@ page. Selected revised pages were reviewed by eye at
 
 ### V1.2 (September 2026)
 
-- New household: Maya Walker, 58, a divorced single mother in Columbus, Ohio, whose son Eli (13)
-  has autism and an intellectual disability; $92,000 income and $400,000 saved. She replaces
-  Jordan Ellis in every module, with her own numbers recomputed from each page's calculators:
-  special needs trust, Ohio STABLE account, SSI at 18, childhood disability benefits, guardianship,
-  term life payable to the trust, catch-up contributions and a $957,500 retirement target.
-- The 24-year-old household is now named Denise Brooks (formerly Maya Brooks); nothing else
-  about her changed.
+- Added earlier versions of the Maya and Denise household cases. Their original assumptions were
+  superseded by the corrected V1.5 profiles; retained teaching scenarios now use separate fictional
+  names so historical calculations are not mistaken for the current households.
 - Glossary adds parental deeming and Medicaid home and community-based services waivers;
   resources add Ohio's STABLE account and the Ohio DODD waiver pages.
 

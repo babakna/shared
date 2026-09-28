@@ -75,16 +75,16 @@
      1. Portfolio builder (INV-055)
      ====================================================================== */
   var PRESETS = {
-    denise: { p: 5580, r: 0, t: 0, s: 90, i: 30, note: "Denise's first-year 401(k) money: her 6% contribution ($3,720) plus the 50% match ($1,860). Her $3,000 of savings stays in cash as the start of an emergency fund." },
+    denise: { p: 5580, r: 0, t: 0, s: 90, i: 30, note: "Jordan's first-year 401(k) money: her 6% contribution ($3,720) plus the 50% match ($1,860). Her $3,000 of savings stays in cash as the start of an emergency fund." },
     rivera: { p: 62000, r: 15000, t: 0, s: 80, i: 30, note: "The Riveras' two 401(k)s ($62,000) plus two 2026 Roth IRA contributions of $7,500 each, funded from idle checking." },
-    maya: { p: 290000, r: 40000, t: 40000, s: 60, i: 30, note: "Maya's 401(k), Roth IRA and taxable account: $370,000 invested for her retirement and, after her, for Eli's lifetime needs. Her $30,000 of savings is her emergency reserve and is not included." },
+    maya: { p: 290000, r: 40000, t: 40000, s: 60, i: 30, note: "Monica's 401(k), Roth IRA and taxable account: $370,000 invested for her retirement and, after her, for Eli's lifetime needs. Her $30,000 of savings is her emergency reserve and is not included." },
     harper: { p: 820000, r: 60000, t: 220000, s: 60, i: 30, note: "The Harpers' $1.1 million: pre-tax 401(k)s, Roth IRAs, and the taxable account of technology stocks that will be diversified over several years." },
     ruth: { p: 780000, r: 0, t: 0, s: 45, i: 30, note: "Ruth's traditional IRA. Her $60,000 of CDs and savings is a separate cash reserve and is not included." }
   };
   TOOLS.s7Builder = function (el) {
     var u = uid(el);
     shell(el, "Portfolio builder: from an allocation to funds in accounts", "Builder",
-      sel(u + "-hh", "Start from a household", [["rivera", "The Riveras"], ["denise", "Denise"], ["maya", "Maya"], ["harper", "The Harpers"], ["ruth", "Ruth"], ["custom", "My own numbers"]], "rivera") +
+      sel(u + "-hh", "Start from a household", [["rivera", "The Riveras"], ["denise", "Jordan"], ["maya", "Monica"], ["harper", "The Harpers"], ["ruth", "Ruth"], ["custom", "My own numbers"]], "rivera") +
       numf(u + "-p", "Pre-tax accounts: 401(k), 403(b), traditional IRA ($)", 62000, 1000) +
       numf(u + "-r", "Roth accounts: Roth IRA, Roth 401(k) ($)", 15000, 500) +
       numf(u + "-t", "Taxable brokerage account ($)", 0, 1000) +

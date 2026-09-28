@@ -35,11 +35,40 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       await page.goto(BASE + pg, { waitUntil: 'load' });
       await page.waitForTimeout(250);
       const release = await page.evaluate(() => ({
-        current: document.body.innerText.includes('V1.4 (October 2026)'),
-        stale: /V1\.[23] \((?:September|October) 2026\)/.test(document.body.innerText),
-        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[23](?:&|$)/.test(u))
+        current: document.body.innerText.includes('V1.5 (October 2026)'),
+        stale: /V1\.[234] \((?:September|October) 2026\)/.test(document.body.innerText),
+        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[234](?:&|$)/.test(u))
       }));
       ok(release.current && !release.stale && !release.oldAssets.length, `${pg} @${w}: release marker ${JSON.stringify(release)}`);
+      if (/^INV-\d{3}\.html$/.test(pg)) {
+        const learning = await page.evaluate(() => ({
+          decisions: document.querySelectorAll('.decide').length,
+          answers: document.querySelectorAll('.decide .answer-recommendation').length,
+          checks: document.querySelectorAll('.knowledge-check').length
+        }));
+        ok(learning.answers === learning.decisions, `${pg} @${w}: every decision has an explicit answer/recommendation ${JSON.stringify(learning)}`);
+        ok(learning.checks >= 2, `${pg} @${w}: at least two in-lesson knowledge checks ${JSON.stringify(learning)}`);
+        const interaction = await page.evaluate(() => {
+          const d = document.querySelector('.decide'), kc = document.querySelector('.knowledge-check');
+          if (d) d.querySelector('.opt')?.click();
+          if (kc) kc.querySelector('[data-kc-answer]')?.click();
+          return {
+            answerShown: !d || (getComputedStyle(d.querySelector('.outcomes')).display !== 'none' && /Answer:/.test(d.querySelector('.answer-recommendation')?.innerText || '')),
+            checkResponded: !kc || kc.querySelector('.kc-feedback')?.classList.contains('show')
+          };
+        });
+        ok(interaction.answerShown && interaction.checkResponded, `${pg} @${w}: learning interactions respond ${JSON.stringify(interaction)}`);
+      }
+      if (pg === 'INV-001.html') {
+        const scales = await page.evaluate(() => {
+          const labels = () => [...document.querySelectorAll('#f14 svg text')].filter(t => t.getAttribute('x') === '54').map(t => t.textContent);
+          const nominal = labels();
+          document.querySelector('#f14mode [data-v="real"]').click();
+          const real = labels();
+          return { nominal, real };
+        });
+        ok(JSON.stringify(scales.nominal) === JSON.stringify(scales.real), `${pg} @${w}: nominal and after-inflation chart share vertical scale ${JSON.stringify(scales)}`);
+      }
       const tabCount = await page.$$eval('.tabs-shell:not([hidden]) .panel', p => p.length);
       const n = Math.max(1, tabCount);
       for (let i = 0; i < n; i++) {
@@ -196,9 +225,15 @@ function ok(c, m) { checks++; if (!c) fail(m); }
     const cards = [...document.querySelectorAll('.course-grid a.course-card')];
     return { cards: cards.length, targets: cards.filter(a => a.target === '_blank' && a.rel.includes('noopener')).length,
       hrefs: new Set(cards.map(a => a.getAttribute('href'))).size, graphics: cards.filter(a => a.querySelector('svg')).length,
-      legacyHidden: [...document.querySelectorAll('.legacy-landing')].every(e => e.hidden || getComputedStyle(e).display === 'none') };
+      legacyHidden: [...document.querySelectorAll('.legacy-landing')].every(e => e.hidden || getComputedStyle(e).display === 'none'),
+      title: document.querySelector('h1')?.textContent.trim(), households: [...document.querySelectorAll('.hh')].map(e => e.textContent).join(' | ') };
   });
   ok(ix.cards === 8 && ix.targets === 8 && ix.hrefs === 8 && ix.graphics === 8 && ix.legacyHidden, `landing courses ${JSON.stringify(ix)}`);
+  ok(ix.title === 'Learn Investing: From the Basics to Advanced Planning', `landing title ${JSON.stringify(ix.title)}`);
+  ok(/Denise Brooks[\s\S]*27[\s\S]*three years remaining[\s\S]*no student loans/i.test(ix.households) &&
+    /Maya Walker[\s\S]*Single mom[\s\S]*special needs[\s\S]*\$400,000/i.test(ix.households) &&
+    /Daniel & Priya Shah[\s\S]*\$5M[\s\S]*60%[\s\S]*25%[\s\S]*15%/i.test(ix.households) &&
+    !/Divorced|autism|intellectual disability|\$92,000|\$95,000/i.test(ix.households), `corrected household profiles ${JSON.stringify(ix.households)}`);
   const popupPromise = page.waitForEvent('popup');
   await page.click('.course-grid a.course-card');
   const popup = await popupPromise; await popup.waitForLoadState('load');

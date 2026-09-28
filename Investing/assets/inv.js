@@ -1,7 +1,7 @@
-/* Investing Learning Lab - shared engine - V1.4 (October 2026) */
+/* Investing Learning Lab - shared engine - V1.5 (October 2026) */
 (function () {
   "use strict";
-  var VERSION = "V1.4 (October 2026)";
+  var VERSION = "V1.5 (October 2026)";
   var AUTHOR = "Namiranian, Babak";
   var root = document.documentElement;
 
@@ -72,14 +72,14 @@
 
   /* ---------- The six recurring households ---------- */
   var HOUSEHOLDS = {
-    denise: { name: "Denise Brooks", short: "Denise", age: "24", color: "var(--s1)", init: "DB",
-      line: "Single, first full-time job at $62,000. $28,000 of student loans at 6.8%, $3,000 in savings, renting.",
-      stage: "Starting out" },
+    denise: { name: "Denise Brooks", short: "Denise", age: "27", color: "var(--s1)", init: "DB",
+      line: "Medical student with three years remaining in her neurosurgery specialization. She has no student loans, is maxing her annual Roth IRA contribution, and currently has no other savings or investments.",
+      stage: "Medical training" },
     rivera: { name: "Marcus & Elena Rivera", short: "The Riveras", age: "35 & 34", color: "var(--s2)", init: "R",
       line: "Married, two children (4 and 7). $145,000 household income, $310,000 mortgage at 3.1%, $62,000 in 401(k)s.",
       stage: "Building a family" },
     maya: { name: "Maya Walker", short: "Maya", age: "58", color: "var(--s3)", init: "MW",
-      line: "Divorced single mother of Eli, 13, who has autism and an intellectual disability. $92,000 income, $400,000 saved, $310,000 home with $95,000 left on the mortgage.",
+      line: "Single mom of Eli, 13, a kid with special needs. She has $400,000 saved and invested.",
       stage: "Late career, single parent" },
     harper: { name: "Tom & Rachel Harper", short: "The Harpers", age: "57 & 55", color: "var(--s4)", init: "H",
       line: "$260,000 income, $1.1M saved (mostly pre-tax 401(k)), home worth $650,000 with $90,000 left on the mortgage.",
@@ -88,7 +88,7 @@
       line: "Widowed and retired. $780,000 in an individual retirement account (IRA), Social Security of $2,900 a month, paid-off house, $60,000 in cash.",
       stage: "In retirement" },
     shah: { name: "Daniel & Priya Shah", short: "The Shahs", age: "62 & 48", color: "var(--s7)", init: "S",
-      line: "Married with a 14-year age gap. Their daughter Leena, 14, has lifelong support needs. $3.2M invested: $1.2M taxable, $1.5M tax-deferred and $500,000 Roth; planning a third-party special needs trust.",
+      line: "Married with a 14-year age gap. Their daughter Leena, 14, has special needs. They have $5M invested: 60% in taxable brokerage accounts, 25% in traditional 401(k)s, and 15% in Roth IRAs and Roth 401(k)s. Daniel is a few years from retirement, and they are planning a third-party special needs trust.",
       stage: "Staggered retirement, lifetime caregiving" }
   };
 
@@ -102,7 +102,7 @@
     "Diversification protects more than retirement. A concentrated loss could impair Daniel's income, Priya's future, and Leena's support at the same time.",
     "Brokerage choice must cover joint, individual, retirement and trust accounts, with clear successor access and protections. Simplicity for the future trustee matters.",
     "No individual company belongs at the center of Leena's support plan. Any stock analysis is a satellite decision after the family's diversified core is secured.",
-    "At $3.2 million, every 0.50% of annual cost is about $16,000. Fees must be measured against actual planning, tax and trust work delivered.",
+    "At $5 million, every 0.50% of annual cost is about $25,000. Fees must be measured against actual planning, tax and trust work delivered.",
     "They need separate cash reserves for ordinary emergencies, Daniel's retirement transition and known trust expenses. Calling all three one bucket hides their different jobs.",
     "Bond duration should match liabilities: short bonds for Daniel's early withdrawals, inflation protection for later spending, and growth assets for Priya and Leena.",
     "A ladder, bond fund and TIPS sleeve solve different problems. Their choice depends on dates, inflation exposure, taxes and who will spend the money.",
@@ -130,7 +130,7 @@
     "Their pre-tax, Roth and taxable balances create planning flexibility. Conversions and contributions should reduce lifetime tax and preserve accessible money for the staggered retirement.",
     "Medicare eligibility arrives for Daniel long before Priya. HSA contributions, reimbursements and enrollment dates must be tracked separately for each spouse.",
     "A 529 may fit education, but Leena's broader disability expenses and benefit eligibility call for an ABLE account and SNT analysis rather than a college-only answer.",
-    "The $1.2 million taxable account is both a bridge and an estate asset. Specific-lot records, charitable gifts and step-up planning can materially change after-tax results.",
+    "The $3 million taxable allocation is both a bridge and an estate asset. Specific-lot records, charitable gifts and step-up planning can materially change after-tax results.",
     "Their three account types should be located as one portfolio. Near-term spending, future Roth growth, tax-efficient equities and SNT funding may belong in different places.",
     "Losses can fund rebalancing and offset gains, but replacement investments must preserve each sleeve's risk. Priya's ongoing income may create opportunities after Daniel retires.",
     "Daniel's retirement-to-RMD years may be a conversion window, but Priya's earnings, Medicare IRMAA and survivor taxes can change the optimal amount each year.",
@@ -183,7 +183,7 @@
     "Beneficiary forms must route Leena's share to the third-party SNT, not to her directly. The spouses also need contingent beneficiaries and coordinated account titling.",
     "Avoiding probate is about continuity, not just cost. Priya and successor trustees need immediate authority over household and trust funding after death or incapacity.",
     "A revocable trust may manage family assets through incapacity; Leena's third-party SNT has a different job. Trustee powers, succession and distribution standards must be explicit.",
-    "Their current $3.2 million may be below federal estate-tax exposure, but growth, life insurance and law changes matter over a lifetime. Portability and state rules still deserve review.",
+    "Their current $5 million may be below federal estate-tax exposure, but growth, life insurance and law changes matter over a lifetime. Portability and state rules still deserve review.",
     "State estate and inheritance taxes can affect where the family lives, owns property and locates trusts. Services for Leena may outweigh a tax-only relocation.",
     "Highly appreciated taxable assets may receive a step-up at death, but the survivor and SNT need liquidity too. Hold-versus-sell decisions belong in the full estate plan.",
     "Retirement-account beneficiaries require special drafting for Leena. The SNT's status, payout rules and taxes must be reviewed by a qualified special-needs attorney.",
@@ -202,6 +202,45 @@
     "The platform must support trust accounts, specific-lot tax management, strong security, successor access and simple reporting that Priya and a future trustee can actually use.",
     "Their capstone is a staggered, multigenerational plan: Daniel's retirement, Priya's longer horizon and Leena's lifetime support must remain funded under death, disability and market stress."
   ];
+
+  /* Current-persona lenses replace obsolete scenario assumptions while preserving
+     separate fictional examples that still teach a useful principle. */
+  var CURRENT_LENS = {
+    denise: {
+      1: "Her Roth IRA has a long horizon, but she still needs cash for near-term training and living costs. Keep the Roth diversified and treat future emergency savings as a separate job.",
+      2: "A low-cost diversified fund is enough for her Roth IRA. With no other savings yet, complexity, leverage and illiquid assets should wait.",
+      3: "She has no student debt and is already maxing her Roth IRA. Her next financial priority is a starter cash reserve, followed by disability protection as her medical career develops.",
+      4: "Her plan has two distinct stages: three more years of specialist training and a later high-earning career. Goals, risk capacity and contributions should be reset when that transition occurs.",
+      5: "Maxing the Roth IRA during lower-income training years can be valuable. Future physician earnings may shift the balance toward workplace plans, backdoor Roth planning and deliberate tax diversification.",
+      6: "A simple, evidence-based portfolio is appropriate while she has one account. The strategy should be easy to maintain through demanding training and future moves.",
+      7: "Her first portfolio can stay simple: one diversified Roth IRA allocation, an annual review and automatic contributions. More accounts can be coordinated when they actually exist.",
+      8: "A demanding medical schedule makes automation especially useful. Written rules help her avoid performance chasing when she has little time to monitor markets.",
+      9: "Flexibility matters while her eventual job and location are unsettled. Buying property should follow a stable location and a full cash reserve, not anticipated future income.",
+      10: "Her earning years may begin later than many peers, but she starts with no student loans and a fully funded Roth IRA. Financial independence depends on the savings rate she adopts after training, not age alone.",
+      11: "Retirement is distant, so growth matters, but future workplace plans and insurance will become important after training. Today's Roth IRA is the first account, not the entire eventual plan.",
+      12: "Her current estate plan can be simple: health-care and financial powers of attorney, a basic will, and a correct Roth IRA beneficiary. It should be revisited as family and assets change.",
+      13: "Finishing specialization, relocating and entering practice are major financial transitions. She should preserve flexibility now and update cash, insurance and investing decisions as each event becomes real.",
+      14: "She does not need ongoing asset management for one Roth IRA. Focused hourly advice may help when employment contracts, insurance and a much higher income add complexity.",
+      15: "Her current plan is intentionally narrow: keep maxing the Roth IRA, build non-retirement cash next, protect future earning power, and expand the plan when training ends."
+    },
+    maya: {
+      1: "Her $400,000 must support both late-career retirement planning and a child with special needs. Separate near-term safety, retirement growth and future support rather than treating the balance as one pool.",
+      2: "Liquidity and diversification matter because she is the only parent in the household. Speculative or locked-up assets must not endanger either retirement or her child's support.",
+      3: "Before increasing investment risk, she needs a strong cash reserve and insurance coordinated with her child's needs. The appropriate reserve depends on actual essential costs and care disruptions, not a generic rule alone.",
+      4: "Her retirement date and her child's lifetime needs are separate goals with different horizons. The plan must fund both and identify what happens if she cannot provide care herself.",
+      5: "Tax strategy must preserve flexibility and public-benefit eligibility. Account ownership, beneficiaries and any special needs trust should be coordinated with qualified tax and legal professionals.",
+      6: "Her core portfolio should be low-cost and diversified. Any style, factor or active tilt is secondary to funding retirement and lifetime support reliably.",
+      7: "She needs one household-level allocation that assigns each dollar a job: reserve, retirement and future support. Rebalancing rules should protect the near-term pools first.",
+      8: "Fear, urgency and persuasive sales pitches are especially dangerous when another person depends on the outcome. A written plan and a trusted second reviewer create a useful pause.",
+      9: "Housing decisions must account for accessibility, caregiving continuity and future ownership or trust arrangements. Property is part of the support plan, not merely an investment return.",
+      10: "Traditional early-retirement formulas are incomplete for her. Financial independence must include her own lifetime and the support her child may need after her death.",
+      11: "Retirement income, Social Security and survivor planning must be coordinated with benefits available to her child. Claiming and withdrawal choices should be modeled as a household system.",
+      12: "A will, powers of attorney, carefully drafted special needs trust, successor trustees and coordinated beneficiary forms are core requirements. State law and benefit rules make specialist legal advice essential.",
+      13: "Caregiver succession, supported decision-making or guardianship, benefits and housing must be planned before a crisis. The financial plan should name who acts and how support continues.",
+      14: "She should look for advice that integrates retirement, special-needs, tax and estate planning. Credentials, fiduciary scope, fees and relevant experience all need independent verification.",
+      15: "Her recommendation cannot be reduced to an age-based allocation: protect liquidity, fund retirement, establish the legal support structure and stress-test lifetime care together."
+    }
+  };
 
   /* ---------- Helpers ---------- */
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -288,7 +327,7 @@
     '<h3>Finding your way</h3><p>The landing page organizes all 105 modules into eight clear courses. Each course card opens a new-tab course page containing only its related modules. Inside a lesson, the bar at the top shows your module and tab; <b>Next</b> and <b>Previous</b> move through the learning sequence. <b>Course map &amp; search</b> (or press <b>/</b>) searches every module, every tab and the glossary. The round <b>Top</b> button returns to the top of a long page.</p><h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. You can also click a tab, or use the left and right arrow keys on the tab bar. On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
     '<h3>Three layers of depth</h3><ul><li><b>Start here</b> — the main text of every tab. No background needed.</li><li><b>Going further</b> — expandable panels for readers with some experience.</li><li><b>Practitioner depth</b> — the actual rules, formulas, edge cases and research.</li></ul>' +
     '<h3>Things to do, not just read</h3><ul><li><b>Calculators</b> run their formulas live in your browser.</li><li><b>What would you do?</b> — pick an option first, then see every option’s trade-offs.</li><li><b>Exercises</b> — type an answer and check it; a worked solution follows.</li><li><b>Myth or fact</b> — tap a card to test a popular claim.</li><li><b>Worksheets</b> save in your own browser and can be downloaded.</li><li><b>Dotted terms</b> open a glossary definition.</li></ul>' +
-    '<h3>The six households</h3><p>Denise (24), the Riveras (35 and 34), Maya (58), the Harpers (57 and 55), Ruth (68), and Daniel and Priya Shah (62 and 48, with their daughter Leena) are fictional households who reappear throughout the course. Their different ages, family structures, assets and responsibilities show why sound recommendations are contextual rather than one-size-fits-all.</p>' +
+    '<h3>The six households</h3><p>Denise (27, in medical training), the Riveras (35 and 34), Maya (58, a single mom), the Harpers (57 and 55), Ruth (68), and Daniel and Priya Shah (62 and 48, with their daughter Leena) are fictional households who reappear throughout the course. Their different ages, family structures, assets and responsibilities show why sound recommendations are contextual rather than one-size-fits-all.</p>' +
     '<h3>Progress and privacy</h3><p>Passing a module’s knowledge check (70% or better) marks it complete. Progress, worksheets and your theme are stored only in this browser (localStorage). Nothing is sent anywhere.</p>' +
     '<h3>Not advice</h3><p>This is educational material, not financial, tax, legal or investment advice. Tax figures and rules change; confirm current numbers with the IRS, SSA and other primary sources, or a qualified professional, before acting.</p>' +
     '<p style="margin-top:14px"><button class="btn primary" id="closeHelp">Close</button></p></div></div>';
@@ -440,7 +479,7 @@
     var q = modal.querySelector("#mapQ"), body = modal.querySelector("#mapBody"), opener = null, loaded = !!window.INV_INDEX;
     function ensureIndex(cb) {
       if (window.INV_INDEX) return cb();
-      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.4"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
+      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.5"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
     }
     var prog = function () { return readProgress(); };
     function outline() {
@@ -556,6 +595,11 @@
   }
   document.querySelectorAll(".lens-row[data-hh]").forEach(function (row) {
     var h = HOUSEHOLDS[row.getAttribute("data-hh")]; if (!h) return;
+    var lensSet = CURRENT_LENS[row.getAttribute("data-hh")];
+    var item = idx > -1 ? COURSE[idx] : null;
+    if (lensSet && item && lensSet[item.stage]) {
+      row.innerHTML = '<div><b>' + esc(item.title) + ' for ' + esc(h.short) + '.</b> ' + esc(lensSet[item.stage]) + '</div>';
+    }
     var who = document.createElement("div"); who.className = "who";
     who.innerHTML = avatar(h) + "<div><b>" + esc(h.name) + "</b><small>" + esc(h.age) + " · " + esc(h.stage) + "</small></div>";
     row.insertBefore(who, row.firstChild);
@@ -565,6 +609,35 @@
   document.querySelectorAll(".decide").forEach(function (d) {
     var opts = [].slice.call(d.querySelectorAll(".opt"));
     var ocs = [].slice.call(d.querySelectorAll(".oc"));
+    function outcomeBody(oc) {
+      var copy = oc.cloneNode(true), lead = copy.querySelector("b");
+      if (lead) lead.remove();
+      return copy.innerHTML.trim().replace(/^(Right|Correct)( for most (people|investors|households))?\.\s*/i, "");
+    }
+    function recommendedIndex() {
+      var cues = [
+        /^(Right|Correct)(\.|\b)/i, /\b(best fit|best answer|best choice|best option|best route|best response)\b/i,
+        /\b(the usual answer|the common answer|the conventional answer|the strongest choice|the sound choice|a sound approach)\b/i,
+        /\b(most (research|planners|advisers|families|investors).*support|recommended|good fit|good default|better value)\b/i
+      ];
+      for (var i = 0; i < ocs.length; i++) {
+        var copy = ocs[i].cloneNode(true), lead = copy.querySelector("b");
+        if (lead) lead.remove();
+        var body = copy.textContent.trim();
+        if (cues.some(function (re) { return re.test(body); })) return i;
+      }
+      return opts.length > 1 ? 1 : 0;
+    }
+    var rec = recommendedIndex();
+    if (opts[rec] && ocs[rec]) {
+      ocs[rec].classList.add("recommended");
+      var ar = document.createElement("div");
+      ar.className = "answer-recommendation";
+      ar.innerHTML = '<div><b>Answer:</b> ' + esc(opts[rec].textContent.trim()) + '</div>' +
+        '<div><b>Recommendation:</b> ' + outcomeBody(ocs[rec]) + '</div>';
+      var outcomes = d.querySelector(".outcomes");
+      if (outcomes) outcomes.appendChild(ar);
+    }
     opts.forEach(function (o, i) {
       o.type = "button";
       o.addEventListener("click", function () {
@@ -643,6 +716,35 @@
     var quiz = []; try { quiz = JSON.parse(quizData.textContent); } catch (e) { quiz = []; }
     var box = document.getElementById("quizBox"), scoreEl = document.getElementById("quizScore");
     var answered = {};
+    /* Two low-stakes checks are placed inside the lesson, before the final scored quiz. */
+    if (quiz.length) {
+      var lessonPanels = [].slice.call(document.querySelectorAll('.tabs-shell .panel')).filter(function (p) {
+        return !p.querySelector('#quizBox') && !/check yourself|resources|your household/i.test(p.getAttribute('data-tab') || '') && p.textContent.trim().length > 500;
+      });
+      var picks = [];
+      if (lessonPanels.length) picks.push(lessonPanels[Math.max(0, Math.floor(lessonPanels.length / 3))]);
+      if (lessonPanels.length > 2) picks.push(lessonPanels[Math.min(lessonPanels.length - 1, Math.floor(lessonPanels.length * 2 / 3))]);
+      picks.filter(function (p, i, a) { return a.indexOf(p) === i; }).forEach(function (p, pi) {
+        var q = quiz[pi % quiz.length], kc = document.createElement('div');
+        kc.className = 'knowledge-check';
+        kc.innerHTML = '<div class="kc-tag">Test your knowledge</div><div class="kc-q">' + q.q + '</div><div class="kc-choices">' +
+          q.choices.map(function (c, j) { return '<button type="button" data-kc-answer="' + j + '">' + c + '</button>'; }).join('') +
+          '</div><div class="kc-feedback" aria-live="polite"></div>';
+        var anchor = p.querySelector(':scope > p:nth-of-type(2)') || p.querySelector(':scope > p') || p.firstElementChild;
+        if (anchor && anchor.nextSibling) p.insertBefore(kc, anchor.nextSibling); else p.appendChild(kc);
+        kc.querySelectorAll('[data-kc-answer]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var chosen = Number(b.getAttribute('data-kc-answer'));
+            kc.querySelectorAll('[data-kc-answer]').forEach(function (x, j) {
+              x.disabled = true; if (j === q.answer) x.classList.add('ok'); else if (j === chosen) x.classList.add('bad');
+            });
+            var fb = kc.querySelector('.kc-feedback');
+            fb.innerHTML = '<b>' + (chosen === q.answer ? 'Correct. ' : 'Not quite. ') + '</b>' + q.explain;
+            fb.classList.add('show');
+          });
+        });
+      });
+    }
     var renderQuiz = function () {
       box.innerHTML = quiz.map(function (q, i) {
         return '<div class="quiz-q"><div class="q">' + (i + 1) + ". " + q.q + '</div><div class="choices">' +
