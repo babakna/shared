@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.6 (October 2026)
+V1.7 (October 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -79,6 +79,7 @@ standard 30-year horizon. Their data lives in `assets/inv.js` (`HOUSEHOLDS`).
 | `tools.html` | Stage 1's 13 calculators embedded, a directory of the other 160 by stage, Babak's planning tools and official calculators |
 | `assets/inv.css` | Design system (light by default, dark mode) |
 | `assets/inv-hub.css` | Landing-card and course-hub layouts, graphics and responsive behavior |
+| `assets/investing-favicon.svg` | Investing-specific browser-tab icon used by every course page |
 | `assets/inv.js` | Engine: course registry, tabs, journey bar, help, quiz, decisions, myths, exercises, worksheets, glossary popovers, resources, SVG charts |
 | `assets/inv-hub.js` | Course-hub renderer, progress and module launch behavior |
 | `assets/inv-tools.js` | Stage 1's 13 calculators |
@@ -118,7 +119,7 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The V1.6 run: **38,738 checks, 0 failures** across 117 pages (105 modules, eight course hubs, the landing page, tools,
+The V1.7 run: **39,206 checks, 0 failures** across 117 pages (105 modules, eight course hubs, the landing page, tools,
 glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
@@ -128,10 +129,22 @@ option, blank and zero inputs, empty result areas), glossary popover, keyboard t
 navigation and theme toggle. It also verifies the Shah lens across the course, the six-household
 capstone, typo-tolerant searches and abbreviations, saved-tab resume/restart, the eight-course
 grouping and new-tab launch behavior, corrected persona profiles, explicit contextual answers and
-recommendations, in-lesson knowledge checks, fixed-scale nominal/real comparisons, and V1.6
-October release markers and cache keys on every page.
+recommendations, in-lesson knowledge checks, fixed-scale nominal/real comparisons, and V1.7
+October release markers and cache keys on every page. V1.7 adds a direct computed-style regression
+for normalized interface sizing at every viewport and verifies the investing-specific favicon on
+every page.
 
 ## Changelog
+
+### V1.7 (October 2026)
+
+- Replaces the empty browser-tab icon with an investing-specific chart favicon across all 117 pages.
+- Normalizes the entire course interface—not only the landing page—including module headers, course
+  hubs, navigation, tabs, teaching panels, figures, tools, cards, controls, quizzes, and disclaimers.
+- Removes viewport-driven font scaling from the course UI in favor of stable desktop, tablet, and
+  mobile sizes so window resizing does not distort the visual hierarchy.
+- Completes desktop/mobile visual review plus a fresh four-viewport rendered and interaction audit:
+  39,206 checks with 0 failures across all 117 pages and the complete calculator/interaction suite.
 
 ### V1.6 (October 2026)
 

@@ -1,7 +1,7 @@
-/* Investing Learning Lab - shared engine - V1.6 (October 2026) */
+/* Investing Learning Lab - shared engine - V1.7 (October 2026) */
 (function () {
   "use strict";
-  var VERSION = "V1.6 (October 2026)";
+  var VERSION = "V1.7 (October 2026)";
   var AUTHOR = "Namiranian, Babak";
   var root = document.documentElement;
 
@@ -479,7 +479,7 @@
     var q = modal.querySelector("#mapQ"), body = modal.querySelector("#mapBody"), opener = null, loaded = !!window.INV_INDEX;
     function ensureIndex(cb) {
       if (window.INV_INDEX) return cb();
-      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.6"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
+      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.7"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
     }
     var prog = function () { return readProgress(); };
     function outline() {

@@ -35,11 +35,18 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       await page.goto(BASE + pg, { waitUntil: 'load' });
       await page.waitForTimeout(250);
       const release = await page.evaluate(() => ({
-        current: document.body.innerText.includes('V1.6 (October 2026)'),
-        stale: /V1\.[2345] \((?:September|October) 2026\)/.test(document.body.innerText),
-        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[2345](?:&|$)/.test(u))
+        current: document.body.innerText.includes('V1.7 (October 2026)'),
+        stale: /V1\.[23456] \((?:September|October) 2026\)/.test(document.body.innerText),
+        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[23456](?:&|$)/.test(u)),
+        favicon: document.querySelector('link[rel~="icon"]')?.getAttribute('href') || ''
       }));
-      ok(release.current && !release.stale && !release.oldAssets.length, `${pg} @${w}: release marker ${JSON.stringify(release)}`);
+      ok(release.current && !release.stale && !release.oldAssets.length && /assets\/investing-favicon\.svg\?v=1\.7$/.test(release.favicon), `${pg} @${w}: release marker and favicon ${JSON.stringify(release)}`);
+      const density = await page.evaluate(() => {
+        const size = sel => { const el = document.querySelector(sel); return el ? parseFloat(getComputedStyle(el).fontSize) : null; };
+        const art = document.querySelector('.course-card .course-art');
+        return { body: size('body'), landingTitle: size('.course-hero h1'), moduleTitle: size('.mhero h1'), panelTitle: size('.panel h2'), disclaimer: size('.disclaim'), cardArt: art ? art.getBoundingClientRect().width : null };
+      });
+      ok(density.body <= 15.1 && (density.landingTitle === null || density.landingTitle <= 35.5) && (density.moduleTitle === null || density.moduleTitle <= 27.1) && (density.panelTitle === null || density.panelTitle <= 19.6) && (density.disclaimer === null || density.disclaimer <= 11.3) && (density.cardArt === null || density.cardArt <= 64.1), `${pg} @${w}: normalized interface sizing ${JSON.stringify(density)}`);
       if (/^INV-\d{3}\.html$/.test(pg)) {
         const learning = await page.evaluate(() => ({
           decisions: document.querySelectorAll('.decide').length,
