@@ -79,11 +79,18 @@ async function main() {
   if (homeCardCount !== 5) { const html = await page.content(); console.error("HOME DIAGNOSTIC", {status:homeResponse?.status(),url:page.url(),closed:page.isClosed(),contentLength:html.length,html,errors}); }
   check("home renders five grouped paths", homeCardCount === 5);
   check("home keeps visible Home control", await page.locator(".home-button").isVisible());
-  check("home displays V2.1 October 2026", (await page.locator("body").innerText()).includes("V2.1 · October 2026"));
+  check("home displays V2.2 October 2026", (await page.locator("body").innerText()).includes("V2.2 · October 2026"));
   check("JavaScript favicon configured", (await page.locator('link[rel="icon"]').getAttribute("href")) === "assets/javascript-logo.svg");
   check("home has purposeful graphics", await page.locator(".hero-art svg").count() === 1 && await page.locator(".path-art svg").count() === 5);
   check("placement, Help and Resources are visible", await page.getByRole("button",{name:"Find my starting point"}).isVisible() && await page.getByRole("button",{name:"Help"}).isVisible() && await page.getByRole("button",{name:"Resources"}).isVisible());
   check("home has no horizontal overflow", await noOverflow(page));
+  const homeScale = await page.evaluate(() => ({
+    topbar: document.querySelector(".topbar").getBoundingClientRect().height,
+    title: parseFloat(getComputedStyle(document.querySelector(".home-hero h1")).fontSize),
+    hero: document.querySelector(".home-hero").getBoundingClientRect().height,
+    lead: parseFloat(getComputedStyle(document.querySelector(".hero-lead")).fontSize)
+  }));
+  check("desktop landing typography and hero are normalized", homeScale.topbar <= 68 && homeScale.title <= 58 && homeScale.hero <= 500 && homeScale.lead <= 19, JSON.stringify(homeScale));
   check("home has semantic landmark and heading structure", await page.locator("main").count() === 1 && await page.locator("h1").count() === 1 && await page.locator('nav[aria-label="Learning paths"]').count() === 1);
   check("home IDs are unique and controls are named", await uniqueIds(page) && await namedControls(page));
   check("desktop does not show a nonfunctional Modules drawer control", !(await page.getByRole("button",{name:"Modules"}).isVisible()));
@@ -117,6 +124,12 @@ async function main() {
   check("every Beginner module opens a new tab", await page.locator(".module-card").evaluateAll(cards => cards.every(card => card.target === "_blank" && card.rel.includes("noopener") && card.rel.includes("noreferrer"))));
   check("sidebar modules open new tabs", await page.locator("#moduleNav [data-nav-id]").evaluateAll(links => links.every(link => link.target === "_blank")));
   check("module cards have graphics", await page.locator(".module-card .module-art svg").count() === 11);
+  const mapScale = await page.evaluate(() => ({
+    title: parseFloat(getComputedStyle(document.querySelector(".track-hero h1")).fontSize),
+    hero: document.querySelector(".track-hero").getBoundingClientRect().height,
+    card: Math.max(...[...document.querySelectorAll(".module-card")].map(node => node.getBoundingClientRect().height))
+  }));
+  check("desktop path typography and cards are normalized", mapScale.title <= 53 && mapScale.hero <= 330 && mapScale.card <= 390, JSON.stringify(mapScale));
   await page.screenshot({path:path.join(SHOTS,"beginner-map-1440.png"),fullPage:true});
 
   const popupPromise = page.waitForEvent("popup");
@@ -130,6 +143,12 @@ async function main() {
   check("lesson has practice, hints, diagnostic and three quiz questions", await popup.locator(".practice-section").count() === 1 && await popup.locator(".hints details").count() >= 2 && await popup.locator("[data-diagnostic]").count() === 1 && await popup.locator("[data-quiz] fieldset").count() === 3);
   check("lesson has floating Top control", await popup.locator("[data-to-top]").count() === 1);
   check("lesson IDs are unique and controls are named", await uniqueIds(popup) && await namedControls(popup));
+  const lessonScale = await popup.evaluate(() => ({
+    title: parseFloat(getComputedStyle(document.querySelector(".lesson-hero h1")).fontSize),
+    hero: document.querySelector(".lesson-hero").getBoundingClientRect().height,
+    body: parseFloat(getComputedStyle(document.querySelector(".lesson-chapter p")).fontSize)
+  }));
+  check("desktop lesson typography and hero are normalized", lessonScale.title <= 53 && lessonScale.hero <= 410 && lessonScale.body <= 17, JSON.stringify(lessonScale));
   check("lesson starts incomplete", (await popup.locator(".completion-panel").innerText()).includes("Mark module complete"));
   await popup.locator('[data-complete="JS-001"]').click();
   check("explicit completion persists", await popup.evaluate(() => JSON.parse(localStorage.getItem("javascript-learning-lab-v2")).done["JS-001"] === true));
@@ -179,6 +198,11 @@ async function main() {
     await p.goto(base + "ProgramLanguages/JavaScript/",{waitUntil:"networkidle"});
     check(`${width}px home has no horizontal overflow`, await noOverflow(p));
     check(`${width}px home shows all paths`, await p.locator(".path-card").count() === 5);
+    const mobileHomeScale = await p.evaluate(() => ({
+      title: parseFloat(getComputedStyle(document.querySelector(".home-hero h1")).fontSize),
+      topbar: document.querySelector(".topbar").getBoundingClientRect().height
+    }));
+    check(`${width}px home scale is normalized`, mobileHomeScale.title <= (width <= 768 ? 45 : 58) && mobileHomeScale.topbar <= 68, JSON.stringify(mobileHomeScale));
     if (width <= 768) check(`${width}px keeps Help and Resources visible`, await p.getByRole("button",{name:"Help"}).isVisible() && await p.getByRole("button",{name:"Resources"}).isVisible());
     await p.goto(base + "ProgramLanguages/JavaScript/js-101.html",{waitUntil:"networkidle"});
     check(`${width}px path has no horizontal overflow`, await noOverflow(p));
@@ -189,6 +213,8 @@ async function main() {
     await p.goto(base + "ProgramLanguages/JavaScript/js-101.html#js-002",{waitUntil:"networkidle"});
     check(`${width}px lesson has no horizontal overflow`, await noOverflow(p));
     check(`${width}px lesson keeps Home visible`, await p.locator(".home-button").isVisible());
+    const mobileLessonTitle = await p.locator(".lesson-hero h1").evaluate(node => parseFloat(getComputedStyle(node).fontSize));
+    check(`${width}px lesson title is normalized`, mobileLessonTitle <= (width <= 768 ? 35 : 53), `font-size=${mobileLessonTitle}px`);
     check(`${width}px has no runtime errors`, mobileErrors.length === 0, mobileErrors.join(" | "));
     if (width === 390) await p.screenshot({path:path.join(SHOTS,"lesson-js-002-390.png"),fullPage:true});
     await mobile.close();

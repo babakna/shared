@@ -35,12 +35,29 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       await page.goto(BASE + pg, { waitUntil: 'load' });
       await page.waitForTimeout(250);
       const release = await page.evaluate(() => ({
-        current: document.body.innerText.includes('V1.7 (October 2026)'),
-        stale: /V1\.[23456] \((?:September|October) 2026\)/.test(document.body.innerText),
-        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[23456](?:&|$)/.test(u)),
+        current: document.body.innerText.includes('V1.8 (October 2026)'),
+        stale: /V1\.[234567] \((?:September|October) 2026\)/.test(document.body.innerText),
+        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[234567](?:&|$)/.test(u)),
         favicon: document.querySelector('link[rel~="icon"]')?.getAttribute('href') || ''
       }));
-      ok(release.current && !release.stale && !release.oldAssets.length && /assets\/investing-favicon\.svg\?v=1\.7$/.test(release.favicon), `${pg} @${w}: release marker and favicon ${JSON.stringify(release)}`);
+      ok(release.current && !release.stale && !release.oldAssets.length && /assets\/investing-favicon\.svg\?v=1\.8$/.test(release.favicon), `${pg} @${w}: release marker and favicon ${JSON.stringify(release)}`);
+      const disclaimer = await page.evaluate(() => {
+        const nodes = [...document.querySelectorAll('.global-financial-disclaimer')];
+        const node = nodes[0];
+        if (!node) return { count: 0 };
+        const style = getComputedStyle(node), rect = node.getBoundingClientRect(), text = node.innerText.replace(/\s+/g, ' ').trim();
+        return {
+          count: nodes.length,
+          visible: style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0,
+          fixed: style.position === 'fixed',
+          inViewport: rect.left <= 1 && rect.right >= innerWidth - 1 && rect.bottom <= innerHeight + 1 && rect.bottom >= innerHeight - 2,
+          readable: parseFloat(style.fontSize) >= 10,
+          exactAuthor: text.includes('Namiranian, Babak is not a financial advisor'),
+          notAdvice: text.toLowerCase().includes('not financial advice'),
+          individualized: text.includes('not individualized financial, investment, tax, legal, or accounting advice')
+        };
+      });
+      ok(disclaimer.count === 1 && disclaimer.visible && disclaimer.fixed && disclaimer.inViewport && disclaimer.readable && disclaimer.exactAuthor && disclaimer.notAdvice && disclaimer.individualized, `${pg} @${w}: persistent financial disclaimer ${JSON.stringify(disclaimer)}`);
       const density = await page.evaluate(() => {
         const size = sel => { const el = document.querySelector(sel); return el ? parseFloat(getComputedStyle(el).fontSize) : null; };
         const art = document.querySelector('.course-card .course-art');

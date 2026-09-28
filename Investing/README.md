@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.7 (October 2026)
+V1.8 (October 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -136,7 +136,7 @@ every page.
 
 ## Changelog
 
-### V1.7 (October 2026)
+### V1.8 (October 2026)
 
 - Replaces the empty browser-tab icon with an investing-specific chart favicon across all 117 pages.
 - Normalizes the entire course interface—not only the landing page—including module headers, course

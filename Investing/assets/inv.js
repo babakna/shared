@@ -1,7 +1,7 @@
-/* Investing Learning Lab - shared engine - V1.7 (October 2026) */
+/* Investing Learning Lab - shared engine - V1.8 (October 2026) */
 (function () {
   "use strict";
-  var VERSION = "V1.7 (October 2026)";
+  var VERSION = "V1.8 (October 2026)";
   var AUTHOR = "Namiranian, Babak";
   var root = document.documentElement;
 
@@ -269,6 +269,17 @@
   /* Hook for page-specific scripts */
   INV.ready = function (fn) { if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); };
 
+  /* ---------- Persistent educational disclaimer on every course page ---------- */
+  INV.ready(function () {
+    if (document.querySelector(".global-financial-disclaimer")) return;
+    var disclaimer = document.createElement("aside");
+    disclaimer.className = "global-financial-disclaimer";
+    disclaimer.setAttribute("role", "note");
+    disclaimer.setAttribute("aria-label", "Financial education disclaimer");
+    disclaimer.innerHTML = '<div><strong>Educational only — not financial advice.</strong> <span>Namiranian, Babak is not a financial advisor. This material provides general education, not individualized financial, investment, tax, legal, or accounting advice. Consult an appropriately qualified professional before acting.</span></div>';
+    document.body.appendChild(disclaimer);
+  });
+
   /* ---------- Guide bar: where you are, one Previous/Next, course map and search ---------- */
   var currentId = document.body.getAttribute("data-module") || "";
   var idx = COURSE.findIndex(function (m) { return m.id === currentId; });
@@ -479,7 +490,7 @@
     var q = modal.querySelector("#mapQ"), body = modal.querySelector("#mapBody"), opener = null, loaded = !!window.INV_INDEX;
     function ensureIndex(cb) {
       if (window.INV_INDEX) return cb();
-      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.7"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
+      var sc = document.createElement("script"); sc.src = "assets/inv-index.js?v=1.8"; sc.onload = function () { loaded = true; cb(); }; sc.onerror = cb; document.head.appendChild(sc);
     }
     var prog = function () { return readProgress(); };
     function outline() {

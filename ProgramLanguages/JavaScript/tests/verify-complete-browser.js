@@ -120,6 +120,8 @@ async function auditDom(page,label) {
       return box.width < 1 || box.height < 1;
     }).length;
     const criticalValues = [...document.querySelectorAll("h1,h2,h3,h4,.module-card-head,.module-card-foot,.path-meta,.lesson-status,.progress-card,.version")].map(node => node.textContent.trim());
+    const h1 = document.querySelector("h1");
+    const topbar = document.querySelector(".topbar");
     return {
       uniqueIds:ids.length === new Set(ids).size,
       unnamed,
@@ -128,7 +130,10 @@ async function auditDom(page,label) {
       overflow:document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       leaks:criticalValues.some(value => value === "undefined" || value === "NaN" || value.includes("[object Object]")),
       main:document.querySelectorAll("main").length,
-      h1:document.querySelectorAll("h1").length
+      h1:document.querySelectorAll("h1").length,
+      h1Font:h1 ? parseFloat(getComputedStyle(h1).fontSize) : 0,
+      topbarHeight:topbar ? topbar.getBoundingClientRect().height : 0,
+      compactWidth:innerWidth <= 820
     };
   });
   check(result.uniqueIds,`${label}: unique IDs`);
@@ -138,6 +143,8 @@ async function auditDom(page,label) {
   check(!result.overflow,`${label}: no horizontal page overflow`);
   check(!result.leaks,`${label}: no undefined/object/NaN rendering leak`);
   check(result.main === 1 && result.h1 === 1,`${label}: one main landmark and one H1`,`main=${result.main},h1=${result.h1}`);
+  check(result.h1Font <= (result.compactWidth ? 45 : 58),`${label}: H1 scale stays normalized`,`font-size=${result.h1Font}px`);
+  check(result.topbarHeight <= 68,`${label}: top bar scale stays normalized`,`height=${result.topbarHeight}px`);
 }
 
 async function currentTheme(page) { return page.evaluate(() => document.documentElement.dataset.theme); }
