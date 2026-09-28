@@ -1,0 +1,5 @@
+"use strict";
+const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm"),ts=require("typescript");
+const ROOT=path.resolve(__dirname,".."),context={window:{}};vm.createContext(context);for(const file of["course-core.js","data-course.js"])vm.runInContext(fs.readFileSync(path.join(ROOT,"assets",file),"utf8"),context);
+let pass=0,fail=0;for(const module of context.window.TSCourse.modules){for(const [kind,source]of[["example",module.example.source],["starter",module.practice.starter]]){const result=ts.transpileModule(source,{fileName:`${module.id}.ts`,reportDiagnostics:true,compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,strict:true,isolatedModules:true,useDefineForClassFields:true}});const errors=(result.diagnostics||[]).filter(item=>item.category===ts.DiagnosticCategory.Error);if(errors.length===0&&result.outputText.trim())pass++;else{fail++;console.error(`FAIL ${module.id} ${kind}:`,errors.map(item=>ts.flattenDiagnosticMessageText(item.messageText," ")).join(" | "));}}}
+console.log(`PASS ${pass} FAIL ${fail}`);if(fail)process.exitCode=1;
