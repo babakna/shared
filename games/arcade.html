@@ -159,8 +159,11 @@ function launch(gm){clearCelebrations();window.__activeGameId=gm.id;window.__act
   current=window['game_'+gm.id](gm);}
 function mkCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;host.appendChild(c);return c;}
 // generic loop helper
-function loop(fn){let raf,last=performance.now(),live=true;
-  function step(t){if(!live)return;const dt=Math.min(50,t-last);last=t;fn(dt/16.6667);raf=requestAnimationFrame(step);}
+function loop(fn){let raf,last=performance.now(),live=true,paused=false;
+  const pauseBtn=document.createElement('button');pauseBtn.className='btn ghost';pauseBtn.textContent='⏸ Pause';
+  pauseBtn.onclick=()=>{paused=!paused;pauseBtn.textContent=paused?'▶ Resume':'⏸ Pause';last=performance.now();};
+  host.appendChild(pauseBtn);
+  function step(t){if(!live)return;const dt=Math.min(50,t-last);last=t;if(!paused)fn(dt/16.6667);raf=requestAnimationFrame(step);}
   raf=requestAnimationFrame(step);
   return ()=>{live=false;cancelAnimationFrame(raf);};
 }

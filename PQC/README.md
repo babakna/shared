@@ -1,8 +1,24 @@
 # Post-Quantum Cryptography Learning Lab
 
-V8.0 (August 2026)
+V10.0 (October 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V10.0
+
+- Corrected the additional-signature round after NIST's 28 July notice: HAWK was withdrawn after an AI-assisted vulnerability finding, so eight Round 3 candidates remain under evaluation; the finalized FIPS 203/204/205 standards are unaffected.
+- Added the September 2026 status of the direct ML-KEM TLS draft: IESG-approved and in the RFC Editor queue, but not yet a published RFC. RFC 10024 remains the published hybrid TLS baseline.
+- Added current policy and planning signals from the EU, UK NCSC, Canada, Australia, the U.S. Treasury Quantum-Readiness Task Force, and NIST's preliminary PIV working drafts, with binding mandates separated from roadmaps, drafts, and working material.
+- Synchronized current pages, shared assets, Help surfaces, and tests to V10.0 (October 2026); primary status sources were checked 27 September 2026.
+
+## What changed in V9.1
+
+- Replaced draft hybrid-TLS wording with published RFC 10024 and its registered hybrid key-agreement groups, linked its RFC 9954 hybrid-design framework and RFC 9958 engineering guidance, and retained deployment and interoperability cautions.
+- Added RFC 9980 as the published OpenPGP crypto-refresh reference and kept post-quantum OpenPGP deployment status distinct from that base protocol update.
+- Added RFC 9936 for direct ML-KEM use in CMS and RFC 9964 for ML-DSA in JOSE/COSE, while keeping protocol publication distinct from product and peer support.
+- Added the 2026 NIST watch items: draft SP 800-230's limited-signature SLH-DSA parameter sets and strict per-key signature cap, plus IR 8610's nine Round 3 additional-signature candidates; neither is presented as a new approved general-purpose algorithm.
+- Refreshed implementation status: OpenSSL 4.0.2 is the stable line checked on 25 September 2026, 4.1.0-beta1 remains pre-release, and FN-DSA/FIPS 206 has no published draft or final standard.
+- Synchronized every module, landing page, glossary, shared asset, Help surface, and local version assertion at V9.1.
 
 ## What changed in V8.0
 

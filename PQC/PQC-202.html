@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-202">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V9.0 (September 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V10.0 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -52,7 +52,7 @@
   <div class="pqc-stepper" data-title="PQC change points by protocol">
     <script type="application/json" class="steps">
     [
-      {"icon":"\ud83c\udf10","title":"TLS / HTTPS","body":"The key-establishment group can move first to the IETF-defined hybrid ECDHE+ML-KEM construction. Certificate and handshake-signature migration is a separate PKI track. For this September 2026 release, sources checked on 20 August 2026 showed hybrid key establishment deployed in major browser/CDN paths and the IETF document approved in the RFC Editor publication queue; it remains an Internet-Draft until an RFC number is assigned. <b>Biggest risk:</b> unsupported clients, middleboxes, and larger messages.","meta":"change: key establishment now; certificate authentication separately"},
+      {"icon":"\ud83c\udf10","title":"TLS / HTTPS","body":"The key-establishment group can move first to the RFC 10024 hybrid ECDHE+ML-KEM construction. It defines <code>X25519MLKEM768</code>, <code>SecP256r1MLKEM768</code>, and <code>SecP384r1MLKEM1024</code>. Publication standardizes the groups; it does not prove universal client, server, CDN, or middlebox deployment. Certificate and handshake-signature migration remains a separate PKI track. <b>Biggest risk:</b> unsupported clients, middleboxes, and larger messages.","meta":"change: RFC 10024 key establishment now; certificate authentication separately"},
       {"icon":"\ud83d\udda5\ufe0f","title":"SSH","body":"The key-exchange method name carries PQC (for example the hybrid <code>sntrup761x25519</code> or ML-KEM methods now shipping in OpenSSH), and host/user keys can move to PQC signatures. <b>Biggest risk:</b> mismatched client/server versions, pinned host keys in <code>known_hosts</code>, and automation that breaks when the negotiated method changes.","meta":"change: kex method + host keys"},
       {"icon":"\ud83d\udd10","title":"IPsec / VPN","body":"IKEv2 gains PQC key exchange, often split across multiple additional key-exchange rounds (RFC 9370) so the extra payload fits. <b>Biggest risk:</b> vendor appliances that update slowly, IKE fragmentation of larger messages, and site-to-site tunnels where <em>both</em> ends must upgrade together.","meta":"change: IKEv2 key exchange"},
       {"icon":"\u2709\ufe0f","title":"Email (S/MIME) & messaging","body":"Signing and key establishment both move to PQC. <b>Biggest risk:</b> long-lived stored mail, diverse clients, and lagging directory/key-distribution systems. Modern messengers show two layers: post-quantum initial session setup (Signal PQXDH) and ongoing post-quantum ratcheting (Signal SPQR/Triple Ratchet or Apple's PQ3).","meta":"change: signing + initial and ongoing key establishment"},
@@ -68,13 +68,16 @@
   <p class="lead">TLS is the highest-traffic migration and the best-tooled today.</p>
   <p>Modern stacks support hybrid key exchange combining X25519 with ML-KEM. You can even negotiate it from the command line to see it work:</p>
   <pre class="code"><span class="cmt"># Negotiate a hybrid X25519+ML-KEM-768 group with OpenSSL 3.5+ (or oqs-provider)</span>
+<span class="cmt"># As checked 25 Sep 2026: 3.5.x is LTS, 4.0.2 is stable; 4.1.0-beta1 is pre-release. Check your build:</span>
+<span class="cmt">#   openssl version   /   openssl list -group-algorithms</span>
 openssl s_client -connect example.com:443 \
   -groups <span class="str">X25519MLKEM768</span> -tls1_3
 
 <span class="cmt"># Look for the negotiated group in the output:</span>
 <span class="cmt">#   Negotiated TLS1.3 group: X25519MLKEM768</span></pre>
-  <div class="callout example"><span class="k">Dated deployment signal</span><p>Cloudflare reported in April 2026 that more than two-thirds of human-generated TLS traffic on its network used hybrid ML-KEM key agreement. Google documented Chrome's hybrid rollout earlier. These are provider-specific measurements, not a percentage of the entire internet. Certificate authentication still largely follows classical PKI while standards and ecosystems test post-quantum chains.</p></div>
-  <p>Why is key exchange already common but PQC certificates lagging? Size. A hybrid key-share adds about a kilobyte to one message; a PQC <em>certificate chain</em> can add many kilobytes to <em>every</em> handshake, because a chain carries a leaf, one or more intermediates, and the signatures binding them &mdash; each of which grows. That inflates the handshake, stresses the initial-window and packet-loss behavior of TCP/QUIC, and can trip certificate-transparency logs and old parsers. So the ecosystem is doing the cheaper half (key exchange) first and staging the harder half (certificates) behind it.</p>
+  <div class="callout example"><span class="k">Dated deployment signal</span><p>Cloudflare reported in April 2026 that more than two-thirds of human-generated TLS traffic on its network used hybrid ML-KEM key agreement. Google documented Chrome's hybrid rollout earlier. These are provider-specific measurements, not a percentage of the entire internet. Certificate authentication still largely follows classical PKI while standards and ecosystems test post-quantum chains. Separately, the direct-ML-KEM TLS draft reached IESG approval on 3 September and was updated to draft-11 on 16 September 2026, but it remains in the RFC Editor queue rather than a published RFC; do not label it final.</p></div>
+  <div class="callout takeaway"><span class="k">Published standard, measured deployment separately</span><p><b>RFC 10024</b> now specifies three TLS 1.3 named groups: <code>X25519MLKEM768</code>, <code>SecP256r1MLKEM768</code>, and <code>SecP384r1MLKEM1024</code>, following the hybrid-design framework in <b>RFC 9954</b>. This removes the earlier Internet-Draft/RFC-queue caveat, but it does not mean every TLS library, browser, server, CDN, or inspection device supports each group. Measure the group actually negotiated.</p></div>
+  <p>Why is key exchange already common but PQC certificates lagging? Size. A hybrid key-share adds about a kilobyte to one message; a PQC <em>certificate chain</em> can add many kilobytes to <em>every</em> handshake, because a chain carries a leaf, one or more intermediates, and the signatures binding them &mdash; each of which grows. That inflates the handshake, stresses the initial-window and packet-loss behavior of TCP/QUIC, and can trip certificate-transparency logs and old parsers. So the ecosystem is doing the cheaper half (key exchange) first and staging the harder half (certificates) behind it. The <em>format</em> question is now settled: RFC 9881 (ML-DSA), RFC 9909 (SLH-DSA) and RFC 9935 (ML-KEM) are published Standards Track algorithm identifiers for X.509, so what remains is deployment and size, not missing specifications.</p>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Enabling PQC on the server and declaring victory. Test through your real CDN, WAF, load balancer, and oldest supported clients &mdash; that is where larger handshakes fail.</p></div>
 </section>
 
@@ -99,6 +102,8 @@ openssl s_client -connect example.com:443 \
   <div class="lesson-title"><span class="num">3</span><h2>Email and messaging trust</h2></div>
   <p class="lead">Email is the hardest "easy" case: ancient, federated, and full of long-lived stored data.</p>
   <p>S/MIME and OpenPGP use signatures and key establishment that need their own PQC transition profiles. Mail is stored for years, read by many clients, and depends on directories or key servers. Centrally shipped messengers can coordinate protocol upgrades more directly, although they still need staged compatibility and downgrade protection.</p>
+  <div class="callout takeaway"><span class="k">OpenPGP publication</span><p><b>RFC 9980</b> defines a post-quantum OpenPGP profile. Implementations conforming to that profile are required to support the composite ML-DSA-65 + Ed25519 signature and ML-KEM-768 + X25519 encryption combinations; larger ML-DSA/ML-KEM combinations are recommended. Publication establishes an interoperable profile, not deployment across mail clients, key servers, archives, or enterprise gateways.</p></div>
+  <div class="callout takeaway"><span class="k">CMS, JOSE, and COSE publication</span><p><b>RFC 9936</b> specifies direct ML-KEM use in CMS through <code>KEMRecipientInfo</code>. <b>RFC 9964</b> registers ML-DSA-44, ML-DSA-65, and ML-DSA-87 for JOSE and COSE and uses the compact 32-byte seed representation for private keys. These RFCs settle protocol encodings; they do not prove that an application stack, HSM, certificate workflow, or peer implementation supports them.</p></div>
   <p>Keep the messaging layers straight. Signal's <b>PQXDH</b> protects initial asynchronous key agreement. Signal later introduced <b>SPQR</b> as a post-quantum ratchet and combined it with its classical Double Ratchet in the <b>Triple Ratchet</b>, providing ongoing post-quantum forward secrecy and post-compromise recovery. Apple's <b>PQ3</b> likewise addresses ongoing conversation keys, not merely the initial handshake. Email cannot copy these protocols directly; its client, directory, and archive ecosystems need interoperable standards.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>A signed email from 2026 may still need to be <em>verified</em> in 2040 for a legal dispute. If it was signed with a classical algorithm that is broken by then, its evidentiary value collapses. This is why archived, signed mail is a genuine harvest-and-forge concern, not just a key-exchange one.</p></div>
   <p>A useful planning grid asks <b>who controls the clients</b> and <b>how long confidentiality or authenticity must last</b>. Centrally distributed clients can coordinate a staged protocol rollout; federated email moves at the speed of widely deployed interoperable clients and archive formats. Data retention varies in both categories, so measure the actual product and policy rather than assuming all messenger data is ephemeral.</p>
@@ -239,9 +244,19 @@ ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></
   <h2>Primary sources</h2>
   <p class="section-hint">Educational; verify current protocol support with your vendors.</p>
   <a href="https://datatracker.ietf.org/doc/html/rfc9846" target="_blank" rel="noopener noreferrer">IETF RFC 9846 &mdash; TLS 1.3</a>
-  <a href="https://datatracker.ietf.org/doc/draft-ietf-tls-ecdhe-mlkem/" target="_blank" rel="noopener noreferrer">IETF ECDHE-MLKEM for TLS 1.3 &mdash; approved; RFC Editor queue (Internet-Draft until published)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc10024.html" target="_blank" rel="noopener noreferrer">IETF RFC 10024 &mdash; Hybrid ECDHE-MLKEM key agreement for TLS 1.3</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9954.html" target="_blank" rel="noopener noreferrer">IETF RFC 9954 &mdash; Hybrid key exchange design framework</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9958.html" target="_blank" rel="noopener noreferrer">IETF RFC 9958 &mdash; Post-Quantum Cryptography for Engineers</a>
+  <a href="https://openssl-library.org/news/timeline/" target="_blank" rel="noopener noreferrer">OpenSSL release and advisory timeline</a>
   <a href="https://datatracker.ietf.org/doc/rfc9370/" target="_blank" rel="noopener noreferrer">IETF RFC 9370 &mdash; Multiple key exchanges in IKEv2</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9881.html" target="_blank" rel="noopener noreferrer">IETF RFC 9881 &mdash; ML-DSA algorithm identifiers for X.509 (Oct 2025)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9909.html" target="_blank" rel="noopener noreferrer">IETF RFC 9909 &mdash; SLH-DSA algorithm identifiers for X.509 (Dec 2025)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9935.html" target="_blank" rel="noopener noreferrer">IETF RFC 9935 &mdash; ML-KEM algorithm identifiers for X.509 (Mar 2026)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9936.html" target="_blank" rel="noopener noreferrer">IETF RFC 9936 &mdash; Direct ML-KEM use in CMS (Mar 2026)</a>
+  <a href="https://datatracker.ietf.org/doc/draft-ietf-tls-mlkem/" target="_blank" rel="noopener noreferrer">IETF draft-ietf-tls-mlkem &mdash; direct ML-KEM groups for TLS (IESG-approved; RFC publication pending)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9964.html" target="_blank" rel="noopener noreferrer">IETF RFC 9964 &mdash; ML-DSA for JOSE and COSE (May 2026)</a>
   <a href="https://www.openssh.org/releasenotes.html" target="_blank" rel="noopener noreferrer">OpenSSH release notes (PQ key exchange)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9980.html" target="_blank" rel="noopener noreferrer">IETF RFC 9980 &mdash; Post-Quantum Cryptography in OpenPGP</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
   <a href="https://security.googleblog.com/2024/09/a-new-path-for-kyber-on-web.html" target="_blank" rel="noopener noreferrer">Google Security Blog &mdash; Chrome hybrid ML-KEM rollout</a>
   <a href="https://blog.cloudflare.com/post-quantum-ipsec/" target="_blank" rel="noopener noreferrer">Cloudflare &mdash; April 2026 deployment measurement</a>
@@ -254,7 +269,7 @@ ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V9.0 (September 2026)</div>
+  <div class="help-ver" data-help-version>V10.0 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through the protocol map, then read each protocol's lesson. The command example is illustrative &mdash; exact group names and tool versions change, so verify before relying on it.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

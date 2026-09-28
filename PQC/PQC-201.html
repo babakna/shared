@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-201">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V9.0 (September 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V10.0 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -83,11 +83,12 @@
       <tr><td><b>FIPS 204</b></td><td>ML-DSA</td><td>Digital signatures (general purpose)</td><td>CRYSTALS-Dilithium (module lattices)</td></tr>
       <tr><td><b>FIPS 205</b></td><td>SLH-DSA</td><td>Digital signatures (conservative)</td><td>SPHINCS+ (hash-based)</td></tr>
       <tr><td>Selected 2025</td><td>HQC</td><td>Backup KEM (different math)</td><td>Code-based</td></tr>
-      <tr><td>Draft (FN-DSA)</td><td>Falcon</td><td>Compact signatures</td><td>NTRU lattices</td></tr>
+      <tr><td>In development (no draft FIPS)</td><td>Falcon / future FN-DSA</td><td>Compact signatures</td><td>NTRU lattices</td></tr>
     </tbody>
   </table></div>
   <p>These did not appear overnight. NIST ran an open, global competition: a public call in 2016, dozens of submissions from teams worldwide, several rounds of public cryptanalysis where researchers openly tried to break each other's designs, draft selections in 2022, and the finalized FIPS 203/204/205 in August 2024. That decade of adversarial peer review is exactly why you should trust these standards over any proprietary alternative &mdash; and why "roll your own PQC" is an even worse idea than rolling your own classical crypto.</p>
-  <p>A standards-aligned plan starts by naming the job (key exchange? signature?), then picks the family, then the parameter set. HQC was selected in 2025 as a <b>backup</b> KEM built on different (code-based) math, so a future weakness in lattices would not take down everything. FN-DSA (Falcon) is still being finalized; track its status before committing.</p>
+  <p>A standards-aligned plan starts by naming the job (key exchange? signature?), then picks the family, then the parameter set. HQC was selected in 2025 as a <b>backup</b> KEM built on different (code-based) math, so a future weakness in lattices would not take down everything. Falcon was selected for future FN-DSA standardization, but NIST has not published a draft or final FIPS 206; track its status before committing.</p>
+  <div class="callout takeaway"><span class="k">2026 standards watch</span><p>NIST SP 800-230 is still an initial public draft. It proposes six additional SLH-DSA parameter sets for limited-signature uses such as software, firmware, and certificate signing, with a strict limit of 2<sup>24</sup> signatures per key; NIST explicitly says they are not approved for general-purpose use. NIST IR 8610 originally advanced nine additional-signature candidates to Round 3 in May. On 28 July 2026, NIST reported that the HAWK team withdrew after an AI-assisted analysis found a vulnerability, leaving eight candidates under evaluation: FAEST, MAYO, MQOM, QR-UOV, SDitH, SNOVA, SQIsign, and UOV. The HAWK result does not affect finalized FIPS 203, 204, or 205. Advancement is not standardization or deployment approval.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Saying "we use PQC" with no specifics. Always state algorithm, parameter set, job, protocol, and implementation &mdash; otherwise the claim is unverifiable.</p></div>
   <div class="callout example"><span class="k">Why two names for the same thing?</span><p>You will see "Kyber" and "ML-KEM," or "Dilithium" and "ML-DSA," used almost interchangeably &mdash; and it trips up newcomers constantly. Kyber, Dilithium, and SPHINCS+ are the submission names behind the finalized ML-KEM, ML-DSA, and SLH-DSA standards. Falcon is different: NIST selected it for a future FIPS 206 expected to use the name FN-DSA, but that standard is still in development. The finalized standards have settled parameters and encodings; do not treat Falcon/FN-DSA as final until FIPS 206 is published. If a product still says "Kyber," ask whether it implements final ML-KEM or a pre-standard build.</p></div>
   <div class="callout example"><span class="k">Everyday analogy</span><p>Think of "job first, then family, then parameter set" like buying a vehicle. First decide the job (haul cargo vs. commute), then the family (truck vs. sedan), then the trim level (engine size, options). Nobody sensibly starts by arguing about trim levels before knowing whether they need a truck &mdash; yet teams routinely argue about PQC parameter sets before agreeing on what job the cryptography is even doing.</p></div>
@@ -123,7 +124,7 @@
     </svg>
     <figcaption>Compare with classical X25519, where each side sends a 32-byte value. ML-KEM's ~1&nbsp;KB messages are the "size tax" that ripples into handshakes, packets, and storage &mdash; but the resulting secret is the same tiny 32 bytes.</figcaption>
   </figure>
-  <div class="callout example"><span class="k">Generic KEM vs TLS</span><p>In the generic recipient/sender model above, the recipient publishes the KEM public key. The IETF-approved TLS hybrid design, now in the RFC Editor publication queue but still an Internet-Draft until publication, instantiates the roles differently: the <b>client</b> sends the ML-KEM encapsulation key in its key share, and the <b>server</b> encapsulates and returns the ciphertext in its key share. TLS then combines the classical and ML-KEM shared secrets through its key schedule. Do not infer wire direction from the generic API model.</p></div>
+  <div class="callout example"><span class="k">Generic KEM vs TLS</span><p>In the generic recipient/sender model above, the recipient publishes the KEM public key. RFC 10024 instantiates the TLS roles differently: the <b>client</b> sends the ML-KEM encapsulation key in its key share, and the <b>server</b> encapsulates and returns the ciphertext in its key share. Its named groups are <code>X25519MLKEM768</code>, <code>SecP256r1MLKEM768</code>, and <code>SecP384r1MLKEM1024</code>. TLS then combines the classical and ML-KEM shared secrets through its key schedule. Publication does not imply universal deployment. Do not infer wire direction from the generic API model.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Trying to "ML-KEM-encrypt" a large blob directly, or stuffing KEM public keys and ciphertexts into old fixed-size fields without checking the new sizes.</p></div>
 </section>
 
@@ -153,7 +154,7 @@
 <section class="lesson" id="s5">
   <div class="lesson-title"><span class="num">5</span><h2>Parameter sets and security levels</h2></div>
   <p class="lead">Each algorithm ships in a few "sizes." NIST labels them by how hard they are to break.</p>
-  <p>You do not just pick "ML-KEM" &mdash; you pick a <b>parameter set</b>, which fixes the target security category and the key/signature sizes. NIST categories compare attack effort with well-studied symmetric primitives: roughly, <b>Category 1</b> with AES-128 key search, <b>Category 3</b> with AES-192, and <b>Category 5</b> with AES-256. The correct set comes from the protocol profile and governing policy. For example, the current IETF TLS hybrid work profiles ML-KEM-768, while NSA's CNSA 2.0 profile for National Security Systems specifies ML-KEM-1024 and ML-DSA-87. Those are different scopes, not evidence for one universal default.</p>
+  <p>You do not just pick "ML-KEM" &mdash; you pick a <b>parameter set</b>, which fixes the target security category and the key/signature sizes. NIST categories compare attack effort with well-studied symmetric primitives: roughly, <b>Category 1</b> with AES-128 key search, <b>Category 3</b> with AES-192, and <b>Category 5</b> with AES-256. The correct set comes from the protocol profile and governing policy. For example, published RFC 10024 profiles ML-KEM-768 in two TLS hybrid groups and ML-KEM-1024 in a third, while NSA's CNSA 2.0 profile for National Security Systems specifies ML-KEM-1024 and ML-DSA-87. Those are different scopes, not evidence for one universal default.</p>
   <div class="table-scroll"><table class="data">
     <thead><tr><th>NIST category</th><th>Comparable attack effort</th><th>KEM</th><th>Signature (lattice)</th><th>Profile context</th></tr></thead>
     <tbody>
@@ -272,7 +273,12 @@
   <a href="https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption" target="_blank" rel="noopener noreferrer">NIST &mdash; HQC selection announcement</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; PQC project (FN-DSA status)</a>
   <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; Recommendations for Key-Encapsulation Mechanisms (final, September 2025)</a>
-  <a href="https://datatracker.ietf.org/doc/draft-ietf-tls-ecdhe-mlkem/" target="_blank" rel="noopener noreferrer">IETF TLS ECDHE-MLKEM &mdash; approved; RFC Editor queue (Internet-Draft until published)</a>
+  <a href="https://csrc.nist.gov/pubs/sp/800/230/ipd" target="_blank" rel="noopener noreferrer">NIST SP 800-230 &mdash; Additional SLH-DSA parameter sets for limited-signature use cases (initial public draft)</a>
+  <a href="https://csrc.nist.gov/pubs/ir/8610/final" target="_blank" rel="noopener noreferrer">NIST IR 8610 &mdash; Round 3 additional-signature report (final, May 2026)</a>
+  <a href="https://www.nist.gov/pqc" target="_blank" rel="noopener noreferrer">NIST PQC project &mdash; HAWK withdrawal notice and current Round 3 status (July 2026)</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc10024.html" target="_blank" rel="noopener noreferrer">IETF RFC 10024 &mdash; Hybrid ECDHE-MLKEM key agreement for TLS 1.3</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9954.html" target="_blank" rel="noopener noreferrer">IETF RFC 9954 &mdash; Hybrid key exchange design framework</a>
+  <a href="https://www.rfc-editor.org/rfc/rfc9958.html" target="_blank" rel="noopener noreferrer">IETF RFC 9958 &mdash; Post-Quantum Cryptography for Engineers</a>
   <a href="https://media.defense.gov/2022/Sep/07/2003071836/-1/-1/0/CSI_CNSA_2.0_FAQ_.PDF" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 FAQ &mdash; National Security System parameter profile</a>
 </section>
 </main>
@@ -282,7 +288,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V9.0 (September 2026)</div>
+  <div class="help-ver" data-help-version>V10.0 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Start with the size comparison &mdash; those ratios explain most PQC engineering pain. Then read each family's lesson and try the labs.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
