@@ -15,6 +15,25 @@ A progressive six-course AI learning series -- from foundational concepts to ope
 
 Courses 101 and 102 are sequential and designed for progressive completion. Course 103 is a standalone reference tool. Courses 104 and 105 build on the earlier material. Course 106 is the capstone for turning AI fluency into repeatable operating practice.
 
+## What changed in V10.0
+
+- Rolled the current release surfaces to October 2026 and rechecked provider and standards links on 27 September 2026.
+- Added OpenAI's 22 September GPT-6 Sol/Luna API release, Anthropic's Fable/Mythos 5.1 and Opus 5.5 releases, and Google's Gemini 3.8 Live, Extended Thinking, and Flash TTS changes with current migration cautions.
+- Added independent Jev evidence from crash-narrative classification, calibration, radiology, rubric-judging, and exploratory security studies. The material separates vendor claims from early external results and keeps validation, recalibration, abstention, policy, and human review authoritative.
+- Added Gemini lifecycle warnings: new-project Gemini 2.5 access restrictions, the 30 September Gemini Omni Flash preview retirement, and the 5 October Antigravity preview shutdown are dated migration items rather than evergreen product claims.
+
+## What changed in V9.1
+
+- Refreshed the September 2026 provider landscape across GPT-6, Claude 5.x, Gemini 3.8, Grok 4.7, DeepSeek V4.1, and Qwen3.8, with instructions to verify live model IDs and endpoint parameters.
+- Added Jev as a vendor-developed bounded decision-model pattern for probability-scored choices over a closed candidate set; vendor comparisons are labeled and deterministic policy/action gates remain authoritative.
+- Made temperature/top-p guidance provider- and model-specific, replaced chain-of-thought guarantees with checkable verification guidance, and synchronized the remaining runtime-generated version surfaces to V9.1.
+- Reframed AI-RAN per-inference pricing as a non-standard future product concept that would require explicit application/edge telemetry, policy, privacy controls, and settlement design.
+- Updated EU AI Act transparency timing and duties from European Commission material.
+- Added NIST TEVV-Athlon and AITE as emerging, non-final evaluation resources for testing and standards work.
+- Added September platform shifts: the public-beta OpenAI Agents API, generally available GPT-Live-1, and Gemini 3.8 Live Extended Thinking's asynchronous client-state requirements.
+- Expanded provenance and impact-assessment guidance with ISO/IEC 42005:2025, C2PA 2.4, and Anthropic text watermarking, including explicit limits on what provenance signals prove.
+- Added independent September Jev evidence showing that type-safe output can still be semantically wrong when option labels and rubrics interact; target-domain calibration and deterministic authorization remain required.
+
 ## Features
 
 - **Self-contained delivery** -- Each course is a standalone HTML document. The landing page uses two local PNG assets. No external dependencies, no build tools, no frameworks.
@@ -65,7 +84,7 @@ Each course keeps its own styles, scripts, data, and content. The course files a
 
 ## Content Currency
 
-Version: **V8.0**. Content reviewed in **August 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
+Version: **V10.0**. October 2026 release; current sources checked **27 September 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
 
 ## Adding a New Course
 
@@ -92,7 +111,7 @@ To add another course:
 
 ## Author
 
-Brought to you by **Babak**
+**Namiranian, Babak**
 
 ## License
 

@@ -45,7 +45,7 @@
   body{overflow-x:hidden;padding-top:48px}
   a[href="index.html"]:not(.pack),#themeToggle{min-height:34px;display:inline-flex!important;align-items:center;justify-content:center;white-space:nowrap;line-height:1.1;backdrop-filter:blur(10px)}
   a[href="index.html"]:not(.pack){max-width:46vw;overflow:hidden;text-overflow:ellipsis}
-  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}
+  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}#host button.btn{min-height:48px}
   .bar{width:100%;display:grid!important;grid-template-columns:auto auto auto minmax(0,1fr);align-items:center;gap:8px!important;margin:0 0 12px!important;padding:8px;border:1px solid var(--border,#d3d8ec);border-radius:16px;background:color-mix(in srgb,var(--panel,#fff) 86%,transparent);box-shadow:0 8px 26px rgba(0,0,0,.12);position:sticky;top:48px;z-index:180;backdrop-filter:blur(12px)}
   .bar .big{min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar .score{grid-column:1/-1;margin-left:0!important;width:100%;text-align:center;font-size:13px;line-height:1.35}
   #gameZoomBar{left:50%!important;right:auto!important;bottom:max(10px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:330!important;padding:6px 10px!important;border:1px solid rgba(255,255,255,.2)!important;backdrop-filter:blur(10px)}
@@ -152,6 +152,7 @@ colorlines:`Tap a ball then an empty cell to move it (a clear path is needed). L
 };
 const host=document.getElementById('host'),statusEl=document.getElementById('status'),titleEl=document.getElementById('title'),hintEl=document.getElementById('hint');
 let current=null,currentGm=null;
+let C2DIFF=localStorage.getItem('c2diff')||'medium';
 function hs(id){return +(localStorage.getItem('c2_'+id)||0)}
 function setHs(id,v){if(v>hs(id)){localStorage.setItem('c2_'+id,v);return true}return false}
 function lowBest(id,v){const c=localStorage.getItem('c2_'+id);if(c===null||v<+c){localStorage.setItem('c2_'+id,v);return true}return false}
@@ -175,7 +176,7 @@ function showRules(){if(!currentGm)return;const ov=el('div',{style:'position:fix
   const close=el('button',{className:'btn',textContent:'Got it!',style:'margin-top:16px'});close.onclick=()=>ov.remove();
   box.append(close);ov.append(box);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.append(ov);}
 function mkCanvas(w,h){const c=el('canvas',{width:w,height:h});host.append(c);return c;}
-function loop(fn){let raf,last=performance.now(),live=true;function step(t){if(!live)return;const dt=Math.min(50,t-last)/16.667;last=t;fn(dt);raf=requestAnimationFrame(step);}raf=requestAnimationFrame(step);return ()=>{live=false;cancelAnimationFrame(raf);};}
+function loop(fn){let raf,last=performance.now(),live=true,paused=false;const pauseBtn=el('button',{className:'btn ghost',textContent:'⏸ Pause'});pauseBtn.onclick=()=>{paused=!paused;pauseBtn.textContent=paused?'▶ Resume':'⏸ Pause';last=performance.now();};host.append(pauseBtn);function step(t){if(!live)return;const dt=Math.min(50,t-last)/16.667;last=t;if(!paused)fn(dt);raf=requestAnimationFrame(step);}raf=requestAnimationFrame(step);return ()=>{live=false;cancelAnimationFrame(raf);};}
 function keyHandler(map){const dn=e=>{if(map[e.key]){map[e.key](true,e);if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();}};const up=e=>{if(map._up)map._up(e.key);};window.addEventListener('keydown',dn);window.addEventListener('keyup',up);return ()=>{window.removeEventListener('keydown',dn);window.removeEventListener('keyup',up);};}
 function rnd(n){return Math.floor(Math.random()*n);}
 const SUITS=['♠','♥','♦','♣'],RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -448,7 +449,7 @@ function game_mahjong(gm){
   const FACES=['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀀','🀁','🀂','🀃','🀄','🀅','🀆','🀫'];
   let tiles,sel,over;
   const board=el('div',{style:'position:relative;width:100%;max-width:560px;height:360px;margin:0 auto'});
-  const newB=el('button',{className:'btn',textContent:'New Game'});
+  const newB=el('button',{className:'btn',textContent:'New Game',style:'min-height:56px'});
   host.append(newB,board);
   function reset(){
     // simple 3-layer pyramid layout
@@ -531,21 +532,23 @@ function game_wordladder(gm){
 /* ---------------- ANAGRAM HUNT ---------------- */
 function game_anagram(gm){
   setHint('Make words from the 6 letters. Longer = more points. 90 seconds.');
-  let letters,score,found,time,timer,cur;
+  let letters,score,found,time,timer,cur,paused;
   const lettersEl=el('div',{className:'row'});
   const curEl=el('div',{className:'big',style:'min-height:28px;letter-spacing:4px'});
   const foundEl=el('div',{style:'color:var(--dim);font-size:13px;max-width:520px;text-align:center'});
   const clearB=el('button',{className:'btn ghost',textContent:'Clear'});
   const subB=el('button',{className:'btn',textContent:'Submit'});
+  const pauseB=el('button',{className:'btn ghost',textContent:'⏸ Pause'});
   const newB=el('button',{className:'btn ghost',textContent:'New Letters'});
-  host.append(lettersEl,curEl,el('div',{className:'row'},subB,clearB,newB),foundEl);
+  host.append(lettersEl,curEl,el('div',{className:'row'},subB,clearB,pauseB,newB),foundEl);
   const VOW='aeiou',CON='bcdfghlmnprst';
   function reset(){letters=[];for(let i=0;i<2;i++)letters.push(VOW[rnd(VOW.length)]);for(let i=0;i<4;i++)letters.push(CON[rnd(CON.length)]);shuffle(letters);
-    score=0;found=[];cur='';time=90;clearInterval(timer);timer=setInterval(()=>{time--;if(time<=0){clearInterval(timer);setHs(gm.id,score);curEl.textContent='⏰ Time! Score '+score;subB.disabled=true;}else upd();},1000);subB.disabled=false;render();}
-  function render(){lettersEl.innerHTML='';letters.forEach((ch,i)=>{const b=el('button',{className:'btn',textContent:ch.toUpperCase(),style:'width:46px;height:46px'});b.onclick=()=>{cur+=ch;curEl.textContent=cur.toUpperCase();};lettersEl.append(b);});upd();}
+    score=0;found=[];cur='';time=90;paused=false;pauseB.textContent='⏸ Pause';clearInterval(timer);timer=setInterval(()=>{if(paused)return;time--;if(time<=0){clearInterval(timer);setHs(gm.id,score);curEl.textContent='⏰ Time! Score '+score;subB.disabled=true;}else upd();},1000);subB.disabled=false;render();}
+  function render(){lettersEl.innerHTML='';letters.forEach((ch,i)=>{const b=el('button',{className:'btn',textContent:ch.toUpperCase(),style:'width:46px;height:46px'});b.onclick=()=>{if(paused)return;cur+=ch;curEl.textContent=cur.toUpperCase();};lettersEl.append(b);});upd();}
   function upd(){foundEl.textContent=found.length?'Found: '+found.join(', '):'';setStatus('Score: '+score+'  •  Time: '+time+'s  •  Best: '+hs(gm.id));}
-  clearB.onclick=()=>{cur='';curEl.textContent='';};
-  subB.onclick=()=>{const w=cur.toLowerCase();cur='';curEl.textContent='';
+  clearB.onclick=()=>{if(paused)return;cur='';curEl.textContent='';};
+  pauseB.onclick=()=>{if(time<=0)return;paused=!paused;pauseB.textContent=paused?'▶ Resume':'⏸ Pause';subB.disabled=paused;setStatus(paused?'Paused • Time: '+time+'s':'Score: '+score+' • Time: '+time+'s • Best: '+hs(gm.id));};
+  subB.onclick=()=>{if(paused)return;const w=cur.toLowerCase();cur='';curEl.textContent='';
     if(w.length<3){return;}if(found.includes(w)){return;}
     // check letters available
     const pool=letters.slice();let ok=true;for(const ch of w){const idx=pool.indexOf(ch);if(idx<0){ok=false;break;}pool.splice(idx,1);}
@@ -556,22 +559,24 @@ function game_anagram(gm){
 /* ---------------- BOGGLE ---------------- */
 function game_boggle(gm){
   setHint('Tap connected letters (touching, incl. diagonally) to spell words of 3+ letters. 90 seconds.');
-  const N=4;let grid,sel,score,found,time,timer;
+  const N=4;let grid,sel,score,found,time,timer,paused;
   const board=el('div',{style:`display:grid;grid-template-columns:repeat(${N},56px);gap:5px`});
   const curEl=el('div',{className:'big',style:'min-height:26px'});
   const subB=el('button',{className:'btn',textContent:'Submit Word'});
+  const pauseB=el('button',{className:'btn ghost',textContent:'⏸ Pause'});
   const newB=el('button',{className:'btn ghost',textContent:'New Board'});
   const foundEl=el('div',{style:'color:var(--dim);font-size:13px;max-width:520px;text-align:center'});
-  host.append(curEl,board,el('div',{className:'row'},subB,newB),foundEl);
+  host.append(curEl,board,el('div',{className:'row'},subB,pauseB,newB),foundEl);
   const DICE=['aaeegn','abbjoo','achops','affkps','aoottw','cimotu','deilrx','delrvy','distty','eeghnw','eeinsu','ehrtvw','eiosst','elrtty','himnqu','hlnnrz'];
-  function reset(){grid=DICE.map(d=>d[rnd(6)].toUpperCase());sel=[];score=0;found=[];time=90;clearInterval(timer);
-    timer=setInterval(()=>{time--;if(time<=0){clearInterval(timer);setHs(gm.id,score);curEl.textContent='⏰ Time! Score '+score;}else upd();},1000);render();}
+  function reset(){grid=DICE.map(d=>d[rnd(6)].toUpperCase());sel=[];score=0;found=[];time=90;paused=false;pauseB.textContent='⏸ Pause';clearInterval(timer);
+    timer=setInterval(()=>{if(paused)return;time--;if(time<=0){clearInterval(timer);setHs(gm.id,score);curEl.textContent='⏰ Time! Score '+score;}else upd();},1000);render();}
   function adj(a,b){const ra=Math.floor(a/N),ca=a%N,rb=Math.floor(b/N),cb=b%N;return Math.abs(ra-rb)<=1&&Math.abs(ca-cb)<=1&&a!==b;}
   function render(){board.innerHTML='';grid.forEach((ch,i)=>{const on=sel.includes(i);const d=el('div',{textContent:ch,style:`width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;border-radius:8px;background:${on?'var(--accent)':'var(--panel)'};color:${on?'#fff':'var(--text)'};border:1px solid var(--border);cursor:pointer`});
-    d.onclick=()=>{if(sel.includes(i)){if(sel[sel.length-1]===i)sel.pop();}else if(sel.length===0||adj(sel[sel.length-1],i))sel.push(i);curEl.textContent=sel.map(x=>grid[x]).join('');render();};board.append(d);});upd();}
+    d.onclick=()=>{if(paused)return;if(sel.includes(i)){if(sel[sel.length-1]===i)sel.pop();}else if(sel.length===0||adj(sel[sel.length-1],i))sel.push(i);curEl.textContent=sel.map(x=>grid[x]).join('');render();};board.append(d);});upd();}
   function upd(){foundEl.textContent=found.length?found.join(', '):'';setStatus('Score: '+score+'  •  Time: '+time+'s  •  Best: '+hs(gm.id));}
-  subB.onclick=()=>{const w=sel.map(x=>grid[x]).join('').toLowerCase();sel=[];curEl.textContent='';
+  subB.onclick=()=>{if(paused)return;const w=sel.map(x=>grid[x]).join('').toLowerCase();sel=[];curEl.textContent='';
     if(w.length>=3&&!found.includes(w)&&DICT.has(w)){found.push(w);score+=[0,0,0,1,2,4,6,9][Math.min(7,w.length)];upd();}render();};
+  pauseB.onclick=()=>{if(time<=0)return;paused=!paused;pauseB.textContent=paused?'▶ Resume':'⏸ Pause';subB.disabled=paused;setStatus(paused?'Paused • Time: '+time+'s':'Score: '+score+' • Time: '+time+'s • Best: '+hs(gm.id));};
   newB.onclick=reset;reset();return{stop:()=>clearInterval(timer)};
 }
 
@@ -876,8 +881,10 @@ function game_scrabble(gm){
 }
 
 function nC(ans,sp){const s=new Set([ans]);let g=0;while(s.size<4&&g<99){g++;const v=ans+rnd(2*sp+1)-sp;if(v!==ans)s.add(v);}return [...s].filter(x=>x!==ans);}
-function mcq(gm,gen){let score=0;const q=el('div',{className:'big',style:'font-size:24px;min-height:42px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});host.append(q,opts,fb,nb);
-  function round(){const d=gen();q.textContent=d.q;fb.textContent='';opts.innerHTML='';shuffle([d.a,...d.wr]).map(String).forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:18px'});b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===String(d.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+d.a;}setHs(gm.id,score);setStatus('Score: '+score+' • Best: '+hs(gm.id));};opts.append(b);});setStatus('Score: '+score+' • Best: '+hs(gm.id));}
+function mcq(gm,gen){let score=0;const diffRow=el('div',{className:'row',style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center'});const q=el('div',{className:'big',style:'font-size:24px;min-height:42px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;width:100%'});const fb=el('div',{className:'big'});const nb=el('button',{className:'btn',textContent:'Next ▶'});
+  function refreshDiff(){[...diffRow.children].forEach((b,i)=>b.className='btn'+(['easy','medium','hard'][i]===C2DIFF?'':' ghost'));}
+  [['easy','😊 Easy'],['medium','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,label])=>{const b=el('button',{className:'btn',textContent:label});b.onclick=()=>{C2DIFF=d;localStorage.setItem('c2diff',d);score=0;refreshDiff();round();};diffRow.append(b);});refreshDiff();host.append(diffRow,q,opts,fb,nb);
+  function round(){const d=gen();q.textContent=d.q;fb.textContent='';opts.innerHTML='';const total={easy:2,medium:3,hard:4}[C2DIFF];const wrong=shuffle((d.wr||[]).map(String)).slice(0,Math.max(1,total-1));shuffle([String(d.a),...wrong]).forEach(o=>{const b=el('button',{className:'btn ghost',textContent:o,style:'padding:14px;font-size:18px'});b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===String(d.a)){score++;b.style.background='#2ecc71';b.style.color='#fff';fb.textContent='✅ Correct!';}else{b.style.background='#e74c3c';b.style.color='#fff';fb.textContent='Answer: '+d.a;}setHs(gm.id,score);setStatus('Score: '+score+' • '+C2DIFF+' • Best: '+hs(gm.id));};opts.append(b);});setStatus('Score: '+score+' • '+C2DIFF+' • Best: '+hs(gm.id));}
   nb.onclick=round;round();return{stop:()=>{}};}
 function game_roundgame(gm){setHint('Round the number to the nearest 10.');return mcq(gm,()=>{const n=rnd(889)+11;const a=Math.round(n/10)*10;return{q:'Round '+n+' to the nearest 10',a:a,wr:[a+10,a-10,a+20].filter(x=>x>=0&&x!==a)};});}
 function game_comparemath(gm){setHint('Which sum is BIGGER?');return mcq(gm,()=>{let a,b,c,d;do{a=rnd(50)+1;b=rnd(50)+1;c=rnd(50)+1;d=rnd(50)+1;}while(a+b===c+d);const s1=a+'+'+b+'='+(a+b),s2=c+'+'+d+'='+(c+d);const ans=(a+b)>(c+d)?s1:s2;return{q:'Which is bigger?',a:ans,wr:[ans===s1?s2:s1]};});}
@@ -887,9 +894,10 @@ function game_placeval(gm){setHint('Which digit is in the named place?');return 
 
 /* ---------------- MATH DASH ---------------- */
 function game_mathdash(gm){setHint('Solve as many as you can in 30 seconds — tap the correct answer!');
-  let score,time,timer,over,ans;const q=el('div',{className:'big',style:'font-size:28px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px;width:100%'});const nb=el('button',{className:'btn',textContent:'New Game'});host.append(q,opts,nb);
-  function reset(){score=0;time=30;over=false;clearInterval(timer);timer=setInterval(()=>{time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);q.textContent='⏰ Time! Score '+score;opts.innerHTML='';}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);next();}
-  function next(){const op=['+','−','×'][rnd(3)];let a,b;if(op==='×'){a=rnd(11)+2;b=rnd(11)+2;ans=a*b;}else{a=rnd(40)+5;b=rnd(40)+1;if(op==='−'&&b>a){const t=a;a=b;b=t;}ans=op==='+'?a+b:a-b;}q.textContent=a+' '+op+' '+b+' = ?';const set=new Set([ans]);while(set.size<4){const v=ans+rnd(13)-6;if(v!==ans)set.add(v);}opts.innerHTML='';[...set].sort(()=>Math.random()-0.5).forEach(v=>{const b2=el('button',{className:'btn ghost',textContent:v,style:'padding:14px;font-size:18px'});b2.onclick=()=>{if(over)return;score+=v===ans?1:-1;if(score<0)score=0;setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();};opts.append(b2);});}
+  let score,time,timer,over,ans,paused;const q=el('div',{className:'big',style:'font-size:28px'});const opts=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px;width:100%'});const pauseB=el('button',{className:'btn ghost',textContent:'⏸ Pause'});const nb=el('button',{className:'btn',textContent:'New Game'});host.append(q,opts,el('div',{className:'row'},pauseB,nb));
+  function reset(){score=0;time=30;over=false;paused=false;pauseB.textContent='⏸ Pause';clearInterval(timer);timer=setInterval(()=>{if(paused)return;time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);q.textContent='⏰ Time! Score '+score;opts.innerHTML='';}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);next();}
+  function next(){const op=['+','−','×'][rnd(3)];let a,b;if(op==='×'){a=rnd(11)+2;b=rnd(11)+2;ans=a*b;}else{a=rnd(40)+5;b=rnd(40)+1;if(op==='−'&&b>a){const t=a;a=b;b=t;}ans=op==='+'?a+b:a-b;}q.textContent=a+' '+op+' '+b+' = ?';const set=new Set([ans]);while(set.size<4){const v=ans+rnd(13)-6;if(v!==ans)set.add(v);}opts.innerHTML='';[...set].sort(()=>Math.random()-0.5).forEach(v=>{const b2=el('button',{className:'btn ghost',textContent:v,style:'padding:14px;font-size:18px'});b2.onclick=()=>{if(over||paused)return;score+=v===ans?1:-1;if(score<0)score=0;setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();};opts.append(b2);});}
+  pauseB.onclick=()=>{if(over)return;paused=!paused;pauseB.textContent=paused?'▶ Resume':'⏸ Pause';setStatus(paused?'Paused • Time: '+time+'s':'Score: '+score+' • Time: '+time+'s • Best: '+hs(gm.id));};
   nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
 
 /* ---------------- NUMBER SEQUENCE ---------------- */
@@ -945,12 +953,13 @@ function game_beggar(gm){setHint('Tap Play. Face cards force the other player to
 
 /* ---------------- SPEED SORT ---------------- */
 function game_speedsort(gm){setHint('A card appears — tap its SUIT as fast as you can! Score as high as possible in 30 seconds.');
-  let deck,score,time,timer,over,cur;const cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});const row=el('div',{style:'display:flex;gap:8px'});
-  SUITS.forEach(s=>{const b=el('button',{className:'btn',textContent:s,style:'font-size:22px'});b.onclick=()=>tap(s);row.append(b);});const nb=el('button',{className:'btn ghost',textContent:'New Game'});const msg=el('div',{className:'big'});
-  host.append(cardEl,row,nb,msg);
-  function reset(){deck=shuffle(makeDeck().concat(makeDeck()));score=0;time=30;over=false;clearInterval(timer);next();timer=setInterval(()=>{time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);msg.textContent='⏰ Time! Score '+score;}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);}
+  let deck,score,time,timer,over,cur,paused;const cardEl=el('div',{style:'display:flex;justify-content:center;min-height:78px'});const row=el('div',{style:'display:flex;gap:8px'});
+  SUITS.forEach(s=>{const b=el('button',{className:'btn',textContent:s,style:'font-size:22px'});b.onclick=()=>tap(s);row.append(b);});const pauseB=el('button',{className:'btn ghost',textContent:'⏸ Pause'});const nb=el('button',{className:'btn ghost',textContent:'New Game'});const msg=el('div',{className:'big'});
+  host.append(cardEl,row,el('div',{className:'row'},pauseB,nb),msg);
+  function reset(){deck=shuffle(makeDeck().concat(makeDeck()));score=0;time=30;over=false;paused=false;pauseB.textContent='⏸ Pause';clearInterval(timer);next();timer=setInterval(()=>{if(paused)return;time--;if(time<=0){over=true;clearInterval(timer);setHs(gm.id,score);msg.textContent='⏰ Time! Score '+score;}setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));},1000);}
   function next(){if(!deck.length)deck=shuffle(makeDeck());cur=deck.pop();cardEl.innerHTML='';cardEl.append(cardFace(cur));}
-  function tap(s){if(over)return;if(s===cur.s){score++;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();}
+  function tap(s){if(over||paused)return;if(s===cur.s){score++;setHs(gm.id,score);}else score=Math.max(0,score-1);setStatus('Score: '+score+' • Time: '+Math.max(0,time)+'s • Best: '+hs(gm.id));next();}
+  pauseB.onclick=()=>{if(over)return;paused=!paused;pauseB.textContent=paused?'▶ Resume':'⏸ Pause';setStatus(paused?'Paused • Time: '+time+'s':'Score: '+score+' • Time: '+time+'s • Best: '+hs(gm.id));};
   nb.onclick=reset;reset();return{stop:()=>clearInterval(timer)};}
 
 function game_c2percent(gm){setHint('Find the percent of the number.');return mcq(gm,function(){var p=[10,25,50][rnd(3)];var mult=rnd(20)+2;var base=mult*(100/p);return{q:p+'% of '+base+' = ?',a:mult,wr:nC(mult,10)};});}

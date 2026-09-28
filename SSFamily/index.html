@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Family SS Planner v10</title>
+<title>Household Social Security Planner V11.0</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -318,11 +318,25 @@ tbody tr.best-row:hover td{background:var(--green-light);}
 #printChart{display:none;}
 
 @media(max-width:860px){
-  .layout{grid-template-columns:1fr;height:auto;}
-  .sidebar{border-right:none;border-bottom:1px solid var(--border);}
-  .main-area{height:auto;}
+  .hdr{height:auto;min-height:52px;flex-wrap:wrap;padding:8px 10px;gap:6px;align-items:flex-start;}
+  .hdr-l{min-width:0;width:100%;flex:0 0 100%;}
+  .hdr-l>div:last-child{min-width:0;flex:1;}
+  .hdr-sub{white-space:normal;overflow-wrap:anywhere;}
+  .hdr-r{width:100%;flex:0 0 100%;justify-content:flex-end;flex-wrap:wrap;}
+  .layout{grid-template-columns:minmax(0,1fr);height:auto;width:100%;overflow-x:hidden;}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border);width:100%;min-width:0;max-width:none;}
+  .main-area{height:auto;padding:14px 10px;min-width:0;width:100%;overflow-x:hidden;}
   .met-grid,.ms-grid{grid-template-columns:repeat(2,1fr);}
   .w-stats{grid-template-columns:repeat(2,1fr);}
+  .sc-bar{flex-wrap:wrap;}
+  .sc-lbl{width:100%;}
+  .sc-slot{flex:1 1 130px;}
+  .sc-add-btn{flex:1 1 100%;}
+}
+@media(max-width:430px){
+  .met-grid,.ms-grid,.w-stats{grid-template-columns:1fr;}
+  .fld-3{grid-template-columns:1fr;}
+  .sc-slot{flex-basis:100%;}
 }
 </style>
 </head>
@@ -333,8 +347,8 @@ tbody tr.best-row:hover td{background:var(--green-light);}
   <div class="hdr-l">
     <div class="logo"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
     <div>
-      <h1 class="hdr-title">Family Social Security Planner</h1>
-      <div class="hdr-sub">RETIREMENT PLANNING TOOL — ALL FIGURES POST-TAX</div>
+      <h1 class="hdr-title">Household Social Security Planner</h1>
+      <div class="hdr-sub">V11.0 &middot; OCTOBER 2026 &middot; RETIREMENT PLANNING TOOL — ALL FIGURES POST-TAX</div>
     </div>
   </div>
   <div class="hdr-r">
@@ -358,74 +372,74 @@ tbody tr.best-row:hover td{background:var(--green-light);}
 <div class="modal-bg" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-hidden="true">
   <div class="modal">
     <div class="modal-hd">
-      <div class="modal-hd-title" id="helpTitle">How to use this planner <span style="font-size:11px;font-weight:600;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-left:8px">v2.0</span></div>
+      <div class="modal-hd-title" id="helpTitle">How to use this planner <span style="font-size:11px;font-weight:600;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-left:8px">V11.0 · October 2026</span></div>
       <button class="modal-close" type="button" onclick="toggleHelp(false)" aria-label="Close help">×</button>
     </div>
     <div class="modal-body">
       <div class="h-sec">
         <div class="h-sec-t">People & birth years</div>
-        <div class="h-row"><div class="h-term">Names</div><div class="h-def">Enter names for the Husband, Wife, and Child. All labels update throughout the app. Names are saved with scenarios.</div></div>
-        <div class="h-row"><div class="h-term">Birth years</div><div class="h-def">Used to calculate exact SS milestone dates. More accurate than ages. FRA is automatically determined from the husband's birth year (67 for those born 1960 or later).</div></div>
-        <div class="h-row"><div class="h-term">Life expectancy</div><div class="h-def">Age each person is assumed to live to. The model runs until the last surviving person passes. The winner scenario often changes significantly based on the wife's longevity.</div></div>
+        <div class="h-row"><div class="h-term">Roles &amp; names</div><div class="h-def">Use any names you choose. The first adult is the primary worker; the second can represent an eligible spouse/former spouse or another trusted adult in the household plan; the third is a learner or other supported dependent. Social Security spouse, survivor, child, and DAC calculations apply only when the person meets SSA's legal eligibility rules. Names are saved with scenarios.</div></div>
+        <div class="h-row"><div class="h-term">Birth years</div><div class="h-def">Used to calculate exact SS milestone dates. More accurate than ages. FRA is automatically determined from the primary worker's birth year (67 for those born 1960 or later).</div></div>
+        <div class="h-row"><div class="h-term">Life expectancy</div><div class="h-def">Age each person is assumed to live to. The model runs until the last surviving person passes. Results often change significantly with the second adult's longevity.</div></div>
       </div>
       <div class="h-sec">
-        <div class="h-sec-t">Social Security — Husband</div>
+        <div class="h-sec-t">Social Security — Primary worker</div>
         <div class="h-row"><div class="h-term">FRA benefit (PIA)</div><div class="h-def">Primary Insurance Amount — what SS pays at Full Retirement Age. Find your actual number at ssa.gov/myaccount. All other SS amounts are calculated from this.</div></div>
-        <div class="h-row"><div class="h-term">File at 62</div><div class="h-def">Permanently reduces benefit to 70% of FRA (for FRA=67). Triggers the child benefit immediately (up to 5 years for a 12-year-old). Reduces wife's survivor benefit permanently.</div></div>
+        <div class="h-row"><div class="h-term">File at 62</div><div class="h-def">Permanently reduces the primary worker's benefit to 70% of FRA (for FRA=67). It may trigger an eligible dependent's benefit immediately and can reduce an eligible spouse's later survivor benefit.</div></div>
         <div class="h-row"><div class="h-term">File at 65</div><div class="h-def">Moderate reduction — roughly 86.7% of FRA (for FRA=67). Balances earlier income against a smaller permanent reduction. Child may still get a few years of benefit.</div></div>
-        <div class="h-row"><div class="h-term">File at 67 (FRA)</div><div class="h-def">Full benefit, no reduction or bonus. Child benefit window closes — child turns 18 around this time. Clean baseline with no penalties.</div></div>
-        <div class="h-row"><div class="h-term">File at 70</div><div class="h-def">Maximum benefit at 124% of FRA. Best outcome for wife's survivor benefit over a long horizon. For a non-DAC minor child the benefit window is largely closed (child likely &gt;18 by then); for a DAC-qualified child the 50%-PIA benefit begins when the parent files and continues for life.</div></div>
-        <div class="h-row"><div class="h-term">Pass without filing</div><div class="h-def">Family is still protected. Wife gets survivor based on FRA (or higher if husband passed after FRA with delayed credits accumulated). Husband collects $0 while alive.</div></div>
-        <div class="h-row"><div class="h-term">Dies before file age</div><div class="h-def">If you set husband's death age earlier than a scenario's filing age (e.g., death at 64 with File at 67), the model treats that scenario as a no-filing case: husband collected $0, no Widow's Limit applies, and the wife receives a survivor benefit based on what husband would have qualified for at the time of death (full PIA if before FRA; PIA + delayed credits if after FRA, capped at age 70).</div></div>
+        <div class="h-row"><div class="h-term">File at 67 (FRA)</div><div class="h-def">Full benefit, no reduction or bonus. In the default example, the non-DAC dependent-benefit window closes around this time. Clean baseline with no filing reduction.</div></div>
+        <div class="h-row"><div class="h-term">File at 70</div><div class="h-def">Maximum benefit at 124% of FRA. This can improve an eligible spouse's survivor benefit over a long horizon. For a non-DAC minor dependent the benefit window may already be closed; for a DAC-qualified beneficiary the 50%-PIA benefit begins when the worker files and can continue while eligible.</div></div>
+        <div class="h-row"><div class="h-term">Pass without filing</div><div class="h-def">An eligible spouse and dependent may still receive survivor benefits based on the primary worker's record. The primary worker collects $0 while alive.</div></div>
+        <div class="h-row"><div class="h-term">Dies before file age</div><div class="h-def">If the primary worker's death age is earlier than a scenario's filing age, the model treats that scenario as a no-filing case: the worker collected $0 and survivor calculations use what the worker would have qualified for at death, subject to this model's stated simplifications.</div></div>
       </div>
       <div class="h-sec">
-        <div class="h-sec-t">Social Security — Wife (spousal &amp; survivor)</div>
-        <div class="h-row"><div class="h-term">Spousal benefit</div><div class="h-def">50% of husband's FRA benefit (PIA). Available only after husband files AND wife is at least 62. The spousal amount is always based on husband's PIA — his filing age (62, 65, 67, 70) does NOT change the spousal amount. <strong>v10 applies the early-claim reduction</strong> (POMS RS 00615.201): 25/36 of 1% per month for the first 36 months early, 5/12 of 1% per month beyond. At age 62 with FRA 67, spousal = 32.5% of PIA (not 50%).</div></div>
-        <div class="h-row"><div class="h-term">Spousal eligibility</div><div class="h-def">Requires: (1) husband has filed for SS, (2) wife is at least 62, (3) married for at least 1 year. If these conditions are not met, wife receives $0 spousal (she may still collect her own SS if she has credits).</div></div>
-        <div class="h-row"><div class="h-term">Survivor benefit</div><div class="h-def">Up to 100% of whatever husband was collecting when he passes. This IS directly affected by husband's filing age — if he filed at 62, the survivor base is lower than if he filed at 70. Widow's Limit (RIB-LIM): if husband filed early, survivor = MAX(his reduced benefit, 82.5% of PIA).</div></div>
-        <div class="h-row"><div class="h-term">Survivor timing</div><div class="h-def">Claimable as early as age 60 (or 50 if disabled). Claiming before FRA (67) permanently reduces the survivor amount: 71.5% at age 60, scaling linearly to 100% at age 67. This model applies that reduction based on when the wife first becomes eligible to claim.</div></div>
-        <div class="h-row"><div class="h-term">Spousal vs survivor</div><div class="h-def">While husband is alive: wife gets spousal (50% PIA). After husband passes: wife switches to survivor (up to 100% of husband's benefit). SS always pays the higher of spousal, survivor, or wife's own benefit — never combined.</div></div>
-        <div class="h-row"><div class="h-term">Own SS credits</div><div class="h-def">If wife has her own work record, SS pays the higher of her own benefit or spousal/survivor — never both combined. She collects her own benefit from age 62 independently if she has credits, even if husband hasn't filed yet.</div></div>
+        <div class="h-sec-t">Social Security — Eligible spouse/former spouse</div>
+        <div class="h-row"><div class="h-term">Spousal benefit</div><div class="h-def">Up to 50% of the primary worker's PIA after the worker files, reduced for early claiming. This calculation is only for a spouse or former spouse who satisfies SSA relationship, duration, age, and other entitlement rules; another trusted adult is not automatically eligible.</div></div>
+        <div class="h-row"><div class="h-term">Spousal eligibility</div><div class="h-def">The model does not adjudicate legal eligibility. Confirm marriage or former-spouse rules, duration, age, worker filing status, and dual-entitlement treatment with SSA before relying on the estimate.</div></div>
+        <div class="h-row"><div class="h-term">Survivor benefit</div><div class="h-def">Up to 100% of the primary worker's applicable amount, affected by filing age and the Widow's Limit. An entered second adult receives this estimate only as an eligible spouse or former spouse under SSA rules.</div></div>
+        <div class="h-row"><div class="h-term">Survivor timing</div><div class="h-def">Claimable as early as age 60 (or 50 if disabled). Claiming before FRA (67) permanently reduces the survivor amount: 71.5% at age 60, scaling linearly to 100% at age 67. This model applies that reduction based on when the surviving adult first becomes eligible to claim.</div></div>
+        <div class="h-row"><div class="h-term">Spousal vs survivor</div><div class="h-def">While the worker is alive, an eligible spouse may receive a spousal benefit (up to 50% of PIA). After the worker dies, the surviving spouse may receive a survivor benefit (up to 100% of the worker's benefit). SSA pays the higher applicable amount, not the benefits combined.</div></div>
+        <div class="h-row"><div class="h-term">Own SS credits</div><div class="h-def">If the second adult has an own work record, SSA pays the higher applicable own, spousal, or survivor amount — not the benefits combined. An eligible worker can claim an own retirement benefit independently from age 62.</div></div>
       </div>
       <div class="h-sec">
-        <div class="h-sec-t">Social Security — Child (DAC)</div>
-        <div class="h-row"><div class="h-term">Child benefit</div><div class="h-def">50% of husband's FRA (PIA) while he is alive and has filed. For non-disabled minors: ends at age 18 (SSA allows 19 if still in high school — <strong>this model uses a hard 18 cutoff for simplicity</strong>). <strong>v10: for a DAC-qualified child, the 50% benefit continues for life</strong> while the parent is alive and filed (POMS DI 10115.001), then switches to the 75% DAC survivor amount on the parent's death.</div></div>
-        <div class="h-row"><div class="h-term">DAC survivor</div><div class="h-def">Disabled Adult Child benefit — 75% of husband's PIA, for child's entire lifetime after husband passes. Requires disability onset documented before age 22. The DAC amount is always based on the husband's PIA regardless of when he filed. Grows with COLA annually. While the parent is alive and filed, the DAC instead receives 50% of PIA (the child-benefit amount), with no age-18 cutoff.</div></div>
+        <div class="h-sec-t">Social Security — Learner/dependent (child &amp; DAC rules)</div>
+        <div class="h-row"><div class="h-term">Dependent benefit</div><div class="h-def">50% of the worker's FRA benefit (PIA) while the worker is alive and has filed. For non-disabled minors, it ends at age 18 (SSA allows 19 if still in high school; <strong>this model uses a hard age-18 cutoff for simplicity</strong>). <strong>V11: for a DAC-qualified beneficiary, the 50% benefit continues while eligible</strong> and the worker is alive and filed (POMS DI 10115.001), then switches to the 75% DAC survivor amount after the worker dies.</div></div>
+        <div class="h-row"><div class="h-term">DAC survivor</div><div class="h-def">Disabled Adult Child benefit — 75% of the worker's PIA, potentially for the learner/dependent's lifetime after the worker dies. Requires disability onset documented before age 22. The DAC amount is based on the worker's PIA regardless of filing age and grows with COLA. While the worker is alive and has filed, an eligible DAC may instead receive 50% of PIA, subject to the family maximum.</div></div>
         <div class="h-row"><div class="h-term">DAC eligibility</div><div class="h-def">Child must be unmarried, have a disability that began before age 22, and meet SSA's definition of disability. Apply through SSA — documentation of early-onset disability is critical. Call SSA at <strong>1-800-772-1213</strong> (TTY 1-800-325-0778) or visit <strong><a href="https://www.ssa.gov/benefits/disability/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/benefits/disability</a></strong>.</div></div>
-        <div class="h-row"><div class="h-term">Family Maximum</div><div class="h-def"><strong>v10 applies the FMB cap.</strong> SSA caps total family benefits at ~150–187% of PIA via a four-bracket formula on monthly PIA (POMS RS 00615.768). Auxiliaries (spousal + child + DAC while parent alive) are prorated when their sum exceeds FMB − worker's PIA. Survivor benefits after the worker passes are NOT subject to FMB (they come from a different fund). Verify with SSA for exact amounts.</div></div>
-        <div class="h-row"><div class="h-term">Living expenses</div><div class="h-def">Child's base annual cost when both parents are gone — housing, food, medical, caregivers beyond Medicaid. In today's dollars.</div></div>
-        <div class="h-row"><div class="h-term">SNT admin costs</div><div class="h-def">Annual cost to administer the Special Needs Trust — corporate trustee fees (0.5–1% of assets), CPA, rep payee, legal reviews. Typically $5K–$20K/yr. Added to living expenses when both parents are gone.</div></div>
-        <div class="h-row"><div class="h-term">Representative Payee</div><div class="h-def">SSA requires a Representative Payee to receive and manage SS/DAC payments on behalf of a beneficiary who cannot manage their own funds. The payee must keep records of how benefits are spent and file annual accounting (Form <strong>SSA-6230</strong>). A parent, family member, or corporate trustee can serve as payee. After both parents pass, the SNT trustee typically becomes rep payee. See: <strong><a href="https://www.ssa.gov/payee/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/payee</a></strong> | SSA Pub <strong><a href="https://www.ssa.gov/pubs/EN-05-10076.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10076</a></strong> (Guide for Rep Payees) | SSA Pub <strong><a href="https://www.ssa.gov/pubs/EN-05-10098.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10098</a></strong> (Benefits for Children with Disabilities) | <strong><a href="https://secure.ssa.gov/poms.nsf/lnx/0200502001" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">POMS GN 00502</a></strong> (Rep Payee policy).</div></div>
+        <div class="h-row"><div class="h-term">Family Maximum</div><div class="h-def"><strong>V11 applies the FMB to auxiliary and survivor benefits.</strong> The planning proxy uses SSA's 2026 retirement/survivor bend points ($1,643, $2,371, and $3,093) and 150%/272%/134%/175% formula. Benefits payable on the worker's record are prorated when the record exceeds its family maximum; a second adult's own benefit on their own record is outside that cap. The actual bend-point year and entitlement exceptions depend on the worker's eligibility/death history, so verify the award with SSA.</div></div>
+        <div class="h-row"><div class="h-term">Living expenses</div><div class="h-def">The learner/dependent's base annual cost after both adults are gone — housing, food, medical, education, and caregiving beyond public benefits. In today's dollars.</div></div>
+        <div class="h-row"><div class="h-term">SNT admin costs</div><div class="h-def">Annual cost to administer the Special Needs Trust — corporate trustee fees (0.5–1% of assets), CPA, representative-payee work, and legal reviews. Typically $5K–$20K/yr. Added to living expenses when the trusted adults are gone.</div></div>
+        <div class="h-row"><div class="h-term">Representative Payee</div><div class="h-def">SSA requires a Representative Payee to receive and manage SS/DAC payments for a beneficiary who cannot manage their own funds. The payee must keep records of how benefits are spent and file annual accounting (Form <strong>SSA-6230</strong>). A trusted adult, family member, or corporate trustee can serve. After the trusted adults die, the SNT trustee commonly becomes representative payee. See: <strong><a href="https://www.ssa.gov/payee/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/payee</a></strong> | SSA Pub <strong><a href="https://www.ssa.gov/pubs/EN-05-10076.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10076</a></strong> (Guide for Rep Payees) | SSA Pub <strong><a href="https://www.ssa.gov/pubs/EN-05-10098.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10098</a></strong> (Benefits for Children with Disabilities) | <strong><a href="https://secure.ssa.gov/poms.nsf/lnx/0200502001" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">POMS GN 00502</a></strong> (Rep Payee policy).</div></div>
       </div>
       <div class="h-sec">
         <div class="h-sec-t">Taxes</div>
-        <div class="h-row"><div class="h-term">Family tax rate</div><div class="h-def">Effective tax rate on portfolio withdrawals and SS income while parents are alive. Default 22%. Applied to the gap between spending needs and SS income received.</div></div>
-        <div class="h-row"><div class="h-term">SNT tax rate</div><div class="h-def">Trust tax rate after both parents pass. SNT trusts reach the 37% bracket very quickly (at ~$15K of income in 2024). Default 37%. Applied to portfolio draws needed beyond child's SS and DAC income.</div></div>
+        <div class="h-row"><div class="h-term">Household tax rate</div><div class="h-def">Effective tax rate on portfolio withdrawals and SS income while at least one trusted adult is alive. Default 22%. Applied to the gap between spending needs and SS income received.</div></div>
+        <div class="h-row"><div class="h-term">SNT tax rate</div><div class="h-def">Planning assumption for the trust's effective tax rate after both adults pass. Trust brackets compress quickly; use the current IRS tables and a tax professional rather than relying on a historical threshold. Applied to portfolio draws needed beyond the dependent's SS and DAC income.</div></div>
       </div>
       <div class="h-sec">
         <div class="h-sec-t">Portfolio & spending</div>
-        <div class="h-row"><div class="h-term">Family spending</div><div class="h-def">Total annual household spending while at least one parent is alive. All amounts in today's dollars — the model inflates them forward automatically.</div></div>
+        <div class="h-row"><div class="h-term">Household spending</div><div class="h-def">Total annual household spending while at least one adult is alive. All amounts are in today's dollars and the model inflates them forward automatically.</div></div>
         <div class="h-row"><div class="h-term">Today's $ vs Nominal</div><div class="h-def">Today's dollars adjusts all figures back to today's purchasing power — easier to understand. Nominal shows actual dollar amounts as they grow with inflation over time.</div></div>
         <div class="h-row"><div class="h-term">Annual return</div><div class="h-def">Expected average portfolio return. 7–8% is a common long-run assumption. Reduce to 5–6% for a conservative stress test. The model assumes constant returns — real outcomes will vary.</div></div>
       </div>
       <div class="h-sec">
         <div class="h-sec-t">Scenarios</div>
         <div class="h-row"><div class="h-term">Save scenario</div><div class="h-def">Save up to 3 named scenarios. Each stores all input values. Click a saved slot to load, rename, or delete it. When 2+ are saved, a comparison table appears automatically.</div></div>
-        <div class="h-row"><div class="h-term">Winner</div><div class="h-def">The filing scenario leaving the largest portfolio at end of plan — accounting for SS income, taxes, portfolio growth, and spending across the full lifetime of all three family members.</div></div>
+        <div class="h-row"><div class="h-term">Winner</div><div class="h-def">The filing scenario leaving the largest portfolio at end of plan — accounting for SS income, taxes, portfolio growth, and spending across the full modeled lifetime of all three household members.</div></div>
       </div>
       <div class="h-sec">
-        <div class="h-sec-t">v10 — Sensitivity, Monte Carlo &amp; survivor-timing panels</div>
-        <div class="h-row"><div class="h-term">Sensitivity Grid A</div><div class="h-def">Heatmap: rows = wife's death age (80–100), cols = portfolio return rate (4–10%). Each cell shows the best filing age for that combination. Gray cells = all filing ages run out of money. Helps identify whether your winner is robust to longevity and market assumptions.</div></div>
-        <div class="h-row"><div class="h-term">Sensitivity Grid B</div><div class="h-def">Heatmap: rows = husband's death age (73–93), cols = wife's death age (80–100). The single most decision-critical pairing — file-at-70 typically wins when the husband lives long; file-at-62 wins when he dies early. Use this to see how the winning strategy depends on lifespan assumptions you can't actually know.</div></div>
+        <div class="h-sec-t">V11 — Sensitivity, Monte Carlo &amp; survivor-timing panels</div>
+        <div class="h-row"><div class="h-term">Sensitivity Grid A</div><div class="h-def">Heatmap: rows = second adult's death age (80–100), cols = portfolio return rate (4–10%). Each cell shows the best filing age for that combination. Gray cells = all filing ages run out of money. Helps identify whether your winner is robust to longevity and market assumptions.</div></div>
+        <div class="h-row"><div class="h-term">Sensitivity Grid B</div><div class="h-def">Heatmap: rows = primary worker death age (73–93), cols = second-adult death age (80–100). Use it to see how the filing result depends on lifespan assumptions that cannot be known in advance.</div></div>
         <div class="h-row"><div class="h-term">Monte Carlo</div><div class="h-def">Runs 500 random trials per filing age with year-by-year returns drawn from a normal distribution around your assumed return (σ=12%, typical for a balanced portfolio). Addresses <em>sequence-of-returns risk</em> that the constant-return model misses. Reports: <strong>success rate</strong> (% of trials where portfolio survives), <strong>10th/median/90th percentile</strong> final values. The "robust winner" is the filing age with the highest survival rate — often different from the constant-return winner. Wide spreads = high sensitivity to return luck.</div></div>
-        <div class="h-row"><div class="h-term">Survivor timing</div><div class="h-def">When the wife has her own SS benefit, SSA allows her to claim her own benefit and survivor benefit at different ages — switching from one to the other later. This panel compares five common strategies (e.g., "survivor at 60, switch to own at 70" vs "own at 62, switch to survivor at FRA") and shows lifetime total for each. Only appears when wife's own SS &gt; $0. POMS RS 00615.482.</div></div>
-        <div class="h-row"><div class="h-term">Fractional FRA</div><div class="h-def">For birth years 1938–1942 and 1955–1959, FRA is partial-month (e.g., 1957 = 66 + 6 mo). v10 uses the exact fractional FRA in all calculations and displays it as "66 + 6 mo" wherever the FRA appears. Birth years 1960+ have FRA = 67 (whole).</div></div>
+        <div class="h-row"><div class="h-term">Survivor timing</div><div class="h-def">When the surviving adult has an own retirement benefit, SSA permits own and survivor benefits to be claimed at different ages, with a later switch when eligible. This panel compares five common strategies and shows the lifetime total for each. It appears when the second adult's own benefit is greater than $0. POMS RS 00615.482.</div></div>
+        <div class="h-row"><div class="h-term">Fractional FRA</div><div class="h-def">For birth years 1938–1942 and 1955–1959, FRA is partial-month (e.g., 1957 = 66 + 6 mo). V11 uses the exact fractional FRA in all calculations and displays it as "66 + 6 mo" wherever the FRA appears. Birth years 1960+ have FRA = 67 (whole).</div></div>
       </div>
       <div class="h-note"><strong>Important:</strong> This is a planning model, not financial advice. Assumes constant returns (deterministic scenarios) or random returns (Monte Carlo only), average COLA, and exact life expectancies. Real outcomes vary. Consult a fee-only financial advisor and special needs attorney for your specific situation.</div>
       <div class="h-sec">
         <div class="h-sec-t">SSA &amp; IRS contacts</div>
         <div class="h-row"><div class="h-term">SSA (Social Security)</div><div class="h-def">Verify your benefit estimates: <strong><a href="https://www.ssa.gov/myaccount" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/myaccount</a></strong>. Phone: <strong>1-800-772-1213</strong> (Mon–Fri 8am–7pm local time; TTY 1-800-325-0778). Local offices: <strong><a href="https://secure.ssa.gov/ICON/main.jsp" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/locator</a></strong>.</div></div>
-        <div class="h-row"><div class="h-term">IRS (tax questions)</div><div class="h-def">For questions about taxation of SS benefits or trust income: <strong><a href="https://www.irs.gov" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">irs.gov</a></strong>. Phone: <strong>1-800-829-1040</strong> (Mon–Fri 7am–7pm). <a href="https://www.irs.gov/newsroom/how-much-of-my-social-security-is-taxable" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">IRS guide on SS taxation</a>.</div></div>
+        <div class="h-row"><div class="h-term">IRS (tax questions)</div><div class="h-def">For questions about taxation of SS benefits or trust income: <strong><a href="https://www.irs.gov" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">irs.gov</a></strong>. Phone: <strong>1-800-829-1040</strong> (Mon–Fri 7am–7pm). <a href="https://www.irs.gov/publications/p915" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">IRS Publication 915 on Social Security taxation</a>.</div></div>
       </div>
     </div>
   </div>
@@ -458,15 +472,15 @@ tbody tr.best-row:hover td{background:var(--green-light);}
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-people-body">
         <div class="person-row">
-          <div class="fld"><label for="name1"><span class="person-dot" style="background:#dc2626"></span>Husband's name</label><input type="text" id="name1" value="Husband" oninput="updateLabels();compute()"></div>
+          <div class="fld"><label for="name1"><span class="person-dot" style="background:#dc2626"></span>Primary worker's name</label><input type="text" id="name1" value="Primary adult" oninput="updateLabels();compute()"></div>
           <div class="fld"><label for="husbandBirth">Birth year</label><input type="number" id="husbandBirth" value="1975" min="1940" max="1985" onchange="onFRAChange();compute()"></div>
         </div>
         <div class="person-row">
-          <div class="fld"><label for="name2"><span class="person-dot" style="background:#2563eb"></span>Wife's name</label><input type="text" id="name2" value="Wife" oninput="updateLabels();compute()"></div>
+          <div class="fld"><label for="name2"><span class="person-dot" style="background:#2563eb"></span>Second adult's name</label><input type="text" id="name2" value="Second adult" oninput="updateLabels();compute()"></div>
           <div class="fld"><label for="wifeBirth">Birth year</label><input type="number" id="wifeBirth" value="1978" min="1940" max="1995" onchange="compute()"></div>
         </div>
         <div class="person-row">
-          <div class="fld"><label for="name3"><span class="person-dot" style="background:#10b981"></span>Child's name</label><input type="text" id="name3" value="Child" oninput="updateLabels();compute()"></div>
+          <div class="fld"><label for="name3"><span class="person-dot" style="background:#10b981"></span>Learner/dependent's name</label><input type="text" id="name3" value="Learner/dependent" oninput="updateLabels();compute()"></div>
           <div class="fld"><label for="childBirth">Birth year</label><input type="number" id="childBirth" value="2010" min="1990" max="2022" onchange="compute()"></div>
         </div>
       </div>
@@ -479,9 +493,9 @@ tbody tr.best-row:hover td{background:var(--green-light);}
         <span class="acc-title">Life expectancy</span>
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-life-body">
-        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-h-life">Husband</span> passes at age <span class="sld-val" id="husbandDeathLbl">85</span></div><input type="range" id="husbandDeath" aria-label="Husband's death age" min="65" max="98" step="1" value="85" oninput="sl('husbandDeath','husbandDeathLbl');compute()"></div>
-        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-w-life">Wife</span> passes at age <span class="sld-val" id="wifeDeathLbl">95</span></div><input type="range" id="wifeDeath" aria-label="Wife's death age" min="65" max="105" step="1" value="95" oninput="sl('wifeDeath','wifeDeathLbl');compute()"></div>
-        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-c-life">Child</span> passes at age <span class="sld-val" id="childDeathLbl">95</span></div><input type="range" id="childDeath" aria-label="Child's death age" min="40" max="100" step="1" value="95" oninput="sl('childDeath','childDeathLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-h-life">Primary adult</span> passes at age <span class="sld-val" id="husbandDeathLbl">85</span></div><input type="range" id="husbandDeath" aria-label="Primary worker death age" min="65" max="98" step="1" value="85" oninput="sl('husbandDeath','husbandDeathLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-w-life">Second adult</span> passes at age <span class="sld-val" id="wifeDeathLbl">95</span></div><input type="range" id="wifeDeath" aria-label="Second adult death age" min="65" max="105" step="1" value="95" oninput="sl('wifeDeath','wifeDeathLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-c-life">Learner/dependent</span> passes at age <span class="sld-val" id="childDeathLbl">95</span></div><input type="range" id="childDeath" aria-label="Learner or dependent death age" min="40" max="100" step="1" value="95" oninput="sl('childDeath','childDeathLbl');compute()"></div>
       </div>
     </div>
 
@@ -492,10 +506,10 @@ tbody tr.best-row:hover td{background:var(--green-light);}
         <span class="acc-title">Spending (today's $)</span>
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-spend-body">
-        <div class="sld"><div class="sld-hd"><span class="sld-label">Family spending (≥1 parent alive)</span><span class="sld-val" id="famSpendLbl">$150K</span></div><input type="range" id="famSpend" aria-label="Family annual spending" min="50000" max="500000" step="5000" value="150000" oninput="slK('famSpend','famSpendLbl');compute()"></div>
-        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-c-spend">Child</span> living expenses (both gone)<span class="sld-val" id="childSpendLbl">$130K</span></div><input type="range" id="childSpend" aria-label="Child living expenses after both parents pass" min="10000" max="250000" step="2500" value="130000" oninput="slK('childSpend','childSpendLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label">Household spending (≥1 adult alive)</span><span class="sld-val" id="famSpendLbl">$150K</span></div><input type="range" id="famSpend" aria-label="Household annual spending" min="50000" max="500000" step="5000" value="150000" oninput="slK('famSpend','famSpendLbl');compute()"></div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-c-spend">Learner/dependent</span> living expenses (both adults gone)<span class="sld-val" id="childSpendLbl">$130K</span></div><input type="range" id="childSpend" aria-label="Learner or dependent living expenses after both adults pass" min="10000" max="250000" step="2500" value="130000" oninput="slK('childSpend','childSpendLbl');compute()"></div>
         <div class="sld"><div class="sld-hd"><span class="sld-label">SNT admin costs / yr</span><span class="sld-val" id="sntCostLbl">$40K</span></div><input type="range" id="sntCost" aria-label="SNT admin cost per year" min="0" max="60000" step="1000" value="40000" oninput="slK('sntCost','sntCostLbl');compute()"></div>
-        <div class="info">SNT admin = trustee fees + CPA + rep payee + legal. Added on top of living expenses once both parents are gone.</div>
+        <div class="info">SNT admin = trustee fees + CPA + representative payee + legal. Added on top of living expenses once both adults are gone.</div>
       </div>
     </div>
 
@@ -507,8 +521,8 @@ tbody tr.best-row:hover td{background:var(--green-light);}
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-tax-body">
         <div class="sld"><div class="sld-hd"><span class="sld-label">Family effective tax rate</span><span class="sld-val" id="famTaxLbl">22%</span></div><input type="range" id="famTax" aria-label="Family effective tax rate" min="0" max="50" step="1" value="22" oninput="slPct('famTax','famTaxLbl');compute()"></div>
-        <div class="sld"><div class="sld-hd"><span class="sld-label">SNT / <span id="lbl-c-tax">Child</span> tax rate</span><span class="sld-val" id="sntTaxLbl">37%</span></div><input type="range" id="sntTax" aria-label="SNT / child tax rate" min="0" max="50" step="1" value="37" oninput="slPct('sntTax','sntTaxLbl');compute()"></div>
-        <div class="info note-blue"><strong>SNT trusts</strong> reach the 37% bracket at ~$15K of taxable income annually. Family rate applies while at least one parent is alive.</div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label">SNT / <span id="lbl-c-tax">learner/dependent</span> tax rate</span><span class="sld-val" id="sntTaxLbl">37%</span></div><input type="range" id="sntTax" aria-label="SNT / learner or dependent tax rate" min="0" max="50" step="1" value="37" oninput="slPct('sntTax','sntTaxLbl');compute()"></div>
+        <div class="info note-blue"><strong>SNT tax:</strong> trust brackets compress quickly. Enter a planning effective rate and verify it against current IRS tables and professional advice. The household rate applies while at least one adult is alive.</div>
       </div>
     </div>
 
@@ -529,11 +543,11 @@ tbody tr.best-row:hover td{background:var(--green-light);}
     <div class="acc closed" id="acc-hss">
       <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-hss-body" onclick="toggleAcc('acc-hss')">
         <div class="acc-icon" style="background:#fef2f2"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
-        <span class="acc-title" id="lbl-hss-title">Husband's Social Security</span>
+        <span class="acc-title" id="lbl-hss-title">Primary adult's Social Security</span>
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-hss-body">
         <div class="fld">
-          <label id="lbl-fra-label" for="fraAmt">Husband's FRA benefit / yr (PIA at age <span id="lbl-fra-age">67</span>)</label>
+          <label id="lbl-fra-label" for="fraAmt">Primary adult's FRA benefit / yr (PIA at age <span id="lbl-fra-age">67</span>)</label>
           <input type="text" id="fraAmt" value="49,848" onchange="onFRAChange();compute()" oninput="formatComma(this)">
         </div>
         <div class="info note-blue">
@@ -551,11 +565,11 @@ tbody tr.best-row:hover td{background:var(--green-light);}
     <div class="acc closed" id="acc-early">
       <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-early-body" onclick="toggleAcc('acc-early')">
         <div class="acc-icon" style="background:#fef2f2"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-        <span class="acc-title" id="lbl-nof-title">Scenario 5 — Husband passes without filing</span>
+        <span class="acc-title" id="lbl-nof-title">Scenario 5 — Primary adult passes without filing</span>
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-early-body">
-        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-h-early">Husband</span> passes at age (no filing) <span class="sld-val" id="earlyDeathLbl">72</span></div><input type="range" id="earlyDeath" aria-label="Husband death age without filing scenario" min="60" max="90" step="1" value="72" oninput="sl('earlyDeath','earlyDeathLbl');compute()"></div>
-        <div class="info note-blue">Models the scenario where <strong id="lbl-h-early3">Husband</strong> passes unexpectedly before filing for SS. <strong id="lbl-h-early2">Husband</strong> collects $0 while alive. <strong id="lbl-w-early">Wife</strong> and <strong id="lbl-c-early">Child</strong> receive survivor benefits immediately after passing. Survivor = MAX(<strong id="lbl-h-early4">Husband</strong>'s FRA benefit, 82.5% of PIA) since he never filed.</div>
+        <div class="sld"><div class="sld-hd"><span class="sld-label" id="lbl-h-early">Primary adult</span> passes at age (no filing) <span class="sld-val" id="earlyDeathLbl">72</span></div><input type="range" id="earlyDeath" aria-label="Primary worker death age without filing" min="60" max="90" step="1" value="72" oninput="sl('earlyDeath','earlyDeathLbl');compute()"></div>
+        <div class="info note-blue">Models the scenario where <strong id="lbl-h-early3">Primary adult</strong> passes before filing. <strong id="lbl-h-early2">Primary adult</strong> collects $0 while alive. An eligible <strong id="lbl-w-early">Second adult</strong> and <strong id="lbl-c-early">Learner/dependent</strong> may receive survivor benefits, subject to SSA rules and the family maximum.</div>
       </div>
     </div>
 
@@ -563,14 +577,14 @@ tbody tr.best-row:hover td{background:var(--green-light);}
     <div class="acc closed" id="acc-wss">
       <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-wss-body" onclick="toggleAcc('acc-wss')">
         <div class="acc-icon" style="background:#eff6ff"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
-        <span class="acc-title" id="lbl-wss-title">Wife's SS credits</span>
+        <span class="acc-title" id="lbl-wss-title">Second adult's SS credits</span>
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-wss-body">
         <div class="fld">
-          <label id="lbl-wown" for="wifeOwnSS">Wife's own benefit at her FRA (enter 0 if none)</label>
+          <label id="lbl-wown" for="wifeOwnSS">Second adult's own benefit at FRA (enter 0 if none)</label>
           <input type="text" id="wifeOwnSS" value="0" onchange="compute()" oninput="formatComma(this)">
         </div>
-        <div class="info">SS pays the higher of own benefit or spousal/survivor — never combined. If own &gt; 50% of husband's FRA, no spousal top-up.</div>
+        <div class="info">SSA pays the higher applicable own, spousal, or survivor amount — not the benefits combined. If the own benefit exceeds 50% of the primary worker's FRA benefit, there is no spousal top-up.</div>
       </div>
     </div>
 
@@ -578,7 +592,7 @@ tbody tr.best-row:hover td{background:var(--green-light);}
     <div class="acc closed" id="acc-css">
       <button class="acc-hd" type="button" aria-expanded="false" aria-controls="acc-css-body" onclick="toggleAcc('acc-css')">
         <div class="acc-icon" style="background:#ecfdf5"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg></div>
-        <span class="acc-title" id="lbl-css-title">Child's SS benefits</span>
+        <span class="acc-title" id="lbl-css-title">Learner/dependent's SS benefits</span>
         <span class="acc-arr"><svg aria-hidden="true" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></button>
       <div class="acc-body" id="acc-css-body">
         <div class="fld">
@@ -590,10 +604,10 @@ tbody tr.best-row:hover td{background:var(--green-light);}
         </div>
         <div class="info note-blue" style="margin-bottom:8px">
           Auto-calculated from FRA: &nbsp;
-          <strong>Child benefit (while alive, under 18):</strong> <span id="calcChild">$24,924</span>/yr &nbsp;
+          <strong>Child/DAC benefit while worker is alive:</strong> <span id="calcChild">$24,924</span>/yr &nbsp;
           <strong>DAC survivor:</strong> <span id="calcDAC">$37,386</span>/yr for life
         </div>
-        <div class="info"><strong>Child benefit:</strong> paid while husband alive + filed, until child turns 18.<br><strong>DAC survivor:</strong> begins after husband passes, for child's entire lifetime. Both grow with COLA.</div>
+        <div class="info"><strong>Child benefit:</strong> paid while the primary worker is alive and filed, normally until the dependent turns 18 (this simplified model uses 18).<br><strong>DAC survivor:</strong> begins after the primary worker passes and can continue for the qualified beneficiary's lifetime. Both grow with COLA and remain subject to SSA eligibility and family-maximum rules.</div>
         <div class="info note-blue" style="margin-top:6px"><strong>Representative Payee:</strong> SSA requires a rep payee to manage SS/DAC payments for a beneficiary who cannot manage funds independently. The payee must file annual <strong>SSA-6230</strong> accounting forms. A corporate trustee or parent typically serves as rep payee. See <strong><a href="https://www.ssa.gov/payee/" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">ssa.gov/payee</a></strong> and SSA Publication <strong><a href="https://www.ssa.gov/pubs/EN-05-10076.pdf" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">10076</a></strong>.</div>
       </div>
     </div>
@@ -804,9 +818,9 @@ function setView(v){
 
 /* ---- LABEL SYNC ---- */
 function updateLabels(){
-  const h = v('name1')||'Husband', w = v('name2')||'Wife', c = v('name3')||'Child';
+  const h = v('name1')||'Primary adult', w = v('name2')||'Second adult', c = v('name3')||'Learner/dependent';
   ['lbl-h-life','lbl-h-early','lbl-h-early2','lbl-h-early3','lbl-h-early4'].forEach(id => el(id) && (el(id).textContent = h));
-  ['lbl-w-life','lbl-wown','lbl-w-early'].forEach(id => el(id) && (el(id).textContent = w + (id==='lbl-wown' ? "'s own benefit at her FRA (enter 0 if none)" : '')));
+  ['lbl-w-life','lbl-wown','lbl-w-early'].forEach(id => el(id) && (el(id).textContent = w + (id==='lbl-wown' ? "'s own benefit at FRA (enter 0 if none)" : '')));
   ['lbl-c-life','lbl-c-spend','lbl-c-tax','lbl-c-early'].forEach(id => el(id) && (el(id).textContent = c));
   el('lbl-hss-title').textContent = h + "'s Social Security";
   el('lbl-wss-title').textContent = w + "'s SS credits";
@@ -843,12 +857,14 @@ function fmtFRA(fra){
 }
 
 // Family Maximum Benefit (annual). SSA POMS RS 00615.768 — four-bracket formula
-// on monthly PIA, 2024 bend points. Returns annual FMB.
+// on monthly PIA, using 2026 bend points as a current-dollar planning proxy.
+// The actual bend-point year depends on the worker's first-eligibility/death history.
+// Returns annual FMB.
 // Cap applies to auxiliaries (spousal + child), NOT the worker's own benefit.
 function getFMB(annualPIA){
   const monthlyPIA = annualPIA / 12;
-  // 2024 FMB bend points (SSA — updated annually).
-  const b1 = 1500, b2 = 2166, b3 = 2825;
+  // 2026 retirement/survivor FMB bend points (SSA — updated annually).
+  const b1 = 1643, b2 = 2371, b3 = 3093;
   let fmb;
   if(monthlyPIA <= b1) fmb = 1.50 * monthlyPIA;
   else if(monthlyPIA <= b2) fmb = 1.50*b1 + 1.272*(monthlyPIA - b1);
@@ -947,7 +963,7 @@ function getParams(){
   const fraAge = getFRA(husbandBirth);
   const pia = parseDollar('fraAmt');
   return {
-    name1:v('name1')||'Husband', name2:v('name2')||'Wife', name3:v('name3')||'Child',
+    name1:v('name1')||'Primary adult', name2:v('name2')||'Second adult', name3:v('name3')||'Learner/dependent',
     husbandBirth, wifeBirth, childBirth, fraAge, pia,
     husbandDeathAge:+v('husbandDeath'), wifeDeathAge:+v('wifeDeath'), childDeathAge:+v('childDeath'),
     famSpend:+el('famSpend').value, childSpend:+el('childSpend').value, sntCost:+el('sntCost').value,
@@ -1053,7 +1069,8 @@ function runScenario(fileAge, noFile, p){
     let ssHusband=0;
     // Auxiliary components (subject to FMB cap when worker is alive & filed):
     let auxSpousal=0, auxChild=0;
-    // Independent components (NOT subject to FMB — survivor benefits):
+    // Components paid from the second adult's own record and the worker's
+    // survivor record. Survivor excess is subject to the deceased worker's FMB.
     let indWifeSurvivor=0, indChildDAC=0, indWifeOwn=0;
 
     // Husband's own SS — only if alive, filed, and past filing year
@@ -1078,8 +1095,8 @@ function runScenario(fileAge, noFile, p){
         indWifeOwn = wifeOwnSS * cola;
       } else if(!husbandAlive && wifeAge >= 60){
         const ownAvail = wifeAge >= 62 ? wifeOwnSS : 0;
-        // Survivor benefit not subject to FMB of deceased worker's auxiliaries.
-        indWifeSurvivor = Math.max(wifeSurBase, ownAvail) * cola;
+        indWifeOwn = ownAvail * cola;
+        indWifeSurvivor = Math.max(0, wifeSurBase - ownAvail) * cola;
       }
     }
 
@@ -1108,6 +1125,18 @@ function runScenario(fileAge, noFile, p){
         tFMBclip += (auxTotal - auxCapNom);
         auxSpousal *= ratio;
         auxChild *= ratio;
+      }
+    }
+    // Survivor benefits on the deceased worker's record are also subject to
+    // that record's family maximum; the second adult's own-record benefit is not.
+    if(!husbandAlive && (indWifeSurvivor + indChildDAC) > 0){
+      const survivorCapNom = fmbAnnual * cola;
+      const survivorTotal = indWifeSurvivor + indChildDAC;
+      if(survivorTotal > survivorCapNom){
+        const ratio = survivorCapNom / survivorTotal;
+        tFMBclip += (survivorTotal - survivorCapNom);
+        indWifeSurvivor *= ratio;
+        indChildDAC *= ratio;
       }
     }
     ssWife = auxSpousal + indWifeSurvivor + indWifeOwn;
@@ -1221,7 +1250,9 @@ function simulateOnce(fileAge, noFile, p, yearReturns){
       } else if(husbandAlive && wifeOwnSS>0 && wifeAge>=62){
         indWifeOwn = wifeOwnSS*cola;
       } else if(!husbandAlive && wifeAge>=60){
-        indWifeSur = Math.max(wifeSurBase, wifeAge>=62?wifeOwnSS:0)*cola;
+        const ownAvail = wifeAge>=62 ? wifeOwnSS : 0;
+        indWifeOwn = ownAvail*cola;
+        indWifeSur = Math.max(0, wifeSurBase-ownAvail)*cola;
       }
     }
     if(childAlive && husbandAlive && !noFile && yr>=husbandFileYear && childAge>=0 && (childAge<18 || childDACQual)){
@@ -1234,6 +1265,11 @@ function simulateOnce(fileAge, noFile, p, yearReturns){
       const capNom = auxCap*cola;
       const total = auxSpousal+auxChild;
       if(total>capNom){ const r=capNom/total; auxSpousal*=r; auxChild*=r; }
+    }
+    if(!husbandAlive && (indWifeSur+indChildDAC)>0){
+      const capNom = getFMB(pia)*cola;
+      const total = indWifeSur+indChildDAC;
+      if(total>capNom){ const r=capNom/total; indWifeSur*=r; indChildDAC*=r; }
     }
     const totalSS = ssHusband+auxSpousal+auxChild+indWifeSur+indWifeOwn+indChildDAC;
     const taxRate = anyParent?famTax:sntTax;
@@ -1397,9 +1433,9 @@ function renderSurvivorTiming(){
           Survivor timing optimization (after ${esc(p.name1)} passes)
         </div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">
-          ${esc(p.name2)} has no own SS benefit on record (set to $0), so survivor-timing optimization does not apply — she claims survivor at the earliest year (later of age 60 or ${esc(p.name1)}'s passing).
+          ${esc(p.name2)} has no own SS benefit on record (set to $0), so survivor-timing optimization does not apply — the survivor claim starts at the earliest modeled year (later of age 60 or ${esc(p.name1)}'s passing).
           <br><br>
-          <strong>If ${esc(p.name2)} has any own work history</strong>, enter her FRA benefit in the sidebar to unlock this panel — switching strategies can be worth tens of thousands over a long retirement.
+          <strong>If ${esc(p.name2)} has any own work history</strong>, enter the FRA benefit in the sidebar to unlock this panel — switching strategies can be worth tens of thousands over a long retirement.
         </div>
       </div>
     `;
@@ -1419,7 +1455,7 @@ function renderSurvivorTiming(){
           Survivor timing optimization (after ${name1} passes)
         </div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6">
-          With the current life-expectancy settings, <strong>${name1} (passes ${husbandDeathYear}) outlives ${name2} (passes ${wifeDeathYear})</strong>. ${name2} never becomes a survivor, so survivor-timing optimization does not apply. Adjust life expectancies in the sidebar if you want to explore the survivor scenario.
+          With the current life-expectancy settings, <strong>${name1} (passes ${husbandDeathYear}) outlives ${name2} (passes ${wifeDeathYear})</strong>. ${name2} does not become a surviving beneficiary, so survivor-timing optimization does not apply. Adjust life expectancies in the sidebar to explore the survivor scenario.
         </div>
       </div>
     `;
@@ -1461,7 +1497,7 @@ function renderSurvivorTiming(){
         Survivor timing optimization (after ${name1} passes)
       </div>
       <div style="margin-bottom:10px;font-size:12px;color:var(--text2);line-height:1.7">
-        ${name2} can claim her <strong>own SS</strong> and <strong>survivor benefit</strong> at different ages. SSA pays the higher of the two she has claimed in any given year. Assumes ${name1} passes at age ${p.husbandDeathAge} (year ${husbandDeathYear}). Survivor base (full): <strong>${fmtV(surBaseFull)}/yr</strong>. ${name2}'s own SS at FRA: <strong>${fmtV(p.wifeOwnSS)}/yr</strong>. <strong>Totals cover only her post-${name1} years</strong> (any own-SS she collected while ${name1} was alive is identical across strategies, so excluded for clarity). All amounts in today's $.
+        ${name2} can claim an <strong>own SS</strong> benefit and a <strong>survivor benefit</strong> at different ages. SSA pays the higher applicable claimed amount in a given year. Assumes ${name1} passes at age ${p.husbandDeathAge} (year ${husbandDeathYear}). Survivor base (full): <strong>${fmtV(surBaseFull)}/yr</strong>. ${name2}'s own SS at FRA: <strong>${fmtV(p.wifeOwnSS)}/yr</strong>. <strong>Totals cover only the post-${name1} years</strong> (any own SS collected while ${name1} was alive is identical across strategies and is excluded for clarity). All amounts are in today's dollars.
       </div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:520px">
         <thead>
@@ -1515,15 +1551,14 @@ function renderExplanation(){
     <strong>Assumptions &amp; model notes</strong><br>
     All amounts in ${real?"today's dollars (COLA-deflated)":"nominal (future) dollars"}.
     Plan runs ${CY}–${endYear} (until last survivor passes).<br>
-    <strong>Tax:</strong> Portfolio draws grossed up — family rate <strong>${Math.round(famTax*100)}%</strong> while ≥1 parent alive;
+    <strong>Tax:</strong> Portfolio draws grossed up — household rate <strong>${Math.round(famTax*100)}%</strong> while at least one trusted adult is alive;
     SNT rate <strong>${Math.round(sntTax*100)}%</strong> after both pass. Formula: gap ÷ (1 − tax rate).<br>
-    <strong>Widow's Limit (RIB-LIM):</strong> If ${name1} files early, ${name2}'s survivor = MAX(${name1}'s reduced benefit, 82.5% of PIA).
+    <strong>Survivor limit (RIB-LIM):</strong> If ${name1} files early, ${name2}'s survivor = MAX(${name1}'s reduced benefit, 82.5% of PIA).
     At PIA=$${pia.toLocaleString()}, floor = <strong>${fmt(widowFloor)}</strong>.<br>
     <strong>Survivor timing:</strong> ${name2} claims survivor at the later of age 60 or ${name1}'s passing.
     Claiming before FRA (67) permanently reduces survivor benefit — 71.5% at 60, scaling to 100% at 67. This reduction is applied in the model.<br>
-    <strong>Family Maximum Benefit (FMB):</strong> v10 applies the SSA four-bracket FMB formula (POMS RS 00615.768).
-    Auxiliaries (spousal + child + DAC while parent alive) are prorated if their sum exceeds FMB − worker's PIA.
-    Survivor benefits paid after the worker passes are NOT subject to FMB. Verify with SSA for exact amounts.<br>
+    <strong>Family Maximum Benefit (FMB):</strong> V11 uses SSA's 2026 retirement/survivor four-bracket formula as a current-dollar planning proxy.
+    Auxiliary benefits while the worker is alive and survivor benefits after death are prorated when benefits on that earnings record exceed the applicable maximum. A second adult's own-record benefit is outside that cap. The actual bend-point year and exceptions depend on the worker's record; verify with SSA.<br>
     <strong>COLA:</strong> All benefits grow ${fmtPct(infl)} annually per year from payment start.<br>
     <strong>${name3} — Child benefit (50% PIA):</strong> <strong>${fmt(childAmt)}/yr</strong> while ${name1} is alive AND has filed.
     ${childDACQual
@@ -1534,7 +1569,7 @@ function renderExplanation(){
       ? `DAC-qualified: paid for ${name3}'s entire lifetime. Always based on PIA regardless of ${name1}'s filing age. Requires disability onset before age 22.`
       : `Non-DAC minor: paid until age 18 only.`}<br>
     <strong>Representative Payee:</strong> SSA requires a rep payee for beneficiaries who cannot manage their own funds.
-    The payee files annual SSA-6230 accounting. After both parents pass, the SNT trustee typically serves as rep payee.
+    The payee files annual SSA-6230 accounting. After the trusted adults die, the SNT trustee commonly serves as representative payee.
   </div>`;
 
   const scenarioHtml = sc.map(s => {
@@ -1671,7 +1706,7 @@ function renderExplanation(){
         </div>
 
         <div class="exp-row">
-          <div class="exp-row-label">${name3} child benefit</div>
+          <div class="exp-row-label">${name3} dependent benefit</div>
           <div class="exp-row-val">${childYears > 0
             ? `<strong>${fmt(childAmt)}/yr</strong> × ${childYears} yrs (${childStart}–${childRowEnd})
                <span class="formula">50% of PIA = ${fmt(childAmt)}/yr, while ${name1} alive &amp; filed${childDACQual?' (DAC: continues for life, no age-18 cutoff)':', '+name3+' under 18'}</span>`
@@ -1700,7 +1735,7 @@ function renderExplanation(){
                 d.tFMBclip > 0
                   ? ` Total clipped from auxiliaries over the plan: <strong style="color:var(--amber)">${fmt(d.tFMBclip)}</strong> (nominal).`
                   : ` No clip in this scenario (auxiliaries stayed under the cap).`
-              }<span class="formula">Worker's PIA is reserved; auxiliaries (spousal + child + DAC while alive) prorated when sum exceeds cap. Survivor benefits after worker passes are exempt.</span>`
+              }<span class="formula">Benefits on the worker's earnings record are prorated when they exceed the applicable family maximum, including survivor-family benefits after death. Own-record benefits remain separate.</span>`
             : 'PIA = 0, no FMB calculation.'
           }</div>
         </div>
@@ -1740,16 +1775,16 @@ function validateParams(p){
   const husbandOk = Number.isFinite(p.husbandBirth) && p.husbandBirth >= 1900 && p.husbandBirth <= yr;
   const wifeOk = Number.isFinite(p.wifeBirth) && p.wifeBirth >= 1900 && p.wifeBirth <= yr;
   const childOk = Number.isFinite(p.childBirth) && p.childBirth >= 1900 && p.childBirth <= yr;
-  if(!husbandOk) errs.push("Husband's birth year is missing or out of range (1900–"+yr+").");
-  if(!wifeOk) errs.push("Wife's birth year is missing or out of range.");
-  if(!childOk) errs.push("Child's birth year is missing or out of range.");
+  if(!husbandOk) errs.push("Primary worker birth year is missing or out of range (1900–"+yr+").");
+  if(!wifeOk) errs.push("Second adult birth year is missing or out of range.");
+  if(!childOk) errs.push("Learner/dependent birth year is missing or out of range.");
   if(!Number.isFinite(p.pia) || p.pia <= 0) errs.push("PIA must be a positive number (enter without letters, e.g. 49,848).");
   // Only check death-age vs current-age when birth year is valid.
-  if(husbandOk && p.husbandDeathAge < (yr - p.husbandBirth)) errs.push("Husband's death age ("+p.husbandDeathAge+") is before his current age ("+(yr-p.husbandBirth)+"). Use a future death age.");
-  if(wifeOk && p.wifeDeathAge < (yr - p.wifeBirth)) errs.push("Wife's death age is before her current age.");
-  if(childOk && p.childDeathAge < (yr - p.childBirth)) errs.push("Child's death age is before her current age.");
-  if(husbandOk && p.earlyDeathAge < (yr - p.husbandBirth)) errs.push("Husband's 'no-filing' early death age is before his current age.");
-  if(p.wifeOwnSS < 0) errs.push("Wife's own SS must be ≥ 0 (negative not allowed).");
+  if(husbandOk && p.husbandDeathAge < (yr - p.husbandBirth)) errs.push("Primary worker death age ("+p.husbandDeathAge+") is before current age ("+(yr-p.husbandBirth)+"). Use a future death age.");
+  if(wifeOk && p.wifeDeathAge < (yr - p.wifeBirth)) errs.push("Second adult death age is before current age.");
+  if(childOk && p.childDeathAge < (yr - p.childBirth)) errs.push("Learner/dependent death age is before current age.");
+  if(husbandOk && p.earlyDeathAge < (yr - p.husbandBirth)) errs.push("Primary worker no-filing death age is before current age.");
+  if(p.wifeOwnSS < 0) errs.push("Second adult own SS must be ≥ 0 (negative not allowed).");
   if(!Number.isFinite(p.ret) || p.ret < 0) errs.push("Return rate is invalid.");
   return errs;
 }
@@ -1810,7 +1845,7 @@ function compute(){
     {id:'c65', label:'File at 65',           labelRaw:'File at 65', data:s65,  color:'#7c3aed', dash:[6,3], fileAge:65, noFile:false},
     {id:'c67', label:'File at '+fmtFRA(fraAge)+' (FRA)', labelRaw:'File at '+fmtFRA(fraAge)+' (FRA)', data:sFRA, color:'#d97706', dash:[8,4], fileAge:fraAge, noFile:false},
     {id:'c70', label:'File at 70',           labelRaw:'File at 70', data:s70,  color:'#10b981', dash:[],    fileAge:70, noFile:false},
-    {id:'cnof',label:esc(p.name1)+' passes age '+p.earlyDeathAge+' (no filing)', labelRaw:(p.name1||'Husband')+' passes age '+p.earlyDeathAge+' (no filing)', data:sNof, color:'#2563eb', dash:[4,4], fileAge:null, noFile:true},
+    {id:'cnof',label:esc(p.name1)+' passes age '+p.earlyDeathAge+' (no filing)', labelRaw:(p.name1||'Primary adult')+' passes age '+p.earlyDeathAge+' (no filing)', data:sNof, color:'#2563eb', dash:[4,4], fileAge:null, noFile:true},
   ];
 
   renderResults();
@@ -1851,7 +1886,7 @@ function renderResults(){
       <div class="met-tip">
         <div class="met-tip-row"><span class="met-tip-lbl">${name1} SS</span><span class="met-tip-val">${tipD(s.data.tHusband)}</span></div>
         <div class="met-tip-row"><span class="met-tip-lbl">${name2} SS</span><span class="met-tip-val">${tipD(s.data.tWife)}</span></div>
-        <div class="met-tip-row"><span class="met-tip-lbl">${name3} child</span><span class="met-tip-val">${tipD(s.data.tChildChild)}</span></div>
+      <div class="met-tip-row"><span class="met-tip-lbl">${name3} dependent</span><span class="met-tip-val">${tipD(s.data.tChildChild)}</span></div>
         <div class="met-tip-row"><span class="met-tip-lbl">${name3} DAC</span><span class="met-tip-val">${tipD(s.data.tChildDAC)}</span></div>
         <div class="met-tip-row"><span class="met-tip-lbl">Tax drag</span><span class="met-tip-val">${fmtV(Math.round(s.data.tTax * midDefl0))}</span></div>
         <div class="met-tip-row"><span class="met-tip-lbl">Total SS</span><span class="met-tip-val">${tipD(s.data.totalSS)}</span></div>
@@ -1876,7 +1911,7 @@ function renderResults(){
   const bestFileAge = best.fileAge;
   const chartMilestones = {};
   // Canvas fillText renders entities literally; use raw (unescaped) names here.
-  const rName1 = p.name1||'Husband', rName2 = p.name2||'Wife', rName3 = p.name3||'Child';
+  const rName1 = p.name1||'Primary adult', rName2 = p.name2||'Second adult', rName3 = p.name3||'Learner/dependent';
   if(bestFileAge && !best.noFile) chartMilestones[bb+bestFileAge] = rName1+' files SS';
   chartMilestones[ab+18] = rName3+' turns 18';
   chartMilestones[bb+(best.noFile?(p.earlyDeathAge||bda):bda)] = rName1+' passes';
@@ -1937,7 +1972,7 @@ function renderResults(){
     <th>Scenario</th>
     <th>${name1}'s SS total</th>
     <th>${name2}'s SS total</th>
-    <th>${name3} child benefit<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(while alive, under 18)</span></th>
+    <th>${name3} dependent benefit<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(while worker is alive, under 18)</span></th>
     <th>${name3} DAC survivor<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(after ${name1} passes)</span></th>
     <th>Total SS</th>
     <th>Tax drag est.</th>
@@ -2062,7 +2097,7 @@ function scheduleHeavyRender(){
 }
 
 /* ---- SCENARIOS ---- */
-const SLOT_VERSION = 'v10';
+const SLOT_VERSION = 'v11';
 // Build a slim, JSON-safe summary of each scenario — strips heavy per-year arrays
 // so localStorage payload stays under ~10 KB per slot (vs. ~200 KB if we kept yearRows).
 function slimResults(results){
@@ -2081,7 +2116,7 @@ function slimResults(results){
 }
 function saveToSlot(i){
   const p = getParams();
-  const defaultName = (p.name1||'Husband')+' '+((p.ret*100).toFixed(1))+'% ret, age '+p.husbandDeathAge+'/'+p.wifeDeathAge;
+  const defaultName = (p.name1||'Primary adult')+' '+((p.ret*100).toFixed(1))+'% ret, age '+p.husbandDeathAge+'/'+p.wifeDeathAge;
   pendingSave = {
     slot: i,
     data: {
@@ -2253,7 +2288,7 @@ function saveToLocalStorage(){
       },
       slots, displayMode
     };
-    localStorage.setItem('ssp_state_v10', JSON.stringify(state));
+    localStorage.setItem('ssp_state_v11', JSON.stringify(state));
   }catch(e){
     // Quota exceeded or storage disabled — surface in console for diagnosis.
     console.warn('saveToLocalStorage failed:', e && e.name, e && e.message);
@@ -2262,7 +2297,9 @@ function saveToLocalStorage(){
 
 function loadFromLocalStorage(){
   try{
-    const raw = localStorage.getItem('ssp_state_v10');
+    // Read V10 once for input migration, but saved scenario results are dropped
+    // because V11 corrects family-maximum calculations.
+    const raw = localStorage.getItem('ssp_state_v11') || localStorage.getItem('ssp_state_v10');
     if(!raw) return;
     const s = JSON.parse(raw);
     const inp = s.inputs;
@@ -2283,8 +2320,8 @@ function loadFromLocalStorage(){
     el('vt-nom').classList.toggle('on',displayMode==='nominal');
     slots.forEach((_,i)=>refreshSlotUI(i));
   }catch(e){
-    console.warn('ssp_state_v10 corrupt or unreadable — clearing.', e);
-    try{ localStorage.removeItem('ssp_state_v10'); }catch(e2){}
+    console.warn('ssp_state_v11 corrupt or unreadable — clearing.', e);
+    try{ localStorage.removeItem('ssp_state_v11'); }catch(e2){}
   }
 }
 
@@ -2342,6 +2379,7 @@ function loadFromLocalStorage(){
 
 /* ---- RESET ---- */
 function resetDefaults(){
+  localStorage.removeItem('ssp_state_v11');
   localStorage.removeItem('ssp_state_v10');
   location.reload();
 }
@@ -2558,7 +2596,7 @@ function renderSensitivity(){
       ${heatHtml}
       <div style="font-size:11px;font-weight:700;color:var(--text2);margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em">Grid B · ${name1}'s lifespan vs ${name2}'s lifespan</div>
       <div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.6">
-        The single most decision-critical pairing. File-at-70 wins when ${name1} lives long; file-at-62 wins when he dies early.
+        The single most decision-critical pairing. File-at-70 wins when ${name1} lives long; file-at-62 wins when the worker dies early.
       </div>
       ${heat2Html}
       <div style="margin-top:8px;font-size:10px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:6px 0">

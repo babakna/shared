@@ -341,7 +341,7 @@ input,textarea,select{font-size:16px!important}
 <header class="hdr" id="hdr">
 <div class="hdr-l">
 <div class="hdr-ico"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v1h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v2a5 5 0 01-10 0v-2H6a3 3 0 01-3-3v-1a3 3 0 013-3h1V7a5 5 0 015-5zm0 2a3 3 0 00-3 3v6a3 3 0 006 0V7a3 3 0 00-3-3zm-2 14v1a2 2 0 004 0v-1h-4z"/></svg></div>
-<div><div class="hdr-t">Building with AI <span class="ver-badge">V9.0</span><span class="hdr-date">Updated September 2026</span></div><div class="hdr-s">Implementation &amp; Engineering for the AI Practitioner &middot; <span class="by">Namiranian, Babak</span></div></div>
+<div><div class="hdr-t">Building with AI <span class="ver-badge">V10.0</span><span class="hdr-date">Updated October 2026</span></div><div class="hdr-s">Implementation &amp; Engineering for the AI Practitioner &middot; <span class="by">Namiranian, Babak</span></div></div>
 </div>
 <div class="hdr-r">
 <button type="button" class="hdr-btn" id="home-btn" title="Home" aria-label="Go to home page" onclick="showLanding()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg></button>
@@ -364,8 +364,8 @@ input,textarea,select{font-size:16px!important}
 <main class="main" id="main-content"></main>
 <script>
 /* ══ VERSION ══ */
-var VERSION='9.0';
-var VERSION_DATE='Updated September 2026';
+var VERSION='10.0';
+var VERSION_DATE='Updated October 2026';
 
 /* ══ DARK MODE ══ */
 (function(){
@@ -1050,6 +1050,7 @@ return '<div class="sec-title">Why Evaluation Matters</div>'+
 '<div class="card"><div class="card-text" style="line-height:1.8">'+
 '<p><strong>The concept:</strong> Not every request needs the most expensive model. Simple formatting tasks, quick lookups, and routine transformations work fine on smaller, cheaper models. Complex analysis, nuanced writing, and multi-step reasoning need the frontier model. A <strong>model router</strong> classifies each incoming request by complexity and routes it to the appropriate model tier, optimizing the cost/quality tradeoff across your entire traffic.</p>'+
 '<p style="margin-top:10px"><strong>How to build a router:</strong> Train a small classifier or use a fast approved model to assess request complexity on a 3-tier scale. Tier 1 (simple): reformatting, extraction, simple Q&A, translation. Tier 2 (medium): summarization, content generation with templates, standard analysis. Tier 3 (complex): multi-step reasoning, nuanced writing, novel analysis, edge cases. Route each tier to the appropriate model. The classifier should be inexpensive relative to the request it is routing.</p>'+
+'<p style="margin-top:10px"><strong>Where Jev can fit:</strong> Jev is a vendor-developed bounded decision model designed to score a closed candidate set and return a probability distribution. It can be evaluated as a router or ranker when the allowed destinations are known in advance. Keep schema validation, permission checks, and the final action gate deterministic; route low-confidence or close-score cases to fallback or human review. Treat published speed, cost, and quality comparisons as vendor claims until your golden set reproduces them. See the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" target="_blank" rel="noopener noreferrer">Jev introduction</a>.</p>'+
 '<p style="margin-top:10px"><strong>The cost math:</strong> If a large share of your requests are simple, routing them to lower-cost tiers can substantially reduce blended cost while reserving frontier models for work that needs them. At scale, this is often the difference between a viable product and a money-losing one.</p>'+
 '<p style="margin-top:10px"><strong>Quality tradeoff:</strong> Simple tasks may actually get <em>better</em> results from smaller models. Smaller models are faster (lower latency), more focused (they don\u2019t over-think simple tasks), and less likely to add unnecessary caveats or qualifications to straightforward answers. A simple extraction task routed to a frontier model might produce a paragraph of context and qualifications when all you need is a JSON object. The smaller model gives you the JSON object directly.</p>'+
 '</div></div>'+
@@ -1311,8 +1312,8 @@ var GLOSSARY=[
 {term:'Prompt Chaining',cat:'Workflow',def:'Breaking a complex task into a sequence of focused prompts, where each step\'s output feeds the next step.',why:'Chains can produce better results for complex tasks than a single monolithic prompt.',rel:['Agentic Workflow','Pipeline']},
 {term:'Self-Consistency',cat:'Prompting',def:'Running the same CoT prompt multiple times and selecting the most common answer via majority vote.',why:'Reduces variance and improves reliability on ambiguous problems at the cost of 3-5x API calls.',rel:['Chain-of-Thought (CoT)','Ensemble']},
 {term:'Tree-of-Thought',cat:'Prompting',def:'Exploring multiple reasoning branches in parallel, evaluating each, and pruning dead ends.',why:'Solves complex planning problems where a single reasoning path might lead to a dead end.',rel:['Chain-of-Thought (CoT)']},
-{term:'Temperature',cat:'GenAI',def:'A parameter controlling output randomness. 0 = deterministic, 1 = creative, >1 = chaotic.',why:'Temperature choice affects reproducibility. Use 0 for code/facts, 0.7 for creative tasks.',rel:['Sampling','Top-p (Nucleus Sampling)']},
-{term:'Top-p (Nucleus Sampling)',cat:'GenAI',def:'A sampling method that considers tokens comprising the top p% of probability mass.',why:'Top-p provides more natural diversity than temperature alone. Common default: 0.9.',rel:['Temperature','Sampling']},
+{term:'Temperature',cat:'GenAI',def:'A sampling control that rescales next-token probabilities where a provider and model expose it. Lower values usually reduce variation; higher values usually increase it.',why:'Availability, range, defaults, and compatibility with reasoning or effort controls are provider- and model-specific. Check the current API documentation before sending it; a low value does not guarantee correctness or exact repeatability.',rel:['Sampling','Top-p (Nucleus Sampling)']},
+{term:'Top-p (Nucleus Sampling)',cat:'GenAI',def:'A sampling method that limits selection to tokens within a cumulative probability mass.',why:'Availability and defaults vary by provider and model, and some APIs restrict combining it with other controls. Verify the exact API rather than assuming a universal default.',rel:['Temperature','Sampling']},
 {term:'LoRA (Low-Rank Adaptation)',cat:'ML Fundamentals',def:'An efficient fine-tuning method that trains small adapter matrices instead of modifying all model weights.',why:'LoRA enables fine-tuning large models on consumer hardware. A 70B model can be fine-tuned with 8GB VRAM.',rel:['Fine-Tuning','Parameters']},
 {term:'GPTQ',cat:'Implementation',def:'A post-training quantization method that compresses models with minimal quality loss.',why:'GPTQ is the standard quantization format for running large models locally.',rel:['Quantization','GGUF']},
 {term:'GGUF',cat:'Implementation',def:'A file format for quantized models, used by llama.cpp and Ollama for efficient local inference.',why:'GGUF models run on CPUs without GPU requirements, democratizing access to large models.',rel:['Quantization','Ollama']},

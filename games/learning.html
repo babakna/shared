@@ -106,7 +106,7 @@
 
         button.action-btn {
             background: var(--accent); border: none; padding: 10px 20px; font-size: 1.2rem;
-            border-radius: 10px; cursor: pointer; margin: 5px; font-family: inherit;
+            border-radius: 10px; cursor: pointer; margin: 5px; font-family: inherit; min-height: 40px;
         }
         button.action-btn:hover { filter: brightness(0.9); }
         input[type="number"], input[type="text"] {
@@ -116,8 +116,11 @@
 
         .question-text { font-size: 1.5rem; font-weight: bold; margin: 20px 0; color: var(--text); }
         .feedback { font-size: 1.3rem; font-weight: bold; margin-top: 15px; color: #ff69b4; min-height: 30px;}
-        .choice-btn { background: var(--secondary); border: 2px solid var(--primary); padding: 10px 20px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; margin: 5px; display: inline-block; font-family: inherit;}
+        .choice-btn { background: var(--secondary); border: 2px solid var(--primary); padding: 10px 20px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; margin: 5px; display: inline-block; font-family: inherit; min-height: 40px;}
         .choice-btn:hover { background: var(--primary); color: white; }
+        #legacy-hint { max-width: 650px; margin: 0 auto 12px; color: #675b70; line-height: 1.45; }
+        #legacy-difficulty { display: none; max-width: 650px; margin: 0 auto 14px; padding: 10px; background: var(--bg); border: 2px dashed var(--primary); border-radius: 14px; }
+        #legacy-difficulty button[aria-pressed="true"] { background: var(--primary); color: white; }
 
         .reading-passage {
             background: var(--bg); padding: 20px; border-radius: 15px; font-size: 1.2rem;
@@ -209,6 +212,13 @@
     <div id="game-view">
         <button class="back-btn" onclick="goHome()">🔙 Back to Play Room</button>
         <h2 id="active-game-title" style="font-size: 1.8rem; color: var(--text); margin-top: 0;">Game Title</h2>
+        <div id="legacy-hint" role="note"></div>
+        <div id="legacy-difficulty" aria-label="Difficulty">
+            <strong>Difficulty:</strong>
+            <button class="choice-btn" data-diff="easy" onclick="setLegacyDifficulty('easy')">😊 Easy</button>
+            <button class="choice-btn" data-diff="medium" onclick="setLegacyDifficulty('medium')">🙂 Medium</button>
+            <button class="choice-btn" data-diff="hard" onclick="setLegacyDifficulty('hard')">🤓 Hard</button>
+        </div>
         
         <div id="game-6" class="game-container">
             <div class="question-text">Read the story, then answer the question! 📖</div>
@@ -613,6 +623,78 @@
             { id: 49, title: "Expanded Form", icon: "📋" },
             { id: 50, title: "Which Position", icon: "🥇" }
         ];
+        const legacyHints = {
+            1:'Take turns placing marks. Make three in a row before your opponent.',
+            2:'Flip two cards at a time and remember their positions to match every pair.',
+            3:'Solve the equation, then tap the correct answer.',
+            4:'Use the range shown and tap the number the game selected.',
+            5:'Rearrange the letters and tap the correctly spelled word.',
+            6:'Read the passage carefully, then answer the question about it.',
+            7:'Read each science question and choose the best answer.',
+            8:'Match each place with its correct capital.',
+            9:'Tap the planets in order from closest to farthest from the Sun.',
+            10:'Use the clue and choose the missing letter.',
+            11:'Identify the food group for the item shown.',
+            12:'Choose the habitat where the animal normally lives.',
+            13:'Match the description to the correct stage of the water cycle.',
+            14:'Work out the time conversion or elapsed-time question.',
+            15:'Choose the command sequence that guides the robot to its goal.',
+            16:'Find the correctly spelled word.',
+            17:'Solve the fraction question and choose the correct value.',
+            18:'Match each invention with the correct inventor.',
+            19:'Choose the word with the opposite meaning.',
+            20:'Count the money or calculate the correct change.',
+            21:'Use the country, capital, and continent clues to choose the answer.',
+            22:'Match the instrument to its musical family.',
+            23:'Read the sentence and identify the requested part of speech.',
+            24:'Use the properties in the clue to identify the shape.',
+            25:'Study the sequence and choose what comes next.',
+            26:'Read the full passage, then answer the comprehension question.',
+            27:'Solve the multiplication problem.',
+            28:'Find the rule in the number pattern and choose the next number.',
+            29:'Round the number to the nearest ten.',
+            30:'Match the number with its Roman numeral.',
+            31:'Choose the word with the same meaning.',
+            32:'Match the country and capital.',
+            33:'Add the digits in the number.',
+            34:'Double the number shown.',
+            35:'Read the time description and choose the matching clock time.',
+            36:'Divide evenly and choose the quotient.',
+            37:'Calculate the requested percentage.',
+            38:'Multiply the number by itself.',
+            39:'Continue the backwards number pattern.',
+            40:'Choose greater than, less than, or equal.',
+            41:'Divide the number into four equal parts.',
+            42:'Multiply the number by ten.',
+            43:'Round the number to the nearest hundred.',
+            44:'Continue the skip-counting pattern.',
+            45:'Calculate the change from one dollar.',
+            46:'Move forward on a 12-hour clock by the number of hours shown.',
+            47:'Divide the total by the divisor.',
+            48:'Match the written number word to its digits.',
+            49:'Combine hundreds, tens, and ones.',
+            50:'Find the item in the requested ordinal position.'
+        };
+        let activeLegacyGameId = 0;
+        let legacyDifficulty = localStorage.getItem('legacyLearningDifficulty') || 'medium';
+        function legacyChoiceCount(){ return activeLegacyGameId <= 5 ? 4 : ({easy:2, medium:3, hard:4}[legacyDifficulty] || 3); }
+        function updateLegacyDifficultyButtons(){
+            document.querySelectorAll('#legacy-difficulty [data-diff]').forEach(button => button.setAttribute('aria-pressed', button.dataset.diff === legacyDifficulty ? 'true' : 'false'));
+        }
+        function setLegacyDifficulty(value){
+            legacyDifficulty=value;localStorage.setItem('legacyLearningDifficulty',value);updateLegacyDifficultyButtons();
+            const game=games.find(item=>item.id===activeLegacyGameId);if(game)openGame(game.id,game.title);
+        }
+        function variedLegacyOptions(options,correct){
+            const answer=String(correct),unique=[...new Set(options.map(String))],wrong=shuffle(unique.filter(value=>value!==answer));
+            return shuffle([answer,...wrong.slice(0,Math.max(1,legacyChoiceCount()-1))]);
+        }
+        function limitLegacyStaticChoices(selector,correct){
+            const buttons=[...document.querySelectorAll(selector+' button')],answer=String(correct);
+            const right=buttons.find(button=>button.textContent.includes(answer)),wrong=shuffle(buttons.filter(button=>button!==right));
+            const keep=new Set([right,...wrong.slice(0,Math.max(1,legacyChoiceCount()-1))]);
+            buttons.forEach(button=>button.style.display=keep.has(button)?'inline-block':'none');
+        }
 
         const homeView = document.getElementById('home-view');
         games.forEach(game => {
@@ -624,9 +706,13 @@
         });
 
         function openGame(id, title) {
+            activeLegacyGameId=id;
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('game-view').style.display = 'block';
             document.getElementById('active-game-title').innerText = title;
+            document.getElementById('legacy-hint').innerText = legacyHints[id] || ('Follow the instructions to play '+title+'.');
+            document.getElementById('legacy-difficulty').style.display = id >= 6 ? 'block' : 'none';
+            updateLegacyDifficultyButtons();
             document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
             document.getElementById('game-' + id).style.display = 'block';
 
@@ -649,6 +735,7 @@
         }
 
         function goHome() {
+            activeLegacyGameId=0;
             document.getElementById('home-view').style.display = 'grid';
             document.getElementById('game-view').style.display = 'none';
         }
@@ -689,7 +776,7 @@
         function populateOptions(optsArray, containerId, feedbackId, correctAns, successMsg) {
             let container = document.getElementById(containerId);
             container.innerHTML = '';
-            shuffle(optsArray).forEach(opt => {
+            variedLegacyOptions(optsArray, correctAns).forEach(opt => {
                 let btn = document.createElement('button');
                 btn.className = 'choice-btn'; btn.innerText = opt;
                 btn.onclick = () => {
@@ -712,7 +799,7 @@
         function populateQuickChoices(optsArray, hostId, correctAns, onCorrect, onWrong) {
             const host = ensureChoiceHost(hostId.replace('-choices','-answer'), hostId);
             host.innerHTML = '';
-            shuffle(optsArray.map(String)).forEach(opt => {
+            variedLegacyOptions(optsArray, correctAns).forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.innerText = opt;
@@ -859,7 +946,15 @@
         function initGeography() { let qData = getRandomItem(geoPool, 'geo'); document.getElementById('geo-q').innerText = `What is the capital of ${qData.state}?`; document.getElementById('geo-feedback').innerText = ''; let options = [qData.cap]; while(options.length < 4) { let r = geoPool[Math.floor(Math.random() * geoPool.length)].cap; if(!options.includes(r)) options.push(r); } populateOptions(options, 'geo-options', 'geo-feedback', qData.cap, "Spot on! 🗺️"); }
 
         const planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']; let targetPlanetIdx = 0;
-        function initPlanets() { targetPlanetIdx = 0; document.getElementById('planet-target').innerHTML = `Find the <strong>1st</strong> planet: <strong>Mercury</strong>`; document.getElementById('planet-feedback').innerText = ''; let container = document.getElementById('planet-options'); container.innerHTML = ''; let mixed = shuffle(planets.map((p, i) => ({name: p, em: ['🌕','🌔','🌍','🔴','🪐','🪐','🔵','🌑'][i], realIdx: i}))); mixed.forEach(pData => { let span = document.createElement('span'); span.innerText = pData.em; span.style.margin = "10px"; span.onclick = () => { if(pData.realIdx === targetPlanetIdx) { span.style.visibility = 'hidden'; targetPlanetIdx++; if(targetPlanetIdx === planets.length) document.getElementById('planet-feedback').innerText = "You sorted the solar system! 🚀"; else document.getElementById('planet-target').innerHTML = `Find the <strong>${targetPlanetIdx+1}</strong> planet: <strong>${planets[targetPlanetIdx]}</strong>`; } else document.getElementById('planet-feedback').innerText = "Nope! Look for " + planets[targetPlanetIdx]; }; container.appendChild(span); }); }
+        function initPlanets() {
+            targetPlanetIdx = 0;
+            const count={easy:4,medium:6,hard:8}[legacyDifficulty]||6,activePlanets=planets.slice(0,count),icons=['🌕','🌔','🌍','🔴','🪐','🪐','🔵','🌑'];
+            document.getElementById('planet-target').innerHTML = `Find the <strong>1st</strong> planet: <strong>${activePlanets[0]}</strong>`;
+            document.getElementById('planet-feedback').innerText = '';
+            let container = document.getElementById('planet-options'); container.innerHTML = '';
+            let mixed = shuffle(activePlanets.map((p, i) => ({name: p, em: icons[i], realIdx: i})));
+            mixed.forEach(pData => { let span = document.createElement('button'); span.className='choice-btn';span.innerText = pData.em; span.setAttribute('aria-label',pData.name);span.style.margin = "10px"; span.onclick = () => { if(pData.realIdx === targetPlanetIdx) { span.style.visibility = 'hidden'; targetPlanetIdx++; if(targetPlanetIdx === activePlanets.length) document.getElementById('planet-feedback').innerText = "You sorted the planets for this level! 🚀"; else document.getElementById('planet-target').innerHTML = `Find the <strong>${targetPlanetIdx+1}</strong> planet: <strong>${activePlanets[targetPlanetIdx]}</strong>`; } else document.getElementById('planet-feedback').innerText = "Nope! Look for " + activePlanets[targetPlanetIdx]; }; container.appendChild(span); });
+        }
 
         let spellWords = [{w:"BUTTERFLY", m:3, d:"A beautiful insect with colorful wings."}, {w:"ASTRONAUT", m:5, d:"Someone who travels to space."}];
         function initSpelling() { let curSpell = getRandomItem(spellWords, 'spell'); let displayWord = curSpell.w.split(''); let missingChar = displayWord[curSpell.m]; displayWord[curSpell.m] = "_"; document.getElementById('spelling-word').innerText = displayWord.join(''); document.querySelector('#game-10 .question-text').innerText = curSpell.d; document.getElementById('spelling-feedback').innerText = ''; let opts = [missingChar]; while(opts.length < 4) { let r = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*26)]; if(!opts.includes(r)) opts.push(r); } let optsDiv = document.getElementById('spelling-options'); optsDiv.innerHTML = ''; shuffle(opts).forEach(letter => { let btn = document.createElement('button'); btn.className = 'choice-btn'; btn.innerText = letter; btn.onclick = () => { if(letter === missingChar) { document.getElementById('spelling-word').innerText = curSpell.w; document.getElementById('spelling-feedback').innerText = "Correct! 📖"; } else document.getElementById('spelling-feedback').innerText = "Try another letter!"; }; optsDiv.appendChild(btn); }); }
@@ -872,18 +967,46 @@
         function initHabitat() { curAnim = getRandomItem(animals, 'habitat'); document.getElementById('habitat-item').innerText = curAnim.e; document.getElementById('habitat-feedback').innerText = ''; }
         function checkHabitat(hab) { document.getElementById('habitat-feedback').innerText = hab === curAnim.h ? "Right! They love it there! 🏡" : "They might get lost there! Try again."; }
 
-        const cycle = [{ stage: "Evaporation", def: "The sun heats up water and turns it into gas." }, { stage: "Condensation", def: "Water vapor cools down to make clouds." }, { stage: "Precipitation", def: "Water falls back down as rain or snow." }, { stage: "Collection", def: "Water gathers in oceans and lakes." }]; let curCycle;
-        function initWater() { curCycle = getRandomItem(cycle, 'water'); document.getElementById('water-def').innerText = curCycle.def; document.getElementById('water-feedback').innerText = ''; }
+        const cycle = [
+            { stage: "Evaporation", def: "The sun heats liquid water and turns it into water vapor." },
+            { stage: "Evaporation", def: "A puddle slowly disappears into the air on a warm day." },
+            { stage: "Evaporation", def: "Ocean water becomes an invisible gas and rises." },
+            { stage: "Condensation", def: "Water vapor cools and forms tiny cloud droplets." },
+            { stage: "Condensation", def: "Water drops form on the outside of a cold glass." },
+            { stage: "Condensation", def: "Invisible water vapor changes back into liquid water." },
+            { stage: "Precipitation", def: "Water falls from clouds as rain, snow, sleet, or hail." },
+            { stage: "Precipitation", def: "Cloud droplets grow heavy enough to fall to Earth." },
+            { stage: "Precipitation", def: "Snow falls from a cloud to the ground." },
+            { stage: "Collection", def: "Water gathers in oceans, lakes, rivers, and soil." },
+            { stage: "Collection", def: "Rainwater flows downhill into streams and lakes." },
+            { stage: "Collection", def: "Groundwater and runoff return water to large bodies of water." }
+        ]; let curCycle;
+        function initWater() { curCycle = getRandomItem(cycle, 'water'); document.getElementById('water-def').innerText = curCycle.def; document.getElementById('water-feedback').innerText = ''; limitLegacyStaticChoices('#game-13',curCycle.stage); }
         function checkWater(stage) { if(stage === curCycle.stage) { document.getElementById('water-feedback').innerText = "Excellent science! 🌧️"; setTimeout(initWater, 2000); } else document.getElementById('water-feedback').innerText = "Try again!"; }
 
         let timeQs = [{ q: "How many minutes are in 1 hour?", a: "60", wr: ["30", "100", "24"] }, { q: "If it's 2:00 PM and a movie is 2 hours long, what time is it over?", a: "4:00 PM", wr: ["3:00 PM", "5:00 PM", "4:30 PM"] }];
         function initTime() { let tData = getRandomItem(timeQs, 'time'); document.getElementById('time-q').innerText = tData.q; document.getElementById('time-feedback').innerText = ''; populateOptions([tData.a, ...tData.wr], 'time-options', 'time-feedback', tData.a, "Right on time! ⌚"); }
 
-        let codes = [{ q: "The robot faces North. Target is 1 step North, 1 step East.", a: "Move Forward, Turn Right, Move Forward", wr: ["Turn Left, Move Forward", "Move Forward, Turn Left"] }];
-        function initCoding() { let cData = getRandomItem(codes, 'code'); document.getElementById('code-q').innerText = cData.q; document.getElementById('code-feedback').innerText = ''; populateOptions([cData.a, ...cData.wr], 'code-options', 'code-feedback', cData.a, "Code accepted! 🤖"); document.querySelectorAll('#code-options button').forEach(b => {b.style.display="block"; b.style.width="90%"; b.style.margin="10px auto";}); }
+        let codes = [];
+        function initCoding() {
+            const dirs=['North','East','South','West'],turns=['Move Forward','Turn Right, Move Forward','Turn Around, Move Forward','Turn Left, Move Forward'];
+            const start=riA(0,3),relative=legacyDifficulty==='easy'?riA(0,1):riA(0,3),steps=riA(1,legacyDifficulty==='hard'?8:legacyDifficulty==='medium'?5:3);
+            const target=dirs[(start+relative)%4],move=turns[relative]+(steps>1?' × '+steps:'');
+            const pool=[];for(let r=0;r<4;r++)for(let n=1;n<=8;n++)pool.push(turns[r]+(n>1?' × '+n:''));
+            const wrong=shuffle(pool.filter(x=>x!==move)).slice(0,4);
+            document.getElementById('code-q').innerText='The robot faces '+dirs[start]+'. The target is '+steps+' step'+(steps>1?'s':'')+' '+target+'. Which program reaches it?';
+            document.getElementById('code-feedback').innerText='';
+            populateOptions([move,...wrong], 'code-options', 'code-feedback', move, "Code accepted! 🤖");
+            document.querySelectorAll('#code-options button').forEach(b => {b.style.display="block"; b.style.width="90%"; b.style.margin="10px auto";});
+        }
 
-        let fixerQs = [{ c: "BEAUTIFUL", w: ["BEUTIFUL", "BEATIFUL", "BEEUTIFUL"] }, { c: "BECAUSE", w: ["BECUASE", "BECAUS", "BECUZ"] }, { c: "FRIEND", w: ["FREIND", "FRIND", "FREND"] }];
-        function initFixer() { let fData = getRandomItem(fixerQs, 'fixer'); document.getElementById('fixer-feedback').innerText = ''; populateOptions([fData.c, ...fData.w.slice(0,2)], 'fixer-options', 'fixer-feedback', fData.c, "Great Spelling! 📝"); }
+        let fixerQs = [];
+        function initFixer() {
+            const source=(typeof SPELL_WORDS!=='undefined'&&SPELL_WORDS.length?SPELL_WORDS:['BEAUTIFUL','BECAUSE','FRIEND']),correct=source[Math.floor(Math.random()*source.length)].toUpperCase();
+            const wrong=new Set();let guard=0;while(wrong.size<4&&guard++<80){const chars=correct.split(''),mode=riA(0,2);if(mode===0&&chars.length>2){const i=riA(0,chars.length-2);[chars[i],chars[i+1]]=[chars[i+1],chars[i]];}else if(mode===1&&chars.length>3){chars.splice(riA(1,chars.length-2),1);}else{const i=riA(0,chars.length-1);chars.splice(i,0,chars[i]);}const candidate=chars.join('');if(candidate!==correct)wrong.add(candidate);}
+            document.getElementById('fixer-feedback').innerText = '';
+            populateOptions([correct,...wrong], 'fixer-options', 'fixer-feedback', correct, "Great Spelling! 📝");
+        }
 
         let fractQs = [{ q: "What is 1/2 of 10?", a: "5", wr: ["2", "10", "4"] }, { q: "Which fraction is the biggest?", a: "1/2", wr: ["1/4", "1/8", "1/10"] }, { q: "If you have 4 slices of an 8-slice pizza, how much is that?", a: "1/2", wr: ["1/4", "3/4", "Whole"] }];
         function initFraction() { let fData = getRandomItem(fractQs, 'fraction'); document.getElementById('fraction-q').innerText = fData.q; document.getElementById('fraction-feedback').innerText = ''; populateOptions([fData.a, ...fData.wr], 'fraction-options', 'fraction-feedback', fData.a, "Perfect fraction math! 🍕"); }
@@ -965,7 +1088,7 @@
     function initSpelling(){const w=SPELL_WORDS[Math.floor(Math.random()*SPELL_WORDS.length)];const idx=Math.floor(Math.random()*w.length);const miss=w[idx];const disp=w.split('');disp[idx]='_';
       document.getElementById('spelling-word').innerText=disp.join('');document.querySelector('#game-10 .question-text').innerText='Which letter is missing?';document.getElementById('spelling-feedback').innerText='';
       let opts=[miss];while(opts.length<4){const r="ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*26)];if(!opts.includes(r))opts.push(r);}
-      const div=document.getElementById('spelling-options');div.innerHTML='';shuffle(opts).forEach(L=>{const b=document.createElement('button');b.className='choice-btn';b.innerText=L;b.onclick=()=>{if(L===miss){document.getElementById('spelling-word').innerText=w;document.getElementById('spelling-feedback').innerText="Correct! 📖";}else document.getElementById('spelling-feedback').innerText="Try another letter!";};div.appendChild(b);});}
+      const div=document.getElementById('spelling-options');div.innerHTML='';var shown=variedLegacyOptions(opts,miss);shown.forEach(L=>{const b=document.createElement('button');b.className='choice-btn';b.innerText=L;b.onclick=()=>{if(L===miss){document.getElementById('spelling-word').innerText=w;document.getElementById('spelling-feedback').innerText="Correct! 📖";}else document.getElementById('spelling-feedback').innerText="Try another letter!";};div.appendChild(b);});}
 
     // ---- SCRAMBLE (endless, big list) ----
     function initScramble(){let diff='medium';const r=document.querySelector('input[name="scrambleDiff"]:checked');if(r)diff=r.value;
@@ -1020,15 +1143,15 @@
 
     // ---- FOOD GROUPS (big; groups: Fruit/Vegetable/Protein/Dairy) ----
     const FOODS=[["🍎","Fruit"],["🍌","Fruit"],["🍓","Fruit"],["🍇","Fruit"],["🍊","Fruit"],["🍉","Fruit"],["🍍","Fruit"],["🥝","Fruit"],["🍑","Fruit"],["🥭","Fruit"],["🥦","Vegetable"],["🥕","Vegetable"],["🌽","Vegetable"],["🥬","Vegetable"],["🍆","Vegetable"],["🥔","Vegetable"],["🫑","Vegetable"],["🧅","Vegetable"],["🥒","Vegetable"],["🍅","Vegetable"],["🍗","Protein"],["🍳","Protein"],["🥩","Protein"],["🐟","Protein"],["🫘","Protein"],["🥜","Protein"],["🍤","Protein"],["🧀","Dairy"],["🥛","Dairy"],["🧈","Dairy"],["🍦","Dairy"],["🍶","Dairy"]];
-    function initFood(){curFood={e:0,g:0};const f=FOODS[Math.floor(Math.random()*FOODS.length)];curFood.e=f[0];curFood.g=f[1];document.getElementById('food-item').innerText=f[0];document.getElementById('food-feedback').innerText='';}
+    function initFood(){curFood={e:0,g:0};const f=FOODS[Math.floor(Math.random()*FOODS.length)];curFood.e=f[0];curFood.g=f[1];document.getElementById('food-item').innerText=f[0];document.getElementById('food-feedback').innerText='';limitLegacyStaticChoices('#game-11',f[1]);}
 
     // ---- ANIMAL HABITATS (big; habitats: Ocean/Forest/Jungle/Farm) ----
     const ANIMS=[["🦈","Ocean"],["🐬","Ocean"],["🐠","Ocean"],["🐙","Ocean"],["🦀","Ocean"],["🐳","Ocean"],["🦭","Ocean"],["🐡","Ocean"],["🐻","Forest"],["🦌","Forest"],["🦊","Forest"],["🦉","Forest"],["🐿️","Forest"],["🦝","Forest"],["🦡","Forest"],["🐺","Forest"],["🐒","Jungle"],["🦜","Jungle"],["🐅","Jungle"],["🦍","Jungle"],["🐍","Jungle"],["🦏","Jungle"],["🐆","Jungle"],["🦥","Jungle"],["🐄","Farm"],["🐖","Farm"],["🐔","Farm"],["🐑","Farm"],["🐎","Farm"],["🐐","Farm"],["🦆","Farm"],["🐓","Farm"]];
-    function initHabitat(){const a=ANIMS[Math.floor(Math.random()*ANIMS.length)];curAnim={e:a[0],h:a[1]};document.getElementById('habitat-item').innerText=a[0];document.getElementById('habitat-feedback').innerText='';}
+    function initHabitat(){const a=ANIMS[Math.floor(Math.random()*ANIMS.length)];curAnim={e:a[0],h:a[1]};document.getElementById('habitat-item').innerText=a[0];document.getElementById('habitat-feedback').innerText='';limitLegacyStaticChoices('#game-12',a[1]);}
 
     // ---- INSTRUMENTS (big; families: String/Woodwind/Brass/Percussion) ----
     const INSTR=[["Guitar","String"],["Violin","String"],["Cello","String"],["Harp","String"],["Banjo","String"],["Viola","String"],["Double Bass","String"],["Flute","Woodwind"],["Clarinet","Woodwind"],["Oboe","Woodwind"],["Saxophone","Woodwind"],["Bassoon","Woodwind"],["Recorder","Woodwind"],["Piccolo","Woodwind"],["Trumpet","Brass"],["Trombone","Brass"],["Tuba","Brass"],["French Horn","Brass"],["Cornet","Brass"],["Bugle","Brass"],["Drum","Percussion"],["Xylophone","Percussion"],["Tambourine","Percussion"],["Cymbals","Percussion"],["Triangle","Percussion"],["Marimba","Percussion"],["Bongos","Percussion"]];
-    function initInstrument(){const i=INSTR[Math.floor(Math.random()*INSTR.length)];curInst={n:i[0],f:i[1]};document.getElementById('instrument-name').innerText=i[0];document.getElementById('instrument-feedback').innerText='';}
+    function initInstrument(){const i=INSTR[Math.floor(Math.random()*INSTR.length)];curInst={n:i[0],f:i[1]};document.getElementById('instrument-name').innerText=i[0];document.getElementById('instrument-feedback').innerText='';limitLegacyStaticChoices('#game-22',i[1]);}
 
     // ---- SHAPES (big) ----
     const SHAPES_Q=[["I have 3 sides and 3 angles.","Triangle",["Square","Circle","Hexagon"]],["I have 8 sides, like a stop sign.","Octagon",["Hexagon","Pentagon","Square"]],["I have 4 equal sides.","Square",["Rectangle","Triangle","Circle"]],["I am perfectly round.","Circle",["Oval","Square","Star"]],["I have 5 sides.","Pentagon",["Hexagon","Octagon","Square"]],["I have 6 sides.","Hexagon",["Pentagon","Octagon","Triangle"]],["I have 4 sides, two long and two short.","Rectangle",["Square","Rhombus","Triangle"]],["I look like a squashed circle.","Oval",["Circle","Diamond","Square"]],["I have 3 sides all the same length.","Equilateral triangle",["Right triangle","Square","Pentagon"]],["I have 10 sides.","Decagon",["Octagon","Nonagon","Hexagon"]],["I am a 3D shape like a ball.","Sphere",["Cube","Cone","Cylinder"]],["I am a 3D box with 6 square faces.","Cube",["Sphere","Pyramid","Cone"]],["I am a 3D shape with a point on top like an ice-cream.","Cone",["Cube","Sphere","Cylinder"]],["I am a 3D can shape.","Cylinder",["Cube","Cone","Sphere"]],["I have 7 sides.","Heptagon",["Hexagon","Octagon","Pentagon"]],["I have a triangular base and a point on top.","Pyramid",["Cube","Cylinder","Sphere"]],["I have 4 sides like a tilted square.","Rhombus",["Rectangle","Trapezoid","Circle"]],["I have only one pair of parallel sides.","Trapezoid",["Square","Rhombus","Circle"]],["I have 5 points like the sky at night.","Star",["Heart","Circle","Square"]],["I have 9 sides.","Nonagon",["Octagon","Decagon","Hexagon"]]];

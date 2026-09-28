@@ -45,7 +45,7 @@
   body{overflow-x:hidden;padding-top:48px}
   a[href="index.html"]:not(.pack),#themeToggle{min-height:34px;display:inline-flex!important;align-items:center;justify-content:center;white-space:nowrap;line-height:1.1;backdrop-filter:blur(10px)}
   a[href="index.html"]:not(.pack){max-width:46vw;overflow:hidden;text-overflow:ellipsis}
-  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}
+  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}#host button.btn{min-height:48px}
   .bar{width:100%;display:grid!important;grid-template-columns:auto auto auto minmax(0,1fr);align-items:center;gap:8px!important;margin:0 0 12px!important;padding:8px;border:1px solid var(--border,#d3d8ec);border-radius:16px;background:color-mix(in srgb,var(--panel,#fff) 86%,transparent);box-shadow:0 8px 26px rgba(0,0,0,.12);position:sticky;top:48px;z-index:180;backdrop-filter:blur(12px)}
   .bar .big{min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar .score{grid-column:1/-1;margin-left:0!important;width:100%;text-align:center;font-size:13px;line-height:1.35}
   #gameZoomBar{left:50%!important;right:auto!important;bottom:max(10px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:330!important;padding:6px 10px!important;border:1px solid rgba(255,255,255,.2)!important;backdrop-filter:blur(10px)}
@@ -180,7 +180,7 @@ function game_wordle(gm){
     const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];kbEl.innerHTML='';
     rows.forEach((rw,ri)=>{const line=el('div',{style:'display:flex;gap:4px;justify-content:center'});
       if(ri===2){const en=el('button',{className:'btn',textContent:'Enter',style:'padding:10px 8px;font-size:13px'});en.onclick=enter;line.append(en);}
-      rw.split('').forEach(ch=>{const st=keyState[ch];const b=el('button',{textContent:ch,style:`min-width:28px;padding:10px 6px;font-size:15px;font-weight:700;border:none;border-radius:5px;cursor:pointer;color:#fff;background:${st?tileColor(st):'#5a4a32'}`});b.onclick=()=>key(ch);line.append(b);});
+      rw.split('').forEach(ch=>{const st=keyState[ch];const b=el('button',{textContent:ch,style:`min-width:36px;min-height:44px;padding:10px 6px;font-size:15px;font-weight:700;border:none;border-radius:5px;cursor:pointer;color:#fff;background:${st?tileColor(st):'#5a4a32'}`});b.onclick=()=>key(ch);line.append(b);});
       if(ri===2){const bk=el('button',{className:'btn ghost',textContent:'⌫',style:'padding:10px 8px'});bk.onclick=back;line.append(bk);}
       kbEl.append(line);});
     msgEl.textContent=msg;info.textContent=over?'Game over':'Guess the 5-letter word ('+(6-guesses.length)+' tries left)';
@@ -308,17 +308,19 @@ function game_reaction(gm){
 /* ---------------- CLICKER ---------------- */
 function game_clicker(gm){
   setHint('Click the cookie. Buy upgrades to auto-generate more!');
-  let count=0,perClick=1,perSec=0,price1=10,price2=50,timer;
+  let count=0,perClick=1,perSec=0,price1=10,price2=50,timer,paused=false;
   const cookie=el('div',{style:'font-size:90px;cursor:pointer;user-select:none;transition:transform .05s'});cookie.textContent='🍪';
   const cnt=el('div',{className:'big',style:'font-size:26px'});
   const up1=el('button',{className:'btn ghost'});
   const up2=el('button',{className:'btn ghost'});
-  host.append(cnt,cookie,el('div',{style:'display:flex;gap:10px;flex-wrap:wrap;justify-content:center'},up1,up2));
+  const pause=el('button',{className:'btn ghost',textContent:'⏸ Pause'});
+  host.append(cnt,cookie,el('div',{style:'display:flex;gap:10px;flex-wrap:wrap;justify-content:center'},up1,up2,pause));
   function draw(){cnt.textContent='🍪 '+Math.floor(count)+'  ('+perSec+'/sec)';up1.textContent='+1 / click  ('+price1+')';up2.textContent='+1 / sec  ('+price2+')';setStatus('Best: '+hs(gm.id));}
-  cookie.onclick=()=>{count+=perClick;cookie.style.transform='scale(0.9)';setTimeout(()=>cookie.style.transform='scale(1)',60);setHs(gm.id,Math.floor(count));draw();};
-  up1.onclick=()=>{if(count>=price1){count-=price1;perClick++;price1=Math.floor(price1*1.6);draw();}};
-  up2.onclick=()=>{if(count>=price2){count-=price2;perSec++;price2=Math.floor(price2*1.7);draw();}};
-  timer=setInterval(()=>{count+=perSec/10;if(perSec)setHs(gm.id,Math.floor(count));draw();},100);
+  cookie.onclick=()=>{if(paused)return;count+=perClick;cookie.style.transform='scale(0.9)';setTimeout(()=>cookie.style.transform='scale(1)',60);setHs(gm.id,Math.floor(count));draw();};
+  up1.onclick=()=>{if(paused)return;if(count>=price1){count-=price1;perClick++;price1=Math.floor(price1*1.6);draw();}};
+  up2.onclick=()=>{if(paused)return;if(count>=price2){count-=price2;perSec++;price2=Math.floor(price2*1.7);draw();}};
+  pause.onclick=()=>{paused=!paused;pause.textContent=paused?'▶ Resume':'⏸ Pause';setStatus(paused?'Clicker paused.':'Best: '+hs(gm.id));};
+  timer=setInterval(()=>{if(paused)return;count+=perSec/10;if(perSec)setHs(gm.id,Math.floor(count));draw();},100);
   draw();
   return {stop:()=>clearInterval(timer)};
 }

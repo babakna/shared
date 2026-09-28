@@ -1,6 +1,6 @@
 # Knowledge &amp; Context Graphs
 
-V3.0 (September 2026)
+V4.0 (October 2026)
 
 A self-paced introduction to knowledge graphs and context graphs, plus an interactive fault-isolation demo that puts the concepts on one screen. Static HTML with no build step, no server, and no external dependencies &mdash; open `index.html` in any modern browser.
 
@@ -9,7 +9,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 | File | What it is |
 |------|------------|
 | `index.html` | Section landing page with the module cards |
-| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 17 diagrams, 43 formal definitions, 132 glossary terms, 23 cited sources |
+| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 17 diagrams, 44 formal definitions, 133 glossary terms, 43 cited sources |
 | `KG-CG-Demo.html` | Charging assurance walkthrough &mdash; ten scenarios, seven stages each |
 | `hero.png` | Landing-page hero image |
 
@@ -24,9 +24,9 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 5. **How the Two Bind** &mdash; anchoring, inheritance, blame propagation. What one anchor makes available for free; the propagation algorithm written out with attenuation and degree normalisation; a confluence score computed step by step; propagation compared with rules engines and statistical correlation. Overlay toggle above a fixed topology.
 6. **Reasoning Over the Pair** &mdash; scoring, separation, and the action gate. Abduction and why the output is a ranking, not a probability; the scoring function with its weights and its temporal veto; why 0.82 over 0.79 is worse than 0.71 over 0.31; the coverage-versus-specificity trap; five distinct reasons to refuse and what each must say; a refusal written out in full. Threshold sliders that turn a recommendation into a refusal.
 7. **Building One for Real** &mdash; where nodes and edges come from, freshness, and four ways graphs quietly go bad. The six ingestion stages and which failure each one introduces, with the cheapest detector for each; edge sources ranked by trust with confidence bands; one edge ingested properly, and the MERGE trap; one traversal crossing four feeds of different ages; a first scope named concretely.
-8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld. Grounding, RAG, GraphRAG and hallucination defined; vector retrieval against graph retrieval on the same question; four boundaries that have to be enforced and the failure each prevents; a grounded narration prompt in full, including how to check its output mechanically.
-9. **Glossary** &mdash; 132 terms across six categories, searchable and filterable.
-10. **References** &mdash; 23 primary sources grouped by topic, each with a verification badge and a note on what it settles.
+8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld. Grounding, RAG, GraphRAG, Jev and hallucination defined; balanced 2026 GraphRAG evidence; a bounded-model routing/scoring pattern that preserves schema validation, calibration and the deterministic action gate; four boundaries around generative models; and a mechanically checkable grounded prompt.
+9. **Glossary** &mdash; 133 terms across six categories, searchable and filterable.
+10. **References** &mdash; 43 primary sources grouped by topic, each with a verification badge and a note on what it settles.
 
 Each module closes with an **onward-reading** block naming specific clauses or sections rather than whole documents, each with the reason to open it. Each of the eight teaching modules then ends with five questions; the glossary and the reference list are not graded. Four correct marks a module complete, and the completion bar is measured against those eight. Progress and theme choice are kept in `localStorage` in the visitor's own browser; nothing is sent anywhere.
 
@@ -47,6 +47,23 @@ The telecom material describes a **generic, vendor-neutral operator**. Element n
 ## Changelog
 
 All three files share one version number, so a single label tells you whether anything in the section changed.
+
+### V4.0 (October 2026)
+
+- Added TM Forum TR326, the 2026 Intent Toolkit, TMF921 v5.0, TR291M intent explainability, and the Knowledge Plane research report with their exact maturity labels.
+- Added W3C RDF 1.2 Semantics Candidate Recommendation Draft and current SPARQL 1.2 entailment work while preserving RDF/SPARQL 1.1 as stable baselines.
+- Expanded Jev evidence beyond vendor examples to crash narratives, calibration, radiology, and rubric judging. The resulting architecture pattern keeps graph/context evidence, deterministic policy, and human approval authoritative.
+- Re-derived and synchronized the visible source count at 43; current sources checked 27 September 2026.
+
+### V3.1 (September 2026)
+
+A current-standards and evidence refresh without changing the course architecture or the demo's ten deterministic outcomes.
+
+- Added Jev as a bounded decision-model pattern: the graph supplies a closed candidate set and evidence; schema validation, calibration, abstention and the separate deterministic action gate remain authoritative. Performance and cost comparisons are labeled as vendor claims.
+- Added balanced 2026 GraphRAG evidence: the NICD 510-question result retains its single-benchmark/model and Neo4j-funding limitations, alongside a comparative preprint showing corpus, hop, retrieval and evaluator dependence.
+- Added published ISO/IEC 39075:2024/Cor 1:2026, SPARQL 1.2 as a non-final 21 September Working Draft, and RDF 1.2 Turtle as a non-final 14 September Working Draft, while retaining SPARQL 1.1 and RDF 1.1 as stable Recommendation baselines.
+- Added two current Jev preprints: one showing that type-safe decisions can remain semantically wrong when option labels and rubrics interact, and one ecosystem snapshot of 2,170 projects; both are labeled as early preprint evidence rather than deployment validation.
+- Re-derived the visible totals: 44 formal definitions, 133 glossary terms and 32 sources.
 
 ### V3.0 (September 2026)
 
@@ -122,8 +139,8 @@ screenshotting each diagram rather than by reading its markup:
   so the arrows could not scroll it. The handler now yields to a focused diagram, and
   both behaviours are asserted.
 
-**The demo is unchanged in V3.0**; its version moved only to keep the section's three
-files in step.
+**The demo outcomes remain unchanged in V4.0**; its version moved only to keep the
+section's three files in step with the standards and evidence refresh.
 
 ### V2.3 (August 2026)
 
@@ -145,9 +162,9 @@ from the publisher.
   Architecture page. This is the one entry still linking a page rather than a document:
   every TM Forum specification URL returns a bot challenge, which the entry now says
   outright.
-- **ISO/IEC 39075 (GQL) remains the single unverified entry.** `iso.org` returns 403 to
-  the network this was checked on. The link is correct and resolves normally elsewhere;
-  only the title-and-date confirmation is missing, and the badge says so.
+- **At V2.3, ISO/IEC 39075 (GQL) was the single unverified entry.** That historical
+  limitation is resolved in V3.1: the published 2024 standard and its 2026 corrigendum
+  are now identified from ISO catalogue records.
 - The badge legend no longer claims that unreachable publishers are linked by portal
   &mdash; every entry now points at a document &mdash; and it reads correctly in the
   singular.
@@ -216,7 +233,7 @@ A word-by-word accuracy pass over all four files. Every finding below was found,
 - **The decay timeline contradicted its own caption.** The final step read "Expired" while the panel still showed confidence between 0.54 and 0.74, with the newest observation at its peak. Decay now lands the two original observations at 0.12 and 0.08 while the third holds at 0.34, and the caption makes the per-element point that difference demonstrates.
 - **The action gate could be set to require zero separation**, which would have permitted action on a 0.03 gap the module calls undecidable. Minimum separation is now 0.05, and a permissive gate that passes on weak evidence says so.
 - **Clocks reconciled.** The stalled-investigation example, its quiz question and the widget's own timeline disagreed; all three now read 14:47.
-- **Glossary: 105 terms, up from 102.** Added Nchf, UPF and CDR. Corrected Label (a node may carry several), Triple (literals as well as resources), IRI (defined properly, and not RDF-exclusive), Reification (named graphs and RDF 1.2 as successors), Charging function (named as the CHF reached over Nchf), and made Staleness and Freshness cross-reference rather than near-duplicate.
+- **Glossary: 105 terms, up from 102.** Added Nchf, UPF and CDR. Corrected Label (a node may carry several), Triple (literals as well as resources), IRI (defined properly, and not RDF-exclusive), Reification (named graphs and RDF 1.2 reifying constructs as alternatives with different granularity), Charging function (named as the CHF reached over Nchf), and made Staleness and Freshness cross-reference rather than near-duplicate.
 - **References reorganised.** GQL moved from Graph data models to Query languages, where it belongs; the two groups that had no note now have one; the Diameter charging entry no longer overstates deployment.
 - **Superlatives that could not be supported** were softened throughout: identity resolution as "a leading reason" rather than "the most common", supernodes as "often" rather than "both the most", reconciliation as the only thing looking for drift rather than "the only reliable defence".
 - **Two quiz answers contradicted the revised prose** &mdash; the translation-risk question and the model-behaviour question &mdash; and were rewritten with the nuance the modules now carry.

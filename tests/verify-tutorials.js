@@ -36,12 +36,13 @@
  */
 const fs=require('fs');
 const path=require('path');
-let JSDOM;
-try{ JSDOM=require('jsdom').JSDOM; }
+const vm=require('vm');
+let JSDOM,VirtualConsole;
+try{ ({JSDOM,VirtualConsole}=require('jsdom')); }
 catch(e){
   try{
     const {createRequire}=require('module');
-    JSDOM=createRequire(path.join(process.cwd(),'index.js'))('jsdom').JSDOM;
+    ({JSDOM,VirtualConsole}=createRequire(path.join(process.cwd(),'index.js'))('jsdom'));
   }catch(e2){}
 }
 if(!JSDOM){ console.error('needs jsdom: npm install jsdom'); process.exit(2); }
@@ -50,13 +51,29 @@ const ROOT=process.argv[2]||'/Users/BNamira/code/Shared';
 let pass=0,fail=0; const failures=[];
 const ck=(n,c,d)=>{ c?pass++:(fail++,failures.push(n+(d?'  -> '+d:''))); };
 
-function load(rel){
+function load(rel,width=1280){
   const f=path.join(ROOT,rel);
+  const runtimeErrors=[];
+  const virtualConsole=new VirtualConsole();
+  virtualConsole.on('jsdomError',e=>runtimeErrors.push(String(e.message||e)));
   const dom=new JSDOM(fs.readFileSync(f,'utf8'),{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/',
+    virtualConsole,
     beforeParse(w){
+      Object.defineProperty(w,'innerWidth',{value:width,writable:true,configurable:true});
       w.matchMedia=w.matchMedia||(q=>({matches:false,media:q,addEventListener(){},removeEventListener(){},addListener(){},removeListener(){},onchange:null,dispatchEvent(){return false}}));
-      w.scrollTo=w.scrollTo||(()=>{});
+      w.scrollTo=()=>{};
+      w.Chart=function(){return {destroy(){},update(){},resize(){}}};
+      w.Chart.register=()=>{};
+      if(w.HTMLCanvasElement){
+        const gradient=()=>({addColorStop(){}});
+        w.HTMLCanvasElement.prototype.getContext=()=>new Proxy({
+          canvas:{width:800,height:600},measureText:s=>({width:String(s).length*8}),
+          createLinearGradient:gradient,createRadialGradient:gradient,createConicGradient:gradient,
+          getImageData:()=>({data:new Uint8ClampedArray(800*600*4),width:800,height:600})
+        },{get:(o,k)=>k in o?o[k]:(()=>{})});
+      }
     }});
+  dom.__runtimeErrors=runtimeErrors;
   return dom;
 }
 
@@ -64,7 +81,7 @@ function checkPage(rel,extra){
   let dom;
   try{ dom=load(rel); }catch(e){ ck(rel+' loads',false,e.message); return; }
   const w=dom.window,d=w.document;
-  const errs=[];
+  const errs=dom.__runtimeErrors||[];
   w.addEventListener('error',e=>errs.push(String(e.message)));
   /* CRITICAL: these pages are single-page apps. The landing view holds only a few
      thousand characters; the real content lives in JS data (MODULES/SECTIONS/FLOWS)
@@ -123,8 +140,8 @@ function checkPage(rel,extra){
   ck(rel+': source has no V8.x release',!/\bV8\.[01]\b/.test(src));
   ck(rel+': source has no VERSION 8.x',!/VERSION\s*=\s*['"]8\.[01]['"]/.test(src));
   ck(rel+': source has no stale August-2026 release stamp',
-     !/(V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026|\((?:July|August) 2026\))/i.test(src));
-  ck(rel+': source says September 2026 or is a fragment',/September 2026/.test(src)||src.length<4000);
+     !/(V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026)/i.test(src));
+  ck(rel+': source says October 2026 or is a fragment',/October 2026/.test(src)||src.length<4000);
   // 3GPP document-type correctness, checked in source.
   ck(rel+': 38.843 is a TR not TS',!/TS ?38\.843/.test(src));
   ck(rel+': 23.288 is a TS not TR',!/TR ?23\.288/.test(src));
@@ -171,9 +188,9 @@ function checkPage(rel,extra){
       && !/(not|never|do not|don't|until|once|before|when|if|pending|awaiting|still|future|forthcoming|upcoming|remains)/i.test(x));
     ck(rel+': FN-DSA never called final in source',affirms.length===0,affirms[0]?affirms[0].slice(0,120):'');
   }
-  // Version and date must be the September 2026 release everywhere.
+  // Version and date must be the October 2026 release everywhere.
   ck(rel+': no stale V8.x',!/\bV8\.[01]\b/.test(body()));
-  ck(rel+': no stale old release date',!/(?:V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026|\((?:July|August) 2026\))/.test(body()));
+  ck(rel+': no stale old release date',!/(?:V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026)/.test(body()));
   // Rendered text must not leak template/undefined artifacts.
   const t=body();
   ck(rel+': no undefined leak',!/\bundefined\b/.test(t));
@@ -239,7 +256,7 @@ pqcFiles.forEach(f=>checkPage('PQC/'+f,(w,d,t,rel)=>{
   ck(rel+': SLH-DSA names in source include SHA2/SHAKE',rawBadSlh.length===0,rawBadSlh.join(','));
   // Version strings must be current in the SOURCE, not just the landing view.
   ck(rel+': source has no V8.x',!/\bV8\.[01]\b/.test(rawFile));
-  ck(rel+': source has no stale old release date',!/(?:V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026|\((?:July|August) 2026\))/.test(rawFile));
+  ck(rel+': source has no stale old release date',!/(?:V8\.[01] \((?:July|August) 2026\)|Updated (?:July|August) 2026)/.test(rawFile));
 
   // Named-algorithm sizes must be exactly right wherever stated.
   const EXPECT=[
@@ -322,8 +339,164 @@ aiFiles.forEach(f=>checkPage('AI/'+f,(w,d,t,rel)=>{
 /* ---------- Shared asset carries the runtime version ---------- */
 {
   const js=fs.readFileSync(path.join(ROOT,'PQC/assets/pqc.js'),'utf8');
-  ck('pqc.js VERSION is V9.0 (September 2026)',/V9\.0 \(September 2026\)/.test(js));
+  ck('pqc.js VERSION is V10.0 (October 2026)',/V10\.0 \(October 2026\)/.test(js));
   ck('pqc.js has no V8.x',!/\bV8\.[01]\b/.test(js));
+}
+
+/* ---------- Whole-release structural, link and interaction checks ---------- */
+const releaseDirs=['AI','eSIM','PQC','5G-6G','KG-CG','SSFamily','games','subscribe'];
+const releaseHtml=releaseDirs.flatMap(dir=>fs.readdirSync(path.join(ROOT,dir))
+  .filter(f=>f.endsWith('.html')).map(f=>dir+'/'+f));
+
+releaseHtml.forEach(rel=>{
+  const file=path.join(ROOT,rel);
+  const src=fs.readFileSync(file,'utf8');
+  const dom=new JSDOM(src);
+  const d=dom.window.document;
+  const ids=[...d.querySelectorAll('[id]')].map(n=>n.id);
+  const duplicateIds=[...new Set(ids.filter((id,i)=>ids.indexOf(id)!==i))];
+  ck(rel+': no duplicate IDs',duplicateIds.length===0,duplicateIds.join(','));
+
+  [...d.querySelectorAll('script:not([src])')].forEach((s,i)=>{
+    if((s.type||'').toLowerCase()==='application/json'){
+      try{JSON.parse(s.textContent);ck(rel+': embedded JSON '+i+' parses',true)}
+      catch(e){ck(rel+': embedded JSON '+i+' parses',false,e.message)}
+      return;
+    }
+    if(s.type && !/(javascript|ecmascript|module)/i.test(s.type))return;
+    try{new vm.Script(s.textContent,{filename:rel+'#script-'+i});ck(rel+': inline script '+i+' compiles',true)}
+    catch(e){ck(rel+': inline script '+i+' compiles',false,e.message)}
+  });
+
+  [...d.querySelectorAll('[href]')].forEach(a=>{
+    const href=(a.getAttribute('href')||'').trim();
+    if(!href||/^(?:https?:|mailto:|tel:|javascript:|data:)/i.test(href)||href.includes('${'))return;
+    const [rawTarget,fragment]=href.split('#');
+    const target=decodeURIComponent(rawTarget.split('?')[0]);
+    const targetFile=target ? (target.startsWith('/')?path.join(ROOT,target):path.resolve(path.dirname(file),target)) : file;
+    const exists=fs.existsSync(targetFile);
+    ck(rel+': local link exists '+href,exists,targetFile);
+    if(exists&&fragment&&targetFile.endsWith('.html')){
+      const td=targetFile===file?d:new JSDOM(fs.readFileSync(targetFile,'utf8')).window.document;
+      ck(rel+': anchor exists '+href,!!td.getElementById(decodeURIComponent(fragment)));
+    }
+  });
+  dom.window.close();
+
+  [1280,390].forEach(width=>{
+    let rendered;
+    try{rendered=load(rel,width);ck(rel+': renders at '+width+'px',!!rendered.window.document.body)}
+    catch(e){ck(rel+': renders at '+width+'px',false,e.message);return}
+    ck(rel+': no runtime errors at '+width+'px',(rendered.__runtimeErrors||[]).length===0,(rendered.__runtimeErrors||[]).join('; '));
+    rendered.window.close();
+  });
+});
+
+const releaseSurfaces={
+  'AI/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
+  'eSIM/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
+  'PQC/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
+  '5G-6G/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
+  'KG-CG/index.html':/V4\.0[\s\S]*October 2026|October 2026[\s\S]*V4\.0/,
+  'SSFamily/index.html':/V11\.0[\s\S]*October 2026|October 2026[\s\S]*V11\.0/,
+  'games/index.html':/V4\.12[\s\S]*October(?: \(2026\)| 2026)|October(?: \(2026\)| 2026)[\s\S]*V4\.12/,
+  'subscribe/index.html':/October 2026/
+};
+Object.entries(releaseSurfaces).forEach(([rel,re])=>{
+  ck(rel+': current release surface is October 2026',re.test(fs.readFileSync(path.join(ROOT,rel),'utf8')));
+});
+
+{
+  const ai=fs.readFileSync(path.join(ROOT,'AI/AI-105.html'),'utf8');
+  ck('AI October currency: OpenAI, Anthropic and Gemini releases',/GPT-6 Sol\/Luna/.test(ai)&&/Fable 5\.1/.test(ai)&&/Opus 5\.5/.test(ai)&&/Gemini 3\.8 Live/.test(ai));
+  ck('AI October currency: Jev evidence and safety boundary',/crash-narrative classification/.test(ai)&&/calibration/i.test(ai)&&/radiology/i.test(ai)&&/deterministic policy\/action gate/.test(ai));
+
+  const esim=fs.readFileSync(path.join(ROOT,'eSIM/GSMA-eSIM-Flow-01.html'),'utf8');
+  ck('eSIM October currency: SGP.24 and SGP.27',/SGP\.24':'v2\.7 \/ v3\.2\.1/.test(esim)&&/SGP\.27':'v1\.0/.test(esim));
+  ck('eSIM October currency: no invented public SGP.42',/no public SGP\.42 listing found/.test(esim)&&/not a published SGP\.42 standard/.test(esim));
+
+  const pqc201=fs.readFileSync(path.join(ROOT,'PQC/PQC-201.html'),'utf8');
+  const pqc202=fs.readFileSync(path.join(ROOT,'PQC/PQC-202.html'),'utf8');
+  const pqc401=fs.readFileSync(path.join(ROOT,'PQC/PQC-401.html'),'utf8');
+  const pqc601=fs.readFileSync(path.join(ROOT,'PQC/PQC-601.html'),'utf8');
+  ck('PQC October currency: HAWK withdrawn and eight remain',/HAWK team withdrew/.test(pqc201)&&/leaving eight candidates/.test(pqc201));
+  ck('PQC October currency: direct ML-KEM TLS not yet RFC',/RFC Editor queue/.test(pqc202)&&/rather than a published RFC/.test(pqc202));
+  ck('PQC October currency: policy and PIV signals',/EU coordinated roadmap/.test(pqc401)&&/UK NCSC migration timeline/.test(pqc401)&&/Treasury Quantum-Readiness Task Force/.test(pqc401)&&/Preliminary June PIV working drafts/.test(pqc601));
+
+  const fiveg=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-5G.html'),'utf8');
+  const sixg=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-6G.html'),'utf8');
+  ck('5G/6G October currency: RAN 113 and SA 113',/RAN#113/.test(fiveg)&&/SA#113/.test(fiveg)&&/RAN#113 Reports/.test(sixg)&&/SA#113 Portal Record/.test(sixg));
+  ck('5G/6G October currency: evaluation remains open',/no candidate RIT or evaluation result has yet been accepted/.test(sixg)&&/finalized 6G protocol stack/.test(sixg));
+
+  const kg=fs.readFileSync(path.join(ROOT,'KG-CG/KG-CG-101.html'),'utf8');
+  const kgIndex=fs.readFileSync(path.join(ROOT,'KG-CG/index.html'),'utf8');
+  ck('KG-CG October currency: TM Forum and W3C',/TR326/.test(kg)&&/TMF921 Intent Management API/.test(kg)&&/TR291M/.test(kg)&&/RDF 1\.2 Semantics/.test(kg));
+  ck('KG-CG October currency: Jev application evidence',/crash narratives, calibration, radiology, rubric judging/.test(kg)&&/deterministic policy and human approval/.test(kg));
+  ck('KG-CG current counts: 133 terms and 43 references',/133 Glossary Terms/.test(kgIndex)&&/43 References/.test(kgIndex));
+}
+
+fs.readdirSync(path.join(ROOT,'games')).filter(f=>f.endsWith('.html')).forEach(f=>{
+  const rel='games/'+f;
+  let dom;
+  try{dom=load(rel);ck(rel+': game page loads',!!dom.window.document.body)}
+  catch(e){ck(rel+': game page loads',false,e.message);return}
+  const d=dom.window.document;
+  if(f!=='index.html'){
+    try{if(typeof dom.window.buildMenu==='function')dom.window.buildMenu()}catch(e){ck(rel+': game menu builds',false,e.message)}
+    const cards=d.querySelectorAll('.card,.game-card').length;
+    ck(rel+': game menu has launchable cards',cards>0,'cards='+cards);
+    let launched=0,launchError='';
+    for(let i=0;i<cards;i++){
+      try{
+        if(i>0){
+          if(typeof dom.window.backToMenu==='function')dom.window.backToMenu();
+          else if(typeof dom.window.goHome==='function')dom.window.goHome();
+        }
+        const card=d.querySelectorAll('.card,.game-card')[i];
+        if(!card)throw new Error('missing card '+i);
+        card.click();launched++;
+      }catch(e){launchError='card '+i+': '+e.message;break}
+    }
+    ck(rel+': every game launches without a synchronous error',launched===cards,launchError||('launched='+launched+' cards='+cards));
+  }
+  ck(rel+': no startup runtime errors',(dom.__runtimeErrors||[]).length===0,(dom.__runtimeErrors||[]).join('; '));
+  dom.window.close();
+});
+
+{
+  const dom=load('subscribe/index.html'),d=dom.window.document;
+  ck('subscribe: renders 10 digest cards',d.querySelectorAll('#digestGrid .card').length===10,'cards='+d.querySelectorAll('#digestGrid .card').length);
+  ck('subscribe: renders 20 mail-app actions',d.querySelectorAll('#digestGrid a[href^="mailto:"]').length===20,'mailto='+d.querySelectorAll('#digestGrid a[href^="mailto:"]').length);
+  ck('subscribe: no startup runtime errors',(dom.__runtimeErrors||[]).length===0,(dom.__runtimeErrors||[]).join('; '));
+  dom.window.close();
+}
+
+{
+  const dom=load('SSFamily/index.html'),w=dom.window,d=w.document;
+  const src=fs.readFileSync(path.join(ROOT,'SSFamily/index.html'),'utf8');
+  ck('SSFamily: generic household defaults',d.getElementById('name1').value==='Primary adult'&&d.getElementById('name2').value==='Second adult'&&d.getElementById('name3').value==='Learner/dependent');
+  ck('SSFamily: 2026 FMB bend points',/1643/.test(src)&&/2371/.test(src)&&/3093/.test(src));
+  ck('SSFamily: survivor benefits are FMB-capped',/survivorCapNom/.test(src)&&/tFMBclip/.test(src));
+  try{w.compute();ck('SSFamily: compute interaction runs',true)}catch(e){ck('SSFamily: compute interaction runs',false,e.message)}
+  try{
+    const p=w.getParams(),scenario=w.runScenario(62,false,p);
+    const aliveCap=scenario.yearRows.filter(r=>r.husbandAlive).every(r=>r.auxSpousal+r.auxChild<=scenario.auxCap*r.cola+0.01);
+    const survivorCap=scenario.yearRows.filter(r=>!r.husbandAlive).every(r=>r.indWifeSurvivor+r.indChildDAC<=scenario.fmbAnnual*r.cola+0.01);
+    ck('SSFamily: live-worker auxiliary benefits stay within FMB',aliveCap);
+    ck('SSFamily: survivor-record benefits stay within FMB',survivorCap);
+  }catch(e){
+    ck('SSFamily: direct FMB invariants execute',false,e.message);
+  }
+  const visible=d.body.cloneNode(true);visible.querySelectorAll('script,style').forEach(n=>n.remove());
+  ck('SSFamily: calculation output has no NaN/undefined',!/\b(?:NaN|undefined)\b/.test(visible.textContent));
+  ck('SSFamily: no startup runtime errors',(dom.__runtimeErrors||[]).length===0,(dom.__runtimeErrors||[]).join('; '));
+  dom.window.close();
+}
+
+{
+  const readme=fs.readFileSync(path.join(ROOT,'README.md'),'utf8');
+  ck('root README: October 2026 release',/October 2026/.test(readme));
+  ck('root README: exact author',/Namiranian, Babak/.test(readme)&&!/Babak Namiranian/.test(readme));
 }
 
 console.log('PASS '+pass+'   FAIL '+fail);

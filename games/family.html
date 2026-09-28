@@ -47,7 +47,7 @@
   body{overflow-x:hidden;padding-top:48px}
   a[href="index.html"]:not(.pack),#themeToggle{min-height:34px;display:inline-flex!important;align-items:center;justify-content:center;white-space:nowrap;line-height:1.1;backdrop-filter:blur(10px)}
   a[href="index.html"]:not(.pack){max-width:46vw;overflow:hidden;text-overflow:ellipsis}
-  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}
+  #app{padding-top:4px}.wrap,#host{max-width:100%;overflow:visible}.hint{padding:0 8px}#host button.btn{min-height:48px}
   .bar{width:100%;display:grid!important;grid-template-columns:auto auto auto minmax(0,1fr);align-items:center;gap:8px!important;margin:0 0 12px!important;padding:8px;border:1px solid var(--border,#d3d8ec);border-radius:16px;background:color-mix(in srgb,var(--panel,#fff) 86%,transparent);box-shadow:0 8px 26px rgba(0,0,0,.12);position:sticky;top:48px;z-index:180;backdrop-filter:blur(12px)}
   .bar .big{min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar .score{grid-column:1/-1;margin-left:0!important;width:100%;text-align:center;font-size:13px;line-height:1.35}
   #gameZoomBar{left:50%!important;right:auto!important;bottom:max(10px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:330!important;padding:6px 10px!important;border:1px solid rgba(255,255,255,.2)!important;backdrop-filter:blur(10px)}
@@ -476,7 +476,7 @@ function game_farkle(gm){
 
 /* ---------------- TRIVIA QUIZ ---------------- */
 function game_trivia(gm){
-  setHint('Answer the multiple-choice questions. 10 per round.');
+  setHint('Choose Easy, Medium, or Hard, then answer the multiple-choice questions.');
   const QS=[
     ['What planet is known as the Red Planet?',['Mars','Venus','Jupiter','Mercury'],0],
     ['How many continents are there?',['7','5','6','8'],0],
@@ -499,12 +499,15 @@ function game_trivia(gm){
     ['What is the chemical symbol for gold?',['Au','Gd','Go','Ag'],0],
     ['Which country has the Eiffel Tower?',['France','Italy','Spain','Germany'],0],
   ];
-  let pool,qi,score;
+  let pool,qi,score,diff=localStorage.getItem('familyTriviaDiff')||'medium';
+  const diffRow=el('div',{className:'row',style:'display:flex;gap:6px;flex-wrap:wrap;justify-content:center'});
   const qBox=el('div',{className:'big',style:'text-align:center;max-width:520px'});
   const ans=el('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:520px'});
   const newBtn=el('button',{className:'btn',textContent:'New Quiz'});
-  host.append(qBox,ans,newBtn);
-  function reset(){pool=[...QS].sort(()=>Math.random()-0.5).slice(0,10).map(q=>{const opts=q[1].map((t,i)=>[t,i===q[2]]).sort(()=>Math.random()-0.5);return{q:q[0],opts};});qi=0;score=0;show();}
+  function refreshDiff(){[...diffRow.children].forEach((b,i)=>b.className='btn'+(['easy','medium','hard'][i]===diff?'':' ghost'));}
+  [['easy','😊 Easy'],['medium','🙂 Medium'],['hard','🤓 Hard']].forEach(([d,label])=>{const b=el('button',{className:'btn',textContent:label});b.onclick=()=>{diff=d;localStorage.setItem('familyTriviaDiff',d);refreshDiff();reset();};diffRow.append(b);});refreshDiff();
+  host.append(diffRow,qBox,ans,newBtn);
+  function reset(){const rounds={easy:5,medium:10,hard:15}[diff],choiceCount={easy:2,medium:3,hard:4}[diff];pool=[...QS].sort(()=>Math.random()-0.5).slice(0,rounds).map(q=>{const correct=q[1][q[2]],wrong=q[1].filter((_,i)=>i!==q[2]).sort(()=>Math.random()-0.5).slice(0,choiceCount-1);const opts=[correct,...wrong].map(t=>[t,t===correct]).sort(()=>Math.random()-0.5);return{q:q[0],opts};});qi=0;score=0;show();}
   function show(){const cur=pool[qi];qBox.textContent='Q'+(qi+1)+'. '+cur.q;ans.innerHTML='';
     cur.opts.forEach(([txt,correct])=>{const b=el('button',{className:'btn ghost',textContent:txt,style:'padding:14px;font-size:16px'});
       b.onclick=()=>{[...ans.children].forEach(c=>c.disabled=true);b.style.background=correct?'#2a6':'#a33';b.style.color='#fff';
@@ -651,17 +654,19 @@ function game_rps(gm){
 function game_scramble(gm){
   setHint('Unscramble the word. Tap the correct answer; no typing needed on mobile. Beat the clock!');
   const WORDS=['planet','garden','window','rocket','puzzle','dragon','castle','guitar','pencil','jungle','rabbit','wizard','market','silver','orange','flower','bridge','candle','monkey','pirate','school','winter','summer','animal','friend'];
-  let word,scrambled,score,timeLeft,timer,streak;
+  let word,scrambled,score,timeLeft,timer,streak,paused;
   const scrEl=el('div',{style:'font-size:44px;font-weight:900;letter-spacing:8px;color:#fc6'});
   const opts=el('div',{className:'kid-choice-row'});
   const skip=el('button',{className:'btn ghost',textContent:'Skip'});
-  host.append(scrEl,opts,el('div',{style:'display:flex;gap:10px'},skip));
+  const pause=el('button',{className:'btn ghost',textContent:'⏸ Pause'});
+  host.append(scrEl,opts,el('div',{style:'display:flex;gap:10px'},skip,pause));
   function scramble(w){let s;do{s=w.split('').sort(()=>Math.random()-0.5).join('');}while(s===w);return s;}
   function choices(){const out=[word];while(out.length<4){const w=WORDS[Math.floor(Math.random()*WORDS.length)];if(!out.includes(w))out.push(w);}return out.sort(()=>Math.random()-0.5);}
   function next(){word=WORDS[Math.floor(Math.random()*WORDS.length)];scrambled=scramble(word);scrEl.textContent=scrambled.toUpperCase();opts.innerHTML='';choices().forEach(w=>{const b=el('button',{className:'btn ghost',textContent:w.toUpperCase(),style:'font-size:18px'});b.onclick=()=>check(w);opts.append(b);});}
-  function reset(){score=0;streak=0;timeLeft=60;next();clearInterval(timer);timer=setInterval(()=>{timeLeft--;if(timeLeft<=0){clearInterval(timer);setHs(gm.id,score);scrEl.textContent='⏰ Time!';opts.innerHTML='';setStatus('Final score: '+score+'  •  Best: '+hs(gm.id));}else setStatus('Score: '+score+'  •  Time: '+timeLeft+'s  •  Best: '+hs(gm.id));},1000);}
-  function check(pick){if(pick===word){streak++;score+=10+streak*2;setStatus('🎉 Correct! Score: '+score+' • Time: '+timeLeft+'s');next();}else{streak=0;scrEl.style.color='#f66';setTimeout(()=>scrEl.style.color='#fc6',300);setStatus('Try again — look at the letters.');}}
-  skip.onclick=next;
+  function reset(){score=0;streak=0;timeLeft=60;paused=false;pause.textContent='⏸ Pause';next();clearInterval(timer);timer=setInterval(()=>{if(paused)return;timeLeft--;if(timeLeft<=0){clearInterval(timer);setHs(gm.id,score);scrEl.textContent='⏰ Time!';opts.innerHTML='';setStatus('Final score: '+score+'  •  Best: '+hs(gm.id));}else setStatus('Score: '+score+'  •  Time: '+timeLeft+'s  •  Best: '+hs(gm.id));},1000);}
+  function check(pick){if(paused)return;if(pick===word){streak++;score+=10+streak*2;setStatus('🎉 Correct! Score: '+score+' • Time: '+timeLeft+'s');next();}else{streak=0;scrEl.style.color='#f66';setTimeout(()=>scrEl.style.color='#fc6',300);setStatus('Try again — look at the letters.');}}
+  skip.onclick=()=>{if(!paused)next();};
+  pause.onclick=()=>{if(timeLeft<=0)return;paused=!paused;pause.textContent=paused?'▶ Resume':'⏸ Pause';setStatus(paused?'Paused • Time: '+timeLeft+'s':'Score: '+score+' • Time: '+timeLeft+'s • Best: '+hs(gm.id));};
   reset();
   return {stop:()=>clearInterval(timer)};
 }

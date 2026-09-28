@@ -54,6 +54,15 @@ reimplement any tool logic. It asserts on rendered output for:
 Every assertion encodes a value traceable to a primary source: GSMA SGP.22 v2.6/v3.1,
 SGP.02 v4.0, SGP.29, SGP.32 v1.1, ITU-T E.118, ETSI TS 102 221, GlobalPlatform 2.2.1.
 
+Those are the spec editions the assertions were **originally** verified against, and the
+list is deliberately left as a provenance record rather than updated to the newest numbers.
+As of the October 2026 release review (sources checked 27 September), GSMA publishes **SGP.02 v4.3** and **SGP.32 v1.3**. The
+EID field layout and the ESipa/ESep function lists have **not** been re-verified against
+those newer editions, so treat any assertion sourced from SGP.02 or SGP.32 as pinned to the
+older edition until someone reconciles it and updates this paragraph. The values themselves
+are believed unchanged - the field layout in SGP.02 section 2.2.2 has been stable across
+releases - but "believed unchanged" is not the same as verified.
+
 **If an assertion fails, check the spec before "fixing" the test.** The test is usually
 right; it exists because the content was wrong once already.
 
