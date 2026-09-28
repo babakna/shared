@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.5 (October 2026)
+V1.6 (October 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -56,13 +56,17 @@ Where a 2026 figure could not be confirmed, the rule is described without the nu
 
 ## The six households
 
-Fictional households recur in every module so each idea is shown at a different life stage:
-Denise Brooks (24, first job), Marcus and Elena Rivera (35 and 34, two children), Maya
-Walker (58, single mother of Eli, 13, who has a disability), Tom and Rachel Harper (57 and 55, pre-retirement) and Ruth
-Kowalski (68, widowed retiree). Daniel and Priya Shah (62 and 48) add a large-age-gap household
-with substantial taxable, tax-deferred and Roth assets and a 14-year-old daughter, Leena, who has
-lifelong support needs. Their plan spans staggered retirements and a third-party special needs
-trust rather than a standard 30-year horizon. Their data lives in `assets/inv.js` (`HOUSEHOLDS`).
+Fictional households recur in every module so each idea is shown at a different life stage.
+Denise Brooks is 27, has three years remaining in her neurosurgery specialization, has no student
+loans, maxes her annual Roth IRA contribution and currently has no other savings or investments.
+Marcus and Elena Rivera are 35 and 34 with two children. Maya Walker is 58, is a single mother of
+Eli, a 13-year-old kid with special needs, and has $400,000 saved and invested. Tom and Rachel
+Harper are 57 and 55 and approaching retirement. Ruth Kowalski is a 68-year-old widowed retiree.
+Daniel and Priya Shah are 62 and 48 and have a 14-year-old daughter, Leena, who has special needs.
+They have $5 million invested: 60% in taxable brokerage accounts, 25% in traditional 401(k)s and
+15% in Roth IRA and Roth 401(k) accounts. Daniel is a few years from retirement. Their plan spans
+staggered retirements, the spouses' age gap and a third-party special needs trust rather than a
+standard 30-year horizon. Their data lives in `assets/inv.js` (`HOUSEHOLDS`).
 
 ## Shared pages and assets
 
@@ -114,7 +118,7 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The V1.4 run: **37,472 checks, 0 failures** across 117 pages (105 modules, eight course hubs, the landing page, tools,
+The V1.6 run: **38,738 checks, 0 failures** across 117 pages (105 modules, eight course hubs, the landing page, tools,
 glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
@@ -123,11 +127,20 @@ element ids and console errors; then it drives every decision card, myth card, e
 option, blank and zero inputs, empty result areas), glossary popover, keyboard tab
 navigation and theme toggle. It also verifies the Shah lens across the course, the six-household
 capstone, typo-tolerant searches and abbreviations, saved-tab resume/restart, the eight-course
-grouping and new-tab launch behavior, and V1.4 October release markers and cache keys on every
-page. Selected revised pages were reviewed by eye at
-1440 and 390 px.
+grouping and new-tab launch behavior, corrected persona profiles, explicit contextual answers and
+recommendations, in-lesson knowledge checks, fixed-scale nominal/real comparisons, and V1.6
+October release markers and cache keys on every page.
 
 ## Changelog
+
+### V1.6 (October 2026)
+
+- Upversions the completed V1.5 overhaul with V1.6 display markers and asset cache keys across all
+  modules, course hubs and shared pages.
+- Corrects the README's household summary so Denise, Maya, and Daniel and Priya Shah match the
+  profiles learners actually see in the course.
+- Completes a fresh four-viewport rendered and interaction audit: 38,738 checks with 0 failures
+  across all 117 pages, every module tab, and the complete calculator and interaction suite.
 
 ### V1.5 (October 2026)
 

@@ -35,9 +35,9 @@ function ok(c, m) { checks++; if (!c) fail(m); }
       await page.goto(BASE + pg, { waitUntil: 'load' });
       await page.waitForTimeout(250);
       const release = await page.evaluate(() => ({
-        current: document.body.innerText.includes('V1.5 (October 2026)'),
-        stale: /V1\.[234] \((?:September|October) 2026\)/.test(document.body.innerText),
-        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[234](?:&|$)/.test(u))
+        current: document.body.innerText.includes('V1.6 (October 2026)'),
+        stale: /V1\.[2345] \((?:September|October) 2026\)/.test(document.body.innerText),
+        oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.[2345](?:&|$)/.test(u))
       }));
       ok(release.current && !release.stale && !release.oldAssets.length, `${pg} @${w}: release marker ${JSON.stringify(release)}`);
       if (/^INV-\d{3}\.html$/.test(pg)) {
