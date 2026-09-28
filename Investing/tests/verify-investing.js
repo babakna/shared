@@ -14,7 +14,8 @@ const BASE = process.env.INV_BASE || 'http://localhost:8732/Investing/';
 const OUT = process.env.INV_SHOTS || path.join(require('os').tmpdir(), 'investing-shots'); fs.mkdirSync(OUT, { recursive: true });
 const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7);
 const DIR = path.join(__dirname, '..');
-const PAGES0 = ['index.html'].concat(fs.readdirSync(DIR).filter(f => /^INV-\d{3}\.html$/.test(f)).sort(), ['tools.html', 'glossary.html', 'resources.html']);
+const HUBS = fs.readdirSync(DIR).filter(f => /^course-[a-z-]+\.html$/.test(f)).sort();
+const PAGES0 = ['index.html'].concat(HUBS, fs.readdirSync(DIR).filter(f => /^INV-\d{3}\.html$/.test(f)).sort(), ['tools.html', 'glossary.html', 'resources.html']);
 const PAGES = ONLY ? PAGES0.filter(p => ONLY.split(',').includes(p)) : PAGES0;
 const VIEWS = ONLY ? [[1440, 900], [390, 844]] : [[1440, 900], [1024, 768], [768, 1024], [390, 844]];
 const SHOTS = process.argv.includes('--shots');
@@ -39,7 +40,7 @@ function ok(c, m) { checks++; if (!c) fail(m); }
         oldAssets: [...document.querySelectorAll('link[href*="assets/"],script[src*="assets/"]')].map(e => e.href || e.src).filter(u => /[?&]v=1\.2(?:&|$)/.test(u))
       }));
       ok(release.current && !release.stale && !release.oldAssets.length, `${pg} @${w}: release marker ${JSON.stringify(release)}`);
-      const tabCount = await page.$$eval('.tabs-shell .panel', p => p.length);
+      const tabCount = await page.$$eval('.tabs-shell:not([hidden]) .panel', p => p.length);
       const n = Math.max(1, tabCount);
       for (let i = 0; i < n; i++) {
         if (tabCount) {
@@ -47,7 +48,7 @@ function ok(c, m) { checks++; if (!c) fail(m); }
           await page.waitForTimeout(120);
         }
         const r = await page.evaluate(() => {
-          const act = document.querySelector('.panel.active') || document.body;
+          const act = document.querySelector('.tabs-shell:not([hidden]) .panel.active') || document.body;
           const txt = act.innerText;
           const bad = ['undefined', 'NaN', '[object', 'Infinity'].filter(x => txt.includes(x));
           const overflowX = document.documentElement.scrollWidth - window.innerWidth;
@@ -191,8 +192,30 @@ function ok(c, m) { checks++; if (!c) fail(m); }
   const rs = await page.evaluate(() => { const all = document.querySelectorAll('.res').length; document.querySelector('#rk button[data-k="video"]').click(); const vid = document.querySelectorAll('.res').length; return { all, vid }; });
   ok(rs.all > 50 && rs.vid > 10 && rs.vid < rs.all, `resources filter ${JSON.stringify(rs)}`);
   await page.goto(BASE + 'index.html'); await page.waitForTimeout(200);
-  const ix = await page.evaluate(() => ({ live: document.querySelectorAll('a.mod').length, soon: document.querySelectorAll('.mod.soon').length, done: document.querySelectorAll('.st.done').length, tabs: document.querySelectorAll('.tab').length }));
-  ok(ix.live + ix.soon === 105 && ix.done === ix.live && ix.tabs === 17, `index ${JSON.stringify(ix)}`);
+  const ix = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('.course-grid a.course-card')];
+    return { cards: cards.length, targets: cards.filter(a => a.target === '_blank' && a.rel.includes('noopener')).length,
+      hrefs: new Set(cards.map(a => a.getAttribute('href'))).size, graphics: cards.filter(a => a.querySelector('svg')).length,
+      legacyHidden: [...document.querySelectorAll('.legacy-landing')].every(e => e.hidden || getComputedStyle(e).display === 'none') };
+  });
+  ok(ix.cards === 8 && ix.targets === 8 && ix.hrefs === 8 && ix.graphics === 8 && ix.legacyHidden, `landing courses ${JSON.stringify(ix)}`);
+  const popupPromise = page.waitForEvent('popup');
+  await page.click('.course-grid a.course-card');
+  const popup = await popupPromise; await popup.waitForLoadState('load');
+  ok(/course-investing-essentials\.html$/.test(new URL(popup.url()).pathname), `landing card did not open expected new-tab course: ${popup.url()}`);
+  await popup.close();
+
+  let hubTotal = 0, hubIds = [];
+  for (const hub of HUBS) {
+    await page.goto(BASE + hub); await page.waitForTimeout(250);
+    const h = await page.evaluate(() => ({ modules: document.querySelectorAll('a.hub-module').length,
+      targets: [...document.querySelectorAll('a.hub-module')].filter(a => a.target === '_blank' && a.rel.includes('noopener')).length,
+      ids: [...document.querySelectorAll('a.hub-module')].map(a => a.getAttribute('href')),
+      stages: document.querySelectorAll('.hub-stage').length, graphic: !!document.querySelector('.hub-hero svg') }));
+    hubTotal += h.modules; hubIds = hubIds.concat(h.ids);
+    ok(h.modules > 0 && h.targets === h.modules && h.stages > 0 && h.graphic, `${hub} structure ${JSON.stringify(h)}`);
+  }
+  ok(hubTotal === 105 && new Set(hubIds).size === 105, `course hubs cover ${hubTotal} modules with ${new Set(hubIds).size} unique links`);
 
   // typo-tolerant course-map search, abbreviations and sixth-persona capstone
   await page.goto(BASE + 'INV-001.html'); await page.waitForTimeout(200);

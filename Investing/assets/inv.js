@@ -236,7 +236,7 @@
   function prevLive(i) { for (var k = i - 1; k >= 0; k--) if (COURSE[k].live) return COURSE[k]; return null; }
   function nextLive(i) { for (var k = i + 1; k < COURSE.length; k++) if (COURSE[k].live) return COURSE[k]; return null; }
   var PAGE = (location.pathname.split("/").pop() || "index.html");
-  var PAGENAME = { "index.html": "Course home", "": "Course home", "glossary.html": "Glossary", "tools.html": "Tools", "resources.html": "Resources" }[PAGE] || "";
+  var PAGENAME = document.body.getAttribute("data-course-name") || { "index.html": "Course home", "": "Course home", "glossary.html": "Glossary", "tools.html": "Tools", "resources.html": "Resources" }[PAGE] || "";
   var guide = null;
   (function buildGuide() {
     var top = document.querySelector(".top"); if (!top) return;
@@ -251,7 +251,7 @@
       crumbs = '<a class="crumb-home" href="index.html">Course</a>' + (PAGENAME && PAGENAME !== "Course home" ? '<span class="sep">\u203A</span><b class="crumb-mod">' + PAGENAME + "</b>" : "") +
         '<span class="sep" data-crumb-sep hidden>\u203A</span><span class="crumb-tab" data-crumb-tab></span>';
     }
-    guide.innerHTML = '<div class="guide-in"><a class="btn small home-btn" href="index.html" title="Investing course home: all stages and modules">\u2302 Home</a><button type="button" class="btn small" data-map aria-haspopup="dialog" title="Course map and search (press /)">\u2630 Course map &amp; search</button>' +
+    guide.innerHTML = '<div class="guide-in"><a class="btn small home-btn" href="index.html" title="Investing course home: eight course groups">\u2302 Home</a><button type="button" class="btn small" data-map aria-haspopup="dialog" title="Course map and search (press /)">\u2630 Course map &amp; search</button>' +
       '<div class="crumbs">' + crumbs + '</div><div class="guide-step"><button type="button" class="btn small" data-step="-1">\u2190 <span>Previous</span></button>' +
       '<button type="button" class="btn small primary" data-step="1"><span>Next</span> \u2192</button></div></div>' +
       '<div class="guide-track" aria-hidden="true"><span></span></div>';
@@ -285,7 +285,7 @@
   /* ---------- Help modal (injected) ---------- */
   var helpHTML = '<div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="modal-card">' +
     '<h2 id="helpTitle">How this course works</h2><p>' + VERSION + ' · ' + AUTHOR + '</p>' +
-    '<h3>Finding your way</h3><p>The bar at the top always shows where you are: stage, module and tab. Its <b>Next</b> button walks through every tab in order and, at the last tab, straight into the next module; <b>Previous</b> does the reverse. <b>Course map &amp; search</b> (or press <b>/</b>) lists all 105 modules by stage, marks where you are and what you have completed, and searches every module, every tab and the glossary. The round <b>Top</b> button returns you to the top of a long page.</p><h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. You can also click a tab, or use the left and right arrow keys on the tab bar. On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
+    '<h3>Finding your way</h3><p>The landing page organizes all 105 modules into eight clear courses. Each course card opens a new-tab course page containing only its related modules. Inside a lesson, the bar at the top shows your module and tab; <b>Next</b> and <b>Previous</b> move through the learning sequence. <b>Course map &amp; search</b> (or press <b>/</b>) searches every module, every tab and the glossary. The round <b>Top</b> button returns to the top of a long page.</p><h3>Tabs, not a long scroll</h3><p>Each module is split into tabs. You can also click a tab, or use the left and right arrow keys on the tab bar. On a phone, the tab bar becomes a drop-down. Your place in each module is remembered.</p>' +
     '<h3>Three layers of depth</h3><ul><li><b>Start here</b> — the main text of every tab. No background needed.</li><li><b>Going further</b> — expandable panels for readers with some experience.</li><li><b>Practitioner depth</b> — the actual rules, formulas, edge cases and research.</li></ul>' +
     '<h3>Things to do, not just read</h3><ul><li><b>Calculators</b> run their formulas live in your browser.</li><li><b>What would you do?</b> — pick an option first, then see every option’s trade-offs.</li><li><b>Exercises</b> — type an answer and check it; a worked solution follows.</li><li><b>Myth or fact</b> — tap a card to test a popular claim.</li><li><b>Worksheets</b> save in your own browser and can be downloaded.</li><li><b>Dotted terms</b> open a glossary definition.</li></ul>' +
     '<h3>The six households</h3><p>Denise (24), the Riveras (35 and 34), Maya (58), the Harpers (57 and 55), Ruth (68), and Daniel and Priya Shah (62 and 48, with their daughter Leena) are fictional households who reappear throughout the course. Their different ages, family structures, assets and responsibilities show why sound recommendations are contextual rather than one-size-fits-all.</p>' +
@@ -314,7 +314,7 @@
   INV.progress = { read: readProgress, write: function (p) { store("inv-progress", p); } };
 
   /* ---------- Tabs ---------- */
-  var shell = document.querySelector(".tabs-shell");
+  var shell = document.querySelector(".tabs-shell:not([hidden])");
   if (shell) {
     var panels = [].slice.call(shell.querySelectorAll(".panel"));
     var bar = document.createElement("div");
