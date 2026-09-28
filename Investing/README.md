@@ -1,6 +1,6 @@
 # Investing Learning Lab
 
-V1.2 (September 2026)
+V1.3 (October 2026)
 
 A comprehensive, self-paced investing curriculum for every stage of life: new investors,
 people with some experience, families, pre-retirees, retirees, and anyone planning what they
@@ -99,17 +99,32 @@ python3 -m http.server 8732          # from the Shared folder
 node Investing/tests/verify-investing.js
 ```
 
-The V1.2 run: **36,989 checks, 0 failures** across 109 pages (105 modules, landing page,
+The V1.3 run: **37,562 checks, 0 failures** across 109 pages (105 modules, landing page,
 tools, glossary and resources) at 1440, 1024, 768 and 390 px. It clicks through every tab and
 checks for `undefined`/`NaN`/`Infinity` text, page overflow, elements past the viewport, SVG
 text escaping its drawing, illegibly small chart text, a figure on every tab, duplicate
 element ids and console errors; then it drives every decision card, myth card, exercise
 (right and wrong answers), quiz, worksheet, calculator (every slider at both extremes, every
 option, blank and zero inputs, empty result areas), glossary popover, keyboard tab
-navigation and theme toggle. Deliberately injected bugs were caught before release, and
-screenshots were reviewed by eye at 1440 and 390 px and in dark mode.
+navigation and theme toggle. It also verifies the Shah lens across the course, the six-household
+capstone, typo-tolerant searches and abbreviations, saved-tab resume/restart, and V1.3 October
+release markers and cache keys on every page. Selected revised tabs were reviewed by eye at
+1440 and 390 px.
 
 ## Changelog
+
+### V1.3 (October 2026)
+
+- Adds Daniel and Priya Shah (62 and 48) and their daughter Leena (14), who has lifelong
+  support needs: a large-age-gap, multigenerational plan spanning taxable, tax-deferred and
+  Roth assets, a third-party special needs trust, staggered retirements, caregiver succession,
+  Social Security child-in-care, disabled-child, family-maximum and survivor considerations.
+- Reworks allocation and retirement-income teaching around context rather than one answer:
+  competing allocation schools and seven distinct two-bucket, three-bucket, purpose-based,
+  income-floor and total-return approaches are compared with advantages, limitations and fit.
+- Adds typo-tolerant course search, abbreviations and synonyms; restores the last-open tab with
+  a visible restart control; corrects the 2026 ABLE-to-Work amount; expands capstone comparisons,
+  graphics, sources, disclaimers and rendered regression coverage for the sixth household.
 
 ### V1.2 (September 2026)
 

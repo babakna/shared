@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 3 (Your Financial Base) calculators - V1.2 (September 2026)
+/* Investing Learning Lab - Stage 3 (Your Financial Base) calculators - V1.3 (October 2026)
    Tools for INV-018 to INV-023. Every tool computes from its stated formula in the browser.
    Pure calculation functions are exposed on INV.s3 so the numbers quoted in the modules can be
    reproduced exactly. */

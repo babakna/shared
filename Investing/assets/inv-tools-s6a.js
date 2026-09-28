@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 6 tools (INV-043 to INV-048) - V1.2 (September 2026)
+/* Investing Learning Lab - Stage 6 tools (INV-043 to INV-048) - V1.3 (October 2026)
    Namiranian, Babak. Loaded after assets/inv-tools.js. Every tool computes in the browser.
    Embedded data (annual %, January-December):
    - ff, ff5, bm, dp, vol, beta, op: Kenneth R. French Data Library (Tuck School of Business,

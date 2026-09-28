@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 8 (Behavioral Finance) tools - V1.2 (September 2026)
+/* Investing Learning Lab - Stage 8 (Behavioral Finance) tools - V1.3 (October 2026)
    Tools for INV-060, INV-061 and INV-062. Each tool computes from its stated formula in the
    browser. Historical tools use window.INV_RETURNS (Damodaran, NYU Stern, 1928-2025).
    Load after assets/inv-tools.js. */

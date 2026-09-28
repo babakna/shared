@@ -1,4 +1,4 @@
-/* Investing Learning Lab - glossary data - V1.2 (September 2026)
+/* Investing Learning Lab - glossary data - V1.3 (October 2026)
    Each entry: t term, a aliases, c category, l level (1 start here, 2 going further, 3 practitioner),
    mod the module that teaches it, d what it is, u what it is used for, m what it means for you.
    Year-specific dollar figures appear only where pinned to a stated tax or benefit year. */

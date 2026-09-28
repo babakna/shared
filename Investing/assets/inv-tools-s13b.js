@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 13 life-event calculators (INV-099 to INV-102) - V1.2 (September 2026)
+/* Investing Learning Lab - Stage 13 life-event calculators (INV-099 to INV-102) - V1.3 (October 2026)
    Every tool computes from its stated formula in the browser. Dollar limits are 2026 figures from
    IRS Rev. Proc. 2025-32, IRS Notice 2025-67 and SSA's 2026 COLA and SSI pages; they are labelled
    with the year wherever they appear. Historical tools use window.INV_RETURNS (Damodaran, NYU Stern). */

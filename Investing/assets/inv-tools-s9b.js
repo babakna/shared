@@ -1,4 +1,4 @@
-/* Investing Learning Lab - Stage 9 real estate calculators (INV-068 to INV-071) - V1.2 (September 2026)
+/* Investing Learning Lab - Stage 9 real estate calculators (INV-068 to INV-071) - V1.3 (October 2026)
    Load after assets/inv-tools.js. Every result is computed in the browser from the formula stated
    in the tool's note. Tax rules follow IRS Publications 527, 544, 925 and 946 (2025 editions) and
    Rev. Proc. 2025-32 (tax year 2026). Educational estimates, not tax advice. */
