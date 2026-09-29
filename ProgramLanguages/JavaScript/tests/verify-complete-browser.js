@@ -494,7 +494,7 @@ async function main() {
   const server = createServer();
   await new Promise((resolve,reject) => server.listen(0,"127.0.0.1",error => error ? reject(error) : resolve()));
   const base = `http://127.0.0.1:${server.address().port}/shared/`;
-  const browser = await chromium.launch({headless:true});
+  const browser = await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{})});
   try {
     await auditAllRenditions(browser,base);
     await auditHomeAndMaps(browser,base);

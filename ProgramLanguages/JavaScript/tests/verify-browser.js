@@ -60,7 +60,7 @@ async function main() {
   const site = server();
   await new Promise((resolve,reject) => site.listen(0,"127.0.0.1",error => error ? reject(error) : resolve()));
   const base = `http://127.0.0.1:${site.address().port}/shared/`;
-  const browser = await chromium.launch({headless:true});
+  const browser = await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{})});
   const context = await browser.newContext({viewport:{width:1440,height:1000},colorScheme:"light",permissions:["clipboard-read","clipboard-write"]});
   const page = await context.newPage();
   const errors = [];
@@ -79,7 +79,7 @@ async function main() {
   if (homeCardCount !== 5) { const html = await page.content(); console.error("HOME DIAGNOSTIC", {status:homeResponse?.status(),url:page.url(),closed:page.isClosed(),contentLength:html.length,html,errors}); }
   check("home renders five grouped paths", homeCardCount === 5);
   check("home keeps visible Home control", await page.locator(".home-button").isVisible());
-  check("home displays V2.2 October 2026", (await page.locator("body").innerText()).includes("V2.2 · October 2026"));
+  check("home displays V2.3 October 2026", (await page.locator("body").innerText()).includes("V2.3 · October 2026"));
   check("JavaScript favicon configured", (await page.locator('link[rel="icon"]').getAttribute("href")) === "assets/javascript-logo.svg");
   check("home has purposeful graphics", await page.locator(".hero-art svg").count() === 1 && await page.locator(".path-art svg").count() === 5);
   check("placement, Help and Resources are visible", await page.getByRole("button",{name:"Find my starting point"}).isVisible() && await page.getByRole("button",{name:"Help"}).isVisible() && await page.getByRole("button",{name:"Resources"}).isVisible());

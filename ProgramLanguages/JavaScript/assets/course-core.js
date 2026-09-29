@@ -3,7 +3,7 @@
 
   const course = window.JSCourse = {
     title: "JavaScript Learning Lab",
-    version: "2.2",
+    version: "2.3",
     release: "October 2026",
     lastVerified: "2026-09-27",
     author: "Namiranian, Babak",

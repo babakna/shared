@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const assert = require("node:assert/strict");
+const {spawnSync} = require("node:child_process");
 
 const ROOT = path.resolve(__dirname, "..");
 const SHARED = path.resolve(ROOT, "..", "..");
@@ -30,13 +31,17 @@ for (const file of dataFiles) vm.runInContext(read(file), context, {filename:fil
 const course = context.window.JSCourse;
 const modules = course.modules;
 
-check("V2.2 metadata", course.version === "2.2" && course.release === "October 2026");
+check("V2.3 metadata", course.version === "2.3" && course.release === "October 2026");
 check("exact author", course.author === "Namiranian, Babak");
 check("33 modules", modules.length === 33, `count=${modules.length}`);
 check("sequential unique IDs", modules.every((module,index) => module.id === `JS-${String(index + 1).padStart(3,"0")}`) && new Set(modules.map(module => module.id)).size === modules.length);
 check("track distribution", JSON.stringify(Object.fromEntries(["Beginner","Intermediate","Advanced","Reference"].map(track => [track,modules.filter(module => module.track === track).length]))) === JSON.stringify({Beginner:11,Intermediate:10,Advanced:9,Reference:3}));
 check("every lesson has teaching depth", modules.every(module => module.summary.length > 180 && module.outcomes.length >= 4 && module.chapters.length >= 4 && module.chapters.every(chapter => chapter.text.length >= 2 && wordCount(chapter.text.join(" ")) >= 90)));
 check("every lesson has worked example", modules.every(module => module.example && module.example.source.length > 80 && module.example.notes.length >= 3));
+for (const id of ["JS-009", "JS-031"]) {
+  const result = spawnSync(process.execPath, ["--check", "--input-type=module"], {input:modules.find(module => module.id === id).example.source, encoding:"utf8"});
+  check(`${id} worked example is one parseable ESM file`, result.status === 0, result.stderr);
+}
 check("every lesson has complete lab", modules.every(module => module.practice && module.practice.steps.length >= 5 && module.practice.criteria.length >= 3 && module.practice.hints.length >= 2 && module.practice.starter.length > 40));
 check("every lesson has failure analysis", modules.every(module => module.diagnostic && module.diagnostic.options.length >= 4 && Number.isInteger(module.diagnostic.answer)));
 check("every lesson has three retrieval questions", modules.every(module => module.checks.length >= 3 && module.checks.every(check => check.options.length >= 4 && Number.isInteger(check.answer) && check.why.length > 35)));
@@ -54,7 +59,7 @@ check("platform differences taught", /Windows/.test(read("assets/data-foundation
 check("VS Code setup is extensive", ["Profiles","integrated terminal","breakpoint","npm scripts","readiness"].every(term => read("assets/data-foundations.js").toLowerCase().includes(term.toLowerCase())));
 check("Node primary and browser substantial", modules.filter(module => /Node|HTTP|Express|stream|file/i.test(`${module.title} ${module.summary}`)).length >= 7 && modules.filter(module => /browser|DOM|React/i.test(`${module.title} ${module.summary}`)).length >= 4);
 check("future AI boundary preserved", /Ministral 3 14B/.test(read("assets/data-advanced.js")) && /frontend will never|browser never/i.test(read("assets/data-advanced.js")));
-check("all canonical pages have author, favicon and V2.2 assets", canonicalPages.every(file => /name="author" content="Namiranian, Babak"/.test(read(file)) && /javascript-logo\.svg/.test(read(file)) && /v=2\.2/.test(read(file))));
+check("all canonical pages have author, favicon and V2.3 assets", canonicalPages.every(file => /name="author" content="Namiranian, Babak"/.test(read(file)) && /javascript-logo\.svg/.test(read(file)) && /v=2\.3/.test(read(file))));
 const notFoundPage = fs.readFileSync(path.join(SHARED,"404.html"),"utf8");
 check("404 normalizes directory and track-file case", /programlanguages\/javascript/.test(notFoundPage) && /ProgramLanguages\/JavaScript/.test(notFoundPage) && ["js-101.html","js-201.html","js-301.html","js-401.html","js-reference.html"].every(file => notFoundPage.includes(`"${file}":"${file}"`)) && /location\.search \+ location\.hash/.test(notFoundPage));
 check("module links explicitly use new tabs", /target="_blank" rel="noopener noreferrer"/.test(read("assets/js-course.js")));
