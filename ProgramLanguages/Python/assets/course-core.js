@@ -3,7 +3,7 @@
 
   const course = window.PyCourse = {
     title: "Python Learning Lab",
-    version: "1.0",
+    version: "1.1",
     release: "October 2026",
     lastVerified: "2026-09-28",
     author: "Namiranian, Babak",

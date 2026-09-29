@@ -6,16 +6,46 @@
   const C = course.code;
   const platform = "In VS Code, always confirm the interpreter shown in the status bar before trusting Run, Debug, Test, or the terminal. On Windows, the launcher is commonly `py`; on macOS and Linux, use `python3`. Inside an activated virtual environment, `python` should resolve to that environment on all three platforms. PowerShell activation uses `.\\.venv\\Scripts\\Activate.ps1`; Command Prompt uses `.venv\\Scripts\\activate.bat`; macOS/Linux shells use `source .venv/bin/activate`.";
 
+  function choice(correct, distractors, seed) {
+    const answer = seed % 4;
+    const options = distractors.slice(0, 3);
+    options.splice(answer, 0, correct);
+    return {options, answer};
+  }
+
   function add(spec) {
+    const number = course.modules.length + 1;
+    const id = `PY-${String(number).padStart(3, "0")}`;
     const source = C(spec.code);
     const resourceIds = [...new Set(["python-docs", "vscode-python", ...(spec.resources || [])])];
+    const prerequisites = spec.prerequisites || (number === 1 || spec.track === "Reference" ? [] : [`PY-${String(number - 1).padStart(3, "0")}`]);
+    const diagnosticChoice = choice(
+      `Create the smallest reproducer for ${spec.concept.toLowerCase()}, inspect the earliest state that contradicts ${spec.boundary}, correct that boundary, then preserve the result with a regression test.`,
+      ["Suppress the symptom with a broad exception handler and substitute an empty value.", "Change the interpreter, dependencies, input, and implementation together until the symptom disappears.", "Discard the traceback and rerun from a different working directory without recording the environment."],
+      number
+    );
+    const conceptChoice = choice(
+      spec.boundary.replace(/\s+$/, ""),
+      ["The boundary exists only in the VS Code interface.", `Using ${spec.concept.toLowerCase()} removes the need to test failure paths.`, "Its behavior is identical across all inputs, runtimes, and environments."],
+      number + 1
+    );
+    const failureChoice = choice(
+      `Reproduce and inspect this module-specific risk: ${spec.failure}`,
+      ["Treat any successful demonstration input as proof that the boundary is correct.", "Replace the implementation before identifying which assumption first became false.", "Ignore environment and dependency evidence because the source file is unchanged."],
+      number + 2
+    );
+    const evidenceChoice = choice(
+      `Preserve this module's evidence: ${spec.evidence}`,
+      ["Keep only a screenshot of the final output.", "Delete the failing input after the correction works once.", "Rely on a verbal description without the command, environment, or regression test."],
+      number + 3
+    );
     course.addModule({
       track: spec.track,
       accent: spec.accent,
       icon: spec.icon,
       title: spec.title,
       minutes: spec.minutes || 90,
-      prerequisites: spec.prerequisites || [],
+      prerequisites,
       domains: spec.domains,
       summary: spec.summary,
       outcomes: [
@@ -33,11 +63,11 @@
       model:{title:spec.modelTitle || `${spec.concept}: evidence flow`,steps:spec.steps.map(([name,detail]) => ({name,detail}))},
       example:{title:spec.exampleTitle || `Make ${spec.concept.toLowerCase()} observable`,language:"Python",source,notes:[spec.notes?.[0] || "Start with a small deterministic input so behavior is easy to inspect.",spec.notes?.[1] || "Keep transformation separate from input/output so it can be tested directly.",spec.notes?.[2] || "Run the same code through the selected interpreter and the VS Code debugger."]},
       practice:{title:spec.labTitle || `Build and test: ${spec.title}`,brief:spec.task,steps:["Create a fresh project folder and `.venv`; select that interpreter in VS Code.",spec.task,"Write at least one normal-case test and one boundary or failure-case test.","Set a breakpoint before the decisive operation, inspect state, then record the command and result."],starter:source,criteria:[spec.outcome,"Normal and failure paths are automated by tests.","No secret, generated environment, cache, or machine-specific path is committed.","A short README records setup, run, test, and platform-specific commands."],hints:[spec.hint || "Reduce the task to one pure function before connecting files, databases, networks, notebooks, or models.",`The causal clue is usually near: ${spec.failure}`,"Compare the interpreter path reported by VS Code with the one printed by `python -c \"import sys; print(sys.executable)\"`." ]},
-      diagnostic:{title:"Diagnose the earliest wrong assumption",prompt:`The program appears to work for the demonstration input, but a realistic run exposes this problem: ${spec.failure} Which response produces the strongest engineering evidence?`,options:["Add a broad try/except and continue with an empty value.","Change several components at once until the symptom disappears.","Create the smallest reproducer, inspect the traceback and state, correct the causal boundary, then add a failing-then-passing test.","Reinstall Python globally and rerun without recording versions."],answer:2,explanation:`The smallest reproducer isolates the cause. Inspection tests the mental model, and the regression test preserves the correction. The other choices suppress evidence or introduce more variables.`},
+      diagnostic:{title:`Diagnose ${spec.concept.toLowerCase()}`,prompt:`A realistic run exposes this module-specific failure: ${spec.failure} Which response tests the earliest wrong assumption and produces durable evidence?`,...diagnosticChoice,explanation:`The correct response tests the boundary ${spec.boundary} It also preserves evidence that the failure is corrected instead of merely hidden.`},
       checks:[
-        {q:`Which statement best describes ${spec.concept.toLowerCase()}?`,options:[spec.boundary.replace(/\s+$/,""),"It is only a VS Code display feature.","It always behaves identically across every environment.","It removes the need to test boundary cases."],answer:0,why:"The concept is a runtime or design boundary; the editor can expose it but does not redefine it."},
-        {q:"What should you verify before diagnosing different behavior between Run, Debug, Test, and the terminal?",options:["The selected interpreter and environment for each execution path.","Only the file's color theme.","Whether the code has comments.","The monitor resolution."],answer:0,why:"Different execution paths can select different interpreters, working directories, variables, and dependencies."},
-        {q:"What turns a correction into durable evidence?",options:["A screenshot of one successful run.","A regression test that demonstrated the failure and now passes, plus recorded environment and command.","Deleting the traceback.","Catching every exception."],answer:1,why:"A reproducible test and recorded context prove the intended behavior and help detect recurrence."}
+        {q:`Which boundary is central to ${spec.concept.toLowerCase()} in this module?`,...conceptChoice,why:`The lesson identifies the relevant boundary as ${spec.boundary} The editor can expose that boundary but does not redefine it.`},
+        {q:`Which failure should a learner deliberately reproduce when practicing ${spec.title.toLowerCase()}?`,...failureChoice,why:`The module names this realistic risk: ${spec.failure} Reproducing it is stronger evidence than reasoning only from the happy path.`},
+        {q:`What evidence best demonstrates the outcome “${spec.outcome}”?`,...evidenceChoice,why:`Durable evidence is module-specific, repeatable, and inspectable. For this lesson, that means: ${spec.evidence}`}
       ],
       project:spec.project,
       resources:resourceIds
