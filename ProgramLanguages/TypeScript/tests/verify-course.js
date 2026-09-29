@@ -22,7 +22,7 @@ const requiredDomains = ["Core", "Tooling", "Frontend", "Backend", "Data", "Qual
 const requiredTracks = {Beginner:8, Intermediate:9, Advanced:8, Capstones:4, Reference:3};
 
 check(course.title === "TypeScript Learning Lab", "course title");
-check(course.version === "1.0" && course.release === "October 2026", "visible release metadata");
+check(course.version === "1.1" && course.release === "October 2026", "visible release metadata");
 check(course.author === "Namiranian, Babak", "exact author");
 check(course.modules.length === 32, "32-module curriculum");
 check(course.resources.length >= 25, "resource catalog breadth");
@@ -35,6 +35,10 @@ for (const [track, count] of Object.entries(requiredTracks)) {
 }
 
 const resourceIds = new Set(course.resources.map(resource => resource.id));
+const moduleIds = new Set(course.modules.map(module => module.id));
+const diagnosticSignatures = new Set();
+const diagnosticAnswers = new Set();
+const quizQuestions = new Set();
 for (const module of course.modules) {
   check(/^TS-\d{3}$/.test(module.id), `${module.id} identifier`);
   check(module.summary.length >= 90, `${module.id} substantial summary`);
@@ -49,9 +53,17 @@ for (const module of course.modules) {
   check(module.project.length >= 90, `${module.id} transfer challenge`);
   check(module.domains.length >= 1 && module.domains.every(domain => requiredDomains.includes(domain)), `${module.id} valid domains`);
   check(module.resources.length >= 3 && module.resources.every(id => resourceIds.has(id)), `${module.id} valid references`);
+  if (module.id !== "TS-001" && module.track !== "Reference") check(module.prerequisites.length >= 1, `${module.id} advisory prerequisite`);
+  check(module.prerequisites.every(id => moduleIds.has(id) && Number(id.slice(3)) < Number(module.id.slice(3))), `${module.id} prerequisites reference earlier modules`);
+  diagnosticSignatures.add(`${module.diagnostic.prompt}|${module.diagnostic.options.join("|")}`);
+  diagnosticAnswers.add(module.diagnostic.answer);
+  module.checks.forEach(item => quizQuestions.add(item.q));
   const lessonWords = module.chapters.flatMap(chapter => chapter.text).join(" ").split(/\s+/).length;
   check(lessonWords >= 300, `${module.id} lesson depth (${lessonWords} words)`);
 }
+check(diagnosticSignatures.size === course.modules.length, "module-specific diagnostics");
+check(diagnosticAnswers.size === 4, "diagnostic correct answers use every position");
+check(quizQuestions.size === course.modules.length * 3, "module-specific retrieval questions");
 
 for (const resource of course.resources) {
   check(/^https:\/\//.test(resource.url), `${resource.id} HTTPS URL`);
@@ -65,8 +77,8 @@ for (const page of pages) {
   const html = fs.readFileSync(path.join(root, page), "utf8");
   check(/<meta name="author" content="Namiranian, Babak">/.test(html), `${page} exact author metadata`);
   check(/assets\/typescript-logo\.svg/.test(html), `${page} TypeScript favicon`);
-  check(/assets\/typescript-course\.css\?v=1\.0/.test(html), `${page} versioned CSS`);
-  check(/assets\/course-core\.js\?v=1\.0/.test(html) && /assets\/data-course\.js\?v=1\.0/.test(html) && /assets\/typescript-course\.js\?v=1\.0/.test(html), `${page} ordered scripts`);
+  check(/assets\/typescript-course\.css\?v=1\.1/.test(html), `${page} versioned CSS`);
+  check(/assets\/course-core\.js\?v=1\.1/.test(html) && /assets\/data-course\.js\?v=1\.1/.test(html) && /assets\/typescript-course\.js\?v=1\.1/.test(html), `${page} ordered scripts`);
 }
 
 for (const file of fs.readdirSync(path.join(root, "assets"))) {
