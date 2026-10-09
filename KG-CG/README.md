@@ -9,7 +9,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 | File | What it is |
 |------|------------|
 | `index.html` | Section landing page with the module cards |
-| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 17 diagrams, 44 formal definitions, 133 glossary terms, 43 cited sources |
+| `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, nine interactive panels, 17 diagrams, 43 formal definitions, 133 glossary terms, 43 cited sources |
 | `KG-CG-Demo.html` | Charging assurance walkthrough &mdash; ten scenarios, seven stages each |
 | `KG-CG-Briefing.html` | Complete standalone charging briefing &mdash; 44 slides, five live demos, definitions, glossary and sources; V2.4 (October 2026) |
 | `hero.png` | Landing-page hero image |
@@ -18,11 +18,11 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 
 `KG-CG-101.html` builds one argument in eight parts, then adds a glossary and a cited reference list.
 
-1. **Why Graphs at All** &mdash; when relationships are the data, and the three signals that justify a graph. Graph, node, edge and traversal defined formally; the same five-hop question drawn as joins and as a traversal; SQL and Cypher written out side by side; a relational/property-graph/RDF comparison; the traversal cost model and why supernodes break it. Interactive join-depth comparison.
-2. **Anatomy of a Graph** &mdash; nodes, edges, direction, properties. Label, property, directed edge, triple, IRI and reification defined; one annotated node and edge; multigraphs and why a relationship that changed needs two edges; one qualified fact written in Cypher, Turtle with reification, TriG named graphs and RDF 1.2 triple terms. Click-to-build sandbox.
-3. **What Makes It Knowledge** &mdash; schema, identity resolution, constraints, provenance. Three levels of schema commitment; SHACL against OWL 2 and why an OWL cardinality does not reject anything; the same rule as a database constraint, a SHACL shape and an OWL axiom; the identity-resolution pipeline and its asymmetric failure modes; provenance in PROV-O. Schema on/off comparison and a provenance inspector.
+1. **Why Graphs at All** &mdash; when relationships are the data, and the three signals that justify a graph. Graph, node, edge and traversal defined formally; the same four-join example drawn as joins and as a traversal; SQL and Cypher written out side by side; a relational/property-graph/RDF comparison; the traversal cost model and why supernodes break it. Interactive join-depth comparison.
+2. **Anatomy of a Graph** &mdash; nodes, edges, direction, properties. Label, property, directed edge, triple, IRI and reification defined; one annotated node and edge; multigraphs and how validity-stamped parallel edges can preserve relationship history; one qualified fact written in Cypher, Turtle with reification, TriG named graphs and RDF 1.2 triple terms. Click-to-build sandbox.
+3. **What Makes It Knowledge** &mdash; schema, identity resolution, constraints, provenance. Three levels of schema commitment; SHACL against OWL 2 and why an OWL cardinality is not a write-time constraint; the same rule as a database constraint, a SHACL shape and an OWL axiom; the identity-resolution pipeline and its asymmetric failure modes; provenance in PROV-O. Schema on/off comparison and a provenance inspector.
 4. **Context Graphs** &mdash; observations, confidence, expiry. Anchors, half-life and TTL defined; anchored against copied, side by side; the decay formula with its curves plotted from the formula; half-lives per evidence class; the five-state lifecycle including refusal; a complete context graph in JSON, mid-investigation. An incident timeline you can scrub.
-5. **How the Two Bind** &mdash; anchoring, inheritance, blame propagation. What one anchor makes available for free; the propagation algorithm written out with attenuation and degree normalisation; a confluence score computed step by step; propagation compared with rules engines and statistical correlation. Overlay toggle above a fixed topology.
+5. **How the Two Bind** &mdash; anchoring, inheritance, blame propagation. What one anchor makes reachable from modeled source facts; the propagation algorithm written out with attenuation and degree normalisation; a confluence score computed step by step; propagation compared with rules engines and statistical correlation. Overlay toggle above a fixed topology.
 6. **Reasoning Over the Pair** &mdash; scoring, separation, and the action gate. Abduction and why the output is a ranking, not a probability; the scoring function with its weights and its temporal veto; why 0.82 over 0.79 is worse than 0.71 over 0.31; the coverage-versus-specificity trap; five distinct reasons to refuse and what each must say; a refusal written out in full. Threshold sliders that turn a recommendation into a refusal.
 7. **Building One for Real** &mdash; where nodes and edges come from, freshness, and four ways graphs quietly go bad. The six ingestion stages and which failure each one introduces, with the cheapest detector for each; edge sources ranked by trust with confidence bands; one edge ingested properly, and the MERGE trap; one traversal crossing four feeds of different ages; a first scope named concretely.
 8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld. Grounding, RAG, GraphRAG, Jev and hallucination defined; balanced 2026 GraphRAG evidence; a bounded-model routing/scoring pattern that preserves schema validation, calibration and the deterministic action gate; four boundaries around generative models; and a mechanically checkable grounded prompt.
@@ -33,7 +33,7 @@ Each module closes with an **onward-reading** block naming specific clauses or s
 
 ## The demo
 
-`KG-CG-Demo.html` runs ten charging-assurance scenarios against a generic operator model. Each steps through seven stages while the candidate pool narrows from the full topology toward a located fault &mdash; or stops short of naming one &mdash; showing evidence, confidence scores, and the action gate at every stage.
+`KG-CG-Demo.html` runs ten charging-assurance scenarios against a generic operator model. Each steps through seven stages while the candidate pool narrows from the full topology toward a located fault &mdash; or stops short of naming one &mdash; progressively revealing evidence, scores, and an action gate as the stages advance.
 
 Five of the ten scenarios deliberately end **without** an automated action &mdash; evidence too thin to separate the candidates, a missing discriminating control, a topology edge too stale to act on, an action permanently barred from automation, and an evidence set that cannot be joined at all. That is the behaviour module 6 argues for, not a gap in the demo.
 
@@ -70,7 +70,7 @@ A current-standards and evidence refresh without changing the course architectur
 - Added balanced 2026 GraphRAG evidence: the NICD 510-question result retains its single-benchmark/model and Neo4j-funding limitations, alongside a comparative preprint showing corpus, hop, retrieval and evaluator dependence.
 - Added published ISO/IEC 39075:2024/Cor 1:2026, SPARQL 1.2 as a non-final 21 September Working Draft, and RDF 1.2 Turtle as a non-final 14 September Working Draft, while retaining SPARQL 1.1 and RDF 1.1 as stable Recommendation baselines.
 - Added two current Jev preprints: one showing that type-safe decisions can remain semantically wrong when option labels and rubrics interact, and one ecosystem snapshot of 2,170 projects; both are labeled as early preprint evidence rather than deployment validation.
-- Re-derived the visible totals: 44 formal definitions, 133 glossary terms and 32 sources.
+- Re-derived the visible totals: 43 formal definitions, 133 glossary terms and 32 sources.
 
 ### V3.0 (September 2026)
 
@@ -81,7 +81,7 @@ doubled, to about 17,900 words across the eight modules, and the additions are
 structural rather than more prose.
 
 - **43 formal definitions**, one block near the top of each module. Every term is given
-  three ways &mdash; the formal statement, the plain-language reading, and the instance
+  through formal and plain-language explanations, with examples or caveats
   used in the running telecom example &mdash; so a reader can take whichever they need.
   Several also carry an *honest* or *caveat* line: `context graph` says outright that it
   is not a standardised term, `confidence` says the scale is ordinal rather than
@@ -103,18 +103,16 @@ structural rather than more prose.
   &sect;4, the 3GPP NRM classes, ETSI ZSM's closed-loop clauses &mdash; each with the
   reason to open it and roughly what it costs to read.
 
-Things that were previously asserted and are now made precise: the traversal cost model
-and its dependence on **degree** rather than dataset size, with index-free adjacency
-correctly described as an implementation choice rather than a property of the model; why
-an `owl:cardinality` of one **does not reject** a second value under open-world semantics
-but instead concludes the two values are the same thing; the decay model's separation of
-a **base** from source trust and a **freshness factor** from age, and the difference
-between decay and a hard TTL; propagation's **attenuation** and **degree normalisation**,
-and what goes wrong when either is omitted; the scoring function's weights and its
-**temporal veto**, which is a veto rather than a penalty because an effect preceding its
-cause is impossible rather than unlikely; and the difference between *"I do not know what
-is wrong"* and *"I know and am not allowed to fix it"*, which are separate refusals with
-separate next actions.
+The revision clarified the traversal cost model, including degree, depth, selectivity,
+indexing and data size. Index-free adjacency is an implementation choice, not a property
+of every graph model. OWL maximum cardinality is not a write-time constraint: it may
+infer sameness for object values, while declared difference or incompatible data values
+can make an ontology inconsistent. The decay model separates base source trust from
+age-based freshness and distinguishes gradual decay from hard expiry. Propagation adds
+attenuation and degree controls for the illustrated score. A validated, comparable cause
+onset after a symptom vetoes that candidate for the earlier symptom. The course also
+separates *"I do not know what is wrong"* from *"I know and am not allowed to fix it"*;
+those refusals require different next actions.
 
 Glossary: **132 terms, up from 111.** Twenty-one additions, all of them terms the expanded
 modules now use: abduction, entailment, the closed- and open-world assumptions,
@@ -173,7 +171,7 @@ from the publisher.
   limitation is resolved in V3.1: the published 2024 standard and its 2026 corrigendum
   are now identified from ISO catalogue records.
 - The badge legend no longer claims that unreachable publishers are linked by portal
-  &mdash; every entry now points at a document &mdash; and it reads correctly in the
+  &mdash; each entry now points at the most specific verified source available &mdash; and it reads correctly in the
   singular.
 - **Demo:** three entities named in the panels but never drawn (a UPF and an alternate
   SMF in the capacity scenario, the slice in the entitlement-drift scenario) now appear
@@ -200,7 +198,7 @@ A second accuracy pass. V2.1 reviewed the wording; this one reviewed the reasoni
 **Demo &mdash; reasoning**
 
 - **Scenario 1 approved a failover along a route it also called unconfigured.** The missing control is observational &mdash; no live traffic runs that pairing &mdash; which is not the same as the path being unavailable. It also held a trigger-side candidate open at 61 on "the same observable signature": charging events that are never generated show a *fall* in request volume and no errors, which is the opposite of this scenario's 200&times; failures and 4.7 s queue. Now dismissed on its fingerprint at 34.
-- **Scenario 3 said both things at once** &mdash; that a route-side cause would show errors and there are none, and that route-side and trigger-side cannot be separated. The request count is measured at the sender, so the shortfall is in requests never sent. The candidate is now inferred rather than demonstrated, and the queued test confirms it rather than separating two live possibilities.
+- **Scenario 3 said both things at once** &mdash; that a route-side cause would show errors and there are none, and that route-side and trigger-side cannot be separated. The request count is measured at the sender, so the shortfall is in requests never sent. The candidate is inferred rather than demonstrated. The queued synthetic test is a proposed discriminator; no live trigger result is claimed.
 - **Four scenarios reported zero at the final stage** while naming concrete open items in the same panel. They now count them. The stage-one failure catalogue is one number across all ten scenarios, because a catalogue does not vary with the incident.
 - **Arithmetic and units.** A p95 measured in seconds is a wait, not a depth, so the counter is renamed `queue_wait_seconds_p95`. A 0.9% duplicate rate on a 99.97% baseline reports as 100.9%, not the 100.8% shown. Scenario 1's window was 12 minutes while quoting a 15-minute credit trigger. `S-NSSAI 1 &middot; 0x000A21` is an SST and an SD. A 38-hour-old edge against a one-hour expectation is as anomalous as scenario 9's 6.1 hours, not merely degraded.
 - **Model gaps closed.** The second SMF had no session-bearing path, so every cross-SMF control was unsupported by the graph; the data network name was modelled and never used; two scenarios cited change records they never revealed; and scenario 8 offered "sessions on unaffected cells" of an SMF whose every cell was affected.

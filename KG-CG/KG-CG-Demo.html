@@ -110,6 +110,8 @@
   .scenbar .nav { padding: 8px 13px; font-size: 16px; line-height: 1; font-weight: 700; }
   .scenbar .of { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
   @media (max-width: 560px) { .brand h1 { font-size: 14px; } .scenbar .of { display: none; } }
+  @media (max-width: 360px) { .brand { flex-wrap: wrap; max-width: 100%; gap: 2px 8px; } .brand h1 { white-space: normal; line-height: 1.25; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 
   main {
     display: grid; grid-template-columns: calc(var(--split, 58) * 1%) 16px minmax(0, 1fr);
@@ -602,7 +604,7 @@
     <h4>What this shows</h4>
     <p><b>Knowledge graph</b> — the durable model: the organization account, its example service plan and the SLA written against it, the slice, data network name and sessions, cells, both SMFs and the UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
     <p>Two different time spans appear in the scenarios and it is worth keeping them apart. The <b>measurement window</b> is the few minutes of counter data the incident is scoped to. The <b>change lookback</b> is the seven days of change records searched for a plausible trigger, so a change dated a day or two before the incident can still be a candidate.</p>
-    <p><b>Context graph</b> — what the system knows about <i>this</i> incident: observations, evidence pointing back at knowledge-graph entities, hypotheses and proposed actions, each with a source and a confidence. Created when the anchor fires, discarded on Reset.</p>
+    <p><b>Context graph</b> — what the system knows about <i>this</i> incident: observations, evidence pointing back at knowledge-graph entities, hypotheses and proposed actions, each with a source and a confidence. Created when the anchor fires and cleared from this browser on Reset. The outcomes describe an illustrative operational archive; this page does not persist or change a real network.</p>
     <h4>Driving the demo</h4>
     <p>Pick a <b>scenario</b> from the blue selector in the header, or step through them with <b>‹</b> and <b>›</b>. Then <b>Play</b> to walk the stages, or <b>Step</b> to advance while you narrate. <b>Speed</b> sets the dwell time. Arrow keys step, space plays and pauses.</p>
     <h4>Sizing it for your display</h4>
@@ -638,7 +640,7 @@
     <h4>Renaming entities</h4>
     <p><b>Settings → Rename entities</b> replaces any entity label with your own, everywhere it appears including the evidence prose. Stored in this browser only.</p>
     <h4>Scope</h4>
-    <p>Illustrative and vendor-neutral. The operator is generic: PLMN 001-01 is the 3GPP test network, the market code and every element name are invented, and vendors are deliberately unnamed. All identifiers, counters, organization names, thresholds, timestamps and change records are fictional and represent no real network, product, customer or operational data. Charging-plane roles and interfaces follow 3GPP TS 32.240, 32.255, 32.290 and 32.291.</p>
+    <p>Illustrative and vendor-neutral. The operator is generic: PLMN 001-01 is the 3GPP test network, the market code and every element name are invented, and vendors are deliberately unnamed. All identifiers, counters, organization names, thresholds, timestamps and change records are fictional and represent no real network, product, customer or operational data. Charging-plane roles and interfaces follow 3GPP TS 32.240, 32.255, 32.290 and 32.291. Scenario execution, incident archiving and KG refresh are scripted illustrations; no external system is changed.</p>
   </div>
 </dialog>
 
@@ -666,6 +668,7 @@
     { id: "acct",  col: 0, y: 76,  label: "ACCT-EX-7821",  sub: "organization · 1,840 lines", src: "CRM" },
     { id: "plan",  col: 0, y: 154, label: "PLAN-EX-01",  sub: "Example Service plan",      src: "BSS" },
     { id: "sla",   col: 0, y: 232, label: "SLA-CDR-9995",  sub: "≥ 99.95% complete",    src: "BSS" },
+    { id: "ent",   col: 0, y: 310, label: "EX-2026-A", sub: "current entitlement", src: "BSS" },
 
     { id: "slice", col: 1, y: 76,  label: "SLICE-EX",    sub: "SST 1 · SD 0x000A21", src: "NSSF" },
     { id: "dnn",   col: 1, y: 154, label: "DNN-EX",      sub: "service.example",       src: "SMF" },
@@ -695,10 +698,10 @@
   ];
 
   var EDGES = [
-    ["acct", "plan"], ["plan", "sla"], ["plan", "slice"], ["slice", "dnn"], ["slice", "sess"],
+    ["acct", "plan"], ["plan", "sla"], ["plan", "ent"], ["ent", "rate"], ["plan", "slice"], ["slice", "dnn"], ["slice", "sess"],
     ["sess", "cell1"], ["sess", "cell2"], ["sess", "cell3"],
     ["cell1", "smf4"], ["cell2", "smf4"], ["cell3", "smf4"], ["cell3", "smf5"],
-    ["smf4", "upf9"], ["smf5", "upf9"], ["smf4", "rtA"], ["smf5", "rtB"],
+    ["smf4", "upf9"], ["smf5", "upf9"], ["smf4", "rtA"], ["smf4", "rtB"], ["smf5", "rtB"],
     ["rtA", "poolA"], ["rtB", "poolB"],
     ["poolA", "med"], ["poolB", "med"], ["med", "store"], ["store", "rate"], ["rate", "bill"]
   ];
@@ -753,7 +756,7 @@
         { type: "Evidence", text: "All abnormal counters sit on {{rtA}} and {{poolA}}. {{rtB}} and {{poolB}} are clean.", source: "traversal", conf: 0.93 },
         { type: "Hypothesis", text: "{{poolA}} is saturating. {{chg007}} raised its queue high-watermark from 80% to 92% two days earlier, removing the headroom that used to absorb this load.", source: "traversal", conf: 0.91 },
         { type: "Action", text: "Fail {{smf4}} charging traffic over to {{rtB}} and {{poolB}}. Reversible in one step, blast radius one route.", source: "traversal", conf: 0.89 },
-        { type: "Outcome", text: "Failover verified: Nchf failures and queue wait back to baseline, CDR arrival lag clearing. New route written back with a validity window; old route retained in history.", source: "traversal", conf: 0.97 }
+        { type: "Outcome", text: "Failover verified: Nchf failures and queue wait back to baseline, CDR arrival lag clearing. The approved route change is recorded with a validity window in its authoritative source; the old route is retained in history, and a governed KG refresh follows.", source: "traversal", conf: 0.97 }
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.062 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
@@ -789,7 +792,7 @@
         { label: "CDR reconciliation remains auditable", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "verified", text: "Operator approved. Nchf failure rate 0.0004/s, queue wait p95 0.21 s, arrival lag clearing. Marked verified and written back to the knowledge graph." }
+      outcome: { state: "verified", text: "Operator approved. Nchf failure rate 0.0004/s, queue wait p95 0.21 s, arrival lag clearing. The verified case outcome is archived; any durable route change is refreshed from the authoritative configuration source." }
     },
 
     {
@@ -817,13 +820,13 @@
         { type: "Evidence", text: "Both {{poolA}} and {{poolB}} show mildly elevated queue wait. Nchf elevation is 10× baseline, not the roughly 200× seen in the route-localised case.", source: "traversal", conf: 0.9 },
         { type: "Hypothesis", text: "Top candidate scores 38 against a surface threshold of 60. Two recent changes fall inside the change lookback and neither fingerprint matches.", source: "traversal", conf: 0.38 },
         { type: "Observation", text: "No candidate is action-eligible. Forcing a top-one answer here would be a guess presented as a finding.", source: "traversal", conf: 0.95 },
-        { type: "Outcome", text: "Filed as no high-confidence cause with an explicit manual-investigation list. Outcome written back so this pattern is recognisable next time.", source: "traversal", conf: 0.95 }
+        { type: "Outcome", text: "Filed as no high-confidence cause with an explicit manual-investigation list. The unresolved case is archived with its manual-investigation list so the pattern can be recognised next time.", source: "traversal", conf: 0.95 }
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.003 /s", base: "0.0003 /s", state: "degraded", on: "both routes" },
         { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.41 s", base: "0.18 s", state: "degraded", on: "{{poolA}}" },
         { label: "CHF queue wait p95", counter: "queue_wait_seconds_p95", value: "0.38 s", base: "0.18 s", state: "degraded", on: "{{poolB}}" },
-        { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "18 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
+        { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "18 s", base: "5–15 s", state: "degraded", on: "{{med}}" },
         { label: "Voice setup failure", counter: "voice_call_setup_failure", value: "+0.2 pp", base: "±0.5 pp", state: "baseline", on: "3 cells" }
       ],
       controls: [
@@ -856,13 +859,13 @@
 
     {
       id: "smf-ctf",
-      name: "3 · SMF / CTF fails to generate charging events",
+      name: "3 · SMF / CTF event-generation shortfall suspected",
       sev: "P2",
-      title: "Charging events never created",
+      title: "Charging-event generation suspected",
       detail: "{{slice}} in market M01 · completeness 94.2% · Nchf request volume down 31%, concentrated on interim update triggers, while sessions are flat · no interface errors",
       counts: [0, 62, 29, 11, 5, 0, 1],
       labels: { 5: "Held for a pre-approved test", 6: "Synthetic charging test queued" },
-      units: { 5: "action-eligible", 6: "queued checks" },
+      units: { 5: "remediation-eligible", 6: "queued checks" },
       root: null,
       nodes: [
         [],
@@ -874,11 +877,11 @@
         ["smf4", "rtB", "poolB"]
       ],
       cg: [
-        { type: "Incident", text: "INC-4602 · charging events missing rather than failing in transit.", source: "traversal", conf: 1.0 },
-        { type: "Observation", text: "Session count on {{smf4}} is flat while its Nchf request volume is down 31%. Records are not being generated.", source: "traversal", conf: 0.92 },
+        { type: "Incident", text: "INC-4602 · charging-event volume is missing at the sender; cause remains under test.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Session count on {{smf4}} is flat while its Nchf request volume is down 31%. A subset of expected requests is not observed at the sender.", source: "traversal", conf: 0.92 },
         { type: "Evidence", text: "No Nchf errors and no queueing anywhere. {{poolA}} is healthy — it is simply being asked for less.", source: "traversal", conf: 0.94 },
-        { type: "Hypothesis", text: "Charging-trigger generation on {{smf4}} is dropping a subset of events. The request count is measured at {{smf4}} itself, so the shortfall is in requests never sent — which no route-side fault could cause.", source: "traversal", conf: 0.74 },
-        { type: "Observation", text: "The confirming control — {{smf4}} over an alternate route — does not exist in this topology, so the trigger side is inferred from the request count rather than demonstrated.", source: "traversal", conf: 0.96 },
+        { type: "Hypothesis", text: "Charging-trigger generation on {{smf4}} is dropping a subset of events. The request count is measured at {{smf4}} itself, so the shortfall is in requests never sent — which is less consistent with an ordinary route-side failure.", source: "traversal", conf: 0.74 },
+        { type: "Observation", text: "The alternate route exists in the catalog, but {{smf4}} has no comparable live traffic on it; the trigger side is inferred from sender-side request counts, not yet demonstrated by that control.", source: "traversal", conf: 0.96 },
         { type: "Outcome", text: "No failover proposed: moving route would not distinguish the two. A pre-approved synthetic charging test on {{smf4}} over {{rtB}} is queued instead, with no billing or credit impact.", source: "traversal", conf: 0.96 }
       ],
       signals: [
@@ -892,11 +895,11 @@
         { label: "Alternate SMF cluster ({{smf5}})", result: "healthy", note: "request volume flat — isolates to {{smf4}}" },
         { label: "Same pool, traffic from other SMFs", result: "healthy", note: "{{poolA}} serves other traffic normally" },
         { label: "Other markets on the same plan", result: "healthy", note: "argues against a plan-level cause" },
-        { label: "{{smf4}} over an alternate CHF route", result: "missing", note: "not configured — the one control that would demonstrate the trigger side rather than infer it" }
+        { label: "{{smf4}} over an alternate CHF route", result: "missing", note: "configured but not exercised by comparable live traffic — the missing observational control" }
       ],
       hyps: [
         { name: "SMF / CTF charging-event generation", score: 71, verdict: "investigate",
-          for: "request volume down with sessions flat; no errors and no queueing", against: "cannot be confirmed without the missing control" },
+          for: "request volume down with sessions flat; no errors and no queueing", against: "cannot be confirmed without a valid independent control" },
         { name: "CHF route / pool saturation", score: 34, verdict: "dismissed",
           for: "same observable completeness gap", against: "a saturating pool produces errors and queueing; neither is present, and requests are down at the sender" },
         { name: "Mediation rejection upstream", score: 19, verdict: "dismissed",
@@ -913,7 +916,7 @@
         { label: "Pre-approved diagnostic available instead", pass: true },
         { label: "Diagnostic touches no billing or credit state", pass: true }
       ] },
-      outcome: { state: "manual", text: "Synthetic charging test queued on {{smf4}} over {{rtB}}. If events appear, the trigger side is exonerated and the route becomes the candidate; if they do not, the trigger side is confirmed. Either way the missing control gets created." }
+      outcome: { state: "manual", text: "Synthetic charging test queued on {{smf4}} over {{rtB}}. The result will be compared with a known-good sender and route: events appearing would weaken the trigger hypothesis; absent events would strengthen it but still require diagnostic confirmation. The missing control is then available for review." }
     },
 
     {
@@ -921,7 +924,7 @@
       name: "4 · Mediation accepts, rating rejects",
       sev: "P2",
       title: "Reconciliation gap downstream of mediation",
-      detail: "{{slice}} in market M01 · completeness 99.96% at mediation · 4.1% of accepted records rejected at rating · no charging-plane anomaly",
+      detail: "{{slice}} in market M01 · completeness 99.96% at mediation · 4.1% of accepted records rejected at rating · online CHF counters at baseline",
       counts: [0, 62, 27, 9, 4, 1, 1],
       root: "rate",
       nodes: [
@@ -937,7 +940,7 @@
         { type: "Incident", text: "INC-4655 · records complete at mediation but failing downstream at rating.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Completeness at {{med}} is 99.96% — within SLA. The loss is after acceptance, which the completeness KPI alone cannot see.", source: "traversal", conf: 0.95 },
         { type: "Evidence", text: "{{rate}} rejects 4.1% of accepted records with a field-validation error on the {{plan}} entitlement code.", source: "traversal", conf: 0.93 },
-        { type: "Hypothesis", text: "A schema expectation at {{rate}} no longer matches what {{store}} emits for this plan. Charging plane is not involved.", source: "traversal", conf: 0.87 },
+        { type: "Hypothesis", text: "A schema expectation at {{rate}} no longer matches what {{store}} emits for this plan. The online CHF path is not implicated by these counters.", source: "traversal", conf: 0.87 },
         { type: "Action", text: "Re-drive the rejected batch through {{rate}} after the mapping correction. Records are retained, so nothing is lost.", source: "traversal", conf: 0.85 },
         { type: "Outcome", text: "Batch re-driven, rejection rate back to 0.02%. Reconciliation gap closed and the mapping recorded as a change.", source: "traversal", conf: 0.94 }
       ],
@@ -951,7 +954,7 @@
       controls: [
         { label: "Other plans through the same rating engine", result: "healthy", note: "isolates to the {{plan}} entitlement code" },
         { label: "Same plan in other markets", result: "anomalous", note: "also rejecting — this is not market-specific" },
-        { label: "Charging plane end to end", result: "healthy", note: "rules out CHF, route and mediation" },
+        { label: "Online CHF path", result: "healthy", note: "CHF and route counters at baseline" },
         { label: "Prior billing cycle for the same plan", result: "healthy", note: "dates the onset to this cycle" }
       ],
       hyps: [
@@ -1036,61 +1039,63 @@
 
     {
       id: "rating-drift",
-      name: "6 · Entitlement mapping drift — no network fault",
+      name: "6 · Entitlement mapping drift — sampled network counters at baseline",
       sev: "P3",
       title: "Records complete and on time, rated against the wrong entitlement",
       detail: "{{slice}} in market M01 · completeness 99.97% · arrival lag normal · 1,840 lines rated against a superseded entitlement",
       counts: [0, 62, 22, 7, 4, 1, 1],
-      root: "plan",
+      root: "rate",
       nodes: [
         [],
-        ["acct", "plan", "sla", "slice"],
-        ["acct", "plan", "sla", "slice", "rate", "bill"],
-        ["plan", "rate", "bill"],
-        ["plan", "sla", "rate", "bill", "med", "store"],
-        ["plan", "rate"],
-        ["plan", "rate", "bill"]
+        ["acct", "plan", "ent", "sla", "slice"],
+        ["acct", "plan", "ent", "sla", "slice", "rate", "bill"],
+        ["plan", "ent", "rate", "bill"],
+        ["plan", "ent", "sla", "rate", "bill", "med", "store"],
+        ["plan", "ent", "rate"],
+        ["plan", "ent", "rate", "bill"]
       ],
       cg: [
-        { type: "Incident", text: "INC-4740 · no network anomaly anywhere; the fault is entirely in the commercial layer.", source: "traversal", conf: 1.0 },
-        { type: "Observation", text: "Completeness, arrival lag and Nchf counters are all at baseline. Nothing in the charging plane is wrong.", source: "traversal", conf: 0.97 },
+        { type: "Incident", text: "INC-4740 · sampled network and online CHF counters are at baseline; the rating basis is wrong.", source: "traversal", conf: 1.0 },
+        { type: "Observation", text: "Completeness, arrival lag and Nchf counters are at baseline; the downstream rating result uses v6 after v7 became effective.", source: "traversal", conf: 0.97 },
         { type: "Evidence", text: "{{rate}} is applying entitlement EX-2025-B to all 1,840 lines on {{acct}}, superseded by EX-2026-A at the last catalogue refresh.", source: "traversal", conf: 0.94 },
-        { type: "Hypothesis", text: "{{plan}} points at a stale entitlement version. The plan-to-entitlement edge was never revalidated after the catalogue refresh.", source: "traversal", conf: 0.91 },
-        { type: "Action", text: "Refresh the plan-to-entitlement edge from the BSS catalogue and re-rate the affected window.", source: "traversal", conf: 0.88 },
-        { type: "Outcome", text: "Edge refreshed, window re-rated, all 1,840 lines on the current entitlement. Any resulting adjustment goes to a human — automated credit posting is permanently blocked.", source: "traversal", conf: 0.93 }
+        { type: "Hypothesis", text: "The rating engine’s cached mapping for {{plan}} is stale. The canonical plan grant is v7, but the rating engine’s derived plan mapping still applies v6; its refresh has stalled.", source: "traversal", conf: 0.91 },
+        { type: "Action", text: "Reconfirm the canonical plan→v7 grant from the BSS catalogue, refresh the rating mapping, then dry-run, reconcile and re-rate the affected window.", source: "traversal", conf: 0.88 },
+        { type: "Outcome", text: "Canonical grant reconfirmed, rating mapping refreshed, and the affected window re-rated against v7 after reconciliation. Any resulting adjustment goes to a human — automated credit posting is permanently blocked.", source: "traversal", conf: 0.93 }
       ],
       signals: [
         { label: "Completeness", counter: "cdr_completeness", value: "99.97%", base: "99.97%", state: "baseline", on: "{{med}}" },
         { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "8 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" },
         { label: "Entitlement version in use", counter: "rating_entitlement_id", value: "EX-2025-B", base: "EX-2026-A", state: "anomalous", on: "{{rate}}" },
-        { label: "Plan catalogue refresh age", counter: "plan_edge_age_hours", value: "38 h", base: "≤ 1 h", state: "anomalous", on: "{{plan}}" }
+        { label: "Rating mapping refresh age", counter: "rating_mapping_age_hours", value: "38 h", base: "≤ 1 h", state: "anomalous", on: "{{rate}}" },
+        { label: "Canonical grant confirmation age", counter: "canonical_grant_age_hours", value: "38 h", base: "≤ 1 h", state: "anomalous", on: "{{plan}}→EX-2026-A" }
       ],
       controls: [
         { label: "Other plans through the same rating engine", result: "healthy", note: "on current entitlements — isolates to this plan" },
-        { label: "Charging plane end to end", result: "healthy", note: "no network cause at all" },
+        { label: "Online CHF path", result: "healthy", note: "no online CHF fault indicated" },
         { label: "Same plan in other markets", result: "anomalous", note: "also on the stale entitlement — plan-level, not market-level" },
-        { label: "Prior cycle for the same plan", result: "healthy", note: "onset is the catalogue refresh" }
+        { label: "Prior cycle for the same plan", result: "healthy", note: "helps bound onset to the rating-mapping refresh failure" }
       ],
       hyps: [
-        { name: "Plan-to-entitlement mapping drift", score: 90, verdict: "eligible",
-          for: "one plan, all markets, stale edge age 38 h against a 1 h expectation", against: "none material" },
+        { name: "Rating mapping/cache drift", score: 90, verdict: "eligible",
+          for: "one plan across markets, applied v6 versus canonical v7, rating mapping 38 h stale against a 1 h expectation", against: "none material" },
         { name: "Rating-engine defect", score: 22, verdict: "dismissed",
           for: "rating is where the wrong value is applied", against: "other plans rate correctly on the same engine" },
         { name: "Mediation transformation", score: 11, verdict: "dismissed",
           for: "none", against: "mediation output matches CHF emission" },
         { name: "Charging-plane loss", score: 3, verdict: "dismissed",
-          for: "none", against: "every charging counter is at baseline" }
+          for: "none", against: "sampled online charging counters are at baseline" }
       ],
       gate: { checks: [
         { label: "Catalogue is reachable and current", pass: true },
-        { label: "Edge refresh pre-approved for this incident class", pass: true },
-        { label: "Blast radius limited to one plan edge", pass: true },
-        { label: "Re-rate is reversible for the affected window", pass: true },
+        { label: "At verification: canonical plan→v7 grant was reconfirmed from the authoritative catalogue before re-rating", pass: true },
+        { label: "Rating mapping refresh and re-rate pre-approved for this incident class", pass: true },
+        { label: "Blast radius limited to one plan and affected usage window", pass: true },
+        { label: "Re-rate dry-run, reversal entries and reconciliation defined", pass: true },
         { label: "No automated credit posting required", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "verified", text: "Entitlement EX-2026-A applied, window re-rated, edge age back under one hour. Financial adjustment referred to a human owner rather than posted automatically." }
+      outcome: { state: "verified", text: "Entitlement EX-2026-A applied, window re-rated, rating mapping age back under one hour. Financial adjustment referred to a human owner rather than posted automatically." }
     },
 
     {
@@ -1100,7 +1105,7 @@
       title: "Confident candidate, refused action",
       detail: "{{slice}} in market M01 · completeness 92.6% · required topology edge last refreshed 41 minutes ago against a 60-second expectation",
       counts: [0, 62, 31, 12, 5, 0, 1],
-      labels: { 5: "Action blocked — stale topology", 6: "Refresh requested, action re-queued" },
+      labels: { 5: "Action blocked — stale topology", 6: "Refresh requested; action held" },
       units: { 5: "action-eligible", 6: "open findings" },
       root: "poolA",
       nodes: [
@@ -1115,10 +1120,10 @@
       cg: [
         { type: "Incident", text: "INC-4771 · same fingerprint as the capacity case, different data-freshness posture.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Route-localised errors and queueing on {{rtA}} and {{poolA}}. Candidate scores 83, comfortably above threshold.", source: "traversal", conf: 0.93 },
-        { type: "Evidence", text: "The {{smf4}} → {{rtB}} capacity edge was last refreshed 41 minutes ago. Its validity window expects a 60-second refresh, so it is out of window.", source: "traversal", conf: 0.99 },
+        { type: "Evidence", text: "The {{smf4}} → {{rtB}} route edge was last refreshed 41 minutes ago. Its validity window expects a 60-second refresh, so it is out of window.", source: "traversal", conf: 0.99 },
         { type: "Hypothesis", text: "Failover target capacity cannot be trusted. Acting on a stale edge risks moving traffic onto a pool that is itself saturated.", source: "traversal", conf: 0.95 },
         { type: "Observation", text: "Eligibility denied by the stale-topology guardrail. The recommendation is retained, not discarded.", source: "traversal", conf: 0.98 },
-        { type: "Outcome", text: "Refresh requested from the charging EMS. The action re-queues automatically once the edge is inside its validity window; it does not silently proceed.", source: "traversal", conf: 0.97 }
+        { type: "Outcome", text: "Refresh requested from the charging EMS. The recommendation remains held for a fresh topology check and an independent target-headroom check; it cannot execute without a new full gate evaluation.", source: "traversal", conf: 0.97 }
       ],
       signals: [
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.048 /s", base: "0.0003 /s", state: "anomalous", on: "{{rtA}}" },
@@ -1131,7 +1136,7 @@
         { label: "Alternate route error rate", result: "healthy", note: "{{rtB}} errors at baseline" },
         { label: "Same cells, other slices", result: "healthy", note: "argues against a radio cause" },
         { label: "Other markets", result: "healthy", note: "localises to M01" },
-        { label: "Live headroom on the failover target", result: "missing", note: "stale edge — the reason the action is refused" }
+        { label: "Live headroom on the failover target", result: "missing", note: "target headroom is unverified; a separate blocking condition" }
       ],
       hyps: [
         { name: "CHF route / pool capacity", score: 83, verdict: "investigate",
@@ -1153,7 +1158,7 @@
         { label: "Single-step rollback available", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "blocked", text: "Action refused by the stale-topology guardrail with the reason shown to the operator. Refresh requested; the recommendation is held and re-queued rather than dropped or silently executed." }
+      outcome: { state: "blocked", text: "Action refused by the stale-topology guardrail with the reason shown to the operator. Refresh requested; the recommendation remains held until both topology and target headroom are verified and the full gate is re-evaluated." }
     },
 
     {
@@ -1241,8 +1246,8 @@
         { type: "Observation", text: "{{poolA}} is answering successfully but granting zero quota to 214 sessions. This is a correct-looking interface with a wrong answer.", source: "traversal", conf: 0.94 },
         { type: "Evidence", text: "Quota pool for the {{plan}} entitlement is exhausted at {{poolA}}; the top-up job that normally replenishes it last ran 6 hours ago.", source: "traversal", conf: 0.96 },
         { type: "Hypothesis", text: "Quota replenishment for {{plan}} has stalled. Denials are the charging plane doing exactly what it was told, on stale entitlement state.", source: "traversal", conf: 0.92 },
-        { type: "Action", text: "Re-run the pre-approved quota replenishment for the {{plan}} entitlement. Reversible and scoped to one entitlement.", source: "traversal", conf: 0.9 },
-        { type: "Outcome", text: "Quota restored, denials stopped, sessions continued. Replenishment schedule failure raised separately as the underlying problem.", source: "traversal", conf: 0.95 }
+        { type: "Action", text: "Run an approved, idempotent and capped replenishment for the {{plan}} entitlement after owner and ledger checks; reconcile grants afterward. Consumed quota cannot simply be rolled back.", source: "traversal", conf: 0.9 },
+        { type: "Outcome", text: "Capped quota grant reconciled; denials stopped and sessions continued. The failed schedule remains a separate problem, and consumed units are not represented as reversible.", source: "traversal", conf: 0.95 }
       ],
       signals: [
         { label: "Sessions denied continuation", counter: "quota_denial_count", value: "214", base: "0", state: "anomalous", on: "{{poolA}}" },
@@ -1272,12 +1277,12 @@
       gate: { checks: [
         { label: "Replenishment is pre-approved for this incident class", pass: true },
         { label: "Blast radius limited to one entitlement", pass: true },
-        { label: "Reversible in a single step", pass: true },
+        { label: "Idempotency key, grant cap and owner approval verified", pass: true },
         { label: "No direct billing-state write required", pass: true },
         { label: "Reconciliation remains auditable", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "verified", text: "Quota restored, denial count 0, sessions continued without re-establishment. The stalled replenishment schedule is raised as a separate problem record rather than treated as fixed." }
+      outcome: { state: "verified", text: "Capped grant reconciled, denial count 0, sessions continued without re-establishment. The stalled replenishment schedule is raised as a separate problem record rather than treated as fixed." }
     },
 
     {
@@ -1353,7 +1358,7 @@
         a: ["<b>{{poolA}} is running out of queue headroom.</b> Every abnormal counter in the window sits on one charging route: Nchf failures at 0.062/s against a 0.0003/s baseline, and queue wait p95 at 4.7 s against 0.18 s.",
             "{{chg007}} raised that pool's queue high-watermark from 80% to 92% two days before the incident. That removed the spare capacity which used to absorb exactly this load pattern. The candidate scores <b>88</b>."],
         prov: "Counters from EMS via traversal · change record from ITSM · confidence 0.91",
-        bare: ["A CDR-completeness breach with elevated Nchf errors on a example service slice is most commonly caused by charging-function capacity, mediation backlog, or a session-management fault. I would start by checking CHF utilisation and mediation queue depth.",
+        bare: ["A CDR-completeness breach with elevated Nchf errors on an example service slice is most commonly caused by charging-function capacity, mediation backlog, or a session-management fault. I would start by checking CHF utilisation and mediation queue depth.",
                "Without the topology I cannot tell you which pool, which route, or whether a recent change is involved — so I cannot rank those three against each other."] },
       { q: "What rules out the other explanations?",
         a: ["<b>Three control groups, and the one that is missing is stated rather than hidden.</b> Sessions on the same cells but off the example service slice are healthy, which argues against a cell-level cause. {{smf5}} over {{rtB}} is healthy, which points back at the affected charging path. {{plan}} sessions in other markets are healthy, which argues against plan or SLA-mapping drift.",
@@ -1365,7 +1370,7 @@
       { q: "Why was automated action allowed here?",
         a: ["<b>All six gate conditions passed.</b> Alternate capacity exists on {{poolB}}, the action is pre-approved for this incident class, the blast radius is one Nchf route, rollback is a single step, CDR reconciliation stays auditable, and the verification KPIs were defined before execution.",
             "The action itself is deliberately small: fail {{smf4}} charging traffic over to {{rtB}} and {{poolB}}. It does not touch the suspected pool, credit the customer, or write billing state — the last two are permanent blocks regardless of confidence.",
-            "Outcome: failures back to 0.0004/s, queue wait p95 to 0.21 s, arrival lag clearing. Verified and written back to the knowledge graph."],
+            "Outcome: failures back to 0.0004/s, queue wait p95 to 0.21 s, arrival lag clearing. Verified; the case outcome is archived, while any durable route correction follows a separate governed KG update."],
         prov: "Gate evaluation and outcome from traversal · confidence 0.89 at proposal, 0.97 after verification",
         bare: ["Failing charging traffic to a standby pool would be a reasonable mitigation if a pool were confirmed saturated.",
                "I cannot confirm alternate capacity exists, that the action is pre-approved, or that it can be rolled back — so recommending it would be advice, not a decision anything should execute."] }
@@ -1388,30 +1393,30 @@
       { q: "So what actually happens now?",
         a: ["<b>It is filed as no high-confidence cause, with a named list of manual work.</b> Run synthetic charging tests on both pools to check pool health independently of live traffic; check mediation pipeline timing across the full window; review SLA mapping for any unrecorded change in the prior seven days.",
             "The gate blocks action for a specific reason: no candidate above threshold, no control isolation, no verification KPIs definable. Pre-approval and rollback were both satisfied — they were simply not enough.",
-            "The outcome is written back, so the next incident with this signature is recognisable as a known-ambiguous pattern rather than starting from zero."],
+            "The unresolved case is archived with its signature, so the next incident can be compared with a known-ambiguous pattern rather than starting from zero."],
         prov: "Gate evaluation and outcome from traversal · confidence 0.95",
         bare: ["I would suggest monitoring and escalating if it worsens.",
                "That is generic advice. It contains no test that would settle the question, because I have nothing to test against."] }
     ],
     "smf-ctf": [
       { q: "What caused this?",
-        a: ["<b>The charging events are never being created.</b> Nchf request volume is down 31% while session count is flat, and there are <b>no interface errors at all</b> — the requests that would fail are not being made.",
+        a: ["<b>Sender-side Nchf request volume is down, with missing events suspected.</b> Nchf request volume is down 31% while session count is flat, and there are <b>no interface errors at all</b> — the requests that would fail are not being made.",
             "That signature points at the trigger side on {{smf4}} rather than anything downstream. Completeness is 94.2%.",
-            "The candidate leads, but it is <b>not confirmed</b>: the control that would prove it does not exist in this topology."],
+            "The candidate leads, but it is <b>not confirmed</b>: a comparable live control on the alternate route is missing."],
         prov: "Counters from EMS via traversal · volume delta against flat session count",
         bare: ["Reduced charging volume with no errors suggests either a session-management problem or a configuration change on the charging trigger.",
                "I cannot distinguish those, and I cannot see that session count is flat, which is the observation that makes this case interesting rather than routine."] },
       { q: "Why is missing evidence more useful than errors here?",
-        a: ["<b>Because absence has a different fingerprint from failure.</b> A route or pool fault produces errors, retries and queueing. This produces silence: fewer requests, normal latency, clean interfaces.",
+        a: ["<b>Because absence has a different fingerprint from failure.</b> An ordinary route or pool failure tends to produce errors, retries or queueing; backpressure can complicate that pattern. This produces silence: fewer requests, normal latency, clean interfaces.",
             "A monitoring approach keyed on error rates sees nothing wrong. The completeness gap is only visible because the case file compares Nchf volume against the session count it should track.",
             "That comparison exists because the topology links sessions to the charging path — it is a traversal, not a threshold."],
         prov: "Traversal across session and charging-plane counters",
         bare: ["Missing data is generally harder to detect than errors, which is true in general and tells you nothing about this window.",
                "I cannot make the volume-against-sessions comparison, because I do not have either series."] },
       { q: "Why no automated action?",
-        a: ["<b>Because the candidate is inferred rather than demonstrated.</b> The shortfall is in requests never sent, which no route-side fault could cause — but nothing yet <i>shows</i> the trigger recovering, and acting on an inference is what the gate exists to prevent.",
-            "Instead of acting, a synthetic charging test is queued on {{smf4}} over {{rtB}}. If events appear over a route the live topology never exercises, the trigger is working and the fault lies in the pairing itself. If they do not, the trigger side is confirmed outright.",
-            "Either way the test creates the missing control, so the next occurrence of this signature is demonstrable rather than inferred. <b>The gap gets closed rather than worked around.</b>"],
+        a: ["<b>Because the candidate is inferred rather than demonstrated.</b> The shortfall is in requests never sent, which is less consistent with an ordinary route-side fault — but nothing yet <i>shows</i> the trigger recovering, and acting on an inference is what the gate exists to prevent.",
+            "Instead of acting, a synthetic charging test is queued on {{smf4}} over {{rtB}}. If events appear, the trigger hypothesis weakens; if they do not, it strengthens. Neither outcome alone proves the cause without validating the synthetic path and comparing a known-good control.",
+            "The test supplies a missing comparison for follow-up diagnosis; no remediation is authorized from this pending result alone."],
         prov: "Gate evaluation and outcome from traversal · action withheld pending the test",
         bare: ["Restarting or reconfiguring the charging trigger would be the usual next step.",
                "That risks acting on the wrong half of the problem. Without the control I cannot tell whether the trigger or the route is at fault."] }
@@ -1419,13 +1424,13 @@
     "mediation-reject": [
       { q: "What caused this?",
         a: ["<b>The problem is downstream of mediation, at rating.</b> Completeness at mediation is 99.96% — records are arriving complete and on time — but <b>4.1% of accepted records are rejected at {{rate}}</b>.",
-            "There is no charging-plane anomaly at all. The Nchf path, the pools and the routes are clean.",
+            "The online CHF counters are at baseline. The sampled Nchf path, pools and routes show no fault signal.",
             "The reconciliation gap opens between mediation acceptance and rating acceptance, which is a mapping problem rather than a network fault."],
         prov: "Acceptance and rejection counts from MED and BSS via traversal",
-        bare: ["A completeness or reconciliation gap on a example service slice would usually be caused by charging-function or mediation problems.",
+        bare: ["A completeness or reconciliation gap on an example service slice would usually be caused by charging-function or mediation problems.",
                "That answer points upstream, and upstream is measurably healthy here. Without the per-stage acceptance counts I would send the investigation to the wrong team."] },
       { q: "Why did the charging plane look healthy?",
-        a: ["<b>Because it was healthy.</b> The failure is one stage further along, and the two stages are measured separately.",
+        a: ["<b>Because sampled online CHF counters were at baseline.</b> The evidence points one stage further along; the two stages are measured separately.",
             "This is the case where a single end-to-end completeness figure misleads: measured at mediation it looks fine, and the loss only appears when mediation acceptance is compared against rating acceptance.",
             "The graph carries both stages and the edge between them, so the gap is locatable rather than merely detectable."],
         prov: "Per-stage traversal from {{med}} through {{store}} to {{rate}}",
@@ -1435,7 +1440,7 @@
         a: ["<b>The mapping was corrected and the rejected records re-driven.</b> Rejection rate fell to 0.02%.",
             "No records were lost and there was no credit exposure, because the records existed throughout — they were simply refused at the rating stage.",
             "The correction is recorded as a change, so the next incident that traverses this path sees it as history rather than rediscovering it."],
-        prov: "Outcome verified after re-drive · written back to the knowledge graph",
+        prov: "Outcome verified after re-drive · archived as incident history",
         bare: ["Rejected records normally need investigation and reprocessing.",
                "I cannot tell you what to correct or confirm the rejection cleared, so nothing here is verifiable."] }
     ],
@@ -1464,21 +1469,21 @@
     ],
     "rating-drift": [
       { q: "What caused this?",
-        a: ["<b>An entitlement mapping on {{plan}} is stale — there is no network fault.</b> Completeness is 99.97%, arrival lag is normal, and every charging-plane counter is at baseline.",
-            "1,840 lines are being rated against a <b>superseded entitlement</b>. The records are correct; the price applied to them is not.",
-            "Nothing in the network is broken, which is why the network-facing candidates all score low."],
+        a: ["<b>The rating engine’s derived mapping for {{plan}} is stale — no network fault is indicated by sampled evidence.</b> Completeness is 99.97%, arrival lag is normal, and sampled online charging counters are at baseline.",
+            "1,840 lines are being rated against a <b>superseded entitlement</b>. The records are complete; their applied entitlement basis is wrong.",
+            "No sampled network fault explains the version mismatch, so network-facing candidates score low."],
         prov: "Entitlement version from BSS · counters at baseline via traversal",
-        bare: ["Charging discrepancies on a example service plan are usually caused by network or mediation faults, so I would check the charging path first.",
-               "That is exactly the wrong direction here. The charging path is clean and the fault is in a BSS mapping."] },
+        bare: ["Charging discrepancies on an example service plan are usually caused by network or mediation faults, so I would check the charging path first.",
+               "That is exactly the wrong direction here. The charging path is clean and the fault is in the derived rating mapping."] },
       { q: "How is this distinguished from a fault?",
-        a: ["<b>By what is normal, not by what is wrong.</b> Complete records, normal timing, clean interfaces — no fault signature anywhere in the charging plane.",
+        a: ["<b>By what is normal, not by what is wrong.</b> Complete records, normal timing, clean interfaces — no fault signature in the sampled online CHF path.",
             "What is abnormal is a version: the entitlement in force does not match the entitlement the plan resolves to. That is a comparison between a record and a catalogue, not a threshold on a counter.",
-            "A system that only watches counters cannot see this at all, because no counter is out of range."],
+            "KPI-only monitoring can miss the version mismatch even while availability and completeness counters remain in range."],
         prov: "Traversal from {{acct}} through {{plan}} to the entitlement catalogue",
         bare: ["Configuration and rating errors can occur without any network fault.",
                "General and correct. I cannot check an entitlement version, so I cannot tell you whether this is one."] },
       { q: "What was done about it?",
-        a: ["<b>Entitlement EX-2026-A was applied and the window re-rated.</b> Edge age is back under one hour.",
+        a: ["<b>Entitlement EX-2026-A was applied and the window re-rated.</b> Rating mapping age is back under one hour.",
             "The financial adjustment was <b>referred to a human owner rather than posted automatically</b>. Applying the correct entitlement going forward is a configuration action; adjusting what a customer is charged for the past is not.",
             "That split is the point: the automation fixes the mapping, a person settles the money."],
         prov: "Outcome verified · financial adjustment referred, not posted",
@@ -1501,7 +1506,7 @@
         bare: ["A high-confidence diagnosis would normally justify a mitigation, so I would proceed.",
                "That is the whole failure being demonstrated. Confidence in the cause says nothing about whether the data underpinning the action is current."] },
       { q: "What happens to the recommendation?",
-        a: ["<b>It is held and re-queued, not dropped and not silently executed.</b> A topology refresh was requested; when the edge is current the recommendation is re-evaluated.",
+        a: ["<b>It remains held, not silently executed.</b> A topology refresh and independent target-headroom measurement were requested; both feed a new full gate evaluation.",
             "The operator sees the refusal <b>and the reason for it</b> — stale topology, 41 minutes, 60-second expectation — so the block is actionable rather than opaque.",
             "A refusal with a stated reason is a better outcome than either acting on a stale map or discarding good analysis."],
         prov: "Gate evaluation and outcome from traversal · refusal reason surfaced to the operator",
@@ -1514,7 +1519,7 @@
             "The ordering is decisive: <b>Nchf errors follow the drops rather than leading them</b>. Sessions fail, and the charging errors are the consequence.",
             "The charging plane is the symptom. Every charging-side candidate scores lower than the RAN firmware candidate."],
         prov: "Counter ordering from EMS and ENM via traversal · firmware change from ITSM",
-        bare: ["Reduced completeness with elevated Nchf errors on a example service slice most likely indicates a charging-path problem.",
+        bare: ["Reduced completeness with elevated Nchf errors on an example service slice most likely indicates a charging-path problem.",
                "Wrong team, wrong plane. Without the timing order I cannot tell that the charging errors are downstream of session drops."] },
       { q: "How was the direction established?",
         a: ["<b>By sequence, which is the one thing a snapshot cannot show.</b> The drops start first; the Nchf errors track them afterwards.",
@@ -1537,7 +1542,7 @@
             "Completeness is 97.3%, so this is not primarily a record-loss problem. Sessions in progress could not get authorisation to continue.",
             "The pool is answering correctly and answering <i>no</i>, which is why an error-rate view sees a healthy interface. The empty pool is where the denials surface; the entitlement whose top-up never ran is the cause — the alternate pool is exhausted for this entitlement too."],
         prov: "Denial counts and quota responses from EMS via traversal",
-        bare: ["Session continuation failures on a example service slice would usually point to session management or charging-function availability.",
+        bare: ["Session continuation failures on an example service slice would usually point to session management or charging-function availability.",
                "The charging function is available. It is refusing quota, which is a different failure needing a different fix."] },
       { q: "Why is this worse than dropped records?",
         a: ["<b>Because it is live service denial on an active response, not a billing artefact.</b> Dropped records cost money and can be reconciled afterwards; denied continuation means a session in progress stops.",
@@ -2113,7 +2118,7 @@
     ob.className = "outcome o-" + o.state;
     var ot = document.createElement("div");
     ot.style.cssText = "font-weight:650;margin-bottom:3px;";
-    ot.textContent = o.state === "verified" ? "Verified and written back"
+    ot.textContent = o.state === "verified" ? "Verified; case archived"
       : o.state === "blocked" ? "Action blocked" : "No action — manual path";
     ob.appendChild(ot);
     var obt = document.createElement("span");
