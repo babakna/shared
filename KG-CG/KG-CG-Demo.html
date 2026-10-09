@@ -2,6 +2,8 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
+<meta name="author" content="Namiranian, Babak">
+<meta name="creator" content="Namiranian, Babak">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Knowledge Graph &amp; Context Graph — Charging Assurance Demo</title>
 <style>
@@ -438,7 +440,7 @@
 <header class="top">
   <div class="brand">
     <h1>Knowledge Graph &amp; Context Graph</h1>
-    <span class="ver" id="verLabel">V4.0 (October 2026)</span>
+    <span class="ver" id="verLabel">V4.1 (October 2026)</span>
   </div>
 
   <div class="spacer"></div>
@@ -495,7 +497,7 @@
 
         <div class="graphwrap" id="graphWrap">
           <svg class="graph" id="graph" viewBox="0 0 1080 434" role="img"
-               aria-label="Charging-assurance knowledge graph from agency account through slice, RAN, core and charging to mediation and billing"></svg>
+               aria-label="Charging-assurance knowledge graph from organization account through slice, RAN, core and charging to mediation and billing"></svg>
         </div>
 
         <div id="belowGraph">
@@ -595,10 +597,10 @@
 </dialog>
 
 <dialog id="dlgHelp">
-  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V4.0 (October 2026)</span><span class="spacer"></span><button type="button" class="btn" data-close>Close</button></div>
+  <div class="dlghdr"><h3>Help</h3><span class="ver" id="verLabel2">V4.1 (October 2026)</span><span class="spacer"></span><button type="button" class="btn" data-close>Close</button></div>
   <div class="dlgbody">
     <h4>What this shows</h4>
-    <p><b>Knowledge graph</b> — the durable model: the agency account, its priority plan and the SLA written against it, the slice, data network name and sessions, cells, both SMFs and the UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
+    <p><b>Knowledge graph</b> — the durable model: the organization account, its example service plan and the SLA written against it, the slice, data network name and sessions, cells, both SMFs and the UPF, the Nchf routes and CHF pools, then mediation, the CDR store, rating and billing. Plus the change records that touched them. It persists across every incident.</p>
     <p>Two different time spans appear in the scenarios and it is worth keeping them apart. The <b>measurement window</b> is the few minutes of counter data the incident is scoped to. The <b>change lookback</b> is the seven days of change records searched for a plausible trigger, so a change dated a day or two before the incident can still be a candidate.</p>
     <p><b>Context graph</b> — what the system knows about <i>this</i> incident: observations, evidence pointing back at knowledge-graph entities, hypotheses and proposed actions, each with a source and a confidence. Created when the anchor fires, discarded on Reset.</p>
     <h4>Driving the demo</h4>
@@ -610,11 +612,13 @@
     <h4>Reading the graph</h4>
     <p>Blue is the current candidate set. Faded entities were ruled out by an earlier stage but stay on screen so the narrowing is visible; entities that never entered scope at all are fainter still. Violet marks a located cause, and covers more than one entity where the cause genuinely spans several &mdash; a firmware build across three sectors, for instance. It appears only once the candidates have been ranked, so the diagram never gives the answer away early, and in the scenarios that never establish a cause nothing turns violet at all. Amber dashed boxes along the bottom are change records, linked to the entities they targeted.</p>
     <h4>Scores</h4>
-    <p>Candidate scores are <b>evidence-match scores against SME-authored failure fingerprints, not probabilities</b>. A candidate is action-eligible only above threshold and only after the guardrail checks pass. A candidate marked <b>unscorable</b> and shown with a dash carries no number at all, because the measurement it would be scored against is itself unavailable &mdash; scoring it zero would claim an elimination the data cannot support. Three actions are permanently blocked from automation in every scenario: customer credit posting, direct billing-state writes, and RAN firmware rollback on cells serving an active public-safety response.</p>
+    <p>Candidate scores are <b>evidence-match scores against SME-authored failure fingerprints, not probabilities</b>. A candidate is action-eligible only above threshold and only after the guardrail checks pass. A candidate marked <b>unscorable</b> and shown with a dash carries no number at all, because the measurement it would be scored against is itself unavailable &mdash; scoring it zero would claim an elimination the data cannot support. Three actions are permanently blocked from automation in every scenario: customer credit posting, direct billing-state writes, and RAN firmware rollback on cells serving an active critical-service response.</p>
     <h4>Ask the case file</h4>
     <p><b>Three pre-written questions per scenario</b>, answered from the case file. Every figure quoted in an answer also appears in the panels above it, so the two can be checked against each other, and each answer names the source it was drawn from.</p>
     <p>Tick <b>&ldquo;answer the same question with the graph evidence withheld&rdquo;</b> to see the same question answered from the incident description alone. Those answers are vague where the grounded one is specific, and in several scenarios they are confidently wrong &mdash; which is the comparison the panel exists to make.</p>
     <p><b>Free-text questions are coming soon</b>, with a selectable provider and model. Nothing else on the page depends on them: every ranking, control comparison and gate decision on screen is deterministic.</p>
+    <h4>What changed in <span class="verbatim">V4.1 (October 2026)</span></h4>
+    <p>The public example now uses generic service, plan and organization labels throughout the scenario and case-file answers. The reasoning and action gates remain deterministic.</p>
     <h4>What changed in <span class="verbatim">V4.0 (October 2026)</span></h4>
     <p>The demo outcomes are unchanged. V4.0 keeps the section in step with the <b>Foundations</b> TM Forum semantic/intent refresh, current W3C drafts, and independently qualified Jev application evidence. Every scenario, score, control comparison, action gate and answer remains deterministic and unchanged from V2.3.</p>
     <h4>What changed in <span class="verbatim">V3.1 (September 2026)</span></h4>
@@ -634,7 +638,7 @@
     <h4>Renaming entities</h4>
     <p><b>Settings → Rename entities</b> replaces any entity label with your own, everywhere it appears including the evidence prose. Stored in this browser only.</p>
     <h4>Scope</h4>
-    <p>Illustrative and vendor-neutral. The operator is generic: PLMN 001-01 is the 3GPP test network, the market code and every element name are invented, and vendors are deliberately unnamed. All identifiers, counters, agency names, thresholds, timestamps and change records are fictional and represent no real network, product, customer or operational data. Charging-plane roles and interfaces follow 3GPP TS 32.240, 32.255, 32.290 and 32.291.</p>
+    <p>Illustrative and vendor-neutral. The operator is generic: PLMN 001-01 is the 3GPP test network, the market code and every element name are invented, and vendors are deliberately unnamed. All identifiers, counters, organization names, thresholds, timestamps and change records are fictional and represent no real network, product, customer or operational data. Charging-plane roles and interfaces follow 3GPP TS 32.240, 32.255, 32.290 and 32.291.</p>
   </div>
 </dialog>
 
@@ -642,7 +646,7 @@
 (function () {
   "use strict";
 
-  var VERSION = "V4.0 (October 2026)";
+  var VERSION = "V4.1 (October 2026)";
   var LS = "kgcg.demo.v1";
 
   /* ============================ knowledge graph ============================ */
@@ -659,12 +663,12 @@
   ];
 
   var NODES = [
-    { id: "acct",  col: 0, y: 76,  label: "ACCT-PR-7821",  sub: "agency · 1,840 lines", src: "CRM" },
-    { id: "plan",  col: 0, y: 154, label: "PLAN-PRI-01",  sub: "Priority Responder plan",      src: "BSS" },
+    { id: "acct",  col: 0, y: 76,  label: "ACCT-EX-7821",  sub: "organization · 1,840 lines", src: "CRM" },
+    { id: "plan",  col: 0, y: 154, label: "PLAN-EX-01",  sub: "Example Service plan",      src: "BSS" },
     { id: "sla",   col: 0, y: 232, label: "SLA-CDR-9995",  sub: "≥ 99.95% complete",    src: "BSS" },
 
-    { id: "slice", col: 1, y: 76,  label: "SLICE-PRI",    sub: "SST 1 · SD 0x000A21", src: "NSSF" },
-    { id: "dnn",   col: 1, y: 154, label: "DNN-PRI",      sub: "priority.example",       src: "SMF" },
+    { id: "slice", col: 1, y: 76,  label: "SLICE-EX",    sub: "SST 1 · SD 0x000A21", src: "NSSF" },
+    { id: "dnn",   col: 1, y: 154, label: "DNN-EX",      sub: "service.example",       src: "SMF" },
     { id: "sess",  col: 1, y: 232, label: "PDU-SESS-M01",  sub: "1,612 active",         src: "SMF" },
 
     { id: "cell1", col: 2, y: 76,  label: "C-M01-7711",    sub: "n78 · 001-01",        src: "ENM" },
@@ -720,7 +724,7 @@
   var BLOCKED = [
     "Customer credit posting",
     "Direct billing-state writes",
-    "RAN firmware rollback on cells serving an active public-safety response"
+    "RAN firmware rollback on cells serving an active critical-service response"
   ];
 
   /* ============================== scenarios =============================== */
@@ -1050,7 +1054,7 @@
       cg: [
         { type: "Incident", text: "INC-4740 · no network anomaly anywhere; the fault is entirely in the commercial layer.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "Completeness, arrival lag and Nchf counters are all at baseline. Nothing in the charging plane is wrong.", source: "traversal", conf: 0.97 },
-        { type: "Evidence", text: "{{rate}} is applying entitlement PRI-2025-B to all 1,840 lines on {{acct}}, superseded by PRI-2026-A at the last catalogue refresh.", source: "traversal", conf: 0.94 },
+        { type: "Evidence", text: "{{rate}} is applying entitlement EX-2025-B to all 1,840 lines on {{acct}}, superseded by EX-2026-A at the last catalogue refresh.", source: "traversal", conf: 0.94 },
         { type: "Hypothesis", text: "{{plan}} points at a stale entitlement version. The plan-to-entitlement edge was never revalidated after the catalogue refresh.", source: "traversal", conf: 0.91 },
         { type: "Action", text: "Refresh the plan-to-entitlement edge from the BSS catalogue and re-rate the affected window.", source: "traversal", conf: 0.88 },
         { type: "Outcome", text: "Edge refreshed, window re-rated, all 1,840 lines on the current entitlement. Any resulting adjustment goes to a human — automated credit posting is permanently blocked.", source: "traversal", conf: 0.93 }
@@ -1059,7 +1063,7 @@
         { label: "Completeness", counter: "cdr_completeness", value: "99.97%", base: "99.97%", state: "baseline", on: "{{med}}" },
         { label: "CDR arrival lag", counter: "cdr_arrival_lag_seconds", value: "8 s", base: "5–15 s", state: "baseline", on: "{{med}}" },
         { label: "Nchf request failures", counter: "nchf_request_failure_count", value: "0.0003 /s", base: "0.0003 /s", state: "baseline", on: "both routes" },
-        { label: "Entitlement version in use", counter: "rating_entitlement_id", value: "PRI-2025-B", base: "PRI-2026-A", state: "anomalous", on: "{{rate}}" },
+        { label: "Entitlement version in use", counter: "rating_entitlement_id", value: "EX-2025-B", base: "EX-2026-A", state: "anomalous", on: "{{rate}}" },
         { label: "Plan catalogue refresh age", counter: "plan_edge_age_hours", value: "38 h", base: "≤ 1 h", state: "anomalous", on: "{{plan}}" }
       ],
       controls: [
@@ -1086,7 +1090,7 @@
         { label: "No automated credit posting required", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "verified", text: "Entitlement PRI-2026-A applied, window re-rated, edge age back under one hour. Financial adjustment referred to a human owner rather than posted automatically." }
+      outcome: { state: "verified", text: "Entitlement EX-2026-A applied, window re-rated, edge age back under one hour. Financial adjustment referred to a human owner rather than posted automatically." }
     },
 
     {
@@ -1176,7 +1180,7 @@
         { type: "Observation", text: "Impact follows cell boundaries, not the SMF or the charging route. All three affected cells carry {{chg022}}.", source: "traversal", conf: 0.92 },
         { type: "Evidence", text: "Radio counters are genuinely abnormal this time: session drop rate 6.2× baseline and GTP packet drop elevated on {{upf9}} for those cells only.", source: "traversal", conf: 0.95 },
         { type: "Hypothesis", text: "Firmware 24.1.4 regressed session retention on every sector carrying the build, across both bands in scope. Charging records are incomplete because sessions are ending abnormally — the charging plane is behaving correctly.", source: "traversal", conf: 0.9 },
-        { type: "Action", text: "Rollback is the indicated fix but is permanently blocked from automation on cells serving an active public-safety response. Routed to the RAN duty owner with the evidence attached.", source: "traversal", conf: 0.93 },
+        { type: "Action", text: "Rollback is the indicated fix but is permanently blocked from automation on cells serving an active critical-service response. Routed to the RAN duty owner with the evidence attached.", source: "traversal", conf: 0.93 },
         { type: "Outcome", text: "Human-approved rollback executed by the RAN team. Drop rate and completeness recovered. Charging was never the cause and is recorded as exonerated.", source: "traversal", conf: 0.94 }
       ],
       signals: [
@@ -1208,11 +1212,11 @@
         { label: "A candidate above the surface threshold of 60", pass: true },
         { label: "Control groups isolate the cause", pass: true },
         { label: "Indicated action is automatable", pass: false },
-        { label: "Cells are clear of any active public-safety response", pass: false },
+        { label: "Cells are clear of any active critical-service response", pass: false },
         { label: "Evidence package routed to the accountable owner", pass: true },
         { label: "Verification KPIs defined before execution", pass: true }
       ] },
-      outcome: { state: "blocked", text: "Automation refused: RAN firmware rollback on cells serving an active public-safety response is one of the three permanent blocks. Evidence handed to the RAN duty owner, who approved and executed the rollback manually. Recovery verified afterwards." }
+      outcome: { state: "blocked", text: "Automation refused: RAN firmware rollback on cells serving an active critical-service response is one of the three permanent blocks. Evidence handed to the RAN duty owner, who approved and executed the rollback manually. Recovery verified afterwards." }
     },
 
     {
@@ -1233,7 +1237,7 @@
         ["poolA", "plan", "sess"]
       ],
       cg: [
-        { type: "Incident", text: "INC-4832 · sessions denied continuation on a public-safety slice during an active response.", source: "traversal", conf: 1.0 },
+        { type: "Incident", text: "INC-4832 · sessions denied continuation on a critical-service slice during an active response.", source: "traversal", conf: 1.0 },
         { type: "Observation", text: "{{poolA}} is answering successfully but granting zero quota to 214 sessions. This is a correct-looking interface with a wrong answer.", source: "traversal", conf: 0.94 },
         { type: "Evidence", text: "Quota pool for the {{plan}} entitlement is exhausted at {{poolA}}; the top-up job that normally replenishes it last ran 6 hours ago.", source: "traversal", conf: 0.96 },
         { type: "Hypothesis", text: "Quota replenishment for {{plan}} has stalled. Denials are the charging plane doing exactly what it was told, on stale entitlement state.", source: "traversal", conf: 0.92 },
@@ -1349,10 +1353,10 @@
         a: ["<b>{{poolA}} is running out of queue headroom.</b> Every abnormal counter in the window sits on one charging route: Nchf failures at 0.062/s against a 0.0003/s baseline, and queue wait p95 at 4.7 s against 0.18 s.",
             "{{chg007}} raised that pool's queue high-watermark from 80% to 92% two days before the incident. That removed the spare capacity which used to absorb exactly this load pattern. The candidate scores <b>88</b>."],
         prov: "Counters from EMS via traversal · change record from ITSM · confidence 0.91",
-        bare: ["A CDR-completeness breach with elevated Nchf errors on a priority slice is most commonly caused by charging-function capacity, mediation backlog, or a session-management fault. I would start by checking CHF utilisation and mediation queue depth.",
+        bare: ["A CDR-completeness breach with elevated Nchf errors on a example service slice is most commonly caused by charging-function capacity, mediation backlog, or a session-management fault. I would start by checking CHF utilisation and mediation queue depth.",
                "Without the topology I cannot tell you which pool, which route, or whether a recent change is involved — so I cannot rank those three against each other."] },
       { q: "What rules out the other explanations?",
-        a: ["<b>Three control groups, and the one that is missing is stated rather than hidden.</b> Sessions on the same cells but off the priority slice are healthy, which argues against a cell-level cause. {{smf5}} over {{rtB}} is healthy, which points back at the affected charging path. {{plan}} sessions in other markets are healthy, which argues against plan or SLA-mapping drift.",
+        a: ["<b>Three control groups, and the one that is missing is stated rather than hidden.</b> Sessions on the same cells but off the example service slice are healthy, which argues against a cell-level cause. {{smf5}} over {{rtB}} is healthy, which points back at the affected charging path. {{plan}} sessions in other markets are healthy, which argues against plan or SLA-mapping drift.",
             "{{chg022}}, the RAN firmware change, falls inside the seven-day change lookback — but the radio and user-plane counters are at baseline and every abnormal counter sits on one charging route, so it scores 6.",
             "The trigger side is dismissed on its fingerprint rather than on a control: charging events that are never generated show a <i>fall</i> in Nchf request volume and no errors at all, and here the failures run roughly 200× baseline with a 4.7 s queue wait behind them. The one control that is missing — the same SMF over an alternate CHF route — is stated rather than hidden, because no live traffic runs that pairing."],
         prov: "Control comparisons from traversal · 3 healthy, 1 unavailable · confidence 0.93",
@@ -1418,7 +1422,7 @@
             "There is no charging-plane anomaly at all. The Nchf path, the pools and the routes are clean.",
             "The reconciliation gap opens between mediation acceptance and rating acceptance, which is a mapping problem rather than a network fault."],
         prov: "Acceptance and rejection counts from MED and BSS via traversal",
-        bare: ["A completeness or reconciliation gap on a priority slice would usually be caused by charging-function or mediation problems.",
+        bare: ["A completeness or reconciliation gap on a example service slice would usually be caused by charging-function or mediation problems.",
                "That answer points upstream, and upstream is measurably healthy here. Without the per-stage acceptance counts I would send the investigation to the wrong team."] },
       { q: "Why did the charging plane look healthy?",
         a: ["<b>Because it was healthy.</b> The failure is one stage further along, and the two stages are measured separately.",
@@ -1464,7 +1468,7 @@
             "1,840 lines are being rated against a <b>superseded entitlement</b>. The records are correct; the price applied to them is not.",
             "Nothing in the network is broken, which is why the network-facing candidates all score low."],
         prov: "Entitlement version from BSS · counters at baseline via traversal",
-        bare: ["Charging discrepancies on a priority plan are usually caused by network or mediation faults, so I would check the charging path first.",
+        bare: ["Charging discrepancies on a example service plan are usually caused by network or mediation faults, so I would check the charging path first.",
                "That is exactly the wrong direction here. The charging path is clean and the fault is in a BSS mapping."] },
       { q: "How is this distinguished from a fault?",
         a: ["<b>By what is normal, not by what is wrong.</b> Complete records, normal timing, clean interfaces — no fault signature anywhere in the charging plane.",
@@ -1474,7 +1478,7 @@
         bare: ["Configuration and rating errors can occur without any network fault.",
                "General and correct. I cannot check an entitlement version, so I cannot tell you whether this is one."] },
       { q: "What was done about it?",
-        a: ["<b>Entitlement PRI-2026-A was applied and the window re-rated.</b> Edge age is back under one hour.",
+        a: ["<b>Entitlement EX-2026-A was applied and the window re-rated.</b> Edge age is back under one hour.",
             "The financial adjustment was <b>referred to a human owner rather than posted automatically</b>. Applying the correct entitlement going forward is a configuration action; adjusting what a customer is charged for the past is not.",
             "That split is the point: the automation fixes the mapping, a person settles the money."],
         prov: "Outcome verified · financial adjustment referred, not posted",
@@ -1510,7 +1514,7 @@
             "The ordering is decisive: <b>Nchf errors follow the drops rather than leading them</b>. Sessions fail, and the charging errors are the consequence.",
             "The charging plane is the symptom. Every charging-side candidate scores lower than the RAN firmware candidate."],
         prov: "Counter ordering from EMS and ENM via traversal · firmware change from ITSM",
-        bare: ["Reduced completeness with elevated Nchf errors on a priority slice most likely indicates a charging-path problem.",
+        bare: ["Reduced completeness with elevated Nchf errors on a example service slice most likely indicates a charging-path problem.",
                "Wrong team, wrong plane. Without the timing order I cannot tell that the charging errors are downstream of session drops."] },
       { q: "How was the direction established?",
         a: ["<b>By sequence, which is the one thing a snapshot cannot show.</b> The drops start first; the Nchf errors track them afterwards.",
@@ -1520,7 +1524,7 @@
         bare: ["Correlated failures across radio and charging can point either way, and I would look at timing to decide.",
                "The right method, named without being able to apply it. I do not have the series."] },
       { q: "Why did automation refuse a correct diagnosis?",
-        a: ["<b>Because RAN firmware rollback on cells serving an active public-safety response is one of the three permanent blocks.</b> No confidence level lifts it.",
+        a: ["<b>Because RAN firmware rollback on cells serving an active critical-service response is one of the three permanent blocks.</b> No confidence level lifts it.",
             "The evidence went to the RAN duty owner, who approved and executed the rollback manually. Recovery was verified afterwards.",
             "This is the distinction the demo is built around: <b>the system was right and still did not act.</b> Being correct is not the same as being authorised."],
         prov: "Gate evaluation and outcome from traversal · permanent block, manual execution",
@@ -1533,7 +1537,7 @@
             "Completeness is 97.3%, so this is not primarily a record-loss problem. Sessions in progress could not get authorisation to continue.",
             "The pool is answering correctly and answering <i>no</i>, which is why an error-rate view sees a healthy interface. The empty pool is where the denials surface; the entitlement whose top-up never ran is the cause — the alternate pool is exhausted for this entitlement too."],
         prov: "Denial counts and quota responses from EMS via traversal",
-        bare: ["Session continuation failures on a priority slice would usually point to session management or charging-function availability.",
+        bare: ["Session continuation failures on a example service slice would usually point to session management or charging-function availability.",
                "The charging function is available. It is refusing quota, which is a different failure needing a different fix."] },
       { q: "Why is this worse than dropped records?",
         a: ["<b>Because it is live service denial on an active response, not a billing artefact.</b> Dropped records cost money and can be reconciled afterwards; denied continuation means a session in progress stops.",

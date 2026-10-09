@@ -1,6 +1,6 @@
 # Knowledge &amp; Context Graphs
 
-V4.0 (October 2026)
+V4.1 (October 2026)
 
 A self-paced introduction to knowledge graphs and context graphs, plus an interactive fault-isolation demo that puts the concepts on one screen. Static HTML with no build step, no server, and no external dependencies &mdash; open `index.html` in any modern browser.
 
@@ -11,6 +11,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 | `index.html` | Section landing page with the module cards |
 | `KG-CG-101.html` | The course &mdash; eight teaching modules plus a glossary and a reference list, eight interactive panels, 17 diagrams, 44 formal definitions, 133 glossary terms, 43 cited sources |
 | `KG-CG-Demo.html` | Charging assurance walkthrough &mdash; ten scenarios, seven stages each |
+| `KG-CG-Briefing.html` | Complete standalone charging briefing &mdash; 44 slides, five live demos, definitions, glossary and sources; V2.4 (October 2026) |
 | `hero.png` | Landing-page hero image |
 
 ## The course
@@ -26,7 +27,7 @@ A self-paced introduction to knowledge graphs and context graphs, plus an intera
 7. **Building One for Real** &mdash; where nodes and edges come from, freshness, and four ways graphs quietly go bad. The six ingestion stages and which failure each one introduces, with the cheapest detector for each; edge sources ranked by trust with confidence bands; one edge ingested properly, and the MERGE trap; one traversal crossing four feeds of different ages; a first scope named concretely.
 8. **Where Language Models Fit** &mdash; the same question answered with the graph in hand and with it withheld. Grounding, RAG, GraphRAG, Jev and hallucination defined; balanced 2026 GraphRAG evidence; a bounded-model routing/scoring pattern that preserves schema validation, calibration and the deterministic action gate; four boundaries around generative models; and a mechanically checkable grounded prompt.
 9. **Glossary** &mdash; 133 terms across six categories, searchable and filterable.
-10. **References** &mdash; 43 primary sources grouped by topic, each with a verification badge and a note on what it settles.
+10. **References** &mdash; 43 sources grouped by topic, each with a verification badge and a note on what it settles.
 
 Each module closes with an **onward-reading** block naming specific clauses or sections rather than whole documents, each with the reason to open it. Each of the eight teaching modules then ends with five questions; the glossary and the reference list are not graded. Four correct marks a module complete, and the completion bar is measured against those eight. Progress and theme choice are kept in `localStorage` in the visitor's own browser; nothing is sent anywhere.
 
@@ -46,7 +47,13 @@ The telecom material describes a **generic, vendor-neutral operator**. Element n
 
 ## Changelog
 
-All three files share one version number, so a single label tells you whether anything in the section changed.
+The landing page, course and interactive walkthrough share V4.1 (October 2026). The full standalone briefing has its own V2.4 (October 2026) version. Both displayed versions include the release month.
+
+### V4.1 (October 2026)
+
+- Audited course examples, temporal evidence, citations, current standards and generic public terminology.
+- Added the complete, self-contained 44-slide charging briefing as its own HTML page, including five live demos, definitions, glossary, source material and alternate read/present modes.
+- Rechecked all visible current version labels to include October 2026.
 
 ### V4.0 (October 2026)
 

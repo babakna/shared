@@ -17,7 +17,7 @@ October 2026 release.
 - [PQC Learning Lab](PQC/index.html) - Post-quantum cryptography foundations, standards, migration tools, and roadmap
 
 ## Knowledge & Context Graphs
-- [Knowledge & Context Graphs](KG-CG/index.html) - Foundations course plus an interactive fault-isolation demo
+- [Knowledge & Context Graphs](KG-CG/index.html) - Foundations course, interactive fault-isolation demo, and complete standalone charging briefing
 
 ## Additional tools
 - [Household Social Security Planner](SSFamily/index.html) — Filing, survivor, dependent, family-maximum, and portfolio scenarios
