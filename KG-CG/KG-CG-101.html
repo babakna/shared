@@ -48,7 +48,7 @@ a{color:var(--blue)}
 .hdr-btn svg{width:18px;height:18px}
 
 /* ---------- module trail ---------- */
-.trail-wrap{position:sticky;top:59px;z-index:55;background:var(--card);border-bottom:1px solid var(--border);padding:7px 22px;overflow-x:auto;scrollbar-width:none}
+.trail-wrap{position:sticky;top:var(--course-header-height, 59px);z-index:55;background:var(--card);border-bottom:1px solid var(--border);padding:7px 22px;overflow-x:auto;scrollbar-width:none}
 .trail-wrap::-webkit-scrollbar{display:none}
 .trail{display:flex;align-items:center;gap:5px;min-width:min-content}
 .tstep{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text-sec);font-size:.775rem;font-weight:650;cursor:pointer;white-space:nowrap;transition:all .15s}
@@ -329,7 +329,7 @@ html[data-theme="dark"] .gcat.on{color:#0A1120}
 @media(max-width:820px){
 .hdr{padding:9px 14px}
 .hdr-s{display:none}
-.trail-wrap{padding:6px 14px;top:55px}
+.trail-wrap{padding:6px 14px}
 .main{padding:24px 15px 60px}
 .bar{grid-template-columns:104px 1fr 46px;gap:8px;font-size:.79rem}
 .foot{padding:18px 15px 26px}
@@ -4448,6 +4448,15 @@ window.addEventListener("scroll", function(){
   el("totop").classList.toggle("on", window.scrollY > 460);
 });
 el("totop").addEventListener("click", function(){ window.scrollTo({top:0, behavior:"smooth"}); });
+
+/* Keep the sticky trail below the header when text wraps on narrow screens. */
+function syncHeaderOffset(){
+  var h = document.querySelector(".hdr").getBoundingClientRect().height;
+  document.documentElement.style.setProperty("--course-header-height", Math.ceil(h) + "px");
+}
+syncHeaderOffset();
+if(window.ResizeObserver) new ResizeObserver(syncHeaderOffset).observe(document.querySelector(".hdr"));
+else window.addEventListener("resize", syncHeaderOffset);
 
 /* ============================ init ============================ */
 load();
