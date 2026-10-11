@@ -1,8 +1,14 @@
 # Post-Quantum Cryptography Learning Lab
 
-V10.0 (October 2026)
+V10.1 (October 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V10.1
+
+- Removed stale counts: PQC-302 has seven labs and PQC-701 has five decision points, so the module and landing text no longer hardcode four or five.
+- Replaced a duplicated PQC-701 final-assessment item (two questions on starting the field-device track early) with a harvest-now-decrypt-later prioritization question.
+- Refined the Grover's algorithm glossary entry: the square-root speedup is theoretical and parallelizes poorly, AES-128 remains acceptable to NIST, and hash collision resistance is affected less directly.
 
 ## What changed in V10.0
 

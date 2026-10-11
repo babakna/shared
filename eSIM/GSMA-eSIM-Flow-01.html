@@ -270,7 +270,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V10.0</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated October 2026 &middot; <span class="byline-name">Namiranian, Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V10.1</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated October 2026 &middot; <span class="byline-name">Namiranian, Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -435,7 +435,7 @@ function ec(n){return EC[n]||'#888'}
    ═══════════════════════════════════════════════════════════ */
 const SPEC={
 m2m:{badge:'SGP.01 '+SPEC_VERSIONS['SGP.01']+' / SGP.02 '+SPEC_VERSIONS['SGP.02'],title:'M2M Remote Provisioning Architecture',
-whatsNew:'v4.x added SM-SR swap (ES6), profile interoperability across SM-SR platforms, and MNO-SD support for operator-controlled security domains.',
+whatsNew:'v4.x added the M2M Service Provider (M2M SP) role, the ES4A Operator\u2013SM-SR interface, Profile Lifecycle Management Authorisation (PLMA), and the Emergency Profile attribute. SM-SR Change (the \u201cSM-SR swap\u201d) over ES7 (SM-SR \u2194 SM-SR) is older: it is already specified in SGP.02 v3.0 (2015). ES6 is the Operator \u2194 eUICC (MNO-SD) OTA interface.',
 overview:['SGP.01 and SGP.02 define the original GSMA architecture for Machine-to-Machine (M2M) Remote SIM Provisioning (RSP). This architecture was designed for devices where there is no end-user interaction \u2014 connected cars, smart meters, industrial IoT modules, and vending machines. The key principle is that an Operator or M2M Service Provider (M2M-SP) remotely manages profiles on an eUICC through backend platform-to-platform communication.','The architecture introduces two critical backend entities: the Subscription Manager \u2013 Data Preparation (SM-DP), which securely prepares and encrypts profile packages, and the Subscription Manager \u2013 Secure Routing (SM-SR), which manages the secure transport channel to the eUICC and handles the lifecycle of profiles on it. The SM-SR maintains a secure remote channel to each eUICC using SCP03t or SCP80/SCP81, and acts as a gatekeeper \u2014 no entity other than the SM-SR communicates directly with the eUICC.','A key design decision in the M2M architecture is the \u201cpush\u201d model: the SM-SR pushes commands to the eUICC via the remote channel, which is why no Local Profile Assistant (LPA) or end-user UI is required. Profile operations (download, enable, disable, delete) are all initiated from the network side. This makes M2M RSP suitable for unattended devices but introduces dependencies on the SM-SR having continuous connectivity to the eUICC.','The SM-DP and SM-SR can be operated by the same entity or different entities. In many deployments, the eUICC manufacturer (EUM) provides the initial SM-SR, and Operators can request SM-SR changes (\u201cSM-SR swap\u201d) to move eUICC management to their preferred platform. Inter-SM-SR handover is defined in the spec but is complex and not universally deployed.','<b>Operational Realities:</b> Many M2M deployments use Binary SMS through the MNO\u2019s SMS-C (Short Message Service Center) for the remote channel, while others use IP-based secure channels. Operational complexity depends on bearer choice, SM-SR topology, key management, and deployment contracts. Compared with Consumer and IoT RSP architectures, SGP.02 deployments can involve more backend coordination, especially for SM-SR onboarding, key exchange, EIS updates, and multi-operator integration.','<b>Deployment Examples (illustrative):</b> Connected vehicles, smart meters, vending machines, industrial modules, and asset trackers. SM-SR operating models vary by EUM, platform vendor, operator, and service-provider contract. Treat vendor and product associations as deployment-specific and source-verification-needed.','<b>Interface note:</b> M2M download starts with the Operator ordering download from the SM-DP; the SM-DP then coordinates with the SM-SR to create the ISD-P, retrieve EIS data, establish the end-to-end secure profile channel, and install the encrypted profile through the SM-SR remote transport. ES4 is the Operator-to-SM-SR path for remote profile management commands such as enable, disable, delete, and EIS queries. The no-ES4 variants below represent deployments where the Operator uses an SM-DP/vendor management path instead of direct Operator-to-SM-SR operations.'],
 entities:['Operator (M2M-SP)','SM-DP','SM-SR','eUICC'],
 flows:{'m2m-download':'Download & Install (Full M2M)','m2m-enable':'Profile Enable (ES4)','m2m-disable':'Profile Disable (ES4)','m2m-delete':'Profile Delete (ES4)','m2m-download-noes4':'Download (SM-DP Managed)','m2m-enable-noes4':'Enable (SM-DP Managed)','m2m-disable-noes4':'Disable (SM-DP Managed)','m2m-delete-noes4':'Delete (SM-DP Managed)'}},
@@ -486,53 +486,53 @@ const FL={
 
 'm2m-enable':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-SR|Secure Routing','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'ES4: EnableProfile Request',a:[['EID','Target eUICC'],['ICCID','Profile to enable']],d:'Operator requests SM-SR to enable a specific profile on the eUICC.'},
-{f:1,t:2,n:'ES1: EnableProfile (SM-SR Push)',a:[['ICCID','Target profile'],['SET STATUS','GlobalPlatform APDU']],d:'SM-SR sends the enable command via the secure remote channel.'},
+{f:1,t:2,n:'ES5: EnableProfile (SM-SR Push)',a:[['ICCID','Target profile'],['SET STATUS','GlobalPlatform APDU']],d:'SM-SR sends the enable command via the secure remote channel.'},
 {f:2,t:2,n:'Profile Switch (Internal)',a:[['Active Profile','Switches to enabled ICCID'],['Previous Profile','Disabled automatically']],d:'eUICC disables the currently active profile and enables the requested one. A REFRESH is triggered to notify the modem.'},
-{f:2,t:1,n:'ES1: EnableResult',a:[['Result Code','Success / failure'],['ICCID','Now-active profile']],d:'eUICC reports the enable result to SM-SR.'},
+{f:2,t:1,n:'ES5: EnableResult',a:[['Result Code','Success / failure'],['ICCID','Now-active profile']],d:'eUICC reports the enable result to SM-SR.'},
 {f:1,t:0,n:'ES4: Notification',a:[['Status','Profile enabled successfully'],['EID','Target eUICC']],d:'SM-SR notifies the Operator that the profile is now active.'}
 ]},
 
 'm2m-enable-noes4':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-DP|Data Preparation','SM-SR (3rd Party)|Secure Routing','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'Enable Request (out-of-band)',a:[['EID','Target eUICC'],['ICCID','Profile to enable']],d:'Operator requests profile enable through the SM-DP vendor\u2019s management interface (API, portal). No ES4 access to SM-SR.'},
-{f:1,t:2,n:'ES2: EnableProfile Request',a:[['EID','Target eUICC'],['ICCID','Profile to enable']],d:'SM-DP relays the enable request to SM-SR via ES2.'},
-{f:2,t:3,n:'ES1: EnableProfile (SM-SR Push)',a:[['ICCID','Target profile'],['SET STATUS','GlobalPlatform APDU']],d:'SM-SR sends enable command via the remote channel.'},
+{f:1,t:2,n:'ES3: EnableProfile Request',a:[['EID','Target eUICC'],['ICCID','Profile to enable']],d:'SM-DP relays the enable request to SM-SR via ES3.'},
+{f:2,t:3,n:'ES5: EnableProfile (SM-SR Push)',a:[['ICCID','Target profile'],['SET STATUS','GlobalPlatform APDU']],d:'SM-SR sends enable command via the remote channel.'},
 {f:3,t:3,n:'Profile Switch (Internal)',a:[['Active Profile','Switches to enabled ICCID'],['Previous Profile','Disabled automatically']],d:'eUICC performs the switch. REFRESH triggers modem re-attach.'},
-{f:3,t:2,n:'ES1: EnableResult',a:[['Result Code','Success / failure'],['ICCID','Now-active profile']],d:'eUICC reports result.'},
-{f:2,t:1,n:'ES2: EnableResult Relay',a:[['Result Code','Success / failure'],['ICCID','Enabled profile']],d:'SM-SR relays result to SM-DP.'},
+{f:3,t:2,n:'ES5: EnableResult',a:[['Result Code','Success / failure'],['ICCID','Now-active profile']],d:'eUICC reports result.'},
+{f:2,t:1,n:'ES3: EnableResult Relay',a:[['Result Code','Success / failure'],['ICCID','Enabled profile']],d:'SM-SR relays result to SM-DP.'},
 {f:1,t:0,n:'Notification (out-of-band)',a:[['Status','Profile enabled'],['EID / ICCID','Identifiers']],d:'SM-DP notifies Operator via vendor-specific mechanism.'}
 ]},
 
 'm2m-disable':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-SR|Secure Routing','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'ES4: DisableProfile Request',a:[['EID','Target eUICC'],['ICCID','Profile to disable']],d:'Operator requests SM-SR to disable a specific profile.'},
-{f:1,t:2,n:'ES1: DisableProfile (SM-SR Push)',a:[['ICCID','Target profile'],['SET STATUS','GlobalPlatform APDU']],d:'SM-SR sends the disable command via the remote channel.'},
-{f:2,t:1,n:'ES1: DisableResult',a:[['Result Code','Success / failure'],['ICCID','Disabled profile']],d:'eUICC confirms the profile has been disabled.'},
+{f:1,t:2,n:'ES5: DisableProfile (SM-SR Push)',a:[['ICCID','Target profile'],['SET STATUS','GlobalPlatform APDU']],d:'SM-SR sends the disable command via the remote channel.'},
+{f:2,t:1,n:'ES5: DisableResult',a:[['Result Code','Success / failure'],['ICCID','Disabled profile']],d:'eUICC confirms the profile has been disabled.'},
 {f:1,t:0,n:'ES4: Notification',a:[['Status','Profile disabled'],['EID','Target eUICC']],d:'SM-SR notifies the Operator of the result.'}
 ]},
 
 'm2m-disable-noes4':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-DP|Data Preparation','SM-SR (3rd Party)|Secure Routing','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'Disable Request (out-of-band)',a:[['EID','Target eUICC'],['ICCID','Profile to disable']],d:'Operator requests through SM-DP vendor interface.'},
-{f:1,t:2,n:'ES2: DisableProfile Request',a:[['EID','Target'],['ICCID','Profile to disable']],d:'SM-DP relays to SM-SR.'},
-{f:2,t:3,n:'ES1: DisableProfile (SM-SR Push)',a:[['ICCID','Target'],['SET STATUS','GP APDU']],d:'Remote disable command via SM-SR.'},
-{f:3,t:2,n:'ES1: DisableResult',a:[['Result Code','Success / failure'],['ICCID','Disabled profile']],d:'eUICC confirms.'},
-{f:2,t:1,n:'ES2: DisableResult Relay',a:[['Result Code','Success / failure']],d:'SM-SR relays result.'},
+{f:1,t:2,n:'ES3: DisableProfile Request',a:[['EID','Target'],['ICCID','Profile to disable']],d:'SM-DP relays to SM-SR.'},
+{f:2,t:3,n:'ES5: DisableProfile (SM-SR Push)',a:[['ICCID','Target'],['SET STATUS','GP APDU']],d:'Remote disable command via SM-SR.'},
+{f:3,t:2,n:'ES5: DisableResult',a:[['Result Code','Success / failure'],['ICCID','Disabled profile']],d:'eUICC confirms.'},
+{f:2,t:1,n:'ES3: DisableResult Relay',a:[['Result Code','Success / failure']],d:'SM-SR relays result.'},
 {f:1,t:0,n:'Notification (out-of-band)',a:[['Status','Profile disabled'],['EID / ICCID','Identifiers']],d:'SM-DP notifies Operator.'}
 ]},
 
 'm2m-delete':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-SR|Secure Routing','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'ES4: DeleteProfile Request',a:[['EID','Target eUICC'],['ICCID','Profile to delete']],d:'Operator requests permanent deletion of a profile from the eUICC.'},
-{f:1,t:2,n:'ES1: DeleteProfile (SM-SR Push)',a:[['ICCID','Target profile'],['DELETE','GlobalPlatform APDU']],d:'SM-SR sends the delete command. The profile must be in disabled state.'},
+{f:1,t:2,n:'ES5: DeleteProfile (SM-SR Push)',a:[['ICCID','Target profile'],['DELETE','GlobalPlatform APDU']],d:'SM-SR sends the delete command. The profile must be in disabled state.'},
 {f:2,t:2,n:'Profile Deletion (Internal)',a:[['Memory Reclaim','Profile data and keys wiped'],['ISD-P Removal','Security domain removed']],d:'eUICC removes the profile, its keys, and frees the memory. This is irreversible.'},
-{f:2,t:1,n:'ES1: DeleteResult',a:[['Result Code','Success / failure'],['ICCID','Deleted profile']],d:'eUICC confirms deletion.'},
+{f:2,t:1,n:'ES5: DeleteResult',a:[['Result Code','Success / failure'],['ICCID','Deleted profile']],d:'eUICC confirms deletion.'},
 {f:1,t:0,n:'ES4: Notification',a:[['Status','Profile deleted'],['EID','Target eUICC']],d:'SM-SR notifies the Operator. The ICCID can now be recycled.'}
 ]},
 
 'm2m-delete-noes4':{nodes:['Operator (M2M-SP)|MNO / M2M-SP','SM-DP|Data Preparation','SM-SR (3rd Party)|Secure Routing','eUICC|Embedded SIM'],steps:[
 {f:0,t:1,n:'Delete Request (out-of-band)',a:[['EID','Target eUICC'],['ICCID','Profile to delete']],d:'Operator requests through SM-DP vendor interface. Profile must be disabled first.'},
-{f:1,t:2,n:'ES2: DeleteProfile Request',a:[['EID','Target'],['ICCID','Profile to delete']],d:'SM-DP relays to SM-SR.'},
-{f:2,t:3,n:'ES1: DeleteProfile (SM-SR Push)',a:[['ICCID','Target'],['DELETE','GP APDU']],d:'Remote delete command via SM-SR.'},
+{f:1,t:2,n:'ES3: DeleteProfile Request',a:[['EID','Target'],['ICCID','Profile to delete']],d:'SM-DP relays to SM-SR.'},
+{f:2,t:3,n:'ES5: DeleteProfile (SM-SR Push)',a:[['ICCID','Target'],['DELETE','GP APDU']],d:'Remote delete command via SM-SR.'},
 {f:3,t:3,n:'Profile Deletion (Internal)',a:[['Memory Reclaim','Profile data and keys wiped'],['ISD-P Removal','Security domain removed']],d:'Irreversible deletion.'},
-{f:3,t:2,n:'ES1: DeleteResult',a:[['Result Code','Success / failure'],['ICCID','Deleted']],d:'eUICC confirms.'},
-{f:2,t:1,n:'ES2: DeleteResult Relay',a:[['Result Code','Success / failure']],d:'SM-SR relays result.'},
+{f:3,t:2,n:'ES5: DeleteResult',a:[['Result Code','Success / failure'],['ICCID','Deleted']],d:'eUICC confirms.'},
+{f:2,t:1,n:'ES3: DeleteResult Relay',a:[['Result Code','Success / failure']],d:'SM-SR relays result.'},
 {f:1,t:0,n:'Notification (out-of-band)',a:[['Status','Profile deleted'],['EID / ICCID','Identifiers']],d:'SM-DP notifies Operator. ICCID can be recycled.'}
 ]},
 
@@ -762,10 +762,10 @@ jumpTarget:{tab:'consumer',flow:'consumer-ac',step:15},
 checks:['Check available memory via ES10b.GetEUICCInfo2 \u2192 extCardResource field','List installed profiles via ES10c.GetProfilesInfo \u2014 identify any that can be deleted','Delete unused disabled profiles to free memory (ES10c.DeleteProfile)','Check with the profile template owner if the profile can be optimized (smaller file system, fewer applets)'],
 logs:['ES10b.GetEUICCInfo2 \u2192 check extCardResource field for available memory','LoadBoundProfilePackage response: SW=6A84 (not enough memory)','Count installed profiles: ES10c.GetProfilesInfo']},
 {symptom:'M2M remote commands fail \u2014 SM-SR cannot establish secure channel to eUICC',
-causes:['Remote channel keys (SCP03t/SCP80/SCP81) on SM-SR do not match keys on eUICC ISD-R','Keys were rotated on one side but not the other','EUM manufacturing error \u2014 ISD-R keys were not correctly loaded','SM-SR was swapped (ES6) but new SM-SR was not provided correct key material','Key version number mismatch between SM-SR and eUICC'],
-flowStep:'M2M flows \u2014 fails at ES1 (any remote push command)',
+causes:['Remote channel keys (SCP03t/SCP80/SCP81) on SM-SR do not match keys on eUICC ISD-R','Keys were rotated on one side but not the other','EUM manufacturing error \u2014 ISD-R keys were not correctly loaded','SM-SR was swapped (ES7) but new SM-SR was not provided correct key material','Key version number mismatch between SM-SR and eUICC'],
+flowStep:'M2M flows \u2014 fails at ES5 (any remote push command)',
 jumpTarget:{tab:'m2m',flow:'m2m-download',step:5},
-checks:['Request the EIS (eUICC Information Set) from the SM-SR via ES4.GetEIS','Compare ISD-R key info in EIS with what the SM-SR has stored','Check if a key rotation occurred recently','If SM-SR was swapped, verify key material was transferred via ES6','Contact the EUM to verify the ISD-R keys loaded during manufacturing','As a last resort, the EUM may need to re-personalize the ISD-R (requires physical access or EUM remote update)'],
+checks:['Request the EIS (eUICC Information Set) from the SM-SR via ES4.GetEIS','Compare ISD-R key info in EIS with what the SM-SR has stored','Check if a key rotation occurred recently','If SM-SR was swapped, verify key material was transferred via ES7','Contact the EUM to verify the ISD-R keys loaded during manufacturing','As a last resort, the EUM may need to re-personalize the ISD-R (requires physical access or EUM remote update)'],
 logs:['SM-SR log: "secure channel establishment failed" or "MAC verification error"','Check SCP03t key version number mismatch','EIS dump: compare ISD-R key info with SM-SR records']},
 {symptom:'IoT device has no connectivity \u2014 bootstrap/provisioning profile missing or non-functional',
 causes:['No bootstrap profile was loaded during manufacturing','Bootstrap profile subscription expired or was deactivated by the operator','Bootstrap APN is not provisioned or has been changed','Device is in a region where the bootstrap operator has no coverage','Bootstrap profile was deleted accidentally','eUICC was reset (factory reset) and bootstrap profile was lost'],
@@ -803,7 +803,7 @@ logs:['ES10c.GetProfilesInfo \u2192 profilePolicyRules field','Error code: subje
 // Format: {term:'Term', def:'Definition', spec:'Spec reference'}
 const GLOSSARY=[
 {term:'eUICC',def:'Embedded Universal Integrated Circuit Card \u2014 the secure element class that supports GSMA remote SIM provisioning and downloadable profile lifecycle management. It is different from a conventional UICC placed in an embedded or soldered form factor.',spec:'All SGP specs'},
-{term:'EID',def:'eUICC Identifier \u2014 a 32-digit globally unique identifier for a specific eUICC. Think of it as the serial number of the eSIM chip. Format: 89049032...',spec:'SGP.29 (current), SGP.02 Annex H (legacy)'},
+{term:'EID',def:'eUICC Identifier \u2014 a 32-digit globally unique identifier for a specific eUICC. Think of it as the serial number of the eSIM chip. Format: 89049032...',spec:'SGP.29 (current), SGP.02 \u00a72.2.2 (legacy)'},
 {term:'ICCID',def:'Integrated Circuit Card Identifier \u2014 identifies a specific profile (subscription). This is the "SIM card number" equivalent. Typically 19\u201320 digits.',spec:'All SGP specs'},
 {term:'IMSI',def:'International Mobile Subscriber Identity \u2014 the identity used by the network to identify the subscriber. Stored inside the profile.',spec:'All SGP specs'},
 {term:'Profile',def:'A complete set of data (file system, applications, credentials, keys) equivalent to a physical SIM card, stored in an ISD-P on the eUICC.',spec:'All SGP specs'},
@@ -958,10 +958,10 @@ function archM2Mv3(){
   s+=svgEnt(420,60,'SM-SR','Secure Routing','#7C3AED');
   s+=svgEnt(780,170,'eUICC','Embedded SIM','#DC2626');
   s+=svgLine(200,93,420,93,'#2563EB','ES4',false,'ES4: Operator \u2192 SM-SR');
-  s+=svgLine(125,125,125,280,'#2563EB','ES5',true,'ES5: Operator \u2194 SM-DP (not used in preloaded)');
-  s+=svgLine(200,313,420,93,'#1E3A5F','ES2',false,'ES2: SM-DP \u2194 SM-SR');
-  s+=svgLine(570,93,780,203,'#7C3AED','ES1',false,'ES1: SM-SR \u2192 eUICC (remote)');
-  s+=svgCurve(200,330,400,440,650,440,780,235,'#1E3A5F','ES3 (logical, via SM-SR)',true,'ES3: SM-DP \u2194 eUICC (logical, tunneled via ES2\u2192SM-SR\u2192ES1)');
+  s+=svgLine(125,125,125,280,'#2563EB','ES2',true,'ES2: Operator \u2194 SM-DP (not used in preloaded)');
+  s+=svgLine(200,313,420,93,'#1E3A5F','ES3',false,'ES3: SM-DP \u2194 SM-SR');
+  s+=svgLine(570,93,780,203,'#7C3AED','ES5',false,'ES5: SM-SR \u2192 eUICC (remote)');
+  s+=svgCurve(200,330,400,440,650,440,780,235,'#1E3A5F','ES8 (logical, via SM-SR)',true,'ES8: SM-DP \u2194 eUICC (logical, tunneled via ES3\u2192SM-SR\u2192ES5)');
   s+='</svg>';
   return s;
 }
@@ -973,14 +973,14 @@ function archM2Mv4(){
   s+=svgEnt(420,60,'SM-SR','Secure Routing','#7C3AED');
   s+=svgEnt(420,380,'SM-SR B','Swap Target','#7C3AED');
   s+=svgEnt(780,170,'eUICC','Embedded SIM','#DC2626');
-  s+=svgBadge(55,345,'Profile Interop','#1E3A5F');
+  s+=svgBadge(55,345,'M2M SP + PLMA','#1E3A5F');
   s+='<text x="855" y="255" text-anchor="middle" fill="#DC2626" font-size="11" font-weight="600">MNO-SD</text>';
   s+=svgLine(200,93,420,93,'#2563EB','ES4',false,'ES4: Operator \u2192 SM-SR');
-  s+=svgLine(125,125,125,280,'#2563EB','ES5',true,'ES5: Operator \u2194 SM-DP (not used in preloaded-profile deployments)');
-  s+=svgLine(200,313,420,93,'#1E3A5F','ES2',false,'ES2: SM-DP \u2194 SM-SR');
-  s+=svgLine(570,93,780,203,'#7C3AED','ES1',false,'ES1: SM-SR \u2192 eUICC (remote)');
-  s+=svgLine(495,125,495,380,'#7C3AED','ES6',true,'ES6: SM-SR \u2194 SM-SR B (platform handover)');
-  s+=svgCurve(200,330,400,480,650,480,780,235,'#1E3A5F','ES3 (logical, via SM-SR)',true,'ES3: SM-DP \u2194 eUICC (logical)');
+  s+=svgLine(125,125,125,280,'#2563EB','ES2',true,'ES2: Operator \u2194 SM-DP (not used in preloaded-profile deployments)');
+  s+=svgLine(200,313,420,93,'#1E3A5F','ES3',false,'ES3: SM-DP \u2194 SM-SR');
+  s+=svgLine(570,93,780,203,'#7C3AED','ES5',false,'ES5: SM-SR \u2192 eUICC (remote)');
+  s+=svgLine(495,125,495,380,'#7C3AED','ES7',true,'ES7: SM-SR \u2194 SM-SR B (SM-SR Change)');
+  s+=svgCurve(200,330,400,480,650,480,780,235,'#1E3A5F','ES8 (logical, via SM-SR)',true,'ES8: SM-DP \u2194 eUICC (logical)');
   s+='</svg>';
   return s;
 }
@@ -1401,7 +1401,7 @@ function esim101HTML(){
   h+='<line x1="50" y1="80" x2="950" y2="80" stroke="var(--bdr)" stroke-width="3"/>';
   /* Milestones */
   var milestones=[
-    {year:'2013',x:90,spec:'SGP.02 v3',label:'M2M RSP',desc:'(illustrative milestone)',color:'#2563EB',tab:'m2m'},
+    {year:'2013',x:90,spec:'SGP.02 v1.0',label:'M2M RSP',desc:'(illustrative milestone)',color:'#2563EB',tab:'m2m'},
     {year:'2016',x:235,spec:'SGP.22 v1',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
     {year:'2019',x:380,spec:'SGP.22 v2',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
     {year:'2023',x:525,spec:'SGP.32 v1',label:'IoT RSP',desc:'(illustrative milestone)',color:'#0891B2',tab:'iot'},
@@ -1490,8 +1490,8 @@ function qrHTML(){
   ['eUICC Security','SGP.08','SGP.25','SGP.25','SGP.25'],
   ['Application Isolation','\u2014','SGP.27','SGP.27','source-verify'],
   ['PKI Policy','SGP.14','SGP.14','SGP.14','SGP.14'],
-  ['EID Format','SGP.02 Annex H','SGP.29','SGP.29','SGP.29'],
-  ['Test Profiles','\u2014','SGP.26','SGP.26','SGP.26']
+  ['EID Format','SGP.02 \u00a72.2.2 (check digits: Annex J)','SGP.29','SGP.29','SGP.29'],
+  ['Test Certificates','\u2014','SGP.26','SGP.26','SGP.26']
   ];
   sm.forEach(function(r){h+='<tr>';r.forEach(function(c,i){
     if(i===0)h+='<td style="font-weight:700;white-space:nowrap">'+c+'</td>';
@@ -1499,7 +1499,7 @@ function qrHTML(){
     else h+='<td>'+c+'</td>';
   });h+='</tr>'});
   h+='</tbody></table></div>';
-  h+='<p class="spec-map-note">SGP.24 covers both Consumer and IoT compliance. SGP.25 V2.1 is the current common eUICC Protection Profile reference for Consumer and IoT scope in the GSMA public listing; SGP.27 V1.0 adds the application-isolation PP module applicable to SGP.25 V2.1. IFPP security controls should be verified against SGP.41 and current GSMA security material. SGP.14 v2.3 is the active eUICC PKI Certificate Policy. SGP.29 supersedes the original EID definition in SGP.02 Annex H. AN-2025-07 addresses prevention of eUICC-profile misuse and installation of malicious Java Card applications; confirm its recommendations in product security and compliance evidence rather than treating a passing RSP flow as sufficient.</p>';
+  h+='<p class="spec-map-note">SGP.24 covers both Consumer and IoT compliance. SGP.25 V2.1 is the current common eUICC Protection Profile reference for Consumer and IoT scope in the GSMA public listing; SGP.27 V1.0 adds the application-isolation PP module applicable to SGP.25 V2.1. IFPP security controls should be verified against SGP.41 and current GSMA security material. SGP.14 v2.3 is the active eUICC PKI Certificate Policy. SGP.29 supersedes the original EID definition in SGP.02 section 2.2.2 (check-digit verification in Annex J). AN-2025-07 addresses prevention of eUICC-profile misuse and installation of malicious Java Card applications; confirm its recommendations in product security and compliance evidence rather than treating a passing RSP flow as sufficient.</p>';
   h+='</div>';
 
   /* Glossary */
@@ -1606,7 +1606,7 @@ function qrHTML(){
   h+='</div>';
   var checklists={
     consumer:['CI compatibility verified \u2014 SM-DP+ CI PKID is in target eUICC\u2019s trusted CI list','SM-DP+ HTTPS connectivity tested from device network (port 443, TLS 1.2+)','SM-DS event registration tested (if using Discovery Server path)','Activation Code format validated (1$address$matchingId)','Profile template tested on target eUICC form factor','eUICC available memory sufficient for profile size','Notification endpoint (SM-DP+ FQDN) reachable from device','PPR flags reviewed and documented for each profile type','LPA version supports required SGP.22 version (v2.x vs v3.x)','MEP port mapping tested (if SGP.22 v3.x with MEP)','Confirmation Code flow tested (if AC includes OID)','DNS resolution for SM-DP+ and SM-DS FQDNs verified'],
-    m2m:['SM-SR connectivity to eUICC verified (SCP03t / SCP80 / SCP81 channel)','ISD-R key material matches between SM-SR and eUICC','EIS (eUICC Information Set) registered in SM-SR','ES4 interface credentials configured (Operator \u2192 SM-SR)','ES2 interface credentials configured (SM-DP \u2192 SM-SR)','Binary SMS transport tested (if using SCP80)','Profile template compatible with target eUICC OS version','SM-SR swap procedure documented (if ES6 will be used)','Bootstrap profile active and providing connectivity'],
+    m2m:['SM-SR connectivity to eUICC verified (SCP03t / SCP80 / SCP81 channel)','ISD-R key material matches between SM-SR and eUICC','EIS (eUICC Information Set) registered in SM-SR','ES4 interface credentials configured (Operator \u2192 SM-SR)','ES3 interface credentials configured (SM-DP \u2192 SM-SR)','Binary SMS transport tested (if using SCP80)','Profile template compatible with target eUICC OS version','SM-SR swap procedure documented (if ES7 will be used)','Bootstrap profile active and providing connectivity'],
     iot:['eIM configured on eUICC (ESep.AddEim / ESep.UpdateEim completed)','eIM trust anchor installed during eUICC manufacturing','IPAd firmware version supports SGP.32 (or IPAe available on eUICC)','ESep transport selected and tested (CoAP/MQTT/SMS/HTTP)','SM-DP+ reachable from IPA (for Indirect Mode)','Bootstrap profile providing connectivity for ESep channel','Direct vs Indirect mode decision documented with rationale','ESop interface configured (Operator \u2192 eIM notifications)','Profile enable/disable/delete tested end-to-end','Batch provisioning tested at target scale']
   };
   if(!window._checklistState)window._checklistState={};
@@ -1910,7 +1910,7 @@ function toolsDbgHTML(){
 
   /* Remote Command Decoder */
   h+='<div class="asec"><h2>Remote Command Decoder (SCP80/SCP81)</h2>';
-  h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a remote command APDU used in M2M RSP (ES1 interface). Paste the hex APDU.</p>';
+  h+='<div class="ac-tool"><p style="font-size:13px;color:var(--tx2);margin-bottom:12px">Decode a remote command APDU used in M2M RSP (ES5 interface). Paste the hex APDU.</p>';
   h+='<div class="ac-input-wrap"><input type="text" id="ota-input" class="ac-input" placeholder="Enter hex APDU (e.g. 80E60000...)" />';
   h+='<button type="button" class="cbtn pri" id="ota-decode">Decode</button>';
   h+='<button type="button" class="cbtn" id="ota-clear">Clear</button></div>';
@@ -1961,7 +1961,7 @@ function appxHTML(){
       ['AN-2026-05','Application note addressing an issue within SGP.22 v2.7 ASN.1',SPEC_VERSIONS['AN-2026-05'],'https://www.gsma.com/newsroom/gsma_resources/application-note/']
     ]},
     {cat:'Other / Supporting',rows:[
-      ['SGP.26','eSIM Test Certificates',SPEC_VERSIONS['SGP.26'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/'],
+      ['SGP.26','RSP Test Certificates Definition',SPEC_VERSIONS['SGP.26'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/'],
       ['SGP.29','EID Definition and Assignment',SPEC_VERSIONS['SGP.29'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/'],
       ['FS.18','Two-Step eUICC Personalisation Process',SPEC_VERSIONS['FS.18'],'https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/']
     ]}
@@ -1974,13 +1974,15 @@ function appxHTML(){
 
   /* Key Interfaces */
   h+='<div class="asec"><h2>Key Interfaces</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Interface</th><th>Between</th><th>Spec</th><th>Purpose</th></tr></thead><tbody>';
-  [['ES1','SM-SR \u2194 eUICC','SGP.02','Secure remote channel for M2M profile management'],
-  ['ES2','SM-DP \u2194 SM-SR','SGP.02','M2M coordination: EIS retrieval, ISD-P preparation, profile-delivery status, and related SM-DP/SM-SR procedures'],
-  ['ES3','SM-DP \u2194 eUICC (logical, via SM-SR)','SGP.02','End-to-end key establishment for profile encryption (tunneled through ES2 + ES1)'],
-  ['ES4','Operator \u2194 SM-SR','SGP.02','Operator-initiated lifecycle management requests'],
-  ['ES5','Operator \u2194 SM-DP','SGP.02','Profile order / data preparation (not used in preloaded-profile deployments)'],
-  ['ES6','SM-SR \u2194 SM-SR','SGP.02','Inter-SM-SR platform handover (SM-SR swap)'],
-  ['ES7','Operator \u2194 SM-SR (indirect)','SGP.02','Alternative operator interface for SM-SR (rarely used)'],
+  [['ES1','EUM \u2194 SM-SR','SGP.02','Register the eUICC Information Set (EIS) of a newly manufactured eUICC with its SM-SR'],
+  ['ES2','Operator \u2194 SM-DP','SGP.02','Profile ordering and download requests; SM-DP-relayed lifecycle requests in deployments without Operator ES4 access'],
+  ['ES3','SM-DP \u2194 SM-SR','SGP.02','EIS retrieval, ISD-P creation, routing of profile-download data, and status/EIS updates'],
+  ['ES4','Operator \u2194 SM-SR','SGP.02','Operator-initiated lifecycle management (enable, disable, delete, GetEIS); v4.x adds the M2M SP role'],
+  ['ES4A','Operator \u2194 SM-SR','SGP.02 v4.x','Additional Operator\u2013SM-SR interface introduced in v4.x'],
+  ['ES5','SM-SR \u2194 eUICC (ISD-R)','SGP.02','OTA remote channel (SCP80 SMS / SCP81 HTTPS) carrying ISD-R commands such as CreateISDP, EnableProfile, DisableProfile, DeleteProfile'],
+  ['ES6','Operator \u2194 eUICC (MNO-SD)','SGP.02','Operator OTA management of its own Profile content (RAM/RFM per ETSI TS 102 225/226)'],
+  ['ES7','SM-SR \u2194 SM-SR','SGP.02','SM-SR Change (SM-SR swap): handover of eUICC management to a new SM-SR'],
+  ['ES8','SM-DP \u2194 eUICC (ISD-P; logical, via SM-SR)','SGP.02','End-to-end ISD-P key establishment and profile download/installation, tunneled through ES3 and ES5'],
   ['ES2+','Operator \u2194 SM-DP+','SGP.22','Profile order, download confirmation, notifications'],
   ['ES8+','SM-DP+ \u2194 eUICC (logical, via LPA)','SGP.22','Logical secure channel for profile binding, tunneled through ES9+ and ES10b'],
   ['ES9+','LPA \u2194 SM-DP+','SGP.22','Profile download: authentication, BPP delivery'],
@@ -2031,20 +2033,20 @@ function appxHTML(){
   /* M2M Messages */
   h+='<div class="asec"><h2>Key Messages \u2014 M2M RSP (SGP.02)</h2><div class="rtwrap"><table class="rtbl"><thead><tr><th>Message</th><th>Interface</th><th>Direction</th><th>Purpose</th></tr></thead><tbody>';
   [['Operator-SM-DP Profile Order','Operator-SM-DP','Operator \u2192 SM-DP','Order or stage a new profile for a target eUICC'],
-  ['Operator-SM-DP Download Request','Operator-SM-DP','Operator \u2192 SM-DP','Request profile download and installation'],
-  ['ES2.RetrieveEIS / PrepareISDP','ES2','SM-DP \u2192 SM-SR','Retrieve EIS data and prepare the target ISD-P'],
-  ['ES2.EIS / ISD-P Ready','ES2','SM-SR \u2192 SM-DP','Return eUICC information and prepared ISD-P details'],
-  ['ES3 Key Establishment','ES3 logical','SM-DP \u2194 eUICC (via SM-SR)','Establish end-to-end profile-protection keys between SM-DP and ISD-P'],
+  ['ES2.DownloadProfile','ES2','Operator \u2192 SM-DP','Request profile download and installation'],
+  ['ES3.GetEIS / ES3.CreateISDP','ES3','SM-DP \u2192 SM-SR','Retrieve EIS data and prepare the target ISD-P'],
+  ['GetEIS / CreateISDP responses','ES3','SM-SR \u2192 SM-DP','Return eUICC information and prepared ISD-P details'],
+  ['ES8.EstablishISDPKeySet','ES8 logical','SM-DP \u2194 eUICC (via SM-SR)','Establish end-to-end profile-protection keys between SM-DP and ISD-P'],
   ['ES4.EnableProfile','ES4','Operator \u2192 SM-SR','Request profile enable on eUICC'],
   ['ES4.DisableProfile','ES4','Operator \u2192 SM-SR','Request profile disable on eUICC'],
   ['ES4.DeleteProfile','ES4','Operator \u2192 SM-SR','Request profile deletion from eUICC'],
-  ['EncP Installation','ES3 logical over ES2/ES1','SM-DP \u2192 eUICC (via SM-SR)','Deliver encrypted profile package to the ISD-P; SM-SR transports but does not decrypt profile payload'],
-  ['ES1.EnableProfile','ES1','SM-SR \u2192 eUICC (remote)','Remote enable command'],
-  ['ES1.DisableProfile','ES1','SM-SR \u2192 eUICC (remote)','Remote disable command'],
-  ['ES1.DeleteProfile','ES1','SM-SR \u2192 eUICC (remote)','Remote delete command'],
-  ['ES1.CreateISDP','ES1','SM-SR \u2192 eUICC (remote)','Create a new ISD-P on the eUICC before profile installation'],
+  ['EncP Installation','ES8 logical over ES3/ES5','SM-DP \u2192 eUICC (via SM-SR)','Deliver encrypted profile package to the ISD-P; SM-SR transports but does not decrypt profile payload'],
+  ['ES5.EnableProfile','ES5','SM-SR \u2192 eUICC (remote)','Remote enable command'],
+  ['ES5.DisableProfile','ES5','SM-SR \u2192 eUICC (remote)','Remote disable command'],
+  ['ES5.DeleteProfile','ES5','SM-SR \u2192 eUICC (remote)','Remote delete command'],
+  ['ES5.CreateISDP','ES5','SM-SR \u2192 eUICC (remote)','Create a new ISD-P on the eUICC before profile installation'],
   ['ES4.GetEIS','ES4','Operator \u2192 SM-SR','Retrieve the eUICC Information Set'],
-  ['ES2.Result / EIS Update','ES2','SM-DP \u2192 SM-SR','Report final install result and update SM-SR EIS state']
+  ['ES3.ProfileDownloadCompleted','ES3','SM-DP \u2192 SM-SR','Report final install result and update SM-SR EIS state']
   ].forEach(function(r){h+='<tr><td><code>'+r[0]+'</code></td><td><code>'+r[1]+'</code></td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>'});
   h+='</tbody></table></div></div>';
 
@@ -2768,7 +2770,7 @@ function bindEIDDecoder(){
 
 /* ── State Machine SVG ── */
 function stateMachineSVG(mode){
-  var cmd=mode==='m2m'?'ES1':mode==='iot'?'ESep':'ES10b';
+  var cmd=mode==='m2m'?'ES5':mode==='iot'?'ESep':'ES10b';
   var loadCmd=mode==='iot'?'ProfileDownloadTriggerRequest':cmd+'.LoadBPP';
   var s='<svg viewBox="0 0 900 450" width="100%" style="max-width:900px;cursor:pointer" id="sm-svg-el">';
   var states=[
@@ -2968,7 +2970,7 @@ function bindICCIDDecoder(){
 
 /* ── State Machine Interactivity ── */
 function getStateInfo(mode){
-  var cmd=mode==='m2m'?'ES1':mode==='iot'?'ESep':'ES10b';
+  var cmd=mode==='m2m'?'ES5':mode==='iot'?'ESep':'ES10b';
   var loadCmd=mode==='iot'?'ProfileDownloadTriggerRequest':cmd+'.LoadBoundProfilePackage';
   var initiator=mode==='iot'?'eIM initiates operations, not the end user or SM-SR.':'';
   return {

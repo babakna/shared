@@ -40,8 +40,8 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
-<div class="hdr-l"><div class="logo">AI</div><div><div class="ttl">AI Strategy &amp; Operating Model <span class="badge">V10.0</span><span class="date">Updated October 2026</span></div><div class="sub">AI-106 Capstone: govern, fund, measure, and scale AI responsibly &middot; <span class="by">Namiranian, Babak</span></div></div></div>
-<div><button type="button" class="hdr-btn" aria-label="Toggle dark mode" onclick="toggleTheme()">T</button><button type="button" class="hdr-btn" aria-label="Search" onclick="openSearch()">S</button></div>
+<div class="hdr-l"><div class="logo">AI</div><div><div class="ttl">AI Strategy &amp; Operating Model <span class="badge">V10.1</span><span class="date">Updated October 2026</span></div><div class="sub">AI-106 Capstone: govern, fund, measure, and scale AI responsibly &middot; <span class="by">Namiranian, Babak</span></div></div></div>
+<div><button type="button" class="hdr-btn" aria-label="Toggle dark mode" onclick="toggleTheme()">T</button><button type="button" class="hdr-btn" id="search-btn" aria-label="Search" aria-controls="search-pop" aria-expanded="false" onclick="toggleSearch()">S</button></div>
 </header>
 <nav class="course-nav" aria-label="Course navigation">
 <a class="course-link" href="AI-101.html">AI Essentials</a>
@@ -55,7 +55,7 @@ a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 <div class="search-pop" id="search-pop"><input id="search-input" type="text" aria-label="Search modules, glossary, and resources" placeholder="Search modules, glossary, resources..." autocomplete="off"><div class="search-results" id="search-results"></div></div>
 <button type="button" class="scroll" id="scroll" aria-label="Scroll to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">Top</button>
 <script>
-var VERSION='10.0';
+var VERSION='10.1';
 var VERSION_DATE='Updated October 2026';
 var MODULES=[
 {id:'operating-model',title:'AI Operating Model',short:'Operating',color:'#2563EB',icon:'OM',desc:'Roles, councils, platform teams, intake, decision rights, and accountability for enterprise AI.',feat:'RACI map - operating model layers - decision gates'},
@@ -198,8 +198,10 @@ function setFilter(c,btn){glossFilter=c;document.querySelectorAll('.filter').for
 function filterGlossary(){glossSearch=document.getElementById('gloss-search').value.toLowerCase();renderGlossary()}
 function renderGlossary(){var items=GLOSSARY.filter(function(g){return (glossFilter==='All'||g.cat===glossFilter)&&(!glossSearch||g.term.toLowerCase().includes(glossSearch)||g.def.toLowerCase().includes(glossSearch)||g.why.toLowerCase().includes(glossSearch))});document.getElementById('gloss').innerHTML=items.length?items.map(function(g){return '<div class="gloss-card"><div><span class="term">'+g.term+'</span><span class="cat">'+g.cat+'</span></div><div class="def">'+g.def+'</div><div class="why">Why it matters: '+g.why+'</div></div>'}).join(''):'<div class="empty">No matching terms found.</div>'}
 function buildSearch(){searchIndex=[];MODULES.forEach(function(m,i){searchIndex.push({kind:'Module',text:m.title,desc:m.desc,run:function(){go(i)}})});GLOSSARY.forEach(function(g){searchIndex.push({kind:'Glossary',text:g.term,desc:g.def,run:function(){go(11);setTimeout(function(){document.getElementById('gloss-search').value=g.term;filterGlossary()},80)}})});RESOURCES.forEach(function(r){searchIndex.push({kind:'Resource',text:r.title,desc:r.why,run:function(){go(10)}})})}
-function openSearch(){var p=document.getElementById('search-pop'),i=document.getElementById('search-input');p.classList.add('open');i.value='';i.focus();renderSearch('')}
-function closeSearch(){document.getElementById('search-pop').classList.remove('open')}
+function openSearch(){var p=document.getElementById('search-pop'),i=document.getElementById('search-input');p.classList.add('open');var b=document.getElementById('search-btn');if(b)b.setAttribute('aria-expanded','true');i.value='';i.focus();renderSearch('')}
+function closeSearch(){document.getElementById('search-pop').classList.remove('open');var b=document.getElementById('search-btn');if(b)b.setAttribute('aria-expanded','false')}
+function toggleSearch(){if(document.getElementById('search-pop').classList.contains('open'))closeSearch();else openSearch()}
+document.addEventListener('pointerdown',function(e){var p=document.getElementById('search-pop'),b=document.getElementById('search-btn');if(p.classList.contains('open')&&!p.contains(e.target)&&!(b&&b.contains(e.target)))closeSearch()});
 function renderSearch(q){var el=document.getElementById('search-results');if(!q.trim()){el.innerHTML='<div class="empty">Start typing to search...</div>';return}var ql=q.toLowerCase();var res=searchIndex.filter(function(x){return x.text.toLowerCase().includes(ql)||x.desc.toLowerCase().includes(ql)}).slice(0,12);el.innerHTML=res.length?res.map(function(r,i){return '<div class="search-item" role="button" tabindex="0" data-i="'+i+'"><div class="search-kind">'+r.kind+'</div><div>'+esc(r.text)+'</div><div class="search-desc">'+esc(r.desc).slice(0,100)+'</div></div>'}).join(''):'<div class="empty">No results found.</div>';el.querySelectorAll('.search-item').forEach(function(node){var run=function(){res[+node.dataset.i].run();closeSearch()};node.onclick=run;node.onkeydown=function(e){activateOnKey(e,run)}})}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSearch();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch()}});
 document.getElementById('search-input').addEventListener('input',function(){renderSearch(this.value)});

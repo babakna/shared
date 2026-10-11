@@ -339,7 +339,7 @@ aiFiles.forEach(f=>checkPage('AI/'+f,(w,d,t,rel)=>{
 /* ---------- Shared asset carries the runtime version ---------- */
 {
   const js=fs.readFileSync(path.join(ROOT,'PQC/assets/pqc.js'),'utf8');
-  ck('pqc.js VERSION is V10.0 (October 2026)',/V10\.0 \(October 2026\)/.test(js));
+  ck('pqc.js VERSION is V10.1 (October 2026)',/V10\.1 \(October 2026\)/.test(js));
   ck('pqc.js has no V8.x',!/\bV8\.[01]\b/.test(js));
 }
 
@@ -393,12 +393,12 @@ releaseHtml.forEach(rel=>{
 });
 
 const releaseSurfaces={
-  'AI/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
-  'eSIM/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
-  'PQC/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
-  '5G-6G/index.html':/V10\.0[\s\S]*October 2026|October 2026[\s\S]*V10\.0/,
-  'KG-CG/index.html':/V4\.0[\s\S]*October 2026|October 2026[\s\S]*V4\.0/,
-  'SSFamily/index.html':/V11\.0[\s\S]*October 2026|October 2026[\s\S]*V11\.0/,
+  'AI/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
+  'eSIM/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
+  'PQC/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
+  '5G-6G/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
+  'KG-CG/index.html':/V4\.1[\s\S]*October 2026|October 2026[\s\S]*V4\.1/,
+  'SSFamily/index.html':/V11\.1[\s\S]*October 2026|October 2026[\s\S]*V11\.1/,
   'games/index.html':/V4\.12[\s\S]*October(?: \(2026\)| 2026)|October(?: \(2026\)| 2026)[\s\S]*V4\.12/,
   'subscribe/index.html':/October 2026/
 };
@@ -487,10 +487,69 @@ fs.readdirSync(path.join(ROOT,'games')).filter(f=>f.endsWith('.html')).forEach(f
   }catch(e){
     ck('SSFamily: direct FMB invariants execute',false,e.message);
   }
+  /* V11.1 regression: SSA family maximum = 150% / 272% / 134% / 175% of the PIA portions
+     split at the 2026 bend points $1,643 / $2,371 / $3,093, rounded down to $0.10
+     (SSA OACT "Automatic Determinations"). V11.0 used 127.2% / 113.4% and understated
+     the cap by about $14.4k/yr at the default PIA. Hand-computed expected values: */
+  try{
+    const fmbM=m=>w.getFMB(m*12)/12;
+    ck('SSFamily: FMB at PIA $1,000/mo = $1,500.0',Math.abs(fmbM(1000)-1500)<0.01);
+    ck('SSFamily: FMB at PIA $2,000/mo = $3,435.5',Math.abs(w.getFMB(24000)-Math.round(3435.5*12))<=1);
+    ck('SSFamily: FMB at PIA $3,093/mo = $5,412.1',Math.abs(w.getFMB(3093*12)-Math.round(5412.1*12))<=1);
+    ck('SSFamily: FMB at default PIA $49,848/yr = $7,268.80/mo',w.getFMB(49848)===Math.round(7268.8*12));
+    ck('SSFamily: FMB of 0/NaN/negative PIA is 0',w.getFMB(0)===0&&w.getFMB(NaN)===0&&w.getFMB(-100)===0);
+    const sc=w.runScenario(62,false,w.getParams());
+    let r=0;sc.yearRows.forEach(y=>{r+=y.totalSS/y.cola;});
+    ck("SSFamily: today's-dollar totals are exact (sum of deflated yearly SS)",Math.abs(r-sc.real.totalSS)<1);
+  }catch(e){ck('SSFamily: FMB regression checks execute',false,e.message);}
+  ck('SSFamily: payee report forms named correctly (SSA-623 adult, SSA-6230 child)',/SSA-623<\/strong> for an adult/.test(src)&&!/annual SSA-6230 accounting/.test(src));
   const visible=d.body.cloneNode(true);visible.querySelectorAll('script,style').forEach(n=>n.remove());
   ck('SSFamily: calculation output has no NaN/undefined',!/\b(?:NaN|undefined)\b/.test(visible.textContent));
   ck('SSFamily: no startup runtime errors',(dom.__runtimeErrors||[]).length===0,(dom.__runtimeErrors||[]).join('; '));
   dom.window.close();
+}
+
+/* ---------- October 2026 tester-finding regressions (V10.1) ---------- */
+{
+  const ai104=fs.readFileSync(path.join(ROOT,'AI/AI-104.html'),'utf8');
+  const code=(ai104.match(/Code: MCP Server \(TypeScript\)[\s\S]*?<\/code><\/pre>/)||[''])[0].replace(/<[^>]+>/g,'');
+  ck('AI-104 MCP sample imports the v2 server package',/from "@modelcontextprotocol\/server"/.test(code)&&/@modelcontextprotocol\/server\/stdio/.test(code));
+  ck('AI-104 MCP sample uses registerTool with a Zod inputSchema',/registerTool\(/.test(code)&&/inputSchema: z\.object\(/.test(code));
+  ck('AI-104 MCP sample has no legacy server.tool() call or bare sdk/server import',!/server\.tool\(/.test(code)&&!/"@modelcontextprotocol\/sdk\/server"/.test(code));
+  ck('AI-104 McpServer is constructed with name and version',/new McpServer\(\{ name: "docs-server", version: "1\.0\.0" \}\)/.test(code));
+  // Search must close on Escape pressed inside the search field, and AI-106 on outside click.
+  ['AI/AI-101.html','AI/AI-102.html','AI/AI-106.html'].forEach(rel=>{
+    const dom=load(rel),w=dom.window,d=w.document;
+    const panel=()=>d.getElementById('search-overlay')||d.getElementById('search-pop');
+    try{
+      w.openSearch();
+      d.getElementById('search-input').dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+      ck(rel+': Escape in the search field closes search',!panel().classList.contains('open'));
+      if(rel.endsWith('AI-106.html')){
+        w.openSearch();
+        d.getElementById('main').dispatchEvent(new w.Event('pointerdown',{bubbles:true}));
+        ck(rel+': outside click closes search',!panel().classList.contains('open'));
+      }
+    }catch(e){ck(rel+': search dismissal executes',false,e.message);}
+    dom.window.close();
+  });
+  const g5=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-5G.html'),'utf8');
+  const g6=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-6G.html'),'utf8');
+  // LTM (L1/L2-triggered mobility) is Rel-18; Rel-19 adds inter-CU/conditional LTM.
+  ck('5G: LTM credited to Rel-18',/Rel-18 introduced <strong>L1\/L2-triggered mobility \(LTM\)/.test(g5)&&/Specified \(Rel-18; Rel-19 enhancements\)/.test(g5)&&/Specified \(Rel-18; Rel-19 enhancements\)/.test(g6));
+  ck('5G: no "Rel-19 introduces L1/L2" claim',!/Rel-19 introduces (<strong>)?L1\/L2/.test(g5));
+  // UE-to-network sidelink relay is Rel-17 (TS 23.304); Rel-18 UE-to-UE; Rel-19 multi-hop.
+  ck('5G: UE-to-network relay credited to Rel-17',/Rel-17 added <strong>UE-to-network relay<\/strong>/.test(g5)&&/Rel-17 added UE-to-network relay/.test(g5));
+  // eRedCap is Rel-18 (TR 38.865), not Rel-19.
+  ck('5G/6G: eRedCap credited to Rel-18',/Rel-18 evolution of RedCap/.test(g5)&&/Enhanced Reduced Capability NR \(Rel-18\)/.test(g6));
+  // ITU-R: peak SE 30/15 bit/s/Hz vs IMT-Advanced 15/6.75 = 2x; 3x is the M.2083 average-SE target.
+  ck('5G: IMT-2020 peak spectral efficiency is 2x IMT-Advanced',/Peak Spectral Efficiency<\/td><td>30 bit\/s\/Hz DL \/ 15 bit\/s\/Hz UL<\/td><td>2\\u00d7 DL/.test(g5)&&/Average Spectral Efficiency/.test(g5));
+  ck('5G: IMT-2020 mobility is 1.4x IMT-Advanced (350 km/h)',/1\.4\\u00d7 \(IMT-Advanced: 350 km\/h\)/.test(g5));
+  const p701=fs.readFileSync(path.join(ROOT,'PQC/PQC-701.html'),'utf8');
+  const qs=JSON.parse((p701.match(/<script type="application\/json" id="quizData">([\s\S]*?)<\/script>/)||[,'[]'])[1]);
+  ck('PQC-701: final assessment has no duplicate field-device question',qs.filter(q=>/field-device track/i.test(q.q)).length===1);
+  ck('PQC-701: section hint matches question count',qs.length===10&&/Ten questions/.test(p701));
+  ck('PQC: no stale four-decision / five-lab counts',!/four decision points|four decisions|eight-question/.test(p701)&&!/five specific scenarios/.test(fs.readFileSync(path.join(ROOT,'PQC/PQC-302.html'),'utf8')));
 }
 
 {

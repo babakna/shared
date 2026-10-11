@@ -298,7 +298,26 @@ w.addEventListener('load',()=>{
   ck('no ES2+.UpdatePolicyRules as a real function',!/must update the profile.s PPR via ES2\+\.UpdatePolicyRules/i.test(body));
   ck('ES6.UpdateMetadata cited',/ES6\.UpdateMetadata/.test(body));
   ck('ESep replaces ESeim',/ESep/.test(body)&&!/ESeim/.test(body));
-  ck('version V10.0 (October 2026)',/V10\.0/.test(body)&&/October 2026/.test(body));
+  ck('version V10.1 (October 2026)',/V10\.1/.test(body)&&/October 2026/.test(body));
+
+  /* V10.1 regression: SGP.02 interface map (SGP.02 v3.0 s.1/Figure 1 and v4.0 section 5):
+     ES1 EUM-SM-SR, ES2 Operator-SM-DP, ES3 SM-DP-SM-SR, ES4 Operator-SM-SR, ES5 SM-SR-eUICC,
+     ES6 Operator-eUICC (MNO-SD), ES7 SM-SR-SM-SR (SM-SR Change), ES8 SM-DP-eUICC (ISD-P).
+     V10.0 had ES1/ES2/ES3/ES5/ES6/ES7 permuted and dated SM-SR swap to v4.x. */
+  const src=fs.readFileSync(HTML,'utf8');
+  const row=(es,between)=>new RegExp("\\['"+es+"','"+between.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(src);
+  ck('SGP.02 ES1 = EUM <-> SM-SR',row('ES1','EUM \\u2194 SM-SR'));
+  ck('SGP.02 ES2 = Operator <-> SM-DP',row('ES2','Operator \\u2194 SM-DP'));
+  ck('SGP.02 ES3 = SM-DP <-> SM-SR',row('ES3','SM-DP \\u2194 SM-SR'));
+  ck('SGP.02 ES5 = SM-SR <-> eUICC (ISD-R)',row('ES5','SM-SR \\u2194 eUICC (ISD-R)'));
+  ck('SGP.02 ES6 = Operator <-> eUICC (MNO-SD)',row('ES6','Operator \\u2194 eUICC (MNO-SD)'));
+  ck('SGP.02 ES7 = SM-SR <-> SM-SR (SM-SR Change)',row('ES7','SM-SR \\u2194 SM-SR'));
+  ck('SGP.02 ES8 = SM-DP <-> eUICC (ISD-P)',row('ES8','SM-DP \\u2194 eUICC (ISD-P'));
+  ck('no ES6 SM-SR swap claim',!/SM-SR swap \(ES6\)|ES6: SM-SR|'ES6','SM-SR/.test(src));
+  ck('SM-SR Change not dated to v4.x',/already specified in SGP\.02 v3\.0/.test(src)&&!/v4\.x added SM-SR swap/.test(src));
+  ck('M2M remote commands use ES5, not ES1',/'ES5\.EnableProfile','ES5','SM-SR \\u2192 eUICC/.test(src)&&!/'ES1\.EnableProfile'/.test(src));
+  ck('SGP.26 official title',/'SGP\.26','RSP Test Certificates Definition'/.test(src)&&!/'Test Profiles'/.test(src));
+  ck('EID format not attributed to SGP.02 Annex H',!/Annex H/.test(src));
 
   // Every PPR bit mention anywhere in the page must use the correct assignment.
   const bitClaims=body.match(/bit\s*(\d)\s*=\s*([A-Za-z][A-Za-z0-9-]*)/g)||[];

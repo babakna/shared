@@ -15,6 +15,13 @@ A progressive six-course AI learning series -- from foundational concepts to ope
 
 Courses 101 and 102 are sequential and designed for progressive completion. Course 103 is a standalone reference tool. Courses 104 and 105 build on the earlier material. Course 106 is the capstone for turning AI fluency into repeatable operating practice.
 
+## What changed in V10.1
+
+- Corrected the AI-104 MCP server sample to the current TypeScript SDK v2 API: `@modelcontextprotocol/server` imports, `McpServer({ name, version })`, `registerTool` with a Zod `inputSchema`, and a stdio transport. The legacy `server.tool()` shortcut and the invalid `@modelcontextprotocol/sdk/server` import path were removed; remote transport is described as Streamable HTTP.
+- Fixed search dismissal: Escape now closes the search panel from inside the search field in AI-101 and AI-102, and AI-106 search closes on an outside click or a second press of its button.
+- Kept the header search, theme, and menu buttons fully on-screen at phone widths in AI-103, AI-104, and AI-105, and stopped the AI-103 comparison selectors from overflowing their card.
+- Updated the Anthropic lineup with Claude Sonnet 5.5 (28 September 2026) and Haiku 5.5 (announced October 2026), and corrected landing-page module and resource counts.
+
 ## What changed in V10.0
 
 - Rolled the current release surfaces to October 2026 and rechecked provider and standards links on 27 September 2026.
@@ -84,7 +91,7 @@ Each course keeps its own styles, scripts, data, and content. The course files a
 
 ## Content Currency
 
-Version: **V10.0**. October 2026 release; current sources checked **27 September 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
+Version: **V10.1**. October 2026 release; provider model releases rechecked **11 October 2026**, other sources checked **27 September 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
 
 ## Adding a New Course
 
