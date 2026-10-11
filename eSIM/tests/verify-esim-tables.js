@@ -298,7 +298,7 @@ w.addEventListener('load',()=>{
   ck('no ES2+.UpdatePolicyRules as a real function',!/must update the profile.s PPR via ES2\+\.UpdatePolicyRules/i.test(body));
   ck('ES6.UpdateMetadata cited',/ES6\.UpdateMetadata/.test(body));
   ck('ESep replaces ESeim',/ESep/.test(body)&&!/ESeim/.test(body));
-  ck('version V10.1 (October 2026)',/V10\.1/.test(body)&&/October 2026/.test(body));
+  ck('version V10.2 (October 2026)',/V10\.2/.test(body)&&/October 2026/.test(body));
 
   /* V10.1 regression: SGP.02 interface map (SGP.02 v3.0 s.1/Figure 1 and v4.0 section 5):
      ES1 EUM-SM-SR, ES2 Operator-SM-DP, ES3 SM-DP-SM-SR, ES4 Operator-SM-SR, ES5 SM-SR-eUICC,
@@ -318,6 +318,20 @@ w.addEventListener('load',()=>{
   ck('M2M remote commands use ES5, not ES1',/'ES5\.EnableProfile','ES5','SM-SR \\u2192 eUICC/.test(src)&&!/'ES1\.EnableProfile'/.test(src));
   ck('SGP.26 official title',/'SGP\.26','RSP Test Certificates Definition'/.test(src)&&!/'Test Profiles'/.test(src));
   ck('EID format not attributed to SGP.02 Annex H',!/Annex H/.test(src));
+
+  /* V10.2 regression: spec-evolution timeline dates come from GSMA document history
+     (SGP.02 V4.0 and SGP.22 V1.2 Document History tables; GSMA eSIM specification listing).
+     V10.1 labelled them "illustrative" and placed SGP.22 v2 in 2019 and v3 in 2023. */
+  const ms=(spec,year,desc)=>new RegExp("\\{year:'"+year+"',x:\\d+,spec:'"+spec.replace(/\./g,'\\.')+"',label:'[^']+',desc:'"+desc+"'").test(src);
+  ck('timeline: SGP.02 v1.0 19 Dec 2013',ms('SGP.02 v1.0','2013','19 Dec 2013'));
+  ck('timeline: SGP.22 v1.0 13 Jan 2016',ms('SGP.22 v1.0','2016','13 Jan 2016'));
+  ck('timeline: SGP.22 v2.0 14 Oct 2016',ms('SGP.22 v2.0','2016','14 Oct 2016'));
+  ck('timeline: SGP.22 v3.0 19 Oct 2022',ms('SGP.22 v3.0','2022','19 Oct 2022'));
+  ck('timeline: SGP.32 v1.0.1 4 Jul 2023',ms('SGP.32 v1.0.1','2023','4 Jul 2023'));
+  ck('timeline: no illustrative milestones',!/illustrative milestone/.test(src));
+  ck('timeline: no 2019 SGP.22 v2 or 2023 SGP.22 v3 claim',!/2019 \\u2014 SGP\.22|2023 \\u2014 SGP\.22/.test(src));
+  ck('timeline: SM-DS credited to v2.0, Confirmation Codes to v1.0',/SGP\.22 v2\.0 \(14 Oct\):<\/tspan> Added the SM-DS/.test(src)&&/SGP\.22 v1\.0 \(13 Jan\):<\/tspan>[^<]*Confirmation Codes/.test(src));
+  ck('phone header uses a short subtitle',/<span class="hdr-s-long">/.test(src)&&/<span class="hdr-s-short">/.test(src)&&/@media\(max-width:600px\)\{[^\n]*\.hdr-s-long\{display:none\}/.test(src));
 
   // Every PPR bit mention anywhere in the page must use the correct assignment.
   const bitClaims=body.match(/bit\s*(\d)\s*=\s*([A-Za-z][A-Za-z0-9-]*)/g)||[];

@@ -13,6 +13,20 @@
     return {options, answer};
   }
 
+
+  /* Wording helpers. A title or concept reused mid-sentence keeps its proper nouns ("install Python", not "install python"); a sentence-final field reused as a clause drops its period; a boundary question's answer is a full sentence; lists end consistently. */
+  const PROPER_FIRST = new Set(["Python", "Python's", "Go", "Docker", "Flask", "Spring", "Jakarta", "Maven", "React", "Blazor", "Send"]);
+  function mid(text) {
+    const [first, ...rest] = text.split(" ");
+    const bare = first.replace(/[,:;]+$/, "");
+    const keep = PROPER_FIRST.has(bare) || /.[A-Z]/.test(bare) || /[.#+]/.test(bare.slice(1)) || /\d/.test(bare);
+    return [keep ? first : first.charAt(0).toLowerCase() + first.slice(1), ...rest].join(" ");
+  }
+  const clause = text => text.replace(/[\s.]+$/, "");
+  const region = boundary => (/^between /.test(boundary) ? `the boundary ${clause(boundary)}` : clause(boundary));
+  const terminate = list => (list.some(item => /[.!?]$/.test(item)) ? list.map(item => (/[.!?:]$/.test(item) ? item : `${item}.`)) : list);
+  const isBetween = boundary => /^between /.test(boundary);
+
   function add(spec) {
     const number = course.modules.length + 1;
     const id = `PY-${String(number).padStart(3, "0")}`;
@@ -20,17 +34,17 @@
     const resourceIds = [...new Set(["python-docs", "vscode-python", ...(spec.resources || [])])];
     const prerequisites = spec.prerequisites || (number === 1 || spec.track === "Reference" ? [] : [`PY-${String(number - 1).padStart(3, "0")}`]);
     const diagnosticChoice = choice(
-      `Create the smallest reproducer for ${spec.concept.toLowerCase()}, inspect the earliest state that contradicts ${spec.boundary}, correct that boundary, then preserve the result with a regression test.`,
+      `Create the smallest reproducer for ${mid(spec.concept)}, inspect the earliest state that contradicts ${region(spec.boundary)}, correct that boundary, then preserve the result with a regression test.`,
       ["Suppress the symptom with a broad exception handler and substitute an empty value.", "Change the interpreter, dependencies, input, and implementation together until the symptom disappears.", "Discard the traceback and rerun from a different working directory without recording the environment."],
       number
     );
     const conceptChoice = choice(
-      spec.boundary.replace(/\s+$/, ""),
-      ["The boundary exists only in the VS Code interface.", `Using ${spec.concept.toLowerCase()} removes the need to test failure paths.`, "Its behavior is identical across all inputs, runtimes, and environments."],
+      isBetween(spec.boundary) ? `Its central boundary lies ${clause(spec.boundary)}.` : spec.boundary.replace(/\s+$/, ""),
+      ["The boundary exists only in the VS Code interface.", `Using ${mid(spec.concept)} removes the need to test failure paths.`, "Its behavior is identical across all inputs, runtimes, and environments."],
       number + 1
     );
     const failureChoice = choice(
-      `Reproduce and inspect this module-specific risk: ${spec.failure}`,
+      `Deliberately reproduce and inspect this module's main risk: ${spec.failure}`,
       ["Treat any successful demonstration input as proof that the boundary is correct.", "Replace the implementation before identifying which assumption first became false.", "Ignore environment and dependency evidence because the source file is unchanged."],
       number + 2
     );
@@ -48,12 +62,12 @@
       prerequisites,
       domains: spec.domains,
       summary: spec.summary,
-      outcomes: [
-        `Explain ${spec.concept.toLowerCase()} without relying on syntax alone.`,
+      outcomes: terminate([
+        `Explain ${mid(spec.concept)} without relying on syntax alone.`,
         spec.outcome,
         "Run, debug, and test the work using the selected Python environment in VS Code.",
         `Recognize and correct this failure mode: ${spec.failure}`
-      ],
+      ]),
       chapters: [
         {title:`Mental model: ${spec.concept}`,text:[spec.why, `The useful boundary is ${spec.boundary} That distinction matters because Python often makes a first experiment easy while leaving ownership, lifetime, performance, or trust decisions to the developer.`],callout:spec.callout},
         {title:"What Python actually does",text:[spec.mechanics, `Trace the behavior in this order: inputs and types, name lookup and object relationships, control transfer, external effects, then the returned value or raised exception. This sequence turns a vague “Python did something” into a falsifiable explanation.`]},
@@ -61,13 +75,13 @@
         {title:"Failure analysis and evidence",text:[`A common failure is ${spec.failure} Do not patch the visible symptom first. Reproduce it with the smallest input, read the final traceback line, follow frames back into your code, inspect state at the earliest wrong assumption, and add a regression test.`, `Evidence for this module means more than “it ran once.” Preserve the command, representative input, expected and actual result, relevant environment or dependency version, and a test that fails before the correction and passes afterward. ${spec.evidence}`]}
       ],
       model:{title:spec.modelTitle || `${spec.concept}: evidence flow`,steps:spec.steps.map(([name,detail]) => ({name,detail}))},
-      example:{title:spec.exampleTitle || `Make ${spec.concept.toLowerCase()} observable`,language:"Python",source,notes:[spec.notes?.[0] || "Start with a small deterministic input so behavior is easy to inspect.",spec.notes?.[1] || "Keep transformation separate from input/output so it can be tested directly.",spec.notes?.[2] || "Run the same code through the selected interpreter and the VS Code debugger."]},
-      practice:{title:spec.labTitle || `Build and test: ${spec.title}`,brief:spec.task,steps:["Create a fresh project folder and `.venv`; select that interpreter in VS Code.",spec.task,"Write at least one normal-case test and one boundary or failure-case test.","Set a breakpoint before the decisive operation, inspect state, then record the command and result."],starter:source,criteria:[spec.outcome,"Normal and failure paths are automated by tests.","No secret, generated environment, cache, or machine-specific path is committed.","A short README records setup, run, test, and platform-specific commands."],hints:[spec.hint || "Reduce the task to one pure function before connecting files, databases, networks, notebooks, or models.",`The causal clue is usually near: ${spec.failure}`,"Compare the interpreter path reported by VS Code with the one printed by `python -c \"import sys; print(sys.executable)\"`." ]},
-      diagnostic:{title:`Diagnose ${spec.concept.toLowerCase()}`,prompt:`A realistic run exposes this module-specific failure: ${spec.failure} Which response tests the earliest wrong assumption and produces durable evidence?`,...diagnosticChoice,explanation:`The correct response tests the boundary ${spec.boundary} It also preserves evidence that the failure is corrected instead of merely hidden.`},
+      example:{title:spec.exampleTitle || `Make ${mid(spec.concept)} observable`,language:"Python",source,notes:[spec.notes?.[0] || "Start with a small deterministic input so behavior is easy to inspect.",spec.notes?.[1] || "Keep transformation separate from input/output so it can be tested directly.",spec.notes?.[2] || "Run the same code through the selected interpreter and the VS Code debugger."]},
+      practice:{title:spec.labTitle || `Build and test: ${spec.title}`,brief:spec.task,steps:["Create a fresh project folder and `.venv`; select that interpreter in VS Code.",spec.task,"Write at least one normal-case test and one boundary or failure-case test.","Set a breakpoint before the decisive operation, inspect state, then record the command and result."],starter:source,criteria:terminate([spec.outcome,"Normal and failure paths are automated by tests.","No secret, generated environment, cache, or machine-specific path is committed.","A short README records setup, run, test, and platform-specific commands."]),hints:[spec.hint || "Reduce the task to one pure function before connecting files, databases, networks, notebooks, or models.",`The causal clue is usually near: ${spec.failure}`,"Compare the interpreter path reported by VS Code with the one printed by `python -c \"import sys; print(sys.executable)\"`." ]},
+      diagnostic:{title:`Diagnose ${mid(spec.concept)}`,prompt:`A realistic run exposes this module-specific failure: ${spec.failure} Which response tests the earliest wrong assumption and produces durable evidence?`,...diagnosticChoice,explanation:`The correct response tests the boundary ${spec.boundary} It also preserves evidence that the failure is corrected instead of merely hidden.`},
       checks:[
-        {q:`Which boundary is central to ${spec.concept.toLowerCase()} in this module?`,...conceptChoice,why:`The lesson identifies the relevant boundary as ${spec.boundary} The editor can expose that boundary but does not redefine it.`},
-        {q:`Which failure should a learner deliberately reproduce when practicing ${spec.title.toLowerCase()}?`,...failureChoice,why:`The module names this realistic risk: ${spec.failure} Reproducing it is stronger evidence than reasoning only from the happy path.`},
-        {q:`What evidence best demonstrates the outcome “${spec.outcome}”?`,...evidenceChoice,why:`Durable evidence is module-specific, repeatable, and inspectable. For this lesson, that means: ${spec.evidence}`}
+        {q:isBetween(spec.boundary) ? `Which statement about ${mid(spec.concept)} matches this lesson?` : `Which boundary is central to ${mid(spec.concept)} in this module?`,...conceptChoice,why:`${isBetween(spec.boundary) ? "The lesson identifies the central boundary as the one" : "The lesson identifies the relevant boundary as"} ${spec.boundary} The editor can expose that boundary but does not redefine it.`},
+        {q:`Which approach is sound while working through “${spec.title}”?`,...failureChoice,why:`The module names this realistic risk: ${spec.failure} Reproducing it is stronger evidence than reasoning only from the happy path.`},
+        {q:`What evidence best demonstrates the outcome “${clause(spec.outcome)}”?`,...evidenceChoice,why:`Durable evidence is module-specific, repeatable, and inspectable. For this lesson, that means: ${spec.evidence}`}
       ],
       project:spec.project,
       resources:resourceIds

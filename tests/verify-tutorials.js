@@ -393,8 +393,8 @@ releaseHtml.forEach(rel=>{
 });
 
 const releaseSurfaces={
-  'AI/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
-  'eSIM/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
+  'AI/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
+  'eSIM/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
   'PQC/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
   '5G-6G/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
   'KG-CG/index.html':/V4\.1[\s\S]*October 2026|October 2026[\s\S]*V4\.1/,
@@ -550,6 +550,21 @@ fs.readdirSync(path.join(ROOT,'games')).filter(f=>f.endsWith('.html')).forEach(f
   ck('PQC-701: final assessment has no duplicate field-device question',qs.filter(q=>/field-device track/i.test(q.q)).length===1);
   ck('PQC-701: section hint matches question count',qs.length===10&&/Ten questions/.test(p701));
   ck('PQC: no stale four-decision / five-lab counts',!/four decision points|four decisions|eight-question/.test(p701)&&!/five specific scenarios/.test(fs.readFileSync(path.join(ROOT,'PQC/PQC-302.html'),'utf8')));
+}
+
+/* ---------- V10.2: compact AI headers on phones ---------- */
+{
+  // At 390 px the AI-101..105 tagline wrapped the header to three or four lines; below 600 px it now gives
+  // way to a short line that keeps the byline.
+  ['AI/AI-101.html','AI/AI-102.html','AI/AI-103.html','AI/AI-104.html','AI/AI-105.html'].forEach(rel=>{
+    const src=fs.readFileSync(path.join(ROOT,rel),'utf8');
+    ck(rel+': tagline is separable from the byline',/<div class="hdr-s"><span class="hdr-tag">[^<]+<\/span>(<span class="hdr-s-short">[^<]+<\/span>)?<span class="by">Namiranian, Babak<\/span><\/div>/.test(src));
+    ck(rel+': phone rule hides the tagline',/@media\(max-width:600px\)\{\.hdr-tag,\.hdr-date,\.hdr-ico\{display:none\}\.hdr-s-short\{display:inline\}\}/.test(src));
+  });
+  // AI-106 hid its whole subtitle (byline included) on phones and stacked its two buttons vertically.
+  const a106=fs.readFileSync(path.join(ROOT,'AI/AI-106.html'),'utf8');
+  ck('AI-106: phone header keeps the byline',/<div class="sub"><span class="hdr-tag">[^<]+<\/span><span class="hdr-s-short">[^<]+<\/span><span class="by">Namiranian, Babak<\/span><\/div>/.test(a106)&&!/\.sub\{display:none\}/.test(a106));
+  ck('AI-106: header buttons share one row',/<div class="hdr-r"><button/.test(a106)&&/\.hdr-r\{display:flex;gap:8px;flex-shrink:0\}/.test(a106));
 }
 
 {

@@ -38,6 +38,10 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 .ver{display:inline-flex;align-items:center;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--mag);color:#fff;font-size:11px;font-weight:800;letter-spacing:.4px;vertical-align:middle}
 .hdr-t{font-size:20px;font-weight:700;color:var(--tx0)}
 .hdr-s{font-size:12px;color:var(--tx2);margin-top:1px}
+.hdr-s-short{display:none}
+/* Phones: a short subtitle, smaller controls and no logo tile keep the header to two lines instead of ten. */
+@media(max-width:600px){.hdr{padding:10px 12px;gap:8px}.hdr-ico{display:none}.hdr-t{font-size:15px;line-height:1.25}.ver{margin-left:4px;padding:1px 6px;font-size:10px}.hdr-s{font-size:11px}.hdr-s-long{display:none}.hdr-s-short{display:inline}.hdr-actions{gap:4px}.hdr-btn,.thm{width:36px;height:36px;font-size:16px}.hdr-l{min-width:0}.hdr-l>div{min-width:0}}
+@media(max-width:380px){.hdr-t{font-size:14px}.hdr-btn,.thm{width:34px;height:34px}#print-btn{display:none}}
 .byline-name{color:#1E3A5F}
 .thm{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background .2s,border-color .2s;color:var(--tx1);flex-shrink:0}
 .thm:hover{border-color:var(--mag)}
@@ -270,7 +274,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V10.1</span></div><div class="hdr-s">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated October 2026 &middot; <span class="byline-name">Namiranian, Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V10.2</span></div><div class="hdr-s"><span class="hdr-s-long">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated October 2026 &middot; </span><span class="hdr-s-short">Oct 2026 &middot; </span><span class="byline-name">Namiranian, Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -1401,11 +1405,14 @@ function esim101HTML(){
   h+='<line x1="50" y1="80" x2="950" y2="80" stroke="var(--bdr)" stroke-width="3"/>';
   /* Milestones */
   var milestones=[
-    {year:'2013',x:90,spec:'SGP.02 v1.0',label:'M2M RSP',desc:'(illustrative milestone)',color:'#2563EB',tab:'m2m'},
-    {year:'2016',x:235,spec:'SGP.22 v1',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
-    {year:'2019',x:380,spec:'SGP.22 v2',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
-    {year:'2023',x:525,spec:'SGP.32 v1',label:'IoT RSP',desc:'(illustrative milestone)',color:'#0891B2',tab:'iot'},
-    {year:'2023',x:670,spec:'SGP.22 v3',label:'Consumer',desc:'(illustrative milestone)',color:'#1E3A5F',tab:'consumer'},
+    /* Dates verified against GSMA document history (Oct 2026): SGP.02 V1.0 19/12/2013 and SGP.22 V1.0 13 Jan 2016 from the Document History tables of
+       SGP.02 V4.0 and SGP.22 V1.2; SGP.22 V2.0 14 Oct 2016, SGP.22 V3.0 19 Oct 2022 and SGP.32 V1.0.1 04 Jul 2023 from the GSMA eSIM specification listing
+       (gsma.com/solutions-and-impact/technologies/esim/esim-specification/). SM-DS (ES11/ES12) first appears in V2.0; V1.x already had Confirmation Codes. */
+    {year:'2013',x:90,spec:'SGP.02 v1.0',label:'M2M RSP',desc:'19 Dec 2013',color:'#2563EB',tab:'m2m'},
+    {year:'2016',x:235,spec:'SGP.22 v1.0',label:'Consumer',desc:'13 Jan 2016',color:'#1E3A5F',tab:'consumer'},
+    {year:'2016',x:380,spec:'SGP.22 v2.0',label:'Consumer',desc:'14 Oct 2016',color:'#1E3A5F',tab:'consumer'},
+    {year:'2022',x:525,spec:'SGP.22 v3.0',label:'Consumer',desc:'19 Oct 2022',color:'#1E3A5F',tab:'consumer'},
+    {year:'2023',x:670,spec:'SGP.32 v1.0.1',label:'IoT RSP',desc:'4 Jul 2023',color:'#0891B2',tab:'iot'},
     {year:'2025',x:815,spec:'SGP.41 v1',label:'IFPP',desc:'(public architecture)',color:'#B45309',tab:'ifpp'},
     {year:'2026',x:940,spec:'SGP.32 v1.3',label:'IoT RSP',desc:'(active GSMA listing)',color:'#0891B2',tab:'iot'}
   ];
@@ -1428,11 +1435,11 @@ function esim101HTML(){
   h+='</g>';
   /* Descriptions */
   h+='<g transform="translate(50,225)">';
-  h+='<text x="0" y="0" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2013 \u2014 SGP.02:</tspan> Early GSMA RSP technical specification for unattended M2M devices.</text>';
-  h+='<text x="0" y="20" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2016 \u2014 SGP.22 v1:</tspan> Consumer eSIM. Pull-model with Activation Codes.</text>';
-  h+='<text x="0" y="40" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2019 \u2014 SGP.22 v2:</tspan> Added Discovery Server path and Confirmation Codes.</text>';
-  h+='<text x="0" y="60" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.32:</tspan> IoT RSP architecture with eIM for a broad IoT device range.</text>';
-  h+='<text x="0" y="80" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.22 v3:</tspan> Multiple Enabled Profiles (MEP) support.</text>';
+  h+='<text x="0" y="0" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2013 \u2014 SGP.02 v1.0 (19 Dec):</tspan> First GSMA RSP technical specification, for unattended M2M devices.</text>';
+  h+='<text x="0" y="20" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2016 \u2014 SGP.22 v1.0 (13 Jan):</tspan> Consumer eSIM. Pull model with Activation Codes and optional Confirmation Codes.</text>';
+  h+='<text x="0" y="40" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2016 \u2014 SGP.22 v2.0 (14 Oct):</tspan> Added the SM-DS Discovery Service path (ES11/ES12).</text>';
+  h+='<text x="0" y="60" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2022 \u2014 SGP.22 v3.0 (19 Oct):</tspan> Multiple Enabled Profiles (MEP) support.</text>';
+  h+='<text x="0" y="80" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2023 \u2014 SGP.32 v1.0.1 (4 Jul):</tspan> IoT RSP technical specification with eIM for a broad IoT device range.</text>';
   h+='<text x="0" y="100" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2025 \u2014 SGP.41:</tspan> In-Factory Profile Provisioning architecture and requirements for manufacturing lines.</text>';
   h+='<text x="0" y="120" fill="var(--tx1)" font-size="11"><tspan font-weight="700">2026 \u2014 SGP.32 v1.3:</tspan> Active IoT technical specification listed by GSMA as published 22 May 2026.</text>';
   h+='</g>';

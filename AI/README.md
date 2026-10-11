@@ -15,6 +15,11 @@ A progressive six-course AI learning series -- from foundational concepts to ope
 
 Courses 101 and 102 are sequential and designed for progressive completion. Course 103 is a standalone reference tool. Courses 104 and 105 build on the earlier material. Course 106 is the capstone for turning AI fluency into repeatable operating practice.
 
+## What changed in V10.2
+
+- Kept the AI-101 to AI-105 headers compact on phones: below 600 px the tagline, long date and logo tile give way to a short "Oct 2026 · Namiranian, Babak" line, so the header drops from three or four wrapped lines to one or two.
+- AI-106 no longer hides the byline on phones, and its theme and search buttons stay side by side instead of stacking.
+
 ## What changed in V10.1
 
 - Corrected the AI-104 MCP server sample to the current TypeScript SDK v2 API: `@modelcontextprotocol/server` imports, `McpServer({ name, version })`, `registerTool` with a Zod `inputSchema`, and a stdio transport. The legacy `server.tool()` shortcut and the invalid `@modelcontextprotocol/sdk/server` import path were removed; remote transport is described as Streamable HTTP.
@@ -91,7 +96,7 @@ Each course keeps its own styles, scripts, data, and content. The course files a
 
 ## Content Currency
 
-Version: **V10.1**. October 2026 release; provider model releases rechecked **11 October 2026**, other sources checked **27 September 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
+Version: **V10.2**. October 2026 release; provider model releases rechecked **11 October 2026**, other sources checked **27 September 2026**. Foundational explanations are designed to age slowly, but model/provider lineups, pricing, benchmarks, regulatory dates, and resource availability move quickly. Verify live operational decisions against official provider docs, NIST, ISO, the European Commission, and other primary sources before relying on them.
 
 ## Adding a New Course
 
