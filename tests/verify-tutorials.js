@@ -394,7 +394,7 @@ releaseHtml.forEach(rel=>{
 
 const releaseSurfaces={
   'AI/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
-  'eSIM/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
+  'eSIM/index.html':/V10\.3[\s\S]*October 2026|October 2026[\s\S]*V10\.3/,
   'PQC/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
   '5G-6G/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
   'KG-CG/index.html':/V4\.1[\s\S]*October 2026|October 2026[\s\S]*V4\.1/,

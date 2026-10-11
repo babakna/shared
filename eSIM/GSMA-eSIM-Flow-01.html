@@ -274,7 +274,7 @@ a{color:var(--mag);text-decoration:none}a:hover{text-decoration:underline}
 <header class="hdr">
   <div class="hdr-l">
     <div class="hdr-ico">e</div>
-    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V10.2</span></div><div class="hdr-s"><span class="hdr-s-long">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated October 2026 &middot; </span><span class="hdr-s-short">Oct 2026 &middot; </span><span class="byline-name">Namiranian, Babak</span></div></div>
+    <div><div class="hdr-t">eSIM Specification Explorer <span class="ver">V10.3</span></div><div class="hdr-s"><span class="hdr-s-long">GSMA Remote SIM Provisioning &mdash; Interactive Flow Reference &middot; Updated October 2026 &middot; </span><span class="hdr-s-short">Oct 2026 &middot; </span><span class="byline-name">Namiranian, Babak</span></div></div>
   </div>
   <div class="hdr-actions">
     <button type="button" class="hdr-btn" id="search-btn" title="Search (Ctrl+K)" aria-label="Search">&#128269;</button>
@@ -345,21 +345,22 @@ const EC={
 // These follow the same schema comment pattern and are referenced by tools.
 
 // ── 13. CI PKID Reference Table ──
-// SOURCE-VERIFICATION NEEDED: CI PKID rows below are illustrative placeholders.
-// Confirm CI PKID, certificate chain, and production/test status against the current GSMA PKI/CI registry before use.
-// CI Public Key Identifiers (SHA-1 Subject Key Identifiers of the CI root certificates).
-// Transcribed from the euicc-manual PKI/CI registry, which mirrors the published GSMA CI
-// certificates. These are public trust-anchor identifiers, not secrets.
-// The set of CIs GROWS over time, and a test CI must never be confused with a production
-// one, so verify against the GSMA CI registry / SGP.26 for current values and expiry dates.
+// Verified 11 Oct 2026 against the CI root certificates themselves. For every row the X.509 Subject Key Identifier
+// was read from the certificate AND recomputed as SHA-1 of the subjectPublicKey bits (they match), each certificate
+// verified as self-signed, and the curve and notAfter date were read from it. Certificates: the GSMA CI set
+// published on the GSMA "Root CI" page (gsma.com/solutions-and-impact/technologies/esim/gsma-root-ci/, which
+// returned HTTP 403 to automated fetches) as mirrored in euicc-manual.osmocom.org/docs/pki/ci/ (bundle.pem,
+// bundle-tests.pem, files/d7a7d0.txt). Production/test status and the SGP.26 version of each test CI follow that
+// GSMA listing; the test certificates carry O=RSPTEST, OU=TESTCERT in their subject. The CI set grows over time;
+// re-check the GSMA page when adding rows. These are public trust-anchor identifiers, not secrets.
 var CI_PKIDS=[
-  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795BEBFB',gen:'GSM Association RSP2 Root CI1 (DigiCert)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3. Reported expiry 2052-02-21 \u2014 expiry NOT independently verified.',status:'Production'},
-  {pkid:'4C27967AD20C14B391E9601E41E604AD57C0222F',gen:'OISTE GSMA CI G1 (WISeKey)',usage:'Production trust anchor for SGP.21/SGP.22 v2 and v3. Reported expiry 2059-01-07 \u2014 expiry NOT independently verified.',status:'Production'},
-  {pkid:'D7A7D0C7C04EA76076E3F44FAEBDE8779E2948D4',gen:'GSM Association M2M31 Root CI2 (Cybertrust)',usage:'Production trust anchor for SGP.01/SGP.02 \u2014 M2M architecture, not Consumer RSP.',status:'Production (M2M)'},
-  {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
-  {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'SGP.26 test CI (v1.0 / v1.5)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
-  {pkid:'34EECF13156518D48D30BDF06853404D115F955D',gen:'SGP.26 test CI (v3.0.x)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'},
-  {pkid:'2209F61CD9EC5C9C854E787341FF83ECF9776A5B',gen:'SGP.26 test CI (v3.0.x)',usage:'Lab and test material only. Must never be trusted in production.',status:'Test'}
+  {pkid:'81370F5125D0B1D408D4C3B232E6D25E795BEBFB',gen:'GSM Association - RSP2 Root CI1',usage:'GSMA production CI for Consumer RSP (SGP.21/SGP.22 v2 and v3). Self-signed root, NIST P-256, valid to 21 Feb 2052.',status:'Production'},
+  {pkid:'4C27967AD20C14B391E9601E41E604AD57C0222F',gen:'OISTE GSMA CI G1 (OISTE Foundation)',usage:'GSMA production CI for Consumer RSP (SGP.21/SGP.22 v2 and v3). Self-signed root, NIST P-256, valid to 7 Jan 2059.',status:'Production'},
+  {pkid:'D7A7D0C7C04EA76076E3F44FAEBDE8779E2948D4',gen:'GSM Association \u2013 M2M31 Root CI2 (Cellco Partnership)',usage:'GSMA production CI for M2M RSP (SGP.01/SGP.02), not Consumer RSP. Self-signed root, NIST P-256, valid to 15 Mar 2052.',status:'Production (M2M)'},
+  {pkid:'F54172BDF98A95D65CBEB88A38A1C11D800A85C3',gen:'SGP.26 Test CI, NIST P-256 (v1.0 and v1.5 certificates share this key)',usage:'GSMA SGP.26 test material; certificates valid to 1 Feb 2052 (v1.0, \u201cGSMA Test CI\u201d) and 1 Apr 2055 (v1.5, \u201cTest CI\u201d). Never trust in production.',status:'Test'},
+  {pkid:'C0BC70BA36929D43B467FF57570530E57AB8FCD8',gen:'SGP.26 Test CI, brainpoolP256r1 (v1.0 and v1.5 certificates share this key)',usage:'GSMA SGP.26 test material; certificates valid to 18 Apr 2052 (v1.0) and 1 Apr 2055 (v1.5). Never trust in production.',status:'Test'},
+  {pkid:'34EECF13156518D48D30BDF06853404D115F955D',gen:'SGP.26 v3.0.x Test CI, NIST P-256',usage:'GSMA SGP.26 test material; certificate valid to 30 May 2058. Never trust in production.',status:'Test'},
+  {pkid:'2209F61CD9EC5C9C854E787341FF83ECF9776A5B',gen:'SGP.26 v3.0.x Test CI, brainpoolP256r1',usage:'GSMA SGP.26 test material; certificate valid to 1 Jun 2058. Never trust in production.',status:'Test'}
 ];
 
 // ── 14. Error Flow Decision Tree ──
@@ -1546,7 +1547,7 @@ function qrHTML(){
   h+='<div style="padding:10px 14px;background:rgba(30,58,95,0.06);border:1px solid var(--mag);border-radius:8px;margin-bottom:14px;font-size:13px;color:var(--tx1);line-height:1.7">';
   h+='<b style="color:var(--mag)">Diagnosing mutual authentication failures:</b> Extract <code>euiccCiPKIdListForVerification</code> from ES10b.GetEUICCInfo, then compare each PKID against this table. If the SM-DP+ certificate was issued by a CI whose PKID is NOT in the eUICC\u2019s trusted list, authentication will fail.';
   h+='</div>';
-  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:10px">PKIDs are the SHA-1 Subject Key Identifiers of the CI root certificates, transcribed from the published GSMA CI material. PKID hex values were transcribed from the euicc-manual CI registry mirror; the GSMA CI page returned HTTP 403 during verification, so <b>expiry dates are unconfirmed</b> and the CI set may have grown since. Confirm against the GSMA CI registry (and SGP.26 for test material) before relying on any value. <b style="color:#D97706">Never trust an SGP.26 test CI in production.</b></p>';
+  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:10px">PKIDs are the SHA-1 Subject Key Identifiers of the CI root certificates, transcribed from the published GSMA CI material. Each value, curve and expiry date was checked against the certificate itself (as of 11 October 2026): the identifier matches the SHA-1 of the certificate\u2019s public key. The CI set grows over time, so check the GSMA Root CI page for CIs added since. <b style="color:#D97706">Never trust an SGP.26 test CI in production.</b></p>';
   h+='<div class="rtwrap"><table class="rtbl"><thead><tr><th>PKID (hex)</th><th>Generation</th><th>Usage</th><th>Status</th></tr></thead><tbody>';
   CI_PKIDS.forEach(function(c){
     var sColor=c.status==='Test'?'#D97706':(c.status.indexOf('Production')===0?'#059669':'#6B7280');

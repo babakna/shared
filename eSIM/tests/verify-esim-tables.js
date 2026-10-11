@@ -282,6 +282,23 @@ w.addEventListener('load',()=>{
   ck('CI has Production rows',ci.some(c=>/^Production/.test(c.status)));
   ck('CI has Test rows',ci.some(c=>c.status==='Test'));
   ck('CI placeholder 3C4FB0 removed',!ci.some(c=>c.pkid.startsWith('3C4FB0')));
+  /* V10.3 regression: every CI row is a real published CI root certificate. Each SKI below was read from the
+     certificate and recomputed as SHA-1 of its public key; curve and notAfter come from the same certificate
+     (GSMA Root CI page certificates, mirrored at euicc-manual.osmocom.org/docs/pki/ci/). V10.2 flagged these rows
+     as "illustrative placeholders" with unverified expiry dates. */
+  const CI_EXPECTED={
+    '81370F5125D0B1D408D4C3B232E6D25E795BEBFB':['Production',/RSP2 Root CI1/,/21 Feb 2052/],
+    '4C27967AD20C14B391E9601E41E604AD57C0222F':['Production',/OISTE GSMA CI G1/,/7 Jan 2059/],
+    'D7A7D0C7C04EA76076E3F44FAEBDE8779E2948D4':['Production (M2M)',/M2M31 Root CI2/,/15 Mar 2052/],
+    'F54172BDF98A95D65CBEB88A38A1C11D800A85C3':['Test',/NIST P-256/,/1 Feb 2052[\s\S]*1 Apr 2055/],
+    'C0BC70BA36929D43B467FF57570530E57AB8FCD8':['Test',/brainpoolP256r1/,/18 Apr 2052[\s\S]*1 Apr 2055/],
+    '34EECF13156518D48D30BDF06853404D115F955D':['Test',/v3\.0\.x[\s\S]*NIST P-256/,/30 May 2058/],
+    '2209F61CD9EC5C9C854E787341FF83ECF9776A5B':['Test',/v3\.0\.x[\s\S]*brainpoolP256r1/,/1 Jun 2058/]
+  };
+  ck('CI table has exactly the verified rows',ci.length===Object.keys(CI_EXPECTED).length&&ci.every(c=>CI_EXPECTED[c.pkid]),ci.map(c=>c.pkid).join(','));
+  ci.forEach(c=>{const e=CI_EXPECTED[c.pkid];if(!e)return;
+    ck('CI '+c.pkid.slice(0,6)+' status/name/expiry match its certificate',c.status===e[0]&&e[1].test(c.gen)&&e[2].test(c.usage));});
+  ck('CI source no longer marked illustrative or unverified',!/illustrative placeholders|SOURCE-VERIFICATION NEEDED: CI PKID|NOT independently verified|expiry dates are unconfirmed/.test(fs.readFileSync(HTML,"utf8")));
   // PPR correctness in prose
   const body=d.body.textContent;
   ck('pprUpdateControl documented',/pprUpdateControl/.test(body));
@@ -298,7 +315,7 @@ w.addEventListener('load',()=>{
   ck('no ES2+.UpdatePolicyRules as a real function',!/must update the profile.s PPR via ES2\+\.UpdatePolicyRules/i.test(body));
   ck('ES6.UpdateMetadata cited',/ES6\.UpdateMetadata/.test(body));
   ck('ESep replaces ESeim',/ESep/.test(body)&&!/ESeim/.test(body));
-  ck('version V10.2 (October 2026)',/V10\.2/.test(body)&&/October 2026/.test(body));
+  ck('version V10.3 (October 2026)',/V10\.3/.test(body)&&/October 2026/.test(body));
 
   /* V10.1 regression: SGP.02 interface map (SGP.02 v3.0 s.1/Figure 1 and v4.0 section 5):
      ES1 EUM-SM-SR, ES2 Operator-SM-DP, ES3 SM-DP-SM-SR, ES4 Operator-SM-SR, ES5 SM-SR-eUICC,
