@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-501">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V10.1 (October 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-501</span><span>Network, 5G/6G, SIM/eSIM, IoT</span><span class="version">V10.2 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -25,6 +25,7 @@
   <a href="#s4"><span class="dot"></span>4. IoT &amp; long-lived devices</a>
   <a href="#s5"><span class="dot"></span>5. Constrained-device strategies</a>
   <a href="#s6"><span class="dot"></span>6. Coordinating the federation</a>
+  <a href="#s7"><span class="dot"></span>7. Standards status tracker</a>
   <a href="#labs"><span class="dot"></span>Hands-on labs</a>
   <a href="#quiz"><span class="dot"></span>Knowledge check</a>
   <a href="#sources"><span class="dot"></span>Sources</a>
@@ -41,6 +42,7 @@
       <li>Explain why telecom PQC is a cross-operator ecosystem problem.</li>
       <li>Locate PQC touch points in 5G authentication and SIM/eSIM provisioning.</li>
       <li>Plan for constrained, long-lived IoT and device fleets.</li>
+      <li>Read current GSMA, 3GPP, and ETSI PQC status without confusing drafts, studies, and demonstrations with published standards.</li>
     </ul>
   </div>
   <img class="hero-art" src="diagrams/telecom-ecosystem.svg" alt="A telecom ecosystem: devices, SIM/eSIM, radio access, core network, operators, and roaming partners, each a PQC touch point.">
@@ -55,7 +57,7 @@
       {"icon":"\ud83d\udcf1","title":"User or operator starts activation","body":"An activation code, default server address, or operator flow reaches the device's <b>Local Profile Assistant (LPA)</b>. The LPA is device software that coordinates the consumer RSP procedure; the eUICC is the secure element that will hold the profile. An eUICC can be embedded or removable depending on the form factor.","meta":"actor: user/operator -> device LPA"},
       {"icon":"\ud83c\udf10","title":"LPA connects to the SM-DP+","body":"The LPA opens the network connection to the operator's SM-DP+ and relays protocol messages between that server and the eUICC. The LPA is the network-facing delivery agent; describing the eUICC as directly contacting an internet server skips an important actor and interface boundary.","meta":"path: LPA <-> SM-DP+; LPA <-> eUICC"},
       {"icon":"\ud83e\udeaa","title":"Server and eUICC authenticate","body":"Through the LPA relay, the SM-DP+ and eUICC perform the certificate-based authentication defined by the GSMA RSP architecture. Certificate issuers and permitted roles form an ecosystem trust chain. A PQC transition must preserve the exact authenticated transcript, roles, and downgrade protections rather than merely replacing a certificate algorithm.","meta":"PQC target: RSP authentication and trust chain"},
-      {"icon":"\ud83d\udd10","title":"SM-DP+ binds and protects the profile","body":"The SM-DP+ prepares a bound profile package for the target eUICC and protects the delivery using the RSP protocol's cryptographic construction. Future PQC work must specify how new key establishment/signature algorithms compose with this protocol; a generic ML-KEM call is not a drop-in RSP profile.","meta":"artifact: bound profile package for one eUICC"},
+      {"icon":"\ud83d\udd10","title":"SM-DP+ binds and protects the profile","body":"The SM-DP+ prepares a bound profile package for the target eUICC and protects the delivery using the RSP protocol's cryptographic construction. Future PQC work must specify how new key establishment/signature algorithms compose with this protocol; a generic ML-KEM call is not a drop-in RSP profile. GSMA's draft PQC work targets this key-agreement step first, proposing hybrid classical-plus-PQC key distribution with algorithms the SM-DP+ selects from those the eUICC supports.","meta":"artifact: bound profile package for one eUICC; first PQC draft target"},
       {"icon":"\ud83e\udde9","title":"LPA transfers; eUICC installs","body":"The LPA downloads the bound profile package and transfers it over the device's local eUICC interface. The eUICC verifies, decrypts, installs, and can enable the profile. Key, signature, working-memory, transaction-size, and timing limits must be benchmarked on each supported secure-element generation.","meta":"destination: eUICC; constraint: measured device resources"},
       {"icon":"\ud83d\udce1","title":"Device attaches to the network","body":"With the profile active, the device performs 5G Authentication and Key Agreement with the operator core. 5G-AKA is primarily symmetric, so its quantum analysis is different from the public-key RSP trust chain and SUCI concealment.","meta":"mostly symmetric: analyze parameters and protocol separately"}
     ]
@@ -90,7 +92,9 @@
 <section class="lesson" id="s2">
   <div class="lesson-title"><span class="num">2</span><h2>5G and future 6G trust layers</h2></div>
   <p class="lead">5G improved subscriber-identity privacy; standards work is now examining quantum-safe impacts, but final 6G cryptographic profiles are not settled.</p>
-  <p>5G conceals the long-term subscriber identifier (SUPI) as SUCI using a public-key protection scheme, making that interface a natural PQC study target. Core network functions use TLS-based service interfaces and inherit TLS migration issues. 5G-AKA is primarily symmetric and needs a separate parameter/protocol review. 3GPP Release 20 includes a study item on the impact of quantum computing on 5G; cite that as active study work, not proof that a complete 6G PQC design has been finalized.</p>
+  <p>5G conceals the long-term subscriber identifier (SUPI) as SUCI using a public-key protection scheme, making that interface a natural PQC study target. Core network functions use TLS-based service interfaces and inherit TLS migration issues. 5G-AKA is primarily symmetric and needs a separate parameter/protocol review.</p>
+  <p>3GPP SA3's Release 20 study <b>FS_CryptoPQC</b>, "Study on Transitioning to Post Quantum Cryptography in 3GPP," is documented in <b>TR 33.703</b>. It is generation-agnostic rather than a 6G design: it reviews the profiles 3GPP takes from other bodies (TLS, IPsec, PKI, and JOSE, which the IETF is updating) and the 3GPP-defined procedures, such as SUCI calculation in TS 33.501 and MIKEY-SAKKE for mission-critical services in TS 33.180. The 3GPP portal listed the study as PCG-approved with a June 2026 end date, and TR 33.703 v20.1.0 was posted in September 2026. 3GPP described the next step as defining work packages for the normative specifications, so a study conclusion is not yet a published PQC SUCI profile or a revised TS 33.501/33.210/33.310.</p>
+  <div class="callout warn"><span class="k">Symmetric margins move separately</span><p>Release 20 also introduced 256-bit algorithm specifications (TS 35.240 to TS 35.248) to keep symmetric margins high against Grover-style search. That is a parameter upgrade for mostly symmetric radio and AKA security, not a replacement of public-key mechanisms such as SUCI concealment or certificate-based TLS.</p></div>
   <p>Sort the surface into three buckets. <b>Symmetric-heavy</b> pieces such as AKA and over-the-air protection are not broken by Shor; validate their parameters against the future profile instead of applying a blanket "double every key" rule. <b>Public-key</b> pieces such as SUCI, SBA TLS, and RSP certificates are the main replacement targets. <b>Long-lived confidentiality or authenticity</b> determines urgency. Mapping each interface this way is faster and more accurate than labeling an entire generation "quantum-safe."</p>
   <div class="callout example"><span class="k">Concrete example</span><p>The SUCI concealment that hides your permanent identity uses elliptic-curve public-key cryptography today. A quantum adversary who harvested those exchanges could later de-conceal identifiers &mdash; a privacy harvest-now-decrypt-later case, motivating PQC there.</p></div>
   <div class="callout tip"><span class="k">The 6G opportunity</span><p>Early standards work can make algorithm identifiers, negotiation, larger objects, telemetry, and replacement paths explicit before deployment. That is an opportunity, not a guarantee: track the normative 3GPP/GSMA output and test the resulting profiles before calling a system 6G quantum-safe.</p></div>
@@ -101,6 +105,9 @@
   <p class="lead">The (e)SIM is a tiny, hardened computer with real constraints &mdash; and a long, multi-party trust chain.</p>
   <p>SIM/eSIM provisioning (GSMA RSP) relies on certificate-based authentication and protected profile delivery. The <span class="term" data-def="An eUICC is a secure UICC that can manage downloadable profiles; it may be embedded, integrated, or supplied in another supported form factor rather than always being soldered into a phone.">eUICC</span> has finite nonvolatile memory, RAM, transaction buffers, and compute. Larger PQC objects can be a fit problem, but "eUICC" does not mean one fixed capacity or always-soldered packaging.</p>
   <div class="callout tip"><span class="k">July 2026 ecosystem signal</span><p>GSMA reported a live quantum-safe <b>pre-SGP.42</b> IFPP demonstration at MWC Shanghai involving IDEMIA, Quectel, and Tele2 IoT. This shows ecosystem experimentation with PQC-aware factory provisioning; it does <em>not</em> establish a published SGP.42 standard, production interoperability baseline, or certification profile.</p></div>
+  <div class="callout warn"><span class="k">Published GSMA status, checked 14 October 2026</span><p>No published GSMA eSIM specification yet defines PQC algorithms. The GSMA specification page listed <b>SGP.22 v2.7</b> (24 April 2026) and <b>v3.1</b> as the active consumer technical versions, <b>SGP.32 v1.3</b> and <b>SGP.31 v1.3</b> (both 22 May 2026) for IoT, and <b>SGP.41 v1.0</b> for in-factory provisioning architecture; its technical counterpart, SGP.42, is not published. A vendor claiming "PQC-compliant SGP.22" today is describing a pre-standard implementation.</p></div>
+  <div class="callout tip"><span class="k">Work in progress: confidentiality first</span><p>GSMA eSIM Working Group change requests circulated in October 2026 and marked non-confidential (for example, CR20016 against draft SGP.31 V2.0 under work item WI_028) propose carrying the PQC features planned for SGP.21/SGP.22 V3.2 into the IoT requirements. The drafts concentrate on <b>confidentiality against quantum attacks</b>: hybrid classical-plus-PQC key distribution using a standardized KEM such as ML-KEM (FIPS 203), at least one common post-quantum KEM supported by the SM-DP+, IPA, and eUICC, the SM-DP+ selecting algorithms from those the eUICC supports, and quantum-resistant confidentiality on interfaces such as ES8+, ES9+, ES11, ES12, ES2+, and ESipa. They are open change requests against draft versions, not approved or published requirements, and they do not by themselves replace the classical signatures in the eSIM certificate hierarchy.</p></div>
+  <p>Why start with confidentiality? A recorded profile download or management session is a harvest-now-decrypt-later target: protected profile data and keys captured today could be decrypted later. Forging a signature, by contrast, requires a cryptographically relevant quantum computer at the moment of attack, so authentication can follow on its own schedule &mdash; except for long-lived roots and verifiers that must already be planned, because certificate hierarchies and secure-element verifiers take years to replace.</p>
   <p>Use vendor measurements, not a kilobytes-versus-megabytes slogan. Current commercial eSIM secure elements advertise capacities such as roughly 1.1 MB or 1.8 MB of user nonvolatile memory, while working RAM and per-command buffers can be much smaller; profiles, OS code, and security metadata also consume space. The engineering questions are whether the exact key, signature, certificate chain, temporary buffers, and transaction fit simultaneously and meet timing/power limits on each supported generation.</p>
   <div class="callout example"><span class="k">Everyday analogy</span><p>Upgrading the eSIM trust chain is like changing the locks on every safe-deposit box in a banking network where the vault doors were made by different companies, the boxes are welded shut, and the master key hierarchy is shared across the whole industry. You cannot just email a patch &mdash; everyone who touches the chain has to agree and re-tool.</p></div>
 </section>
@@ -147,6 +154,30 @@
   <div class="callout takeaway"><span class="k">Takeaway</span><p>For federated systems, invest early in standards influence and contract language. Those, plus crypto-agility, let you move the instant your slowest partner is ready &mdash; and not a release later.</p></div>
 </section>
 
+<section class="lesson" id="s7">
+  <div class="lesson-title"><span class="num">7</span><h2>Telecom PQC standards status tracker</h2></div>
+  <p class="lead">Telecom PQC news arrives as studies, white papers, change requests, demonstrations, and published specifications. Label each one before you plan against it.</p>
+  <p>The table below records the status checked on 14 October 2026. The "Status" column matters more than the document number: a demonstration proves feasibility, a study informs requirements, a change request is a proposal, and only a published specification version is something a supplier can be certified against.</p>
+  <div class="table-scroll"><table class="data">
+    <thead><tr><th>Body / document</th><th>What it covers</th><th>Status (14 Oct 2026)</th></tr></thead>
+    <tbody>
+      <tr><td>GSMA SGP.22 (consumer RSP technical)</td><td>v2.7 (24 April 2026) and v3.1 (1 December 2023) are active</td><td>Published, classical cryptography; PQC features are being drafted for a v3.2 line</td></tr>
+      <tr><td>GSMA SGP.21 / SGP.31 (architecture and requirements)</td><td>SGP.31 v1.3 (22 May 2026) is active; SGP.31 V2.0 is in drafting under WI_028</td><td>Open, non-confidential change requests propose hybrid PQC key distribution requirements</td></tr>
+      <tr><td>GSMA SGP.32 (IoT technical)</td><td>v1.3 (22 May 2026) with eIM, IPA, ESipa, and ESep; test specifications SGP.33 remain at v1.2</td><td>Published, classical; the newest version is not automatically the certification baseline</td></tr>
+      <tr><td>GSMA SGP.41 / SGP.42 (in-factory profile provisioning)</td><td>SGP.41 v1.0 (28 February 2025) sets architecture and requirements</td><td>SGP.42 unpublished; a quantum-safe pre-SGP.42 demonstration ran in June 2026</td></tr>
+      <tr><td>GSMA PQTN Task Force, PQ.01&ndash;PQ.08</td><td>Impact assessment, risk management, telecom use cases (PQ.03), IoT (PQ.04), 4G/5G roaming (PQ.05), hybrid key exchange prototype for base station to security gateway IPsec (PQ.06, May 2026), non-terrestrial networks (PQ.07, February 2026), automotive impact assessment (PQ.08, October 2026)</td><td>Non-normative guidance; GSMA said a specification-impact table with indicative timelines will be published before the end of 2026</td></tr>
+      <tr><td>3GPP TR 33.703 (FS_CryptoPQC, Rel-20)</td><td>Transition of 3GPP profiles and 3GPP-defined procedures such as SUCI and MIKEY-SAKKE</td><td>Study; v20.1.0 posted September 2026; normative work packages are the next step</td></tr>
+      <tr><td>3GPP TS 35.240&ndash;35.248 (Rel-20)</td><td>256-bit symmetric algorithm specifications</td><td>Symmetric margin work, not public-key replacement</td></tr>
+      <tr><td>ETSI TS 103 744 V1.2.2 (February 2026)</td><td>Quantum-safe hybrid key establishment (CYBER QSC)</td><td>Published Technical Specification</td></tr>
+      <tr><td>ETSI TR 104 005 V1.2.1 (January 2026)</td><td>Impacts of PQC on ETSI TC SET (SIM/UICC) specifications</td><td>Published Technical Report (informative, not a card profile)</td></tr>
+      <tr><td>GlobalPlatform secure-element PQC</td><td>Secure channel and card-content management changes for PQC</td><td>In development; not published as a PQC amendment</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout example"><span class="k">GSMA's four PQTN workstreams</span><p>At its June 2026 MWC Shanghai roundtable, the GSMA Post-Quantum Telco Network Task Force described four parallel workstreams: a <b>specification impact analysis</b> of every GSMA specification, a telecom <b>CBOM</b>, <b>crypto-agility</b> guidelines for a roaming-dependent multi-vendor industry, and <b>testing</b> of ML-KEM and ML-DSA on real network elements, including SIM cards and low-end smart meters.</p></div>
+  <div class="callout warn"><span class="k">Read event summaries carefully</span><p>Event write-ups sometimes describe NIST's 2030 deprecation and 2035 disallowance of RSA and ECC as already in force. Those dates come from NIST IR 8547, which remains an initial public draft; binding dates come from the documents that adopt them, such as OMB M-26-15 for covered U.S. federal agencies. Cite the governing document, not the summary.</p></div>
+  <div class="callout takeaway"><span class="k">Takeaway</span><p>For every telecom PQC claim, record the body, document, version, and status. Plan supplier requirements against published versions and track drafts as roadmap items with an owner and a review date.</p></div>
+</section>
+
 <section class="block lab" id="labs">
   <h2>Hands-on labs</h2>
   <p class="section-hint">Decide first, then reveal.</p>
@@ -186,6 +217,20 @@
       <button class="btn small reveal">Show recommended answer</button>
       <p class="answer"><span class="k">Recommended answer</span> The GSMA trust hierarchy, eUICC vendors, and SM-DP+ provisioning servers must all support the new algorithms and larger certificates first &mdash; the operator owns only part of the chain. Their highest-leverage moves are standards participation (GSMA/3GPP) and PQC/agility clauses in procurement, which pull the rest of the federation forward.</p>
     </article>
+    <article class="case">
+      <h3>Lab 6 &middot; "PQC-compliant SGP.22"</h3>
+      <p class="scenario">In October 2026 an eUICC supplier's proposal says its product is "PQC-compliant with SGP.22" and asks you to make that a selection criterion.</p>
+      <p class="decide">How do you evaluate the claim and write the requirement?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> No published SGP.22 version defines PQC yet (v2.7 and v3.1 are classical), so the claim can only mean a pre-standard implementation. Ask which draft or change request it follows, which algorithms and hybrid combination it uses, and what RAM, buffer, and timing results it measured. Write the requirement as an upgrade commitment: support the published GSMA PQC version within a stated period after publication, with crypto-agile key agreement and interoperability with your SM-DP+, rather than certifying today against a draft.</p>
+    </article>
+    <article class="case">
+      <h3>Lab 7 &middot; Which half first?</h3>
+      <p class="scenario">Your eSIM platform team has budget for one PQC track this year: key establishment for profile delivery, or PQC signatures for the certificate hierarchy.</p>
+      <p class="decide">Which goes first, and what must the other track still do this year?</p>
+      <button class="btn small reveal">Show recommended answer</button>
+      <p class="answer"><span class="k">Recommended answer</span> Key establishment first, matching GSMA's draft direction: recorded profile downloads are a harvest-now-decrypt-later target, while signature forgery needs a quantum computer at the time of attack. The signature track still needs this year's planning work: inventory the certificate hierarchy and long-lived verifiers, measure larger certificate chains on target eUICCs, and put agility requirements into new hardware, because those replacement cycles take years.</p>
+    </article>
   </div>
 </section>
 
@@ -204,7 +249,10 @@
     {"q":"A roaming partner lacks a mutually supported PQC profile. What is the correct conclusion?","choices":["That interconnect remains classical or unavailable under policy; unrelated interfaces can still migrate","Every interface worldwide must fall back","The stronger partner silently forces PQC"],"answer":0,"explain":"Assess each protocol boundary separately. A partner constrains its interconnect, not every cryptographic surface in the home network."},
     {"q":"A device only VERIFIES signatures, never signs. Is it too constrained for PQC?","choices":["Usually no - verification is far cheaper than signing","Yes, all PQC is too heavy for any device","Only if it has a screen"],"answer":0,"explain":"Signing is the costly operation. Verification (ML-DSA, or tiny-key LMS/XMSS for firmware) is typically affordable, and heavy signing stays in the cloud/HSM."},
     {"q":"What is an operator's most effective lever for telecom PQC?","choices":["Standards participation and procurement/contract clauses","Rewriting its own code faster","Changing the phone color"],"answer":0,"explain":"Because the chain spans many owners, alignment via standards (GSMA/3GPP) and contracts moves the federation more than any single implementation."},
-    {"q":"Why should telecom PQC readiness be tracked per interface?","choices":["RSP, radio security, SBA TLS, SUCI, and roaming are distinct protocols with different owners and fallbacks","They are all one TLS handshake","Only the RAN uses cryptography"],"answer":0,"explain":"The ecosystem is connected, but its cryptographic surfaces are not one negotiation. Inventory and evidence must identify each interface and dependency."}
+    {"q":"Why should telecom PQC readiness be tracked per interface?","choices":["RSP, radio security, SBA TLS, SUCI, and roaming are distinct protocols with different owners and fallbacks","They are all one TLS handshake","Only the RAN uses cryptography"],"answer":0,"explain":"The ecosystem is connected, but its cryptographic surfaces are not one negotiation. Inventory and evidence must identify each interface and dependency."},
+    {"q":"As checked in October 2026, which published GSMA eSIM specification version defines PQC algorithms?","choices":["None yet - PQC is in working-group drafts and change requests","SGP.22 v2.7","SGP.32 v1.3"],"answer":0,"explain":"SGP.22 v2.7/v3.1 and SGP.32 v1.3 are the active published versions and are classical. PQC requirements are being drafted, for example for SGP.21/SGP.22 V3.2 and SGP.31 V2.0."},
+    {"q":"Why do GSMA's draft eSIM PQC requirements address confidentiality (key establishment) first?","choices":["Recorded profile downloads can be decrypted later, while forging a signature needs a quantum computer at the time of attack","Signatures are not used in eSIM","Confidentiality is cheaper to standardize because it needs no algorithms"],"answer":0,"explain":"Harvest-now-decrypt-later makes captured confidential traffic urgent today. Signatures still need early planning because certificate hierarchies and verifiers are slow to replace."},
+    {"q":"What is 3GPP TR 33.703?","choices":["The Rel-20 study on transitioning 3GPP to post-quantum cryptography","A published PQC SUCI profile","The 6G air-interface specification"],"answer":0,"explain":"TR 33.703 documents the FS_CryptoPQC study. It informs later normative work; it is not itself a published PQC SUCI profile."}
   ]
   </script>
 </section>
@@ -219,7 +267,13 @@
   <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/wp-content/uploads/2024/07/A-guide-to-eSIM-Architectures.pdf" target="_blank" rel="noopener noreferrer">GSMA &mdash; Guide to eSIM architectures and actors</a>
   <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/wp-content/uploads/2024/09/SGP.21-v2.6.pdf" target="_blank" rel="noopener noreferrer">GSMA SGP.21 &mdash; Consumer RSP architecture</a>
   <a href="https://www.gsma.com/solutions-and-impact/technologies/security/post-quantum/quantum-safe-or-quantum-vulnerable-inside-gsmas-second-pqc-roundtable-at-mwc-shanghai/" target="_blank" rel="noopener noreferrer">GSMA &mdash; July 2026 PQC roundtable and pre-SGP.42 IFPP demonstration</a>
-  <a href="https://portal.3gpp.org/desktopmodules/WorkItem/WorkItemDetails.aspx?workitemId=1080045" target="_blank" rel="noopener noreferrer">3GPP Release 20 study &mdash; impact of quantum computing on 5G</a>
+  <a href="https://portal.3gpp.org/desktopmodules/WorkItem/WorkItemDetails.aspx?workitemId=1080045" target="_blank" rel="noopener noreferrer">3GPP FS_CryptoPQC (Rel-20) &mdash; Study on Transitioning to Post Quantum Cryptography in 3GPP</a>
+  <a href="https://www.3gpp.org/ftp/Specs/archive/33_series/33.703/" target="_blank" rel="noopener noreferrer">3GPP TR 33.703 &mdash; published versions (v20.1.0, September 2026)</a>
+  <a href="https://www.3gpp.org/technologies/pqc-sa3" target="_blank" rel="noopener noreferrer">3GPP &mdash; Post Quantum Cryptography in 3GPP (SA3 overview, July 2026)</a>
+  <a href="https://www.gsma.com/solutions-and-impact/technologies/esim/esim-specification/" target="_blank" rel="noopener noreferrer">GSMA &mdash; eSIM Consumer and IoT specification status (SGP.22, SGP.31/32, SGP.41)</a>
+  <a href="https://www.gsma.com/solutions-and-impact/technologies/security/post-quantum-cryptography-documents/" target="_blank" rel="noopener noreferrer">GSMA PQTN Task Force &mdash; PQ.01 to PQ.08 documents</a>
+  <a href="https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.02.02_60/ts_103744v010202p.pdf" target="_blank" rel="noopener noreferrer">ETSI TS 103 744 V1.2.2 &mdash; Quantum-safe hybrid key establishment (February 2026)</a>
+  <a href="https://www.etsi.org/deliver/etsi_tr/104000_104099/104005/01.02.01_60/tr_104005v010201p.pdf" target="_blank" rel="noopener noreferrer">ETSI TR 104 005 V1.2.1 &mdash; PQC impacts on TC SET (SIM/UICC) specifications (January 2026)</a>
   <a href="https://www.infineon.com/assets/row/public/documents/30/49/infineon-oc1230-datasheet-en.pdf?fileId=8ac78c8c8d2fe47b018e3d401d0a6772" target="_blank" rel="noopener noreferrer">Infineon OC1230 datasheet &mdash; example 1.1 MB eSIM capacity</a>
   <a href="https://www.infineon.com/assets/row/public/documents/30/41/infineon-tegrion-short-product-overview-sli22-en.pdf" target="_blank" rel="noopener noreferrer">Infineon SLI22 overview &mdash; example 1.8 MB NVM / 96 KB RAM</a>
 </section>
@@ -230,9 +284,9 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V10.1 (October 2026)</div>
+  <div class="help-ver" data-help-version>V10.2 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
-  <p>Step through eSIM provisioning first to see the multi-party trust chain, then read how 5G/6G, SIM/eSIM, and IoT each add their own constraints.</p>
+  <p>Step through eSIM provisioning first to see the multi-party trust chain, then read how 5G/6G, SIM/eSIM, and IoT each add their own constraints. Section 7 tracks which telecom PQC documents are published, drafted, or only demonstrated.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
   <p class="disclaimer">Educational material only, not production cryptographic approval.</p>
 </div></div>

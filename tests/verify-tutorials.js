@@ -339,7 +339,7 @@ aiFiles.forEach(f=>checkPage('AI/'+f,(w,d,t,rel)=>{
 /* ---------- Shared asset carries the runtime version ---------- */
 {
   const js=fs.readFileSync(path.join(ROOT,'PQC/assets/pqc.js'),'utf8');
-  ck('pqc.js VERSION is V10.1 (October 2026)',/V10\.1 \(October 2026\)/.test(js));
+  ck('pqc.js VERSION is V10.2 (October 2026)',/var VERSION = "V10\.2 \(October 2026\)"/.test(js));
   ck('pqc.js has no V8.x',!/\bV8\.[01]\b/.test(js));
 }
 
@@ -395,7 +395,7 @@ releaseHtml.forEach(rel=>{
 const releaseSurfaces={
   'AI/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
   'eSIM/index.html':/V10\.3[\s\S]*October 2026|October 2026[\s\S]*V10\.3/,
-  'PQC/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
+  'PQC/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
   '5G-6G/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
   'KG-CG/index.html':/V4\.1[\s\S]*October 2026|October 2026[\s\S]*V4\.1/,
   'SSFamily/index.html':/V11\.1[\s\S]*October 2026|October 2026[\s\S]*V11\.1/,
@@ -422,6 +422,22 @@ Object.entries(releaseSurfaces).forEach(([rel,re])=>{
   ck('PQC October currency: HAWK withdrawn and eight remain',/HAWK team withdrew/.test(pqc201)&&/leaving eight candidates/.test(pqc201));
   ck('PQC October currency: direct ML-KEM TLS not yet RFC',/RFC Editor queue/.test(pqc202)&&/rather than a published RFC/.test(pqc202));
   ck('PQC October currency: policy and PIV signals',/EU coordinated roadmap/.test(pqc401)&&/UK NCSC migration timeline/.test(pqc401)&&/Treasury Quantum-Readiness Task Force/.test(pqc401)&&/Preliminary June PIV working drafts/.test(pqc601));
+
+  /* V10.2 (14 Oct 2026 status check): positive assertions on telecom and dated currency. */
+  const pqc100=fs.readFileSync(path.join(ROOT,'PQC/PQC-100.html'),'utf8');
+  const pqc101=fs.readFileSync(path.join(ROOT,'PQC/PQC-101.html'),'utf8');
+  const pqc501=fs.readFileSync(path.join(ROOT,'PQC/PQC-501.html'),'utf8');
+  const pqcGloss=fs.readFileSync(path.join(ROOT,'PQC/glossary.html'),'utf8');
+  ck('PQC V10.2: 3GPP study named FS_CryptoPQC / TR 33.703, not "impact on 5G"',/FS_CryptoPQC/.test(pqc501)&&/TR 33\.703/.test(pqc501)&&/v20\.1\.0/.test(pqc501)&&!/impact of quantum computing on 5G/.test(pqc501));
+  ck('PQC V10.2: published GSMA eSIM versions are classical',/No published GSMA eSIM specification yet defines PQC/.test(pqc501)&&/SGP\.22 v2\.7<\/b> \(24 April 2026\)/.test(pqc501)&&/SGP\.32 v1\.3<\/b>/.test(pqc501));
+  ck('PQC V10.2: GSMA drafts labelled as open change requests',/not approved or published requirements/.test(pqc501)&&/WI_028/.test(pqc501));
+  ck('PQC V10.2: standards tracker section and nav link',/id="s7"/.test(pqc501)&&/href="#s7"/.test(pqc501)&&/PQ\.08/.test(pqc501));
+  ck('PQC V10.2: Gidney logical-qubit count replaces "thousands"',/1,537 logical qubits/.test(pqc100)&&!/thousands of logical qubits/.test(pqc100));
+  ck('PQC V10.2: 2026 elliptic-curve estimate cited',/1,200 logical qubits/.test(pqc101)&&/2603\.28846/.test(pqc101));
+  ck('PQC V10.2: OpenSSL 4.0.3 / 4.1.0-beta2 and OpenSSH 10.6',/4\.0\.3/.test(pqc202)&&/4\.1\.0-beta2/.test(pqc202)&&/ssh-mldsa44-ed25519/.test(pqc202)&&/WarnWeakCrypto/.test(pqc202)&&!/4\.0\.2 is stable/.test(pqc202));
+  ck('PQC V10.2: HAWK dates are attack 28 July, withdrawal 29 July',/withdrew the scheme on 29 July/.test(pqc201));
+  ck('PQC V10.2: CISA product categories and M-26-15 plan date',/CISA PQC product categories/.test(pqc401)&&/October 22, 2026/.test(pqc401));
+  ck('PQC V10.2: glossary telecom and stateful-signature terms',['LMS / XMSS','eIM / IPA','IFPP','GSMA PQTN Task Force','TR 33.703 (FS_CryptoPQC)'].every(k=>pqcGloss.includes('<span class="k">'+k+'</span>')));
 
   const fiveg=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-5G.html'),'utf8');
   const sixg=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-6G.html'),'utf8');

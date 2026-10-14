@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-201">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V10.1 (October 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V10.2 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -88,7 +88,7 @@
   </table></div>
   <p>These did not appear overnight. NIST ran an open, global competition: a public call in 2016, dozens of submissions from teams worldwide, several rounds of public cryptanalysis where researchers openly tried to break each other's designs, draft selections in 2022, and the finalized FIPS 203/204/205 in August 2024. That decade of adversarial peer review is exactly why you should trust these standards over any proprietary alternative &mdash; and why "roll your own PQC" is an even worse idea than rolling your own classical crypto.</p>
   <p>A standards-aligned plan starts by naming the job (key exchange? signature?), then picks the family, then the parameter set. HQC was selected in 2025 as a <b>backup</b> KEM built on different (code-based) math, so a future weakness in lattices would not take down everything. Falcon was selected for future FN-DSA standardization, but NIST has not published a draft or final FIPS 206; track its status before committing.</p>
-  <div class="callout takeaway"><span class="k">2026 standards watch</span><p>NIST SP 800-230 is still an initial public draft. It proposes six additional SLH-DSA parameter sets for limited-signature uses such as software, firmware, and certificate signing, with a strict limit of 2<sup>24</sup> signatures per key; NIST explicitly says they are not approved for general-purpose use. NIST IR 8610 originally advanced nine additional-signature candidates to Round 3 in May. On 28 July 2026, NIST reported that the HAWK team withdrew after an AI-assisted analysis found a vulnerability, leaving eight candidates under evaluation: FAEST, MAYO, MQOM, QR-UOV, SDitH, SNOVA, SQIsign, and UOV. The HAWK result does not affect finalized FIPS 203, 204, or 205. Advancement is not standardization or deployment approval.</p></div>
+  <div class="callout takeaway"><span class="k">2026 standards watch</span><p>NIST SP 800-230 is still an initial public draft. It proposes six additional SLH-DSA parameter sets for limited-signature uses such as software, firmware, and certificate signing, with a strict limit of 2<sup>24</sup> signatures per key; NIST explicitly said they are not approved for general-purpose use. NIST IR 8610 originally advanced nine additional-signature candidates to Round 3 in May. After an AI-assisted key-recovery attack was posted to NIST's pqc-forum on 28 July 2026, the HAWK team withdrew the scheme on 29 July, leaving eight candidates under evaluation: FAEST, MAYO, MQOM, QR-UOV, SDitH, SNOVA, SQIsign, and UOV. The HAWK result does not affect finalized FIPS 203, 204, or 205. Advancement is not standardization or deployment approval. As checked 14 October 2026, NIST's PQC news page listed no new FIPS since August 2024: FIPS 206 (FN-DSA) and the HQC standard have no public draft yet, and NIST IR 8547 remains an initial public draft.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Saying "we use PQC" with no specifics. Always state algorithm, parameter set, job, protocol, and implementation &mdash; otherwise the claim is unverifiable.</p></div>
   <div class="callout example"><span class="k">Why two names for the same thing?</span><p>You will see "Kyber" and "ML-KEM," or "Dilithium" and "ML-DSA," used almost interchangeably &mdash; and it trips up newcomers constantly. Kyber, Dilithium, and SPHINCS+ are the submission names behind the finalized ML-KEM, ML-DSA, and SLH-DSA standards. Falcon is different: NIST selected it for a future FIPS 206 expected to use the name FN-DSA, but that standard is still in development. The finalized standards have settled parameters and encodings; do not treat Falcon/FN-DSA as final until FIPS 206 is published. If a product still says "Kyber," ask whether it implements final ML-KEM or a pre-standard build.</p></div>
   <div class="callout example"><span class="k">Everyday analogy</span><p>Think of "job first, then family, then parameter set" like buying a vehicle. First decide the job (haul cargo vs. commute), then the family (truck vs. sedan), then the trim level (engine size, options). Nobody sensibly starts by arguing about trim levels before knowing whether they need a truck &mdash; yet teams routinely argue about PQC parameter sets before agreeing on what job the cryptography is even doing.</p></div>
@@ -159,11 +159,11 @@
     <thead><tr><th>NIST category</th><th>Comparable attack effort</th><th>KEM</th><th>Signature (lattice)</th><th>Profile context</th></tr></thead>
     <tbody>
       <tr><td>Level 1</td><td>AES-128</td><td>ML-KEM-512</td><td>ML-DSA-44</td><td>Constrained / low-margin</td></tr>
-      <tr><td><b>Level 3</b></td><td>AES-192</td><td><b>ML-KEM-768</b></td><td><b>ML-DSA-65</b></td><td>Used by profiles including current hybrid TLS work</td></tr>
+      <tr><td><b>Level 3</b></td><td>AES-192</td><td><b>ML-KEM-768</b></td><td><b>ML-DSA-65</b></td><td>Profiled by the RFC 10024 hybrid TLS groups</td></tr>
       <tr><td>Level 5</td><td>AES-256</td><td>ML-KEM-1024</td><td>ML-DSA-87</td><td>Required by some high-assurance profiles, including CNSA 2.0</td></tr>
     </tbody>
   </table></div>
-  <div class="callout example"><span class="k">Concrete example</span><p>A web service following the active hybrid TLS specification implements its profiled ML-KEM-768 group. A U.S. National Security System follows CNSA 2.0 and its transition schedule, including ML-KEM-1024 and ML-DSA-87. A commercial firmware program documents its own verifier, lifetime, compliance, and size constraints before selecting a signature set.</p></div>
+  <div class="callout example"><span class="k">Concrete example</span><p>A web service following published RFC 10024 implements a profiled hybrid group such as <code>X25519MLKEM768</code>. A U.S. National Security System follows CNSA 2.0 and its transition schedule, including ML-KEM-1024 and ML-DSA-87. A commercial firmware program documents its own verifier, lifetime, compliance, and size constraints before selecting a signature set.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Mixing levels inconsistently across a system &mdash; e.g. a Level 5 signature protecting a Level 1 key exchange. Match the level to the weakest link and the data's real lifetime, and document the choice.</p></div>
 </section>
 
@@ -231,7 +231,7 @@
       <p class="scenario">Team A runs a public API; Team B builds a firmware root of trust meant to be trusted for 20 years.</p>
       <p class="decide">Which parameter levels make sense for each?</p>
       <button class="btn small reveal">Show recommended answer</button>
-      <p class="answer"><span class="k">Recommended answer</span> Team A must follow its deployed protocol profile; the current IETF hybrid TLS work uses ML-KEM-768 for key establishment. Team B is choosing a <em>signature</em>, not a KEM, and should select the approved ML-DSA or SLH-DSA set after testing boot-ROM size, verification time, artifact lifetime, and policy. CNSA 2.0 systems use ML-DSA-87; that mandate should not be generalized to every firmware product.</p>
+      <p class="answer"><span class="k">Recommended answer</span> Team A must follow its deployed protocol profile; published RFC 10024 uses ML-KEM-768 in two of its three hybrid TLS groups and ML-KEM-1024 in <code>SecP384r1MLKEM1024</code>. Team B is choosing a <em>signature</em>, not a KEM, and should select the approved ML-DSA or SLH-DSA set after testing boot-ROM size, verification time, artifact lifetime, and policy. CNSA 2.0 systems use ML-DSA-87; that mandate should not be generalized to every firmware product.</p>
     </article>
     <article class="case">
       <h3>Lab 5 &middot; Diversity in practice</h3>
@@ -275,7 +275,8 @@
   <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; Recommendations for Key-Encapsulation Mechanisms (final, September 2025)</a>
   <a href="https://csrc.nist.gov/pubs/sp/800/230/ipd" target="_blank" rel="noopener noreferrer">NIST SP 800-230 &mdash; Additional SLH-DSA parameter sets for limited-signature use cases (initial public draft)</a>
   <a href="https://csrc.nist.gov/pubs/ir/8610/final" target="_blank" rel="noopener noreferrer">NIST IR 8610 &mdash; Round 3 additional-signature report (final, May 2026)</a>
-  <a href="https://www.nist.gov/pqc" target="_blank" rel="noopener noreferrer">NIST PQC project &mdash; HAWK withdrawal notice and current Round 3 status (July 2026)</a>
+  <a href="https://csrc.nist.gov/projects/pqc-dig-sig/round-3-additional-signatures" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Round 3 additional signatures, with HAWK withdrawal notice</a>
+  <a href="https://csrc.nist.gov/projects/post-quantum-cryptography/news" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; PQC project news (status checked 14 October 2026)</a>
   <a href="https://www.rfc-editor.org/rfc/rfc10024.html" target="_blank" rel="noopener noreferrer">IETF RFC 10024 &mdash; Hybrid ECDHE-MLKEM key agreement for TLS 1.3</a>
   <a href="https://www.rfc-editor.org/rfc/rfc9954.html" target="_blank" rel="noopener noreferrer">IETF RFC 9954 &mdash; Hybrid key exchange design framework</a>
   <a href="https://www.rfc-editor.org/rfc/rfc9958.html" target="_blank" rel="noopener noreferrer">IETF RFC 9958 &mdash; Post-Quantum Cryptography for Engineers</a>
@@ -288,7 +289,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V10.1 (October 2026)</div>
+  <div class="help-ver" data-help-version>V10.2 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Start with the size comparison &mdash; those ratios explain most PQC engineering pain. Then read each family's lesson and try the labs.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

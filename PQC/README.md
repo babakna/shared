@@ -1,8 +1,21 @@
 # Post-Quantum Cryptography Learning Lab
 
-V10.1 (October 2026)
+V10.2 (October 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V10.2
+
+Primary status sources were checked 14 October 2026.
+
+- Corrected the 3GPP study in PQC-501: it is FS_CryptoPQC, "Study on Transitioning to Post Quantum Cryptography in 3GPP" (TR 33.703, v20.1.0 posted September 2026), a generation-agnostic Rel-20 study whose next step is normative work packages, not a study of "the impact of quantum computing on 5G." Added the Rel-20 256-bit symmetric algorithm specifications (TS 35.240 to TS 35.248).
+- Added the published GSMA eSIM status: SGP.22 v2.7 and v3.1, SGP.31/SGP.32 v1.3 (22 May 2026) and SGP.41 v1.0 are classical; SGP.42 is unpublished. Added the October 2026 non-confidential eSIM Working Group change requests that propose hybrid PQC key distribution for SGP.21/SGP.22 V3.2 and SGP.31 V2.0 (WI_028), labelled as open drafts that address confidentiality first and do not replace eSIM PKI signatures.
+- Added a telecom PQC standards status tracker (PQC-501 section 7) covering GSMA SGP.22/31/32/41/42, GSMA PQTN PQ.01 to PQ.08 (including PQ.08 automotive, October 2026), 3GPP TR 33.703 and TS 35.240 to 35.248, ETSI TS 103 744 V1.2.2 and TR 104 005 V1.2.1, and GlobalPlatform, plus two labs and three quiz questions.
+- Added dated quantum resource estimates: Gidney's 2025 RSA-2048 construction (about 1,537 logical qubits, under one million physical qubits, about five days) and the March 2026 Google Quantum AI elliptic-curve estimate (at most 1,200 to 1,450 logical qubits), with a worked research-triage example in PQC-601. Replaced "thousands of logical qubits" in PQC-100.
+- Updated implementation status: OpenSSL 4.0.3 is the stable line after the 29 September 2026 security release, 4.1.0-beta2 is pre-release, and OpenSSH 10.6 (6 October 2026) enabled hybrid `ssh-mldsa44-ed25519` signatures and server-side `WarnWeakCrypto` logging. Composite ML-DSA and ML-KEM certificate drafts are in the RFC Editor queue without RFC numbers.
+- Corrected the HAWK timeline (attack posted 28 July, withdrawal 29 July 2026) and replaced the remaining "active/current hybrid TLS work" wording with published RFC 10024.
+- Added the CISA PQC product-category list (January 2026) and the 22 October 2026 due date for M-26-15 agency plans to PQC-401; added GSMA PQ.06 IKEv2 prototype evidence to PQC-202 and the GSMA telecom CBOM workstream to PQC-402.
+- Added glossary entries for LMS/XMSS, eIM/IPA, IFPP, the GSMA PQTN Task Force, and TR 33.703, and synchronized every page, shared asset, Help surface, and test to V10.2 (October 2026).
 
 ## What changed in V10.1
 
@@ -105,4 +118,4 @@ Stage 5 &mdash; Capstone
 
 ## Source alignment
 
-Content is aligned to NIST PQC standards and guidance including FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA), the HQC selection, NCCoE migration guidance, NIST CSWP 39upd1 crypto-agility guidance, White House EO 14412, OMB M-26-15, and NSA CNSA 2.0. Algorithm sizes are representative values from the FIPS parameter sets. This is educational reference material, not production cryptographic approval; verify against current primary sources and your security team before any deployment.
+Content is aligned to NIST PQC standards and guidance including FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA), the HQC selection, NCCoE migration guidance, NIST CSWP 39upd1 crypto-agility guidance, White House EO 14412, OMB M-26-15, and NSA CNSA 2.0. Telecom content is aligned to the published GSMA eSIM specification status, GSMA PQTN guidance, 3GPP TR 33.703, and ETSI TS 103 744 / TR 104 005, with drafts and demonstrations labelled as such. Algorithm sizes are representative values from the FIPS parameter sets. This is educational reference material, not production cryptographic approval; verify against current primary sources and your security team before any deployment.

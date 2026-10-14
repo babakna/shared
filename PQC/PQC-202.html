@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-202">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V10.1 (October 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-202</span><span>Protocols in Practice</span><span class="version">V10.2 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -53,7 +53,7 @@
     <script type="application/json" class="steps">
     [
       {"icon":"\ud83c\udf10","title":"TLS / HTTPS","body":"The key-establishment group can move first to the RFC 10024 hybrid ECDHE+ML-KEM construction. It defines <code>X25519MLKEM768</code>, <code>SecP256r1MLKEM768</code>, and <code>SecP384r1MLKEM1024</code>. Publication standardizes the groups; it does not prove universal client, server, CDN, or middlebox deployment. Certificate and handshake-signature migration remains a separate PKI track. <b>Biggest risk:</b> unsupported clients, middleboxes, and larger messages.","meta":"change: RFC 10024 key establishment now; certificate authentication separately"},
-      {"icon":"\ud83d\udda5\ufe0f","title":"SSH","body":"The key-exchange method name carries PQC (for example the hybrid <code>sntrup761x25519</code> or ML-KEM methods now shipping in OpenSSH), and host/user keys can move to PQC signatures. <b>Biggest risk:</b> mismatched client/server versions, pinned host keys in <code>known_hosts</code>, and automation that breaks when the negotiated method changes.","meta":"change: kex method + host keys"},
+      {"icon":"\ud83d\udda5\ufe0f","title":"SSH","body":"The key-exchange method name carries PQC (for example the hybrid <code>sntrup761x25519</code> or ML-KEM methods now shipping in OpenSSH), and host/user keys can move to hybrid PQC signatures (OpenSSH 10.6 enabled <code>ssh-mldsa44-ed25519</code>). <b>Biggest risk:</b> mismatched client/server versions, pinned host keys in <code>known_hosts</code>, and automation that breaks when the negotiated method changes.","meta":"change: kex method + host keys"},
       {"icon":"\ud83d\udd10","title":"IPsec / VPN","body":"IKEv2 gains PQC key exchange, often split across multiple additional key-exchange rounds (RFC 9370) so the extra payload fits. <b>Biggest risk:</b> vendor appliances that update slowly, IKE fragmentation of larger messages, and site-to-site tunnels where <em>both</em> ends must upgrade together.","meta":"change: IKEv2 key exchange"},
       {"icon":"\u2709\ufe0f","title":"Email (S/MIME) & messaging","body":"Signing and key establishment both move to PQC. <b>Biggest risk:</b> long-lived stored mail, diverse clients, and lagging directory/key-distribution systems. Modern messengers show two layers: post-quantum initial session setup (Signal PQXDH) and ongoing post-quantum ratcheting (Signal SPQR/Triple Ratchet or Apple's PQ3).","meta":"change: signing + initial and ongoing key establishment"},
       {"icon":"\ud83d\udce6","title":"Code & package signing","body":"Signatures move to ML-DSA or the conservative hash-based SLH-DSA. <b>Biggest risk:</b> every verifier - bootloaders, package managers, OS update clients, app stores - must accept the new signature <em>before</em> you can enforce it, and some verifiers are burned into hardware. Dual-signing (classical + PQC) bridges the gap.","meta":"change: signatures + every verifier"}
@@ -68,16 +68,17 @@
   <p class="lead">TLS is the highest-traffic migration and the best-tooled today.</p>
   <p>Modern stacks support hybrid key exchange combining X25519 with ML-KEM. You can even negotiate it from the command line to see it work:</p>
   <pre class="code"><span class="cmt"># Negotiate a hybrid X25519+ML-KEM-768 group with OpenSSL 3.5+ (or oqs-provider)</span>
-<span class="cmt"># As checked 25 Sep 2026: 3.5.x is LTS, 4.0.2 is stable; 4.1.0-beta1 is pre-release. Check your build:</span>
+<span class="cmt"># As checked 14 Oct 2026: 3.5.x is LTS; 4.0.3 (29 Sep 2026 security release) is stable;</span>
+<span class="cmt"># 4.1.0-beta2 (9 Oct 2026) is pre-release. Check your build:</span>
 <span class="cmt">#   openssl version   /   openssl list -group-algorithms</span>
 openssl s_client -connect example.com:443 \
   -groups <span class="str">X25519MLKEM768</span> -tls1_3
 
 <span class="cmt"># Look for the negotiated group in the output:</span>
 <span class="cmt">#   Negotiated TLS1.3 group: X25519MLKEM768</span></pre>
-  <div class="callout example"><span class="k">Dated deployment signal</span><p>Cloudflare reported in April 2026 that more than two-thirds of human-generated TLS traffic on its network used hybrid ML-KEM key agreement. Google documented Chrome's hybrid rollout earlier. These are provider-specific measurements, not a percentage of the entire internet. Certificate authentication still largely follows classical PKI while standards and ecosystems test post-quantum chains. Separately, the direct-ML-KEM TLS draft reached IESG approval on 3 September and was updated to draft-11 on 16 September 2026, but it remains in the RFC Editor queue rather than a published RFC; do not label it final.</p></div>
+  <div class="callout example"><span class="k">Dated deployment signal</span><p>Cloudflare reported in April 2026 that more than two-thirds of human-generated TLS traffic on its network used hybrid ML-KEM key agreement. Google documented Chrome's hybrid rollout earlier. These are provider-specific measurements, not a percentage of the entire internet. Certificate authentication still largely follows classical PKI while standards and ecosystems test post-quantum chains. Separately, the direct-ML-KEM TLS draft reached IESG approval on 3 September and was updated to draft-11 on 16 September 2026, but as checked 14 October 2026 it remains in the RFC Editor queue rather than a published RFC; do not label it final.</p></div>
   <div class="callout takeaway"><span class="k">Published standard, measured deployment separately</span><p><b>RFC 10024</b> now specifies three TLS 1.3 named groups: <code>X25519MLKEM768</code>, <code>SecP256r1MLKEM768</code>, and <code>SecP384r1MLKEM1024</code>, following the hybrid-design framework in <b>RFC 9954</b>. This removes the earlier Internet-Draft/RFC-queue caveat, but it does not mean every TLS library, browser, server, CDN, or inspection device supports each group. Measure the group actually negotiated.</p></div>
-  <p>Why is key exchange already common but PQC certificates lagging? Size. A hybrid key-share adds about a kilobyte to one message; a PQC <em>certificate chain</em> can add many kilobytes to <em>every</em> handshake, because a chain carries a leaf, one or more intermediates, and the signatures binding them &mdash; each of which grows. That inflates the handshake, stresses the initial-window and packet-loss behavior of TCP/QUIC, and can trip certificate-transparency logs and old parsers. So the ecosystem is doing the cheaper half (key exchange) first and staging the harder half (certificates) behind it. The <em>format</em> question is now settled: RFC 9881 (ML-DSA), RFC 9909 (SLH-DSA) and RFC 9935 (ML-KEM) are published Standards Track algorithm identifiers for X.509, so what remains is deployment and size, not missing specifications.</p>
+  <p>Why is key exchange already common but PQC certificates lagging? Size. A hybrid key-share adds about a kilobyte to one message; a PQC <em>certificate chain</em> can add many kilobytes to <em>every</em> handshake, because a chain carries a leaf, one or more intermediates, and the signatures binding them &mdash; each of which grows. That inflates the handshake, stresses the initial-window and packet-loss behavior of TCP/QUIC, and can trip certificate-transparency logs and old parsers. So the ecosystem is doing the cheaper half (key exchange) first and staging the harder half (certificates) behind it. The <em>format</em> question is now settled: RFC 9881 (ML-DSA), RFC 9909 (SLH-DSA) and RFC 9935 (ML-KEM) are published Standards Track algorithm identifiers for X.509, so for single-algorithm certificates what remains is deployment and size, not missing specifications. Composite (hybrid) certificates are one step behind: as checked 14 October 2026, the LAMPS composite ML-DSA and composite ML-KEM drafts are approved and in the RFC Editor queue but have no RFC numbers yet.</p>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Enabling PQC on the server and declaring victory. Test through your real CDN, WAF, load balancer, and oldest supported clients &mdash; that is where larger handshakes fail.</p></div>
 </section>
 
@@ -85,10 +86,12 @@ openssl s_client -connect example.com:443 \
   <div class="lesson-title"><span class="num">2</span><h2>SSH and VPN</h2></div>
   <p class="lead">Both are key-exchange-heavy and both have long-lived, slow-moving endpoints.</p>
   <p>OpenSSH release notes document hybrid post-quantum key exchange and changes to the default preference over multiple releases; confirm the exact method name and default in the deployed client/server versions rather than assuming all "recent" installations match. VPNs based on IKEv2 can carry additional key exchanges using RFC 9370, but specific PQC transforms remain an implementation/profile question and appliance firmware often lags.</p>
+  <div class="callout example"><span class="k">October 2026: OpenSSH 10.6</span><p>OpenSSH 10.6 (6 October 2026) enabled the hybrid post-quantum signature algorithm <code>ssh-mldsa44-ed25519</code>, dropping the <code>@openssh.com</code> suffix of the earlier experimental version, so keys made with that experimental support must be regenerated or removed. It also added a server-side <code>WarnWeakCrypto</code> option, on by default, that logs when a client uses key agreement that is not post-quantum safe. Those log lines are exactly the downgrade telemetry section 6 asks for.</p></div>
+  <div class="callout example"><span class="k">Telecom IPsec evidence</span><p>GSMA's PQ.06 (May 2026) documented a prototype of hybrid key exchange carried as an additional IKEv2 key exchange between base stations and security gateways. It is industry guidance and prototype evidence, not a mandated profile, but it shows the RFC 9370 pattern on a high-volume, latency-sensitive telecom link.</p></div>
   <div class="table-scroll"><table class="data">
     <thead><tr><th>Protocol</th><th>PQC change</th><th>Ecosystem risk</th></tr></thead>
     <tbody>
-      <tr><td>SSH</td><td>Hybrid ML-KEM key-exchange method; PQC host/user keys later</td><td>Old clients/servers negotiate down; pinned host keys</td></tr>
+      <tr><td>SSH</td><td>Hybrid ML-KEM key-exchange method; hybrid ML-DSA-44 + Ed25519 signatures enabled in OpenSSH 10.6</td><td>Old clients/servers negotiate down; pinned host keys</td></tr>
       <tr><td>IPsec/IKEv2 VPN</td><td>PQC key exchange in IKE_SA</td><td>Vendor appliance update cadence; message fragmentation</td></tr>
       <tr><td>WireGuard-style</td><td>Needs a PQC-aware variant/overlay</td><td>Fixed handshake design; requires protocol changes</td></tr>
     </tbody>
@@ -170,7 +173,7 @@ ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></
     <thead><tr><th>Protocol</th><th>What to measure</th><th>Green signal</th></tr></thead>
     <tbody>
       <tr><td>TLS</td><td>Negotiated group per connection</td><td>% of traffic on a hybrid ML-KEM group, trending up</td></tr>
-      <tr><td>SSH</td><td>Negotiated kex method in logs</td><td>Hybrid ML-KEM method, not a classical fallback</td></tr>
+      <tr><td>SSH</td><td>Negotiated kex method in logs (OpenSSH 10.6 <code>WarnWeakCrypto</code> flags non-PQ key agreement)</td><td>Hybrid ML-KEM method, not a classical fallback</td></tr>
       <tr><td>VPN/IKEv2</td><td>Additional key-exchange rounds present</td><td>PQC exchange completes without fragmentation errors</td></tr>
       <tr><td>Signing</td><td>Verifier coverage for the PQC algorithm</td><td>100% of verifiers validate before classical is dropped</td></tr>
     </tbody>
@@ -235,7 +238,8 @@ ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></
     {"q":"Which factor makes a protocol EASIER to migrate?","choices":["Clients that update centrally and frequently","More middleboxes","Longer data retention"],"answer":0,"explain":"Frequent, central client updates (e.g. modern messengers) make coordinated PQC adoption far easier than federated, slow-updating systems."},
     {"q":"What are the four phases of a safe protocol migration?","choices":["Inventory, run both, monitor, retire old","Delete, rebuild, hope, pray","Encrypt, compress, sign, forget"],"answer":0,"explain":"Inventory every use, run classical+PQC together (hybrid/dual-sign), monitor what is negotiated, then retire the classical algorithm once coverage is complete."},
     {"q":"What is a 'silent downgrade'?","choices":["PQC is enabled but classical is quietly negotiated instead","The server crashes loudly","Encryption is turned off on purpose"],"answer":0,"explain":"Old clients or middleboxes can negotiate classical even when PQC is offered, so you must measure the negotiated algorithm, not just assume."},
-    {"q":"Why is a 100% connection success rate NOT proof of a PQC rollout?","choices":["Classical fallback can silently rescue connections that can't do PQC","Success rate is always fake","PQC has no effect on connections"],"answer":0,"explain":"Success rate measures availability, not which algorithm ran. Log the negotiated group per connection to confirm PQC actually protected the traffic."}
+    {"q":"Why is a 100% connection success rate NOT proof of a PQC rollout?","choices":["Classical fallback can silently rescue connections that can't do PQC","Success rate is always fake","PQC has no effect on connections"],"answer":0,"explain":"Success rate measures availability, not which algorithm ran. Log the negotiated group per connection to confirm PQC actually protected the traffic."},
+    {"q": "What does OpenSSH 10.6's server-side WarnWeakCrypto option do by default?", "choices": ["Logs clients that use key agreement that is not post-quantum safe", "Blocks every classical client", "Disables SSH host keys"], "answer": 0, "explain": "It is on by default and logs non-PQ key agreement, giving operators downgrade telemetry without breaking older clients."}
   ]
   </script>
 </section>
@@ -256,6 +260,10 @@ ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></
   <a href="https://datatracker.ietf.org/doc/draft-ietf-tls-mlkem/" target="_blank" rel="noopener noreferrer">IETF draft-ietf-tls-mlkem &mdash; direct ML-KEM groups for TLS (IESG-approved; RFC publication pending)</a>
   <a href="https://www.rfc-editor.org/rfc/rfc9964.html" target="_blank" rel="noopener noreferrer">IETF RFC 9964 &mdash; ML-DSA for JOSE and COSE (May 2026)</a>
   <a href="https://www.openssh.org/releasenotes.html" target="_blank" rel="noopener noreferrer">OpenSSH release notes (PQ key exchange)</a>
+  <a href="https://www.openssh.org/txt/release-10.6" target="_blank" rel="noopener noreferrer">OpenSSH 10.6 release notes &mdash; ssh-mldsa44-ed25519 and WarnWeakCrypto (6 October 2026)</a>
+  <a href="https://datatracker.ietf.org/doc/draft-ietf-lamps-pq-composite-sigs/" target="_blank" rel="noopener noreferrer">IETF draft-ietf-lamps-pq-composite-sigs &mdash; composite ML-DSA for X.509 (RFC Editor queue)</a>
+  <a href="https://datatracker.ietf.org/doc/draft-ietf-lamps-pq-composite-kem/" target="_blank" rel="noopener noreferrer">IETF draft-ietf-lamps-pq-composite-kem &mdash; composite ML-KEM for X.509 (RFC Editor queue)</a>
+  <a href="https://www.gsma.com/solutions-and-impact/technologies/security/post-quantum-cryptography-documents/" target="_blank" rel="noopener noreferrer">GSMA PQ.06 &mdash; hybrid key exchange prototype for base station to security gateway IPsec (May 2026)</a>
   <a href="https://www.rfc-editor.org/rfc/rfc9980.html" target="_blank" rel="noopener noreferrer">IETF RFC 9980 &mdash; Post-Quantum Cryptography in OpenPGP</a>
   <a href="https://csrc.nist.gov/projects/post-quantum-cryptography" target="_blank" rel="noopener noreferrer">NIST CSRC &mdash; Post-Quantum Cryptography Project</a>
   <a href="https://security.googleblog.com/2024/09/a-new-path-for-kyber-on-web.html" target="_blank" rel="noopener noreferrer">Google Security Blog &mdash; Chrome hybrid ML-KEM rollout</a>
@@ -269,7 +277,7 @@ ssh -vv user@host 2&gt;&amp;1 | grep <span class="str">"kex: algorithm"</span></
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V10.1 (October 2026)</div>
+  <div class="help-ver" data-help-version>V10.2 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Step through the protocol map, then read each protocol's lesson. The command example is illustrative &mdash; exact group names and tool versions change, so verify before relying on it.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

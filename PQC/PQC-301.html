@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-301">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-301</span><span>Developer Implementation Engineering</span><span class="version">V10.1 (October 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-301</span><span>Developer Implementation Engineering</span><span class="version">V10.2 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -79,6 +79,7 @@ kem = <span class="str">"ML-KEM-768"</span>
     <li><b>API stability:</b> pre-standard "Kyber" APIs differ from final "ML-KEM"; do not ship a draft.</li>
   </ul>
   <p>"Supported" is a spectrum, and the gap between the ends is where projects get burned. At the shallow end, a library merely <em>compiles</em> an ML-KEM function. At the deep end, it is a FIPS-validated module, passes the official ACVP test vectors for your exact parameter set, runs decapsulation and signing in constant time, is actively maintained with a fast patch cadence, and exposes the final standardized names and encodings. Write these out as acceptance criteria and check each one &mdash; do not let "it has the function" stand in for "it is production-ready."</p>
+  <div class="callout example"><span class="k">Patch cadence is part of "supported"</span><p>On 29 September 2026 OpenSSL shipped 4.0.3, 3.6.5, 3.5.9, and 3.4.8 together with a security advisory covering 14 CVEs, and the 4.1.0 line was still in beta (4.1.0-beta2 on 9 October 2026). A PQC-capable library is only as safe as your ability to take such releases quickly: track the branch you depend on, its support end date, and how fast your build and deployment pipeline can absorb a security update.</p></div>
   <div class="callout example"><span class="k">Concrete example</span><p>Two teams both "support ML-KEM." Team A pulled a research branch that still uses round-3 Kyber constants; Team B uses a maintained, FIPS-track build of FIPS 203. Their handshakes will not interoperate, and Team A's build may never be approvable for regulated use. Same words on the slide, completely different reality &mdash; which is why the algorithm identifier and version belong in your inventory.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Shipping a pre-standardization implementation (round-3 Kyber) and assuming it interoperates with FIPS 203 ML-KEM. Parameters and encodings changed; they do not match.</p></div>
 </section>
@@ -252,6 +253,7 @@ blob   = {<span class="str">"alg"</span>: signer.alg_id, <span class="str">"sig"
   <a href="https://csrc.nist.gov/pubs/fips/204/final" target="_blank" rel="noopener noreferrer">NIST FIPS 204 &mdash; ML-DSA</a>
   <a href="https://csrc.nist.gov/pubs/fips/205/final" target="_blank" rel="noopener noreferrer">NIST FIPS 205 &mdash; stateless SLH-DSA key and signature formats</a>
   <a href="https://doi.org/10.6028/NIST.SP.800-227" target="_blank" rel="noopener noreferrer">NIST SP 800-227 &mdash; secure KEM use and composition</a>
+  <a href="https://openssl-library.org/news/timeline/" target="_blank" rel="noopener noreferrer">OpenSSL release and advisory timeline (4.0.3 and 20260929 advisory)</a>
 </section>
 </main>
 </div>
@@ -260,7 +262,7 @@ blob   = {<span class="str">"alg"</span>: signer.alg_id, <span class="str">"sig"
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V10.1 (October 2026)</div>
+  <div class="help-ver" data-help-version>V10.2 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>The code is illustrative and API names change across library versions &mdash; read the current docs before using it. Focus on the engineering constraints: sizes, randomness, constant-time, and hardware dependencies.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>
