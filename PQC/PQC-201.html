@@ -11,7 +11,7 @@
 <body id="top" data-module="PQC-201">
 <div class="readbar"></div>
 <header class="top"><div class="top-in">
-  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V10.2 (October 2026)</span></div>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span class="code">PQC-201</span><span>PQC Standards &amp; Algorithm Families</span><span class="version">V10.3 (October 2026)</span></div>
   <div class="buttons"><a class="btn" href="index.html">All modules</a><a class="btn ghost" href="glossary.html">Glossary</a><button class="btn" data-theme-btn>Dark</button><button class="btn" data-help-btn>Help</button></div>
 </div></header>
 
@@ -135,7 +135,7 @@
     <div class="callout"><span class="k" style="color:var(--primary-ink)">ML-DSA (lattice)</span><p>The practical, general-purpose default for most workflows as tooling matures. Moderate sizes (ML-DSA-65 signature ~3,309 B), fast verification.</p></div>
     <div class="callout"><span class="k" style="color:var(--teal)">SLH-DSA (hash-based)</span><p>Rests only on hash-function security &mdash; a very conservative foundation, valuable for long-lived roots. Cost: large signatures (7,856 B and up) and slower signing.</p></div>
   </div>
-  <p>Signature choice depends on verifier constraints, artifact lifetime, signature size, verification speed, validation requirements, and ecosystem support. Falcon (the selected design behind future FN-DSA) is attractive where signatures must be <em>small</em>, but its floating-point signing is tricky to implement safely.</p>
+  <p>Signature choice depends on verifier constraints, artifact lifetime, signature size, verification speed, validation requirements, and ecosystem support. Falcon (the selected design behind future FN-DSA) is attractive where signatures must be <em>small</em>, but its floating-point signing is tricky to implement safely. For National Security Systems, NSA's October 2026 CNSA 2.0 FAQ said ML-DSA is preferred, that NSA does not anticipate adding FN-DSA to CNSA 2.0, and that SLH-DSA is not approved for any NSS use; LMS and XMSS remain the approved hash-based options for software and firmware signing there.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>A high-volume package repository may prefer ML-DSA (small enough, fast verify). A firmware root of trust that must be trusted for 15 years may choose SLH-DSA precisely because its security rests on a different, well-understood assumption.</p></div>
   <p>There is one more signature category worth knowing for firmware and boot use: <b>stateful hash-based signatures</b> &mdash; LMS and XMSS, standardized in NIST SP 800-208. They are extremely conservative (hash-only) and have tiny public keys, but they carry a sharp edge: the signer must never reuse a one-time state, or security collapses. That makes them excellent for a carefully controlled, low-volume signer (like a firmware signing appliance) and dangerous for a general-purpose service. SLH-DSA is the <em>stateless</em> hash-based option precisely to avoid that footgun at the cost of larger signatures.</p>
   <div class="callout warn"><span class="k">Verification is the real cost center</span><p>An artifact is signed once but verified thousands or millions of times. So the metric that matters at scale is verification speed and signature size on the <em>verifier</em>, not signing convenience. ML-DSA verifies fast; SLH-DSA's large signatures cost bandwidth and storage everywhere they travel. Choose for the verifier's world, not the signer's.</p></div>
@@ -147,6 +147,7 @@
   <p class="lead">You rarely flip a switch. You run old and new together, and you design to change again later.</p>
   <p><b>Hybrid</b> combines a classical mechanism (e.g. X25519) and a PQC mechanism (e.g. ML-KEM) so you are protected if either holds &mdash; buying safety while ecosystems catch up. <span class="term" data-def="The ability to change algorithms, parameters, identifiers, and providers without re-architecting the system.">Algorithm agility</span> means your systems can swap algorithms, parameters, identifiers, and providers without a rewrite &mdash; which is what makes a future move to HQC or FN-DSA feasible.</p>
   <div class="callout example"><span class="k">Concrete example</span><p>A company pilots hybrid TLS on internal APIs, measures handshake failure rates, then expands only after load balancers and clients prove compatible. Agility is what lets them later add a backup KEM without touching every service.</p></div>
+  <div class="callout warn"><span class="k">Hybrid is a profile decision, not a universal rule</span><p>Commercial profiles such as RFC 10024 are hybrid by design. NSA's CNSA 2.0 FAQ (Ver. 2.2, October 2026) took a different line for U.S. National Security Systems: NSA said it will not require hybrid products, warned that hybrids add negotiation complexity and a second transition later, and said a product marketed as hybrid or composite is not automatically quantum-resistant. It accepted hybrid constructions where a protocol needs them, such as the IKEv2 additional key exchange that carries ML-KEM-1024. Follow the profile that governs the system.</p></div>
   <div class="callout pitfall"><span class="k">Common pitfall</span><p>Inventing a custom hybrid "combiner" in application code. Combination must be protocol-defined and cryptographically reviewed (transcript binding, downgrade protection, error handling).</p></div>
   <div class="callout takeaway"><span class="k">Takeaway</span><p>Hybrid reduces transition risk only when protocol rigor is preserved. Agility is the design goal that outlives any single algorithm choice.</p></div>
 </section>
@@ -280,7 +281,7 @@
   <a href="https://www.rfc-editor.org/rfc/rfc10024.html" target="_blank" rel="noopener noreferrer">IETF RFC 10024 &mdash; Hybrid ECDHE-MLKEM key agreement for TLS 1.3</a>
   <a href="https://www.rfc-editor.org/rfc/rfc9954.html" target="_blank" rel="noopener noreferrer">IETF RFC 9954 &mdash; Hybrid key exchange design framework</a>
   <a href="https://www.rfc-editor.org/rfc/rfc9958.html" target="_blank" rel="noopener noreferrer">IETF RFC 9958 &mdash; Post-Quantum Cryptography for Engineers</a>
-  <a href="https://media.defense.gov/2022/Sep/07/2003071836/-1/-1/0/CSI_CNSA_2.0_FAQ_.PDF" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 FAQ &mdash; National Security System parameter profile</a>
+  <a href="https://media.defense.gov/2022/Sep/07/2003071836/-1/-1/0/CSI_CNSA_2.0_FAQ_.PDF" target="_blank" rel="noopener noreferrer">NSA CNSA 2.0 FAQ (Ver. 2.2, October 2026) &mdash; National Security System parameter profile, hybrids, and FN-DSA position</a>
 </section>
 </main>
 </div>
@@ -289,7 +290,7 @@
 
 <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="help-card">
   <h2 id="helpTitle">How to use this module</h2>
-  <div class="help-ver" data-help-version>V10.2 (October 2026)</div>
+  <div class="help-ver" data-help-version>V10.3 (October 2026)</div>
   <button class="btn" id="closeHelp">Close</button>
   <p>Start with the size comparison &mdash; those ratios explain most PQC engineering pain. Then read each family's lesson and try the labs.</p>
   <p>Key terms link to the <a href="glossary.html">Glossary</a>.</p>

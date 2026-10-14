@@ -339,7 +339,7 @@ aiFiles.forEach(f=>checkPage('AI/'+f,(w,d,t,rel)=>{
 /* ---------- Shared asset carries the runtime version ---------- */
 {
   const js=fs.readFileSync(path.join(ROOT,'PQC/assets/pqc.js'),'utf8');
-  ck('pqc.js VERSION is V10.2 (October 2026)',/var VERSION = "V10\.2 \(October 2026\)"/.test(js));
+  ck('pqc.js VERSION is V10.3 (October 2026)',/var VERSION = "V10\.3 \(October 2026\)"/.test(js));
   ck('pqc.js has no V8.x',!/\bV8\.[01]\b/.test(js));
 }
 
@@ -395,7 +395,7 @@ releaseHtml.forEach(rel=>{
 const releaseSurfaces={
   'AI/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
   'eSIM/index.html':/V10\.3[\s\S]*October 2026|October 2026[\s\S]*V10\.3/,
-  'PQC/index.html':/V10\.2[\s\S]*October 2026|October 2026[\s\S]*V10\.2/,
+  'PQC/index.html':/V10\.3[\s\S]*October 2026|October 2026[\s\S]*V10\.3/,
   '5G-6G/index.html':/V10\.1[\s\S]*October 2026|October 2026[\s\S]*V10\.1/,
   'KG-CG/index.html':/V4\.1[\s\S]*October 2026|October 2026[\s\S]*V4\.1/,
   'SSFamily/index.html':/V11\.1[\s\S]*October 2026|October 2026[\s\S]*V11\.1/,
@@ -438,6 +438,10 @@ Object.entries(releaseSurfaces).forEach(([rel,re])=>{
   ck('PQC V10.2: HAWK dates are attack 28 July, withdrawal 29 July',/withdrew the scheme on 29 July/.test(pqc201));
   ck('PQC V10.2: CISA product categories and M-26-15 plan date',/CISA PQC product categories/.test(pqc401)&&/October 22, 2026/.test(pqc401));
   ck('PQC V10.2: glossary telecom and stateful-signature terms',['LMS / XMSS','eIM / IPA','IFPP','GSMA PQTN Task Force','TR 33.703 (FS_CryptoPQC)'].every(k=>pqcGloss.includes('<span class="k">'+k+'</span>')));
+  /* V10.3: NSA CNSA 2.0 FAQ Ver. 2.2 (October 2026) and NCCoE link. */
+  ck('PQC V10.3: CNSA 2.0 FAQ Ver. 2.2 dates in policy table',/FAQ Ver\. 2\.2, October 2026/.test(pqc401)&&/January 1, 2027/.test(pqc401)&&/December 31, 2030/.test(pqc401)&&/December 31, 2031/.test(pqc401)&&!/Verify current dates at source/.test(pqc401));
+  ck('PQC V10.3: NSA hybrid and FN-DSA positions',/will not require hybrid products/.test(pqc201)&&/does not anticipate adding FN-DSA/.test(pqc201)&&/parallel PKI/.test(pqc202));
+  ck('PQC V10.3: no stale NCCoE link',fs.readdirSync(path.join(ROOT,'PQC')).filter(f=>f.endsWith('.html')).every(f=>!/crypto-agility-considerations-migrating-post-quantum/.test(fs.readFileSync(path.join(ROOT,'PQC',f),'utf8'))));
 
   const fiveg=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-5G.html'),'utf8');
   const sixg=fs.readFileSync(path.join(ROOT,'5G-6G/3GPP-Flows-6G.html'),'utf8');
@@ -481,8 +485,18 @@ fs.readdirSync(path.join(ROOT,'games')).filter(f=>f.endsWith('.html')).forEach(f
 
 {
   const dom=load('subscribe/index.html'),d=dom.window.document;
-  ck('subscribe: renders 10 digest cards',d.querySelectorAll('#digestGrid .card').length===10,'cards='+d.querySelectorAll('#digestGrid .card').length);
-  ck('subscribe: renders 20 mail-app actions',d.querySelectorAll('#digestGrid a[href^="mailto:"]').length===20,'mailto='+d.querySelectorAll('#digestGrid a[href^="mailto:"]').length);
+  /* Digests are added and removed over time (n8n updates the list), so derive the
+     expected count from the page's own DIGESTS array instead of a fixed number. */
+  const subSrc=fs.readFileSync(path.join(ROOT,'subscribe/index.html'),'utf8');
+  const digestBlock=(subSrc.match(/const DIGESTS = \[([\s\S]*?)\n\s*\];/)||[,''])[1];
+  const nDigests=(digestBlock.match(/subject:"Subscribe to /g)||[]).length;
+  const nCards=d.querySelectorAll('#digestGrid .card').length;
+  const nMail=d.querySelectorAll('#digestGrid a[href^="mailto:"]').length;
+  ck('subscribe: DIGESTS array is non-empty',nDigests>0,'digests='+nDigests);
+  ck('subscribe: one card per configured digest',nCards===nDigests,'cards='+nCards+' digests='+nDigests);
+  ck('subscribe: two mail-app actions per digest',nMail===2*nDigests,'mailto='+nMail+' digests='+nDigests);
+  const pill=(subSrc.match(/hero-pill">(\d+) curated digests/)||[])[1];
+  ck('subscribe: hero digest count matches the list',!pill||+pill===nDigests,'pill='+pill+' digests='+nDigests);
   ck('subscribe: no startup runtime errors',(dom.__runtimeErrors||[]).length===0,(dom.__runtimeErrors||[]).join('; '));
   dom.window.close();
 }

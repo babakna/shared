@@ -1,8 +1,15 @@
 # Post-Quantum Cryptography Learning Lab
 
-V10.2 (October 2026)
+V10.3 (October 2026)
 
 A free, self-paced, static HTML course that takes a learner from **zero cryptography background** to planning a real post-quantum migration. No build step, no server required &mdash; open `index.html` in any modern browser.
+
+## What changed in V10.3
+
+- Added NSA's CNSA 2.0 and Quantum Computing FAQ Ver. 2.2 (October 2026): PQC-401 now gives the CNSSP 15 dates (new NSS acquisitions from January 1, 2027; phase-out by December 31, 2030; mandated by December 31, 2031; NSM-10 goal 2035) and the 2027 NIAP certification and archiving changes, replacing "verify current dates at source."
+- Added NSA's positions from that FAQ: no required hybrids for National Security Systems, with IKEv2 additional key exchange as the accepted hybrid case (PQC-201); parallel PKI instead of composite certificates (PQC-202); ML-DSA preferred, no planned FN-DSA addition, SLH-DSA not approved for NSS, single-tree LMS/XMSS approved for software and firmware signing (PQC-201, glossary); and buying quantum-resistant firmware-update verifiers at purchase (PQC-501).
+- Updated the NCCoE migration-project links to the current NCCoE address.
+- Synchronized every page, shared asset, Help surface, and test to V10.3 (October 2026).
 
 ## What changed in V10.2
 
